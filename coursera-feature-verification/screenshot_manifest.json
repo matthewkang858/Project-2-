@@ -1,0 +1,206 @@
+[
+  {
+    "row": 6,
+    "feature": "Coursera Coach \u2014 in-course Q&A",
+    "url": "https://www.coursera.org/explore/coach",
+    "target_text": "Coursera Coach"
+  },
+  {
+    "row": 7,
+    "feature": "Coursera Coach \u2014 video & reading summaries",
+    "url": "https://www.coursera.org/explore/coach",
+    "target_text": "summar"
+  },
+  {
+    "row": 8,
+    "feature": "Coursera Coach \u2014 assignment feedback",
+    "url": "https://www.coursera.org/explore/coach",
+    "target_text": "feedback"
+  },
+  {
+    "row": 9,
+    "feature": "Coursera Coach \u2014 next-skill suggestions",
+    "url": "https://www.coursera.org/explore/coach",
+    "target_text": "skills"
+  },
+  {
+    "row": 10,
+    "feature": "Coach interactive instruction \u2014 Socratic dialogue mode",
+    "url": "https://blog.coursera.org/announcing-ai-powered-capabilities-enabling-educators-to-use-coursera-coach-to-deliver-interactive-personalized-instruction",
+    "target_text": "Socratic"
+  },
+  {
+    "row": 11,
+    "feature": "Coach interactive instruction \u2014 role-based practice",
+    "url": "https://www.coursera.support/s/article/learner-000002340",
+    "target_text": "Role Play"
+  },
+  {
+    "row": 12,
+    "feature": "Coach interactive instruction \u2014 career-guidance conversations",
+    "url": "https://blog.coursera.org/from-catalog-to-compass",
+    "target_text": "career"
+  },
+  {
+    "row": 13,
+    "feature": "AI-graded assignments",
+    "url": "https://www.coursera.org/learn/ai-for-education-advanced",
+    "target_text": "AI Graded"
+  },
+  {
+    "row": 14,
+    "feature": "AI-translated courses & subtitles",
+    "url": "https://blog.coursera.org/coursera-expands-ai-powered-translations-to-17-popular-languages",
+    "target_text": "languages"
+  },
+  {
+    "row": 15,
+    "feature": "Personalized recommendations",
+    "url": "https://blog.coursera.org/from-catalog-to-compass",
+    "target_text": "recommend"
+  },
+  {
+    "row": 16,
+    "feature": "Guided Projects",
+    "url": "https://www.coursera.org/courses?query=guided+projects",
+    "target_text": "Guided Project"
+  },
+  {
+    "row": 17,
+    "feature": "Specializations (multi-course series)",
+    "url": "https://www.coursera.org/articles/what-is-coursera",
+    "target_text": "Specialization"
+  },
+  {
+    "row": 18,
+    "feature": "Professional Certificates (industry-built programs)",
+    "url": "https://www.coursera.org/professional-certificates/google-it-support",
+    "target_text": "Professional Certificate"
+  },
+  {
+    "row": 19,
+    "feature": "Graded quizzes",
+    "url": "https://www.coursera.org/learn/machine-learning",
+    "target_text": "quiz"
+  },
+  {
+    "row": 20,
+    "feature": "Auto-graded programming assignments",
+    "url": "https://www.coursera.org/learn/python",
+    "target_text": "assignment"
+  },
+  {
+    "row": 21,
+    "feature": "Peer-reviewed assignments",
+    "url": "https://www.classcentral.com/report/courses-with-peer-reviews/",
+    "target_text": "peer"
+  },
+  {
+    "row": 22,
+    "feature": "Discussion forums",
+    "url": "https://www.coursera.support/s/community",
+    "target_text": "discussion"
+  },
+  {
+    "row": 23,
+    "feature": "Shareable course certificates",
+    "url": "https://www.coursera.org/courseraplus",
+    "target_text": "certificate"
+  },
+  {
+    "row": 24,
+    "feature": "MasterTrack certificates",
+    "url": "https://www.coursera.org/mastertrack",
+    "target_text": "MasterTrack"
+  },
+  {
+    "row": 25,
+    "feature": "Online degrees",
+    "url": "https://www.coursera.org/degrees",
+    "target_text": "degree"
+  },
+  {
+    "row": 26,
+    "feature": "Weekly learning goals",
+    "url": "https://www.coursera.support/s/topic/0TOVH0000009Cuo4AE",
+    "target_text": "Weekly goal"
+  },
+  {
+    "row": 27,
+    "feature": "Streaks",
+    "url": "https://www.coursera.support/s/topic/0TOVH0000009Cuo4AE",
+    "target_text": "streak"
+  },
+  {
+    "row": 28,
+    "feature": "Study reminders",
+    "url": "https://blog.coursera.org/new-mobile-features-transcripts-notes-reminders",
+    "target_text": "reminder"
+  },
+  {
+    "row": 29,
+    "feature": "Mobile apps (iOS/Android)",
+    "url": "https://apps.apple.com/us/app/coursera-build-new-skills/id736535961",
+    "target_text": "Coursera"
+  },
+  {
+    "row": 30,
+    "feature": "Offline downloads",
+    "url": "https://blog.coursera.org/mobile-offline-features",
+    "target_text": "offline"
+  },
+  {
+    "row": 31,
+    "feature": "Course library & catalog",
+    "url": "https://www.coursera.org/courseraplus",
+    "target_text": "10,000"
+  },
+  {
+    "row": 32,
+    "feature": "Career Academy (role explorer)",
+    "url": "https://www.coursera.org/career-academy",
+    "target_text": "salary"
+  },
+  {
+    "row": 33,
+    "feature": "Career Academy (sponsored catalog)",
+    "url": "https://www.coursera.support/s/article/learner-000001684",
+    "target_text": "sponsored"
+  },
+  {
+    "row": 34,
+    "feature": "Career resource hub & aptitude test",
+    "url": "https://www.coursera.org/resources/career-quiz",
+    "target_text": "career"
+  },
+  {
+    "row": 35,
+    "feature": "Third-party cert alignment & exam discounts",
+    "url": "https://www.coursera.org/professional-certificates/google-it-support",
+    "target_text": "CompTIA"
+  },
+  {
+    "row": 36,
+    "feature": "Partner-funded scholarships",
+    "url": "https://blog.coursera.org/announcing-four-new-entry-level-certificates-and-universal-skills-scholarship-program-from-microsoft-to-help-learners-land-in-demand-jobs",
+    "target_text": "scholarship"
+  },
+  {
+    "row": 37,
+    "feature": "Learner community (standalone)",
+    "url": "https://www.coursera.support/s/community",
+    "target_text": "Community"
+  },
+  {
+    "row": 38,
+    "feature": "Accessibility statement",
+    "url": "https://www.coursera.support/s/article/learner-000001351",
+    "target_text": "accessibility"
+  },
+  {
+    "row": 39,
+    "feature": "Coursera Podcast",
+    "url": "https://podcasts.apple.com/us/podcast/the-coursera-podcast/id1708599019",
+    "target_text": "The Coursera Podcast"
+  }
+]
