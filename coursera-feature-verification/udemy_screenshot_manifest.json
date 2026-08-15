@@ -1,0 +1,152 @@
+[
+  {
+    "row": 43,
+    "feature": "Udemy AI Assistant \u2014 content discovery chat",
+    "url": "https://www.udemy.com/personal-plan/",
+    "target_text": "AI Assistant"
+  },
+  {
+    "row": 44,
+    "feature": "Udemy AI Assistant \u2014 in-course Q&A",
+    "url": "https://support.udemy.com/hc/en-us/articles/27554582323863-Udemy-AI-Assistant-Frequently-Asked-Questions",
+    "target_text": "AI Assistant"
+  },
+  {
+    "row": 45,
+    "feature": "AI Role Play",
+    "url": "https://support.udemy.com/hc/en-us/articles/31522529224343-How-to-use-the-Role-Play-feature",
+    "target_text": "Role Play"
+  },
+  {
+    "row": 46,
+    "feature": "Personalized recommendations",
+    "url": "https://support.udemy.com/hc/en-us/articles/17015232224023-Personalize-Your-Learning-Experience-on-Udemy",
+    "target_text": "recommendations"
+  },
+  {
+    "row": 47,
+    "feature": "Career Accelerators",
+    "url": "https://www.udemy.com/career/full-stack-web-developer/",
+    "target_text": "Career Accelerator"
+  },
+  {
+    "row": 48,
+    "feature": "Labs",
+    "url": "https://support.udemy.com/hc/en-us/articles/36212876902679-In-course-labs",
+    "target_text": "labs"
+  },
+  {
+    "row": 49,
+    "feature": "Coding exercises",
+    "url": "https://support.udemy.com/hc/en-us/articles/229606768-Learning-With-Coding-Exercises",
+    "target_text": "coding exercises"
+  },
+  {
+    "row": 50,
+    "feature": "Quizzes (in-course)",
+    "url": "https://support.udemy.com/hc/en-us/articles/229231627-Create-a-Multiple-Choice-Quiz",
+    "target_text": "quiz"
+  },
+  {
+    "row": 51,
+    "feature": "Assignments (in-course)",
+    "url": "https://support.udemy.com/hc/en-us/articles/115000340668-Assignments-Apply-Your-Knowledge-and-Improve-the-Skills-You-ve-Learned-With-Udemy",
+    "target_text": "assignment"
+  },
+  {
+    "row": 52,
+    "feature": "Certification exam practice tests",
+    "url": "https://www.udemy.com/browse/certification/",
+    "target_text": "practice test"
+  },
+  {
+    "row": 53,
+    "feature": "Certificate of completion",
+    "url": "https://support.udemy.com/hc/en-us/articles/14291607637015-Certificates-of-Completion-Frequently-Asked-Questions",
+    "target_text": "certificate of completion"
+  },
+  {
+    "row": 54,
+    "feature": "Course Q&A board",
+    "url": "https://support.udemy.com/hc/en-us/articles/229233387-How-to-Ask-a-Question-About-a-Course-You-re-Taking",
+    "target_text": "Q&A"
+  },
+  {
+    "row": 55,
+    "feature": "Direct instructor messaging",
+    "url": "https://support.udemy.com/hc/en-us/articles/229232987-Direct-Messages-Rules-and-Guidelines",
+    "target_text": "Direct Messag"
+  },
+  {
+    "row": 56,
+    "feature": "Closed captions & auto-subtitles",
+    "url": "https://support.udemy.com/hc/en-us/articles/229605028-How-to-Use-Subtitles-Transcripts-on-a-Browser",
+    "target_text": "subtitles"
+  },
+  {
+    "row": 57,
+    "feature": "Searchable transcripts",
+    "url": "https://support.udemy.com/hc/en-us/articles/229605028-How-to-Use-Subtitles-Transcripts-on-a-Browser",
+    "target_text": "Transcript"
+  },
+  {
+    "row": 58,
+    "feature": "Lifetime access",
+    "url": "https://support.udemy.com/hc/en-us/articles/229603708-Lifetime-access",
+    "target_text": "Lifetime access"
+  },
+  {
+    "row": 59,
+    "feature": "Offline viewing (mobile)",
+    "url": "https://support.udemy.com/hc/en-us/articles/229603928-Downloading-Courses-for-Offline-Viewing-on-The-iOS-App",
+    "target_text": "offline"
+  },
+  {
+    "row": 60,
+    "feature": "Downloadable instructor resources",
+    "url": "https://support.udemy.com/hc/en-us/articles/229604708-How-to-access-course-resources-on-a-browser",
+    "target_text": "resources"
+  },
+  {
+    "row": 61,
+    "feature": "Marketplace catalog & UGC supply model",
+    "url": "https://www.udemy.com/personal-plan/",
+    "target_text": "courses"
+  },
+  {
+    "row": 62,
+    "feature": "Ratings, reviews & searchable feedback",
+    "url": "https://support.udemy.com/hc/en-us/articles/229231027-How-to-preview-and-compare-courses",
+    "target_text": "reviews"
+  },
+  {
+    "row": 63,
+    "feature": "Instructor profiles & direct contact",
+    "url": "https://support.udemy.com/hc/en-us/articles/229231027-How-to-Preview-And-Compare-Courses",
+    "target_text": "Instructor"
+  },
+  {
+    "row": 64,
+    "feature": "Learning reminders",
+    "url": "https://support.udemy.com/hc/en-us/articles/4501093209367-How-to-Schedule-Learning-Reminders-on-a-Browser",
+    "target_text": "reminder"
+  },
+  {
+    "row": 65,
+    "feature": "Course gifting",
+    "url": "https://support.udemy.com/hc/en-us/articles/229231187-How-to-send-a-Udemy-gift",
+    "target_text": "gift"
+  },
+  {
+    "row": 66,
+    "feature": "Mobile + connected-TV apps",
+    "url": "https://support.udemy.com/hc/en-us/articles/360005889053-How-to-Cast-Udemy-Courses-Via-Your-Mobile-Device",
+    "target_text": "Cast"
+  },
+  {
+    "row": 67,
+    "feature": "30-day money-back guarantee",
+    "url": "https://support.udemy.com/hc/en-us/articles/360050856093-Udemy-s-Refund-Policy",
+    "target_text": "30 days"
+  }
+]

@@ -1,0 +1,227 @@
+[
+ {
+  "row": 43,
+  "feature": "Udemy AI Assistant \u2014 content discovery chat",
+  "what": "Natural-language discovery across the catalog.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2014",
+  "personal_plan": "\u2713",
+  "notes_source": "udemy.com/personal-plan (also in Business tiers)."
+ },
+ {
+  "row": 44,
+  "feature": "Udemy AI Assistant \u2014 in-course Q&A",
+  "what": "Grounded Q&A and guidance inside a course.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2014",
+  "personal_plan": "\u2713",
+  "notes_source": "udemy.com/personal-plan (also in Business tiers)."
+ },
+ {
+  "row": 45,
+  "feature": "AI Role Play",
+  "what": "AI-driven practice simulations for applied/soft-skill scenarios (e.g., conversations), with feedback.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2014",
+  "personal_plan": "\u2713",
+  "notes_source": "udemy.com/personal-plan."
+ },
+ {
+  "row": 46,
+  "feature": "Personalized recommendations",
+  "what": "Topic- and behavior-based recommendations; Personal Plan adds a curated 26,000-course collection framing.",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 47,
+  "feature": "Career Accelerators",
+  "what": "Curated multi-course programs mapped to a target career (Full-Stack Web Developer, Data Scientist, Digital Marketer, etc.), with completion certificates.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2014",
+  "personal_plan": "\u2713",
+  "notes_source": "about.udemy.com launch post."
+ },
+ {
+  "row": 48,
+  "feature": "Labs",
+  "what": "Hands-on lab environments attached to technical content (subscription feature).",
+  "free_tutorials": "\u2014",
+  "individual_course": "Varies",
+  "personal_plan": "\u2713",
+  "notes_source": "Labs are a subscription feature; coding exercises appear in many purchased courses."
+ },
+ {
+  "row": 49,
+  "feature": "Coding exercises",
+  "what": "In-browser coding exercises inside many courses.",
+  "free_tutorials": "\u2014",
+  "individual_course": "Varies",
+  "personal_plan": "\u2713",
+  "notes_source": "Labs are a subscription feature; coding exercises appear in many purchased courses."
+ },
+ {
+  "row": 50,
+  "feature": "Quizzes (in-course)",
+  "what": "Instructor-built quizzes (course-dependent).",
+  "free_tutorials": "Limited",
+  "individual_course": "Varies",
+  "personal_plan": "Varies",
+  "notes_source": null
+ },
+ {
+  "row": 51,
+  "feature": "Assignments (in-course)",
+  "what": "Instructor-built assignments and practice activities (course-dependent).",
+  "free_tutorials": "Limited",
+  "individual_course": "Varies",
+  "personal_plan": "Varies",
+  "notes_source": null
+ },
+ {
+  "row": 52,
+  "feature": "Certification exam practice tests",
+  "what": "Practice exams for third-party certifications (AWS, Microsoft, Google, CompTIA, PMI).",
+  "free_tutorials": "\u2014",
+  "individual_course": "Varies (per course)",
+  "personal_plan": "\u2713",
+  "notes_source": "Included in Personal Plan; also sold as individual practice-test courses."
+ },
+ {
+  "row": 53,
+  "feature": "Certificate of completion",
+  "what": "Udemy completion certificate per finished course; cert-prep courses feed third-party issuer credentials.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": "Free Tutorials exclude certificates and Q&A."
+ },
+ {
+  "row": 54,
+  "feature": "Course Q&A board",
+  "what": "Course-level Q&A with instructor/TA responses.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 55,
+  "feature": "Direct instructor messaging",
+  "what": "Direct messages to instructors on paid courses.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 56,
+  "feature": "Closed captions & auto-subtitles",
+  "what": "Captions incl. auto-generated across the player.",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 57,
+  "feature": "Searchable transcripts",
+  "what": "Full-course transcripts, searchable in the player.",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 58,
+  "feature": "Lifetime access",
+  "what": "Purchased courses stay in the learner's library indefinitely (while listed) \u2014 the core a-la-carte value prop vs. subscription access.",
+  "free_tutorials": "n/a",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2014",
+  "notes_source": "Personal Plan access lasts only while subscribed."
+ },
+ {
+  "row": 59,
+  "feature": "Offline viewing (mobile)",
+  "what": "Download lectures in the mobile app.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 60,
+  "feature": "Downloadable instructor resources",
+  "what": "Files, templates and articles provided per course.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": null
+ },
+ {
+  "row": 61,
+  "feature": "Marketplace catalog & UGC supply model",
+  "what": "250,000-course open instructor marketplace. Personal Plan is a curated 26,000-course subset selected by Udemy content experts using signals from 75,000 learners.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "Curated 26k",
+  "notes_source": "udemy.com/personal-plan, checked 8/13/26. FILLS THE EMPTY Content & Formats CATEGORY \u2014 the single widest gap in the tab. Sheet currently shows 28,000+."
+ },
+ {
+  "row": 62,
+  "feature": "Ratings, reviews & searchable feedback",
+  "what": "Star ratings and student feedback on every course, with keyword search inside the review set (e.g. 'responsive instructor').",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": "Verified 8/13/26. Primary purchase driver and ranking input; no ratings row exists for any platform."
+ },
+ {
+  "row": 63,
+  "feature": "Instructor profiles & direct contact",
+  "what": "Per-course instructor bio with prior experience, aggregate ratings and their other courses; some instructors accept direct learner contact.",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": "Verified 8/13/26."
+ },
+ {
+  "row": 64,
+  "feature": "Learning reminders",
+  "what": "Scheduled study reminders to drive return visits.",
+  "free_tutorials": "\u2713",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": "Fills the empty Engagement & Gamification category for Udemy."
+ },
+ {
+  "row": 65,
+  "feature": "Course gifting",
+  "what": "Purchase a course as a gift for another learner.",
+  "free_tutorials": "\u2014",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2014",
+  "notes_source": "Verified 8/13/26. Pluralsight also offers gifting \u2014 candidate for a cross-platform row."
+ },
+ {
+  "row": 66,
+  "feature": "Mobile + connected-TV apps",
+  "what": "iOS/Android apps plus connected-TV playback; offline downloads captured separately in the existing tab.",
+  "free_tutorials": "Limited",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2713",
+  "notes_source": "Cited in Pricing & Packaging inclusions ('mobile and TV') but absent from Features."
+ },
+ {
+  "row": 67,
+  "feature": "30-day money-back guarantee",
+  "what": "Refund window on individual course purchases; the subscription instead cancels at period end.",
+  "free_tutorials": "n/a",
+  "individual_course": "\u2713",
+  "personal_plan": "\u2014",
+  "notes_source": "Risk-reversal is a real purchase feature here given a la carte pricing."
+ }
+]
