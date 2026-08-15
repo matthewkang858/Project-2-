@@ -1,0 +1,281 @@
+[
+ {
+  "row": 71,
+  "feature": "AI coaching \u2014 conversational career & management advice",
+  "what": "Real-time advice chat grounded in LinkedIn Learning content.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "All Premium subscribers (launched Oct 2023, expanded since)."
+ },
+ {
+  "row": 72,
+  "feature": "AI coaching \u2014 in-course Q&A",
+  "what": "Ask questions about the course while watching.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "All Premium subscribers (launched Oct 2023, expanded since)."
+ },
+ {
+  "row": 73,
+  "feature": "AI coaching \u2014 content summaries",
+  "what": "Simplify this concept' style summaries of course content.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "All Premium subscribers (launched Oct 2023, expanded since)."
+ },
+ {
+  "row": 74,
+  "feature": "AI coaching \u2014 practice scenarios with AI feedback",
+  "what": "Interactive practice scenarios with AI feedback.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "All Premium subscribers (launched Oct 2023, expanded since)."
+ },
+ {
+  "row": 75,
+  "feature": "Personalized recommendations (Skills Graph)",
+  "what": "Course recommendations driven by profile data, career goals, and followed skills via LinkedIn's Skills Graph.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 76,
+  "feature": "Full course library (25,000+ courses)",
+  "what": "Expert-led video library across business, tech, and creative; free tier limited to a rotating selection.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "premium.linkedin.com/careers/career."
+ },
+ {
+  "row": 77,
+  "feature": "Learning paths & role-based content",
+  "what": "Curated course sequences aligned to roles/skills.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 78,
+  "feature": "Localized course libraries",
+  "what": "Professionally localized course catalogs in 20+ languages beyond the English library.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 79,
+  "feature": "Certificates of completion (profile-integrated)",
+  "what": "Completion certificates that add directly to the LinkedIn profile.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Deep profile integration = key differentiator."
+ },
+ {
+  "row": 80,
+  "feature": "CEU/CPE credits (select courses)",
+  "what": "Continuing-education credits on select courses.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Deep profile integration = key differentiator."
+ },
+ {
+  "row": 81,
+  "feature": "Exercise files",
+  "what": "Downloadable practice files per course.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 82,
+  "feature": "Chapter quizzes",
+  "what": "In-course chapter quizzes.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 83,
+  "feature": "In-course Q&A & community",
+  "what": "Q&A and discussion threads attached to courses; instructor and learner responses.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 84,
+  "feature": "AI profile writing assistant",
+  "what": "AI drafting/improvement of the LinkedIn profile.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Packaging analog: skills content bundled into a broader career subscription."
+ },
+ {
+  "row": 85,
+  "feature": "AI interview prep with feedback",
+  "what": "Practice interview answers with AI feedback.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Packaging analog: skills content bundled into a broader career subscription."
+ },
+ {
+  "row": 86,
+  "feature": "Jobseeker Coach (conversational)",
+  "what": "Conversational job-search coach.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Packaging analog: skills content bundled into a broader career subscription."
+ },
+ {
+  "row": 87,
+  "feature": "AI job-match insights",
+  "what": "AI read on fit between profile and job postings.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Packaging analog: skills content bundled into a broader career subscription."
+ },
+ {
+  "row": 88,
+  "feature": "Offline viewing (mobile)",
+  "what": "Download courses in the mobile app.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 89,
+  "feature": "Audio-only mode",
+  "what": "Podcast-style audio playback of courses.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": null
+ },
+ {
+  "row": 90,
+  "feature": "LinkedIn Skill Assessments & verified skill badges",
+  "what": "Timed multiple-choice assessments tied to the profile Skills section; a passing score earns a verified Skill Badge visible to recruiters.",
+  "tier_free": "\u2713",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26. Free of charge and distinct from course certificates."
+ },
+ {
+  "row": 91,
+  "feature": "Professional Certificates",
+  "what": "Credentials co-built with Microsoft, Zendesk, Twilio, LambdaTest and BluePrism: complete courses, pass an assessment, share the credential without leaving LinkedIn.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "linkedin.com/learning, checked 8/13/26. An entire credential line absent from the current tab."
+ },
+ {
+  "row": 92,
+  "feature": "Certification prep (120+ external credentials)",
+  "what": "2,000+ courses preparing learners for 120+ off-platform credentials across four credential types, including certifications, CEUs and academic credit.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "business.linkedin.com/learn/certifications-and-credentials."
+ },
+ {
+  "row": 93,
+  "feature": "Code Challenges (CoderPad)",
+  "what": "In-browser coding challenges powered by CoderPad attached to technical courses.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26. Practice category currently only lists exercise files and quizzes."
+ },
+ {
+  "row": 94,
+  "feature": "GitHub Codespaces & GitHub Models integration",
+  "what": "Courses integrated with GitHub Codespaces and GitHub Models so learners practise in a real dev environment.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26."
+ },
+ {
+  "row": 95,
+  "feature": "Cybersecurity Training Labs (Hack the Box)",
+  "what": "Hands-on security labs powered by Hack the Box.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26."
+ },
+ {
+  "row": 96,
+  "feature": "AI role-play scenarios",
+  "what": "Interactive role-play practice for difficult conversations with real-time feedback. Scenario customization is admin-configured on B2B plans \u2014 confirm consumer scope.",
+  "tier_free": "\u2014",
+  "tier_premium": "Varies",
+  "tier_col_u": null,
+  "notes_source": "Sourced from business.linkedin.com \u2014 verify availability on consumer Premium Career before publishing."
+ },
+ {
+  "row": 97,
+  "feature": "Authors' Office Hours (live)",
+  "what": "Live expert-hosted topic discussions, interviews and open Q&As with new events weekly; recordings available on demand.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26. Fills a Live sessions gap."
+ },
+ {
+  "row": 98,
+  "feature": "Learning path completion badges",
+  "what": "A badge awarded for completing a curated learning path.",
+  "tier_free": "\u2014",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26."
+ },
+ {
+  "row": 99,
+  "feature": "Multi-format content (text, audio, nano)",
+  "what": "The same content delivered as text, audio and nano-learning alongside video.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "business.linkedin.com/learn/product-overview."
+ },
+ {
+  "row": 100,
+  "feature": "Free access via public libraries",
+  "what": "Full library access with a library card number and PIN through participating public libraries; no LinkedIn account required or linked.",
+  "tier_free": "\u2713",
+  "tier_premium": "n/a",
+  "tier_col_u": null,
+  "notes_source": "Verified via multiple library systems 8/13/26. Materially undercuts the paid consumer tier \u2014 nothing else in the set has this."
+ },
+ {
+  "row": 101,
+  "feature": "Notes, playlists & interactive transcripts",
+  "what": "In-player note-taking, saved collections/playlists and searchable transcripts with jump-to-timestamp.",
+  "tier_free": "Limited",
+  "tier_premium": "\u2713",
+  "tier_col_u": null,
+  "notes_source": "Verified 8/13/26. Distinctive vs. video-only competitors."
+ }
+]
