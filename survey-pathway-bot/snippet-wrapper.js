@@ -121,6 +121,7 @@ function makeTrace(runId, plan, steps, decisions, type, text) {
 
 const spb = {
   core: C,
+  version: typeof SPB_BUILD !== 'undefined' ? SPB_BUILD : 'dev',
   config: {},
   traces: [],
 
@@ -868,6 +869,6 @@ if (stepState && stepState.active) {
   console.log('%csurvey pathway bot — step mode active', 'font-weight:bold');
   spb.go();
 } else {
-  console.log('%csurvey pathway bot loaded', 'font-weight:bold');
+  console.log(`%csurvey pathway bot loaded — build ${typeof SPB_BUILD !== 'undefined' ? SPB_BUILD : 'dev'}`, 'font-weight:bold');
   console.log('spb.auto()  explore everything automatically   ·   spb.help()  all commands');
 }

@@ -2,6 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
+const SPB_BUILD = "7904780 2026-08-27 23:15";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -1240,6 +1241,7 @@ function makeTrace(runId, plan, steps, decisions, type, text) {
 
 const spb = {
   core: C,
+  version: typeof SPB_BUILD !== 'undefined' ? SPB_BUILD : 'dev',
   config: {},
   traces: [],
 
@@ -1987,7 +1989,7 @@ if (stepState && stepState.active) {
   console.log('%csurvey pathway bot — step mode active', 'font-weight:bold');
   spb.go();
 } else {
-  console.log('%csurvey pathway bot loaded', 'font-weight:bold');
+  console.log(`%csurvey pathway bot loaded — build ${typeof SPB_BUILD !== 'undefined' ? SPB_BUILD : 'dev'}`, 'font-weight:bold');
   console.log('spb.auto()  explore everything automatically   ·   spb.help()  all commands');
 }
 
