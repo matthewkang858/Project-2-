@@ -229,7 +229,7 @@ export async function runOnce(page, opts) {
       }
     }
 
-    if (current.pager && !current.pager.atEnd) {
+    if (current.pager && !current.pager.atEnd && current.pager.selector) {
       const before = current.fingerprint + '|' + current.url;
       await scopeOf(page, current.docPath)
         .locator(current.pager.selector)

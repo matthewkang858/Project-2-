@@ -368,7 +368,7 @@ const lost = ans.planned.filter((d) => {
           }
 
           // A carousel's own pager moves between cards inside one question.
-          if (current.pager && !current.pager.atEnd) {
+          if (current.pager && !current.pager.atEnd && current.pager.selector) {
             const at = current.fingerprint + '|' + current.url;
             C.clickNext({ next: { selector: current.pager.selector } }, C.docFor(current, docOf()));
             const until = Date.now() + timeout;
@@ -446,7 +446,20 @@ const lost = ans.planned.filter((d) => {
 
     this.traces = state.traces;
     this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
-    frame.remove();
+    const lastOutcome = state.traces[state.traces.length - 1]?.outcome?.type;
+    if (lastOutcome && !['complete', 'terminate', 'quota'].includes(lastOutcome)) {
+      // Leave the stuck page inspectable: spb.debug() reads this frame.
+      frame.style.cssText =
+        'position:fixed;right:12px;bottom:12px;width:460px;height:620px;z-index:2147483647;' +
+        'border:2px solid #b91c1c;border-radius:6px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.35)';
+      console.warn(
+        `%cthe last run ended "${lastOutcome}" — the survey frame is left open on the stuck page.\n` +
+          'Run  copy(JSON.stringify(spb.debug(), null, 1))  and paste the result to diagnose it. spb.closeFrame() removes the panel.',
+        'font-weight:bold'
+      );
+    } else {
+      frame.remove();
+    }
     if (this._abort) console.log(`%cstopped after ${state.traces.length} traversal(s).`, 'font-weight:bold');
     if (!state.traces.some((t) => t.decisions.length)) {
       console.error(
@@ -545,9 +558,44 @@ const lost = ans.planned.filter((d) => {
         labelled: !!el.closest('label, .choice, .option, .answer'),
       })),
       bodyStart: (d.body?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 300),
+      carousel: (() => {
+        const tidy = (x) => (x || '').replace(/\s+/g, ' ').trim();
+        const posTexts = [...d.querySelectorAll('span, div, p, li, b, strong')]
+          .map((e) => tidy(e.innerText))
+          .filter((t) => /^\d+\s*\/\s*\d+$/.test(t));
+        const navButtons = [...d.querySelectorAll('button, [role="button"], a')]
+          .filter(vis)
+          .map((b) => ({ text: tidy(b.innerText).slice(0, 24), aria: b.getAttribute('aria-label') || undefined, cls: (b.className || '').slice(0, 40) }))
+          .slice(0, 14);
+        const groups = new Map();
+        for (const el of d.querySelectorAll('button, [role="button"], a, div, li, span')) {
+          if (!vis(el) || el.querySelector('input, select, textarea')) continue;
+          const t = tidy(el.innerText);
+          if (!t || t.length > 60) continue;
+          const cur = win.getComputedStyle(el).cursor;
+          if (cur !== 'pointer' && el.tagName !== 'BUTTON' && el.getAttribute('role') !== 'button') continue;
+          const parent = el.parentElement;
+          if (!parent) continue;
+          const key = parent.tagName + '.' + (parent.className || '').split(' ')[0];
+          if (!groups.has(key)) groups.set(key, new Set());
+          groups.get(key).add(t);
+        }
+        const clickableGroups = [...groups.entries()]
+          .map(([parent, labels]) => ({ parent, labels: [...labels].slice(0, 10) }))
+          .filter((g) => g.labels.length >= 2)
+          .slice(0, 8);
+        return { detectedPager: model.pager ?? null, posTexts: [...new Set(posTexts)].slice(0, 5), navButtons, clickableGroups };
+      })(),
     };
     console.log(JSON.stringify(out, null, 1));
     return out;
+  },
+
+  closeFrame() {
+    try {
+      this._lastFrame && this._lastFrame.remove();
+    } catch {}
+    console.log('panel removed');
   },
 
   // Stop the current exploration. Whatever has been recorded stays available
@@ -644,7 +692,7 @@ const lost = ans.planned.filter((d) => {
     c.decisions.push(...answered.record.decisions);
     writeJSON(STEP_KEY, state);
     console.table(Object.fromEntries(answered.record.decisions.map((d) => [d.key, d.chosen])));
-    const nav = model.pager && !model.pager.atEnd ? { next: { selector: model.pager.selector } } : model;
+    const nav = model.pager && !model.pager.atEnd && model.pager.selector ? { next: { selector: model.pager.selector } } : model;
     C.clickNext(nav, target);
     console.log(`${c.runId} · page ${c.steps.length} answered — press Ctrl/Cmd+Enter again on the next page.`);
     return answered.record;

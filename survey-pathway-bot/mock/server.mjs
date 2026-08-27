@@ -321,6 +321,71 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  if (req.url && req.url.split('?')[0] === '/cards3') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['Legal (e.g., general counsel, outside law firm)', 'Executive Management (e.g., CEO)', 'End Users (i.e., employees who will be using the software)'];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.abtn{display:inline-block;padding:14px;border:1px solid #ccc;border-radius:8px;margin:6px;cursor:pointer}
+             .abtn.sel{background:#dde}
+             .track{display:flex;overflow:hidden;width:420px;margin:10px auto}
+             .face{min-width:300px;padding:30px;border:1px solid #ddd;margin-right:12px}
+             .navbtn{border:none;background:none;width:28px;height:28px}
+             .navbtn svg{width:16px;height:16px}
+             input[type=radio]{display:none}</style>
+      </head><body>
+      <form method="POST" action="/cardscheck">
+        <div class="qtitle">Which of the following best describes the role that is typically played by the following departments/members of your company?</div>
+        <div class="track" id="track"></div>
+        <div class="pager" style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <button type="button" class="navbtn car-left" id="prev"><svg viewBox="0 0 10 10"><path d="M7 1 3 5l4 4"/></svg></button>
+          <span class="pos"><span id="posA"></span><span> / </span><span id="posB"></span></span>
+          <button type="button" class="navbtn car-right" id="nextCard"><svg viewBox="0 0 10 10"><path d="M3 1l4 4-4 4"/></svg></button>
+        </div>
+        <div id="answers">
+          <div class="abtn" data-a="1">Key decision-maker</div>
+          <div class="abtn" data-a="2">Influencer</div>
+          <div class="abtn" data-a="3">No role in the process</div>
+        </div>
+        ${rows.map((_, i) => [1,2,3].map((v) =>
+          `<input type="radio" name="ans32900.0.${i}" value="${v}">`).join('')).join('')}
+        ${rows.map((_, i) => `<input type="hidden" name="h${i}" id="h${i}" value="">`).join('')}
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var rows = ${JSON.stringify(rows)};
+        var at = 0;
+        function paint() {
+          // current card plus a peek of the next one, like the real player
+          var track = document.getElementById('track');
+          track.innerHTML = rows.slice(at, at + 2).map(function (t, i) {
+            return '<div class="face' + (i ? ' peek' : '') + '">' + t + '</div>';
+          }).join('');
+          document.getElementById('posA').textContent = at + 1;
+          document.getElementById('posB').textContent = rows.length;
+          var val = document.getElementById('h' + at).value;
+          [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+            b.className = 'abtn' + (b.getAttribute('data-a') === val ? ' sel' : '');
+          });
+          var done = rows.every(function (_, i) { return document.getElementById('h' + i).value; });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+          b.addEventListener('click', function () {
+            var v = b.getAttribute('data-a');
+            document.getElementById('h' + at).value = v;
+            var radios = document.querySelectorAll('input[name="ans32900.0.' + at + '"]');
+            [].forEach.call(radios, function (r) { r.checked = r.value === v; });
+            if (at < rows.length - 1) at++;
+            paint();
+          });
+        });
+        document.getElementById('nextCard').addEventListener('click', function () { if (at < rows.length - 1) { at++; paint(); } });
+        document.getElementById('prev').addEventListener('click', function () { if (at > 0) { at--; paint(); } });
+        paint();
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/offscreen') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
@@ -498,7 +563,7 @@ createServer((req, res) => {
     req.on('end', () => {
       const form = new URLSearchParams(raw);
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-      const all = [0, 1, 2].every((i) => form.get(`ans32900.0.${i}`));
+      const all = [0, 1, 2].every((i) => form.get(`ans32900.0.${i}`) || form.get(`h${i}`));
       if (!all) res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please provide an answer for each item.</p></body></html>`);
       else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
     });

@@ -130,7 +130,7 @@ const lost = planned.decisions.filter((d) => {
       }
 
       const before = current.fingerprint + '|' + location.href;
-      const nav = current.pager && !current.pager.atEnd ? { next: { selector: current.pager.selector } } : current;
+      const nav = current.pager && !current.pager.atEnd && current.pager.selector ? { next: { selector: current.pager.selector } } : current;
       if (!nav.next || !SPB_CORE.clickNext(nav, SPB_CORE.docFor(current, document))) {
         await send({ type: 'stalled', record, text: 'no forward button could be clicked' });
         return;

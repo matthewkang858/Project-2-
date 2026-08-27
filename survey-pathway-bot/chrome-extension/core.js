@@ -352,8 +352,30 @@ function pageModel(cfg, doc) {
         return /^(next|forward|›|>|→|»)$/i.test(label) || /next|forward/i.test(aria);
       });
     }
-    if (btn && index < total) pager = { selector: cssFor(btn), index, total };
-    else if (btn) pager = { selector: cssFor(btn), index, total, atEnd: true };
+    if (!btn) {
+      // Icon-only arrows carry no text and often no aria-label; a class name
+      // is the next hint.
+      scope = posEl.parentElement;
+      for (let up = 0; up < 4 && scope && !btn; up++, scope = scope.parentElement)
+        btn = [...scope.querySelectorAll('button, a, [role="button"]')].find(
+          (b) => visible(b) && !b.disabled && /next|right|forward/i.test(b.className || '')
+        );
+    }
+    if (!btn) {
+      // Last hint is geometry: the forward arrow sits just right of the "N / M"
+      // readout, on the same line.
+      const pr = posEl.getBoundingClientRect();
+      const near = [...doc.querySelectorAll('button, a, [role="button"]')].filter((b) => {
+        if (!visible(b) || b.disabled) return false;
+        const r = b.getBoundingClientRect();
+        return r.left >= pr.right - 4 && Math.abs(r.top + r.height / 2 - (pr.top + pr.height / 2)) < Math.max(40, pr.height);
+      });
+      near.sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+      btn = near[0] ?? null;
+    }
+    // Even with no clickable arrow found, a "N / M" readout is a carousel:
+    // answering a card advances it, so the pager needs no button of its own.
+    pager = { selector: btn ? cssFor(btn) : null, index, total, atEnd: index >= total };
   }
 
   // Sliders that are not <input type=range>: a focusable element carrying the
@@ -432,9 +454,9 @@ function pageModel(cfg, doc) {
         if (blocks.some((o) => o !== el && el.contains(o))) continue; // deepest only
         if (posEl.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) title = clean(el.innerText);
       }
-      const slug = (title || `card${pager.index}`).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+      const slug = (title || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
       questions.push({
-        key: `card:${slug}`,
+        key: `card${pager.index}:${slug}`,
         kind: 'buttons',
         label: title ? `${stem} — ${title}` : `${stem} — card ${pager.index}/${pager.total}`,
         group: 'cards:' + clean(stem).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30),

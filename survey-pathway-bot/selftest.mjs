@@ -77,10 +77,10 @@ try {
     const o = join(out, 'cards');
     const r = await run(['explore.mjs', '--url', URL + 'cards', '--out', o, '--max-runs', '4']);
     const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
-    const cards = ['card:it-e-g-cio-members-of-the-technology-team', 'card:executive-management-e-g-ceo', 'card:finance-e-g-cfo'];
+    const cards = ['card1:', 'card2:', 'card3:'];
     check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes a button-driven card carousel');
-    check(ts.every((t) => cards.every((c) => t.decisions.filter((d) => d.key === c).length === 1)), 'answers each card exactly once');
-    check(new Set(ts.map((t) => t.decisions.find((d) => d.key === cards[0])?.chosenIndex)).size >= 3, 'branches across the three answer buttons');
+    check(ts.every((t) => cards.every((c) => t.decisions.filter((d) => d.key.startsWith(c)).length === 1)), 'answers each card exactly once');
+    check(new Set(ts.map((t) => t.decisions.find((d) => d.key.startsWith('card1:'))?.chosenIndex)).size >= 3, 'branches across the three answer buttons');
   }
 
   // The same carousel built the hostile way: pager readout and card title in
@@ -91,8 +91,22 @@ try {
     const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
     check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes the nested-DOM card carousel');
     check(
-      ts.every((t) => t.decisions.some((d) => d.key.startsWith('card:it-e-g'))),
-      'names nested-DOM cards by their wording'
+      ts.every((t) => t.decisions.some((d) => /^card\d+:/.test(d.key))),
+      'keys nested-DOM cards by pager position'
+    );
+  }
+
+  // The field's own carousel shape, from a debug dump: icon arrows with no
+  // text and no aria-label, hidden unlabelled radios as state, a peeking next
+  // card, auto-advance on answer click.
+  {
+    const o = join(out, 'cards3');
+    const r = await run(['explore.mjs', '--url', URL + 'cards3', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes the field-faithful carousel (icon-only arrows, hidden radios)');
+    check(
+      ts.every((t) => ['card1:', 'card2:', 'card3:'].every((c) => t.decisions.some((d) => d.key.startsWith(c)))),
+      'answers all three cards despite the peeking card face'
     );
   }
 
