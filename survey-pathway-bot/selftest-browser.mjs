@@ -49,6 +49,57 @@ try {
   check(advanced.join(',') === 'S2,S3', 'snippet advances to the next page');
   await page.close();
 
+  // ---- snippet: automatic (iframe) mode ---------------------------------
+  const auto = await ctx.newPage();
+  await auto.goto(URL_);
+  await auto.evaluate(snippet);
+  const autoTraces = await auto.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 14, config: { delay: 0 } }), URL_);
+  const autoOutcomes = new Set((autoTraces || []).map((t) => t.outcome?.type));
+  check(autoTraces?.length === 14, `snippet auto mode completed 14 traversals (got ${autoTraces?.length})`);
+  for (const want of ['terminate', 'quota', 'complete'])
+    check(autoOutcomes.has(want), `snippet auto mode found the "${want}" end state`);
+  check(!autoOutcomes.has('stalled') && !autoOutcomes.has('error'), 'no snippet auto run stalled or errored');
+  check(
+    (autoTraces || []).some((t) => t.outcome?.type === 'complete' && !t.steps.some((s) => s.questionKeys.includes('Q2r1'))),
+    'snippet auto mode found the skipped-grid branch'
+  );
+  const autoMd = await auto.evaluate(() => spb.report());
+  check(!!autoMd && autoMd.includes('flowchart TD'), 'snippet renders the report');
+  check(await auto.evaluate(() => !document.querySelector('iframe')), 'snippet removes its iframe when finished');
+  await auto.close();
+
+  // ---- snippet: step-through mode ---------------------------------------
+  // Simulates the user pressing Ctrl+Enter on each page: the snippet is
+  // re-evaluated after every navigation and resumes from sessionStorage.
+  const stepPage = await ctx.newPage();
+  await stepPage.goto(URL_);
+  await stepPage.evaluate(snippet);
+  await stepPage.evaluate(() => spb.plan({ maxRuns: 3, config: { delay: 0 } }));
+  let active = true;
+  for (let i = 0; i < 40 && active; i++) {
+    await stepPage.waitForLoadState('domcontentloaded').catch(() => {});
+    await sleep(150);
+    try {
+      await stepPage.evaluate(snippet);
+    } catch {
+      continue; // navigation tore down the context; the next loop re-injects
+    }
+    active = await stepPage
+      .evaluate(() => {
+        try {
+          return !!JSON.parse(sessionStorage.getItem('spb-step-state'))?.active;
+        } catch {
+          return false;
+        }
+      })
+      .catch(() => true); // navigating — still going
+  }
+  const stepTraces = await stepPage.evaluate(() => spb.allTraces());
+  const stepOutcomes = new Set(stepTraces.map((t) => t.outcome?.type));
+  check(stepTraces.length === 3, `snippet step mode completed 3 traversals (got ${stepTraces.length})`);
+  check(stepOutcomes.has('terminate') && stepOutcomes.has('complete'), 'snippet step mode reached different end states');
+  await stepPage.close();
+
   // ---- chrome extension ------------------------------------------------
   let sw = ctx.serviceWorkers()[0] ?? (await ctx.waitForEvent('serviceworker', { timeout: 15000 }));
   const extId = new URL(sw.url()).host;

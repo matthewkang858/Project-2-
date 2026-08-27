@@ -7,23 +7,57 @@ every question it finds, and maps which pages, questions and end states
 Three ways to run it — all sharing one page-reading core, so they see a survey
 identically and produce the same report:
 
-| Where it runs | What you use | Best for |
+| Where it runs | What it needs installed | Best for |
 |---|---|---|
-| **Your Chrome, automatically** | `chrome-extension/` loaded unpacked | Driving whole pathways in your own logged-in browser. No install, no Node. |
-| **Your Chrome, one page at a time** | `dist/console-snippet.js` pasted into DevTools | Seeing what the bot sees, filling a page by hand, capturing a pathway you walked yourself. |
-| **Node + Playwright** | `explore.mjs`, `run-paths.mjs` | Batch runs, screenshots, CI assertions on your routing. |
+| **Chrome DevTools console** (`dist/console-snippet.js`) | **Nothing.** Copy/paste text into a panel Chrome already has. | Locked-down machines. `spb.auto()` explores every pathway on its own. |
+| **Chrome extension** (`chrome-extension/`) | No installer, but files on disk + Developer mode at `chrome://extensions` (often disabled by enterprise policy). | Surveys that refuse to be framed, or long unattended runs. |
+| **Node CLI** (`explore.mjs`, `run-paths.mjs`) | Node.js + Playwright + a Chromium download. | Batch runs, screenshots, CI assertions. |
 
 > Point any of these at a **test/preview link for a survey you own or are
 > authorised to QA**. Driving a live, in-field link puts fake interviews into
 > real sample and burns respondent entries.
 
+## Zero-install quick start
+
+1. Open your survey test link in Chrome.
+2. `F12` (or ⌥⌘I) ▸ **Console**. If Chrome warns about pasting, type `allow pasting` ▸ Enter.
+3. Open [`dist/console-snippet.js`](dist/console-snippet.js) raw, select all, copy, paste into the console, Enter.
+4. Run:
+
+   ```js
+   spb.auto({ maxRuns: 15 })
+   ```
+
+   It loads the survey in a small iframe in the corner of the page and walks
+   pathway after pathway while you watch. The parent page never navigates, which
+   is what keeps the script alive.
+5. `spb.download()` saves the Markdown report; `spb.report()` just prints it.
+
+If step 4 reports that the survey refuses to be framed, use step-through mode
+instead — same exploration, one keystroke per page:
+
+```js
+spb.plan({ maxRuns: 15 })   // then press Ctrl/Cmd+Enter on each page
+```
+
+Save the snippet as a **DevTools Snippet** (Sources ▸ Snippets ▸ New) so
+Ctrl/Cmd+Enter re-runs it; it resumes from `sessionStorage`, answers the page,
+and clicks Next each time.
+
+**If DevTools itself is blocked.** Some managed profiles set the
+`DeveloperToolsAvailability` policy, which disables the console entirely — check
+`chrome://policy`. In that case the options are a personal machine, a Chrome
+profile outside the managed one, or asking IT for the survey platform's own test
+tooling (see Practical notes).
+
 ---
 
-## 1. Chrome extension (recommended if you just want it to run in Chrome)
+## Chrome extension (unattended runs, or when framing is blocked)
 
-A pasted console script dies on every page navigation, so multi-page automation
-needs an extension. This one is ~400 lines, uses no remote code, and needs no
-build step.
+No installer and no build step, but it does need the files on disk and
+Developer mode — which many managed Chrome profiles disable. Check
+`chrome://policy` for `ExtensionInstallBlocklist` or a disabled developer mode
+before counting on it.
 
 1. Chrome ▸ `chrome://extensions` ▸ turn on **Developer mode**.
 2. **Load unpacked** ▸ select the `chrome-extension/` folder.
@@ -45,14 +79,14 @@ previous run's answers up to one decision, flips that decision, and continues �
 breadth-first, so screener logic gets covered first. The status line shows how
 many branches are still queued.
 
-## 2. Console snippet (single page)
+## Console snippet reference
 
-`dist/console-snippet.js` is the same core plus a small console API. Paste it
-into DevTools on a survey page — or, better, save it as a **DevTools Snippet**
-(Sources ▸ Snippets ▸ New), which persists across navigations so you can re-run
-it on each page with Ctrl/Cmd+Enter.
+Beyond `spb.auto()` and `spb.plan()` above, the snippet gives you per-page
+tools — useful for working out why a page misbehaves:
 
 ```js
+spb.help()                     // list every command
+spb.status()                   // where the current exploration is up to
 spb.inspect()                  // table of every question, its options and how many branches it creates
 spb.fill()                     // answer the whole page with the first option everywhere
 spb.fill({ S1: 2 })            // …but take option index 2 for S1
@@ -68,7 +102,7 @@ you walked by hand into a scripted regression test for the CLI.
 
 Rebuild the snippet after editing the core with `npm run build:snippet`.
 
-## 3. Node CLI
+## Node CLI
 
 ```bash
 cd survey-pathway-bot
@@ -156,7 +190,7 @@ conditionally-shown page) rendered the way hosted engines render:
 
 ```bash
 node selftest.mjs           # CLI: explores the mock, then runs the scripted scenarios
-node selftest-browser.mjs   # loads the extension into a real Chromium and drives the mock; also tests the snippet
+node selftest-browser.mjs   # real Chromium: the snippet's auto + step modes and the extension
 node mock/server.mjs        # or poke at it yourself on :8099
 ```
 

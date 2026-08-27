@@ -37,11 +37,13 @@ const DEFAULT_SELECTORS = {
   },
 };
 
-function pageModel(cfg) {
+function pageModel(cfg, doc) {
+  doc = doc || document;
+  const win = doc.defaultView || window;
   const visible = (el) => {
     if (!el) return false;
     const r = el.getBoundingClientRect();
-    const s = getComputedStyle(el);
+    const s = win.getComputedStyle(el);
     return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0' && (r.width > 0 || r.height > 0);
   };
   const clean = (s) => (s || '').replace(/\s+/g, ' ').trim();
@@ -51,7 +53,7 @@ function pageModel(cfg) {
   // the control inside it, so an unchecked `#Q3` would target the wrapper.
   let stamp = 0;
   const resolves = (sel, el) => {
-    try { return document.querySelector(sel) === el; } catch { return false; }
+    try { return doc.querySelector(sel) === el; } catch { return false; }
   };
   const cssFor = (el) => {
     if (el.id && /^[A-Za-z][\w:.-]*$/.test(el.id)) {
@@ -75,7 +77,7 @@ function pageModel(cfg) {
   // Text of the label attached to a single control.
   const optionLabel = (el) => {
     if (el.id) {
-      const lab = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      const lab = doc.querySelector(`label[for="${CSS.escape(el.id)}"]`);
       if (lab && clean(lab.innerText)) return clean(lab.innerText);
     }
     const wrap = el.closest('label');
@@ -107,7 +109,7 @@ function pageModel(cfg) {
     return stem.slice(0, 300);
   };
 
-  const controls = [...document.querySelectorAll('input, select, textarea')].filter((el) => {
+  const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
     const type = (el.type || '').toLowerCase();
     if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type)) return false;
     if (el.disabled) return false;
@@ -160,14 +162,14 @@ function pageModel(cfg) {
   // Forward button.
   let next = null;
   for (const sel of cfg.nextButtons) {
-    const el = [...document.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
+    const el = [...doc.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
     if (el) {
       next = { selector: cssFor(el), label: clean(el.innerText || el.value || ''), matched: sel };
       break;
     }
   }
 
-  const bodyText = clean(document.body?.innerText || '');
+  const bodyText = clean(doc.body?.innerText || '');
   const lower = bodyText.toLowerCase();
   let outcome = null;
   for (const [name, pats] of Object.entries(cfg.terminalPatterns)) {
@@ -175,12 +177,12 @@ function pageModel(cfg) {
   }
 
   const heading = clean(
-    document.querySelector('h1, h2, .page-title, .survey-title')?.innerText || document.title || ''
+    doc.querySelector('h1, h2, .page-title, .survey-title')?.innerText || doc.title || ''
   ).slice(0, 200);
 
   return {
-    url: location.href,
-    title: document.title,
+    url: doc.location.href,
+    title: doc.title,
     heading,
     questions,
     next,
@@ -268,13 +270,15 @@ function describe(q, candidate) {
 // DOM-native answering, used by the Chrome extension and the console snippet.
 // (The Node/Playwright build answers through Playwright's own APIs instead, so
 // that it waits for the engine's own visibility and enabled checks.)
-function applyAnswer(q, candidate) {
+function applyAnswer(q, candidate, doc) {
+  doc = doc || document;
+  const win = doc.defaultView || window;
   if (!candidate || candidate.kind === 'noop') return true;
   const fire = (el, types) => {
-    for (const t of types) el.dispatchEvent(new Event(t, { bubbles: true }));
+    for (const t of types) el.dispatchEvent(new win.Event(t, { bubbles: true }));
   };
   if (candidate.kind === 'value') {
-    const el = document.querySelector(q.selector);
+    const el = doc.querySelector(q.selector);
     if (!el) return false;
     el.focus?.();
     el.value = candidate.value;
@@ -284,13 +288,13 @@ function applyAnswer(q, candidate) {
   const opt = q.options[candidate.index];
   if (!opt) return false;
   if (q.kind === 'select') {
-    const el = document.querySelector(q.selector);
+    const el = doc.querySelector(q.selector);
     if (!el) return false;
     el.value = opt.value;
     fire(el, ['input', 'change']);
     return true;
   }
-  const el = document.querySelector(opt.selector);
+  const el = doc.querySelector(opt.selector);
   if (!el) return false;
   el.click();
   if (!el.checked) {
@@ -301,22 +305,22 @@ function applyAnswer(q, candidate) {
 }
 
 // Click the forward button described by a page model.
-function clickNext(model) {
+function clickNext(model, doc) {
   if (!model.next) return false;
-  const el = document.querySelector(model.next.selector);
+  const el = (doc || document).querySelector(model.next.selector);
   if (!el) return false;
   el.click();
   return true;
 }
 
 // Everything a caller needs to read the current page in one call.
-function readPage(cfg) {
+function readPage(cfg, doc) {
   const c = cfg || DEFAULT_SELECTORS;
   const model = pageModel({
     questionContainers: c.questionContainers || DEFAULT_SELECTORS.questionContainers,
     nextButtons: c.nextButtons || DEFAULT_SELECTORS.nextButtons,
     terminalPatterns: c.terminalPatterns || DEFAULT_SELECTORS.terminalPatterns,
-  });
+  }, doc);
   model.fingerprint = fingerprint(model);
   model.isTerminal = !model.next || (model.questions.length === 0 && !!model.outcome);
   return model;
@@ -333,31 +337,542 @@ globalThis.SPB_CORE = {
   clickNext,
 };
 
-// Console API built on top of the shared core. Everything here is scoped to the
-// page you are currently looking at — a page navigation clears it, which is why
-// multi-page automation lives in the Chrome extension instead.
+// Report rendering — shared by the CLI (report.mjs) and the Chrome extension's
+// "Download report" button, so both produce the same Markdown.
+//
+// Plain script, no imports: it is loaded as a content/popup script in the
+// extension and eval'd by lib/report-core.mjs in Node.
+
+const esc = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n+/g, ' ').trim();
+const trunc = (s, n) => (String(s ?? '').length > n ? String(s).slice(0, n - 1) + '…' : String(s ?? ''));
+// djb2 — a stable id for a Mermaid node, without Buffer (this file runs in the
+// browser too).
+const nodeId = (fp) => {
+  let h = 5381;
+  for (const ch of String(fp)) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0;
+  return 'N' + h.toString(16);
+};
+
+function buildReport(traces, summary = {}) {
+  const L = [];
+  L.push('# Survey pathway test report', '');
+  if (summary.url) L.push(`Survey: \`${summary.url}\``);
+  L.push(`Generated: ${summary.generatedAt ?? new Date().toISOString()}`);
+  L.push(`Traversals: **${traces.length}**` + (summary.plansQueuedButNotRun ? `  ·  untried branches still queued: **${summary.plansQueuedButNotRun}**` : ''));
+  L.push('');
+
+  // --- outcomes -----------------------------------------------------------
+  const byOutcome = new Map();
+  for (const t of traces) {
+    const k = t.outcome?.type ?? 'unknown';
+    if (!byOutcome.has(k)) byOutcome.set(k, []);
+    byOutcome.get(k).push(t);
+  }
+  L.push('## Outcomes', '');
+  L.push('| Outcome | Runs | Example ending text |', '|---|---:|---|');
+  for (const [k, list] of [...byOutcome.entries()].sort((a, b) => b[1].length - a[1].length)) {
+    L.push(`| ${k} | ${list.length} | ${esc(trunc(list[0].outcome?.heading || list[0].outcome?.text, 90))} |`);
+  }
+  L.push('');
+
+  // --- runs ---------------------------------------------------------------
+  L.push('## Traversals', '');
+  L.push('| Run | Pages | Outcome | Decisions taken |', '|---|---:|---|---|');
+  for (const t of traces) {
+    const path = t.decisions.map((d) => `${d.key}=${esc(trunc(d.chosen, 28))}`).join(' → ');
+    L.push(`| ${t.runId} | ${t.steps.length} | ${t.outcome?.type ?? '?'} | ${esc(trunc(path, 240)) || '—'} |`);
+  }
+  L.push('');
+
+  // --- flow graph ---------------------------------------------------------
+  // Nodes are pages (identified by the questions they ask), edges are the
+  // answers that moved the bot from one page to the next.
+  const nodes = new Map();
+  const edges = new Map();
+  for (const t of traces) {
+    for (let i = 0; i < t.steps.length; i++) {
+      const s = t.steps[i];
+      if (!nodes.has(s.fingerprint)) {
+        const label = s.questionKeys.length
+          ? s.questionKeys.join(', ')
+          : trunc(s.outcome ? `${s.outcome.toUpperCase()}: ${s.heading}` : s.heading || 'page', 40);
+        nodes.set(s.fingerprint, { label, questions: s.questionKeys, outcome: s.outcome, count: 0 });
+      }
+      nodes.get(s.fingerprint).count++;
+      const nxt = t.steps[i + 1];
+      if (!nxt) continue;
+      const via = (s.decisions ?? [])
+        .filter((d) => d.candidateCount > 1)
+        .map((d) => `${d.key}=${trunc(d.chosen, 18)}`)
+        .join(', ');
+      const key = `${s.fingerprint}|${nxt.fingerprint}|${via}`;
+      edges.set(key, (edges.get(key) ?? 0) + 1);
+    }
+  }
+  L.push('## Pathway map', '');
+  L.push('Nodes are pages (labelled with the questions they ask); edge labels are the answers that led there.', '');
+  L.push('```mermaid', 'flowchart TD');
+  for (const [fp, n] of nodes) {
+    const shape = n.outcome ? ['([', '])'] : ['[', ']'];
+    L.push(`  ${nodeId(fp)}${shape[0]}"${n.label.replace(/"/g, "'")}"${shape[1]}`);
+  }
+  for (const [key, count] of edges) {
+    const [from, to, via] = key.split('|');
+    const lbl = (via || '(no branching answer)') + (count > 1 ? ` ×${count}` : '');
+    L.push(`  ${nodeId(from)} -->|"${lbl.replace(/"/g, "'")}"| ${nodeId(to)}`);
+  }
+  L.push('```', '');
+
+  // --- coverage -----------------------------------------------------------
+  // Every option the bot ever saw, and whether any run actually selected it.
+  const qs = new Map(); // key -> {label, kind, options: Map<label, {seen, chosen}>}
+  for (const t of traces) {
+    for (const s of t.steps) {
+      for (const q of s.questions ?? []) {
+        if (!qs.has(q.key)) qs.set(q.key, { label: q.label, kind: q.kind, options: new Map() });
+        const rec = qs.get(q.key);
+        for (const o of q.options ?? []) {
+          const k = o.label || o.value;
+          if (!rec.options.has(k)) rec.options.set(k, { chosen: 0 });
+        }
+        // Leaving a standalone checkbox blank is a branch of its own.
+        if (q.kind === 'checkbox' && (q.options ?? []).length === 1 && !rec.options.has('(left unchecked)'))
+          rec.options.set('(left unchecked)', { chosen: 0 });
+      }
+      for (const d of s.decisions ?? []) {
+        const rec = qs.get(d.key);
+        if (!rec) continue;
+        const lbl = String(d.chosen ?? '').replace(/\s*\[[^\]]*\]$/, '');
+        for (const [k, v] of rec.options) {
+          if (k === lbl || d.chosen?.includes(`[${k}]`)) { v.chosen++; break; }
+        }
+      }
+    }
+  }
+  L.push('## Answer-option coverage', '');
+  L.push('| Question | Type | Options | Exercised | Never selected |', '|---|---|---:|---:|---|');
+  const untested = [];
+  for (const [key, rec] of qs) {
+    const total = rec.options.size;
+    const hit = [...rec.options.values()].filter((v) => v.chosen > 0).length;
+    const missed = [...rec.options.entries()].filter(([, v]) => v.chosen === 0).map(([k]) => k);
+    if (total && missed.length) untested.push({ key, missed });
+    L.push(
+      `| \`${key}\` — ${esc(trunc(rec.label, 60))} | ${rec.kind} | ${total || '—'} | ${total ? hit : '—'} | ${esc(trunc(missed.join(', '), 80)) || '—'} |`
+    );
+  }
+  L.push('');
+
+  // --- findings -----------------------------------------------------------
+  L.push('## Findings to check', '');
+  const findings = [];
+  for (const t of traces) {
+    if (t.outcome?.type === 'stalled')
+      findings.push(`**${t.runId} stalled** on page \`${t.outcome.atFingerprint}\` — the page did not advance after submitting. Message: ${esc(trunc(t.outcome.text, 200))}`);
+    if (t.outcome?.type === 'error') findings.push(`**${t.runId} errored**: ${esc(trunc(t.outcome.text, 200))}`);
+    if (t.outcome?.type === 'maxsteps') findings.push(`**${t.runId} hit the page limit** — possible loop, or a longer survey than \`maxSteps\` allows.`);
+    for (const d of t.decisions) if (d.error) findings.push(`**${t.runId}**: could not answer \`${d.key}\` (${esc(d.error)}).`);
+  }
+  for (const u of untested) findings.push(`\`${u.key}\`: ${u.missed.length} option(s) never selected in any run — ${esc(trunc(u.missed.join(', '), 120))}. Raise \`--max-runs\` or target them with a scripted path.`);
+  if (!findings.length) findings.push('None — every traversal reached an end state and every option was exercised.');
+  for (const f of findings) L.push(`- ${f}`);
+  L.push('');
+  return L.join('\n');
+}
+
+globalThis.SPB_REPORT = { buildReport };
+
+// Console API on top of the shared core — the zero-install way to run this.
+//
+// Three ways to use it, in order of preference:
+//
+//   spb.auto()   full automatic exploration, no install, no keystrokes. Loads
+//                the survey in a same-origin iframe on the page you are already
+//                on, so the parent page never navigates and this script keeps
+//                running. Blocked only if the survey refuses to be framed.
+//   spb.plan()   step-through exploration for when framing is blocked: it keeps
+//                the run queue in sessionStorage, so re-running this snippet on
+//                each page (DevTools ▸ Snippets ▸ Ctrl/Cmd+Enter) advances one
+//                page and picks up exactly where it left off.
+//   spb.inspect() / spb.fill() / spb.step() / spb.capture()
+//                manual, one page at a time.
+//
+// Results from any mode: spb.report() prints Markdown, spb.download() saves it.
 
 const C = globalThis.SPB_CORE;
 const CAPTURE_KEY = 'spb-captured-answers';
+const STEP_KEY = 'spb-step-state';
 
-const readCaptured = () => {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const readJSON = (key, fallback) => {
   try {
-    return JSON.parse(sessionStorage.getItem(CAPTURE_KEY) || '[]');
+    return JSON.parse(sessionStorage.getItem(key)) ?? fallback;
   } catch {
-    return [];
+    return fallback;
   }
 };
-const writeCaptured = (v) => {
+const writeJSON = (key, v) => {
   try {
-    sessionStorage.setItem(CAPTURE_KEY, JSON.stringify(v));
+    sessionStorage.setItem(key, JSON.stringify(v));
   } catch {}
 };
+
+// ---- breadth-first branch expansion (same rule as the CLI and extension) ----
+function planKey(plan) {
+  const p = [...plan];
+  while (p.length && p[p.length - 1] === 0) p.pop(); // trailing zeros are implicit
+  return p.join(',');
+}
+
+function expand(state, trace) {
+  for (let i = 0; i < trace.decisions.length; i++) {
+    const d = trace.decisions[i];
+    if (!d || d.candidateCount <= 1) continue;
+    const prefix = trace.decisions.slice(0, i).map((x) => x.chosenIndex ?? 0);
+    for (let alt = 0; alt < d.candidateCount; alt++) {
+      if (alt === d.chosenIndex) continue;
+      const plan = [...prefix, alt];
+      const key = planKey(plan);
+      if (state.seen.includes(key)) continue;
+      state.seen.push(key);
+      state.queue.push(plan);
+    }
+  }
+}
+
+// Answer every question on `doc`, returning the page record.
+function answerPage(model, plan, di, cfg, doc) {
+  const record = {
+    url: model.url,
+    fingerprint: model.fingerprint,
+    heading: model.heading,
+    outcome: model.outcome,
+    questionKeys: model.questions.map((q) => q.key),
+    questions: model.questions.map((q) => ({
+      key: q.key,
+      kind: q.kind,
+      label: q.label,
+      options: q.options.map((o) => ({ value: o.value, label: o.label })),
+    })),
+    decisions: [],
+  };
+  for (const q of model.questions) {
+    const cands = C.candidates(q, cfg);
+    const wanted = plan[di];
+    const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
+    const chosen = cands[idx];
+    const ok = C.applyAnswer(q, chosen, doc);
+    record.decisions.push({
+      di,
+      key: q.key,
+      kind: q.kind,
+      label: q.label,
+      candidateCount: cands.length,
+      chosenIndex: idx,
+      chosen: C.describe(q, chosen),
+      error: ok ? undefined : 'could not set answer',
+    });
+    di++;
+  }
+  return { record, di };
+}
+
+function makeTrace(runId, plan, steps, decisions, type, text) {
+  const last = steps[steps.length - 1] || {};
+  return {
+    runId,
+    plan,
+    steps: steps.map((s, i) => ({ step: i, ...s })),
+    decisions,
+    outcome: {
+      type,
+      heading: last.heading || '',
+      text: text || '',
+      url: last.url || '',
+      atFingerprint: type === 'stalled' ? last.fingerprint : undefined,
+    },
+    pathKey: decisions.map((d) => `${d.key}=${d.chosenIndex}`).join('>'),
+    pageKey: steps.map((s) => s.fingerprint).join('>'),
+  };
+}
 
 const spb = {
   core: C,
   config: {},
+  traces: [],
 
-  // What the bot sees on this page.
+  help() {
+    console.log(`spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
+spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
+spb.status()                where the current exploration is up to
+spb.report()                print the Markdown report   ·  spb.download() saves it
+spb.inspect()               what the bot sees on this page
+spb.fill({ S1: 2 })         answer this page  ·  spb.step() answer + Next
+spb.capture()               record answers you picked  ·  spb.scenario('name') export them
+spb.reset()                 clear stored state`);
+  },
+
+  // ---- automatic mode ------------------------------------------------------
+  async auto(opts = {}) {
+    const startUrl = opts.url || location.href;
+    const maxRuns = opts.maxRuns ?? 20;
+    const cfg = { ...this.config, ...(opts.config || {}) };
+    const delay = Number(cfg.delay ?? 300);
+    const timeout = Number(cfg.stepTimeout ?? 20000);
+    const maxSteps = Number(cfg.maxSteps ?? 60);
+
+    const frame = document.createElement('iframe');
+    frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
+    frame.style.cssText =
+      'position:fixed;right:12px;bottom:12px;width:460px;height:620px;z-index:2147483647;' +
+      'border:2px solid #333;border-radius:6px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.35)';
+    document.body.appendChild(frame);
+    this._frame = frame;
+
+    const load = (url) =>
+      new Promise((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error('iframe load timed out')), timeout);
+        frame.onload = () => {
+          clearTimeout(t);
+          resolve();
+        };
+        frame.src = url;
+      });
+
+    const docOf = () => {
+      const d = frame.contentDocument;
+      if (!d) throw new Error('framing blocked');
+      return d;
+    };
+
+    try {
+      await load(startUrl);
+      docOf().querySelector('body');
+    } catch (e) {
+      frame.remove();
+      console.error(
+        `Could not drive the survey in an iframe (${e.message}). The survey refuses to be framed — ` +
+          `use step-through mode instead:  spb.plan({ maxRuns: 20 })`
+      );
+      return null;
+    }
+
+    const state = { queue: [[]], seen: [''], traces: [] };
+    let runs = 0;
+    while (state.queue.length && runs < maxRuns) {
+      const plan = state.queue.shift();
+      const runId = `run-${String(++runs).padStart(3, '0')}`;
+      const steps = [];
+      const decisions = [];
+      let di = 0;
+      let type = 'maxsteps';
+      let text = '';
+
+      try {
+        if (runs > 1) await load(startUrl);
+        for (let step = 0; step < maxSteps; step++) {
+          const doc = docOf();
+          const model = C.readPage(cfg.selectors, doc);
+          if (model.isTerminal) {
+            steps.push({
+              url: model.url, fingerprint: model.fingerprint, heading: model.heading, outcome: model.outcome,
+              questionKeys: [], questions: [], decisions: [],
+            });
+            type = model.outcome || 'end';
+            text = model.bodyText.slice(0, 600);
+            break;
+          }
+          const answered = answerPage(model, plan, di, cfg, doc);
+          di = answered.di;
+          steps.push(answered.record);
+          decisions.push(...answered.record.decisions);
+
+          await sleep(delay);
+          const before = model.fingerprint + '|' + model.url;
+          C.clickNext(model, doc);
+          const deadline = Date.now() + timeout;
+          let moved = false;
+          while (Date.now() < deadline) {
+            await sleep(200);
+            try {
+              const m = C.readPage(cfg.selectors, docOf());
+              if (m.fingerprint + '|' + m.url !== before) {
+                moved = true;
+                break;
+              }
+            } catch {
+              /* mid-navigation */
+            }
+          }
+          if (!moved) {
+            type = 'stalled';
+            try {
+              const now = C.readPage(cfg.selectors, docOf());
+              text = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [
+                'page did not advance after submitting',
+              ])[0];
+            } catch {
+              text = 'page did not advance after submitting';
+            }
+            break;
+          }
+        }
+      } catch (e) {
+        type = e.message === 'framing blocked' ? 'left-origin' : 'error';
+        text = e.message;
+      }
+
+      const trace = makeTrace(runId, plan, steps, decisions, type, text);
+      state.traces.push(trace);
+      expand(state, trace);
+      console.log(
+        `${runId}  plan=[${plan.join(',')}]  pages=${trace.steps.length}  outcome=${type}  ` +
+          `${trace.decisions.map((d) => `${d.key}:${d.chosenIndex}`).join(' > ')}`
+      );
+    }
+
+    this.traces = state.traces;
+    this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
+    frame.remove();
+    console.log(
+      `%cdone — ${state.traces.length} traversal(s), ${state.queue.length} branch(es) untried. spb.report() / spb.download()`,
+      'font-weight:bold'
+    );
+    return state.traces;
+  },
+
+  // ---- step-through mode ---------------------------------------------------
+  plan(opts = {}) {
+    const state = {
+      active: true,
+      startUrl: opts.url || location.href,
+      cfg: { ...this.config, ...(opts.config || {}) },
+      maxRuns: opts.maxRuns ?? 20,
+      maxSteps: opts.maxSteps ?? 60,
+      queue: [[]],
+      seen: [''],
+      traces: [],
+      runs: 0,
+      current: null,
+    };
+    writeJSON(STEP_KEY, state);
+    console.log('step mode armed. Re-run this snippet (Ctrl/Cmd+Enter) on each page; it advances one page per run.');
+    return this.go();
+  },
+
+  go() {
+    const state = readJSON(STEP_KEY, null);
+    if (!state || !state.active) {
+      console.log('step mode is not armed — run spb.plan() first.');
+      return null;
+    }
+
+    const startNext = () => {
+      if (state.runs >= state.maxRuns || !state.queue.length) {
+        state.active = false;
+        writeJSON(STEP_KEY, state);
+        this.traces = state.traces;
+        this._summary = { url: state.startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
+        console.log(
+          `%cdone — ${state.traces.length} traversal(s), ${state.queue.length} branch(es) untried. spb.report() / spb.download()`,
+          'font-weight:bold'
+        );
+        return null;
+      }
+      const plan = state.queue.shift();
+      state.runs += 1;
+      state.current = { runId: `run-${String(state.runs).padStart(3, '0')}`, plan, di: 0, steps: [], decisions: [] };
+      writeJSON(STEP_KEY, state);
+      console.log(`starting ${state.current.runId} plan=[${plan.join(',')}] — reloading the survey…`);
+      location.href = state.startUrl;
+      return null;
+    };
+
+    if (!state.current) return startNext();
+
+    const cfg = state.cfg;
+    const model = C.readPage(cfg.selectors);
+    const c = state.current;
+
+    if (model.isTerminal) {
+      c.steps.push({ url: model.url, fingerprint: model.fingerprint, heading: model.heading, outcome: model.outcome, questionKeys: [], questions: [], decisions: [] });
+      const trace = makeTrace(c.runId, c.plan, c.steps, c.decisions, model.outcome || 'end', model.bodyText.slice(0, 600));
+      state.traces.push(trace);
+      expand(state, trace);
+      state.current = null;
+      writeJSON(STEP_KEY, state);
+      console.log(`${trace.runId} finished: ${trace.outcome.type} after ${trace.steps.length} page(s)`);
+      return startNext();
+    }
+
+    if (c.steps.length >= state.maxSteps) {
+      const trace = makeTrace(c.runId, c.plan, c.steps, c.decisions, 'maxsteps', `stopped after ${state.maxSteps} pages`);
+      state.traces.push(trace);
+      expand(state, trace);
+      state.current = null;
+      writeJSON(STEP_KEY, state);
+      return startNext();
+    }
+
+    const answered = answerPage(model, c.plan, c.di, cfg, document);
+    c.di = answered.di;
+    c.steps.push(answered.record);
+    c.decisions.push(...answered.record.decisions);
+    writeJSON(STEP_KEY, state);
+    console.table(Object.fromEntries(answered.record.decisions.map((d) => [d.key, d.chosen])));
+    C.clickNext(model);
+    console.log(`${c.runId} · page ${c.steps.length} answered — press Ctrl/Cmd+Enter again on the next page.`);
+    return answered.record;
+  },
+
+  status() {
+    const state = readJSON(STEP_KEY, null);
+    if (state?.active) {
+      console.log(
+        `step mode: ${state.runs} run(s) started, ${state.traces.length} finished, ${state.queue.length} queued` +
+          (state.current ? `, currently ${state.current.runId} on page ${state.current.steps.length + 1}` : '')
+      );
+      return state;
+    }
+    console.log(`${this.traces.length} traversal(s) recorded in this tab.`);
+    return { traces: this.traces };
+  },
+
+  allTraces() {
+    const state = readJSON(STEP_KEY, null);
+    return this.traces.length ? this.traces : state?.traces ?? [];
+  },
+
+  report() {
+    const traces = this.allTraces();
+    if (!traces.length) return console.log('no traversals recorded yet.');
+    const md = globalThis.SPB_REPORT.buildReport(traces, this._summary || { url: location.href, generatedAt: new Date().toISOString() });
+    console.log(md);
+    return md;
+  },
+
+  download(name = 'survey-pathway-REPORT.md') {
+    const md = this.report();
+    if (!md) return;
+    const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    console.log(`saved ${name}`);
+  },
+
+  reset() {
+    writeJSON(STEP_KEY, null);
+    writeJSON(CAPTURE_KEY, []);
+    this.traces = [];
+    console.log('cleared');
+  },
+
+  // ---- manual, one page at a time -----------------------------------------
   inspect() {
     const m = C.readPage(this.config.selectors);
     console.log(`%c${m.heading || document.title}`, 'font-weight:bold');
@@ -375,10 +890,9 @@ const spb = {
     return m;
   },
 
-  // Answer every question on the page. Override by question name:
-  //   spb.fill({ S1: 2 })            -> option index 2
-  //   spb.fill({ S1: /55 or older/ })-> first option whose label/value matches
-  //   spb.fill({ Q3: 'some text' })  -> text answer
+  // spb.fill({ S1: 2 })            option index
+  // spb.fill({ S1: /55 or older/ }) first option whose label or value matches
+  // spb.fill({ Q3: 'some text' })   text answer
   fill(overrides = {}) {
     const m = C.readPage(this.config.selectors);
     const chosen = {};
@@ -399,8 +913,7 @@ const spb = {
   },
 
   next() {
-    const m = C.readPage(this.config.selectors);
-    return C.clickNext(m);
+    return C.clickNext(C.readPage(this.config.selectors));
   },
 
   step(overrides) {
@@ -409,9 +922,8 @@ const spb = {
     return chosen;
   },
 
-  // Record the answers currently selected on this page, so a pathway you walk
-  // by hand can be turned into a scripted test. Run it on each page, then call
-  // spb.scenario('name') at the end.
+  // Record the answers currently selected, so a pathway walked by hand can
+  // become a scripted test.
   capture() {
     const m = C.readPage(this.config.selectors);
     const answers = [];
@@ -429,35 +941,32 @@ const spb = {
         answers.push({ match: `^${q.key}$`, value: el.value });
       }
     }
-    const all = readCaptured();
+    const all = readJSON(CAPTURE_KEY, []);
     all.push({ url: location.href, fingerprint: m.fingerprint, answers });
-    writeCaptured(all);
+    writeJSON(CAPTURE_KEY, all);
     console.log(`captured ${answers.length} answer(s) on ${m.fingerprint} (${all.length} page(s) so far)`);
     return answers;
   },
 
-  // Print the captured pages as a paths.json scenario.
   scenario(name = 'Captured pathway') {
-    const all = readCaptured();
-    const answers = all.flatMap((p) => p.answers);
-    const seen = [...new Set(all.flatMap((p) => p.fingerprint))];
-    const out = { name, answers, expect: { outcome: 'complete' }, _pages: seen };
+    const all = readJSON(CAPTURE_KEY, []);
+    const out = { name, answers: all.flatMap((p) => p.answers), expect: { outcome: 'complete' }, _pages: all.map((p) => p.fingerprint) };
     console.log(JSON.stringify(out, null, 2));
     return out;
   },
-
-  clear() {
-    writeCaptured([]);
-    console.log('capture buffer cleared');
-  },
 };
 
-function escapeRe(s) {
-  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 globalThis.spb = spb;
-console.log('%csurvey pathway bot loaded', 'font-weight:bold');
-console.log('spb.inspect()  spb.fill({S1: 2})  spb.step()  spb.capture()  spb.scenario("name")');
+
+// Re-running the snippet while step mode is armed advances the run, so the
+// whole loop is one keystroke per page.
+const stepState = readJSON(STEP_KEY, null);
+if (stepState && stepState.active) {
+  console.log('%csurvey pathway bot — step mode active', 'font-weight:bold');
+  spb.go();
+} else {
+  console.log('%csurvey pathway bot loaded', 'font-weight:bold');
+  console.log('spb.auto()  explore everything automatically   ·   spb.help()  all commands');
+}
 
 })();

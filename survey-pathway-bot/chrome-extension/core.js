@@ -33,11 +33,13 @@ const DEFAULT_SELECTORS = {
   },
 };
 
-function pageModel(cfg) {
+function pageModel(cfg, doc) {
+  doc = doc || document;
+  const win = doc.defaultView || window;
   const visible = (el) => {
     if (!el) return false;
     const r = el.getBoundingClientRect();
-    const s = getComputedStyle(el);
+    const s = win.getComputedStyle(el);
     return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0' && (r.width > 0 || r.height > 0);
   };
   const clean = (s) => (s || '').replace(/\s+/g, ' ').trim();
@@ -47,7 +49,7 @@ function pageModel(cfg) {
   // the control inside it, so an unchecked `#Q3` would target the wrapper.
   let stamp = 0;
   const resolves = (sel, el) => {
-    try { return document.querySelector(sel) === el; } catch { return false; }
+    try { return doc.querySelector(sel) === el; } catch { return false; }
   };
   const cssFor = (el) => {
     if (el.id && /^[A-Za-z][\w:.-]*$/.test(el.id)) {
@@ -71,7 +73,7 @@ function pageModel(cfg) {
   // Text of the label attached to a single control.
   const optionLabel = (el) => {
     if (el.id) {
-      const lab = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      const lab = doc.querySelector(`label[for="${CSS.escape(el.id)}"]`);
       if (lab && clean(lab.innerText)) return clean(lab.innerText);
     }
     const wrap = el.closest('label');
@@ -103,7 +105,7 @@ function pageModel(cfg) {
     return stem.slice(0, 300);
   };
 
-  const controls = [...document.querySelectorAll('input, select, textarea')].filter((el) => {
+  const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
     const type = (el.type || '').toLowerCase();
     if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type)) return false;
     if (el.disabled) return false;
@@ -156,14 +158,14 @@ function pageModel(cfg) {
   // Forward button.
   let next = null;
   for (const sel of cfg.nextButtons) {
-    const el = [...document.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
+    const el = [...doc.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
     if (el) {
       next = { selector: cssFor(el), label: clean(el.innerText || el.value || ''), matched: sel };
       break;
     }
   }
 
-  const bodyText = clean(document.body?.innerText || '');
+  const bodyText = clean(doc.body?.innerText || '');
   const lower = bodyText.toLowerCase();
   let outcome = null;
   for (const [name, pats] of Object.entries(cfg.terminalPatterns)) {
@@ -171,12 +173,12 @@ function pageModel(cfg) {
   }
 
   const heading = clean(
-    document.querySelector('h1, h2, .page-title, .survey-title')?.innerText || document.title || ''
+    doc.querySelector('h1, h2, .page-title, .survey-title')?.innerText || doc.title || ''
   ).slice(0, 200);
 
   return {
-    url: location.href,
-    title: document.title,
+    url: doc.location.href,
+    title: doc.title,
     heading,
     questions,
     next,
@@ -264,13 +266,15 @@ function describe(q, candidate) {
 // DOM-native answering, used by the Chrome extension and the console snippet.
 // (The Node/Playwright build answers through Playwright's own APIs instead, so
 // that it waits for the engine's own visibility and enabled checks.)
-function applyAnswer(q, candidate) {
+function applyAnswer(q, candidate, doc) {
+  doc = doc || document;
+  const win = doc.defaultView || window;
   if (!candidate || candidate.kind === 'noop') return true;
   const fire = (el, types) => {
-    for (const t of types) el.dispatchEvent(new Event(t, { bubbles: true }));
+    for (const t of types) el.dispatchEvent(new win.Event(t, { bubbles: true }));
   };
   if (candidate.kind === 'value') {
-    const el = document.querySelector(q.selector);
+    const el = doc.querySelector(q.selector);
     if (!el) return false;
     el.focus?.();
     el.value = candidate.value;
@@ -280,13 +284,13 @@ function applyAnswer(q, candidate) {
   const opt = q.options[candidate.index];
   if (!opt) return false;
   if (q.kind === 'select') {
-    const el = document.querySelector(q.selector);
+    const el = doc.querySelector(q.selector);
     if (!el) return false;
     el.value = opt.value;
     fire(el, ['input', 'change']);
     return true;
   }
-  const el = document.querySelector(opt.selector);
+  const el = doc.querySelector(opt.selector);
   if (!el) return false;
   el.click();
   if (!el.checked) {
@@ -297,22 +301,22 @@ function applyAnswer(q, candidate) {
 }
 
 // Click the forward button described by a page model.
-function clickNext(model) {
+function clickNext(model, doc) {
   if (!model.next) return false;
-  const el = document.querySelector(model.next.selector);
+  const el = (doc || document).querySelector(model.next.selector);
   if (!el) return false;
   el.click();
   return true;
 }
 
 // Everything a caller needs to read the current page in one call.
-function readPage(cfg) {
+function readPage(cfg, doc) {
   const c = cfg || DEFAULT_SELECTORS;
   const model = pageModel({
     questionContainers: c.questionContainers || DEFAULT_SELECTORS.questionContainers,
     nextButtons: c.nextButtons || DEFAULT_SELECTORS.nextButtons,
     terminalPatterns: c.terminalPatterns || DEFAULT_SELECTORS.terminalPatterns,
-  });
+  }, doc);
   model.fingerprint = fingerprint(model);
   model.isTerminal = !model.next || (model.questions.length === 0 && !!model.outcome);
   return model;
