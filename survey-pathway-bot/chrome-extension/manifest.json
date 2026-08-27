@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Survey pathway bot",
+  "version": "1.0.0",
+  "description": "Walks a survey's branching logic in your own browser and reports which pathways, questions and end states exist.",
+  "permissions": ["storage", "tabs", "browsingData"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["core.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": { "default_popup": "popup.html", "default_title": "Survey pathway bot" }
+}

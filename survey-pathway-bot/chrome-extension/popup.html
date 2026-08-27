@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { font: 13px/1.45 system-ui, sans-serif; width: 360px; margin: 0; padding: 12px; }
+      h1 { font-size: 14px; margin: 0 0 8px; }
+      label { display: block; margin: 8px 0 2px; font-weight: 600; font-size: 12px; }
+      input[type="text"], input[type="number"], textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospace; padding: 4px; }
+      textarea { height: 90px; }
+      .row { display: flex; gap: 8px; }
+      .row > div { flex: 1; }
+      button { margin-top: 10px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+      #status { margin-top: 10px; padding: 8px; background: #f4f4f5; border-radius: 4px; font-size: 12px; white-space: pre-wrap; }
+      .muted { color: #666; font-size: 11px; margin-top: 6px; }
+      .warn { color: #8a4b00; background: #fff5e6; padding: 6px; border-radius: 4px; font-size: 11px; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Survey pathway bot</h1>
+
+    <label for="url">Survey start URL (use a test/preview link)</label>
+    <input type="text" id="url" placeholder="https://…/survey/selfserve/…" />
+
+    <div class="row">
+      <div>
+        <label for="maxRuns">Max traversals</label>
+        <input type="number" id="maxRuns" value="20" min="1" />
+      </div>
+      <div>
+        <label for="delay">Delay per page (ms)</label>
+        <input type="number" id="delay" value="600" min="0" step="100" />
+      </div>
+    </div>
+
+    <label><input type="checkbox" id="clearCookies" /> Clear this site's cookies between runs</label>
+
+    <label for="config">Config (optional JSON — answer rules, branchOn, …)</label>
+    <textarea id="config" placeholder='{ "branchOn": "^S\\d|age|brand", "maxOptionsPerQuestion": 4, "answers": [{ "match": "zip|postal", "value": "10001" }] }'></textarea>
+
+    <div class="row">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+    </div>
+    <div class="row">
+      <button id="report">Download report</button>
+      <button id="traces">Download traces</button>
+    </div>
+
+    <div id="status">idle</div>
+    <div class="warn">Run this against a survey you own or are authorised to QA — a live in-field link puts fake interviews into real sample.</div>
+    <div class="muted">The run opens its own tab. You can keep using other tabs; closing the run tab stops the run.</div>
+
+    <script src="report-core.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

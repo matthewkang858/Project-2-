@@ -2,8 +2,8 @@
 
 # Survey pathway test report
 
-Survey: `http://127.0.0.1:8101/`
-Generated: 2026-08-27T16:42:16.261Z
+Survey: `http://127.0.0.1:8102/`
+Generated: 2026-08-27T17:10:57.554Z
 Traversals: **14**  ·  untried branches still queued: **63**
 
 ## Outcomes
@@ -39,33 +39,33 @@ Nodes are pages (labelled with the questions they ask); edge labels are the answ
 
 ```mermaid
 flowchart TD
-  N513a5331["S1"]
-  N5445524d494e(["TERMINATE: We're sorry"])
-  N513a53322c53["S2, S3"]
-  N513a51317231["Q1r1, Q1r2, Q1r3"]
-  N513a51327231["Q2r1, Q2r2"]
-  N513a5133["Q3"]
-  N434f4d504c45(["COMPLETE: Thank you for completing this…"])
-  N51554f54413a(["QUOTA: Quota full"])
-  N513a5331 -->|"S1=Under 18 [1]"| N5445524d494e
-  N513a5331 -->|"S1=18–34 [2] ×11"| N513a53322c53
-  N513a53322c53 -->|"S2=Male [1], S3=California [1] ×8"| N513a51317231
-  N513a51317231 -->|"Q1r1=Alpha [1], Q1r2=Beta [1], Q1r3=Gamma [1] ×9"| N513a51327231
-  N513a51327231 -->|"Q2r1=Poor [1], Q2r2=Poor [1] ×8"| N513a5133
-  N513a5133 -->|"(no branching answer) ×12"| N434f4d504c45
-  N513a5331 -->|"S1=35–54 [3]"| N513a53322c53
-  N513a5331 -->|"S1=55 or older [4]"| N513a53322c53
-  N513a53322c53 -->|"S2=Male [1], S3=California [1]"| N51554f54413a
-  N513a53322c53 -->|"S2=Female [2], S3=California [1]"| N513a51317231
-  N513a53322c53 -->|"S2=Prefer not to say…, S3=California [1]"| N513a51317231
-  N513a53322c53 -->|"S2=Male [1], S3=New York [2]"| N513a51317231
-  N513a53322c53 -->|"S2=Male [1], S3=Texas [3]"| N513a51317231
-  N513a51317231 -->|"Q1r1=(left unchecked), Q1r2=Beta [1], Q1r3=Gamma [1]"| N513a5133
-  N513a51317231 -->|"Q1r1=Alpha [1], Q1r2=(left unchecked), Q1r3=Gamma [1]"| N513a51327231
-  N513a51317231 -->|"Q1r1=Alpha [1], Q1r2=Beta [1], Q1r3=(left unchecked)"| N513a51327231
-  N513a51327231 -->|"Q2r1=OK [2], Q2r2=Poor [1]"| N513a5133
-  N513a51327231 -->|"Q2r1=Good [3], Q2r2=Poor [1]"| N513a5133
-  N513a51327231 -->|"Q2r1=Poor [1], Q2r2=OK [2]"| N513a5133
+  N7c87c9cc["S1"]
+  Nbd3afc4c(["TERMINATE: We're sorry"])
+  N71cfe983["S2, S3"]
+  Ndcb1530c["Q1r1, Q1r2, Q1r3"]
+  Nc8220f61["Q2r1, Q2r2"]
+  N7c87ca0c["Q3"]
+  N25bb3eaf(["COMPLETE: Thank you for completing this…"])
+  N848012a1(["QUOTA: Quota full"])
+  N7c87c9cc -->|"S1=Under 18 [1]"| Nbd3afc4c
+  N7c87c9cc -->|"S1=18–34 [2] ×11"| N71cfe983
+  N71cfe983 -->|"S2=Male [1], S3=California [1] ×8"| Ndcb1530c
+  Ndcb1530c -->|"Q1r1=Alpha [1], Q1r2=Beta [1], Q1r3=Gamma [1] ×9"| Nc8220f61
+  Nc8220f61 -->|"Q2r1=Poor [1], Q2r2=Poor [1] ×8"| N7c87ca0c
+  N7c87ca0c -->|"(no branching answer) ×12"| N25bb3eaf
+  N7c87c9cc -->|"S1=35–54 [3]"| N71cfe983
+  N7c87c9cc -->|"S1=55 or older [4]"| N71cfe983
+  N71cfe983 -->|"S2=Male [1], S3=California [1]"| N848012a1
+  N71cfe983 -->|"S2=Female [2], S3=California [1]"| Ndcb1530c
+  N71cfe983 -->|"S2=Prefer not to say…, S3=California [1]"| Ndcb1530c
+  N71cfe983 -->|"S2=Male [1], S3=New York [2]"| Ndcb1530c
+  N71cfe983 -->|"S2=Male [1], S3=Texas [3]"| Ndcb1530c
+  Ndcb1530c -->|"Q1r1=(left unchecked), Q1r2=Beta [1], Q1r3=Gamma [1]"| N7c87ca0c
+  Ndcb1530c -->|"Q1r1=Alpha [1], Q1r2=(left unchecked), Q1r3=Gamma [1]"| Nc8220f61
+  Ndcb1530c -->|"Q1r1=Alpha [1], Q1r2=Beta [1], Q1r3=(left unchecked)"| Nc8220f61
+  Nc8220f61 -->|"Q2r1=OK [2], Q2r2=Poor [1]"| N7c87ca0c
+  Nc8220f61 -->|"Q2r1=Good [3], Q2r2=Poor [1]"| N7c87ca0c
+  Nc8220f61 -->|"Q2r1=Poor [1], Q2r2=OK [2]"| N7c87ca0c
 ```
 
 ## Answer-option coverage

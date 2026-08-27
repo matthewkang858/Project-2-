@@ -1,0 +1,463 @@
+// Survey pathway bot — console snippet. Built by build-snippet.mjs; do not edit here.
+// Paste into the DevTools console on a survey page, or save as a DevTools Snippet
+// (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
+(() => {
+// Shared core — the only copy of "what is on this page and how do I answer it".
+//
+// Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
+// apart from the SPB_CORE assignment at the bottom:
+//   1. the Chrome extension  (a content script, listed in manifest.json)
+//   2. the console snippet   (dist/console-snippet.js is this file + a wrapper)
+//   3. the Node/Playwright CLIs (injected into the page by lib/extract.mjs)
+//
+// Questions are found by grouping the visible form controls by their `name`
+// attribute, which is how every hosted survey engine (Decipher/Forsta,
+// Qualtrics, Confirmit, Alchemer, SurveyMonkey) renders radios, checkboxes,
+// dropdowns, grids and open ends.
+
+const DEFAULT_SELECTORS = {
+  // Containers used to find a question's wording. Decipher-first, then generic.
+  questionContainers: ['div.question', 'div.q', 'fieldset', 'div[role="group"]', 'div[class*="question"]'],
+  // Candidates for the forward button, best first.
+  nextButtons: [
+    '#continue',
+    'input[name="continue"]',
+    'button[name="continue"]',
+    'input[type="submit"]',
+    'button[type="submit"]',
+    '.btn-primary',
+    'button.next',
+    'a.next',
+  ],
+  // Page text that means "this run is over".
+  terminalPatterns: {
+    complete: ['thank you for completing', 'survey is complete', 'thanks for taking', 'your responses have been recorded', 'completed the survey'],
+    quota: ['quota', 'we have enough', 'group is full'],
+    terminate: ['do not qualify', "don't qualify", 'not qualify', 'screened out', 'unfortunately', "we're sorry", 'we are sorry', 'no longer available'],
+  },
+};
+
+function pageModel(cfg) {
+  const visible = (el) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    const s = getComputedStyle(el);
+    return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0' && (r.width > 0 || r.height > 0);
+  };
+  const clean = (s) => (s || '').replace(/\s+/g, ' ').trim();
+
+  // A selector that is *verified* to resolve back to this exact element.
+  // Survey engines routinely put id="Q3" on the wrapper div and name="Q3" on
+  // the control inside it, so an unchecked `#Q3` would target the wrapper.
+  let stamp = 0;
+  const resolves = (sel, el) => {
+    try { return document.querySelector(sel) === el; } catch { return false; }
+  };
+  const cssFor = (el) => {
+    if (el.id && /^[A-Za-z][\w:.-]*$/.test(el.id)) {
+      const sel = `#${CSS.escape(el.id)}`;
+      if (resolves(sel, el)) return sel;
+    }
+    const tag = el.tagName.toLowerCase();
+    if (el.name) {
+      const attrs = [`[name="${CSS.escape(el.name)}"]`];
+      if (el.tagName === 'INPUT' && el.getAttribute('value') != null)
+        attrs.push(`[value="${CSS.escape(el.getAttribute('value'))}"]`);
+      const sel = tag + attrs.join('');
+      if (resolves(sel, el)) return sel;
+    }
+    // Last resort: mark the element so the selector cannot be ambiguous.
+    const mark = el.getAttribute('data-spb') ?? String(++stamp);
+    el.setAttribute('data-spb', mark);
+    return `[data-spb="${mark}"]`;
+  };
+
+  // Text of the label attached to a single control.
+  const optionLabel = (el) => {
+    if (el.id) {
+      const lab = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      if (lab && clean(lab.innerText)) return clean(lab.innerText);
+    }
+    const wrap = el.closest('label');
+    if (wrap && clean(wrap.innerText)) return clean(wrap.innerText);
+    const cell = el.closest('td, th, li, div');
+    if (cell && clean(cell.innerText) && clean(cell.innerText).length < 120) return clean(cell.innerText);
+    return clean(el.getAttribute('aria-label') || el.value || '');
+  };
+
+  // Wording of the question a control belongs to. For a grid, the row header
+  // is appended, since that is what distinguishes Q2r1 from Q2r2.
+  const questionLabel = (el) => {
+    let stem = '';
+    for (const sel of cfg.questionContainers) {
+      const box = el.closest(sel);
+      if (!box) continue;
+      const head = box.querySelector('legend, .qtitle, .question-text, .question-title, h1, h2, h3, h4, .title, p');
+      stem = clean(head?.innerText || '') || clean(box.innerText).slice(0, 300);
+      if (stem) break;
+    }
+    const row = el.closest('tr');
+    if (row) {
+      const cell = row.querySelector('th') ?? row.querySelector('td');
+      const rowLabel = clean(cell?.innerText || '');
+      // Only a header cell, not the cell holding this very control.
+      if (rowLabel && !cell.contains(el) && rowLabel.length < 120)
+        return (stem ? `${stem} — ${rowLabel}` : rowLabel).slice(0, 300);
+    }
+    return stem.slice(0, 300);
+  };
+
+  const controls = [...document.querySelectorAll('input, select, textarea')].filter((el) => {
+    const type = (el.type || '').toLowerCase();
+    if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type)) return false;
+    if (el.disabled) return false;
+    return visible(el);
+  });
+
+  const groups = new Map();
+  for (const el of controls) {
+    const key = el.name || el.id || cssFor(el);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(el);
+  }
+
+  const questions = [];
+  for (const [key, els] of groups) {
+    const first = els[0];
+    const tag = first.tagName.toLowerCase();
+    const type = (first.type || '').toLowerCase();
+    let kind;
+    if (tag === 'select') kind = 'select';
+    else if (type === 'radio') kind = 'radio';
+    else if (type === 'checkbox') kind = 'checkbox';
+    else if (tag === 'textarea') kind = 'textarea';
+    else if (type === 'number' || type === 'range') kind = 'number';
+    else kind = 'text';
+
+    const q = {
+      key,
+      kind,
+      label: questionLabel(first),
+      required: els.some((e) => e.required || e.getAttribute('aria-required') === 'true'),
+      selector: cssFor(first),
+      options: [],
+    };
+
+    if (kind === 'select') {
+      q.options = [...first.options]
+        .filter((o) => o.value !== '' && !o.disabled)
+        .map((o) => ({ value: o.value, label: clean(o.text), selector: q.selector }));
+    } else if (kind === 'radio' || kind === 'checkbox') {
+      q.options = els.map((e) => ({
+        value: e.value ?? '',
+        label: optionLabel(e),
+        selector: cssFor(e),
+      }));
+    }
+    questions.push(q);
+  }
+
+  // Forward button.
+  let next = null;
+  for (const sel of cfg.nextButtons) {
+    const el = [...document.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
+    if (el) {
+      next = { selector: cssFor(el), label: clean(el.innerText || el.value || ''), matched: sel };
+      break;
+    }
+  }
+
+  const bodyText = clean(document.body?.innerText || '');
+  const lower = bodyText.toLowerCase();
+  let outcome = null;
+  for (const [name, pats] of Object.entries(cfg.terminalPatterns)) {
+    if (pats.some((p) => lower.includes(p))) { outcome = name; break; }
+  }
+
+  const heading = clean(
+    document.querySelector('h1, h2, .page-title, .survey-title')?.innerText || document.title || ''
+  ).slice(0, 200);
+
+  return {
+    url: location.href,
+    title: document.title,
+    heading,
+    questions,
+    next,
+    outcome,
+    bodyText: bodyText.slice(0, 4000),
+  };
+}
+
+function fingerprint(model) {
+  const keys = model.questions.map((q) => q.key).sort();
+  if (keys.length) return `Q:${keys.join(',')}`;
+  const kind = model.outcome ?? 'page';
+  return `${kind.toUpperCase()}:${(model.heading || model.bodyText.slice(0, 60)).toLowerCase().replace(/\s+/g, '-').slice(0, 40)}`;
+}
+
+const DEFAULT_VALUES = {
+  text: 'Test response',
+  textarea: 'Automated pathway-test response.',
+  number: '30',
+};
+
+function ruleFor(q, config) {
+  for (const rule of config.answers ?? []) {
+    const re = new RegExp(rule.match, rule.flags ?? 'i');
+    if (re.test(q.key) || (q.label && re.test(q.label))) return rule;
+  }
+  return null;
+}
+
+function branchable(q, config) {
+  if (config.branchOn) {
+    const re = new RegExp(config.branchOn, 'i');
+    if (!re.test(q.key) && !(q.label && re.test(q.label))) return false;
+  }
+  if (config.noBranch) {
+    const re = new RegExp(config.noBranch, 'i');
+    if (re.test(q.key) || (q.label && re.test(q.label))) return false;
+  }
+  return true;
+}
+
+// -> [{ kind: 'option', index, value, label } | { kind: 'value', value }]
+function candidates(q, config = {}) {
+  const rule = ruleFor(q, config);
+
+  if (q.kind === 'radio' || q.kind === 'checkbox' || q.kind === 'select') {
+    let opts = q.options.map((o, index) => ({ kind: 'option', index, value: o.value, label: o.label }));
+    if (rule?.options) {
+      const re = new RegExp(rule.options, 'i');
+      const filtered = opts.filter((o) => re.test(o.value) || re.test(o.label));
+      if (filtered.length) opts = filtered;
+    }
+    if (rule?.skip) return [{ kind: 'noop', label: '(left unchecked)' }];
+    if (rule?.fixed != null) {
+      const re = new RegExp(rule.fixed, 'i');
+      const hit = opts.find((o) => re.test(o.value) || re.test(o.label));
+      return hit ? [hit] : opts.slice(0, 1);
+    }
+    // A lone checkbox is a two-way branch: ticked, or deliberately left blank.
+    // (Decipher and friends name each checkbox of a multi-select separately, so
+    // this is the common case, not an edge case.)
+    if (q.kind === 'checkbox' && opts.length === 1 && rule?.fixed == null) {
+      return branchable(q, config) ? [opts[0], { kind: 'noop', label: '(left unchecked)' }] : [opts[0]];
+    }
+    if (!branchable(q, config)) opts = opts.slice(0, 1);
+    const cap = config.maxOptionsPerQuestion ?? 0;
+    if (cap > 0 && opts.length > cap) opts = opts.slice(0, cap);
+    return opts.length ? opts : [{ kind: 'noop' }];
+  }
+
+  // Free-text style.
+  if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'value', value: String(v) }));
+  if (rule?.value != null) return [{ kind: 'value', value: String(rule.value) }];
+  const fallback = config.values?.[q.kind] ?? DEFAULT_VALUES[q.kind] ?? 'Test';
+  return [{ kind: 'value', value: String(fallback) }];
+}
+
+function describe(q, candidate) {
+  if (candidate.kind === 'value') return `"${candidate.value}"`;
+  if (candidate.kind === 'noop') return candidate.label ?? '(no answer)';
+  const opt = q.options[candidate.index];
+  return opt?.label ? `${opt.label} [${opt.value}]` : `[${opt?.value ?? candidate.index}]`;
+}
+
+// DOM-native answering, used by the Chrome extension and the console snippet.
+// (The Node/Playwright build answers through Playwright's own APIs instead, so
+// that it waits for the engine's own visibility and enabled checks.)
+function applyAnswer(q, candidate) {
+  if (!candidate || candidate.kind === 'noop') return true;
+  const fire = (el, types) => {
+    for (const t of types) el.dispatchEvent(new Event(t, { bubbles: true }));
+  };
+  if (candidate.kind === 'value') {
+    const el = document.querySelector(q.selector);
+    if (!el) return false;
+    el.focus?.();
+    el.value = candidate.value;
+    fire(el, ['input', 'change', 'blur']);
+    return true;
+  }
+  const opt = q.options[candidate.index];
+  if (!opt) return false;
+  if (q.kind === 'select') {
+    const el = document.querySelector(q.selector);
+    if (!el) return false;
+    el.value = opt.value;
+    fire(el, ['input', 'change']);
+    return true;
+  }
+  const el = document.querySelector(opt.selector);
+  if (!el) return false;
+  el.click();
+  if (!el.checked) {
+    el.checked = true;
+    fire(el, ['input', 'change']);
+  }
+  return true;
+}
+
+// Click the forward button described by a page model.
+function clickNext(model) {
+  if (!model.next) return false;
+  const el = document.querySelector(model.next.selector);
+  if (!el) return false;
+  el.click();
+  return true;
+}
+
+// Everything a caller needs to read the current page in one call.
+function readPage(cfg) {
+  const c = cfg || DEFAULT_SELECTORS;
+  const model = pageModel({
+    questionContainers: c.questionContainers || DEFAULT_SELECTORS.questionContainers,
+    nextButtons: c.nextButtons || DEFAULT_SELECTORS.nextButtons,
+    terminalPatterns: c.terminalPatterns || DEFAULT_SELECTORS.terminalPatterns,
+  });
+  model.fingerprint = fingerprint(model);
+  model.isTerminal = !model.next || (model.questions.length === 0 && !!model.outcome);
+  return model;
+}
+
+globalThis.SPB_CORE = {
+  DEFAULT_SELECTORS,
+  pageModel,
+  readPage,
+  fingerprint,
+  candidates,
+  describe,
+  applyAnswer,
+  clickNext,
+};
+
+// Console API built on top of the shared core. Everything here is scoped to the
+// page you are currently looking at — a page navigation clears it, which is why
+// multi-page automation lives in the Chrome extension instead.
+
+const C = globalThis.SPB_CORE;
+const CAPTURE_KEY = 'spb-captured-answers';
+
+const readCaptured = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem(CAPTURE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+const writeCaptured = (v) => {
+  try {
+    sessionStorage.setItem(CAPTURE_KEY, JSON.stringify(v));
+  } catch {}
+};
+
+const spb = {
+  core: C,
+  config: {},
+
+  // What the bot sees on this page.
+  inspect() {
+    const m = C.readPage(this.config.selectors);
+    console.log(`%c${m.heading || document.title}`, 'font-weight:bold');
+    console.log(`page id: ${m.fingerprint}   next: ${m.next ? m.next.selector : 'none'}   end state: ${m.outcome || '—'}`);
+    console.table(
+      m.questions.map((q) => ({
+        name: q.key,
+        type: q.kind,
+        question: (q.label || '').slice(0, 60),
+        options: q.options.length || '',
+        labels: q.options.map((o) => o.label).join(' | ').slice(0, 80),
+        branches: C.candidates(q, this.config).length,
+      }))
+    );
+    return m;
+  },
+
+  // Answer every question on the page. Override by question name:
+  //   spb.fill({ S1: 2 })            -> option index 2
+  //   spb.fill({ S1: /55 or older/ })-> first option whose label/value matches
+  //   spb.fill({ Q3: 'some text' })  -> text answer
+  fill(overrides = {}) {
+    const m = C.readPage(this.config.selectors);
+    const chosen = {};
+    for (const q of m.questions) {
+      const cands = C.candidates(q, this.config);
+      let pick = cands[0];
+      const o = overrides[q.key];
+      if (o != null) {
+        if (typeof o === 'number') pick = cands[o] || pick;
+        else if (o instanceof RegExp) pick = cands.find((c) => o.test(c.label || '') || o.test(c.value || '')) || pick;
+        else pick = { kind: 'value', value: String(o) };
+      }
+      C.applyAnswer(q, pick);
+      chosen[q.key] = C.describe(q, pick);
+    }
+    console.table(chosen);
+    return chosen;
+  },
+
+  next() {
+    const m = C.readPage(this.config.selectors);
+    return C.clickNext(m);
+  },
+
+  step(overrides) {
+    const chosen = this.fill(overrides);
+    this.next();
+    return chosen;
+  },
+
+  // Record the answers currently selected on this page, so a pathway you walk
+  // by hand can be turned into a scripted test. Run it on each page, then call
+  // spb.scenario('name') at the end.
+  capture() {
+    const m = C.readPage(this.config.selectors);
+    const answers = [];
+    for (const q of m.questions) {
+      const el = document.querySelector(q.selector);
+      if (q.kind === 'radio' || q.kind === 'checkbox') {
+        for (const o of q.options) {
+          const input = document.querySelector(o.selector);
+          if (input && input.checked) answers.push({ match: `^${q.key}$`, fixed: escapeRe(o.label || o.value) });
+        }
+      } else if (q.kind === 'select') {
+        const opt = q.options.find((o) => o.value === (el && el.value));
+        if (opt) answers.push({ match: `^${q.key}$`, fixed: escapeRe(opt.label || opt.value) });
+      } else if (el && el.value) {
+        answers.push({ match: `^${q.key}$`, value: el.value });
+      }
+    }
+    const all = readCaptured();
+    all.push({ url: location.href, fingerprint: m.fingerprint, answers });
+    writeCaptured(all);
+    console.log(`captured ${answers.length} answer(s) on ${m.fingerprint} (${all.length} page(s) so far)`);
+    return answers;
+  },
+
+  // Print the captured pages as a paths.json scenario.
+  scenario(name = 'Captured pathway') {
+    const all = readCaptured();
+    const answers = all.flatMap((p) => p.answers);
+    const seen = [...new Set(all.flatMap((p) => p.fingerprint))];
+    const out = { name, answers, expect: { outcome: 'complete' }, _pages: seen };
+    console.log(JSON.stringify(out, null, 2));
+    return out;
+  },
+
+  clear() {
+    writeCaptured([]);
+    console.log('capture buffer cleared');
+  },
+};
+
+function escapeRe(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+globalThis.spb = spb;
+console.log('%csurvey pathway bot loaded', 'font-weight:bold');
+console.log('spb.inspect()  spb.fill({S1: 2})  spb.step()  spb.capture()  spb.scenario("name")');
+
+})();
