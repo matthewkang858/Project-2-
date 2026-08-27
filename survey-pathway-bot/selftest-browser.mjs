@@ -68,6 +68,21 @@ try {
   check(await auto.evaluate(() => !document.querySelector('iframe')), 'snippet removes its iframe when finished');
   await auto.close();
 
+  // ---- snippet: survey inside an iframe ---------------------------------
+  const framed = await ctx.newPage();
+  await framed.goto(URL_ + 'framed');
+  await framed.evaluate(snippet);
+  const framedTraces = await framed.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 4, config: { delay: 0 } }), URL_ + 'framed');
+  check(
+    (framedTraces || []).some((t) => t.decisions.length >= 8),
+    'snippet drives a survey nested inside an iframe'
+  );
+  check(
+    (framedTraces || []).some((t) => ['complete', 'quota', 'terminate'].includes(t.outcome?.type)),
+    'snippet reads the end state from inside the frame'
+  );
+  await framed.close();
+
   // ---- snippet: login-wall diagnostics ----------------------------------
   // The failure that produced an empty report in the field: a start URL that
   // renders an interstitial instead of the questionnaire.

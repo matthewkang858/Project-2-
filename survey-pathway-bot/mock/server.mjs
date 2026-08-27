@@ -73,6 +73,8 @@ function render(pageNo, st) {
 // Routing logic — the branching the bot is supposed to discover.
 function nextPage(submitted, st) {
   switch (submitted) {
+    case 0:
+      return 1;  // welcome page
     case 1:
       if (st.S1 === '1') return 'TERMINATE';          // under 18 screens out
       return 2;
@@ -98,6 +100,31 @@ createServer((req, res) => {
     res.end(`<!doctype html><html><head><title>Survey</title></head><body>
       <h1>Please login to see additional testing options</h1>
       <p>You must be signed in to view this survey.</p></body></html>`);
+    return;
+  }
+  // The welcome page real survey players show first: no questions, and a
+  // forward control that matches none of the classic selectors — a plain
+  // <button> whose only clue is the word "Continue".
+  if (req.url && req.url.startsWith('/intro')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <div class="banner">Please login to see additional testing features</div>
+      <form method="POST" action="/">
+        <input type="hidden" name="state" value="${enc({})}">
+        <input type="hidden" name="page" value="0">
+        <p>Click "Continue" to begin.</p>
+        <button class="btn-continue" onclick="this.form.submit()">Continue</button>
+      </form></body></html>`);
+    return;
+  }
+  // The same survey embedded in a host page, as players that frame the
+  // questionnaire do.
+  if (req.url && req.url.startsWith('/framed')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey host</title></head><body>
+      <h1>Survey</h1>
+      <iframe id="surveyFrame" src="/intro" style="width:900px;height:700px;border:0"></iframe>
+      </body></html>`);
     return;
   }
   if (req.method === 'GET') {

@@ -49,6 +49,17 @@ try {
   check(/`S3`.*select.*\| 3 \| 3 \|/.test(report), 'report shows full option coverage for the dropdown');
   check(report.includes('18–34'), 'option labels are read as UTF-8');
 
+  // A welcome page whose only forward control is a plain <button>Continue</button>,
+  // and the same survey embedded in a host page — the two shapes that made a
+  // field run stop on page one.
+  for (const [path, label] of [['intro', 'welcome page with a text-only Continue button'], ['framed', 'survey inside an iframe']]) {
+    const o = join(out, path);
+    const r = await run(['explore.mjs', '--url', URL + path, '--out', o, '--max-runs', '4']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.some((t) => t.decisions.length >= 8), `walks past a ${label}`);
+    check(ts.some((t) => ['complete', 'quota', 'terminate'].includes(t.outcome?.type)), `reaches a real end state through the ${label}`);
+  }
+
   const paths = await run(['run-paths.mjs', '--url', URL, '--paths', 'paths.example.json', '--out', out]);
   process.stdout.write(paths.stdout.replace(/^/gm, '      '));
   check(paths.code === 0, 'all scripted scenarios in paths.example.json pass');

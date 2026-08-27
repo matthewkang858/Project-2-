@@ -10,31 +10,36 @@ import { core } from './core.mjs';
 export const candidates = core.candidates;
 export const describe = core.describe;
 
-export async function apply(page, q, candidate) {
+// The survey may live inside an iframe on the host page; readPage records the
+// route as `docPath`, and Playwright reaches it through frame locators.
+export function scopeOf(page, docPath = []) {
+  return docPath.reduce((scope, sel) => scope.frameLocator(sel), page);
+}
+
+export async function apply(page, q, candidate, docPath = []) {
   if (candidate.kind === 'noop') return;
+  const scope = scopeOf(page, docPath);
   if (candidate.kind === 'value') {
-    await page.fill(q.selector, candidate.value);
+    await scope.locator(q.selector).fill(candidate.value);
     return;
   }
   const opt = q.options[candidate.index];
   if (!opt) throw new Error(`option ${candidate.index} missing on ${q.key}`);
   if (q.kind === 'select') {
-    await page.selectOption(q.selector, opt.value);
+    await scope.locator(q.selector).selectOption(opt.value);
     return;
   }
   // Radio / checkbox. Some engines overlay a styled span on the real input, so
   // fall back to a DOM click + change event when the normal check is blocked.
   try {
-    await page.check(opt.selector, { timeout: 3000 });
+    await scope.locator(opt.selector).check({ timeout: 3000 });
   } catch {
-    await page.evaluate((sel) => {
-      const el = document.querySelector(sel);
-      if (!el) return;
+    await scope.locator(opt.selector).evaluate((el) => {
       el.click();
       if (!el.checked) {
         el.checked = true;
         el.dispatchEvent(new Event('change', { bubbles: true }));
       }
-    }, opt.selector);
+    });
   }
 }

@@ -7,7 +7,7 @@
 // option forever" is a deterministic, resumable description of a pathway.
 
 import { readPage, DEFAULT_SELECTORS } from './extract.mjs';
-import { candidates, apply, describe } from './answer.mjs';
+import { candidates, apply, describe, scopeOf } from './answer.mjs';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -15,7 +15,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function advance(page, model, timeout) {
   const before = model.fingerprint + '|' + model.url;
-  await page.click(model.next.selector).catch(() => {});
+  await scopeOf(page, model.docPath).locator(model.next.selector).click({ timeout: 5000 }).catch(() => {});
   const deadline = Date.now() + timeout;
   let last = null;
   while (Date.now() < deadline) {
@@ -91,7 +91,7 @@ export async function runOnce(page, opts) {
       const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
       const chosen = cands[idx];
       try {
-        await apply(page, q, chosen);
+        await apply(page, q, chosen, model.docPath);
       } catch (err) {
         // Still counts as a decision slot so that replay plans stay aligned.
         const failed = { di, step, key: q.key, kind: q.kind, label: q.label, candidateCount: 1, chosenIndex: 0, chosen: '(failed)', error: String(err.message ?? err) };

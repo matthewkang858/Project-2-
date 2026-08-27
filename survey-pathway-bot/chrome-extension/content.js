@@ -65,12 +65,13 @@
         return;
       }
 
+      const target = SPB_CORE.docFor(model, document);
       for (const q of model.questions) {
         const cands = SPB_CORE.candidates(q, cfg);
         const wanted = plan[di];
         const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
         const chosen = cands[idx];
-        const ok = SPB_CORE.applyAnswer(q, chosen);
+        const ok = SPB_CORE.applyAnswer(q, chosen, target);
         record.decisions.push({
           di,
           key: q.key,
@@ -89,7 +90,7 @@
 
       await sleep(delay);
       const before = model.fingerprint + '|' + location.href;
-      if (!SPB_CORE.clickNext(model)) {
+      if (!SPB_CORE.clickNext(model, target)) {
         await send({ type: 'stalled', record, text: 'no forward button could be clicked' });
         return;
       }

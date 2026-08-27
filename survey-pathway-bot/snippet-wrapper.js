@@ -136,7 +136,8 @@ spb.reset()                 clear stored state`);
     const url = opts.url || location.href;
     const here = C.readPage(this.config.selectors);
     console.log(`%cpage: ${location.href}`, 'font-weight:bold');
-    console.log(`  questions found: ${here.questions.length}   forward button: ${here.next ? 'yes' : 'no'}   end state: ${here.outcome || '—'}`);
+    console.log(`  questions found: ${here.questions.length}   forward button: ${here.next ? `yes ("${here.next.label}")` : 'no'}   end state: ${here.outcome || '—'}`);
+    if (here.docPath?.length) console.log(`  (the survey is inside an iframe: ${here.docPath.join(' > ')})`);
     if (!here.questions.length) {
       const wall = /log ?in|sign ?in|password|testing options|not authorized|session/i.test(here.bodyText.slice(0, 400));
       console.warn(
@@ -214,11 +215,13 @@ spb.reset()                 clear stored state`);
     }
 
     const first = C.readPage(cfg.selectors, docOf());
-    if (!first.questions.length) {
+    // A welcome page legitimately has no questions — what matters is whether
+    // there is any way forward from it.
+    if (!first.questions.length && !first.next) {
       frame.remove();
       const wall = /log ?in|sign ?in|password|testing options|not authorized|session/i.test(first.bodyText.slice(0, 400));
       console.error(
-        `%cnothing to answer at ${startUrl} — ${first.questions.length} questions found.` +
+        `%cnothing to work with at ${startUrl} — no questions and no way forward.` +
           (wall ? ' The page looks like a login / interstitial wall: sign in first, open the survey so its first question is on screen, then run spb.auto() again.' : ' Check the start URL is the first page of the survey.'),
         'font-weight:bold'
       );
@@ -251,14 +254,15 @@ spb.reset()                 clear stored state`);
             text = model.bodyText.slice(0, 600);
             break;
           }
-          const answered = answerPage(model, plan, di, cfg, doc);
+          const target = C.docFor(model, doc);
+          const answered = answerPage(model, plan, di, cfg, target);
           di = answered.di;
           steps.push(answered.record);
           decisions.push(...answered.record.decisions);
 
           await sleep(delay);
           const before = model.fingerprint + '|' + model.url;
-          C.clickNext(model, doc);
+          C.clickNext(model, target);
           const deadline = Date.now() + timeout;
           let moved = false;
           while (Date.now() < deadline) {
@@ -390,13 +394,14 @@ spb.reset()                 clear stored state`);
       return startNext();
     }
 
-    const answered = answerPage(model, c.plan, c.di, cfg, document);
+    const target = C.docFor(model, document);
+    const answered = answerPage(model, c.plan, c.di, cfg, target);
     c.di = answered.di;
     c.steps.push(answered.record);
     c.decisions.push(...answered.record.decisions);
     writeJSON(STEP_KEY, state);
     console.table(Object.fromEntries(answered.record.decisions.map((d) => [d.key, d.chosen])));
-    C.clickNext(model);
+    C.clickNext(model, target);
     console.log(`${c.runId} · page ${c.steps.length} answered — press Ctrl/Cmd+Enter again on the next page.`);
     return answered.record;
   },
@@ -469,6 +474,7 @@ spb.reset()                 clear stored state`);
   // spb.fill({ Q3: 'some text' })   text answer
   fill(overrides = {}) {
     const m = C.readPage(this.config.selectors);
+    const doc = C.docFor(m, document);
     const chosen = {};
     for (const q of m.questions) {
       const cands = C.candidates(q, this.config);
@@ -479,7 +485,7 @@ spb.reset()                 clear stored state`);
         else if (o instanceof RegExp) pick = cands.find((c) => o.test(c.label || '') || o.test(c.value || '')) || pick;
         else pick = { kind: 'value', value: String(o) };
       }
-      C.applyAnswer(q, pick);
+      C.applyAnswer(q, pick, doc);
       chosen[q.key] = C.describe(q, pick);
     }
     console.table(chosen);
@@ -487,7 +493,8 @@ spb.reset()                 clear stored state`);
   },
 
   next() {
-    return C.clickNext(C.readPage(this.config.selectors));
+    const m = C.readPage(this.config.selectors);
+    return C.clickNext(m, C.docFor(m, document));
   },
 
   step(overrides) {
@@ -500,12 +507,13 @@ spb.reset()                 clear stored state`);
   // become a scripted test.
   capture() {
     const m = C.readPage(this.config.selectors);
+    const doc = C.docFor(m, document);
     const answers = [];
     for (const q of m.questions) {
-      const el = document.querySelector(q.selector);
+      const el = doc.querySelector(q.selector);
       if (q.kind === 'radio' || q.kind === 'checkbox') {
         for (const o of q.options) {
-          const input = document.querySelector(o.selector);
+          const input = doc.querySelector(o.selector);
           if (input && input.checked) answers.push({ match: `^${q.key}$`, fixed: escapeRe(o.label || o.value) });
         }
       } else if (q.kind === 'select') {
