@@ -51,7 +51,7 @@ function pageModel(cfg, doc) {
   // A selector that is *verified* to resolve back to this exact element.
   // Survey engines routinely put id="Q3" on the wrapper div and name="Q3" on
   // the control inside it, so an unchecked `#Q3` would target the wrapper.
-  let stamp = 0;
+
   const resolves = (sel, el) => {
     try { return doc.querySelector(sel) === el; } catch { return false; }
   };
@@ -69,9 +69,14 @@ function pageModel(cfg, doc) {
       if (resolves(sel, el)) return sel;
     }
     // Last resort: mark the element so the selector cannot be ambiguous.
-    const mark = el.getAttribute('data-spb') ?? String(++stamp);
-    el.setAttribute('data-spb', mark);
-    return `[data-spb="${mark}"]`;
+    // The counter lives on the document, not this call: a counter that resets
+    // per read hands the same mark to two different elements — which once made
+    // "click Continue" re-click an answer button instead.
+    const prior = el.getAttribute('data-spb');
+    if (prior && resolves(`[data-spb="${prior}"]`, el)) return `[data-spb="${prior}"]`;
+    const n = (doc.__spbStamp = (doc.__spbStamp || 0) + 1);
+    el.setAttribute('data-spb', String(n));
+    return `[data-spb="${n}"]`;
   };
 
   // Which phrases inside an element are bold or underlined. Emphasis is part of
@@ -373,6 +378,61 @@ function pageModel(cfg, doc) {
     });
   }
 
+  // Button-driven carousel cards: one card at a time, a pager, and a row of
+  // clickable non-form answer buttons shared by every card. There is no radio
+  // or checkbox to find, so this is its own question kind.
+  if (pager && !questions.length) {
+    const FWD = /^(continue|next|start|begin|proceed|submit|go on|ok|done|→|»|>>|›|>)$/i;
+    const BWD = /^(back|previous|prev|return|cancel|exit|«|<<|‹|<)$/i;
+    const byParent = new Map();
+    for (const el of doc.querySelectorAll('button, [role="button"], a, div, li, span')) {
+      if (!visible(el) || el.querySelector('input, select, textarea')) continue;
+      if (el.children.length > 2) continue;
+      const t = clean(el.innerText || '');
+      if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || /^\d+\s*\/\s*\d+$/.test(t)) continue;
+      const style = win.getComputedStyle(el);
+      const clicky = el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || el.onclick;
+      if (!clicky) continue;
+      const parent = el.parentElement;
+      if (!parent) continue;
+      if (!byParent.has(parent)) byParent.set(parent, []);
+      byParent.get(parent).push(el);
+    }
+    let best = null;
+    for (const [, els] of byParent) {
+      if (els.length < 2 || els.length > 8) continue;
+      if (new Set(els.map((e) => clean(e.innerText))).size !== els.length) continue;
+      if (!best || els.length > best.length) best = els;
+    }
+    if (best && posEl) {
+      // The card's own wording is the nearest text block above the pager that
+      // is not the question stem and not one of the buttons.
+      const stem = clean(
+        doc.querySelector('h1, h2, .page-title, .qtitle, .question-text, .survey-title')?.innerText || doc.title || ''
+      ).slice(0, 200);
+      let title = '';
+      for (const el of doc.querySelectorAll('div, p, span, h1, h2, h3, td, th, li')) {
+        if (el.children.length || !visible(el)) continue;
+        const t = clean(el.innerText || '');
+        if (t.length < 5 || t.length > 200 || t === stem || /^\d+\s*\/\s*\d+$/.test(t)) continue;
+        if (best.some((b) => clean(b.innerText) === t)) continue;
+        if (posEl.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) title = t;
+      }
+      const slug = (title || `card${pager.index}`).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+      questions.push({
+        key: `card:${slug}`,
+        kind: 'buttons',
+        label: title ? `${stem} — ${title}` : `${stem} — card ${pager.index}/${pager.total}`,
+        group: 'cards:' + clean(stem).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30),
+        required: true,
+        selector: cssFor(best[0]),
+        emphasis: { bold: [], underline: [] },
+        answered: best.some((b) => /\b(sel|selected|active|checked)\b/i.test(b.className || '') || b.getAttribute('aria-pressed') === 'true'),
+        options: best.map((b) => ({ value: clean(b.innerText), label: clean(b.innerText), selector: cssFor(b), emphasis: marksOf(b) })),
+      });
+    }
+  }
+
   // Forward button. Selector matches first (precise), then anything that reads
   // like a forward control — modern survey players render a plain
   // <button>Continue</button> that matches none of the classic selectors, and
@@ -461,7 +521,7 @@ function branchable(q, config) {
 function candidates(q, config = {}) {
   const rule = ruleFor(q, config);
 
-  if (q.kind === 'radio' || q.kind === 'checkbox' || q.kind === 'select') {
+  if (q.kind === 'radio' || q.kind === 'checkbox' || q.kind === 'select' || q.kind === 'buttons') {
     let opts = q.options.map((o, index) => ({ kind: 'option', index, value: o.value, label: o.label }));
     if (rule?.options) {
       const re = new RegExp(rule.options, 'i');
@@ -675,6 +735,22 @@ function applyAnswer(q, candidate, doc) {
     el.value = opt.value;
     fire(el, ['input', 'change']);
     return String(el.value) === String(opt.value);
+  }
+  if (q.kind === 'buttons') {
+    const tidy = (x) => (x || '').replace(/\s+/g, ' ').trim();
+    let el = null;
+    try {
+      el = doc.querySelector(opt.selector);
+    } catch {
+      el = null;
+    }
+    if (!el || !el.isConnected)
+      el = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].find(
+        (e) => tidy(e.innerText) === tidy(opt.label) && e.getClientRects().length
+      );
+    if (!el) return false;
+    el.click();
+    return true;
   }
   const el = findControl(doc, q, opt);
   if (!el) return false;

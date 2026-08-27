@@ -25,6 +25,12 @@ export async function apply(page, q, candidate, docPath = []) {
   }
   const opt = q.options[candidate.index];
   if (!opt) throw new Error(`option ${candidate.index} missing on ${q.key}`);
+  if (q.kind === 'buttons') {
+    await scope.locator(opt.selector).click({ timeout: 5000 }).catch(async () => {
+      await scope.getByText(opt.label, { exact: true }).first().click({ timeout: 5000 });
+    });
+    return;
+  }
   if (q.kind === 'select') {
     await scope.locator(q.selector).selectOption(opt.value);
     return;

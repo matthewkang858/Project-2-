@@ -215,6 +215,57 @@ createServer((req, res) => {
   }
   // "Please select up to two" — each checkbox carries its own name, and the
   // server rejects more than two, exactly as Decipher does.
+  // A button-driven card carousel: one card at a time, three shared answer
+  // buttons that are plain divs (no form controls anywhere visible), a pager,
+  // and Continue only after every card is answered.
+  if (req.url && req.url.split('?')[0] === '/cards') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['IT (e.g., CIO, members of the technology team)', 'Executive Management (e.g., CEO)', 'Finance (e.g., CFO)'];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.abtn{display:inline-block;padding:14px;border:1px solid #ccc;border-radius:8px;margin:6px;cursor:pointer}
+             .abtn.sel{background:#dde}.cardface{padding:30px;border:1px solid #ddd;border-radius:8px;width:300px;margin:10px auto;text-align:center}</style>
+      </head><body>
+      <form method="POST" action="/cardscheck">
+        <div class="qtitle">Which of the following best describes the role that is typically played by the following departments/members of your company?</div>
+        <div class="cardface" id="face"></div>
+        <div class="pager"><button type="button" id="prev" aria-label="Previous">&lsaquo;</button>
+          <span id="pos"></span>
+          <button type="button" id="nextCard" aria-label="Next">&rsaquo;</button></div>
+        <div id="answers">
+          <div class="abtn" data-a="1">Key decision-maker</div>
+          <div class="abtn" data-a="2">Influencer</div>
+          <div class="abtn" data-a="3">No role in the process</div>
+        </div>
+        ${rows.map((_, i) => `<input type="hidden" name="ans32900.0.${i}" id="h${i}" value="">`).join('')}
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var rows = ${JSON.stringify(rows)};
+        var at = 0;
+        function paint() {
+          document.getElementById('face').textContent = rows[at];
+          document.getElementById('pos').textContent = (at + 1) + ' / ' + rows.length;
+          var val = document.getElementById('h' + at).value;
+          [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+            b.className = 'abtn' + (b.getAttribute('data-a') === val ? ' sel' : '');
+          });
+          var done = rows.every(function (_, i) { return document.getElementById('h' + i).value; });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+          b.addEventListener('click', function () {
+            document.getElementById('h' + at).value = b.getAttribute('data-a');
+            if (at < rows.length - 1) at++;
+            paint();
+          });
+        });
+        document.getElementById('nextCard').addEventListener('click', function () { if (at < rows.length - 1) { at++; paint(); } });
+        document.getElementById('prev').addEventListener('click', function () { if (at > 0) { at--; paint(); } });
+        paint();
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/offscreen') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
@@ -382,6 +433,18 @@ createServer((req, res) => {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       if (!form.get('RR1'))
         res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url === '/cardscheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      const all = [0, 1, 2].every((i) => form.get(`ans32900.0.${i}`));
+      if (!all) res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please provide an answer for each item.</p></body></html>`);
       else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
     });
     return;

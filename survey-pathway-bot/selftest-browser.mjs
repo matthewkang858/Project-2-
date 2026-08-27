@@ -98,6 +98,16 @@ try {
     await w.close();
   }
 
+  const cardsPage = await ctx.newPage();
+  await cardsPage.goto(URL_ + 'cards');
+  await cardsPage.evaluate(snippet);
+  const cardTraces = (await cardsPage.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 3, config: { delay: 0 } }), URL_ + 'cards')) || [];
+  check(
+    cardTraces.length === 3 && cardTraces.every((t) => t.outcome?.type === 'complete'),
+    'snippet completes a button-driven card carousel'
+  );
+  await cardsPage.close();
+
   const rer = await ctx.newPage();
   await rer.goto(URL_ + 'rerender');
   await rer.evaluate(snippet);

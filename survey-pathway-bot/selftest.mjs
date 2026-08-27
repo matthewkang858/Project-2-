@@ -71,6 +71,18 @@ try {
     check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
   }
 
+  // A button-driven card carousel: no form controls at all — the answers are
+  // styled divs shared across cards, one card shown at a time.
+  {
+    const o = join(out, 'cards');
+    const r = await run(['explore.mjs', '--url', URL + 'cards', '--out', o, '--max-runs', '4']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    const cards = ['card:it-e-g-cio-members-of-the-technology-team', 'card:executive-management-e-g-ceo', 'card:finance-e-g-cfo'];
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes a button-driven card carousel');
+    check(ts.every((t) => cards.every((c) => t.decisions.filter((d) => d.key === c).length === 1)), 'answers each card exactly once');
+    check(new Set(ts.map((t) => t.decisions.find((d) => d.key === cards[0])?.chosenIndex)).size >= 3, 'branches across the three answer buttons');
+  }
+
   // The real player parks its radios off-screen (left:-9999px) inside visible
   // labels — those must be answered — while a genuine off-screen honeypot with
   // no visible stand-in must not be (the server rejects the submit if it is).
