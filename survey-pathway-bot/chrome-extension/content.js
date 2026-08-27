@@ -45,7 +45,13 @@
     const answered = new Set(); // keys this run has already dealt with
 
     for (;;) {
-      const model = SPB_CORE.readPage(sel);
+      let model = SPB_CORE.readPage(sel);
+      const full = Number(cfg.settleTimeout ?? 4000);
+      const settleUntil = Date.now() + (model.stuck ? full : Math.min(full, 2000));
+      while (!model.questions.length && Date.now() < settleUntil) {
+        await sleep(250);
+        model = SPB_CORE.readPage(sel);
+      }
       const record = {
         url: model.url,
         fingerprint: model.fingerprint,

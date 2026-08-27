@@ -129,6 +129,7 @@ const spb = {
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
 spb.stop()                  end the run now and keep what was recorded
+spb.debug()                 what the bot can and cannot see on this page
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
 spb.inspect()               what the bot sees on this page
@@ -230,6 +231,7 @@ spb.reset()                 clear stored state`);
       'border:2px solid #333;border-radius:6px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.35)';
     document.body.appendChild(frame);
     this._frame = frame;
+    this._lastFrame = frame;
 
     const load = (url) =>
       new Promise((resolve, reject) => {
@@ -259,7 +261,12 @@ spb.reset()                 clear stored state`);
       return null;
     }
 
-    const first = C.readPage(cfg.selectors, docOf());
+    let first = C.readPage(cfg.selectors, docOf());
+    const firstSettle = Date.now() + Number(cfg.settleTimeout ?? 4000);
+    while (first.stuck && !first.next && Date.now() < firstSettle) {
+      await sleep(300);
+      first = C.readPage(cfg.selectors, docOf());
+    }
     // A welcome page legitimately has no questions — what matters is whether
     // there is any way forward from it.
     if (!first.questions.length && !first.next) {
@@ -292,7 +299,15 @@ spb.reset()                 clear stored state`);
         for (let step = 0; step < maxSteps; step++) {
           if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
-          const model = C.readPage(cfg.selectors, doc);
+          let model = C.readPage(cfg.selectors, doc);
+          // A player that fetches its question body after the page loads looks
+          // empty for a moment; give it a beat before calling the survey over.
+          const full = Number(cfg.settleTimeout ?? 4000);
+          const settleUntil = Date.now() + (model.stuck ? full : Math.min(full, 2000));
+          while (!model.questions.length && Date.now() < settleUntil) {
+            await sleep(250);
+            model = C.readPage(cfg.selectors, docOf());
+          }
           if (model.isTerminal) {
             steps.push({
               url: model.url, fingerprint: model.fingerprint, heading: model.heading, outcome: model.outcome,
@@ -427,6 +442,55 @@ spb.reset()                 clear stored state`);
     }
     frame.style.cssText = style;
     return null;
+  },
+
+  // What the bot can and cannot see on a page — paste the output when a survey
+  // page defeats it.
+  debug(doc) {
+    let framed = null;
+    try {
+      framed = this._lastFrame && this._lastFrame.contentDocument;
+    } catch {
+      framed = null;
+    }
+    const d = doc || framed || document;
+    const win = d.defaultView || window;
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      const s = win.getComputedStyle(el);
+      return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0' && (r.width > 0 || r.height > 0);
+    };
+    const controls = [...d.querySelectorAll('input, select, textarea')];
+    const model = C.readPage(this.config.selectors, d);
+    const out = {
+      url: d.location?.href,
+      title: d.title,
+      heading: model.heading,
+      questionsDetected: model.questions.length,
+      forwardButton: model.next ? `${model.next.label} (${model.next.matched})` : 'none',
+      insideIframe: model.docPath?.length ? model.docPath.join(' > ') : 'no',
+      iframes: [...d.querySelectorAll('iframe')].map((f) => {
+        let same = false;
+        try { same = !!f.contentDocument; } catch { same = false; }
+        return { src: (f.src || '').slice(0, 80), sameOrigin: same };
+      }),
+      controlsInDom: controls.length,
+      controlsVisible: controls.filter(vis).length,
+      controlsHiddenButLabelled: controls.filter((el) => !vis(el) && el.closest('label, .choice, .option, .answer')).length,
+      buttonsOnPage: [...d.querySelectorAll('button, input[type="submit"], input[type="button"], [role="button"], a.btn')]
+        .filter(vis)
+        .map((b) => (b.innerText || b.value || '').trim().slice(0, 30))
+        .slice(0, 10),
+      sampleControls: controls.slice(0, 12).map((el) => ({
+        name: el.name || el.id || '(none)',
+        type: (el.type || el.tagName).toLowerCase(),
+        visible: vis(el),
+        labelled: !!el.closest('label, .choice, .option, .answer'),
+      })),
+      bodyStart: (d.body?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 300),
+    };
+    console.log(JSON.stringify(out, null, 1));
+    return out;
   },
 
   // Stop the current exploration. Whatever has been recorded stays available

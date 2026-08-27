@@ -63,6 +63,7 @@ export async function runOnce(page, opts) {
     maxSteps = 60,
     delay = 0,
     manualTimeout = 0,
+    settleTimeout = 4000,
     selectors = DEFAULT_SELECTORS,
   } = opts;
 
@@ -75,6 +76,13 @@ export async function runOnce(page, opts) {
   const answered = new Set(); // keys this run has already dealt with
   for (let step = 0; step < maxSteps; step++) {
     let model = await readPage(page, selectors);
+    // Players that fetch their question body after the page loads look empty
+    // for a moment; give them a beat before calling the survey over.
+    const settleUntil = Date.now() + (model.stuck ? settleTimeout : Math.min(settleTimeout, 2000));
+    while (!model.questions.length && Date.now() < settleUntil) {
+      await sleep(250);
+      model = await readPage(page, selectors).catch(() => model);
+    }
     const record = {
       step,
       url: model.url,

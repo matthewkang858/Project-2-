@@ -185,6 +185,34 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // How modern survey players render answers: the real <input> is hidden and a
+  // styled label stands in for it, and the question body arrives a moment after
+  // the page does.
+  if (req.url && req.url.startsWith('/styled')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.choice input{position:absolute;opacity:0;width:1px;height:1px}
+             .choice{display:block;padding:8px;border:1px solid #ccc;margin:4px 0;cursor:pointer}</style>
+      </head><body>
+      <form method="POST" action="/">
+        <input type="hidden" name="state" value="${enc({ S1: '2', S2: '1', S3: '1' })}">
+        <input type="hidden" name="page" value="4">
+        <div id="host"><p>Loading…</p></div>
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        setTimeout(function () {
+          document.getElementById('host').innerHTML =
+            '<div class="question" id="ST1"><div class="qtitle">How satisfied are you overall?</div>' +
+            ['Very satisfied', 'Satisfied', 'Neutral', 'Dissatisfied'].map(function (t, i) {
+              return '<label class="choice" for="ST1_' + (i + 1) + '">' +
+                     '<input type="radio" name="ST1" id="ST1_' + (i + 1) + '" value="' + (i + 1) + '"> ' + t + '</label>';
+            }).join('') + '</div>';
+        }, 900);
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));

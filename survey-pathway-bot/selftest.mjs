@@ -60,6 +60,17 @@ try {
     check(ts.some((t) => ['complete', 'quota', 'terminate'].includes(t.outcome?.type)), `reaches a real end state through the ${label}`);
   }
 
+  // The shape a modern survey player renders: the real <input> hidden behind a
+  // styled label, and the question body arriving after the page does.
+  {
+    const o = join(out, 'styled');
+    const r = await run(['explore.mjs', '--url', URL + 'styled', '--out', o, '--max-runs', '4']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    const picks = new Set(ts.flatMap((t) => t.decisions.filter((d) => d.key === 'ST1').map((d) => d.chosenIndex)));
+    check(r.code === 0 && picks.size === 4, `answers a question whose inputs are hidden behind styled labels (${picks.size}/4 options tried)`);
+    check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
+  }
+
   // Widgets that a plain form reader cannot drive: native + custom sliders, and
   // a carousel that reveals one question at a time without a page load.
   for (const [path, label, expectKeys] of [

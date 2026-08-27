@@ -98,6 +98,16 @@ try {
     await w.close();
   }
 
+  const styled = await ctx.newPage();
+  await styled.goto(URL_ + 'styled');
+  await styled.evaluate(snippet);
+  const styledTraces = await styled.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 4, config: { delay: 0 } }), URL_ + 'styled');
+  const styledPicks = new Set((styledTraces || []).flatMap((t) => t.decisions.filter((d) => d.key === 'ST1').map((d) => d.chosenIndex)));
+  check(styledPicks.size === 4, `snippet answers inputs hidden behind styled labels (${styledPicks.size}/4 options)`);
+  const dbg = await styled.evaluate(() => spb.debug());
+  check(typeof dbg.controlsInDom === 'number' && Array.isArray(dbg.buttonsOnPage), 'spb.debug() dumps what the page contains');
+  await styled.close();
+
   const stopPage = await ctx.newPage();
   await stopPage.goto(URL_);
   await stopPage.evaluate(snippet);

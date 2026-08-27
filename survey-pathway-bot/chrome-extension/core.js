@@ -135,11 +135,21 @@ function pageModel(cfg, doc) {
     return stem.slice(0, 300);
   };
 
+  // Survey players routinely hide the real control (opacity:0, a 1px box, or
+  // clipped off-screen) and style a label in its place. The question is on
+  // screen and answerable through that input, so a control counts as present
+  // when either it or the label standing in for it is visible.
+  const answerable = (el) => {
+    if (visible(el)) return true;
+    const host = el.closest('label, .answer, .option, .choice, [class*="option"], [class*="answer"], li, td');
+    return !!host && visible(host);
+  };
+
   const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
     const type = (el.type || '').toLowerCase();
     if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type)) return false;
     if (el.disabled) return false;
-    return visible(el);
+    return answerable(el);
   });
 
   const groups = new Map();
@@ -425,7 +435,15 @@ function applyAnswer(q, candidate, doc) {
   }
   const el = doc.querySelector(opt.selector);
   if (!el) return false;
-  el.click();
+  // With a hidden input the player listens on the styled label, so click that
+  // first and only fall back to forcing the input's state.
+  const box = el.getBoundingClientRect();
+  const hidden = box.width <= 2 || box.height <= 2 || (doc.defaultView || window).getComputedStyle(el).opacity === '0';
+  const label = hidden
+    ? (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label')
+    : null;
+  if (label) label.click();
+  if (!el.checked) el.click();
   if (!el.checked) {
     el.checked = true;
     fire(el, ['input', 'change']);
