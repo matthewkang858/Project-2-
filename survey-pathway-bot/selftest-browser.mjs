@@ -98,6 +98,16 @@ try {
     await w.close();
   }
 
+  const rer = await ctx.newPage();
+  await rer.goto(URL_ + 'rerender');
+  await rer.evaluate(snippet);
+  const rerTraces = (await rer.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 3, config: { delay: 900 } }), URL_ + 'rerender')) || [];
+  check(
+    rerTraces.length === 3 && rerTraces.every((t) => t.outcome?.type === 'complete'),
+    'snippet answers a question whose answer list is repainted'
+  );
+  await rer.close();
+
   const styled = await ctx.newPage();
   await styled.goto(URL_ + 'styled');
   await styled.evaluate(snippet);

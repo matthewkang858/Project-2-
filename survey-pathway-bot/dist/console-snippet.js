@@ -147,10 +147,22 @@ function pageModel(cfg, doc) {
   // clipped off-screen) and style a label in its place. The question is on
   // screen and answerable through that input, so a control counts as present
   // when either it or the label standing in for it is visible.
+  const rendered = (node) => !!node && node.getClientRects().length > 0;
   const answerable = (el) => {
     if (visible(el)) return true;
-    const host = el.closest('label, .answer, .option, .choice, [class*="option"], [class*="answer"], li, td');
-    return !!host && visible(host);
+    // A control with no layout box at all is inside a hidden subtree — a
+    // carousel card waiting its turn, say — unless a label standing in for it
+    // is on screen.
+    if (!rendered(el)) {
+      const lab = (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
+      return rendered(lab) && visible(lab);
+    }
+    // Laid out but invisible (opacity:0, clipped to a pixel): answerable when
+    // something wrapping it is on screen. Players wrap the real control in
+    // whatever element they like, so matching class names is a losing game.
+    let node = el.parentElement;
+    for (let up = 0; node && up < 4; up++, node = node.parentElement) if (visible(node)) return true;
+    return false;
   };
 
   const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
@@ -510,6 +522,48 @@ function planPage(model, plan, startDi, cfg, answered) {
   return { decisions, di };
 }
 
+// Find a control again, even when the player has repainted the page since it
+// was read: by the recorded selector, then by name and value (immune to both
+// re-renders and to CSS-escaping of names like "ans32477.0.0"), then by the
+// option's own wording.
+function findControl(doc, q, opt) {
+  const tidy = (s) => (s || '').replace(/\s+/g, ' ').trim();
+  let el = null;
+  try {
+    el = doc.querySelector(opt ? opt.selector : q.selector);
+  } catch {
+    el = null;
+  }
+  if (el && el.isConnected) return el;
+
+  const all = [...doc.querySelectorAll('input, select, textarea')];
+  if (opt) {
+    el = all.find((e) => (e.name === q.key || e.id === q.key) && String(e.value) === String(opt.value));
+    if (el) return el;
+    if (opt.label) {
+      const wrap = [...doc.querySelectorAll('label, li, td, div, span')].find(
+        (w) => w.querySelectorAll('input').length === 1 && tidy(w.innerText) === tidy(opt.label)
+      );
+      if (wrap) return wrap.querySelector('input');
+    }
+    return null;
+  }
+  return all.find((e) => e.name === q.key || e.id === q.key) || null;
+}
+
+// The clickable thing standing in for a hidden control: the nearest wrapper
+// that holds this control and no other.
+function wrapperFor(el) {
+  let node = el.parentElement;
+  for (let up = 0; node && up < 4; up++, node = node.parentElement) {
+    if (node.querySelectorAll('input, select, textarea').length === 1) {
+      if (node.tagName === 'LABEL' || /ans|answer|choice|option|item|cell|row/i.test(node.className || '')) return node;
+      if (up === 0) var fallback = node;
+    }
+  }
+  return typeof fallback === 'undefined' ? null : fallback;
+}
+
 // DOM-native answering, used by the Chrome extension and the console snippet.
 // (The Node/Playwright build answers through Playwright's own APIs instead, so
 // that it waits for the engine's own visibility and enabled checks.)
@@ -521,15 +575,15 @@ function applyAnswer(q, candidate, doc) {
     for (const t of types) el.dispatchEvent(new win.Event(t, { bubbles: true }));
   };
   if (candidate.kind === 'value') {
-    const el = doc.querySelector(q.selector);
+    const el = findControl(doc, q);
     if (!el) return false;
     el.focus?.();
     el.value = candidate.value;
     fire(el, ['input', 'change', 'blur']);
-    return true;
+    return String(el.value) === String(candidate.value);
   }
   if (candidate.kind === 'slide') {
-    const el = doc.querySelector(q.selector);
+    const el = findControl(doc, q);
     if (!el) return false;
     const target = Number(candidate.value);
     el.focus?.();
@@ -559,28 +613,31 @@ function applyAnswer(q, candidate, doc) {
   const opt = q.options[candidate.index];
   if (!opt) return false;
   if (q.kind === 'select') {
-    const el = doc.querySelector(q.selector);
+    const el = findControl(doc, q);
     if (!el) return false;
     el.value = opt.value;
     fire(el, ['input', 'change']);
-    return true;
+    return String(el.value) === String(opt.value);
   }
-  const el = doc.querySelector(opt.selector);
+  const el = findControl(doc, q, opt);
   if (!el) return false;
-  // With a hidden input the player listens on the styled label, so click that
-  // first and only fall back to forcing the input's state.
+  // With a hidden input the player listens on the wrapper that stands in for
+  // it — a <label>, or just a styled <div>. Click that, then fall back to
+  // clicking and finally forcing the control itself.
   const box = el.getBoundingClientRect();
   const hidden = box.width <= 2 || box.height <= 2 || (doc.defaultView || window).getComputedStyle(el).opacity === '0';
-  const label = hidden
-    ? (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label')
-    : null;
-  if (label) label.click();
+  const wrapper =
+    (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label') || wrapperFor(el);
+  if (hidden && wrapper) wrapper.click();
   if (!el.checked) el.click();
   if (!el.checked) {
     el.checked = true;
     fire(el, ['input', 'change']);
   }
-  return true;
+  const marked = wrapper
+    ? wrapper.getAttribute('aria-checked') === 'true' || /\b(selected|checked|active)\b/i.test(wrapper.className || '')
+    : false;
+  return el.checked || marked;
 }
 
 // Click the forward button described by a page model.
@@ -667,6 +724,7 @@ globalThis.SPB_CORE = {
   fingerprint,
   candidates,
   planPage,
+  findControl,
   describe,
   applyAnswer,
   clickNext,
@@ -935,7 +993,7 @@ function answerPage(model, plan, di, cfg, doc, answered) {
       error: ok ? undefined : 'could not set answer',
     });
   }
-  return { record, di: planned.di };
+  return { record, di: planned.di, planned: planned.decisions };
 }
 
 function makeTrace(runId, plan, steps, decisions, type, text) {
@@ -1169,7 +1227,18 @@ spb.reset()                 clear stored state`);
           if (model.questions.length) {
             const after = C.readPage(cfg.selectors, docOf());
             if (after.fingerprint !== model.fingerprint) continue;
-            current = after;
+            // A player that repaints its answers can wipe a selection right
+            // after it is made; redo any answer that did not stick.
+            const lost = ans.planned.filter((d) => {
+              if (!d.candidate || d.candidate.kind === 'noop') return false;
+              const fresh = after.questions.find((x) => x.key === d.q.key);
+              return fresh && fresh.answered === false;
+            });
+            for (const d of lost) {
+              const fresh = after.questions.find((x) => x.key === d.q.key);
+              C.applyAnswer(fresh, d.candidate, C.docFor(after, docOf()));
+            }
+            current = lost.length ? C.readPage(cfg.selectors, docOf()) : after;
           }
 
           // A carousel's own pager moves between cards inside one question.

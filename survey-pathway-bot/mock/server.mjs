@@ -284,6 +284,42 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // A player that re-renders its answer list after the page settles (so any
+  // selector captured a moment earlier is stale), and whose click handler sits
+  // on the wrapper div rather than a <label>.
+  if (req.url && req.url.split('?')[0] === '/rerender') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.ans input{position:absolute;opacity:0}.ans{display:block;padding:10px;border:1px solid #ccc;margin:4px}</style>
+      </head><body>
+      <form method="POST" action="/rerendercheck">
+        <div class="question" id="RR1"><div class="qtitle">Approximately how many full-time employees work for your company?</div>
+          <div id="answers"></div></div>
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var labels = ['1-50 employees', '51-100 employees', '101-200 employees', '201-300 employees'];
+        function paint() {
+          document.getElementById('answers').innerHTML = labels.map(function (t, i) {
+            return '<div class="ans" data-v="' + (i + 1) + '">' +
+              '<input type="radio" name="RR1" value="' + (i + 1) + '"> ' + t + '</div>';
+          }).join('');
+          [].forEach.call(document.querySelectorAll('.ans'), function (d) {
+            d.addEventListener('click', function () {
+              var input = d.querySelector('input');
+              input.checked = true;
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+          });
+        }
+        paint();
+        // The player repaints once more a moment later — anything captured
+        // before this point is stale.
+        setTimeout(paint, 700);   // wipes any selection made before this
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/other') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(`<!doctype html><html><head><title>Survey</title></head><body>
@@ -301,6 +337,18 @@ createServer((req, res) => {
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));
+    return;
+  }
+  if (req.url === '/rerendercheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      if (!form.get('RR1'))
+        res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
     return;
   }
   if (req.url === '/othercheck') {

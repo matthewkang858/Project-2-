@@ -176,7 +176,23 @@ export async function runOnce(page, opts) {
         trace.steps.push(record);
         continue;
       }
-      if (after) current = after;
+      if (after) {
+        // Players that repaint their answer list can wipe a selection the
+        // moment after it is made. Check each answer took, and redo the ones
+        // that did not.
+        const lost = planned.decisions.filter((d) => {
+          if (!d.candidate || d.candidate.kind === 'noop') return false;
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          return fresh && fresh.answered === false;
+        });
+        for (const d of lost) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          await apply(page, fresh, d.candidate, after.docPath).catch(() => {});
+          const dec = record.decisions.find((x) => x.key === d.q.key);
+          if (dec) dec.reapplied = true;
+        }
+        current = lost.length ? (await readPage(page, selectors).catch(() => after)) : after;
+      }
     }
 
     if (current.pager && !current.pager.atEnd) {

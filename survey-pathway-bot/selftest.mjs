@@ -71,6 +71,18 @@ try {
     check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
   }
 
+  // A player that repaints its answer list: the control found a moment ago is
+  // gone, the click target is a styled div rather than a label, and a late
+  // repaint can wipe a selection that was already made.
+  {
+    const o = join(out, 'rerender');
+    const r = await run(['explore.mjs', '--url', URL + 'rerender', '--out', o, '--max-runs', '3', '--delay', '900']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    const picks = new Set(ts.flatMap((t) => t.decisions.filter((d) => d.key === 'RR1').map((d) => d.chosenIndex)));
+    check(r.code === 0 && picks.size === 3, `answers a question whose answer list is repainted (${picks.size}/3 options)`);
+    check(ts.every((t) => t.outcome?.type === 'complete'), 'the survey accepts every repainted answer');
+  }
+
   // An "Other (please specify)" box must stay empty unless its option is taken
   // — typing in it otherwise is a validation error.
   {

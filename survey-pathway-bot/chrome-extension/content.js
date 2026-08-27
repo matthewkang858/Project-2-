@@ -106,7 +106,17 @@
       if (model.questions.length) {
         const after = SPB_CORE.readPage(sel);
         if (after.fingerprint !== model.fingerprint) continue;
-        current = after;
+        // Redo any answer a repaint wiped before moving on.
+        const lost = planned.decisions.filter((d) => {
+          if (!d.candidate || d.candidate.kind === 'noop') return false;
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          return fresh && fresh.answered === false;
+        });
+        for (const d of lost) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          SPB_CORE.applyAnswer(fresh, d.candidate, SPB_CORE.docFor(after, document));
+        }
+        current = lost.length ? SPB_CORE.readPage(sel) : after;
       }
 
       const before = current.fingerprint + '|' + location.href;

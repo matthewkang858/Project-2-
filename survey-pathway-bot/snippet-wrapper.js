@@ -97,7 +97,7 @@ function answerPage(model, plan, di, cfg, doc, answered) {
       error: ok ? undefined : 'could not set answer',
     });
   }
-  return { record, di: planned.di };
+  return { record, di: planned.di, planned: planned.decisions };
 }
 
 function makeTrace(runId, plan, steps, decisions, type, text) {
@@ -331,7 +331,18 @@ spb.reset()                 clear stored state`);
           if (model.questions.length) {
             const after = C.readPage(cfg.selectors, docOf());
             if (after.fingerprint !== model.fingerprint) continue;
-            current = after;
+            // A player that repaints its answers can wipe a selection right
+            // after it is made; redo any answer that did not stick.
+            const lost = ans.planned.filter((d) => {
+              if (!d.candidate || d.candidate.kind === 'noop') return false;
+              const fresh = after.questions.find((x) => x.key === d.q.key);
+              return fresh && fresh.answered === false;
+            });
+            for (const d of lost) {
+              const fresh = after.questions.find((x) => x.key === d.q.key);
+              C.applyAnswer(fresh, d.candidate, C.docFor(after, docOf()));
+            }
+            current = lost.length ? C.readPage(cfg.selectors, docOf()) : after;
           }
 
           // A carousel's own pager moves between cards inside one question.
