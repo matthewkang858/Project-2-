@@ -314,6 +314,16 @@ function pageModel(cfg, doc) {
       null;
     q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
   }
+  // A group of numeric fields on a "what percentage…" question is a
+  // sum-to-100 allocation even when the page only says so after a failed
+  // submit.
+  const numericPerGroup = {};
+  for (const q of questions)
+    if (q.kind === 'number' || q.kind === 'text') numericPerGroup[q.group] = (numericPerGroup[q.group] || 0) + 1;
+  for (const q of questions)
+    if (!q.sumTo && (q.kind === 'number' || q.kind === 'text') && numericPerGroup[q.group] >= 2 &&
+        /percent|share of|allocat|distribut|sum to|%/i.test(q.label || ''))
+      q.sumTo = 100;
 
   // A carousel's own pager ("1 / 8" with arrows). It moves between cards inside
   // one question, so it must not be mistaken for the page's forward button.

@@ -297,6 +297,7 @@ spb.reset()                 clear stored state`);
         if (runs > 1) await load(startUrl);
         const answered = new Set();
         const visits = new Map(); // how often each page has come round
+        const validationRetried = new Set(); // pages re-answered after an error
         for (let step = 0; step < maxSteps; step++) {
           if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
@@ -330,6 +331,7 @@ spb.reset()                 clear stored state`);
             break;
           }
           const target = C.docFor(model, doc);
+          const pageStartDi = di;
           const ans = answerPage(model, plan, di, cfg, target, answered);
           di = ans.di;
           steps.push(ans.record);
@@ -406,6 +408,16 @@ const lost = ans.planned.filter((d) => {
               const now = C.readPage(cfg.selectors, docOf());
               why = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [why])[0];
             } catch {}
+            // The validation message states the constraint the page withheld;
+            // re-reading now detects it, so retry the page once before asking
+            // for help. Plan index rewinds to keep branch numbering aligned.
+            if (!validationRetried.has(current.fingerprint)) {
+              validationRetried.add(current.fingerprint);
+              for (const q of model.questions) answered.delete(q.key);
+              di = pageStartDi;
+              ans.record.validationRetry = why;
+              continue;
+            }
             const helped = await this._waitForHuman(frame, current, cfg, why);
             if (helped) { ans.record.manual = true; continue; }
             type = 'stalled';

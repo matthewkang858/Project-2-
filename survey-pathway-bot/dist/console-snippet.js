@@ -318,6 +318,16 @@ function pageModel(cfg, doc) {
       null;
     q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
   }
+  // A group of numeric fields on a "what percentage…" question is a
+  // sum-to-100 allocation even when the page only says so after a failed
+  // submit.
+  const numericPerGroup = {};
+  for (const q of questions)
+    if (q.kind === 'number' || q.kind === 'text') numericPerGroup[q.group] = (numericPerGroup[q.group] || 0) + 1;
+  for (const q of questions)
+    if (!q.sumTo && (q.kind === 'number' || q.kind === 'text') && numericPerGroup[q.group] >= 2 &&
+        /percent|share of|allocat|distribut|sum to|%/i.test(q.label || ''))
+      q.sumTo = 100;
 
   // A carousel's own pager ("1 / 8" with arrows). It moves between cards inside
   // one question, so it must not be mistaken for the page's forward button.
@@ -1246,6 +1256,7 @@ spb.reset()                 clear stored state`);
         if (runs > 1) await load(startUrl);
         const answered = new Set();
         const visits = new Map(); // how often each page has come round
+        const validationRetried = new Set(); // pages re-answered after an error
         for (let step = 0; step < maxSteps; step++) {
           if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
@@ -1279,6 +1290,7 @@ spb.reset()                 clear stored state`);
             break;
           }
           const target = C.docFor(model, doc);
+          const pageStartDi = di;
           const ans = answerPage(model, plan, di, cfg, target, answered);
           di = ans.di;
           steps.push(ans.record);
@@ -1355,6 +1367,16 @@ const lost = ans.planned.filter((d) => {
               const now = C.readPage(cfg.selectors, docOf());
               why = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [why])[0];
             } catch {}
+            // The validation message states the constraint the page withheld;
+            // re-reading now detects it, so retry the page once before asking
+            // for help. Plan index rewinds to keep branch numbering aligned.
+            if (!validationRetried.has(current.fingerprint)) {
+              validationRetried.add(current.fingerprint);
+              for (const q of model.questions) answered.delete(q.key);
+              di = pageStartDi;
+              ans.record.validationRetry = why;
+              continue;
+            }
             const helped = await this._waitForHuman(frame, current, cfg, why);
             if (helped) { ans.record.manual = true; continue; }
             type = 'stalled';

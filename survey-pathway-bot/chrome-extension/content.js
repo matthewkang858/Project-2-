@@ -43,6 +43,7 @@
     let di = Number(session.di ?? 0);
     const plan = session.plan || [];
     const answered = new Set(); // keys this run has already dealt with
+    const validationRetried = new Set(); // pages re-answered after an error
 
     for (;;) {
       let model = SPB_CORE.readPage(sel);
@@ -77,6 +78,7 @@
       }
 
       const target = SPB_CORE.docFor(model, document);
+      const pageStartDi = di;
       const planned = SPB_CORE.planPage(model, plan, di, cfg, answered);
       for (const d of planned.decisions) {
         const ok = SPB_CORE.applyAnswer(d.q, d.candidate, target);
@@ -138,6 +140,14 @@ const lost = planned.decisions.filter((d) => {
       if (!moved) {
         const now = SPB_CORE.readPage(sel);
         const msg = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [''])[0];
+        // The validation message states the constraint the page withheld;
+        // re-reading detects it, so retry once before reporting a stall.
+        if (!validationRetried.has(current.fingerprint)) {
+          validationRetried.add(current.fingerprint);
+          for (const q of model.questions) answered.delete(q.key);
+          di = pageStartDi;
+          continue;
+        }
         await send({ type: 'stalled', record, text: msg || 'page did not advance after submitting' });
         return;
       }

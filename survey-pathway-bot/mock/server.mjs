@@ -271,7 +271,7 @@ createServer((req, res) => {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(`<!doctype html><html><head><title>Survey</title></head><body>
       <form method="POST" action="/sumcheck">
-        <div class="question" id="SM1"><div class="qtitle">Split your incremental spend across the following. Your total must equal 100 exactly.</div>
+        <div class="question" id="SM1"><div class="qtitle">Split your incremental spend across the following categories.</div>
         <table>
           <tr><td>Direct AI Spend</td><td><input type="number" name="SM1r1" id="SM1r1" value=""> %</td></tr>
           <tr><td>AI Enablement Spend</td><td><input type="number" name="SM1r2" id="SM1r2" value=""> %</td></tr>

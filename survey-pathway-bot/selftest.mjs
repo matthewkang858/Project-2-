@@ -124,8 +124,12 @@ try {
     const cases = [
       ['limit', 'respects "select up to two"', (ts) =>
         ts.every((t) => t.decisions.filter((d) => /\[1\]$/.test(d.chosen)).length <= 2)],
-      ['sum100', 'makes a percentage group total 100', (ts) =>
-        ts.some((t) => t.decisions.filter((d) => d.key.startsWith('SM1')).reduce((n, d) => n + Number((d.chosen.match(/\d+/) || [0])[0]), 0) === 100)],
+      ['sum100', 'learns a hidden sum-to-100 rule from the validation error and retries', (ts) =>
+        ts.some((t) => {
+          const last = {};
+          for (const d of t.decisions) if (d.key.startsWith('SM1')) last[d.key] = Number((d.chosen.match(/\d+/) || [0])[0]);
+          return Object.values(last).reduce((a, b) => a + b, 0) === 100;
+        })],
       ['pager', 'answers every card of a carousel grid', (ts) =>
         ts.some((t) => ['PG1r1', 'PG1r2', 'PG1r3'].every((k) => t.decisions.some((d) => d.key === k)))],
     ];

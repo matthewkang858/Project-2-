@@ -76,6 +76,7 @@ export async function runOnce(page, opts) {
   let di = 0; // decision index — indexes into `plan`
   const answered = new Set(); // keys this run has already dealt with
   const visits = new Map(); // how often each page has come round
+  const validationRetried = new Set(); // pages already re-answered after an error
   for (let step = 0; step < maxSteps; step++) {
     let model = await readPage(page, selectors);
     // Players that fetch their question body after the page loads look empty
@@ -142,6 +143,7 @@ export async function runOnce(page, opts) {
 
     // One plan for the whole page, so "select up to two" and "must total 100"
     // are honoured across the questions that share a group.
+    const pageStartDi = di;
     const planned = core.planPage(model, plan, di, config, answered);
     for (const d of planned.decisions) {
       const dec = {
@@ -273,6 +275,18 @@ export async function runOnce(page, opts) {
     trace.steps.push(record);
     if (!moved.moved) {
       const err = moved.model?.bodyText?.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i)?.[0];
+      // The validation message states the constraint the page withheld ("must
+      // equal 100", "at most 2 boxes"). Re-reading now detects it, so forget
+      // this page's answers and take one more pass before giving up. The plan
+      // index rewinds so the retry consumes the same slots and branch numbering
+      // stays aligned.
+      if (!validationRetried.has(current.fingerprint)) {
+        validationRetried.add(current.fingerprint);
+        for (const q of model.questions) answered.delete(q.key);
+        di = pageStartDi;
+        record.validationRetry = err ?? true;
+        continue;
+      }
       const helped = manualTimeout ? await waitForHuman(page, current, manualTimeout, selectors, err) : null;
       if (helped) {
         record.manual = true;
