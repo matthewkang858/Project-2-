@@ -1529,6 +1529,12 @@ const lost = ans.planned.filter((d) => {
       }
 
       const trace = makeTrace(runId, plan, steps, decisions, type, text);
+      if (['stuck', 'stalled', 'looping'].includes(type)) {
+        // The one moment the stuck page is guaranteed to be in the frame.
+        try {
+          trace.outcome.debug = this.debug(docOf(), true);
+        } catch {}
+      }
       state.traces.push(trace);
       expand(state, trace);
       // Keep the report available at all times: stopping the run, or losing the
@@ -1540,6 +1546,20 @@ const lost = ans.planned.filter((d) => {
         `${runId}  plan=[${plan.join(',')}]  pages=${trace.steps.length}  outcome=${type}  ` +
           `${trace.decisions.map((d) => `${d.key}:${d.chosenIndex}`).join(' > ')}`
       );
+      if (['stuck', 'stalled', 'looping'].includes(type) && (cfg.stopOnStuck ?? true)) {
+        console.warn(
+          `%c${runId} ended "${type}" — stopping so the failed page stays open in the frame. ` +
+            '(pass config.stopOnStuck: false to push on instead)',
+          'font-weight:bold'
+        );
+        if (trace.outcome.debug) {
+          console.log('%cDiagnosis of the stuck page — paste this back:', 'font-weight:bold');
+          try {
+            console.log(JSON.stringify(trace.outcome.debug, null, 1));
+          } catch {}
+        }
+        break;
+      }
     }
 
     this.traces = state.traces;
@@ -1614,7 +1634,7 @@ const lost = ans.planned.filter((d) => {
 
   // What the bot can and cannot see on a page — paste the output when a survey
   // page defeats it.
-  debug(doc) {
+  debug(doc, quiet) {
     let framed = null;
     try {
       framed = this._lastFrame && this._lastFrame.contentDocument;
@@ -1647,8 +1667,15 @@ const lost = ans.planned.filter((d) => {
       controlsHiddenButLabelled: controls.filter((el) => !vis(el) && el.closest('label, .choice, .option, .answer')).length,
       buttonsOnPage: [...d.querySelectorAll('button, input[type="submit"], input[type="button"], [role="button"], a.btn')]
         .filter(vis)
-        .map((b) => (b.innerText || b.value || '').trim().slice(0, 30))
+        .map((b) => (b.innerText || b.value || '').trim().slice(0, 30) + (b.disabled ? ' [disabled]' : ''))
         .slice(0, 10),
+      detectedQuestions: (() => {
+        try {
+          return model.questions.map((q) => ({ key: q.key.slice(0, 40), kind: q.kind }));
+        } catch {
+          return [];
+        }
+      })(),
       sampleControls: controls.slice(0, 12).map((el) => ({
         name: el.name || el.id || '(none)',
         type: (el.type || el.tagName).toLowerCase(),
@@ -1685,7 +1712,7 @@ const lost = ans.planned.filter((d) => {
         return { detectedPager: model.pager ?? null, posTexts: [...new Set(posTexts)].slice(0, 5), navButtons, clickableGroups };
       })(),
     };
-    console.log(JSON.stringify(out, null, 1));
+    if (!quiet) console.log(JSON.stringify(out, null, 1));
     return out;
   },
 
