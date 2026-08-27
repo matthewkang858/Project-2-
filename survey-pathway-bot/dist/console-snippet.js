@@ -148,21 +148,38 @@ function pageModel(cfg, doc) {
   // screen and answerable through that input, so a control counts as present
   // when either it or the label standing in for it is visible.
   const rendered = (node) => !!node && node.getClientRects().length > 0;
+  // Where the control's visible stand-in sits on screen. Survey players park
+  // the real input off-screen (left:-9999px) inside a perfectly visible label —
+  // so what matters is the label's geometry, never the input's own.
+  const onScreen = (node) => {
+    if (!node) return false;
+    const r = node.getBoundingClientRect();
+    const w = win.innerWidth || 1e5;
+    return r.width > 0 && r.height > 0 && r.right > -50 && r.left < w + 50;
+  };
+  const standIn = (el) => {
+    const lab = (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
+    if (lab) return lab;
+    let node = el.parentElement;
+    for (let up = 0; node && up < 4; up++, node = node.parentElement) {
+      if (node.querySelectorAll('input, select, textarea').length === 1 && visible(node) && onScreen(node)) return node;
+    }
+    return null;
+  };
   const answerable = (el) => {
-    if (visible(el)) return true;
+    if (visible(el) && onScreen(el)) return true;
     // A control with no layout box at all is inside a hidden subtree — a
-    // carousel card waiting its turn, say — unless a label standing in for it
-    // is on screen.
+    // carousel card waiting its turn — unless a label standing in for it is on
+    // screen.
     if (!rendered(el)) {
       const lab = (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
-      return rendered(lab) && visible(lab);
+      return rendered(lab) && visible(lab) && onScreen(lab);
     }
-    // Laid out but invisible (opacity:0, clipped to a pixel): answerable when
-    // something wrapping it is on screen. Players wrap the real control in
-    // whatever element they like, so matching class names is a losing game.
-    let node = el.parentElement;
-    for (let up = 0; node && up < 4; up++, node = node.parentElement) if (visible(node)) return true;
-    return false;
+    // Rendered but invisible or parked off-screen: answerable exactly when a
+    // visible on-screen element stands in for it. A honeypot has no such
+    // stand-in — nothing visible wraps it alone.
+    const sub = standIn(el);
+    return !!sub && visible(sub) && onScreen(sub);
   };
 
   // Survey engines carry their own machinery in the form: per-render nonce
@@ -171,12 +188,6 @@ function pageModel(cfg, doc) {
   // treating them as questions makes every re-render look like a new page,
   // which is how a run ends up looping on one question.
   const MACHINE_NAME = /^(ra|rvid|rid|psid|sid|uid|hid|sys|tok|csrf|honeypot)[_.]|^[a-z]{1,6}__\d+$/i;
-  const offscreen = (el) => {
-    const r = el.getBoundingClientRect();
-    const w = win.innerWidth || 1e5;
-    const h = win.innerHeight || 1e5;
-    return r.right < -100 || r.bottom < -100 || r.left > w + 100 || r.top > h * 20;
-  };
 
   const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
     const type = (el.type || '').toLowerCase();
@@ -184,7 +195,6 @@ function pageModel(cfg, doc) {
     if (el.disabled || el.readOnly) return false;
     const name = el.name || el.id || '';
     if (MACHINE_NAME.test(name) && !clean(questionLabel(el))) return false;
-    if (offscreen(el)) return false;
     return answerable(el);
   });
 

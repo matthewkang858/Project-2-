@@ -215,6 +215,24 @@ createServer((req, res) => {
   }
   // "Please select up to two" — each checkbox carries its own name, and the
   // server rejects more than two, exactly as Decipher does.
+  if (req.url && req.url.split('?')[0] === '/offscreen') {
+    const nonce = Math.floor(Math.random() * 900000 + 100000);
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.answer{display:block;padding:12px;border:1px solid #ccd;margin:6px;background:#eef}
+             .answer input{position:absolute;left:-9999px}</style>
+      </head><body>
+      <form method="POST" action="/offscreencheck">
+        <div class="question" id="ans32477"><div class="qtitle">Approximately how many full-time employees work for your current company?</div>
+        ${['1-50 employees', '51-100 employees', '101-200 employees', '201-300 employees']
+          .map((t, i) => `<label class="answer" for="a${i}"><input type="radio" name="ans32477.0.0" id="a${i}" value="${i + 1}"> ${t}</label>`)
+          .join('')}
+        </div>
+        <input type="text" name="ra__${nonce}" style="position:absolute;left:-9999px" value="">
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form></body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/dotted') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
@@ -364,6 +382,20 @@ createServer((req, res) => {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       if (!form.get('RR1'))
         res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url === '/offscreencheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      if (!form.get('ans32477.0.0'))
+        res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
+      else if ([...form.keys()].some((k) => k.startsWith('ra__') && form.get(k)))
+        res.end(`<!doctype html><html><body><p class="error">Automated response detected.</p></body></html>`);
       else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
     });
     return;

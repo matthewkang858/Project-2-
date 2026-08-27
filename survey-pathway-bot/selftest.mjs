@@ -71,6 +71,17 @@ try {
     check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
   }
 
+  // The real player parks its radios off-screen (left:-9999px) inside visible
+  // labels — those must be answered — while a genuine off-screen honeypot with
+  // no visible stand-in must not be (the server rejects the submit if it is).
+  {
+    const o = join(out, 'offscreen');
+    const r = await run(['explore.mjs', '--url', URL + 'offscreen', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'answers radios parked off-screen behind visible labels');
+    check(!ts.some((t) => t.decisions.some((d) => /^ra__/.test(d.key))), 'still leaves the off-screen honeypot alone');
+  }
+
   // Decipher's own shape: dotted row names (ans32645.0.8), a per-render nonce
   // field, and an "other" box named after the question group.
   {
