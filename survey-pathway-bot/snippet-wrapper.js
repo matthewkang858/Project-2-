@@ -120,7 +120,8 @@ const spb = {
   traces: [],
 
   help() {
-    console.log(`spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
+    console.log(`spb.check()                 is this page the survey, and can it be framed?
+spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
@@ -128,6 +129,43 @@ spb.inspect()               what the bot sees on this page
 spb.fill({ S1: 2 })         answer this page  ·  spb.step() answer + Next
 spb.capture()               record answers you picked  ·  spb.scenario('name') export them
 spb.reset()                 clear stored state`);
+  },
+
+  // Preflight: is this page actually the survey, and can it be framed?
+  async check(opts = {}) {
+    const url = opts.url || location.href;
+    const here = C.readPage(this.config.selectors);
+    console.log(`%cpage: ${location.href}`, 'font-weight:bold');
+    console.log(`  questions found: ${here.questions.length}   forward button: ${here.next ? 'yes' : 'no'}   end state: ${here.outcome || '—'}`);
+    if (!here.questions.length) {
+      const wall = /log ?in|sign ?in|password|testing options|not authorized|session/i.test(here.bodyText.slice(0, 400));
+      console.warn(
+        wall
+          ? '  ⚠ this looks like a login / interstitial page, not a survey question. Log in first, then open the survey link so the first question is on screen.'
+          : '  ⚠ no questions detected on this page.'
+      );
+    }
+    const frame = document.createElement('iframe');
+    frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
+    frame.style.cssText = 'position:fixed;left:-9999px;width:900px;height:700px';
+    document.body.appendChild(frame);
+    const ok = await new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(false), 15000);
+      frame.onload = () => { clearTimeout(timer); resolve(true); };
+      frame.src = url;
+    });
+    let inner = null;
+    try {
+      inner = ok && frame.contentDocument ? C.readPage(this.config.selectors, frame.contentDocument) : null;
+    } catch {
+      inner = null;
+    }
+    frame.remove();
+    if (!inner) console.warn(`  ⚠ ${url} cannot be driven in an iframe (the host refuses framing) — use spb.plan() step mode instead.`);
+    else console.log(`  iframe of ${url}: ${inner.questions.length} question(s), forward button: ${inner.next ? 'yes' : 'no'}`);
+    if (inner && !inner.questions.length)
+      console.warn('  ⚠ the frame loaded but shows no questions — usually the login wall again, or a start URL that is not the first page of the survey.');
+    return { page: here, frame: inner };
   },
 
   // ---- automatic mode ------------------------------------------------------
@@ -172,6 +210,19 @@ spb.reset()                 clear stored state`);
         `Could not drive the survey in an iframe (${e.message}). The survey refuses to be framed — ` +
           `use step-through mode instead:  spb.plan({ maxRuns: 20 })`
       );
+      return null;
+    }
+
+    const first = C.readPage(cfg.selectors, docOf());
+    if (!first.questions.length) {
+      frame.remove();
+      const wall = /log ?in|sign ?in|password|testing options|not authorized|session/i.test(first.bodyText.slice(0, 400));
+      console.error(
+        `%cnothing to answer at ${startUrl} — ${first.questions.length} questions found.` +
+          (wall ? ' The page looks like a login / interstitial wall: sign in first, open the survey so its first question is on screen, then run spb.auto() again.' : ' Check the start URL is the first page of the survey.'),
+        'font-weight:bold'
+      );
+      console.log('Run spb.check() for details.');
       return null;
     }
 
@@ -252,6 +303,13 @@ spb.reset()                 clear stored state`);
     this.traces = state.traces;
     this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
     frame.remove();
+    if (!state.traces.some((t) => t.decisions.length)) {
+      console.error(
+        '%cno questions were answered in any run — the report would be empty. The bot never reached the questionnaire.',
+        'font-weight:bold'
+      );
+      return state.traces;
+    }
     console.log(
       `%cdone — ${state.traces.length} traversal(s), ${state.queue.length} branch(es) untried. spb.report() / spb.download()`,
       'font-weight:bold'

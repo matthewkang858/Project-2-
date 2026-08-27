@@ -91,6 +91,15 @@ function nextPage(submitted, st) {
 }
 
 createServer((req, res) => {
+  // A stand-in for the login/interstitial wall a real survey host puts in front
+  // of a test link: a page with no questions and no forward button.
+  if (req.url && req.url.startsWith('/wall')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <h1>Please login to see additional testing options</h1>
+      <p>You must be signed in to view this survey.</p></body></html>`);
+    return;
+  }
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));

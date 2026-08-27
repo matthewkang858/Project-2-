@@ -68,6 +68,24 @@ try {
   check(await auto.evaluate(() => !document.querySelector('iframe')), 'snippet removes its iframe when finished');
   await auto.close();
 
+  // ---- snippet: login-wall diagnostics ----------------------------------
+  // The failure that produced an empty report in the field: a start URL that
+  // renders an interstitial instead of the questionnaire.
+  const wall = await ctx.newPage();
+  const wallLogs = [];
+  wall.on('console', (m) => wallLogs.push(m.text()));
+  await wall.goto(URL_ + 'wall');
+  await wall.evaluate(snippet);
+  const wallResult = await wall.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 5, config: { delay: 0 } }), URL_ + 'wall');
+  check(wallResult === null, 'auto mode refuses to run when the start page has no questions');
+  check(
+    wallLogs.some((t) => /login|interstitial/i.test(t)),
+    'auto mode names the login wall as the reason'
+  );
+  await wall.evaluate(async (u) => await spb.check({ url: u }), URL_ + 'wall');
+  check(wallLogs.some((t) => /questions found: 0/.test(t)), 'spb.check() reports what it found on the page');
+  await wall.close();
+
   // ---- snippet: step-through mode ---------------------------------------
   // Simulates the user pressing Ctrl+Enter on each page: the snippet is
   // re-evaluated after every navigation and resumes from sessionStorage.

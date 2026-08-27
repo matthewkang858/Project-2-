@@ -22,11 +22,19 @@ identically and produce the same report:
 1. Open your survey test link in Chrome.
 2. `F12` (or ⌥⌘I) ▸ **Console**. If Chrome warns about pasting, type `allow pasting` ▸ Enter.
 3. Open [`dist/console-snippet.js`](dist/console-snippet.js) raw, select all, copy, paste into the console, Enter.
-4. Run:
+4. Check the page is really the survey, then run it:
 
    ```js
+   await spb.check()          // questions found? can it be framed?
    spb.auto({ maxRuns: 15 })
    ```
+
+   `spb.check()` exists because the common first failure is running from a login
+   or interstitial page: the bot dutifully explores it, finds no questions, and
+   writes an empty report. If it says *"this looks like a login / interstitial
+   page"*, sign in, open the survey link until the first question is on screen,
+   and try again — `spb.auto()` refuses to start rather than produce an empty
+   report.
 
    It loads the survey in a small iframe in the corner of the page and walks
    pathway after pathway while you watch. The parent page never navigates, which
