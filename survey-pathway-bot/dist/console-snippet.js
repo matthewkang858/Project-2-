@@ -74,29 +74,59 @@ function pageModel(cfg, doc) {
     return `[data-spb="${mark}"]`;
   };
 
+  // Which phrases inside an element are bold or underlined. Emphasis is part of
+  // the questionnaire spec (underlined phrases are what piped questions insert),
+  // so it is captured, not ignored. Only leaf nodes are inspected, otherwise a
+  // bold container would report every phrase inside it.
+  const marksOf = (el) => {
+    const out = { bold: [], underline: [] };
+    if (!el) return out;
+    const nodes = [el, ...el.querySelectorAll('*')];
+    for (const node of nodes) {
+      if (node.children.length) continue;
+      const t = clean(node.innerText || node.textContent || '');
+      if (!t || t.length > 160) continue;
+      let s;
+      try { s = win.getComputedStyle(node); } catch { continue; }
+      const weight = parseInt(s.fontWeight, 10) || (s.fontWeight === 'bold' ? 700 : 400);
+      const deco = `${s.textDecorationLine || ''} ${s.textDecoration || ''}`;
+      if (weight >= 600 && out.bold.length < 8) out.bold.push(t);
+      if (deco.includes('underline') && out.underline.length < 8) out.underline.push(t);
+    }
+    return out;
+  };
+
   // Text of the label attached to a single control.
-  const optionLabel = (el) => {
+  const optionLabelEl = (el) => {
     if (el.id) {
       const lab = doc.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-      if (lab && clean(lab.innerText)) return clean(lab.innerText);
+      if (lab && clean(lab.innerText)) return lab;
     }
     const wrap = el.closest('label');
-    if (wrap && clean(wrap.innerText)) return clean(wrap.innerText);
+    if (wrap && clean(wrap.innerText)) return wrap;
     const cell = el.closest('td, th, li, div');
-    if (cell && clean(cell.innerText) && clean(cell.innerText).length < 120) return clean(cell.innerText);
+    if (cell && clean(cell.innerText) && clean(cell.innerText).length < 120) return cell;
+    return null;
+  };
+  const optionLabel = (el) => {
+    const lab = optionLabelEl(el);
+    if (lab) return clean(lab.innerText);
     return clean(el.getAttribute('aria-label') || el.value || '');
   };
 
   // Wording of the question a control belongs to. For a grid, the row header
   // is appended, since that is what distinguishes Q2r1 from Q2r2.
-  const questionLabel = (el) => {
+  const questionLabel = (el, sink) => {
     let stem = '';
     for (const sel of cfg.questionContainers) {
       const box = el.closest(sel);
       if (!box) continue;
       const head = box.querySelector('legend, .qtitle, .question-text, .question-title, h1, h2, h3, h4, .title, p');
       stem = clean(head?.innerText || '') || clean(box.innerText).slice(0, 300);
-      if (stem) break;
+      if (stem) {
+        if (sink) sink.el = head || box;
+        break;
+      }
     }
     const row = el.closest('tr');
     if (row) {
@@ -136,12 +166,14 @@ function pageModel(cfg, doc) {
     else if (type === 'number' || type === 'range') kind = 'number';
     else kind = 'text';
 
+    const stemSink = {};
     const q = {
       key,
       kind,
-      label: questionLabel(first),
+      label: questionLabel(first, stemSink),
       required: els.some((e) => e.required || e.getAttribute('aria-required') === 'true'),
       selector: cssFor(first),
+      emphasis: marksOf(stemSink.el),
       options: [],
     };
 
@@ -154,6 +186,7 @@ function pageModel(cfg, doc) {
         value: e.value ?? '',
         label: optionLabel(e),
         selector: cssFor(e),
+        emphasis: marksOf(optionLabelEl(e)),
       }));
     }
     questions.push(q);

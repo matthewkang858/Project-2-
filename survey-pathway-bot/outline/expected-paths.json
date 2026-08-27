@@ -1,0 +1,52 @@
+{
+  "_comment": "Scenarios derived from the Activate B2B questionnaire's own routing rules. Question names in the live survey are unknown until a first capture, so every rule matches on question wording. Run: node run-paths.mjs --url <link> --paths outline/expected-paths.json",
+  "maxSteps": 120,
+  "answers": [
+    { "match": "how many full-time employees", "fixed": "1,001-1,500" },
+    { "match": "total gross revenue in 2025", "fixed": "\\$100M-\\$499M" },
+    { "match": "in which of the following countries", "fixed": "United States" },
+    { "match": "industry your current company operates", "fixed": "Technology" },
+    { "match": "focus as it pertains to its customers", "fixed": "^B2B" }
+  ],
+  "scenarios": [
+    {
+      "name": "Q4 non-decision-maker terminates",
+      "answers": [{ "match": "role you play in evaluating", "fixed": "I am not involved in the process" }],
+      "expect": { "outcome": "terminate", "maxPages": 6 }
+    },
+    {
+      "name": "Q4 'some influence' terminates (only a-c qualify)",
+      "answers": [{ "match": "role you play in evaluating", "fixed": "I have some influence in the process" }],
+      "expect": { "outcome": "terminate", "maxPages": 6 }
+    },
+    {
+      "name": "Q4 sole decision maker continues",
+      "answers": [{ "match": "role you play in evaluating", "fixed": "I am the sole decision maker" }],
+      "expect": { "outcome": "complete" }
+    },
+    {
+      "name": "Q5 non-US terminates (must select United States)",
+      "answers": [
+        { "match": "role you play in evaluating", "fixed": "I am the sole decision maker" },
+        { "match": "in which of the following countries", "fixed": "^Canada" }
+      ],
+      "expect": { "outcome": "terminate", "maxPages": 7 }
+    },
+    {
+      "name": "Q43 'not using AI' skips the 18 AI-gated questions",
+      "answers": [
+        { "match": "role you play in evaluating", "fixed": "I am the sole decision maker" },
+        { "match": "currently using artificial intelligence", "fixed": "not currently using AI and is not planning" }
+      ],
+      "expect": { "outcome": "complete" }
+    },
+    {
+      "name": "Q43 'using AI over one year ago' shows the AI battery",
+      "answers": [
+        { "match": "role you play in evaluating", "fixed": "I am the sole decision maker" },
+        { "match": "currently using artificial intelligence", "fixed": "began using AI over one year ago" }
+      ],
+      "expect": { "outcome": "complete" }
+    }
+  ]
+}

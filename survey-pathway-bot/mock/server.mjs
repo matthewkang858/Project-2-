@@ -48,7 +48,10 @@ const grid = (name, title, rows, scale) => `<div class="question" id="${name}"><
 function render(pageNo, st) {
   switch (pageNo) {
     case 1:
-      return page(radio('S1', 'Which age group are you in?', ['Under 18', '18–34', '35–54', '55 or older']), st, 1);
+      return page(
+        radio('S1', 'Which <b>age group</b> are you <u>in</u>?', ['Under 18', '18–34', '35–54', '55 or older']),
+        st, 1
+      );
     case 2:
       return page(
         radio('S2', 'What is your gender?', ['Male', 'Female', 'Prefer not to say']) +
