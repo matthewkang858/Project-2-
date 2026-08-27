@@ -101,6 +101,22 @@ try {
   check(wallLogs.some((t) => /questions found: 0/.test(t)), 'spb.check() reports what it found on the page');
   await wall.close();
 
+  // A welcome page is not a wall: check() should click through it and report on
+  // the first real question instead of crying login.
+  const intro = await ctx.newPage();
+  const introLogs = [];
+  intro.on('console', (m) => introLogs.push(m.text()));
+  await intro.goto(URL_ + 'intro');
+  await intro.evaluate(snippet);
+  const introCheck = await intro.evaluate(async (u) => {
+    const r = await spb.check({ url: u });
+    return { questions: r.frame ? r.frame.questions.map((q) => q.key) : [] };
+  }, URL_ + 'intro');
+  check(introCheck.questions.includes('S1'), 'spb.check() clicks past the welcome page to the first question');
+  check(introLogs.some((t) => /welcome \/ intro page/.test(t)), 'spb.check() calls a welcome page what it is');
+  check(!introLogs.some((t) => /login \/ interstitial/.test(t)), 'spb.check() does not cry login on a working welcome page');
+  await intro.close();
+
   // ---- snippet: step-through mode ---------------------------------------
   // Simulates the user pressing Ctrl+Enter on each page: the snippet is
   // re-evaluated after every navigation and resumes from sessionStorage.

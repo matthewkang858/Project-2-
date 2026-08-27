@@ -713,41 +713,80 @@ spb.capture()               record answers you picked  ·  spb.scenario('name') 
 spb.reset()                 clear stored state`);
   },
 
-  // Preflight: is this page actually the survey, and can it be framed?
+  // Preflight: is this page the survey, can it be framed, and does the
+  // questionnaire actually render once you click past the welcome page?
   async check(opts = {}) {
     const url = opts.url || location.href;
     const here = C.readPage(this.config.selectors);
     console.log(`%cpage: ${location.href}`, 'font-weight:bold');
-    console.log(`  questions found: ${here.questions.length}   forward button: ${here.next ? `yes ("${here.next.label}")` : 'no'}   end state: ${here.outcome || '—'}`);
+    console.log(
+      `  questions found: ${here.questions.length}   forward button: ${here.next ? `yes ("${here.next.label}")` : 'no'}   end state: ${here.outcome || '—'}`
+    );
     if (here.docPath?.length) console.log(`  (the survey is inside an iframe: ${here.docPath.join(' > ')})`);
-    if (!here.questions.length) {
-      const wall = /log ?in|sign ?in|password|testing options|not authorized|session/i.test(here.bodyText.slice(0, 400));
+    if (!here.questions.length && here.next)
+      console.log('  this is a welcome / intro page — no questions yet, but there is a way forward. That is fine: spb.auto() clicks through it.');
+    if (!here.questions.length && !here.next)
       console.warn(
-        wall
-          ? '  ⚠ this looks like a login / interstitial page, not a survey question. Log in first, then open the survey link so the first question is on screen.'
-          : '  ⚠ no questions detected on this page.'
+        /log ?in|sign ?in|password|not authorized|session expired/i.test(here.bodyText.slice(0, 400))
+          ? '  ⚠ no questions and no way forward, and the page mentions signing in — log in first, then reopen the survey link.'
+          : '  ⚠ no questions and no way forward on this page.'
       );
-    }
+
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
     frame.style.cssText = 'position:fixed;left:-9999px;width:900px;height:700px';
     document.body.appendChild(frame);
-    const ok = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve(false), 15000);
-      frame.onload = () => { clearTimeout(timer); resolve(true); };
-      frame.src = url;
-    });
-    let inner = null;
-    try {
-      inner = ok && frame.contentDocument ? C.readPage(this.config.selectors, frame.contentDocument) : null;
-    } catch {
-      inner = null;
+    const load = (target) =>
+      new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(false), 15000);
+        frame.onload = () => { clearTimeout(timer); resolve(true); };
+        frame.src = target;
+      });
+    const read = () => {
+      try {
+        return frame.contentDocument ? C.readPage(this.config.selectors, frame.contentDocument) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const ok = await load(url);
+    let inner = ok ? read() : null;
+    if (!inner) {
+      frame.remove();
+      console.warn(`  ⚠ ${url} cannot be driven in an iframe (the host refuses framing) — use step mode: spb.plan()`);
+      return { page: here, frame: null };
+    }
+    console.log(`  iframe of ${url}: ${inner.questions.length} question(s), forward button: ${inner.next ? 'yes' : 'no'}`);
+
+    // Click through up to three question-free pages, so the check reports on
+    // the first real question rather than on the welcome screen.
+    let clicked = 0;
+    while (inner && !inner.questions.length && inner.next && clicked < 3) {
+      const before = inner.fingerprint + '|' + inner.url;
+      C.clickNext(inner, C.docFor(inner, frame.contentDocument));
+      clicked++;
+      const deadline = Date.now() + 15000;
+      let moved = null;
+      while (Date.now() < deadline) {
+        await sleep(300);
+        const now = read();
+        if (now && now.fingerprint + '|' + now.url !== before) { moved = now; break; }
+      }
+      inner = moved ?? inner;
+      if (!moved) break;
+      console.log(`  after clicking "${'forward'}" (${clicked}): ${inner.questions.length} question(s) — ${(inner.heading || inner.bodyText.slice(0, 60)).slice(0, 70)}`);
     }
     frame.remove();
-    if (!inner) console.warn(`  ⚠ ${url} cannot be driven in an iframe (the host refuses framing) — use spb.plan() step mode instead.`);
-    else console.log(`  iframe of ${url}: ${inner.questions.length} question(s), forward button: ${inner.next ? 'yes' : 'no'}`);
-    if (inner && !inner.questions.length)
-      console.warn('  ⚠ the frame loaded but shows no questions — usually the login wall again, or a start URL that is not the first page of the survey.');
+
+    if (inner && inner.questions.length) {
+      console.log('%c  ready — run spb.auto({ maxRuns: 20 })', 'font-weight:bold');
+      console.table(
+        inner.questions.map((q) => ({ name: q.key, type: q.kind, question: (q.label || '').slice(0, 60), options: q.options.length }))
+      );
+    } else if (inner) {
+      console.warn('  ⚠ clicked forward but still no questions — the survey may need a login, or the link may not start at page one.');
+    }
     return { page: here, frame: inner };
   },
 
