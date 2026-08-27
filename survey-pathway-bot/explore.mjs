@@ -76,7 +76,7 @@ while (queue.length && n < maxRuns) {
       delay: Number(a.delay ?? config.delay ?? 0),
       manualTimeout: Number(a.manual ?? config.manualTimeout ?? 0) * 1000,
       stepTimeout: Number(config.stepTimeout ?? 20000),
-      maxSteps: Number(config.maxSteps ?? 60),
+      maxSteps: Number(config.maxSteps ?? 200),
     });
   } catch (err) {
     trace = { runId, plan, decisions: [], steps: [], outcome: { type: 'error', text: String(err.message ?? err) } };

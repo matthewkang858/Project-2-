@@ -108,6 +108,22 @@ try {
   check(typeof dbg.controlsInDom === 'number' && Array.isArray(dbg.buttonsOnPage), 'spb.debug() dumps what the page contains');
   await styled.close();
 
+  for (const [path, label, keys] of [
+    ['limit', 'respects "select up to two"', null],
+    ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],
+    ['sum100', 'makes a percentage group total 100', null],
+  ]) {
+    const w = await ctx.newPage();
+    await w.goto(URL_ + path);
+    await w.evaluate(snippet);
+    const ts = (await w.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 2, config: { delay: 0, manualTimeout: 0 } }), URL_ + path)) || [];
+    let ok = ts.some((t) => t.outcome?.type === 'complete');
+    if (keys) ok = ok && ts.some((t) => keys.every((k) => t.decisions.some((d) => d.key === k)));
+    if (path === 'limit') ok = ok && ts.every((t) => t.decisions.filter((d) => /\[1\]$/.test(d.chosen)).length <= 2);
+    check(ok, `snippet ${label}`);
+    await w.close();
+  }
+
   const stopPage = await ctx.newPage();
   await stopPage.goto(URL_);
   await stopPage.evaluate(snippet);

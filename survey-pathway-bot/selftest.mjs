@@ -71,6 +71,43 @@ try {
     check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
   }
 
+  // An "Other (please specify)" box must stay empty unless its option is taken
+  // — typing in it otherwise is a validation error.
+  {
+    const o = join(out, 'other');
+    const r = await run(['explore.mjs', '--url', URL + 'other', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'leaves an "other, please specify" box blank unless that option is chosen');
+    const blanks = ts.flatMap((t) => t.decisions.filter((d) => d.key === 'oeOT1'));
+    check(blanks.some((d) => /not selected/.test(d.chosen)) && blanks.some((d) => /Test/.test(d.chosen)),
+      'fills the "other" box only on the run that picks Other');
+  }
+
+  // The three shapes that made a field run need a human: "select up to two"
+  // checkboxes, percentages that must total 100, and a carousel grid whose
+  // cards are moved by its own pager.
+  {
+    const cases = [
+      ['limit', 'respects "select up to two"', (ts) =>
+        ts.every((t) => t.decisions.filter((d) => /\[1\]$/.test(d.chosen)).length <= 2)],
+      ['sum100', 'makes a percentage group total 100', (ts) =>
+        ts.some((t) => t.decisions.filter((d) => d.key.startsWith('SM1')).reduce((n, d) => n + Number((d.chosen.match(/\d+/) || [0])[0]), 0) === 100)],
+      ['pager', 'answers every card of a carousel grid', (ts) =>
+        ts.some((t) => ['PG1r1', 'PG1r2', 'PG1r3'].every((k) => t.decisions.some((d) => d.key === k)))],
+    ];
+    for (const [path, label, ok] of cases) {
+      const o = join(out, path);
+      const r = await run(['explore.mjs', '--url', URL + path, '--out', o, '--max-runs', '3']);
+      const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+      check(r.code === 0 && ok(ts), label);
+      check(ts.every((t) => t.outcome?.type === 'complete'), `clears validation on the ${path} page`);
+      if (path === 'limit') {
+        const md = readFileSync(join(o, 'REPORT.md'), 'utf8');
+        check(/\| `LM1` /.test(md) && !/\| `LM1r1` /.test(md), 'coverage reports one row per question, not one per checkbox');
+      }
+    }
+  }
+
   // Widgets that a plain form reader cannot drive: native + custom sliders, and
   // a carousel that reveals one question at a time without a page load.
   for (const [path, label, expectKeys] of [

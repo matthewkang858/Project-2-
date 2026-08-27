@@ -90,18 +90,30 @@ function buildReport(traces, summary = {}) {
   for (const t of traces) {
     for (const s of t.steps) {
       for (const q of s.questions ?? []) {
-        if (!qs.has(q.key)) qs.set(q.key, { label: q.label, kind: q.kind, options: new Map() });
-        const rec = qs.get(q.key);
+        // Survey engines name each checkbox of one question separately
+        // (Q7r1, Q7r2 …). Reporting them as separate questions buries the
+        // report in near-identical rows, so they collapse back into the group.
+        const id = q.kind === 'checkbox' && q.group && q.group !== q.key ? q.group : q.key;
+        if (!qs.has(id)) qs.set(id, { label: q.label, kind: q.kind, options: new Map(), grouped: id !== q.key });
+        const rec = qs.get(id);
         for (const o of q.options ?? []) {
           const k = o.label || o.value;
           if (!rec.options.has(k)) rec.options.set(k, { chosen: 0 });
         }
-        // Leaving a standalone checkbox blank is a branch of its own.
-        if (q.kind === 'checkbox' && (q.options ?? []).length === 1 && !rec.options.has('(left unchecked)'))
+        // Under a group, each box is one selectable answer; the option label is
+        // the box's own text.
+        if (rec.grouped)
+          for (const o of q.options ?? []) {
+            const k = o.label || q.key;
+            if (!rec.options.has(k)) rec.options.set(k, { chosen: 0 });
+          }
+        else if (q.kind === 'checkbox' && (q.options ?? []).length === 1 && !rec.options.has('(left unchecked)'))
           rec.options.set('(left unchecked)', { chosen: 0 });
       }
       for (const d of s.decisions ?? []) {
-        const rec = qs.get(d.key);
+        const q = (s.questions ?? []).find((x) => x.key === d.key);
+        const id = q && q.kind === 'checkbox' && q.group && q.group !== q.key ? q.group : d.key;
+        const rec = qs.get(id);
         if (!rec) continue;
         const lbl = String(d.chosen ?? '').replace(/\s*\[[^\]]*\]$/, '');
         for (const [k, v] of rec.options) {

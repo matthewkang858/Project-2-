@@ -59,7 +59,9 @@ function expand(state, trace) {
   }
 }
 
-// Answer every question on `doc`, returning the page record.
+// Answer every question on `doc`, returning the page record. The plan comes
+// from the shared core so group constraints ("select up to two", "must total
+// 100") are applied the same way in every runner.
 function answerPage(model, plan, di, cfg, doc, answered) {
   const record = {
     url: model.url,
@@ -69,35 +71,33 @@ function answerPage(model, plan, di, cfg, doc, answered) {
     questionKeys: model.questions.map((q) => q.key),
     questions: model.questions.map((q) => ({
       key: q.key,
+      group: q.group,
       kind: q.kind,
       label: q.label,
-      options: q.options.map((o) => ({ value: o.value, label: o.label })),
+      limit: q.limit ?? undefined,
+      sumTo: q.sumTo ?? undefined,
+      emphasis: q.emphasis,
+      options: q.options.map((o) => ({ value: o.value, label: o.label, emphasis: o.emphasis })),
     })),
     decisions: [],
   };
-  for (const q of model.questions) {
-    // A carousel keeps answered cards on screen; re-answering them would
-    // consume plan slots and skew the branch numbering.
-    if (answered && answered.has(q.key) && q.answered) continue;
-    const cands = C.candidates(q, cfg);
-    const wanted = plan[di];
-    const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
-    const chosen = cands[idx];
-    const ok = C.applyAnswer(q, chosen, doc);
-    if (answered) answered.add(q.key);
+  const planned = C.planPage(model, plan, di, cfg, answered);
+  for (const d of planned.decisions) {
+    const ok = C.applyAnswer(d.q, d.candidate, doc);
+    if (answered) answered.add(d.q.key);
     record.decisions.push({
-      di,
-      key: q.key,
-      kind: q.kind,
-      label: q.label,
-      candidateCount: cands.length,
-      chosenIndex: idx,
-      chosen: C.describe(q, chosen),
+      di: d.di,
+      key: d.q.key,
+      kind: d.q.kind,
+      label: d.q.label,
+      candidateCount: d.candidateCount,
+      chosenIndex: d.chosenIndex,
+      chosen: C.describe(d.q, d.candidate),
+      note: d.note ?? undefined,
       error: ok ? undefined : 'could not set answer',
     });
-    di++;
   }
-  return { record, di };
+  return { record, di: planned.di };
 }
 
 function makeTrace(runId, plan, steps, decisions, type, text) {
@@ -222,7 +222,7 @@ spb.reset()                 clear stored state`);
     const cfg = { ...this.config, ...(opts.config || {}) };
     const delay = Number(cfg.delay ?? 300);
     const timeout = Number(cfg.stepTimeout ?? 20000);
-    const maxSteps = Number(cfg.maxSteps ?? 60);
+    const maxSteps = Number(cfg.maxSteps ?? 200);
 
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
@@ -332,6 +332,20 @@ spb.reset()                 clear stored state`);
             const after = C.readPage(cfg.selectors, docOf());
             if (after.fingerprint !== model.fingerprint) continue;
             current = after;
+          }
+
+          // A carousel's own pager moves between cards inside one question.
+          if (current.pager && !current.pager.atEnd) {
+            const at = current.fingerprint + '|' + current.url;
+            C.clickNext({ next: { selector: current.pager.selector } }, C.docFor(current, docOf()));
+            const until = Date.now() + timeout;
+            let advanced = false;
+            while (Date.now() < until) {
+              await sleep(200);
+              const now = C.readPage(cfg.selectors, docOf());
+              if (now.fingerprint + '|' + now.url !== at) { advanced = true; break; }
+            }
+            if (advanced) { ans.record.pager = `${current.pager.index}/${current.pager.total}`; continue; }
           }
 
           if (!current.next) {
@@ -514,7 +528,7 @@ spb.reset()                 clear stored state`);
       startUrl: opts.url || location.href,
       cfg: { ...this.config, ...(opts.config || {}) },
       maxRuns: opts.maxRuns ?? 20,
-      maxSteps: opts.maxSteps ?? 60,
+      maxSteps: opts.maxSteps ?? 200,
       queue: [[]],
       seen: [''],
       traces: [],
@@ -587,7 +601,8 @@ spb.reset()                 clear stored state`);
     c.decisions.push(...answered.record.decisions);
     writeJSON(STEP_KEY, state);
     console.table(Object.fromEntries(answered.record.decisions.map((d) => [d.key, d.chosen])));
-    C.clickNext(model, target);
+    const nav = model.pager && !model.pager.atEnd ? { next: { selector: model.pager.selector } } : model;
+    C.clickNext(nav, target);
     console.log(`${c.runId} · page ${c.steps.length} answered — press Ctrl/Cmd+Enter again on the next page.`);
     return answered.record;
   },

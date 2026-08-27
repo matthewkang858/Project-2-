@@ -27,7 +27,11 @@ const DEFAULT_SELECTORS = {
   ],
   // Page text that means "this run is over".
   terminalPatterns: {
-    complete: ['thank you for completing', 'survey is complete', 'thanks for taking', 'your responses have been recorded', 'completed the survey'],
+    complete: [
+      'thank you for completing', 'thanks for completing', 'survey is complete', 'survey completed',
+      'thanks for taking', 'thank you for taking', 'your responses have been recorded',
+      'completed the survey', 'already completed', 'please close the window',
+    ],
     quota: ['quota', 'we have enough', 'group is full'],
     terminate: ['do not qualify', "don't qualify", 'not qualify', 'screened out', 'unfortunately', "we're sorry", 'we are sorry', 'no longer available'],
   },
@@ -190,6 +194,11 @@ function pageModel(cfg, doc) {
         step: Number(first.step || 1),
       };
 
+    // Decipher and friends name each row of a question separately (LM1r1,
+    // LM1r2 …). The group is what carries "select up to two" and "must total
+    // 100", so it has to be reconstructed.
+    q.group = key.replace(/[_-]?[rc]\d+([_-]\d+)?$/i, '').replace(/[_-]\d+$/, '') || key;
+
     // Whether the respondent (or the bot) has already answered it — used to
     // avoid re-answering questions that stay on screen as a carousel reveals
     // more, and to explain validation stalls.
@@ -199,6 +208,20 @@ function pageModel(cfg, doc) {
         : kind === 'select'
           ? !!first.value
           : String(first.value ?? '') !== '';
+
+    q.checkedValues =
+      kind === 'radio' || kind === 'checkbox' ? els.filter((e) => e.checked).map((e) => e.value) : [];
+
+    // An "Other (please specify)" box lives inside the option's own row. Typing
+    // in it without selecting that option is a validation error in every survey
+    // platform, so record who owns it.
+    if (kind === 'text' || kind === 'textarea' || kind === 'number') {
+      const row = first.closest('label, td, tr, li, .choice, .option, [class*="answer"]');
+      const owner = row && [...row.querySelectorAll('input')].find(
+        (e) => (e.type === 'radio' || e.type === 'checkbox') && e.name !== first.name
+      );
+      if (owner) q.ownedBy = { key: owner.name || owner.id, value: owner.value ?? '' };
+    }
 
     if (kind === 'select') {
       q.options = [...first.options]
@@ -213,6 +236,50 @@ function pageModel(cfg, doc) {
       }));
     }
     questions.push(q);
+  }
+
+  // Constraints stated in the question wording (and repeated by the validation
+  // message when it fires): how many boxes may be ticked, what the numbers must
+  // add up to.
+  const WORD_NUMBER = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  const numberIn = (text, re) => {
+    const m = text.match(re);
+    if (!m) return null;
+    const raw = (m[1] || '').toLowerCase();
+    return WORD_NUMBER[raw] ?? (Number(raw) || null);
+  };
+  for (const q of questions) {
+    const scope = clean(
+      [q.label, ...[...doc.querySelectorAll('.error, .alert, [class*="error"]')].map((e) => clean(e.innerText))].join(' ')
+    );
+    q.limit =
+      numberIn(scope, /select up to (\w+)/i) ??
+      numberIn(scope, /choose up to (\w+)/i) ??
+      numberIn(scope, /at most (\w+) box/i) ??
+      numberIn(scope, /top (\w+) /i) ??
+      null;
+    q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
+  }
+
+  // A carousel's own pager ("1 / 8" with arrows). It moves between cards inside
+  // one question, so it must not be mistaken for the page's forward button.
+  let pager = null;
+  const posEl = [...doc.querySelectorAll('span, div, p, li')].find(
+    (el) => !el.children.length && /^\d+\s*\/\s*\d+$/.test(clean(el.innerText || ''))
+  );
+  if (posEl) {
+    const [index, total] = clean(posEl.innerText).split('/').map((n) => Number(n.trim()));
+    let scope = posEl.parentElement;
+    let btn = null;
+    for (let up = 0; up < 3 && scope && !btn; up++, scope = scope.parentElement) {
+      btn = [...scope.querySelectorAll('button, a, [role="button"]')].find((b) => {
+        if (!visible(b) || b.disabled) return false;
+        const label = clean(b.innerText || b.getAttribute('aria-label') || '');
+        return /^(next|forward|›|>|→|»)$/i.test(label) || /next/i.test(b.getAttribute('aria-label') || '');
+      });
+    }
+    if (btn && index < total) pager = { selector: cssFor(btn), index, total };
+    else if (btn) pager = { selector: cssFor(btn), index, total, atEnd: true };
   }
 
   // Sliders that are not <input type=range>: a focusable element carrying the
@@ -260,6 +327,7 @@ function pageModel(cfg, doc) {
     const clickable = [...doc.querySelectorAll('button, input[type="button"], input[type="submit"], a[role="button"], a.btn, [role="button"], .button, .btn')];
     const el = clickable.find((e) => {
       if (!visible(e) || e.disabled) return false;
+      if (pager && cssFor(e) === pager.selector) return false; // that is the carousel's arrow
       const label = clean(e.innerText || e.value || e.getAttribute('aria-label') || '');
       return label && forward.test(label) && !backward.test(label);
     });
@@ -278,6 +346,7 @@ function pageModel(cfg, doc) {
   ).slice(0, 200);
 
   return {
+    pager,
     url: doc.location.href,
     title: doc.title,
     heading,
@@ -376,6 +445,65 @@ function describe(q, candidate) {
   if (candidate.kind === 'noop') return candidate.label ?? '(no answer)';
   const opt = q.options[candidate.index];
   return opt?.label ? `${opt.label} [${opt.value}]` : `[${opt?.value ?? candidate.index}]`;
+}
+
+// What to answer on this page, as one plan: per-question choices with the
+// group constraints applied — at most N boxes ticked per question, numbers
+// distributed so a group totals what the question demands.
+function planPage(model, plan, startDi, cfg, answered) {
+  const config = cfg || {};
+  const decisions = [];
+  let di = startDi || 0;
+  const ticked = {};
+  const groups = {};
+  for (const q of model.questions) (groups[q.group] = groups[q.group] || []).push(q);
+
+  const picked = {}; // key -> values chosen on this page
+  for (const q of model.questions) (picked[q.key] = picked[q.key] || []).push(...(q.checkedValues || []));
+
+  for (const q of model.questions) {
+    if (answered && answered.has(q.key) && q.answered) continue;
+    const cands = candidates(q, config);
+    const wanted = plan ? plan[di] : undefined;
+    const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
+    let chosen = cands[idx];
+    let note = null;
+
+    if (q.kind === 'checkbox' && chosen && chosen.kind === 'option') {
+      // Default to a single box per question: ticking every box of a
+      // "select up to two" question is the fastest way to a validation error.
+      const limit = q.limit ?? config.checkboxLimit ?? 1;
+      const used = ticked[q.group] || 0;
+      if (used >= limit) {
+        chosen = { kind: 'noop', label: `(limit of ${limit} reached)` };
+        note = `limit ${limit}`;
+      } else ticked[q.group] = used + 1;
+    }
+
+    if (q.sumTo && (q.kind === 'number' || q.kind === 'text')) {
+      const members = groups[q.group] || [q];
+      const share = Math.floor(q.sumTo / members.length);
+      const first = q.sumTo - share * (members.length - 1);
+      chosen = { kind: 'value', value: String(members.indexOf(q) === 0 ? first : share) };
+      note = `sums to ${q.sumTo}`;
+    }
+
+    // Record what this page is choosing, so an option's own text box knows
+    // whether it is in play.
+    if (chosen && chosen.kind === 'option') (picked[q.key] = picked[q.key] || []).push(String(chosen.value));
+
+    if (q.ownedBy) {
+      const taken = (picked[q.ownedBy.key] || []).includes(String(q.ownedBy.value));
+      if (!taken) {
+        chosen = { kind: 'noop', label: '(its option was not selected)' };
+        note = 'other-specify left blank';
+      }
+    }
+
+    decisions.push({ q, candidate: chosen, di, candidateCount: cands.length, chosenIndex: idx, note });
+    di++;
+  }
+  return { decisions, di };
 }
 
 // DOM-native answering, used by the Chrome extension and the console snippet.
@@ -534,6 +662,7 @@ globalThis.SPB_CORE = {
   docFor,
   fingerprint,
   candidates,
+  planPage,
   describe,
   applyAnswer,
   clickNext,

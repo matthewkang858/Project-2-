@@ -7,7 +7,8 @@
 // option forever" is a deterministic, resumable description of a pathway.
 
 import { readPage, DEFAULT_SELECTORS } from './extract.mjs';
-import { candidates, apply, describe, scopeOf } from './answer.mjs';
+import { apply, describe, scopeOf } from './answer.mjs';
+import { core } from './core.mjs';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -60,7 +61,7 @@ export async function runOnce(page, opts) {
     outDir = null,
     screenshots = false,
     stepTimeout = 20000,
-    maxSteps = 60,
+    maxSteps = 200,
     delay = 0,
     manualTimeout = 0,
     settleTimeout = 4000,
@@ -91,9 +92,13 @@ export async function runOnce(page, opts) {
       questionKeys: model.questions.map((q) => q.key),
       questions: model.questions.map((q) => ({
         key: q.key,
+        group: q.group,
         kind: q.kind,
         label: q.label,
-        options: q.options.map((o) => ({ value: o.value, label: o.label })),
+        limit: q.limit ?? undefined,
+        sumTo: q.sumTo ?? undefined,
+        emphasis: q.emphasis,
+        options: q.options.map((o) => ({ value: o.value, label: o.label, emphasis: o.emphasis })),
       })),
       outcome: model.outcome,
       decisions: [],
@@ -116,40 +121,48 @@ export async function runOnce(page, opts) {
       break;
     }
 
-    for (const q of model.questions) {
-      // A carousel keeps earlier cards on screen; re-answering them would
-      // consume plan slots and skew the branch numbering.
-      if (answered.has(q.key) && q.answered) continue;
-      const cands = candidates(q, config);
-      const wanted = plan[di];
-      const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
-      const chosen = cands[idx];
-      try {
-        await apply(page, q, chosen, model.docPath);
-      } catch (err) {
-        // Still counts as a decision slot so that replay plans stay aligned.
-        const failed = { di, step, key: q.key, kind: q.kind, label: q.label, candidateCount: 1, chosenIndex: 0, chosen: '(failed)', error: String(err.message ?? err) };
-        record.decisions.push(failed);
-        trace.decisions.push(failed);
-        di++;
-        continue;
-      }
+    // One plan for the whole page, so "select up to two" and "must total 100"
+    // are honoured across the questions that share a group.
+    const planned = core.planPage(model, plan, di, config, answered);
+    for (const d of planned.decisions) {
       const dec = {
-        di,
+        di: d.di,
         step,
-        key: q.key,
-        kind: q.kind,
-        label: q.label,
-        candidateCount: cands.length,
-        chosenIndex: idx,
-        chosen: describe(q, chosen),
-        planned: Number.isInteger(wanted),
+        key: d.q.key,
+        kind: d.q.kind,
+        label: d.q.label,
+        candidateCount: d.candidateCount,
+        chosenIndex: d.chosenIndex,
+        chosen: describe(d.q, d.candidate),
+        note: d.note ?? undefined,
+        planned: Number.isInteger(plan[d.di]),
       };
+      try {
+        await apply(page, d.q, d.candidate, model.docPath);
+      } catch (err) {
+        // A page that re-renders under us invalidates the selector; re-read and
+        // try the same question once more before giving up on it.
+        let retried = false;
+        try {
+          const fresh = await readPage(page, selectors);
+          const again = fresh.questions.find((x) => x.key === d.q.key);
+          if (again) {
+            await apply(page, again, d.candidate, fresh.docPath);
+            retried = true;
+          }
+        } catch {
+          /* fall through to recording the failure */
+        }
+        if (!retried) {
+          dec.chosen = '(failed)';
+          dec.error = String(err.message ?? err);
+        }
+      }
+      answered.add(d.q.key);
       record.decisions.push(dec);
       trace.decisions.push(dec);
-      answered.add(q.key);
-      di++;
     }
+    di = planned.di;
 
     if (delay) await sleep(delay);
 
@@ -164,6 +177,26 @@ export async function runOnce(page, opts) {
         continue;
       }
       if (after) current = after;
+    }
+
+    if (current.pager && !current.pager.atEnd) {
+      const before = current.fingerprint + '|' + current.url;
+      await scopeOf(page, current.docPath)
+        .locator(current.pager.selector)
+        .click({ timeout: 5000 })
+        .catch(() => {});
+      const deadline = Date.now() + stepTimeout;
+      let advanced = false;
+      while (Date.now() < deadline) {
+        await sleep(200);
+        const now = await readPage(page, selectors).catch(() => null);
+        if (now && now.fingerprint + '|' + now.url !== before) { advanced = true; break; }
+      }
+      if (advanced) {
+        record.pager = `${current.pager.index}/${current.pager.total}`;
+        trace.steps.push(record);
+        continue;
+      }
     }
 
     if (!current.next) {

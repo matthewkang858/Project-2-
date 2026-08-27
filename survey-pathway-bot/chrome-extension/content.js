@@ -60,9 +60,13 @@
         questionKeys: model.questions.map((q) => q.key),
         questions: model.questions.map((q) => ({
           key: q.key,
+          group: q.group,
           kind: q.kind,
           label: q.label,
-          options: q.options.map((o) => ({ value: o.value, label: o.label })),
+          limit: q.limit ?? undefined,
+          sumTo: q.sumTo ?? undefined,
+          emphasis: q.emphasis,
+          options: q.options.map((o) => ({ value: o.value, label: o.label, emphasis: o.emphasis })),
         })),
         decisions: [],
       };
@@ -73,28 +77,23 @@
       }
 
       const target = SPB_CORE.docFor(model, document);
-      for (const q of model.questions) {
-        // A carousel keeps answered cards on screen — re-answering them would
-        // consume plan slots and skew the branch numbering.
-        if (answered.has(q.key) && q.answered) continue;
-        const cands = SPB_CORE.candidates(q, cfg);
-        const wanted = plan[di];
-        const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
-        const chosen = cands[idx];
-        const ok = SPB_CORE.applyAnswer(q, chosen, target);
-        answered.add(q.key);
+      const planned = SPB_CORE.planPage(model, plan, di, cfg, answered);
+      for (const d of planned.decisions) {
+        const ok = SPB_CORE.applyAnswer(d.q, d.candidate, target);
+        answered.add(d.q.key);
         record.decisions.push({
-          di,
-          key: q.key,
-          kind: q.kind,
-          label: q.label,
-          candidateCount: cands.length,
-          chosenIndex: idx,
-          chosen: SPB_CORE.describe(q, chosen),
+          di: d.di,
+          key: d.q.key,
+          kind: d.q.kind,
+          label: d.q.label,
+          candidateCount: d.candidateCount,
+          chosenIndex: d.chosenIndex,
+          chosen: SPB_CORE.describe(d.q, d.candidate),
+          note: d.note ?? undefined,
           error: ok ? undefined : 'could not set answer',
         });
-        di++;
       }
+      di = planned.di;
 
       const ack = await send({ type: 'step', record, di });
       if (!ack || !ack.continue) return;
@@ -111,7 +110,8 @@
       }
 
       const before = current.fingerprint + '|' + location.href;
-      if (!current.next || !SPB_CORE.clickNext(current, SPB_CORE.docFor(current, document))) {
+      const nav = current.pager && !current.pager.atEnd ? { next: { selector: current.pager.selector } } : current;
+      if (!nav.next || !SPB_CORE.clickNext(nav, SPB_CORE.docFor(current, document))) {
         await send({ type: 'stalled', record, text: 'no forward button could be clicked' });
         return;
       }

@@ -213,9 +213,148 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // "Please select up to two" — each checkbox carries its own name, and the
+  // server rejects more than two, exactly as Decipher does.
+  if (req.url && req.url.split('?')[0] === '/limit') {
+    const checked = Number((req.url.match(/checked=(\d+)/) || [, 0])[1]);
+    const err = checked > 2 ? `<p class="error">Please check at most 2 boxes in this column (you checked ${checked}).</p>` : '';
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/limitcheck">
+        <div class="question" id="LM1"><div class="qtitle">What are the top two reasons you expect spend to increase?<br>Please select up to two.</div>
+        ${err}
+        ${['Upgrading legacy systems', 'Adoption of AI', 'Business intelligence', 'Revenue growth', 'Cybersecurity']
+          .map((t, i) => `<label class="choice" for="LM1r${i + 1}"><input type="checkbox" name="LM1r${i + 1}" id="LM1r${i + 1}" value="1"> ${t}</label>`)
+          .join('')}
+        </div>
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form></body></html>`);
+    return;
+  }
+  // Percentages that must total exactly 100.
+  if (req.url && req.url.split('?')[0] === '/sum100') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/sumcheck">
+        <div class="question" id="SM1"><div class="qtitle">Split your incremental spend across the following. Your total must equal 100 exactly.</div>
+        <table>
+          <tr><td>Direct AI Spend</td><td><input type="number" name="SM1r1" id="SM1r1" value=""> %</td></tr>
+          <tr><td>AI Enablement Spend</td><td><input type="number" name="SM1r2" id="SM1r2" value=""> %</td></tr>
+          <tr><td>Non-AI Spend</td><td><input type="number" name="SM1r3" id="SM1r3" value=""> %</td></tr>
+        </table></div>
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form></body></html>`);
+    return;
+  }
+  // A carousel grid: one row per card, its own pager, Continue only once every
+  // card is answered.
+  if (req.url && req.url.startsWith('/pager')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['Executive Management', 'IT', 'Finance'];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.choice input{position:absolute;opacity:0}.card{display:none}.card.on{display:block}</style>
+      </head><body>
+      <form method="POST" action="/">
+        <input type="hidden" name="state" value="${enc({ S1: '2', S2: '1', S3: '1' })}">
+        <input type="hidden" name="page" value="4">
+        <div class="question" id="PG1"><div class="qtitle">Which role is played by each department?</div>
+          ${rows.map((r, i) => `<div class="card ${i === 0 ? 'on' : ''}" data-i="${i}"><p class="rowlabel">${r}</p>
+            ${['Key decision-maker', 'Influencer', 'No role'].map((t, j) =>
+              `<label class="choice" for="PG1r${i + 1}_${j + 1}"><input type="checkbox" name="PG1r${i + 1}" id="PG1r${i + 1}_${j + 1}" value="${j + 1}"> ${t}</label>`).join('')}
+            </div>`).join('')}
+          <div class="pager"><button type="button" id="prev" aria-label="Previous">&lsaquo;</button>
+            <span id="pos">1 / ${rows.length}</span>
+            <button type="button" id="nextCard" aria-label="Next">&rsaquo;</button></div>
+        </div>
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var at = 0, cards = document.querySelectorAll('.card');
+        function show(n) {
+          at = Math.max(0, Math.min(cards.length - 1, n));
+          cards.forEach(function (c, i) { c.className = 'card' + (i === at ? ' on' : ''); });
+          document.getElementById('pos').textContent = (at + 1) + ' / ' + cards.length;
+          var done = [].every.call(cards, function (c) { return c.querySelector('input:checked'); });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        document.getElementById('nextCard').addEventListener('click', function () { show(at + 1); });
+        document.getElementById('prev').addEventListener('click', function () { show(at - 1); });
+        document.addEventListener('change', function () { show(at); });
+      </script>
+      </body></html>`);
+    return;
+  }
+  if (req.url && req.url.split('?')[0] === '/other') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/othercheck">
+        <div class="question" id="OT1"><div class="qtitle">Which industry does your company operate in?</div>
+          <label class="choice" for="OT1_1"><input type="radio" name="OT1" id="OT1_1" value="1"> Technology</label>
+          <label class="choice" for="OT1_2"><input type="radio" name="OT1" id="OT1_2" value="2"> Finance</label>
+          <label class="choice" for="OT1_3"><input type="radio" name="OT1" id="OT1_3" value="3"> Other (please specify)
+            <input type="text" name="oeOT1" id="oeOT1" value=""></label>
+        </div>
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form></body></html>`);
+    return;
+  }
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));
+    return;
+  }
+  if (req.url === '/othercheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      // Typing in the "other" box without picking "Other" is the error Decipher
+      // raises, and vice versa.
+      if (form.get('oeOT1') && form.get('OT1') !== '3')
+        res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. You typed a response for "Other" but did not select it.</p></body></html>`);
+      else if (form.get('OT1') === '3' && !form.get('oeOT1'))
+        res.end(`<!doctype html><html><body><p class="error">Please specify your answer for "Other".</p></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url === '/limitcheck' || req.url === '/sumcheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      if (req.url === '/limitcheck') {
+        const checked = [...form.keys()].filter((k) => k.startsWith('LM1r')).length;
+        if (checked > 2 || checked === 0) {
+          res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+            <p class="error">Please check at most 2 boxes in this column (you checked ${checked}).</p>
+            <form method="POST" action="/limitcheck">
+              ${['Upgrading legacy systems', 'Adoption of AI', 'Business intelligence', 'Revenue growth', 'Cybersecurity']
+                .map((t, i) => `<label class="choice" for="LM1r${i + 1}"><input type="checkbox" name="LM1r${i + 1}" id="LM1r${i + 1}" value="1"> ${t}</label>`)
+                .join('')}
+              <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+            </form></body></html>`);
+          return;
+        }
+      } else {
+        const total = ['SM1r1', 'SM1r2', 'SM1r3'].reduce((n, k) => n + Number(form.get(k) || 0), 0);
+        if (total !== 100) {
+          res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+            <p class="error">Your total must equal 100 exactly. You have entered ${total}.</p>
+            <form method="POST" action="/sumcheck"><div class="question" id="SM1">
+              <div class="qtitle">Split your incremental spend. Your total must equal 100 exactly.</div>
+              <table><tr><td>Direct AI Spend</td><td><input type="number" name="SM1r1" value="${form.get('SM1r1') || ''}"></td></tr>
+              <tr><td>AI Enablement Spend</td><td><input type="number" name="SM1r2" value="${form.get('SM1r2') || ''}"></td></tr>
+              <tr><td>Non-AI Spend</td><td><input type="number" name="SM1r3" value="${form.get('SM1r3') || ''}"></td></tr></table></div>
+              <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+            </form></body></html>`);
+          return;
+        }
+      }
+      res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
     return;
   }
   let body = '';

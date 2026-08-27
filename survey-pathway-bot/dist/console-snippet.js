@@ -31,7 +31,11 @@ const DEFAULT_SELECTORS = {
   ],
   // Page text that means "this run is over".
   terminalPatterns: {
-    complete: ['thank you for completing', 'survey is complete', 'thanks for taking', 'your responses have been recorded', 'completed the survey'],
+    complete: [
+      'thank you for completing', 'thanks for completing', 'survey is complete', 'survey completed',
+      'thanks for taking', 'thank you for taking', 'your responses have been recorded',
+      'completed the survey', 'already completed', 'please close the window',
+    ],
     quota: ['quota', 'we have enough', 'group is full'],
     terminate: ['do not qualify', "don't qualify", 'not qualify', 'screened out', 'unfortunately', "we're sorry", 'we are sorry', 'no longer available'],
   },
@@ -194,6 +198,11 @@ function pageModel(cfg, doc) {
         step: Number(first.step || 1),
       };
 
+    // Decipher and friends name each row of a question separately (LM1r1,
+    // LM1r2 …). The group is what carries "select up to two" and "must total
+    // 100", so it has to be reconstructed.
+    q.group = key.replace(/[_-]?[rc]\d+([_-]\d+)?$/i, '').replace(/[_-]\d+$/, '') || key;
+
     // Whether the respondent (or the bot) has already answered it — used to
     // avoid re-answering questions that stay on screen as a carousel reveals
     // more, and to explain validation stalls.
@@ -203,6 +212,20 @@ function pageModel(cfg, doc) {
         : kind === 'select'
           ? !!first.value
           : String(first.value ?? '') !== '';
+
+    q.checkedValues =
+      kind === 'radio' || kind === 'checkbox' ? els.filter((e) => e.checked).map((e) => e.value) : [];
+
+    // An "Other (please specify)" box lives inside the option's own row. Typing
+    // in it without selecting that option is a validation error in every survey
+    // platform, so record who owns it.
+    if (kind === 'text' || kind === 'textarea' || kind === 'number') {
+      const row = first.closest('label, td, tr, li, .choice, .option, [class*="answer"]');
+      const owner = row && [...row.querySelectorAll('input')].find(
+        (e) => (e.type === 'radio' || e.type === 'checkbox') && e.name !== first.name
+      );
+      if (owner) q.ownedBy = { key: owner.name || owner.id, value: owner.value ?? '' };
+    }
 
     if (kind === 'select') {
       q.options = [...first.options]
@@ -217,6 +240,50 @@ function pageModel(cfg, doc) {
       }));
     }
     questions.push(q);
+  }
+
+  // Constraints stated in the question wording (and repeated by the validation
+  // message when it fires): how many boxes may be ticked, what the numbers must
+  // add up to.
+  const WORD_NUMBER = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  const numberIn = (text, re) => {
+    const m = text.match(re);
+    if (!m) return null;
+    const raw = (m[1] || '').toLowerCase();
+    return WORD_NUMBER[raw] ?? (Number(raw) || null);
+  };
+  for (const q of questions) {
+    const scope = clean(
+      [q.label, ...[...doc.querySelectorAll('.error, .alert, [class*="error"]')].map((e) => clean(e.innerText))].join(' ')
+    );
+    q.limit =
+      numberIn(scope, /select up to (\w+)/i) ??
+      numberIn(scope, /choose up to (\w+)/i) ??
+      numberIn(scope, /at most (\w+) box/i) ??
+      numberIn(scope, /top (\w+) /i) ??
+      null;
+    q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
+  }
+
+  // A carousel's own pager ("1 / 8" with arrows). It moves between cards inside
+  // one question, so it must not be mistaken for the page's forward button.
+  let pager = null;
+  const posEl = [...doc.querySelectorAll('span, div, p, li')].find(
+    (el) => !el.children.length && /^\d+\s*\/\s*\d+$/.test(clean(el.innerText || ''))
+  );
+  if (posEl) {
+    const [index, total] = clean(posEl.innerText).split('/').map((n) => Number(n.trim()));
+    let scope = posEl.parentElement;
+    let btn = null;
+    for (let up = 0; up < 3 && scope && !btn; up++, scope = scope.parentElement) {
+      btn = [...scope.querySelectorAll('button, a, [role="button"]')].find((b) => {
+        if (!visible(b) || b.disabled) return false;
+        const label = clean(b.innerText || b.getAttribute('aria-label') || '');
+        return /^(next|forward|›|>|→|»)$/i.test(label) || /next/i.test(b.getAttribute('aria-label') || '');
+      });
+    }
+    if (btn && index < total) pager = { selector: cssFor(btn), index, total };
+    else if (btn) pager = { selector: cssFor(btn), index, total, atEnd: true };
   }
 
   // Sliders that are not <input type=range>: a focusable element carrying the
@@ -264,6 +331,7 @@ function pageModel(cfg, doc) {
     const clickable = [...doc.querySelectorAll('button, input[type="button"], input[type="submit"], a[role="button"], a.btn, [role="button"], .button, .btn')];
     const el = clickable.find((e) => {
       if (!visible(e) || e.disabled) return false;
+      if (pager && cssFor(e) === pager.selector) return false; // that is the carousel's arrow
       const label = clean(e.innerText || e.value || e.getAttribute('aria-label') || '');
       return label && forward.test(label) && !backward.test(label);
     });
@@ -282,6 +350,7 @@ function pageModel(cfg, doc) {
   ).slice(0, 200);
 
   return {
+    pager,
     url: doc.location.href,
     title: doc.title,
     heading,
@@ -380,6 +449,65 @@ function describe(q, candidate) {
   if (candidate.kind === 'noop') return candidate.label ?? '(no answer)';
   const opt = q.options[candidate.index];
   return opt?.label ? `${opt.label} [${opt.value}]` : `[${opt?.value ?? candidate.index}]`;
+}
+
+// What to answer on this page, as one plan: per-question choices with the
+// group constraints applied — at most N boxes ticked per question, numbers
+// distributed so a group totals what the question demands.
+function planPage(model, plan, startDi, cfg, answered) {
+  const config = cfg || {};
+  const decisions = [];
+  let di = startDi || 0;
+  const ticked = {};
+  const groups = {};
+  for (const q of model.questions) (groups[q.group] = groups[q.group] || []).push(q);
+
+  const picked = {}; // key -> values chosen on this page
+  for (const q of model.questions) (picked[q.key] = picked[q.key] || []).push(...(q.checkedValues || []));
+
+  for (const q of model.questions) {
+    if (answered && answered.has(q.key) && q.answered) continue;
+    const cands = candidates(q, config);
+    const wanted = plan ? plan[di] : undefined;
+    const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
+    let chosen = cands[idx];
+    let note = null;
+
+    if (q.kind === 'checkbox' && chosen && chosen.kind === 'option') {
+      // Default to a single box per question: ticking every box of a
+      // "select up to two" question is the fastest way to a validation error.
+      const limit = q.limit ?? config.checkboxLimit ?? 1;
+      const used = ticked[q.group] || 0;
+      if (used >= limit) {
+        chosen = { kind: 'noop', label: `(limit of ${limit} reached)` };
+        note = `limit ${limit}`;
+      } else ticked[q.group] = used + 1;
+    }
+
+    if (q.sumTo && (q.kind === 'number' || q.kind === 'text')) {
+      const members = groups[q.group] || [q];
+      const share = Math.floor(q.sumTo / members.length);
+      const first = q.sumTo - share * (members.length - 1);
+      chosen = { kind: 'value', value: String(members.indexOf(q) === 0 ? first : share) };
+      note = `sums to ${q.sumTo}`;
+    }
+
+    // Record what this page is choosing, so an option's own text box knows
+    // whether it is in play.
+    if (chosen && chosen.kind === 'option') (picked[q.key] = picked[q.key] || []).push(String(chosen.value));
+
+    if (q.ownedBy) {
+      const taken = (picked[q.ownedBy.key] || []).includes(String(q.ownedBy.value));
+      if (!taken) {
+        chosen = { kind: 'noop', label: '(its option was not selected)' };
+        note = 'other-specify left blank';
+      }
+    }
+
+    decisions.push({ q, candidate: chosen, di, candidateCount: cands.length, chosenIndex: idx, note });
+    di++;
+  }
+  return { decisions, di };
 }
 
 // DOM-native answering, used by the Chrome extension and the console snippet.
@@ -538,6 +666,7 @@ globalThis.SPB_CORE = {
   docFor,
   fingerprint,
   candidates,
+  planPage,
   describe,
   applyAnswer,
   clickNext,
@@ -635,18 +764,30 @@ function buildReport(traces, summary = {}) {
   for (const t of traces) {
     for (const s of t.steps) {
       for (const q of s.questions ?? []) {
-        if (!qs.has(q.key)) qs.set(q.key, { label: q.label, kind: q.kind, options: new Map() });
-        const rec = qs.get(q.key);
+        // Survey engines name each checkbox of one question separately
+        // (Q7r1, Q7r2 …). Reporting them as separate questions buries the
+        // report in near-identical rows, so they collapse back into the group.
+        const id = q.kind === 'checkbox' && q.group && q.group !== q.key ? q.group : q.key;
+        if (!qs.has(id)) qs.set(id, { label: q.label, kind: q.kind, options: new Map(), grouped: id !== q.key });
+        const rec = qs.get(id);
         for (const o of q.options ?? []) {
           const k = o.label || o.value;
           if (!rec.options.has(k)) rec.options.set(k, { chosen: 0 });
         }
-        // Leaving a standalone checkbox blank is a branch of its own.
-        if (q.kind === 'checkbox' && (q.options ?? []).length === 1 && !rec.options.has('(left unchecked)'))
+        // Under a group, each box is one selectable answer; the option label is
+        // the box's own text.
+        if (rec.grouped)
+          for (const o of q.options ?? []) {
+            const k = o.label || q.key;
+            if (!rec.options.has(k)) rec.options.set(k, { chosen: 0 });
+          }
+        else if (q.kind === 'checkbox' && (q.options ?? []).length === 1 && !rec.options.has('(left unchecked)'))
           rec.options.set('(left unchecked)', { chosen: 0 });
       }
       for (const d of s.decisions ?? []) {
-        const rec = qs.get(d.key);
+        const q = (s.questions ?? []).find((x) => x.key === d.key);
+        const id = q && q.kind === 'checkbox' && q.group && q.group !== q.key ? q.group : d.key;
+        const rec = qs.get(id);
         if (!rec) continue;
         const lbl = String(d.chosen ?? '').replace(/\s*\[[^\]]*\]$/, '');
         for (const [k, v] of rec.options) {
@@ -756,7 +897,9 @@ function expand(state, trace) {
   }
 }
 
-// Answer every question on `doc`, returning the page record.
+// Answer every question on `doc`, returning the page record. The plan comes
+// from the shared core so group constraints ("select up to two", "must total
+// 100") are applied the same way in every runner.
 function answerPage(model, plan, di, cfg, doc, answered) {
   const record = {
     url: model.url,
@@ -766,35 +909,33 @@ function answerPage(model, plan, di, cfg, doc, answered) {
     questionKeys: model.questions.map((q) => q.key),
     questions: model.questions.map((q) => ({
       key: q.key,
+      group: q.group,
       kind: q.kind,
       label: q.label,
-      options: q.options.map((o) => ({ value: o.value, label: o.label })),
+      limit: q.limit ?? undefined,
+      sumTo: q.sumTo ?? undefined,
+      emphasis: q.emphasis,
+      options: q.options.map((o) => ({ value: o.value, label: o.label, emphasis: o.emphasis })),
     })),
     decisions: [],
   };
-  for (const q of model.questions) {
-    // A carousel keeps answered cards on screen; re-answering them would
-    // consume plan slots and skew the branch numbering.
-    if (answered && answered.has(q.key) && q.answered) continue;
-    const cands = C.candidates(q, cfg);
-    const wanted = plan[di];
-    const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
-    const chosen = cands[idx];
-    const ok = C.applyAnswer(q, chosen, doc);
-    if (answered) answered.add(q.key);
+  const planned = C.planPage(model, plan, di, cfg, answered);
+  for (const d of planned.decisions) {
+    const ok = C.applyAnswer(d.q, d.candidate, doc);
+    if (answered) answered.add(d.q.key);
     record.decisions.push({
-      di,
-      key: q.key,
-      kind: q.kind,
-      label: q.label,
-      candidateCount: cands.length,
-      chosenIndex: idx,
-      chosen: C.describe(q, chosen),
+      di: d.di,
+      key: d.q.key,
+      kind: d.q.kind,
+      label: d.q.label,
+      candidateCount: d.candidateCount,
+      chosenIndex: d.chosenIndex,
+      chosen: C.describe(d.q, d.candidate),
+      note: d.note ?? undefined,
       error: ok ? undefined : 'could not set answer',
     });
-    di++;
   }
-  return { record, di };
+  return { record, di: planned.di };
 }
 
 function makeTrace(runId, plan, steps, decisions, type, text) {
@@ -919,7 +1060,7 @@ spb.reset()                 clear stored state`);
     const cfg = { ...this.config, ...(opts.config || {}) };
     const delay = Number(cfg.delay ?? 300);
     const timeout = Number(cfg.stepTimeout ?? 20000);
-    const maxSteps = Number(cfg.maxSteps ?? 60);
+    const maxSteps = Number(cfg.maxSteps ?? 200);
 
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
@@ -1029,6 +1170,20 @@ spb.reset()                 clear stored state`);
             const after = C.readPage(cfg.selectors, docOf());
             if (after.fingerprint !== model.fingerprint) continue;
             current = after;
+          }
+
+          // A carousel's own pager moves between cards inside one question.
+          if (current.pager && !current.pager.atEnd) {
+            const at = current.fingerprint + '|' + current.url;
+            C.clickNext({ next: { selector: current.pager.selector } }, C.docFor(current, docOf()));
+            const until = Date.now() + timeout;
+            let advanced = false;
+            while (Date.now() < until) {
+              await sleep(200);
+              const now = C.readPage(cfg.selectors, docOf());
+              if (now.fingerprint + '|' + now.url !== at) { advanced = true; break; }
+            }
+            if (advanced) { ans.record.pager = `${current.pager.index}/${current.pager.total}`; continue; }
           }
 
           if (!current.next) {
@@ -1211,7 +1366,7 @@ spb.reset()                 clear stored state`);
       startUrl: opts.url || location.href,
       cfg: { ...this.config, ...(opts.config || {}) },
       maxRuns: opts.maxRuns ?? 20,
-      maxSteps: opts.maxSteps ?? 60,
+      maxSteps: opts.maxSteps ?? 200,
       queue: [[]],
       seen: [''],
       traces: [],
@@ -1284,7 +1439,8 @@ spb.reset()                 clear stored state`);
     c.decisions.push(...answered.record.decisions);
     writeJSON(STEP_KEY, state);
     console.table(Object.fromEntries(answered.record.decisions.map((d) => [d.key, d.chosen])));
-    C.clickNext(model, target);
+    const nav = model.pager && !model.pager.atEnd ? { next: { selector: model.pager.selector } } : model;
+    C.clickNext(nav, target);
     console.log(`${c.runId} · page ${c.steps.length} answered — press Ctrl/Cmd+Enter again on the next page.`);
     return answered.record;
   },
