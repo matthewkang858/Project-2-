@@ -401,6 +401,8 @@ createServer((req, res) => {
              .faces{display:flex;overflow:hidden;width:520px;margin:10px auto}
              .face{min-width:240px;padding:24px;border:1px solid #eee;margin-right:8px}
              .swiper-button-prev,.swiper-button-next{width:28px;height:28px;background:#eee;border-radius:50%}
+             .cell{display:inline-block}
+             .face{cursor:pointer}
              input[type=radio]{display:none}</style>
       </head><body>
       <form method="POST" action="/cardscheck">
@@ -413,10 +415,9 @@ createServer((req, res) => {
         </div>
         <div class="content-container">
           ${['Key decision-maker', 'Influencer', 'No role in the process'].map((t, i) =>
-            `<div class="box"><div class="middle"><div class="mx-card" data-a="${i + 1}"><div class="mx-carouselapp-scale">${t}</div></div></div></div>`
+            `<div class="cell"><div class="box">${rows.map((_, r) => `<input type="radio" name="ans32900.0.${r}" value="${i + 1}">`).join('')}<div class="middle"><div class="mx-card" data-a="${i + 1}"><div class="mx-carouselapp-scale">${t}</div></div></div></div></div>`
           ).join('')}
         </div>
-        ${rows.map((_, i) => [1, 2, 3].map((v) => `<input type="radio" name="ans32900.0.${i}" value="${v}">`).join('')).join('')}
         ${rows.map((_, i) => `<input type="hidden" name="h${i}" id="h${i}" value="">`).join('')}
         <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
       </form>
@@ -426,7 +427,7 @@ createServer((req, res) => {
         function paint() {
           document.getElementById('faces').innerHTML = rows
             .slice(Math.max(0, at - 1), at + 2)
-            .map(function (t) { return '<div class="face">' + t + '</div>'; })
+            .map(function (t) { return '<div class="face">' + t.slice(0, 40) + '</div>'; })
             .join('');
           document.getElementById('posA').textContent = at + 1;
           document.getElementById('posB').textContent = rows.length;

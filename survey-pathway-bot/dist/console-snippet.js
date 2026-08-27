@@ -416,9 +416,12 @@ function pageModel(cfg, doc) {
   if (pager && !hasChoiceQuestion) {
     const FWD = /^(continue|next|start|begin|proceed|submit|go on|ok|done|→|»|>>|›|>)$/i;
     const BWD = /^(back|previous|prev|return|cancel|exit|«|<<|‹|<)$/i;
-    const byParent = new Map();
     const candidates = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].filter((el) => {
-      if (!visible(el) || el.querySelector('input, select, textarea')) return false;
+      if (!visible(el)) return false;
+      // Only a RENDERED control inside disqualifies a clickable — players park
+      // their display:none state radios inside the very buttons that drive
+      // them, and those must still count as buttons.
+      if ([...el.querySelectorAll('input, select, textarea')].some((c) => c.getClientRects().length)) return false;
       const t = clean(el.innerText || '');
       if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
       const style = win.getComputedStyle(el);
@@ -436,19 +439,37 @@ function pageModel(cfg, doc) {
       return texts.size > 1;
     };
     const buttons = candidates.filter((el) => !isContainer(el));
-    for (const el of buttons) {
-      // outermost level of each tower
-      if (buttons.some((o) => o !== el && o.contains(el))) continue;
-      const parent = el.parentElement;
-      if (!parent) continue;
-      if (!byParent.has(parent)) byParent.set(parent, []);
-      byParent.get(parent).push(el);
+    const tops = buttons.filter((el) => !buttons.some((o) => o !== el && o.contains(el)));
+    // Buttons rarely share a direct parent — each one usually sits in its own
+    // wrapper cell — so group by the nearest ancestor holding at least two
+    // tops, and within it by the tops' own tag+class so the answer row does
+    // not mix with unrelated clickables under some distant shared wrapper.
+    const groups = new Map();
+    for (const el of tops) {
+      let anc = el.parentElement;
+      while (anc && tops.filter((t) => t !== el && anc.contains(t)).length < 1) anc = anc.parentElement;
+      if (!anc) continue;
+      const sig = el.tagName + '|' + (el.className || '');
+      if (!groups.has(anc)) groups.set(anc, new Map());
+      const bySig = groups.get(anc);
+      if (!bySig.has(sig)) bySig.set(sig, []);
+      bySig.get(sig).push(el);
     }
     let best = null;
-    for (const [, els] of byParent) {
-      if (els.length < 2 || els.length > 8) continue;
-      if (new Set(els.map((e) => clean(e.innerText))).size !== els.length) continue;
-      if (!best || els.length > best.length) best = els;
+    let bestScore = -1;
+    for (const [, bySig] of groups) {
+      for (const [, els] of bySig) {
+        if (els.length < 2 || els.length > 8) continue;
+        if (new Set(els.map((e) => clean(e.innerText))).size !== els.length) continue;
+        // The answer row sits below the pager; a look-alike group above it
+        // (peeking card faces, say) must not win.
+        const below = els.filter((e) => posEl && posEl.compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING).length;
+        const score = (below >= els.length / 2 ? 100 : 0) + els.length;
+        if (score > bestScore) {
+          bestScore = score;
+          best = els;
+        }
+      }
     }
     if (best && posEl) {
       // The card's own wording is the nearest text block above the pager that
