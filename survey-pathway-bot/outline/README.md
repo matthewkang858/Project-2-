@@ -56,3 +56,44 @@ wording drifted, not that the question is wrong.
 
 `expected-paths.json` encodes the outline's terminates and its biggest routing
 gate as assertions for `run-paths.mjs`.
+
+## Filling the QA workbook
+
+`qa/fill_qa.py` writes the per-question columns of the QA workbook from the same
+two sources — the questionnaire spec and a captured run:
+
+```bash
+# after a capture, produce the structured comparison
+node compare.mjs --spec outline/outline-spec.json --traces out/runs   # writes COMPARE.md + compare.json
+
+# then fill the two MK sheets (every other sheet is left untouched)
+python3 qa/fill_qa.py \
+  --workbook OUT27_B2B_Survey_QA_Doc.xlsx \
+  --spec outline/outline-spec.json \
+  --compare out/compare.json \
+  --general "General QA – MK" --logic "Logic QA – MK" \
+  --out OUT27_B2B_Survey_QA_Doc_MK.xlsx
+```
+
+**General QA – MK** — one row per question, the tick boxes driven by evidence:
+
+| Column | Ticked when |
+|---|---|
+| Question not skippable | no validation stall proves otherwise |
+| Wording matches questionnaire | live question text and option list match the Word doc |
+| Formatting matches | every phrase the doc bolds or underlines is emphasised live |
+| Randomization/anchor | option order varies across runs where `[Randomize]` is specified, anchors stay last |
+| SP or MP | rendered control matches `[SP]`/`[MP]`, and a "select up to N" limit is enforced |
+| Exclusive logic | exclusive/anchor options behave; ticked with an "n/a" note when the question has none |
+| Piped text | a piped answer is substituted, not left as a placeholder |
+| Other logic | write-ins, sum-to-100 grids and other-specify boxes behave |
+| Termination logic | non-qualifying answers terminate |
+
+**Logic QA – MK** — one row per gate question. `Logic Detailed` is written from
+the questionnaire (which questions the gate opens, and on which answers);
+`Checked?` is ticked only when a run actually exercised the gate, and `Correct?`
+only when nothing contradicted it.
+
+A box left `False` with a "not verified" comment means nothing reached that
+question yet — never "tested and broken". Re-run the fill after each capture;
+it overwrites the two MK sheets and leaves the rest of the workbook alone.

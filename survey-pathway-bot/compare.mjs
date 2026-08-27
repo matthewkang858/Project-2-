@@ -325,7 +325,29 @@ for (const [oq, m] of matches) {
 }
 L.push('');
 
-const out = join(statSync(args.traces).isDirectory() ? dirname(args.traces) : dirname(args.traces), 'COMPARE.md');
+const out = join(dirname(args.traces), 'COMPARE.md');
 writeFileSync(out, L.join('\n'));
+
+// Structured form of the same findings, for qa/fill_qa.py to turn into the QA
+// workbook's per-question columns.
+const asJson = {
+  survey: traces.find((t) => t.steps?.[0]?.url)?.steps?.[0]?.url ?? null,
+  generatedAt: new Date().toISOString(),
+  traces: traces.length,
+  matched: Object.fromEntries([...matches].map(([q, m]) => [q, { key: m.key, score: Number(m.score.toFixed(2)) }])),
+  notSeen: notSeen.map((q) => q.q),
+  unknownLive: unknown,
+  perQuestion: perQuestion.map((p) => ({
+    q: p.q,
+    key: p.key,
+    liveKind: p.live.kind,
+    liveLabel: p.live.label,
+    optionCount: (p.live.options ?? []).length,
+    limit: p.live.limit ?? null,
+    issues: p.issues,
+  })),
+  findings,
+};
+writeFileSync(join(dirname(args.traces), 'compare.json'), JSON.stringify(asJson, null, 2));
 console.log(`${matches.size}/${spec.questionCount} outline questions seen live · ${findings.filter((f) => f.severity === 'error').length} mismatch(es)`);
-console.log(`wrote ${out}`);
+console.log(`wrote ${out} and ${join(dirname(args.traces), 'compare.json')}`);
