@@ -466,7 +466,13 @@ function candidates(q, config = {}) {
     if (rule?.fixed != null) {
       const re = new RegExp(rule.fixed, 'i');
       const hit = opts.find((o) => re.test(o.value) || re.test(o.label));
-      return hit ? [hit] : opts.slice(0, 1);
+      if (hit) return [hit];
+      // No match: a multi-select names each box separately, so the fixed rule
+      // matches the whole group and only the named box should be ticked — the
+      // others stay blank. Ticking the first box instead would answer "Canada"
+      // to a rule that says "United States".
+      if (q.kind === 'checkbox') return [{ kind: 'noop', label: '(not the fixed option)' }];
+      return opts.slice(0, 1);
     }
     // A lone checkbox is a two-way branch: ticked, or deliberately left blank.
     // (Decipher and friends name each checkbox of a multi-select separately, so
@@ -1288,7 +1294,15 @@ spb.reset()                 clear stored state`);
             if (after.fingerprint !== model.fingerprint) continue;
             // A player that repaints its answers can wipe a selection right
             // after it is made; redo any answer that did not stick.
-            const lost = ans.planned.filter((d) => {
+                    // An answer the fresh read shows as taken is good — clear its error.
+        for (const d of ans.planned) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          if (fresh && fresh.answered) {
+            const dec = ans.record.decisions.find((x) => x.key === d.q.key);
+            if (dec && dec.error) delete dec.error;
+          }
+        }
+const lost = ans.planned.filter((d) => {
               if (!d.candidate || d.candidate.kind === 'noop') return false;
               const fresh = after.questions.find((x) => x.key === d.q.key);
               return fresh && fresh.answered === false;

@@ -462,7 +462,13 @@ function candidates(q, config = {}) {
     if (rule?.fixed != null) {
       const re = new RegExp(rule.fixed, 'i');
       const hit = opts.find((o) => re.test(o.value) || re.test(o.label));
-      return hit ? [hit] : opts.slice(0, 1);
+      if (hit) return [hit];
+      // No match: a multi-select names each box separately, so the fixed rule
+      // matches the whole group and only the named box should be ticked — the
+      // others stay blank. Ticking the first box instead would answer "Canada"
+      // to a rule that says "United States".
+      if (q.kind === 'checkbox') return [{ kind: 'noop', label: '(not the fixed option)' }];
+      return opts.slice(0, 1);
     }
     // A lone checkbox is a two-way branch: ticked, or deliberately left blank.
     // (Decipher and friends name each checkbox of a multi-select separately, so

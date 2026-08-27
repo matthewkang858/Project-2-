@@ -107,7 +107,15 @@
         const after = SPB_CORE.readPage(sel);
         if (after.fingerprint !== model.fingerprint) continue;
         // Redo any answer a repaint wiped before moving on.
-        const lost = planned.decisions.filter((d) => {
+                // An answer the fresh read shows as taken is good — clear its error.
+        for (const d of planned.decisions) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          if (fresh && fresh.answered) {
+            const dec = record.decisions.find((x) => x.key === d.q.key);
+            if (dec && dec.error) delete dec.error;
+          }
+        }
+const lost = planned.decisions.filter((d) => {
           if (!d.candidate || d.candidate.kind === 'noop') return false;
           const fresh = after.questions.find((x) => x.key === d.q.key);
           return fresh && fresh.answered === false;

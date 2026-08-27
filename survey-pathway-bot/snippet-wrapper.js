@@ -345,7 +345,15 @@ spb.reset()                 clear stored state`);
             if (after.fingerprint !== model.fingerprint) continue;
             // A player that repaints its answers can wipe a selection right
             // after it is made; redo any answer that did not stick.
-            const lost = ans.planned.filter((d) => {
+                    // An answer the fresh read shows as taken is good — clear its error.
+        for (const d of ans.planned) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          if (fresh && fresh.answered) {
+            const dec = ans.record.decisions.find((x) => x.key === d.q.key);
+            if (dec && dec.error) delete dec.error;
+          }
+        }
+const lost = ans.planned.filter((d) => {
               if (!d.candidate || d.candidate.kind === 'noop') return false;
               const fresh = after.questions.find((x) => x.key === d.q.key);
               return fresh && fresh.answered === false;

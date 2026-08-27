@@ -199,6 +199,19 @@ export async function runOnce(page, opts) {
         // Players that repaint their answer list can wipe a selection the
         // moment after it is made. Check each answer took, and redo the ones
         // that did not.
+        // An answer the fresh read shows as taken is good, whatever applyAnswer
+        // thought at the time — clear its error so the report does not claim a
+        // failure that the survey accepted.
+        for (const d of planned.decisions) {
+          const fresh = after.questions.find((x) => x.key === d.q.key);
+          if (fresh && fresh.answered) {
+            const dec = record.decisions.find((x) => x.key === d.q.key);
+            if (dec && dec.error) {
+              delete dec.error;
+              dec.chosen = describe(d.q, d.candidate);
+            }
+          }
+        }
         const lost = planned.decisions.filter((d) => {
           if (!d.candidate || d.candidate.kind === 'noop') return false;
           const fresh = after.questions.find((x) => x.key === d.q.key);
