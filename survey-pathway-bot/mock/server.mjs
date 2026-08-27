@@ -266,6 +266,61 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // The same card carousel built the hostile way: the "1 / 8" readout and the
+  // card title are nested spans (no single leaf element carries the text), the
+  // arrows are icon buttons whose only text is an entity, and the answer
+  // buttons wrap their labels in inner spans.
+  if (req.url && req.url.split('?')[0] === '/cards2') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['IT (e.g., CIO, members of the technology team)', 'Executive Management (e.g., CEO)', 'Finance (e.g., CFO)'];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.abtn{display:inline-block;padding:14px;border:1px solid #ccc;border-radius:8px;margin:6px;cursor:pointer}
+             .abtn.sel{background:#dde}.cardface{padding:30px;border:1px solid #ddd;width:300px;margin:10px auto;text-align:center}</style>
+      </head><body>
+      <form method="POST" action="/cardscheck">
+        <div class="qtitle">Which of the following best describes the role that is typically played by the following departments/members of your company?</div>
+        <div class="cardface"><span class="cf-inner"><span id="face"></span></span></div>
+        <div class="pager">
+          <button type="button" id="prev" aria-label="Previous slide"><span>&lsaquo;</span></button>
+          <span class="pos"><span id="posA"></span><span class="sep"> / </span><span id="posB"></span></span>
+          <button type="button" id="nextCard" aria-label="Next slide"><span>&rsaquo;</span></button>
+        </div>
+        <div id="answers">
+          <div class="abtn" data-a="1"><span><span>Key decision-maker</span></span></div>
+          <div class="abtn" data-a="2"><span><span>Influencer</span></span></div>
+          <div class="abtn" data-a="3"><span><span>No role in the process</span></span></div>
+        </div>
+        ${rows.map((_, i) => `<input type="hidden" name="ans32900.0.${i}" id="h${i}" value="">`).join('')}
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var rows = ${JSON.stringify(rows)};
+        var at = 0;
+        function paint() {
+          document.getElementById('face').textContent = rows[at];
+          document.getElementById('posA').textContent = at + 1;
+          document.getElementById('posB').textContent = rows.length;
+          var val = document.getElementById('h' + at).value;
+          [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+            b.className = 'abtn' + (b.getAttribute('data-a') === val ? ' sel' : '');
+          });
+          var done = rows.every(function (_, i) { return document.getElementById('h' + i).value; });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+          b.addEventListener('click', function () {
+            document.getElementById('h' + at).value = b.getAttribute('data-a');
+            if (at < rows.length - 1) at++;
+            paint();
+          });
+        });
+        document.getElementById('nextCard').addEventListener('click', function () { if (at < rows.length - 1) { at++; paint(); } });
+        document.getElementById('prev').addEventListener('click', function () { if (at > 0) { at--; paint(); } });
+        paint();
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/offscreen') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });

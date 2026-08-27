@@ -83,6 +83,19 @@ try {
     check(new Set(ts.map((t) => t.decisions.find((d) => d.key === cards[0])?.chosenIndex)).size >= 3, 'branches across the three answer buttons');
   }
 
+  // The same carousel built the hostile way: pager readout and card title in
+  // nested spans, icon-only arrow buttons, button labels wrapped in spans.
+  {
+    const o = join(out, 'cards2');
+    const r = await run(['explore.mjs', '--url', URL + 'cards2', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes the nested-DOM card carousel');
+    check(
+      ts.every((t) => t.decisions.some((d) => d.key.startsWith('card:it-e-g'))),
+      'names nested-DOM cards by their wording'
+    );
+  }
+
   // The real player parks its radios off-screen (left:-9999px) inside visible
   // labels — those must be answered — while a genuine off-screen honeypot with
   // no visible stand-in must not be (the server rejects the submit if it is).

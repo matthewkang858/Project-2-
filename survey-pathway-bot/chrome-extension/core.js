@@ -333,18 +333,23 @@ function pageModel(cfg, doc) {
   // A carousel's own pager ("1 / 8" with arrows). It moves between cards inside
   // one question, so it must not be mistaken for the page's forward button.
   let pager = null;
-  const posEl = [...doc.querySelectorAll('span, div, p, li')].find(
-    (el) => !el.children.length && /^\d+\s*\/\s*\d+$/.test(clean(el.innerText || ''))
+  const POS = /^\d+\s*\/\s*\d+$/;
+  const posCandidates = [...doc.querySelectorAll('span, div, p, li, b, strong')].filter(
+    (el) => visible(el) && POS.test(clean(el.innerText || ''))
   );
+  // Deepest match: the smallest element whose text is the whole readout, even
+  // when the number, slash and total live in separate child spans.
+  const posEl = posCandidates.find((el) => !posCandidates.some((o) => o !== el && el.contains(o))) ?? null;
   if (posEl) {
     const [index, total] = clean(posEl.innerText).split('/').map((n) => Number(n.trim()));
     let scope = posEl.parentElement;
     let btn = null;
-    for (let up = 0; up < 3 && scope && !btn; up++, scope = scope.parentElement) {
+    for (let up = 0; up < 4 && scope && !btn; up++, scope = scope.parentElement) {
       btn = [...scope.querySelectorAll('button, a, [role="button"]')].find((b) => {
         if (!visible(b) || b.disabled) return false;
-        const label = clean(b.innerText || b.getAttribute('aria-label') || '');
-        return /^(next|forward|›|>|→|»)$/i.test(label) || /next/i.test(b.getAttribute('aria-label') || '');
+        const aria = b.getAttribute('aria-label') || '';
+        const label = clean(b.innerText || aria || '');
+        return /^(next|forward|›|>|→|»)$/i.test(label) || /next|forward/i.test(aria);
       });
     }
     if (btn && index < total) pager = { selector: cssFor(btn), index, total };
@@ -381,18 +386,22 @@ function pageModel(cfg, doc) {
   // Button-driven carousel cards: one card at a time, a pager, and a row of
   // clickable non-form answer buttons shared by every card. There is no radio
   // or checkbox to find, so this is its own question kind.
-  if (pager && !questions.length) {
+  const hasChoiceQuestion = questions.some((q) => ['radio', 'checkbox', 'select', 'slider'].includes(q.kind));
+  if (pager && !hasChoiceQuestion) {
     const FWD = /^(continue|next|start|begin|proceed|submit|go on|ok|done|→|»|>>|›|>)$/i;
     const BWD = /^(back|previous|prev|return|cancel|exit|«|<<|‹|<)$/i;
     const byParent = new Map();
-    for (const el of doc.querySelectorAll('button, [role="button"], a, div, li, span')) {
-      if (!visible(el) || el.querySelector('input, select, textarea')) continue;
-      if (el.children.length > 2) continue;
+    const candidates = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].filter((el) => {
+      if (!visible(el) || el.querySelector('input, select, textarea')) return false;
       const t = clean(el.innerText || '');
-      if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || /^\d+\s*\/\s*\d+$/.test(t)) continue;
+      if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
       const style = win.getComputedStyle(el);
-      const clicky = el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || el.onclick;
-      if (!clicky) continue;
+      return el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || !!el.onclick;
+    });
+    // Keep only the outermost clickable of each nest — a button whose label
+    // sits in an inner span must count once, as the button.
+    for (const el of candidates) {
+      if (candidates.some((o) => o !== el && o.contains(el))) continue;
       const parent = el.parentElement;
       if (!parent) continue;
       if (!byParent.has(parent)) byParent.set(parent, []);
@@ -411,12 +420,17 @@ function pageModel(cfg, doc) {
         doc.querySelector('h1, h2, .page-title, .qtitle, .question-text, .survey-title')?.innerText || doc.title || ''
       ).slice(0, 200);
       let title = '';
-      for (const el of doc.querySelectorAll('div, p, span, h1, h2, h3, td, th, li')) {
-        if (el.children.length || !visible(el)) continue;
+      const blocks = [...doc.querySelectorAll('div, p, span, h1, h2, h3, td, th, li')].filter((el) => {
+        if (!visible(el)) return false;
         const t = clean(el.innerText || '');
-        if (t.length < 5 || t.length > 200 || t === stem || /^\d+\s*\/\s*\d+$/.test(t)) continue;
-        if (best.some((b) => clean(b.innerText) === t)) continue;
-        if (posEl.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) title = t;
+        if (t.length < 5 || t.length > 200 || t === stem || POS.test(t)) return false;
+        if (/^\W*\d+\s*\/\s*\d+\W*$/.test(t)) return false; // "‹ 1 / 3 ›"
+        if (el.contains(posEl) || posEl.contains(el)) return false; // the pager itself
+        return !best.some((b) => b === el || b.contains(el) || el.contains(b));
+      });
+      for (const el of blocks) {
+        if (blocks.some((o) => o !== el && el.contains(o))) continue; // deepest only
+        if (posEl.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) title = clean(el.innerText);
       }
       const slug = (title || `card${pager.index}`).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
       questions.push({
