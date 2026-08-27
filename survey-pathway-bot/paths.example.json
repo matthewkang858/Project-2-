@@ -1,0 +1,40 @@
+{
+  "maxSteps": 40,
+  "answers": [
+    { "match": "^Q3$|anything else", "value": "Scripted pathway test." }
+  ],
+  "scenarios": [
+    {
+      "name": "Under 18 is screened out",
+      "answers": [{ "match": "^S1$|age group", "fixed": "Under 18" }],
+      "expect": { "outcome": "terminate", "notSees": ["^Q1", "^Q2"], "maxPages": 2, "textContains": "do not qualify" }
+    },
+    {
+      "name": "California 55+ hits the quota",
+      "answers": [
+        { "match": "^S1$|age group", "fixed": "55 or older" },
+        { "match": "^S3$|which state", "fixed": "California" }
+      ],
+      "expect": { "outcome": "quota", "notSees": ["^Q1"], "maxPages": 3 }
+    },
+    {
+      "name": "Alpha buyers are asked the rating grid",
+      "answers": [
+        { "match": "^S1$|age group", "fixed": "^18" },
+        { "match": "^S3$|which state", "fixed": "Texas" },
+        { "match": "^Q1r1$", "fixed": "Alpha" }
+      ],
+      "expect": { "outcome": "complete", "sees": ["^Q2r1$", "^Q3$"] }
+    },
+    {
+      "name": "Non-Alpha buyers skip the rating grid",
+      "answers": [
+        { "match": "^S1$|age group", "fixed": "^18" },
+        { "match": "^S3$|which state", "fixed": "Texas" },
+        { "match": "^Q1r1$", "skip": true },
+        { "match": "^Q1r2$", "fixed": "Beta" }
+      ],
+      "expect": { "outcome": "complete", "sees": ["^Q3$"], "notSees": ["^Q2r"] }
+    }
+  ]
+}

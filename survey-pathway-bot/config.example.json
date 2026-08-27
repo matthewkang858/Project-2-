@@ -1,0 +1,22 @@
+{
+  "maxRuns": 40,
+  "maxSteps": 80,
+  "delay": 400,
+  "stepTimeout": 20000,
+  "branchOn": "^(S\\d|Q[1-9])|age|gender|region|state|brand|aware|purchase",
+  "noBranch": "^(rid|psid|hidden|vendor)",
+  "maxOptionsPerQuestion": 6,
+  "values": {
+    "text": "Test response",
+    "textarea": "Automated pathway-test response.",
+    "number": "35"
+  },
+  "answers": [
+    { "match": "zip|postal", "value": "10001" },
+    { "match": "e-?mail", "value": "qa+pathbot@example.com" },
+    { "match": "year (of|you were) born|birth year", "values": ["1990", "1958"] },
+    { "match": "household income", "fixed": "50,000" },
+    { "match": "^Q7$", "options": "Alpha|Beta" },
+    { "match": "newsletter|opt.?in", "skip": true }
+  ]
+}

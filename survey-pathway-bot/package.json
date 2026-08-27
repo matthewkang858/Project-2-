@@ -1,0 +1,14 @@
+{
+  "name": "survey-pathway-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Automated pathway/branching-logic tester for hosted surveys (Decipher/Dynata-style)",
+  "scripts": {
+    "mock": "node mock/server.mjs",
+    "selftest": "node selftest.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.56.1"
+  }
+}
