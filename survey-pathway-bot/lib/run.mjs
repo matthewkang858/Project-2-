@@ -75,6 +75,7 @@ export async function runOnce(page, opts) {
 
   let di = 0; // decision index — indexes into `plan`
   const answered = new Set(); // keys this run has already dealt with
+  const visits = new Map(); // how often each page has come round
   for (let step = 0; step < maxSteps; step++) {
     let model = await readPage(page, selectors);
     // Players that fetch their question body after the page loads look empty
@@ -108,6 +109,24 @@ export async function runOnce(page, opts) {
       const file = join(outDir, `${runId}-s${String(step).padStart(2, '0')}.png`);
       await page.screenshot({ path: file, fullPage: true }).catch(() => {});
       record.screenshot = file;
+    }
+
+    // A page coming round again is only a loop if nothing new got answered in
+    // between — a carousel legitimately revisits the same page per card.
+    const visit = visits.get(model.fingerprint) ?? { count: 0, answered: -1 };
+    visit.count = visit.answered === answered.size ? visit.count + 1 : 1;
+    visit.answered = answered.size;
+    visits.set(model.fingerprint, visit);
+    if (visit.count > 3 && !model.isTerminal) {
+      trace.steps.push(record);
+      trace.outcome = {
+        type: 'looping',
+        heading: model.heading,
+        text: `the same page came round ${visit.count} times with nothing new answered — the survey is not accepting the answers, or is re-serving the page`,
+        url: model.url,
+        atFingerprint: model.fingerprint,
+      };
+      break;
     }
 
     if (model.isTerminal) {

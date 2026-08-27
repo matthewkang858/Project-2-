@@ -296,6 +296,7 @@ spb.reset()                 clear stored state`);
       try {
         if (runs > 1) await load(startUrl);
         const answered = new Set();
+        const visits = new Map(); // how often each page has come round
         for (let step = 0; step < maxSteps; step++) {
           if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
@@ -307,6 +308,17 @@ spb.reset()                 clear stored state`);
           while (!model.questions.length && Date.now() < settleUntil) {
             await sleep(250);
             model = C.readPage(cfg.selectors, docOf());
+          }
+          // A page coming round again is only a loop if nothing new got
+          // answered in between — a carousel revisits the same page per card.
+          const visit = visits.get(model.fingerprint) ?? { count: 0, answered: -1 };
+          visit.count = visit.answered === answered.size ? visit.count + 1 : 1;
+          visit.answered = answered.size;
+          visits.set(model.fingerprint, visit);
+          if (visit.count > 3 && !model.isTerminal) {
+            type = 'looping';
+            text = `the same page came round ${visit.count} times with nothing new answered`;
+            break;
           }
           if (model.isTerminal) {
             steps.push({

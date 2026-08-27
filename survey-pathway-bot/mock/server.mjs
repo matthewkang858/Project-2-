@@ -215,6 +215,23 @@ createServer((req, res) => {
   }
   // "Please select up to two" — each checkbox carries its own name, and the
   // server rejects more than two, exactly as Decipher does.
+  if (req.url && req.url.split('?')[0] === '/dotted') {
+    const nonce = Math.floor(Math.random() * 900000 + 100000);
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/dottedcheck">
+        <div class="question" id="ans32645"><div class="qtitle">What are the top two reasons you expect spend to increase?<br>Please select up to two.</div>
+        ${['Upgrading legacy systems', 'Adoption of AI', 'Business intelligence', 'Revenue growth', 'Cybersecurity']
+          .map((t, i) => `<label class="choice" for="ans32645.0.${i}"><input type="checkbox" name="ans32645.0.${i}" id="ans32645.0.${i}" value="1"> ${t}</label>`)
+          .join('')}
+        <label class="choice" for="ans32645.0.9"><input type="checkbox" name="ans32645.0.9" id="ans32645.0.9" value="1"> Other (please specify)
+          <input type="text" name="oe32645.0" id="oe32645.0" value=""></label>
+        </div>
+        <input type="text" name="ra__${nonce}" style="position:absolute;left:-9999px" value="">
+        <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form></body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/limit') {
     const checked = Number((req.url.match(/checked=(\d+)/) || [, 0])[1]);
     const err = checked > 2 ? `<p class="error">Please check at most 2 boxes in this column (you checked ${checked}).</p>` : '';
@@ -348,6 +365,31 @@ createServer((req, res) => {
       if (!form.get('RR1'))
         res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
       else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url === '/dottedcheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      const checked = [...form.keys()].filter((k) => k.startsWith('ans32645')).length;
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      if (checked > 2 || checked === 0) {
+        // Decipher re-renders the page with a fresh machine field on every error
+        const nonce = Math.floor(Math.random() * 900000 + 100000);
+        res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+          <p class="error">Please check at most 2 boxes in this column (you checked ${checked}).</p>
+          <form method="POST" action="/dottedcheck">
+            ${['Upgrading legacy systems', 'Adoption of AI', 'Business intelligence', 'Revenue growth', 'Cybersecurity']
+              .map((t, i) => `<label class="choice" for="ans32645.0.${i}"><input type="checkbox" name="ans32645.0.${i}" id="ans32645.0.${i}" value="1"> ${t}</label>`)
+              .join('')}
+            <input type="text" name="ra__${nonce}" style="position:absolute;left:-9999px" value="">
+            <p><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+          </form></body></html>`);
+        return;
+      }
+      res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
     });
     return;
   }

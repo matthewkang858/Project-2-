@@ -71,6 +71,17 @@ try {
     check(ts.every((t) => t.outcome?.type === 'complete'), 'no run gives up on the late-rendering page');
   }
 
+  // Decipher's own shape: dotted row names (ans32645.0.8), a per-render nonce
+  // field, and an "other" box named after the question group.
+  {
+    const o = join(out, 'dotted');
+    const r = await run(['explore.mjs', '--url', URL + 'dotted', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'respects "select up to two" on dotted row names');
+    check(!ts.some((t) => t.decisions.some((d) => /^ra__/.test(d.key))), "does not answer the engine's own nonce fields");
+    check(ts.every((t) => t.steps.length <= 3), 'does not loop when the page is re-served');
+  }
+
   // A player that repaints its answer list: the control found a moment ago is
   // gone, the click target is a styled div rather than a label, and a late
   // repaint can wipe a selection that was already made.

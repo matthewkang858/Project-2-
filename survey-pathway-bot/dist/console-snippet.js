@@ -165,10 +165,26 @@ function pageModel(cfg, doc) {
     return false;
   };
 
+  // Survey engines carry their own machinery in the form: per-render nonce
+  // fields (ra__812345), respondent ids, trackers, and offscreen honeypots.
+  // Answering them is wrong — and because their names change on every render,
+  // treating them as questions makes every re-render look like a new page,
+  // which is how a run ends up looping on one question.
+  const MACHINE_NAME = /^(ra|rvid|rid|psid|sid|uid|hid|sys|tok|csrf|honeypot)[_.]|^[a-z]{1,6}__\d+$/i;
+  const offscreen = (el) => {
+    const r = el.getBoundingClientRect();
+    const w = win.innerWidth || 1e5;
+    const h = win.innerHeight || 1e5;
+    return r.right < -100 || r.bottom < -100 || r.left > w + 100 || r.top > h * 20;
+  };
+
   const controls = [...doc.querySelectorAll('input, select, textarea')].filter((el) => {
     const type = (el.type || '').toLowerCase();
     if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type)) return false;
-    if (el.disabled) return false;
+    if (el.disabled || el.readOnly) return false;
+    const name = el.name || el.id || '';
+    if (MACHINE_NAME.test(name) && !clean(questionLabel(el))) return false;
+    if (offscreen(el)) return false;
     return answerable(el);
   });
 
@@ -213,7 +229,10 @@ function pageModel(cfg, doc) {
     // Decipher and friends name each row of a question separately (LM1r1,
     // LM1r2 …). The group is what carries "select up to two" and "must total
     // 100", so it has to be reconstructed.
-    q.group = key.replace(/[_-]?[rc]\d+([_-]\d+)?$/i, '').replace(/[_-]\d+$/, '') || key;
+    q.group = key
+      .replace(/([._-]\d+)+$/, '')   // ans32645.0.8 -> ans32645
+      .replace(/[rc]\d+$/i, '')      // Q1r1 -> Q1
+      || key;
 
     // Whether the respondent (or the bot) has already answered it — used to
     // avoid re-answering questions that stay on screen as a carousel reveals
@@ -233,9 +252,22 @@ function pageModel(cfg, doc) {
     // platform, so record who owns it.
     if (kind === 'text' || kind === 'textarea' || kind === 'number') {
       const row = first.closest('label, td, tr, li, .choice, .option, [class*="answer"]');
-      const owner = row && [...row.querySelectorAll('input')].find(
+      let owner = row && [...row.querySelectorAll('input')].find(
         (e) => (e.type === 'radio' || e.type === 'checkbox') && e.name !== first.name
       );
+      // Decipher names the open-end after the question it belongs to:
+      // oe32645.0 is the "other, please specify" box of ans32645.*. Its owner is
+      // whichever option says "other" or "please specify".
+      if (!owner) {
+        const stem = (key.match(/^oe[_.]?(\d+)/i) || [])[1];
+        if (stem)
+          owner = [...doc.querySelectorAll('input')].find(
+            (e) =>
+              (e.type === 'radio' || e.type === 'checkbox') &&
+              new RegExp(`^ans[_.]?${stem}\\b`, 'i').test(e.name || '') &&
+              /other|please specify/i.test(clean(optionLabel(e)))
+          );
+      }
       if (owner) q.ownedBy = { key: owner.name || owner.id, value: owner.value ?? '' };
     }
 
@@ -374,6 +406,9 @@ function pageModel(cfg, doc) {
 }
 
 function fingerprint(model) {
+  // Field names are used as-is: nonce fields are filtered out before this point,
+  // and normalising the digits away would make a carousel's cards (PG1r1, PG1r2)
+  // indistinguishable from one another.
   const keys = model.questions.map((q) => q.key).sort();
   if (keys.length) return `Q:${keys.join(',')}`;
   const kind = model.outcome ?? 'page';
@@ -875,6 +910,8 @@ function buildReport(traces, summary = {}) {
     const manual = (t.steps ?? []).filter((s) => s.manual);
     if (manual.length)
       findings.push(`**${t.runId} needed a hand** on ${manual.length} page(s) — ${manual.map((s) => `\`${s.fingerprint}\`${s.manualReason ? ` (${esc(trunc(s.manualReason, 60))})` : ''}`).join(', ')}. Those widgets (sliders, carousels, custom controls) are worth teaching the bot, or scripting with a \`fixed\` rule.`);
+    if (t.outcome?.type === 'looping')
+      findings.push(`**${t.runId} looped** on \`${t.outcome.atFingerprint ?? '?'}\` — ${esc(trunc(t.outcome.text, 160))}. Usually a validation the bot is not satisfying; the page's own error message is the place to look.`);
     if (t.outcome?.type === 'stuck')
       findings.push(`**${t.runId} got stuck** on \`${t.outcome.atFingerprint ?? '?'}\` — the page was answered but offered no way forward. ${esc(trunc(t.outcome.text, 160))}`);
     if (t.outcome?.type === 'stopped')
@@ -1192,6 +1229,7 @@ spb.reset()                 clear stored state`);
       try {
         if (runs > 1) await load(startUrl);
         const answered = new Set();
+        const visits = new Map(); // how often each page has come round
         for (let step = 0; step < maxSteps; step++) {
           if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
@@ -1203,6 +1241,17 @@ spb.reset()                 clear stored state`);
           while (!model.questions.length && Date.now() < settleUntil) {
             await sleep(250);
             model = C.readPage(cfg.selectors, docOf());
+          }
+          // A page coming round again is only a loop if nothing new got
+          // answered in between — a carousel revisits the same page per card.
+          const visit = visits.get(model.fingerprint) ?? { count: 0, answered: -1 };
+          visit.count = visit.answered === answered.size ? visit.count + 1 : 1;
+          visit.answered = answered.size;
+          visits.set(model.fingerprint, visit);
+          if (visit.count > 3 && !model.isTerminal) {
+            type = 'looping';
+            text = `the same page came round ${visit.count} times with nothing new answered`;
+            break;
           }
           if (model.isTerminal) {
             steps.push({
