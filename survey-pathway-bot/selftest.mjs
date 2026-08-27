@@ -124,6 +124,25 @@ try {
     );
   }
 
+  // A single-card carousel whose answers are long descriptive sentences
+  // (the shape that beat a 60-character label cap in the field).
+  {
+    const o = join(out, 'cards5');
+    const r = await run(['explore.mjs', '--url', URL + 'cards5', '--out', o, '--max-runs', '3']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'answers a 1/1 carousel with long sentence options');
+    check(new Set(ts.map((t) => t.decisions[0]?.chosenIndex)).size >= 3, 'branches across the long-label options');
+  }
+
+  // Five consecutive pages with identical card keys (Q27-Q30's shape) must
+  // not be mistaken for a loop.
+  {
+    const o = join(out, 'repeat');
+    const r = await run(['explore.mjs', '--url', URL + 'repeat', '--out', o, '--max-runs', '1']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts[0]?.outcome?.type === 'complete', 'walks five identical carousel pages without a false looping abort');
+  }
+
   // The real player parks its radios off-screen (left:-9999px) inside visible
   // labels — those must be answered — while a genuine off-screen honeypot with
   // no visible stand-in must not be (the server rejects the submit if it is).

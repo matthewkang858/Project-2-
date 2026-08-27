@@ -454,6 +454,91 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  if (req.url && req.url.split('?')[0] === '/cards5') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const opts = [
+      'Remain As-Is: Keep our current provider and not adopt significant new AI capabilities',
+      'Upgrade with Current Provider: Adopt the AI capabilities our current provider offers',
+      'Supplement with Point Solutions: Keep the provider but add standalone AI tools alongside',
+      'Switch to an AI-Native Provider: Replace the current provider with an AI-native alternative',
+      'Replace with In-House Build: Build our own AI-enabled replacement internally',
+      'I am not sure',
+    ];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.abtn{display:block;padding:12px;border:1px solid #ccc;border-radius:8px;margin:6px;cursor:pointer;max-width:520px}
+             .abtn.sel{background:#dde}input[type=radio]{display:none}</style>
+      </head><body>
+      <form method="POST" action="/cards5check">
+        <div class="qtitle">Over the next three years, what is most likely to be your company's approach to AI capability adoption for each of the following types of software?</div>
+        <div class="face">Human Resources Management / Human Capital Management Software (i.e., HRM/HCM)</div>
+        <div class="pager" style="display:flex;align-items:center;gap:8px;justify-content:center">
+          <div class="swiper-button-prev swiper-button-disable" role="button" aria-label="Previous slide"></div>
+          <span>1 / 1</span>
+          <div class="swiper-button-next swiper-button-disable" role="button" aria-label="Next slide"></div>
+        </div>
+        ${opts.map((t, i) => `<div class="abtn" data-a="${i + 1}"><input type="radio" name="ans33053.0.2" value="${i + 1}">${t}</div>`).join('')}
+        <input type="hidden" name="h0" id="h0" value="">
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+          b.addEventListener('click', function () {
+            document.getElementById('h0').value = b.getAttribute('data-a');
+            [].forEach.call(document.querySelectorAll('.abtn'), function (x) { x.className = 'abtn' + (x === b ? ' sel' : ''); });
+            document.getElementById('submitWrap').style.display = '';
+          });
+        });
+      </script>
+      </body></html>`);
+    return;
+  }
+  // Five consecutive pages with IDENTICAL card keys — the shape of Q27–Q30,
+  // which must not be mistaken for a loop.
+  if (req.url && req.url.split('?')[0] === '/repeat') {
+    const step = Number((req.url.match(/step=(\d+)/) || [, 1])[1]);
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.abtn{display:inline-block;padding:12px;border:1px solid #ccc;margin:6px;cursor:pointer}.abtn.sel{background:#dde}</style>
+      </head><body>
+      <form method="POST" action="/repeatcheck?step=${step}">
+        <div class="qtitle">To what extent would you face challenge ${step} for each software area?</div>
+        <div class="face">Verticalized Software and Applications (i.e., specialized tools)</div>
+        <div class="pager" style="display:flex;align-items:center;gap:8px;justify-content:center">
+          <button type="button" id="prev" aria-label="Previous slide">&lsaquo;</button>
+          <span id="pos">1 / 2</span>
+          <button type="button" id="nextCard" aria-label="Next slide">&rsaquo;</button>
+        </div>
+        <div id="answers">
+          <div class="abtn" data-a="1">Major challenge</div>
+          <div class="abtn" data-a="2">Minor challenge</div>
+          <div class="abtn" data-a="3">No challenge</div>
+        </div>
+        <input type="hidden" name="h0" id="h0" value=""><input type="hidden" name="h1" id="h1" value="">
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var faces = ['Verticalized Software and Applications (i.e., specialized tools)', 'Data Storage and Infrastructure'];
+        var at = 0;
+        function paint() {
+          document.querySelector('.face').textContent = faces[at];
+          document.getElementById('pos').textContent = (at + 1) + ' / 2';
+          var done = ['h0', 'h1'].every(function (id) { return document.getElementById(id).value; });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        [].forEach.call(document.querySelectorAll('.abtn'), function (b) {
+          b.addEventListener('click', function () {
+            document.getElementById('h' + at).value = b.getAttribute('data-a');
+            if (at < 1) at++;
+            paint();
+          });
+        });
+        document.getElementById('nextCard').addEventListener('click', function () { if (at < 1) { at++; paint(); } });
+        document.getElementById('prev').addEventListener('click', function () { if (at > 0) { at--; paint(); } });
+        paint();
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/offscreen') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
@@ -622,6 +707,38 @@ createServer((req, res) => {
       if (!form.get('RR1'))
         res.end(`<!doctype html><html><body><p class="error">There were problems with some of the data you entered. Please select an answer.</p></body></html>`);
       else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url && req.url.startsWith('/cards5check')) {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      if (!form.get('h0')) res.end(`<!doctype html><html><body><p class="error">Please select an answer.</p></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
+  if (req.url && req.url.startsWith('/repeatcheck')) {
+    const step = Number((req.url.match(/step=(\d+)/) || [, 1])[1]);
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      if (!form.get('h0') || !form.get('h1')) {
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+        res.end(`<!doctype html><html><body><p class="error">Please provide an answer for each item.</p></body></html>`);
+        return;
+      }
+      if (step < 5) {
+        res.writeHead(302, { location: `/repeat?step=${step + 1}` });
+        res.end();
+        return;
+      }
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
     });
     return;
   }

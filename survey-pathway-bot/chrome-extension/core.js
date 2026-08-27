@@ -419,7 +419,7 @@ function pageModel(cfg, doc) {
       // them, and those must still count as buttons.
       if ([...el.querySelectorAll('input, select, textarea')].some((c) => c.getClientRects().length)) return false;
       const t = clean(el.innerText || '');
-      if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
+      if (!t || t.length > 220 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
       const style = win.getComputedStyle(el);
       return el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || !!el.onclick;
     });

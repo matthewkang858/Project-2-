@@ -115,8 +115,8 @@ export async function runOnce(page, opts) {
     // A page coming round again is only a loop if nothing new got answered in
     // between — a carousel legitimately revisits the same page per card.
     const visit = visits.get(model.fingerprint) ?? { count: 0, answered: -1 };
-    visit.count = visit.answered === answered.size ? visit.count + 1 : 1;
-    visit.answered = answered.size;
+    visit.count = visit.answered === di ? visit.count + 1 : 1;
+    visit.answered = di;
     visits.set(model.fingerprint, visit);
     if (visit.count > 3 && !model.isTerminal) {
       trace.steps.push(record);

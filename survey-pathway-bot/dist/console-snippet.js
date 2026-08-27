@@ -423,7 +423,7 @@ function pageModel(cfg, doc) {
       // them, and those must still count as buttons.
       if ([...el.querySelectorAll('input, select, textarea')].some((c) => c.getClientRects().length)) return false;
       const t = clean(el.innerText || '');
-      if (!t || t.length > 60 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
+      if (!t || t.length > 220 || FWD.test(t) || BWD.test(t) || POS.test(t)) return false;
       const style = win.getComputedStyle(el);
       return el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || !!el.onclick;
     });
@@ -1432,8 +1432,8 @@ spb.reset()                 clear stored state`);
           // A page coming round again is only a loop if nothing new got
           // answered in between — a carousel revisits the same page per card.
           const visit = visits.get(model.fingerprint) ?? { count: 0, answered: -1 };
-          visit.count = visit.answered === answered.size ? visit.count + 1 : 1;
-          visit.answered = answered.size;
+          visit.count = visit.answered === di ? visit.count + 1 : 1;
+          visit.answered = di;
           visits.set(model.fingerprint, visit);
           if (visit.count > 3 && !model.isTerminal) {
             type = 'looping';
@@ -1717,7 +1717,7 @@ const lost = ans.planned.filter((d) => {
         for (const el of d.querySelectorAll('button, [role="button"], a, div, li, span')) {
           if (!vis(el) || el.querySelector('input, select, textarea')) continue;
           const t = tidy(el.innerText);
-          if (!t || t.length > 60) continue;
+          if (!t || t.length > 220) continue;
           const cur = win.getComputedStyle(el).cursor;
           if (cur !== 'pointer' && el.tagName !== 'BUTTON' && el.getAttribute('role') !== 'button') continue;
           const parent = el.parentElement;
