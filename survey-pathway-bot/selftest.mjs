@@ -110,6 +110,20 @@ try {
     );
   }
 
+  // The tower variant from the second field debug dump: each answer is five
+  // nested pointer-cursored divs, the click handler on a middle level, and the
+  // shared row's own text short enough to pose as a button itself.
+  {
+    const o = join(out, 'cards4');
+    const r = await run(['explore.mjs', '--url', URL + 'cards4', '--out', o, '--max-runs', '4']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes the tower-of-divs carousel (handler on a middle level)');
+    check(
+      new Set(ts.map((t) => t.decisions.find((d) => d.key.startsWith('card1:'))?.chosenIndex)).size >= 3,
+      'tower carousel still branches across all three answers'
+    );
+  }
+
   // The real player parks its radios off-screen (left:-9999px) inside visible
   // labels — those must be answered — while a genuine off-screen honeypot with
   // no visible stand-in must not be (the server rejects the submit if it is).

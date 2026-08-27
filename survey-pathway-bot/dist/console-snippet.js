@@ -424,10 +424,21 @@ function pageModel(cfg, doc) {
       const style = win.getComputedStyle(el);
       return el.tagName === 'BUTTON' || el.getAttribute('role') === 'button' || style.cursor === 'pointer' || !!el.onclick;
     });
-    // Keep only the outermost clickable of each nest — a button whose label
-    // sits in an inner span must count once, as the button.
-    for (const el of candidates) {
-      if (candidates.some((o) => o !== el && o.contains(el))) continue;
+    // A clickable that holds candidates with DIFFERENT texts is the row
+    // holding the buttons, not a button — cursor:pointer inherits, so the
+    // shared container often qualifies as a candidate itself and must not
+    // swallow the real buttons. A clickable whose inner candidates all carry
+    // its own text is one button rendered as a tower of divs.
+    const textOf = (el) => clean(el.innerText || '');
+    const isContainer = (el) => {
+      const texts = new Set();
+      for (const o of candidates) if (o !== el && el.contains(o)) texts.add(textOf(o));
+      return texts.size > 1;
+    };
+    const buttons = candidates.filter((el) => !isContainer(el));
+    for (const el of buttons) {
+      // outermost level of each tower
+      if (buttons.some((o) => o !== el && o.contains(el))) continue;
       const parent = el.parentElement;
       if (!parent) continue;
       if (!byParent.has(parent)) byParent.set(parent, []);
@@ -468,7 +479,15 @@ function pageModel(cfg, doc) {
         selector: cssFor(best[0]),
         emphasis: { bold: [], underline: [] },
         answered: best.some((b) => /\b(sel|selected|active|checked)\b/i.test(b.className || '') || b.getAttribute('aria-pressed') === 'true'),
-        options: best.map((b) => ({ value: clean(b.innerText), label: clean(b.innerText), selector: cssFor(b), emphasis: marksOf(b) })),
+        options: best.map((b) => {
+          let target = b;
+          for (;;) {
+            const deeper = buttons.find((o) => o !== target && target.contains(o));
+            if (!deeper) break;
+            target = deeper;
+          }
+          return { value: clean(b.innerText), label: clean(b.innerText), selector: cssFor(target), emphasis: marksOf(b) };
+        }),
       });
     }
   }
@@ -784,11 +803,19 @@ function applyAnswer(q, candidate, doc) {
     } catch {
       el = null;
     }
-    if (!el || !el.isConnected)
-      el = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].find(
+    if (!el || !el.isConnected) {
+      // Re-find by wording; the DEEPEST match, so the click bubbles up
+      // through every level of the button's tower of divs.
+      const matches = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].filter(
         (e) => tidy(e.innerText) === tidy(opt.label) && e.getClientRects().length
       );
+      el = matches.find((m) => !matches.some((o) => o !== m && m.contains(o))) ?? null;
+    }
     if (!el) return false;
+    // Some players listen for pointer events rather than click.
+    const Pointer = win.PointerEvent || win.MouseEvent;
+    for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup'])
+      el.dispatchEvent(new (type.startsWith('pointer') ? Pointer : win.MouseEvent)(type, { bubbles: true, cancelable: true, view: win }));
     el.click();
     return true;
   }

@@ -386,6 +386,73 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // The field's exact carousel per the second debug dump: each answer is a
+  // five-deep tower of divs, every level pointer-cursored, the click handler
+  // on a MIDDLE level (mx-card), the shared row's own text under 60 chars,
+  // swiper-style arrows (role=button, aria-label, no text), three card faces
+  // in the DOM at once, and hidden radios as state.
+  if (req.url && req.url.split('?')[0] === '/cards4') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['Finance (e.g., CFO, financial planning & analysis team)', 'Executive Management (e.g., CEO)', 'IT (e.g., CIO, members of the technology team)'];
+    res.end(`<!doctype html><html><head><title>Survey</title>
+      <style>.content-container{cursor:pointer;display:flex;justify-content:center}
+             .box{margin:6px}.middle{padding:2px}.mx-card{border:1px solid #ccc;border-radius:8px;padding:12px}
+             .mx-card.sel{background:#dde}.mx-carouselapp-scale{font-size:14px}
+             .faces{display:flex;overflow:hidden;width:520px;margin:10px auto}
+             .face{min-width:240px;padding:24px;border:1px solid #eee;margin-right:8px}
+             .swiper-button-prev,.swiper-button-next{width:28px;height:28px;background:#eee;border-radius:50%}
+             input[type=radio]{display:none}</style>
+      </head><body>
+      <form method="POST" action="/cardscheck">
+        <div class="qtitle">Which of the following best describes the role that is typically played by the following departments/members of your company when evaluating and selecting software or technology?</div>
+        <div class="faces" id="faces"></div>
+        <div class="pager" style="display:flex;align-items:center;justify-content:center;gap:10px">
+          <div class="swiper-button-prev swiper-button-disable" role="button" aria-label="Previous slide"></div>
+          <span class="pos"><span id="posA"></span> / <span id="posB"></span></span>
+          <div class="swiper-button-next swiper-button-disable" role="button" aria-label="Next slide"></div>
+        </div>
+        <div class="content-container">
+          ${['Key decision-maker', 'Influencer', 'No role in the process'].map((t, i) =>
+            `<div class="box"><div class="middle"><div class="mx-card" data-a="${i + 1}"><div class="mx-carouselapp-scale">${t}</div></div></div></div>`
+          ).join('')}
+        </div>
+        ${rows.map((_, i) => [1, 2, 3].map((v) => `<input type="radio" name="ans32900.0.${i}" value="${v}">`).join('')).join('')}
+        ${rows.map((_, i) => `<input type="hidden" name="h${i}" id="h${i}" value="">`).join('')}
+        <p id="submitWrap" style="display:none"><button class="btn-continue" onclick="this.form.submit()">Continue</button></p>
+      </form>
+      <script>
+        var rows = ${JSON.stringify(rows)};
+        var at = 0;
+        function paint() {
+          document.getElementById('faces').innerHTML = rows
+            .slice(Math.max(0, at - 1), at + 2)
+            .map(function (t) { return '<div class="face">' + t + '</div>'; })
+            .join('');
+          document.getElementById('posA').textContent = at + 1;
+          document.getElementById('posB').textContent = rows.length;
+          var val = document.getElementById('h' + at).value;
+          [].forEach.call(document.querySelectorAll('.mx-card'), function (b) {
+            b.className = 'mx-card' + (b.getAttribute('data-a') === val ? ' sel' : '');
+          });
+          var done = rows.every(function (_, i) { return document.getElementById('h' + i).value; });
+          document.getElementById('submitWrap').style.display = done ? '' : 'none';
+        }
+        // Handler on the MIDDLE level only — a click dispatched on an outer
+        // level never reaches it, exactly like the real player.
+        [].forEach.call(document.querySelectorAll('.mx-card'), function (b) {
+          b.addEventListener('click', function () {
+            var v = b.getAttribute('data-a');
+            document.getElementById('h' + at).value = v;
+            [].forEach.call(document.querySelectorAll('input[name="ans32900.0.' + at + '"]'), function (r) { r.checked = r.value === v; });
+            if (at < rows.length - 1) at++;
+            paint();
+          });
+        });
+        paint();
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.url && req.url.split('?')[0] === '/offscreen') {
     const nonce = Math.floor(Math.random() * 900000 + 100000);
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
