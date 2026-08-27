@@ -128,6 +128,13 @@ function buildReport(traces, summary = {}) {
   L.push('## Findings to check', '');
   const findings = [];
   for (const t of traces) {
+    const manual = (t.steps ?? []).filter((s) => s.manual);
+    if (manual.length)
+      findings.push(`**${t.runId} needed a hand** on ${manual.length} page(s) — ${manual.map((s) => `\`${s.fingerprint}\`${s.manualReason ? ` (${esc(trunc(s.manualReason, 60))})` : ''}`).join(', ')}. Those widgets (sliders, carousels, custom controls) are worth teaching the bot, or scripting with a \`fixed\` rule.`);
+    if (t.outcome?.type === 'stuck')
+      findings.push(`**${t.runId} got stuck** on \`${t.outcome.atFingerprint ?? '?'}\` — the page was answered but offered no way forward. ${esc(trunc(t.outcome.text, 160))}`);
+    if (t.outcome?.type === 'stopped')
+      findings.push(`**${t.runId} was stopped by hand** — the report covers the traversals completed before that.`);
     if (t.outcome?.type === 'stalled')
       findings.push(`**${t.runId} stalled** on page \`${t.outcome.atFingerprint}\` — the page did not advance after submitting. Message: ${esc(trunc(t.outcome.text, 200))}`);
     if (t.outcome?.type === 'error') findings.push(`**${t.runId} errored**: ${esc(trunc(t.outcome.text, 200))}`);

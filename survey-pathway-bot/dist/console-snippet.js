@@ -163,7 +163,8 @@ function pageModel(cfg, doc) {
     else if (type === 'radio') kind = 'radio';
     else if (type === 'checkbox') kind = 'checkbox';
     else if (tag === 'textarea') kind = 'textarea';
-    else if (type === 'number' || type === 'range') kind = 'number';
+    else if (type === 'range') kind = 'slider';
+    else if (type === 'number') kind = 'number';
     else kind = 'text';
 
     const stemSink = {};
@@ -176,6 +177,22 @@ function pageModel(cfg, doc) {
       emphasis: marksOf(stemSink.el),
       options: [],
     };
+    if (kind === 'slider')
+      q.range = {
+        min: Number(first.min === '' ? 0 : first.min),
+        max: Number(first.max === '' ? 100 : first.max),
+        step: Number(first.step || 1),
+      };
+
+    // Whether the respondent (or the bot) has already answered it — used to
+    // avoid re-answering questions that stay on screen as a carousel reveals
+    // more, and to explain validation stalls.
+    q.answered =
+      kind === 'radio' || kind === 'checkbox'
+        ? els.some((e) => e.checked)
+        : kind === 'select'
+          ? !!first.value
+          : String(first.value ?? '') !== '';
 
     if (kind === 'select') {
       q.options = [...first.options]
@@ -190,6 +207,33 @@ function pageModel(cfg, doc) {
       }));
     }
     questions.push(q);
+  }
+
+  // Sliders that are not <input type=range>: a focusable element carrying the
+  // slider role and aria-value* attributes, driven by keyboard or drag. They
+  // hold no form control, so the grouping above cannot see them.
+  for (const el of doc.querySelectorAll('[role="slider"]')) {
+    if (!visible(el) || el.tagName === 'INPUT') continue;
+    const stemSink = {};
+    const key = el.id || el.getAttribute('aria-label') || cssFor(el);
+    if (questions.some((q) => q.key === key)) continue;
+    questions.push({
+      key,
+      kind: 'slider',
+      label: questionLabel(el, stemSink),
+      required: el.getAttribute('aria-required') === 'true',
+      selector: cssFor(el),
+      emphasis: marksOf(stemSink.el),
+      aria: true,
+      answered: Number(el.getAttribute('aria-valuenow') ?? 0) !== Number(el.getAttribute('aria-valuemin') ?? 0),
+      range: {
+        min: Number(el.getAttribute('aria-valuemin') ?? 0),
+        max: Number(el.getAttribute('aria-valuemax') ?? 100),
+        step: Number(el.getAttribute('aria-valuestep') || 1),
+        now: Number(el.getAttribute('aria-valuenow') ?? 0),
+      },
+      options: [],
+    });
   }
 
   // Forward button. Selector matches first (precise), then anything that reads
@@ -300,6 +344,19 @@ function candidates(q, config = {}) {
     return opts.length ? opts : [{ kind: 'noop' }];
   }
 
+  if (q.kind === 'slider') {
+    const { min = 0, max = 100, step = 1 } = q.range || {};
+    const at = (fraction) => {
+      const raw = min + (max - min) * fraction;
+      return String(Math.round(raw / step) * step);
+    };
+    if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'slide', value: String(v) }));
+    if (rule?.value != null) return [{ kind: 'slide', value: String(rule.value) }];
+    const wanted = config.sliderValues ?? ['mid'];
+    const points = { min: at(0), low: at(0.25), mid: at(0.5), high: at(0.75), max: at(1) };
+    return wanted.map((w) => ({ kind: 'slide', value: points[w] ?? String(w) }));
+  }
+
   // Free-text style.
   if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'value', value: String(v) }));
   if (rule?.value != null) return [{ kind: 'value', value: String(rule.value) }];
@@ -308,6 +365,7 @@ function candidates(q, config = {}) {
 }
 
 function describe(q, candidate) {
+  if (candidate.kind === 'slide') return `slider → ${candidate.value}`;
   if (candidate.kind === 'value') return `"${candidate.value}"`;
   if (candidate.kind === 'noop') return candidate.label ?? '(no answer)';
   const opt = q.options[candidate.index];
@@ -331,6 +389,34 @@ function applyAnswer(q, candidate, doc) {
     el.value = candidate.value;
     fire(el, ['input', 'change', 'blur']);
     return true;
+  }
+  if (candidate.kind === 'slide') {
+    const el = doc.querySelector(q.selector);
+    if (!el) return false;
+    const target = Number(candidate.value);
+    el.focus?.();
+    if (!q.aria) {
+      el.value = String(target);
+      fire(el, ['input', 'change']);
+      return Number(el.value) === target;
+    }
+    // A custom slider: nudge it with the arrow keys it listens for, then fall
+    // back to a drag to the right spot on its track.
+    const now = () => Number(el.getAttribute('aria-valuenow') ?? 0);
+    const { min = 0, max = 100, step = 1 } = q.range || {};
+    const key = (name) => {
+      for (const type of ['keydown', 'keyup'])
+        el.dispatchEvent(new win.KeyboardEvent(type, { key: name, bubbles: true }));
+    };
+    for (let i = 0; i < Math.abs(max - min) / step + 2 && now() !== target; i++)
+      key(now() < target ? 'ArrowRight' : 'ArrowLeft');
+    if (now() === target) return true;
+    const box = el.getBoundingClientRect();
+    const x = box.left + (box.width * (target - min)) / (max - min || 1);
+    const y = box.top + box.height / 2;
+    for (const type of ['mousedown', 'mousemove', 'mouseup'])
+      el.dispatchEvent(new win.MouseEvent(type, { clientX: x, clientY: y, bubbles: true }));
+    return now() === target;
   }
   const opt = q.options[candidate.index];
   if (!opt) return false;
@@ -401,8 +487,12 @@ function readPage(cfg, doc, depth) {
   }
 
   model.fingerprint = fingerprint(model);
-  model.isTerminal = !model.next || (model.questions.length === 0 && !!model.outcome);
-  if (model.isTerminal && !model.outcome && !model.questions.length) model.stuck = true;
+  // Terminal means "nothing left to do here": no questions and no way forward.
+  // A page with unanswered questions but no visible button is a carousel or a
+  // validation state, not the end of the survey.
+  model.isTerminal = !model.next && !model.questions.length;
+  model.needsAnswerFirst = !model.next && model.questions.length > 0;
+  if (model.isTerminal && !model.outcome) model.stuck = true;
   return model;
 }
 
@@ -565,6 +655,13 @@ function buildReport(traces, summary = {}) {
   L.push('## Findings to check', '');
   const findings = [];
   for (const t of traces) {
+    const manual = (t.steps ?? []).filter((s) => s.manual);
+    if (manual.length)
+      findings.push(`**${t.runId} needed a hand** on ${manual.length} page(s) — ${manual.map((s) => `\`${s.fingerprint}\`${s.manualReason ? ` (${esc(trunc(s.manualReason, 60))})` : ''}`).join(', ')}. Those widgets (sliders, carousels, custom controls) are worth teaching the bot, or scripting with a \`fixed\` rule.`);
+    if (t.outcome?.type === 'stuck')
+      findings.push(`**${t.runId} got stuck** on \`${t.outcome.atFingerprint ?? '?'}\` — the page was answered but offered no way forward. ${esc(trunc(t.outcome.text, 160))}`);
+    if (t.outcome?.type === 'stopped')
+      findings.push(`**${t.runId} was stopped by hand** — the report covers the traversals completed before that.`);
     if (t.outcome?.type === 'stalled')
       findings.push(`**${t.runId} stalled** on page \`${t.outcome.atFingerprint}\` — the page did not advance after submitting. Message: ${esc(trunc(t.outcome.text, 200))}`);
     if (t.outcome?.type === 'error') findings.push(`**${t.runId} errored**: ${esc(trunc(t.outcome.text, 200))}`);
@@ -600,6 +697,7 @@ globalThis.SPB_REPORT = { buildReport };
 const C = globalThis.SPB_CORE;
 const CAPTURE_KEY = 'spb-captured-answers';
 const STEP_KEY = 'spb-step-state';
+const AUTO_KEY = 'spb-auto-traces';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -641,7 +739,7 @@ function expand(state, trace) {
 }
 
 // Answer every question on `doc`, returning the page record.
-function answerPage(model, plan, di, cfg, doc) {
+function answerPage(model, plan, di, cfg, doc, answered) {
   const record = {
     url: model.url,
     fingerprint: model.fingerprint,
@@ -657,11 +755,15 @@ function answerPage(model, plan, di, cfg, doc) {
     decisions: [],
   };
   for (const q of model.questions) {
+    // A carousel keeps answered cards on screen; re-answering them would
+    // consume plan slots and skew the branch numbering.
+    if (answered && answered.has(q.key) && q.answered) continue;
     const cands = C.candidates(q, cfg);
     const wanted = plan[di];
     const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
     const chosen = cands[idx];
     const ok = C.applyAnswer(q, chosen, doc);
+    if (answered) answered.add(q.key);
     record.decisions.push({
       di,
       key: q.key,
@@ -705,6 +807,7 @@ const spb = {
     console.log(`spb.check()                 is this page the survey, and can it be framed?
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
+spb.stop()                  end the run now and keep what was recorded
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
 spb.inspect()               what the bot sees on this page
@@ -852,7 +955,8 @@ spb.reset()                 clear stored state`);
 
     const state = { queue: [[]], seen: [''], traces: [] };
     let runs = 0;
-    while (state.queue.length && runs < maxRuns) {
+    this._abort = false;
+    while (state.queue.length && runs < maxRuns && !this._abort) {
       const plan = state.queue.shift();
       const runId = `run-${String(++runs).padStart(3, '0')}`;
       const steps = [];
@@ -863,7 +967,9 @@ spb.reset()                 clear stored state`);
 
       try {
         if (runs > 1) await load(startUrl);
+        const answered = new Set();
         for (let step = 0; step < maxSteps; step++) {
+          if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
           const model = C.readPage(cfg.selectors, doc);
           if (model.isTerminal) {
@@ -871,43 +977,58 @@ spb.reset()                 clear stored state`);
               url: model.url, fingerprint: model.fingerprint, heading: model.heading, outcome: model.outcome,
               questionKeys: [], questions: [], decisions: [],
             });
-            type = model.outcome || 'end';
+            type = model.outcome || (model.stuck ? 'stuck' : 'end');
             text = model.bodyText.slice(0, 600);
             break;
           }
           const target = C.docFor(model, doc);
-          const answered = answerPage(model, plan, di, cfg, target);
-          di = answered.di;
-          steps.push(answered.record);
-          decisions.push(...answered.record.decisions);
-
+          const ans = answerPage(model, plan, di, cfg, target, answered);
+          di = ans.di;
+          steps.push(ans.record);
+          decisions.push(...ans.record.decisions);
           await sleep(delay);
-          const before = model.fingerprint + '|' + model.url;
-          C.clickNext(model, target);
+
+          // Answering can move the survey on by itself — a carousel revealing
+          // its next card, or a page that advances on the last answer. Re-read
+          // before clicking, or the click skips a card.
+          let current = model;
+          if (model.questions.length) {
+            const after = C.readPage(cfg.selectors, docOf());
+            if (after.fingerprint !== model.fingerprint) continue;
+            current = after;
+          }
+
+          if (!current.next) {
+            const helped = await this._waitForHuman(frame, current, cfg, 'this page has no forward button the bot can find');
+            if (helped) { ans.record.manual = true; continue; }
+            type = 'stuck';
+            text = 'answered the page but found no way forward';
+            break;
+          }
+
+          const before = current.fingerprint + '|' + current.url;
+          C.clickNext(current, C.docFor(current, docOf()));
           const deadline = Date.now() + timeout;
           let moved = false;
           while (Date.now() < deadline) {
             await sleep(200);
             try {
               const m = C.readPage(cfg.selectors, docOf());
-              if (m.fingerprint + '|' + m.url !== before) {
-                moved = true;
-                break;
-              }
+              if (m.fingerprint + '|' + m.url !== before) { moved = true; break; }
             } catch {
               /* mid-navigation */
             }
           }
           if (!moved) {
-            type = 'stalled';
+            let why = 'the page did not advance';
             try {
               const now = C.readPage(cfg.selectors, docOf());
-              text = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [
-                'page did not advance after submitting',
-              ])[0];
-            } catch {
-              text = 'page did not advance after submitting';
-            }
+              why = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [why])[0];
+            } catch {}
+            const helped = await this._waitForHuman(frame, current, cfg, why);
+            if (helped) { ans.record.manual = true; continue; }
+            type = 'stalled';
+            text = why;
             break;
           }
         }
@@ -919,6 +1040,11 @@ spb.reset()                 clear stored state`);
       const trace = makeTrace(runId, plan, steps, decisions, type, text);
       state.traces.push(trace);
       expand(state, trace);
+      // Keep the report available at all times: stopping the run, or losing the
+      // tab, should never cost the traversals already walked.
+      this.traces = state.traces;
+      this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
+      writeJSON(AUTO_KEY, { summary: this._summary, traces: state.traces });
       console.log(
         `${runId}  plan=[${plan.join(',')}]  pages=${trace.steps.length}  outcome=${type}  ` +
           `${trace.decisions.map((d) => `${d.key}:${d.chosenIndex}`).join(' > ')}`
@@ -928,6 +1054,7 @@ spb.reset()                 clear stored state`);
     this.traces = state.traces;
     this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
     frame.remove();
+    if (this._abort) console.log(`%cstopped after ${state.traces.length} traversal(s).`, 'font-weight:bold');
     if (!state.traces.some((t) => t.decisions.length)) {
       console.error(
         '%cno questions were answered in any run — the report would be empty. The bot never reached the questionnaire.',
@@ -940,6 +1067,59 @@ spb.reset()                 clear stored state`);
       'font-weight:bold'
     );
     return state.traces;
+  },
+
+  // Hand the wheel to the user for a widget the bot cannot drive — a drag-only
+  // slider, a carousel with custom controls, anything unexpected. The frame is
+  // enlarged so the page is actually usable, and the run resumes the moment the
+  // page moves.
+  async _waitForHuman(frame, model, cfg, why) {
+    const wait = Number(cfg.manualTimeout ?? 120000);
+    if (!wait) return null;
+    const before = model.fingerprint + '|' + model.url;
+    const style = frame.style.cssText;
+    frame.style.cssText =
+      'position:fixed;right:12px;bottom:12px;width:min(900px,92vw);height:min(760px,86vh);z-index:2147483647;' +
+      'border:3px solid #d97706;border-radius:6px;background:#fff;box-shadow:0 8px 40px rgba(0,0,0,.45)';
+    console.warn(
+      `%c⏸ over to you (${Math.round(wait / 1000)}s): ${why}\n` +
+        `   page: ${model.heading || model.url}\n` +
+        `   answer it in the panel and move to the next page — the run continues by itself.`,
+      'font-weight:bold'
+    );
+    const deadline = Date.now() + wait;
+    while (Date.now() < deadline) {
+      await sleep(500);
+      if (this._abort) break;
+      let now = null;
+      try {
+        now = C.readPage(cfg.selectors, frame.contentDocument);
+      } catch {
+        /* navigating */
+      }
+      if (now && now.fingerprint + '|' + now.url !== before) {
+        frame.style.cssText = style;
+        console.log('%c▶ thanks — carrying on.', 'font-weight:bold');
+        this._manualAssists = (this._manualAssists || 0) + 1;
+        return now;
+      }
+    }
+    frame.style.cssText = style;
+    return null;
+  },
+
+  // Stop the current exploration. Whatever has been recorded stays available
+  // to spb.report() / spb.download().
+  stop() {
+    this._abort = true;
+    const state = readJSON(STEP_KEY, null);
+    if (state?.active) {
+      state.active = false;
+      writeJSON(STEP_KEY, state);
+    }
+    const n = this.allTraces().length;
+    console.log(`%cstopping — ${n} traversal(s) recorded. spb.report() / spb.download()`, 'font-weight:bold');
+    return n;
   },
 
   // ---- step-through mode ---------------------------------------------------
@@ -1041,8 +1221,10 @@ spb.reset()                 clear stored state`);
   },
 
   allTraces() {
-    const state = readJSON(STEP_KEY, null);
-    return this.traces.length ? this.traces : state?.traces ?? [];
+    if (this.traces.length) return this.traces;
+    const step = readJSON(STEP_KEY, null);
+    if (step?.traces?.length) return step.traces;
+    return readJSON(AUTO_KEY, {})?.traces ?? [];
   },
 
   report() {

@@ -16,6 +16,8 @@
 //   --screenshots        full-page PNG of every page of every run
 //   --headed             show the browser
 //   --delay MS           pause before each page submit (default 0)
+//   --manual SECONDS     when a page cannot be driven, wait this long for you to
+//                        handle it by hand (use with --headed), then carry on
 
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -72,6 +74,7 @@ while (queue.length && n < maxRuns) {
       outDir: shotsDir,
       screenshots: !!a.screenshots,
       delay: Number(a.delay ?? config.delay ?? 0),
+      manualTimeout: Number(a.manual ?? config.manualTimeout ?? 0) * 1000,
       stepTimeout: Number(config.stepTimeout ?? 20000),
       maxSteps: Number(config.maxSteps ?? 60),
     });

@@ -18,6 +18,7 @@
 const C = globalThis.SPB_CORE;
 const CAPTURE_KEY = 'spb-captured-answers';
 const STEP_KEY = 'spb-step-state';
+const AUTO_KEY = 'spb-auto-traces';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -59,7 +60,7 @@ function expand(state, trace) {
 }
 
 // Answer every question on `doc`, returning the page record.
-function answerPage(model, plan, di, cfg, doc) {
+function answerPage(model, plan, di, cfg, doc, answered) {
   const record = {
     url: model.url,
     fingerprint: model.fingerprint,
@@ -75,11 +76,15 @@ function answerPage(model, plan, di, cfg, doc) {
     decisions: [],
   };
   for (const q of model.questions) {
+    // A carousel keeps answered cards on screen; re-answering them would
+    // consume plan slots and skew the branch numbering.
+    if (answered && answered.has(q.key) && q.answered) continue;
     const cands = C.candidates(q, cfg);
     const wanted = plan[di];
     const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
     const chosen = cands[idx];
     const ok = C.applyAnswer(q, chosen, doc);
+    if (answered) answered.add(q.key);
     record.decisions.push({
       di,
       key: q.key,
@@ -123,6 +128,7 @@ const spb = {
     console.log(`spb.check()                 is this page the survey, and can it be framed?
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
+spb.stop()                  end the run now and keep what was recorded
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
 spb.inspect()               what the bot sees on this page
@@ -270,7 +276,8 @@ spb.reset()                 clear stored state`);
 
     const state = { queue: [[]], seen: [''], traces: [] };
     let runs = 0;
-    while (state.queue.length && runs < maxRuns) {
+    this._abort = false;
+    while (state.queue.length && runs < maxRuns && !this._abort) {
       const plan = state.queue.shift();
       const runId = `run-${String(++runs).padStart(3, '0')}`;
       const steps = [];
@@ -281,7 +288,9 @@ spb.reset()                 clear stored state`);
 
       try {
         if (runs > 1) await load(startUrl);
+        const answered = new Set();
         for (let step = 0; step < maxSteps; step++) {
+          if (this._abort) { type = 'stopped'; text = 'stopped by spb.stop()'; break; }
           const doc = docOf();
           const model = C.readPage(cfg.selectors, doc);
           if (model.isTerminal) {
@@ -289,43 +298,58 @@ spb.reset()                 clear stored state`);
               url: model.url, fingerprint: model.fingerprint, heading: model.heading, outcome: model.outcome,
               questionKeys: [], questions: [], decisions: [],
             });
-            type = model.outcome || 'end';
+            type = model.outcome || (model.stuck ? 'stuck' : 'end');
             text = model.bodyText.slice(0, 600);
             break;
           }
           const target = C.docFor(model, doc);
-          const answered = answerPage(model, plan, di, cfg, target);
-          di = answered.di;
-          steps.push(answered.record);
-          decisions.push(...answered.record.decisions);
-
+          const ans = answerPage(model, plan, di, cfg, target, answered);
+          di = ans.di;
+          steps.push(ans.record);
+          decisions.push(...ans.record.decisions);
           await sleep(delay);
-          const before = model.fingerprint + '|' + model.url;
-          C.clickNext(model, target);
+
+          // Answering can move the survey on by itself — a carousel revealing
+          // its next card, or a page that advances on the last answer. Re-read
+          // before clicking, or the click skips a card.
+          let current = model;
+          if (model.questions.length) {
+            const after = C.readPage(cfg.selectors, docOf());
+            if (after.fingerprint !== model.fingerprint) continue;
+            current = after;
+          }
+
+          if (!current.next) {
+            const helped = await this._waitForHuman(frame, current, cfg, 'this page has no forward button the bot can find');
+            if (helped) { ans.record.manual = true; continue; }
+            type = 'stuck';
+            text = 'answered the page but found no way forward';
+            break;
+          }
+
+          const before = current.fingerprint + '|' + current.url;
+          C.clickNext(current, C.docFor(current, docOf()));
           const deadline = Date.now() + timeout;
           let moved = false;
           while (Date.now() < deadline) {
             await sleep(200);
             try {
               const m = C.readPage(cfg.selectors, docOf());
-              if (m.fingerprint + '|' + m.url !== before) {
-                moved = true;
-                break;
-              }
+              if (m.fingerprint + '|' + m.url !== before) { moved = true; break; }
             } catch {
               /* mid-navigation */
             }
           }
           if (!moved) {
-            type = 'stalled';
+            let why = 'the page did not advance';
             try {
               const now = C.readPage(cfg.selectors, docOf());
-              text = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [
-                'page did not advance after submitting',
-              ])[0];
-            } catch {
-              text = 'page did not advance after submitting';
-            }
+              why = (now.bodyText.match(/[^.]*(required|please|must|error|invalid)[^.]*\./i) || [why])[0];
+            } catch {}
+            const helped = await this._waitForHuman(frame, current, cfg, why);
+            if (helped) { ans.record.manual = true; continue; }
+            type = 'stalled';
+            text = why;
             break;
           }
         }
@@ -337,6 +361,11 @@ spb.reset()                 clear stored state`);
       const trace = makeTrace(runId, plan, steps, decisions, type, text);
       state.traces.push(trace);
       expand(state, trace);
+      // Keep the report available at all times: stopping the run, or losing the
+      // tab, should never cost the traversals already walked.
+      this.traces = state.traces;
+      this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
+      writeJSON(AUTO_KEY, { summary: this._summary, traces: state.traces });
       console.log(
         `${runId}  plan=[${plan.join(',')}]  pages=${trace.steps.length}  outcome=${type}  ` +
           `${trace.decisions.map((d) => `${d.key}:${d.chosenIndex}`).join(' > ')}`
@@ -346,6 +375,7 @@ spb.reset()                 clear stored state`);
     this.traces = state.traces;
     this._summary = { url: startUrl, generatedAt: new Date().toISOString(), plansQueuedButNotRun: state.queue.length };
     frame.remove();
+    if (this._abort) console.log(`%cstopped after ${state.traces.length} traversal(s).`, 'font-weight:bold');
     if (!state.traces.some((t) => t.decisions.length)) {
       console.error(
         '%cno questions were answered in any run — the report would be empty. The bot never reached the questionnaire.',
@@ -358,6 +388,59 @@ spb.reset()                 clear stored state`);
       'font-weight:bold'
     );
     return state.traces;
+  },
+
+  // Hand the wheel to the user for a widget the bot cannot drive — a drag-only
+  // slider, a carousel with custom controls, anything unexpected. The frame is
+  // enlarged so the page is actually usable, and the run resumes the moment the
+  // page moves.
+  async _waitForHuman(frame, model, cfg, why) {
+    const wait = Number(cfg.manualTimeout ?? 120000);
+    if (!wait) return null;
+    const before = model.fingerprint + '|' + model.url;
+    const style = frame.style.cssText;
+    frame.style.cssText =
+      'position:fixed;right:12px;bottom:12px;width:min(900px,92vw);height:min(760px,86vh);z-index:2147483647;' +
+      'border:3px solid #d97706;border-radius:6px;background:#fff;box-shadow:0 8px 40px rgba(0,0,0,.45)';
+    console.warn(
+      `%c⏸ over to you (${Math.round(wait / 1000)}s): ${why}\n` +
+        `   page: ${model.heading || model.url}\n` +
+        `   answer it in the panel and move to the next page — the run continues by itself.`,
+      'font-weight:bold'
+    );
+    const deadline = Date.now() + wait;
+    while (Date.now() < deadline) {
+      await sleep(500);
+      if (this._abort) break;
+      let now = null;
+      try {
+        now = C.readPage(cfg.selectors, frame.contentDocument);
+      } catch {
+        /* navigating */
+      }
+      if (now && now.fingerprint + '|' + now.url !== before) {
+        frame.style.cssText = style;
+        console.log('%c▶ thanks — carrying on.', 'font-weight:bold');
+        this._manualAssists = (this._manualAssists || 0) + 1;
+        return now;
+      }
+    }
+    frame.style.cssText = style;
+    return null;
+  },
+
+  // Stop the current exploration. Whatever has been recorded stays available
+  // to spb.report() / spb.download().
+  stop() {
+    this._abort = true;
+    const state = readJSON(STEP_KEY, null);
+    if (state?.active) {
+      state.active = false;
+      writeJSON(STEP_KEY, state);
+    }
+    const n = this.allTraces().length;
+    console.log(`%cstopping — ${n} traversal(s) recorded. spb.report() / spb.download()`, 'font-weight:bold');
+    return n;
   },
 
   // ---- step-through mode ---------------------------------------------------
@@ -459,8 +542,10 @@ spb.reset()                 clear stored state`);
   },
 
   allTraces() {
-    const state = readJSON(STEP_KEY, null);
-    return this.traces.length ? this.traces : state?.traces ?? [];
+    if (this.traces.length) return this.traces;
+    const step = readJSON(STEP_KEY, null);
+    if (step?.traces?.length) return step.traces;
+    return readJSON(AUTO_KEY, {})?.traces ?? [];
   },
 
   report() {

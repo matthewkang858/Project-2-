@@ -127,6 +127,64 @@ createServer((req, res) => {
       </body></html>`);
     return;
   }
+  // Two widget shapes that a plain form-control reader cannot answer: a native
+  // range slider plus a custom keyboard/pointer-driven one, and a carousel that
+  // reveals its questions one at a time without a page load.
+  if (req.url && req.url.startsWith('/slider')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/">
+        <input type="hidden" name="state" value="${enc({ S1: '2', S2: '1', S3: '1' })}">
+        <input type="hidden" name="page" value="4">
+        <div class="question" id="SL1"><div class="qtitle">What share of revenue goes to technology?</div>
+          <input type="range" name="SL1" id="SL1_r" min="0" max="100" step="5" value="0">
+        </div>
+        <div class="question" id="SL2"><div class="qtitle">How impactful has AI been?</div>
+          <div id="SL2_s" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"
+               style="width:300px;height:24px;background:#eee">handle</div>
+          <input type="hidden" name="SL2" id="SL2_v" value="">
+        </div>
+        <p><input type="submit" name="continue" id="continue" value="Next"></p>
+      </form>
+      <script>
+        var s = document.getElementById('SL2_s'), v = document.getElementById('SL2_v');
+        function set(n) { n = Math.max(0, Math.min(10, n)); s.setAttribute('aria-valuenow', n); v.value = String(n); }
+        s.addEventListener('keydown', function (e) {
+          var now = Number(s.getAttribute('aria-valuenow'));
+          if (e.key === 'ArrowRight' || e.key === 'ArrowUp') set(now + 1);
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') set(now - 1);
+          if (e.key === 'End') set(10);
+        });
+        s.addEventListener('mouseup', function (e) {
+          var r = s.getBoundingClientRect();
+          set(Math.round(((e.clientX - r.left) / r.width) * 10));
+        });
+      </script>
+      </body></html>`);
+    return;
+  }
+  if (req.url && req.url.startsWith('/carousel')) {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Survey</title></head><body>
+      <form method="POST" action="/">
+        <input type="hidden" name="state" value="${enc({ S1: '2', S2: '1', S3: '1' })}">
+        <input type="hidden" name="page" value="4">
+        <div class="card" data-card="0">${radio('C1', 'Card one: how satisfied are you?', ['Low', 'Medium', 'High'])}</div>
+        <div class="card" data-card="1" style="display:none">${radio('C2', 'Card two: how likely to renew?', ['Low', 'Medium', 'High'])}</div>
+        <div class="card" data-card="2" style="display:none">${radio('C3', 'Card three: how likely to recommend?', ['Low', 'Medium', 'High'])}</div>
+        <p id="submitWrap" style="display:none"><input type="submit" name="continue" id="continue" value="Next"></p>
+      </form>
+      <script>
+        var shown = 0;
+        document.addEventListener('change', function () {
+          var cards = document.querySelectorAll('.card');
+          if (shown < cards.length - 1) { shown++; cards[shown].style.display = ''; }
+          else { document.getElementById('submitWrap').style.display = ''; }
+        });
+      </script>
+      </body></html>`);
+    return;
+  }
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));

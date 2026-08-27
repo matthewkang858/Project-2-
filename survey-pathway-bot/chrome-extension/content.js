@@ -42,6 +42,7 @@
     const timeout = Number(cfg.stepTimeout ?? 20000);
     let di = Number(session.di ?? 0);
     const plan = session.plan || [];
+    const answered = new Set(); // keys this run has already dealt with
 
     for (;;) {
       const model = SPB_CORE.readPage(sel);
@@ -67,11 +68,15 @@
 
       const target = SPB_CORE.docFor(model, document);
       for (const q of model.questions) {
+        // A carousel keeps answered cards on screen — re-answering them would
+        // consume plan slots and skew the branch numbering.
+        if (answered.has(q.key) && q.answered) continue;
         const cands = SPB_CORE.candidates(q, cfg);
         const wanted = plan[di];
         const idx = Number.isInteger(wanted) && wanted < cands.length ? wanted : 0;
         const chosen = cands[idx];
         const ok = SPB_CORE.applyAnswer(q, chosen, target);
+        answered.add(q.key);
         record.decisions.push({
           di,
           key: q.key,
@@ -89,8 +94,18 @@
       if (!ack || !ack.continue) return;
 
       await sleep(delay);
-      const before = model.fingerprint + '|' + location.href;
-      if (!SPB_CORE.clickNext(model, target)) {
+
+      // Answering can move the survey on by itself (a carousel revealing its
+      // next card); re-read before clicking so a card is not skipped.
+      let current = model;
+      if (model.questions.length) {
+        const after = SPB_CORE.readPage(sel);
+        if (after.fingerprint !== model.fingerprint) continue;
+        current = after;
+      }
+
+      const before = current.fingerprint + '|' + location.href;
+      if (!current.next || !SPB_CORE.clickNext(current, SPB_CORE.docFor(current, document))) {
         await send({ type: 'stalled', record, text: 'no forward button could be clicked' });
         return;
       }

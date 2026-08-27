@@ -60,6 +60,24 @@ try {
     check(ts.some((t) => ['complete', 'quota', 'terminate'].includes(t.outcome?.type)), `reaches a real end state through the ${label}`);
   }
 
+  // Widgets that a plain form reader cannot drive: native + custom sliders, and
+  // a carousel that reveals one question at a time without a page load.
+  for (const [path, label, expectKeys] of [
+    ['slider', 'sliders (native and ARIA)', ['SL1', 'SL2_s']],
+    ['carousel', 'a carousel that reveals cards as you answer', ['C1', 'C2', 'C3']],
+  ]) {
+    const o = join(out, path);
+    const r = await run(['explore.mjs', '--url', URL + path, '--out', o, '--max-runs', '2']);
+    const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
+    const keys = new Set(ts.flatMap((t) => t.decisions.map((d) => d.key)));
+    check(r.code === 0 && expectKeys.every((k) => keys.has(k)), `answers ${label}`);
+    check(ts.some((t) => t.outcome?.type === 'complete'), `completes the survey through ${label}`);
+    check(
+      !ts.some((t) => t.decisions.filter((d) => d.key === expectKeys[0]).length > 1),
+      `does not re-answer the same question when it stays on screen (${path})`
+    );
+  }
+
   const paths = await run(['run-paths.mjs', '--url', URL, '--paths', 'paths.example.json', '--out', out]);
   process.stdout.write(paths.stdout.replace(/^/gm, '      '));
   check(paths.code === 0, 'all scripted scenarios in paths.example.json pass');

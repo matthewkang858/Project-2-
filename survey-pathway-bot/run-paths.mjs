@@ -53,6 +53,7 @@ for (const scenario of spec.scenarios ?? []) {
       outDir: join(outDir, 'screenshots'),
       screenshots: !!a.screenshots,
       delay: Number(a.delay ?? spec.delay ?? 0),
+      manualTimeout: Number(a.manual ?? spec.manualTimeout ?? 0) * 1000,
       stepTimeout: Number(spec.stepTimeout ?? 20000),
       maxSteps: Number(spec.maxSteps ?? 60),
     });

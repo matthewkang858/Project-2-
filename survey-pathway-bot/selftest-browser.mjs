@@ -83,6 +83,35 @@ try {
   );
   await framed.close();
 
+  // ---- snippet: sliders, carousel, and stopping mid-run ------------------
+  for (const [path, keys, label] of [
+    ['slider', ['SL1', 'SL2_s'], 'sliders'],
+    ['carousel', ['C1', 'C2', 'C3'], 'a carousel'],
+  ]) {
+    const w = await ctx.newPage();
+    await w.goto(URL_ + path);
+    await w.evaluate(snippet);
+    const ts = await w.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 2, config: { delay: 0, manualTimeout: 0 } }), URL_ + path);
+    const seen = new Set((ts || []).flatMap((t) => t.decisions.map((d) => d.key)));
+    check(keys.every((k) => seen.has(k)), `snippet answers ${label}`);
+    check((ts || []).some((t) => t.outcome?.type === 'complete'), `snippet completes the survey through ${label}`);
+    await w.close();
+  }
+
+  const stopPage = await ctx.newPage();
+  await stopPage.goto(URL_);
+  await stopPage.evaluate(snippet);
+  const stopped = await stopPage.evaluate(async (u) => {
+    const running = spb.auto({ url: u, maxRuns: 40, config: { delay: 60 } });
+    await new Promise((r) => setTimeout(r, 1500));
+    const n = spb.stop();
+    await running;
+    return { stoppedAt: n, traces: spb.allTraces().length, report: (spb.report() || '').slice(0, 40) };
+  }, URL_);
+  check(stopped.traces > 0 && stopped.traces < 40, `spb.stop() ends the run and keeps its traversals (${stopped.traces})`);
+  check(stopped.report.includes('Survey pathway test report'), 'a report is available after stopping');
+  await stopPage.close();
+
   // ---- snippet: login-wall diagnostics ----------------------------------
   // The failure that produced an empty report in the field: a start URL that
   // renders an interstitial instead of the questionnaire.

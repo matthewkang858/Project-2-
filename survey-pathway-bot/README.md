@@ -40,6 +40,17 @@ identically and produce the same report:
    pathway after pathway while you watch. The parent page never navigates, which
    is what keeps the script alive.
 5. `spb.download()` saves the Markdown report; `spb.report()` just prints it.
+6. `spb.stop()` ends a run early and keeps everything walked so far — the report
+   works straight after.
+
+**When a page needs you.** Sliders, carousels and custom widgets are answered
+where possible (native `input[type=range]`, ARIA sliders driven by keyboard or
+drag, carousels that reveal cards as you answer). When the bot still cannot move
+a page on, it enlarges its panel, says what is blocking it, and waits (default
+two minutes, `manualTimeout` in the config) for you to answer that page by hand;
+the moment the page moves it carries on by itself. Every page you had to touch
+is listed in the report's findings, so you know which widgets to script with a
+`fixed` rule next time.
 
 If step 4 reports that the survey refuses to be framed, use step-through mode
 instead — same exploration, one keystroke per page:

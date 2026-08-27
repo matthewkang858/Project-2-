@@ -159,7 +159,8 @@ function pageModel(cfg, doc) {
     else if (type === 'radio') kind = 'radio';
     else if (type === 'checkbox') kind = 'checkbox';
     else if (tag === 'textarea') kind = 'textarea';
-    else if (type === 'number' || type === 'range') kind = 'number';
+    else if (type === 'range') kind = 'slider';
+    else if (type === 'number') kind = 'number';
     else kind = 'text';
 
     const stemSink = {};
@@ -172,6 +173,22 @@ function pageModel(cfg, doc) {
       emphasis: marksOf(stemSink.el),
       options: [],
     };
+    if (kind === 'slider')
+      q.range = {
+        min: Number(first.min === '' ? 0 : first.min),
+        max: Number(first.max === '' ? 100 : first.max),
+        step: Number(first.step || 1),
+      };
+
+    // Whether the respondent (or the bot) has already answered it — used to
+    // avoid re-answering questions that stay on screen as a carousel reveals
+    // more, and to explain validation stalls.
+    q.answered =
+      kind === 'radio' || kind === 'checkbox'
+        ? els.some((e) => e.checked)
+        : kind === 'select'
+          ? !!first.value
+          : String(first.value ?? '') !== '';
 
     if (kind === 'select') {
       q.options = [...first.options]
@@ -186,6 +203,33 @@ function pageModel(cfg, doc) {
       }));
     }
     questions.push(q);
+  }
+
+  // Sliders that are not <input type=range>: a focusable element carrying the
+  // slider role and aria-value* attributes, driven by keyboard or drag. They
+  // hold no form control, so the grouping above cannot see them.
+  for (const el of doc.querySelectorAll('[role="slider"]')) {
+    if (!visible(el) || el.tagName === 'INPUT') continue;
+    const stemSink = {};
+    const key = el.id || el.getAttribute('aria-label') || cssFor(el);
+    if (questions.some((q) => q.key === key)) continue;
+    questions.push({
+      key,
+      kind: 'slider',
+      label: questionLabel(el, stemSink),
+      required: el.getAttribute('aria-required') === 'true',
+      selector: cssFor(el),
+      emphasis: marksOf(stemSink.el),
+      aria: true,
+      answered: Number(el.getAttribute('aria-valuenow') ?? 0) !== Number(el.getAttribute('aria-valuemin') ?? 0),
+      range: {
+        min: Number(el.getAttribute('aria-valuemin') ?? 0),
+        max: Number(el.getAttribute('aria-valuemax') ?? 100),
+        step: Number(el.getAttribute('aria-valuestep') || 1),
+        now: Number(el.getAttribute('aria-valuenow') ?? 0),
+      },
+      options: [],
+    });
   }
 
   // Forward button. Selector matches first (precise), then anything that reads
@@ -296,6 +340,19 @@ function candidates(q, config = {}) {
     return opts.length ? opts : [{ kind: 'noop' }];
   }
 
+  if (q.kind === 'slider') {
+    const { min = 0, max = 100, step = 1 } = q.range || {};
+    const at = (fraction) => {
+      const raw = min + (max - min) * fraction;
+      return String(Math.round(raw / step) * step);
+    };
+    if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'slide', value: String(v) }));
+    if (rule?.value != null) return [{ kind: 'slide', value: String(rule.value) }];
+    const wanted = config.sliderValues ?? ['mid'];
+    const points = { min: at(0), low: at(0.25), mid: at(0.5), high: at(0.75), max: at(1) };
+    return wanted.map((w) => ({ kind: 'slide', value: points[w] ?? String(w) }));
+  }
+
   // Free-text style.
   if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'value', value: String(v) }));
   if (rule?.value != null) return [{ kind: 'value', value: String(rule.value) }];
@@ -304,6 +361,7 @@ function candidates(q, config = {}) {
 }
 
 function describe(q, candidate) {
+  if (candidate.kind === 'slide') return `slider → ${candidate.value}`;
   if (candidate.kind === 'value') return `"${candidate.value}"`;
   if (candidate.kind === 'noop') return candidate.label ?? '(no answer)';
   const opt = q.options[candidate.index];
@@ -327,6 +385,34 @@ function applyAnswer(q, candidate, doc) {
     el.value = candidate.value;
     fire(el, ['input', 'change', 'blur']);
     return true;
+  }
+  if (candidate.kind === 'slide') {
+    const el = doc.querySelector(q.selector);
+    if (!el) return false;
+    const target = Number(candidate.value);
+    el.focus?.();
+    if (!q.aria) {
+      el.value = String(target);
+      fire(el, ['input', 'change']);
+      return Number(el.value) === target;
+    }
+    // A custom slider: nudge it with the arrow keys it listens for, then fall
+    // back to a drag to the right spot on its track.
+    const now = () => Number(el.getAttribute('aria-valuenow') ?? 0);
+    const { min = 0, max = 100, step = 1 } = q.range || {};
+    const key = (name) => {
+      for (const type of ['keydown', 'keyup'])
+        el.dispatchEvent(new win.KeyboardEvent(type, { key: name, bubbles: true }));
+    };
+    for (let i = 0; i < Math.abs(max - min) / step + 2 && now() !== target; i++)
+      key(now() < target ? 'ArrowRight' : 'ArrowLeft');
+    if (now() === target) return true;
+    const box = el.getBoundingClientRect();
+    const x = box.left + (box.width * (target - min)) / (max - min || 1);
+    const y = box.top + box.height / 2;
+    for (const type of ['mousedown', 'mousemove', 'mouseup'])
+      el.dispatchEvent(new win.MouseEvent(type, { clientX: x, clientY: y, bubbles: true }));
+    return now() === target;
   }
   const opt = q.options[candidate.index];
   if (!opt) return false;
@@ -397,8 +483,12 @@ function readPage(cfg, doc, depth) {
   }
 
   model.fingerprint = fingerprint(model);
-  model.isTerminal = !model.next || (model.questions.length === 0 && !!model.outcome);
-  if (model.isTerminal && !model.outcome && !model.questions.length) model.stuck = true;
+  // Terminal means "nothing left to do here": no questions and no way forward.
+  // A page with unanswered questions but no visible button is a carousel or a
+  // validation state, not the end of the survey.
+  model.isTerminal = !model.next && !model.questions.length;
+  model.needsAnswerFirst = !model.next && model.questions.length > 0;
+  if (model.isTerminal && !model.outcome) model.stuck = true;
   return model;
 }
 
