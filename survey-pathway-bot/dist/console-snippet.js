@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "f7f57cc 2026-08-28 02:58";
+const SPB_BUILD = "2acbb34 2026-08-28 03:04";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
