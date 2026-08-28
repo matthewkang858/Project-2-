@@ -170,7 +170,7 @@ def parse(path):
             if marker and not entry['text']:
                 q['grid'] = True
                 q['_mode'] = 'rows' if marker.lower().startswith('rows') else 'columns'
-                q.setdefault('gridTags', []).append(marker)
+                q.setdefault('gridTags', []).extend(entry['tags'])
                 continue
             target = q.get('_mode')
             if num[1] != q['numId'] and not target:
