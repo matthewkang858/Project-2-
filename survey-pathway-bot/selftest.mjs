@@ -119,6 +119,10 @@ try {
     const ts = readdirSync(join(o, 'runs')).map((f) => JSON.parse(readFileSync(join(o, 'runs', f), 'utf8')));
     check(r.code === 0 && ts.every((t) => t.outcome?.type === 'complete'), 'completes the tower-of-divs carousel (handler on a middle level)');
     check(
+      ts.every((t) => t.decisions.find((d) => d.key.startsWith('card1:'))?.candidateCount === 9),
+      'all nine answer buttons are offered as branches (Q58 shape)'
+    );
+    check(
       new Set(ts.map((t) => t.decisions.find((d) => d.key.startsWith('card1:'))?.chosenIndex)).size >= 3,
       'tower carousel still branches across all three answers'
     );

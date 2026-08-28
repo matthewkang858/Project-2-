@@ -455,7 +455,10 @@ function pageModel(cfg, doc) {
     let bestScore = -1;
     for (const [, bySig] of groups) {
       for (const [, els] of bySig) {
-        if (els.length < 2 || els.length > 8) continue;
+        // Q58-style card questions offer nine role buttons; radios elsewhere
+        // in this questionnaire go to 22 options — the cap only exists to
+        // reject page furniture, so it is generous.
+        if (els.length < 2 || els.length > 26) continue;
         if (new Set(els.map((e) => clean(e.innerText))).size !== els.length) continue;
         // The answer row sits below the pager; a look-alike group above it
         // (peeking card faces, say) must not win.

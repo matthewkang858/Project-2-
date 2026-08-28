@@ -414,7 +414,7 @@ createServer((req, res) => {
           <div class="swiper-button-next swiper-button-disable" role="button" aria-label="Next slide"></div>
         </div>
         <div class="content-container">
-          ${['Key decision-maker', 'Influencer', 'No role in the process'].map((t, i) =>
+          ${['Key decision-maker', 'Influencer', 'No role in the process', 'Chief AI Officer (CAIO)', 'Chief Technology Officer (CTO)', 'Chief Information Officer (CIO)', 'Chief Operating Officer (COO)', 'Chief Financial Officer (CFO)', 'Other'].map((t, i) =>
             `<div class="cell"><div class="box">${rows.map((_, r) => `<input type="radio" name="ans32900.0.${r}" value="${i + 1}">`).join('')}<div class="middle"><div class="mx-card" data-a="${i + 1}"><div class="mx-carouselapp-scale">${t}</div></div></div></div></div>`
           ).join('')}
         </div>
