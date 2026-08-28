@@ -151,6 +151,138 @@ def pair_score(q, entry):
     return s
 
 
+def live_from_traces(traces_path):
+    """Full-fidelity live entries from a traces export: complete stem text,
+    complete option labels, and the captured bold/underline phrases."""
+    data = json.load(open(traces_path, encoding='utf-8'))
+    traces = data['traces'] if isinstance(data, dict) else data
+    full = {}
+    order_n = 0
+    for t in traces:
+        for step in t.get('steps', []):
+            for q in step.get('questions', []):
+                key = q['key']
+                cm = re.match(r'card\d+:', key)
+                if cm:
+                    gkey = 'cards:' + re.sub(r'[^a-z0-9]+', '-', (q.get('label') or '').split('—')[0].lower())[:40]
+                else:
+                    if MACHINE.match(key) or key.startswith('[data-spb'):
+                        continue
+                    gkey = re.sub(r'([._-]\d+)+$', '', key)
+                e = full.setdefault(gkey, {'label': '', 'emphasis': {'bold': set(), 'underline': set()},
+                                           'options': {}, 'order': order_n})
+                order_n += 1
+                lab = (q.get('label') or '').split(' — ')[0]
+                if len(lab) > len(e['label']):
+                    e['label'] = lab
+                for kind in ('bold', 'underline'):
+                    e['emphasis'][kind] |= set((q.get('emphasis') or {}).get(kind, []))
+                for o in q.get('options', []):
+                    if not o.get('label'):
+                        continue
+                    oe = e['options'].setdefault(o['label'], {'bold': set(), 'underline': set()})
+                    for kind in ('bold', 'underline'):
+                        oe[kind] |= set((o.get('emphasis') or {}).get(kind, []))
+    return full
+
+
+def opt_sim(a, b):
+    """Character-bigram dice — word-level dice returns 0 for short or
+    symbol-heavy labels like “$5M-$9.9M”, which are common answer options."""
+    na = re.sub(r'\s+', ' ', a).strip().lower()
+    nb = re.sub(r'\s+', ' ', b).strip().lower()
+    if na == nb:
+        return 1.0
+    A = {na[i:i + 2] for i in range(len(na) - 1)}
+    B = {nb[i:i + 2] for i in range(len(nb) - 1)}
+    if not A or not B:
+        return 1.0 if na == nb else 0.0
+    return 2 * len(A & B) / (len(A) + len(B))
+
+
+def phrase_in(phrase, pool):
+    p = re.sub(r'\s+', ' ', phrase).strip().lower()
+    return any(p in re.sub(r'\s+', ' ', x).strip().lower() or opt_sim(phrase, x) > 0.85 for x in pool)
+
+
+def check_full_text(q, entry, summary, qn):
+    """Wording, option presence/spelling and emphasis against a traces entry.
+    -> (D_ok, E_ok, notes)"""
+    notes = []
+    # D — full wording, word by word
+    ow = [w for w in re.sub(r'[^\w ]', ' ', q['text'].lower()).split() if w]
+    lw = [w for w in re.sub(r'[^\w ]', ' ', entry['label'].lower()).split() if w]
+    missing_w = [w for w in ow if w not in lw]
+    extra_w = [w for w in lw if w not in ow and not w.isdigit()]
+    d_ok = not missing_w and len(extra_w) <= 2
+    if d_ok:
+        notes.append('full wording verified against the live text')
+    else:
+        bits = []
+        if missing_w:
+            bits.append('outline words missing live: "' + ' '.join(missing_w[:12]) + '"')
+        if extra_w:
+            bits.append('live has extra: "' + ' '.join(extra_w[:12]) + '"')
+        notes.append('WORDING DIFFERS — ' + '; '.join(bits))
+        summary.append(f"{qn}: wording differs — {'; '.join(bits)}"[:180])
+
+    # options — presence and spelling
+    opts = q['options'] or q.get('columns', [])
+    live_opts = list(entry['options'].keys())
+    if opts and live_opts:
+        # one-to-one greedy assignment, best pairs first — otherwise a truly
+        # missing option can claim a lookalike neighbour ($500M-$999M would
+        # match $50M-$99.9M) and hide as a "spelling difference"
+        checkable = [o for o in opts
+                     if not any(re.match(r'(if |display|show)', t, re.I) for t in o['tags'])]
+        pairs = sorted(((opt_sim(o['text'], lo), oi, lo)
+                        for oi, o in enumerate(checkable) for lo in live_opts),
+                       key=lambda p: -p[0])
+        assigned, used = {}, set()
+        for sc, oi, lo in pairs:
+            if sc < 0.55:
+                break
+            if oi in assigned or lo in used:
+                continue
+            assigned[oi] = (lo, sc)
+            used.add(lo)
+        for oi, o in enumerate(checkable):
+            if oi not in assigned:
+                notes.append(f"MISSING CHOICE — outline option {o['letter']} “{o['text'][:55]}” not found live")
+                summary.append(f"{qn}: option {o['letter']} “{o['text'][:50]}” missing live")
+                continue
+            best, best_s = assigned[oi]
+            if o['text'].strip().lower() != best.strip().lower() and best_s < 0.98:
+                notes.append(f"option {o['letter']} wording differs — outline “{o['text'][:45]}” vs live “{best[:45]}”")
+                summary.append(f"{qn} opt {o['letter']}: “{o['text'][:40]}” vs live “{best[:40]}”")
+            # emphasis on the option
+            for kind in ('bold', 'underline'):
+                for phrase in (o.get('emphasis') or {}).get(kind, []):
+                    if not phrase_in(phrase, entry['options'][best][kind]):
+                        notes.append(f"option {o['letter']}: “{phrase[:35]}” is {kind} in the questionnaire but not live")
+                        summary.append(f"{qn} opt {o['letter']}: “{phrase[:35]}” should be {kind}")
+        for lo in live_opts:
+            if lo not in used and not any(opt_sim(lo, o['text']) >= 0.55 for o in opts):
+                notes.append(f"EXTRA live choice not in outline — “{lo[:55]}”")
+                summary.append(f"{qn}: live has extra choice “{lo[:50]}”")
+
+    # E — stem emphasis
+    e_probs = []
+    for kind in ('bold', 'underline'):
+        for phrase in (q.get('emphasis') or {}).get(kind, []):
+            if not phrase_in(phrase, entry['emphasis'][kind]):
+                e_probs.append(f'“{phrase[:40]}” should be {kind}')
+    opt_e = [n for n in notes if 'is bold in the questionnaire' in n or 'is underline in the questionnaire' in n]
+    e_ok = not e_probs and not opt_e
+    if e_ok:
+        notes.append('bold/underline verified — every emphasised questionnaire phrase is emphasised live')
+    else:
+        for pr in e_probs:
+            notes.append('EMPHASIS MISSING — ' + pr)
+            summary.append(f'{qn}: {pr}')
+    return d_ok, e_ok, notes
+
+
 def match(spec, live):
     """Order-preserving alignment: live ans-ids run monotonically through the
     survey, exactly like outline question numbers, so the pairing is a
@@ -190,6 +322,7 @@ def match(spec, live):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--report', required=True)
+    ap.add_argument('--traces', help='traces JSON export — upgrades wording, option-text and bold/underline checks')
     ap.add_argument('--spec', required=True)
     ap.add_argument('--workbook', required=True)
     ap.add_argument('--general', default='General QA – MK')
@@ -201,6 +334,7 @@ def main():
     spec = json.load(open(args.spec))
     live = build_live(report)
     matched = match(spec, live)
+    full = live_from_traces(args.traces) if args.traces else None
     rules = rules_by_question(spec)
     questions = {q['q']: q for q in spec['questions']}
     doc_findings = defaultdict(list)
@@ -244,17 +378,26 @@ def main():
             cols['C'] = False
             notes.append('skippability not tested — the bot always answers before continuing')
 
-            # D — wording, to the report's 60-char truncation
-            score = prefix_dice(q['text'], lv['label'])
-            if score >= 0.75:
-                cols['D'] = True
-                notes.append('wording matches to the report’s 60-char truncation — full-text check needs the traces export')
+            full_entry = None
+            if full:
+                fk = m['key']
+                full_entry = full.get(fk) or next((v for k, v in full.items() if k.startswith(fk) or fk.startswith(k)), None)
+            if full_entry:
+                d_ok, e_ok, tnotes = check_full_text(q, full_entry, summary, qn)
+                cols['D'] = d_ok
+                cols['E'] = e_ok
+                notes.extend(tnotes)
             else:
-                notes.append(f"wording prefix differs from the questionnaire (similarity {score:.2f}): live shows “{lv['label'][:70]}”")
-
-            # E — formatting: not present in a report
-            cols['E'] = False
-            notes.append('bold/underline not captured in the report — needs the traces export')
+                # D — wording, to the report's 60-char truncation
+                score = prefix_dice(q['text'], lv['label'])
+                if score >= 0.75:
+                    cols['D'] = True
+                    notes.append('wording matches to the report’s 60-char truncation — full-text check needs the traces export')
+                else:
+                    notes.append(f"wording prefix differs from the questionnaire (similarity {score:.2f}): live shows “{lv['label'][:70]}”")
+                # E — formatting: not present in a report
+                cols['E'] = False
+                notes.append('bold/underline not captured in the report — needs the traces export')
 
             # F — randomization, from order variation across runs
             if not has_random:
