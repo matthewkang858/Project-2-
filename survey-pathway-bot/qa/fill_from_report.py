@@ -204,14 +204,22 @@ def live_from_traces(trace_paths):
             for q in step.get('questions', []):
                 key = q['key']
                 cm = re.match(r'card\d+:', key)
+                is_slider = q.get('kind') == 'slider' or key.startswith('[data-spb')
                 if cm:
                     # full slug — a 40-char cut cannot tell apart sibling grids
                     # that share an opening ("To what extent would you …")
                     gkey = 'cards:' + re.sub(r'[^a-z0-9]+', '-', (q.get('label') or '').split('—')[0].lower())[:160]
                     frac += 1
                     order = last_ans + frac / 1000.0
+                elif is_slider:
+                    # sliders share one unstable [data-spb] key, so the report
+                    # collapses every slider page into a single row; keyed by
+                    # the preceding ans-id they stay distinct pages
+                    gkey = f'slider:{int(last_ans)}'
+                    frac += 1
+                    order = last_ans + frac / 1000.0
                 else:
-                    if MACHINE.match(key) or key.startswith('[data-spb'):
+                    if MACHINE.match(key):
                         continue
                     gkey = re.sub(r'([._-]\d+)+$', '', key)
                     am = re.match(r'ans(\d+)', gkey)
@@ -222,7 +230,7 @@ def live_from_traces(trace_paths):
                         last_ans, frac = order, 0
                 e = full.setdefault(gkey, {'label': '', 'emphasis': {'bold': set(), 'underline': set()},
                                            'options': {}, 'order': order,
-                                           'ckind': 'cards' if cm else 'form'})
+                                           'ckind': 'cards' if cm else ('slider' if is_slider else 'form')})
                 lab = (q.get('label') or '').split(' — ')[0]
                 if len(lab) > len(e['label']):
                     e['label'] = lab
@@ -275,12 +283,20 @@ def assign_full(spec, full):
     n, m = len(qs), len(entries)
     dp = [[0.0] * (m + 1) for _ in range(n + 1)]
     back = [[None] * (m + 1) for _ in range(n + 1)]
+    def score(q, e):
+        if e.get('ckind') == 'slider':
+            # a slider's captured label is its tick marks, not the stem —
+            # pair by kind and sequence position instead
+            blob = ' '.join([q['raw']] + q.get('notes', []) + [o['text'] for o in q['options']])
+            return 0.65 if re.search(r'sliding scale', blob, re.I) else 0.0
+        return prefix_dice(q['text'], e['label'])
+
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             best, move = dp[i - 1][j], 'up'
             if dp[i][j - 1] > best:
                 best, move = dp[i][j - 1], 'left'
-            sc = prefix_dice(qs[i - 1]['text'], entries[j - 1]['label'])
+            sc = score(qs[i - 1], entries[j - 1])
             if sc >= 0.6 and dp[i - 1][j - 1] + sc > best:
                 best, move = dp[i - 1][j - 1] + sc, 'diag'
             dp[i][j], back[i][j] = best, move
@@ -513,13 +529,19 @@ def main():
             # sharing the same opening, but the traces hold its full stem: it
             # rendered live. Verify text and emphasis from the trace; the
             # report-level columns get soft notes.
-            notes.append('rendered live — verified from the raw traces (the report merged it with a sibling '
-                         'question sharing the same 60-char opening)')
-            notes.append('skippability not tested — the bot always answers before continuing')
-            d_ok, e_ok, tnotes = check_full_text(q, full_entry, summary, qn)
-            cols['D'] = d_ok
-            cols['E'] = e_ok
-            notes.extend(tnotes)
+            if full_entry.get('ckind') == 'slider':
+                notes.append('rendered live — the traces show a slider page exactly at this question’s slot '
+                             '(the report merges every slider into one row because they share a key)')
+                notes.append('skippability not tested — the bot always answers before continuing')
+                notes.append('slider stem text/formatting is not captured — check the wording and emphasis by eye')
+            else:
+                notes.append('rendered live — verified from the raw traces (the report merged it with a sibling '
+                             'question sharing the same 60-char opening)')
+                notes.append('skippability not tested — the bot always answers before continuing')
+                d_ok, e_ok, tnotes = check_full_text(q, full_entry, summary, qn)
+                cols['D'] = d_ok
+                cols['E'] = e_ok
+                notes.extend(tnotes)
             if not has_random:
                 cols['F'] = True
                 notes.append('n/a — not randomized per questionnaire')
@@ -527,7 +549,8 @@ def main():
                 notes.append('randomization not separable from the sibling grids in the report capture — check by eye')
             expect = q['type']
             cols['G'] = expect in ('SP', 'unspecified')
-            notes.append('single-choice card grid live' if expect == 'SP' else f'outline says {expect} — check the live control by eye')
+            notes.append(('slider rendered live' if full_entry.get('ckind') == 'slider' else 'single-choice card grid live')
+                         if expect == 'SP' else f'outline says {expect} — check the live control by eye')
             cols['H'] = not has_exclusive
             notes.append('n/a — no exclusive/anchor option' if not has_exclusive
                          else 'exclusive/anchor behaviour not exercised')
@@ -586,7 +609,9 @@ def main():
             cols['C'] = False
             notes.append('skippability not tested — the bot always answers before continuing')
 
-            if full_entry:
+            if full_entry and full_entry.get('ckind') == 'slider':
+                notes.append('slider stem text/formatting is not captured by the bot — check the wording and emphasis by eye')
+            elif full_entry:
                 d_ok, e_ok, tnotes = check_full_text(q, full_entry, summary, qn)
                 cols['D'] = d_ok
                 cols['E'] = e_ok
