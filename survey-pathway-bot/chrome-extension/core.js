@@ -497,7 +497,9 @@ function pageModel(cfg, doc) {
         group: 'cards:' + clean(stem).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30),
         required: true,
         selector: cssFor(best[0]),
-        emphasis: { bold: [], underline: [] },
+        emphasis: marksOf(
+          doc.querySelector('h1, h2, .page-title, .qtitle, .question-text, .survey-title')
+        ),
         answered: best.some((b) => /\b(sel|selected|active|checked)\b/i.test(b.className || '') || b.getAttribute('aria-pressed') === 'true'),
         options: best.map((b) => {
           let target = b;
