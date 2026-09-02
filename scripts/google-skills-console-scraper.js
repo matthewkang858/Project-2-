@@ -1,24 +1,23 @@
 /**
- * Google Skills catalog scraper (v2) — paste into the Chrome DevTools console on:
+ * Google Skills catalog scraper (v3) — paste into the Chrome DevTools console on:
  * https://www.skills.google/catalog?format%5B%5D=courses
  *
- * How it works (built from the real page markup):
- *   The catalog's <ql-search-result-container> element carries a
- *   `pagedsearchresults` attribute containing JSON: searchResults[] (title,
- *   duration, level, path, credentialType), resultsCount, itemsPerPage, and
- *   the backend list URL (e.g. /catalog/list?format[]=courses&...).
- *   v2 fetches that URL with &page=N for every page and parses the same JSON
- *   out of each response — no clicking, no scrolling. If fetching fails, it
- *   falls back to clicking the next-page arrow inside the container's shadow
- *   DOM and harvesting each page as it renders.
+ * How it works: the catalog page embeds each page's results as JSON in the
+ * `pagedsearchresults` attribute of <ql-search-result-container> (title,
+ * duration, level, path, credentialType, resultsCount, itemsPerPage).
+ * v3 fetches the CATALOG PAGE ITSELF with ?page=2, ?page=3, ... and reads
+ * that same attribute out of each response — the one place the data is
+ * guaranteed to exist, since it's exactly what the live page renders from.
+ * (v2 hit the internal /catalog/list endpoint, which answers in a different
+ * format and parsed as empty.)
  *
  * Controls:
  *   window.__GS_STOP = true   // stop
  *   __GS_EXPORT()             // download CSV of everything collected so far
  *   __GS_RESET()              // wipe saved data
  */
-(async function scrapeGoogleSkillsV2() {
-  const PAUSE_MS = 700;
+(async function scrapeGoogleSkillsV3() {
+  const PAUSE_MS = 800;
   const LS_KEY = 'gs_scrape_v1';
   window.__GS_STOP = false;
 
@@ -37,7 +36,7 @@
   }
   window.__GS_RESET = () => { localStorage.removeItem(LS_KEY); data.clear(); console.log('Cleared saved data.'); };
 
-  // ----- duration: "30 minutes", "45 minutes", "1 hour 15 minutes", "3 hours 45 minutes" -----
+  // ----- duration: "30 minutes", "1 hour 15 minutes", "3 hours 45 minutes" -----
   function parseDuration(text) {
     if (!text) return { length: '', hours: '' };
     const h = text.match(/(\d+(?:\.\d+)?)\s*hours?/i);
@@ -65,12 +64,22 @@
     return 0;
   }
 
-  // ----- read the live container's embedded JSON -----
-  function containerJSON(doc) {
-    const el = (doc || document).querySelector('ql-search-result-container');
-    if (!el) return null;
-    try { return JSON.parse(el.getAttribute('pagedsearchresults') || 'null'); }
-    catch { return null; }
+  // ----- pull the embedded JSON out of a document or raw HTML string -----
+  function extractJSON(docOrHtml) {
+    if (typeof docOrHtml !== 'string') {
+      const el = docOrHtml.querySelector('ql-search-result-container');
+      if (el) {
+        try { return JSON.parse(el.getAttribute('pagedsearchresults') || 'null'); } catch {}
+      }
+      return null;
+    }
+    // raw-text fallback: find the attribute and decode HTML entities
+    const m = docOrHtml.match(/pagedsearchresults="([^"]*)"/i);
+    if (!m) return null;
+    const decoded = m[1]
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    try { return JSON.parse(decoded); } catch { return null; }
   }
 
   // ----- export -----
@@ -92,7 +101,7 @@
   };
 
   // ----- main -----
-  const seed = containerJSON();
+  const seed = extractJSON(document);
   if (!seed) {
     console.error('Could not find the results container. Are you on https://www.skills.google/catalog with results visible?');
     return;
@@ -100,7 +109,6 @@
   const total = seed.resultsCount || 0;
   const perPage = seed.itemsPerPage || 8;
   const pages = Math.max(1, Math.ceil(total / perPage));
-  const listPath = seed.path; // e.g. /catalog/list?format[]=courses&keywords=&level[]=__any__&locale=
   console.log(`%cScraping Google Skills: ${total} results, ${pages} pages of ${perPage}. Stop: window.__GS_STOP = true`, 'color:#fff;background:#1a73e8;font-weight:bold');
 
   let added = 0;
@@ -108,75 +116,40 @@
   persist();
   console.log(`Page 1 (from live page): +${added} (total ${data.size}/${total})`);
 
-  // --- primary: fetch each page's HTML fragment and read its embedded JSON ---
-  let fetchWorks = true;
-  for (let page = 1; page <= pages && !window.__GS_STOP; page++) {
-    try {
-      const sep = listPath.includes('?') ? '&' : '?';
-      const res = await fetch(`${listPath}${sep}page=${page}`, {
-        credentials: 'same-origin',
-        headers: { 'Accept': 'text/html, */*' },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const html = await res.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      let json = containerJSON(doc);
-      if (!json) {
-        // some deployments return bare JSON instead of an HTML fragment
-        try { json = JSON.parse(html); } catch {}
-      }
-      const results = json?.searchResults || json?.results;
-      if (!results || !results.length) throw new Error('no results parsed');
-      let got = 0;
-      for (const r of results) got += addResult(r);
-      persist();
-      if (page % 5 === 0 || page === pages) console.log(`Page ${page}/${pages}: total ${data.size}/${total}`);
-      await sleep(PAUSE_MS);
-    } catch (e) {
-      console.warn(`Fetch mode failed on page ${page} (${e.message}) — switching to click-through mode.`);
-      fetchWorks = false;
-      break;
-    }
+  // fetch the catalog page itself with ?page=N — same URL you're on now
+  function pageURL(n) {
+    const u = new URL(location.href);
+    u.searchParams.set('page', String(n));
+    return u.pathname + u.search;
   }
 
-  // --- fallback: click the next-page arrow inside the shadow DOM ---
-  if (!fetchWorks && !window.__GS_STOP) {
-    const container = document.querySelector('ql-search-result-container');
-    const sr = () => container.shadowRoot;
-    const pageLabel = () => sr()?.querySelector('.pagination-page')?.textContent?.trim() || '';
-
-    function harvestShadowCards() {
-      let got = 0;
-      for (const card of sr()?.querySelectorAll('ql-activity-card') || []) {
-        const root = card.shadowRoot || card;
-        const a = root.querySelector('a.wrapper-link');
-        if (!a) continue;
-        const durEl = root.querySelector('.duration span, .duration');
-        got += addResult({
-          title: a.getAttribute('title') || root.querySelector('h3.name')?.textContent || '',
-          path: a.getAttribute('href') || '',
-          duration: durEl ? durEl.textContent.replace(/^pace/i, '').trim() : '',
-          type: 'course',
-        });
+  let emptyStreak = 0;
+  for (let page = 2; page <= pages && !window.__GS_STOP; page++) {
+    let got = 0;
+    try {
+      const res = await fetch(pageURL(page), { credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+      let json = extractJSON(new DOMParser().parseFromString(html, 'text/html')) || extractJSON(html);
+      const results = json?.searchResults;
+      if (!results || !results.length) {
+        console.warn(`Page ${page}: could not parse results. First 1200 chars of response (paste back to Claude if this keeps happening):`);
+        console.log(html.slice(0, 1200));
+        throw new Error('no results parsed');
       }
+      for (const r of results) got += addResult(r);
       persist();
-      return got;
+    } catch (e) {
+      console.warn(`Page ${page} failed: ${e.message}`);
     }
-
-    harvestShadowCards();
-    for (let i = 0; i < pages + 5 && !window.__GS_STOP; i++) {
-      if (data.size >= total) break;
-      const before = pageLabel();
-      const next = sr()?.querySelector('ql-icon-button.next-page');
-      const nextBtn = next?.shadowRoot?.querySelector('button') || next;
-      if (!next || next.hasAttribute('disabled')) { console.log('Next-page button disabled — reached the end.'); break; }
-      nextBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
-      // wait for the page label ("9 - 16 of 607") to change
-      for (let w = 0; w < 40 && pageLabel() === before; w++) await sleep(250);
-      await sleep(400);
-      harvestShadowCards();
-      if (i % 5 === 0) console.log(`${pageLabel()} — total ${data.size}/${total}`);
-    }
+    if (got === 0) {
+      if (++emptyStreak >= 3) {
+        console.error('3 pages in a row added nothing — the ?page= parameter may be ignored or the session is being rate-limited. Stopping; paste the warnings above back to Claude.');
+        break;
+      }
+    } else emptyStreak = 0;
+    if (page % 5 === 0 || page === pages) console.log(`Page ${page}/${pages}: total ${data.size}/${total}`);
+    await sleep(PAUSE_MS);
   }
 
   console.log(`%cFinished with ${data.size} rows (site reported ${total}).`, 'color:green;font-weight:bold');
