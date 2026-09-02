@@ -1,25 +1,26 @@
 /**
- * ed2go course scraper — paste into the Chrome DevTools console while on:
- * https://www.ed2go.com/search
+ * ed2go course scraper (v2) — paste into the Chrome DevTools console while on:
+ * https://www.ed2go.com/search  (with results visible)
  *
- * Repeatedly clicks the "Load More" button (with real pointer events),
- * harvesting every course card as it appears: name, duration (weeks),
- * course hours, price. Rows persist in localStorage after every round, so
- * a reload never loses progress — re-paste the script to resume.
+ * Built against ed2go's real search results:
+ *   - course links have 4+ path segments: /courses/<cat>/<sub>/<ilc|ctp>/<slug>
+ *   - durations appear as "6 Weeks / 24 Course Hours" or "3 Months / 24 Course Hours"
+ *   - "Course type: Fundamentals", "Open Enrollment" or "Starting <dates>"
  *
- * If it can't parse any cards, it prints the first card's markup on its
- * own — paste that output back to Claude for exact selectors.
+ * Clicks Load More until all ~987 results are collected, harvesting every
+ * round and persisting to localStorage (a reload never loses progress —
+ * re-paste to resume). Exports CSV at the end.
  *
  * Controls:
- *   window.__E2_STOP = true   // stop clicking/collecting
+ *   window.__E2_STOP = true   // stop
  *   __E2_EXPORT()             // download CSV of everything collected so far
- *   __E2_RESET()              // wipe saved data and start fresh
+ *   __E2_RESET()              // wipe saved data
  */
-(async function scrapeEd2go() {
-  const PAUSE_MS = 1800;      // wait after each Load More click
-  const MAX_IDLE = 8;         // stop after this many rounds with nothing new
+(async function scrapeEd2goV2() {
+  const PAUSE_MS = 1800;
+  const MAX_IDLE = 8;
   const MAX_ROUNDS = 1000;
-  const LS_KEY = 'e2_scrape_v1';
+  const LS_KEY = 'e2_scrape_v2';
   window.__E2_STOP = false;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -37,68 +38,75 @@
   }
   window.__E2_RESET = () => { localStorage.removeItem(LS_KEY); data.clear(); console.log('Cleared saved data.'); };
 
-  // ----- cards -----
-  function getCards() {
-    const cards = new Set();
-    // Course links on ed2go contain /courses/ (category pages do too, but
-    // those cards won't parse a duration and get filtered out).
-    for (const a of document.querySelectorAll('a[href*="/courses/"], a[href*="/course/"]')) {
-      const card = a.closest('li, article, [class*="card" i], [class*="result" i], [class*="tile" i], div');
-      if (card && (card.innerText || '').trim().length > 20) cards.add(card);
-    }
-    return [...cards];
+  // Course links: /courses/ + at least 3 more path segments
+  const COURSE_HREF = /^\/courses\/[^/]+\/[^/]+\/[^/]+\/[^/?#]+/;
+  const DURATION_RE = /(\d+(?:\.\d+)?)\s*(Weeks?|Months?)\s*\/\s*([\d,]+(?:\.\d+)?)\s*Course\s*Hours?/i;
+
+  function getCourseLinks() {
+    return [...document.querySelectorAll('a[href]')].filter((a) =>
+      COURSE_HREF.test(a.getAttribute('href') || '')
+    );
   }
 
-  function parseCard(card) {
-    const text = (card.innerText || '').replace(/\s+/g, ' ').trim();
-
-    let name = '';
-    const heading = card.querySelector('h1,h2,h3,h4,h5,[class*="title" i]');
-    if (heading) name = (heading.innerText || '').trim().split('\n')[0];
-    if (!name) {
-      const link = card.querySelector('a[href*="/course"]');
-      if (link) name = (link.innerText || '').trim().split('\n')[0];
+  function cardFor(link) {
+    // Climb until the container's text includes the duration line, but stop
+    // if it starts spanning multiple courses.
+    let el = link;
+    for (let i = 0; i < 8 && el.parentElement; i++) {
+      el = el.parentElement;
+      const linksInside = [...el.querySelectorAll('a[href]')].filter((a) =>
+        COURSE_HREF.test(a.getAttribute('href') || '')
+      ).length;
+      if (linksInside > 1) return null; // overshot into the results list
+      if (DURATION_RE.test(el.innerText || '')) return el;
     }
-    name = name.trim();
+    return null;
+  }
 
-    // "Duration: 6 Weeks" / "6 weeks"
-    let weeks = '';
-    const w = text.match(/(\d+(?:\.\d+)?)\s*weeks?\b/i);
-    if (w) weeks = w[1];
+  function parseCard(link, card) {
+    const text = (card.innerText || '').replace(/\s+/g, ' ').trim();
+    const name = (link.innerText || '').trim();
 
-    // "24 Course Hrs" / "24 hours" / "24 hrs"
-    let hours = '';
-    const h = text.match(/(\d+(?:\.\d+)?)\s*(?:course\s*)?(?:hrs?|hours?)\b/i);
-    if (h) hours = h[1];
+    let weeks = '', months = '', hours = '';
+    const d = text.match(DURATION_RE);
+    if (d) {
+      const n = d[1], unit = d[2].toLowerCase(), h = d[3].replace(/,/g, '');
+      if (unit.startsWith('week')) weeks = n; else months = n;
+      hours = h;
+    }
 
-    // Months, for self-paced listings that use them
-    let months = '';
-    const mo = text.match(/(\d+(?:\.\d+)?)\s*months?\b/i);
-    if (mo) months = mo[1];
+    const typeMatch = text.match(/Course type:\s*(.+?)(?:\s{2,}|\s(?=[A-Z0-9].{30,}))/);
+    let courseType = '';
+    const t = text.match(/Course type:\s*([A-Za-z ]+?)(?=\s*[A-Z0-9].*)/);
+    courseType = (typeMatch?.[1] || t?.[1] || '').trim();
 
-    let price = '';
-    const p = text.match(/\$\s?([\d,]+(?:\.\d{2})?)/);
-    if (p) price = p[1].replace(/,/g, '');
+    const schedule = /Open Enrollment/i.test(text)
+      ? 'Open Enrollment'
+      : (text.match(/Starting\s+([^|]+(?:\|[^|]+)*)/i)?.[0] || '').trim().slice(0, 80);
 
-    const link = card.querySelector('a[href*="/course"]');
-    const url = link ? new URL(link.getAttribute('href'), location.origin).href.split('?')[0] : '';
-
-    return { key: url || name, name, weeks, months, hours, price, url };
+    const url = new URL(link.getAttribute('href'), location.origin).href.split('?')[0];
+    return { key: url, name, weeks, months, hours, courseType, schedule, url };
   }
 
   function harvest() {
     let added = 0;
-    for (const card of getCards()) {
-      const row = parseCard(card);
-      // A real course card has a duration of some kind
-      if (!row.name || (!row.weeks && !row.hours && !row.months)) continue;
+    for (const link of getCourseLinks()) {
+      const card = cardFor(link);
+      if (!card) continue;
+      const row = parseCard(link, card);
+      if (!row.name || (!row.weeks && !row.months)) continue;
       const existing = data.get(row.key);
       if (!existing) { data.set(row.key, row); added++; }
-      else for (const f of ['weeks', 'months', 'hours', 'price', 'url'])
+      else for (const f of ['weeks', 'months', 'hours', 'courseType', 'schedule'])
         if (!existing[f] && row[f]) existing[f] = row[f];
     }
     persist();
     return added;
+  }
+
+  function totalResults() {
+    const m = (document.body.innerText || '').match(/([\d,]+)\s*Results/i);
+    return m ? Number(m[1].replace(/,/g, '')) : null;
   }
 
   // ----- load more -----
@@ -120,36 +128,14 @@
     }
   }
 
-  // ----- self-diagnostic when parsing fails -----
-  function dumpDiagnostic() {
-    console.error('Parsed 0 courses. Diagnostic dump — paste ALL of this back to Claude:');
-    const leaves = [...document.querySelectorAll('body *')].filter(
-      (e) => e.children.length === 0 && /\d+\s*(weeks?|hrs?|hours?|months?)\b/i.test(e.textContent || '')
-    );
-    console.log(`Duration-looking elements: ${leaves.length}`);
-    if (leaves.length) {
-      let card = leaves[0];
-      for (let i = 0; i < 6 && card.parentElement; i++) {
-        card = card.parentElement;
-        if ((card.innerText || '').length > 80) break;
-      }
-      console.log('=== CARD innerText ===\n' + card.innerText);
-      console.log('=== CARD outerHTML (first 4000) ===\n' + card.outerHTML.slice(0, 4000));
-      card.querySelectorAll('a').forEach((x) => console.log('link:', x.getAttribute('href')));
-    } else {
-      console.log('Sample links on page:');
-      [...document.querySelectorAll('a[href]')].slice(0, 30).forEach((x) => console.log(x.getAttribute('href')));
-    }
-  }
-
   // ----- export -----
   window.__E2_EXPORT = async function () {
     const rows = [...data.values()];
-    console.table(rows.slice(0, 30), ['name', 'weeks', 'months', 'hours', 'price']);
+    console.table(rows.slice(0, 30), ['name', 'weeks', 'months', 'hours', 'courseType']);
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const csv = [
-      ['Course Name', 'Weeks', 'Months', 'Course Hours', 'Price', 'URL'].join(','),
-      ...rows.map((r) => [r.name, r.weeks, r.months, r.hours, r.price, r.url].map(esc).join(',')),
+      ['Course Name', 'Weeks', 'Months', 'Course Hours', 'Course Type', 'Schedule', 'URL'].join(','),
+      ...rows.map((r) => [r.name, r.weeks, r.months, r.hours, r.courseType, r.schedule, r.url].map(esc).join(',')),
     ].join('\n');
     try { await navigator.clipboard.writeText(csv); console.log('CSV copied ✔'); } catch {}
     const a = document.createElement('a');
@@ -161,34 +147,36 @@
   };
 
   // ----- main loop -----
-  console.log('%cScraping ed2go… Stop: window.__E2_STOP = true   Export: __E2_EXPORT()', 'color:#fff;background:#0057b8;font-weight:bold');
+  const target = totalResults();
+  console.log(`%cScraping ed2go… ${target ? target + ' results reported by the page.' : ''} Stop: window.__E2_STOP = true   Export: __E2_EXPORT()`, 'color:#fff;background:#0057b8;font-weight:bold');
 
   let added = harvest();
-  console.log(`Initial page: +${added} (total ${data.size})`);
-  if (data.size === 0) { dumpDiagnostic(); return; }
+  console.log(`Initial page: +${added} (total ${data.size}${target ? '/' + target : ''})`);
+  if (data.size === 0) {
+    console.error('Still parsed 0 courses — are the search results visible on this page?');
+    return;
+  }
 
   let idle = 0;
   for (let round = 0; round < MAX_ROUNDS && !window.__E2_STOP; round++) {
+    if (target && data.size >= target) { console.log('All results collected.'); break; }
+
     const btn = findLoadMore();
-    if (btn) {
-      if (round % 10 === 0) console.log('Clicking:', JSON.stringify((btn.innerText || btn.value || '').trim()));
-      realClick(btn);
-    } else {
-      // No button — maybe infinite scroll, or everything is loaded
-      window.scrollTo(0, document.body.scrollHeight);
-    }
+    if (btn) realClick(btn);
+    else window.scrollTo(0, document.body.scrollHeight);
     await sleep(PAUSE_MS);
 
     added = harvest();
     if (added > 0) {
       idle = 0;
-      console.log(`+${added} (total ${data.size})`);
+      console.log(`+${added} (total ${data.size}${target ? '/' + target : ''})`);
     } else if (++idle >= MAX_IDLE) {
-      console.log(btn ? 'Load More clicked but nothing new — done (or the site stopped serving).' : 'No Load More button and nothing new — done.');
+      console.log(btn ? 'Load More clicked but nothing new — stopping.' : 'No Load More button and nothing new — stopping.');
       break;
     }
   }
 
-  console.log(`%cFinished with ${data.size} courses.`, 'color:green;font-weight:bold');
+  const missing = [...data.values()].filter((r) => !r.hours).length;
+  console.log(`%cFinished with ${data.size} courses (${missing} missing hours).`, 'color:green;font-weight:bold');
   await window.__E2_EXPORT();
 })();
