@@ -1,29 +1,42 @@
 /**
- * Educative course scraper — paste into the Chrome DevTools console while on:
+ * Educative course scraper (v2) — paste into the Chrome DevTools console on:
  * https://www.educative.io/search?tab=courses
  *
- * Strategies, tried in order each round:
- *   1. __NEXT_DATA__ / embedded JSON scan (Educative is a Next.js app).
- *   2. DOM harvest of visible course cards (title + duration + level),
- *      clicking load-more/next controls and scrolling for more.
+ * Built against Educative's real search-results markup:
+ *   - each result is [data-testid^="search-result-tile-"] wrapping one
+ *     <a href="/courses/...">
+ *   - durations render as "26 h", "9 h 30 m", "45 m"
+ *   - level (Beginner/Intermediate/Advanced), rating "4.7", lesson counts
+ *   - the list loads more via an infinite-scroll sentinel
+ *     [data-testid="infinite-scroll-sentinel"] — so v2 ONLY scrolls, it never
+ *     clicks anything (v1 accidentally clicked the "Show more (382)" topics
+ *     filter, which opened the Filter-by-Topics modal).
  *
- * Rows persist in localStorage — re-paste to resume, results accumulate
- * across searches/categories too. If nothing parses, it prints a
- * diagnostic dump to paste back to Claude.
+ * If that modal is open, this closes it first. Rows persist in localStorage —
+ * re-paste to resume; results accumulate across tabs/filters too.
  *
  * Controls:
  *   window.__ED_STOP = true   // stop
  *   __ED_EXPORT()             // download CSV of everything collected so far
  *   __ED_RESET()              // wipe saved data
  */
-(async function scrapeEducative() {
-  const PAUSE_MS = 1600;
-  const MAX_IDLE = 8;
-  const MAX_ROUNDS = 600;
+(async function scrapeEducativeV2() {
+  const PAUSE_MS = 1500;
+  const MAX_IDLE = 10;
+  const MAX_ROUNDS = 1500;
   const LS_KEY = 'ed_scrape_v1';
   window.__ED_STOP = false;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ----- close any open filter/topics modal (the v1 "weird popup") -----
+  document.querySelectorAll('div.fixed.inset-0 svg line').forEach((line) => {
+    const modal = line.closest('div.fixed.inset-0');
+    if (modal && /Filter by Topics|Filters/i.test(modal.innerText || '')) {
+      const closer = line.closest('svg');
+      closer?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
+  });
 
   // ----- persistent store -----
   const data = new Map();
@@ -38,159 +51,79 @@
   }
   window.__ED_RESET = () => { localStorage.removeItem(LS_KEY); data.clear(); console.log('Cleared saved data.'); };
 
-  function put(row) {
-    if (!row.name || !row.length) return 0;
-    const existing = data.get(row.key);
-    if (!existing) { data.set(row.key, row); return 1; }
-    for (const f of ['length', 'hours', 'level', 'rating', 'url']) if (!existing[f] && row[f]) existing[f] = row[f];
-    return 0;
-  }
-
-  // ----- duration parsing -----
-  const DUR_RE = /(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)(?:\s*(\d+)\s*(?:minutes?|mins?))?|(\d+)\s*(?:minutes?|mins?)\b|(\d+)h(?:\s*(\d+)m)?\b|(\d+)m\b/i;
+  // ----- duration parsing: "26 h", "9 h 30 m", "45 m", "1.5 hours" -----
+  const DUR_RE = /(\d+(?:\.\d+)?)\s*h(?:ours?|rs?)?\b(?:\s*(\d+)\s*m(?:in(?:ute)?s?)?\b)?|(\d+)\s*m(?:in(?:ute)?s?)?\b/i;
   function parseDuration(text) {
     const m = text.match(DUR_RE);
     if (!m) return { length: '', hours: '' };
     let h = 0, min = 0;
     if (m[1] != null) { h = parseFloat(m[1]); min = parseInt(m[2] || 0); }
     else if (m[3] != null) min = parseInt(m[3]);
-    else if (m[4] != null) { h = parseInt(m[4]); min = parseInt(m[5] || 0); }
-    else if (m[6] != null) min = parseInt(m[6]);
     const length = (h ? h + 'h' : '') + (h && min ? ' ' : '') + (min ? min + 'm' : '');
     return { length, hours: String(Math.round((h + min / 60) * 100) / 100) };
   }
 
-  // ----- strategy 1: embedded JSON -----
-  function scanNextData() {
-    const tag = document.getElementById('__NEXT_DATA__');
-    if (!tag) return 0;
-    let root;
-    try { root = JSON.parse(tag.textContent); } catch { return 0; }
-    const TIME_KEYS = ['duration', 'durationHours', 'completionTime', 'estimatedTime', 'readingTime', 'total_time', 'time'];
-    let found = 0;
-    const seen = new Set();
-    (function walk(node) {
-      if (!node || typeof node !== 'object' || seen.has(node)) return;
-      if (seen.size < 300000) seen.add(node);
-      if (Array.isArray(node)) { node.forEach(walk); return; }
-      const title = node.title || node.name;
-      const timeKey = TIME_KEYS.find((k) => node[k] != null && node[k] !== '');
-      if (typeof title === 'string' && title.length > 2 && timeKey) {
-        const rawTime = String(node[timeKey]);
-        const { length, hours } = parseDuration(rawTime.match(/[a-z]/i) ? rawTime : rawTime + ' hours');
-        const slug = node.slug || node.url || node.urlPath || '';
-        const url = slug ? new URL(String(slug).startsWith('/') ? slug : '/courses/' + slug, location.origin).href : '';
-        if (length) found += put({
-          key: url || title, name: title, length, hours,
-          level: node.level || node.difficulty || '', rating: '', url,
-          source: 'json:' + timeKey,
-        });
-      }
-      for (const k of Object.keys(node)) walk(node[k]);
-    })(root);
-    if (found) {
-      const sample = [...data.values()].find((r) => r.source);
-      console.log(`__NEXT_DATA__ scan found ${found} entries (field "${sample?.source}") — verify a few in the table.`);
-    }
-    persist();
-    return found;
-  }
-
-  // ----- strategy 2: DOM harvest -----
-  const LINK_RE = /\/(courses|path|paths|module|projects|assessments|collection)\/[^/?#]+|\/courses\/[^/?#]+/;
-
-  function getCourseLinks() {
-    return [...document.querySelectorAll('a[href]')].filter((a) => {
-      const h = a.getAttribute('href') || '';
-      return LINK_RE.test(h) && !/\/search|\/signup|\/login|\/pricing/.test(h);
-    });
-  }
-
-  function cardFor(link) {
-    let el = link;
-    for (let i = 0; i < 8 && el.parentElement; i++) {
-      el = el.parentElement;
-      const inside = getCourseLinks().filter((a) => el.contains(a));
-      const distinct = new Set(inside.map((a) => a.getAttribute('href').split('?')[0]));
-      if (distinct.size > 1) return null;
-      if (DUR_RE.test(el.innerText || '')) return el;
-    }
-    return DUR_RE.test(link.innerText || '') ? link : null;
+  // ----- harvest the exact result tiles -----
+  function getTiles() {
+    return [...document.querySelectorAll('[data-testid^="search-result-tile-"]')];
   }
 
   function harvest() {
     let added = 0;
-    for (const link of getCourseLinks()) {
-      const card = cardFor(link);
-      if (!card) continue;
-      const text = (card.innerText || '').replace(/\s+/g, ' ').trim();
+    for (const tile of getTiles()) {
+      const link = tile.querySelector('a[href]');
+      if (!link) continue;
+      const href = link.getAttribute('href') || '';
+      const url = new URL(href, location.origin).href.split('?')[0];
 
-      let name = '';
-      const heading = card.querySelector('h1,h2,h3,h4,h5,[class*="title" i]');
-      if (heading) name = (heading.innerText || '').trim().split('\n')[0];
-      if (!name) name = (link.innerText || '').trim().split('\n')[0];
-      name = name.trim();
+      const titleEl = tile.querySelector('.content-emphasis.line-clamp-2, [class*="line-clamp"][class*="text-xl"], h1,h2,h3');
+      const name = ((titleEl?.innerText || link.innerText || '').trim()).split('\n')[0].trim();
+      if (!name) continue;
 
+      const text = (tile.innerText || '').replace(/\s+/g, ' ').trim();
       const { length, hours } = parseDuration(text);
-      const level = (text.match(/\b(Beginner|Intermediate|Advanced)\b/i)?.[1]) || '';
-      const rt = text.match(/(\d\.\d)\s*(?:\(|stars?|out of)/i);
-      const rating = rt ? rt[1] : '';
+      if (!length) continue;
 
-      const url = new URL(link.getAttribute('href'), location.origin).href.split('?')[0];
-      added += put({ key: url, name, length, hours, level, rating, url });
+      const kind = (text.match(/^(Course|Cloud Lab|Project|Path|Assessment|Mock Interview)\b/i)?.[1]) || '';
+      const level = (text.match(/\b(Beginner|Intermediate|Advanced)\b/)?.[1]) || '';
+      const rating = (text.match(/\b(\d\.\d)\b/)?.[1]) || '';
+      const free = /\bFree\b/.test(text) ? 'Free' : '';
+
+      const existing = data.get(url);
+      if (!existing) {
+        data.set(url, { key: url, name, length, hours, level, rating, kind, free, url });
+        added++;
+      } else {
+        for (const f of ['length', 'hours', 'level', 'rating', 'kind', 'free'])
+          if (!existing[f]) existing[f] = { length, hours, level, rating, kind, free }[f] || existing[f];
+      }
     }
     persist();
     return added;
   }
 
-  function findMoreControl() {
-    const els = [...document.querySelectorAll('button, a, [role="button"]')];
-    const candidates = els.filter((el) => {
-      const label = ((el.innerText || '') + ' ' + (el.getAttribute('aria-label') || '')).toLowerCase();
-      if (/options|menu|filter|cart|sign|log|pricing/.test(label)) return false;
-      return /(load|show|view|see)\s*more|more results|next page|go to next|^next$|›|→/.test(label);
-    });
-    return document.querySelector('[rel="next"]') || candidates[candidates.length - 1] || null;
+  function totalResults() {
+    const m = (document.body.innerText || '').match(/Search Results\s*\(([\d,]+)\)/i);
+    return m ? Number(m[1].replace(/,/g, '')) : null;
   }
 
-  function realClick(el) {
-    el.scrollIntoView({ block: 'center' });
-    const opts = { bubbles: true, cancelable: true, view: window };
-    for (const type of ['pointerover', 'pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click']) {
-      el.dispatchEvent(new PointerEvent(type, opts));
-    }
-  }
-
-  function dumpDiagnostic() {
-    console.error('Parsed 0 courses. Diagnostic dump — paste ALL of this back to Claude:');
-    const els = [...document.querySelectorAll('body *')].filter(
-      (e) => DUR_RE.test(e.textContent || '') && (e.textContent || '').length < 300
-    );
-    console.log(`Duration-mentioning elements: ${els.length}`);
-    if (els.length) {
-      let card = els[0];
-      for (let i = 0; i < 6 && card.parentElement; i++) {
-        card = card.parentElement;
-        if ((card.innerText || '').length > 100) break;
-      }
-      console.log('=== CARD text ===\n' + (card.innerText || ''));
-      console.log('=== CARD outerHTML (first 4000) ===\n' + card.outerHTML.slice(0, 4000));
-      card.querySelectorAll('a').forEach((x) => console.log('card link:', x.getAttribute('href')));
-    } else {
-      const main = document.querySelector('main') || document.body;
-      console.log('=== MAIN text (first 2000) ===\n' + (main.innerText || '').slice(0, 2000));
-      [...document.querySelectorAll('a[href]')].slice(0, 30).forEach((x) => console.log(x.getAttribute('href')));
-    }
+  // ----- scroll-only loading (no clicks!) -----
+  function nudgeScroll() {
+    const sentinel = document.querySelector('[data-testid="infinite-scroll-sentinel"]');
+    if (sentinel) sentinel.scrollIntoView({ block: 'center' });
+    const tiles = getTiles();
+    if (tiles.length) tiles[tiles.length - 1].scrollIntoView({ block: 'end' });
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
   // ----- export -----
   window.__ED_EXPORT = async function () {
     const rows = [...data.values()];
-    console.table(rows.slice(0, 30), ['name', 'length', 'hours', 'level', 'rating']);
+    console.table(rows.slice(0, 30), ['name', 'length', 'hours', 'level', 'rating', 'free']);
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const csv = [
-      ['Course Name', 'Length', 'Hours', 'Level', 'Rating', 'URL'].join(','),
-      ...rows.map((r) => [r.name, r.length, r.hours, r.level, r.rating, r.url].map(esc).join(',')),
+      ['Course Name', 'Length', 'Hours', 'Level', 'Rating', 'Type', 'Free', 'URL'].join(','),
+      ...rows.map((r) => [r.name, r.length, r.hours, r.level, r.rating, r.kind, r.free, r.url].map(esc).join(',')),
     ].join('\n');
     try { await navigator.clipboard.writeText(csv); console.log('CSV copied ✔'); } catch {}
     const a = document.createElement('a');
@@ -202,26 +135,30 @@
   };
 
   // ----- main -----
-  console.log('%cScraping Educative… Stop: window.__ED_STOP = true   Export: __ED_EXPORT()', 'color:#fff;background:#4951f5;font-weight:bold');
+  const target = totalResults();
+  console.log(`%cScraping Educative… ${target ? target + ' results reported.' : ''} Stop: window.__ED_STOP = true   Export: __ED_EXPORT()`, 'color:#fff;background:#4951f5;font-weight:bold');
 
-  const fromJson = scanNextData();
   let added = harvest();
-  console.log(`Initial: ${fromJson} from embedded JSON, +${added} from the page (total ${data.size})`);
-  if (data.size === 0) { dumpDiagnostic(); return; }
+  console.log(`Initial: +${added} (total ${data.size}${target ? '/' + target : ''})`);
+  if (data.size === 0) {
+    console.error('Parsed 0 tiles — are you on https://www.educative.io/search?tab=courses with results visible? If yes, paste this back to Claude:');
+    console.log('tiles found:', getTiles().length);
+    const first = document.querySelector('[data-testid="search-result-tile-0"]');
+    if (first) console.log(first.outerHTML.slice(0, 3000));
+    return;
+  }
 
   let idle = 0;
   for (let round = 0; round < MAX_ROUNDS && !window.__ED_STOP; round++) {
-    const btn = findMoreControl();
-    if (btn) realClick(btn);
-    else window.scrollTo(0, document.body.scrollHeight);
+    if (target && data.size >= target) { console.log('All results collected.'); break; }
+    nudgeScroll();
     await sleep(PAUSE_MS);
-
     added = harvest();
     if (added > 0) {
       idle = 0;
-      console.log(`+${added} (total ${data.size})`);
+      if (data.size % 100 < added) console.log(`+${added} (total ${data.size}${target ? '/' + target : ''})`);
     } else if (++idle >= MAX_IDLE) {
-      console.log('Nothing new after several rounds — done with this view. (Other tabs/filters accumulate if you re-run there.)');
+      console.log(`Nothing new after ${MAX_IDLE} scrolls — done with this view (${data.size}${target ? '/' + target : ''}).`);
       break;
     }
   }
