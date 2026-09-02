@@ -33,7 +33,7 @@
       const m = a.getAttribute('href').match(/\/learning\/([^/?#]+)/);
       if (!m) continue;
       const slug = m[1];
-      if (['search', 'me', 'topics', 'browse', 'subscription', 'paths'].includes(slug)) continue;
+      if (['search', 'me', 'topics', 'browse', 'subscription', 'paths', 'instructors'].includes(slug)) continue;
       const card = a.closest('li, section, div[data-item-index]');
       if (card && card.innerText && card.innerText.trim().length > 10) {
         cards.add(card);
@@ -114,6 +114,8 @@
   for (const card of getCards()) {
     const row = parseCard(card);
     if (!row.name) continue;
+    // Instructor/author sub-cards have none of the course metrics — skip them.
+    if (!row.length && !row.rating && !row.learners) continue;
     const key = row.url || row.name;
     if (seen.has(key)) continue;
     seen.add(key);
