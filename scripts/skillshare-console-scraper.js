@@ -153,25 +153,38 @@
 
   while (currentPage() < MAX_PAGES && !window.__SS_STOP) {
     const target = currentPage() + 1;
-    const link = findPageLink(target);
-    if (!link) { console.log(`No link to page ${target} — assuming last page. Done.`); break; }
 
-    const before = pageSignature();
+    // The pagination links vanish while a page is loading — retry before
+    // concluding we're on the last page.
+    let link = null;
+    for (let attempt = 0; attempt < 8 && !link && !window.__SS_STOP; attempt++) {
+      link = findPageLink(target);
+      if (!link) await sleep(1500);
+    }
+    if (!link) { console.log(`No link to page ${target} after retries — assuming last page. Done.`); break; }
+
+    const beforeFirst = getCards()[0]?.querySelector('.class-link')?.innerText || '';
     realClick(link);
 
+    // Wait for a NEW, fully populated grid: cards present AND a different
+    // first title (the grid empties out during loading — don't harvest then).
     const deadline = Date.now() + RENDER_TIMEOUT_MS;
-    let changed = false;
+    let ready = false;
     while (Date.now() < deadline && !window.__SS_STOP) {
       await sleep(300);
-      if (pageSignature() !== before) { changed = true; break; }
+      const cards = getCards();
+      const firstTitle = cards[0]?.querySelector('.class-link')?.innerText || '';
+      if (cards.length >= 5 && firstTitle && firstTitle !== beforeFirst) { ready = true; break; }
     }
-    if (!changed) {
-      console.warn(`Cards did not change within ${RENDER_TIMEOUT_MS / 1000}s of clicking to page ${target} — stopping. Progress is saved; re-paste the script to resume.`);
+    if (!ready) {
+      console.warn(`New cards did not render within ${RENDER_TIMEOUT_MS / 1000}s of clicking to page ${target} — stopping. Progress is saved; re-paste the script to resume.`);
       break;
     }
     await sleep(SETTLE_MS);
 
     added = harvest();
+    // Late stragglers: if nothing new landed, give it one more beat and retry
+    if (added === 0) { await sleep(2000); added = harvest(); }
     console.log(`Page ${currentPage()}/${MAX_PAGES}: +${added} (total ${data.size})`);
   }
 
