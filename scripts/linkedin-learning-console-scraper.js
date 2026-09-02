@@ -66,10 +66,14 @@
 
   function findMoreButton() {
     const els = [...document.querySelectorAll('button, a[role="button"], span[role="button"]')];
-    return els.find((el) => {
+    const candidates = els.filter((el) => {
       const label = ((el.innerText || '') + ' ' + (el.getAttribute('aria-label') || '')).toLowerCase();
-      return /show more|load more|see more|more results|show additional/.test(label);
+      // "Show more options for <course>" is each card's kebab menu — not pagination.
+      if (/options|menu|filter|skill|save|share/.test(label)) return false;
+      return /(show|load|see)\s*more|more results|show additional/.test(label);
     });
+    // The pagination button sits at the bottom of the results — take the last one.
+    return candidates[candidates.length - 1];
   }
 
   // Full pointer-event sequence — LinkedIn's framework often ignores bare .click()
