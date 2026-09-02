@@ -141,14 +141,42 @@
     return added;
   }
 
+  function currentPage() {
+    return Number(new URLSearchParams(location.search).get('page') || '1');
+  }
+
+  // Numbered pagination: a link/button leading to the given page
+  function findPageControl(page) {
+    for (const a of document.querySelectorAll('a[href*="page="]')) {
+      try {
+        const u = new URL(a.getAttribute('href'), location.origin);
+        if (Number(u.searchParams.get('page')) === page) return a;
+      } catch {}
+    }
+    // Buttons labeled with the page number or "next"
+    const els = [...document.querySelectorAll('button, a, [role="button"]')];
+    return (
+      document.querySelector('[rel="next"]') ||
+      els.find((el) => {
+        const label = ((el.getAttribute('aria-label') || '') + ' ' + (el.innerText || '')).trim().toLowerCase();
+        return label === String(page) || /next page|go to next|^next$|›|→/.test(label);
+      }) || null
+    );
+  }
+
   function findMoreControl() {
     const els = [...document.querySelectorAll('button, a[role="button"], [role="button"]')];
     const candidates = els.filter((el) => {
       const label = ((el.innerText || '') + ' ' + (el.getAttribute('aria-label') || '')).toLowerCase();
       if (/options|menu|filter|cart|search\b|sign|log/.test(label)) return false;
-      return /(load|show|view|see)\s*more|more results|next page|^next$/.test(label);
+      return /(load|show|view|see)\s*more|more results/.test(label);
     });
-    return candidates[candidates.length - 1] || document.querySelector('[rel="next"]') || null;
+    return candidates[candidates.length - 1] || null;
+  }
+
+  function firstCardName() {
+    const link = document.querySelector(CARD_LINK);
+    return link ? (link.innerText || '').trim().slice(0, 120) : '';
   }
 
   function realClick(el) {
@@ -209,6 +237,41 @@
 
   let idle = 0;
   for (let round = 0; round < MAX_ROUNDS && !window.__CC_STOP; round++) {
+    // Prefer numbered pagination when it exists; the links may be absent
+    // while a page is loading, so retry before giving up on them.
+    const target = currentPage() + 1;
+    let pageCtrl = null;
+    for (let attempt = 0; attempt < 6 && !pageCtrl && !window.__CC_STOP; attempt++) {
+      pageCtrl = findPageControl(target);
+      if (!pageCtrl) await sleep(1000);
+    }
+
+    if (pageCtrl) {
+      const before = firstCardName();
+      realClick(pageCtrl);
+
+      // Wait for a new, populated grid (first card title changes)
+      const deadline = Date.now() + 15000;
+      let ready = false;
+      while (Date.now() < deadline && !window.__CC_STOP) {
+        await sleep(300);
+        const now = firstCardName();
+        if (now && now !== before) { ready = true; break; }
+      }
+      if (!ready) {
+        console.warn(`Cards did not change after clicking to page ${target} — stopping. Progress is saved; re-paste to resume.`);
+        break;
+      }
+      await sleep(600);
+      added = harvest();
+      if (added === 0) { await sleep(2000); added = harvest(); }
+      console.log(`Page ${currentPage()}: +${added} (total ${data.size})`);
+      if (added === 0 && ++idle >= 3) { console.log('Pages no longer adding entries — done.'); break; }
+      if (added > 0) idle = 0;
+      continue;
+    }
+
+    // No numbered pagination — fall back to load-more / scrolling
     const btn = findMoreControl();
     if (btn) realClick(btn);
     else window.scrollTo(0, document.body.scrollHeight);
