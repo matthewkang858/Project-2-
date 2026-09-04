@@ -86,7 +86,8 @@ def letters_in(spec_letters, q):
         return []
     pool = [o['letter'] for o in (q['options'] or q.get('columns', []))]
     out = []
-    for part in re.split(r'\s*,\s*', spec_letters):
+    # "a, b", "a or c", "b OR c" all list single letters; only "a-c" is a range
+    for part in re.split(r'\s*(?:,|\bor\b|\band\b)\s*', spec_letters, flags=re.I):
         ends = re.findall(r'[a-z]+', part)
         if not ends or not all(e in pool for e in ends):
             continue

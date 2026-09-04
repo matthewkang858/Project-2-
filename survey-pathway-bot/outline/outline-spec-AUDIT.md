@@ -1,6 +1,6 @@
-# Questionnaire audit — outline.docx
+# Questionnaire audit — 770f93b4-2026.08.21_Activate_B2B_Survey_Outline__Questionnaire_Sent_to_Dynata.docx
 
-84 questions · 272 programmed rules · **2 error(s), 3 warning(s)**
+84 questions · 258 programmed rules · **4 error(s), 3 warning(s)**
 
 This checks the document against itself — numbering, cross-references, option lettering, emphasis and programmer syntax. Comparing it to the *live* survey is `compare.mjs`, which needs a captured run.
 
@@ -12,7 +12,9 @@ This checks the document against itself — numbering, cross-references, option 
 | Q6 | **error**: quota for "B2B" points at Q6 (Which of the following best describes the industry…), whose options never mention it — Q7 does |
 | Q6 | **error**: quota for "B2C" points at Q6 (Which of the following best describes the industry…), whose options never mention it — Q7 does |
 | Q43 | warning: has answer options but no [SP]/[MP]/[Grid] tag for the programmer |
+| Q54 | **error**: refers to Q53 option(s) s, which Q53 does not have (it has a–l) |
 | Q55 | warning: 4/5 options use underline, but option(s) e do not — emphasis is inconsistent within the question |
+| Q80 | **error**: refers to Q74 option(s) or, which Q74 does not have (it has a–c) |
 
 ## Every question
 
@@ -71,7 +73,7 @@ This checks the document against itself — numbering, cross-references, option 
 | Q51 | Ai Adoption And Value | SP | 3 options | a-c is selected for Q43 |  | bold stem, underlined stem | ok |
 | Q52 | Ai Adoption And Value | SP | grid 26×6 | a-c is selected for Q43 AND a-z is selected for  |  | bold stem, underlined stem | ok |
 | Q53 | Ai Adoption And Value | MP | 12 options | always | Q54 | bold stem | ok |
-| Q54 | Ai Adoption And Value | MP | 8 options | always |  | bold stem | ok |
+| Q54 | Ai Adoption And Value | MP | 8 options | always |  | bold stem | **error** |
 | Q55 | Ai Operating Model And Governance | SP | 5 options | a-c is selected for Q43 |  | bold stem, underlined stem, underlined answers | warning |
 | Q56 | Ai Operating Model And Governance | MP | 11 options | a-c is selected for Q43 | Q57 | bold stem | ok |
 | Q57 | Ai Operating Model And Governance | SP | 5 options | a-c is selected for Q43 | Q58 | bold stem, underlined stem, underlined answers | ok |
@@ -83,8 +85,8 @@ This checks the document against itself — numbering, cross-references, option 
 | Q63 | Ai Operating Model And Governance | SP | grid 6×11 | a-f is selected at Q61 |  | bold stem, underlined stem | ok |
 | Q64 | Data Infrastructure / Ai Tech Stack | SP | 4 options | always |  | bold stem, underlined stem, underlined answers | ok |
 | Q65 | Data Infrastructure / Ai Tech Stack | SP | 4 options | always |  | bold stem, underlined answers | ok |
-| Q66 | Data Infrastructure / Ai Tech Stack | SP | 4 options | always |  | bold stem, underlined stem | ok |
-| Q67 | Data Infrastructure / Ai Tech Stack | SP | 5 options | always |  | bold stem | ok |
+| Q66 | Data Infrastructure / Ai Tech Stack | SP | 4 options | always | Q67 | bold stem, underlined stem | ok |
+| Q67 | Data Infrastructure / Ai Tech Stack | SP | 5 options | b is selected at Q66 |  | bold stem | ok |
 | Q68 | Data Infrastructure / Ai Tech Stack | MP | 10 options | always |  | bold stem | ok |
 | Q69 | Data Infrastructure / Ai Tech Stack | SP | 5 options | always |  | bold stem | ok |
 | Q70 | Data Infrastructure / Ai Tech Stack | SP | 4 options | a-c is selected for Q43 |  | bold stem, underlined stem, underlined answers | ok |
@@ -97,7 +99,7 @@ This checks the document against itself — numbering, cross-references, option 
 | Q77 | Cybersecurity | MP | 11 options | a is selected for Q76 |  | bold stem, underlined stem | ok |
 | Q78 | Cybersecurity | MP | 11 options | b is selected for Q76 |  | bold stem, underlined stem | ok |
 | Q79 | Cybersecurity | SP | grid 17×6 | h is selected for Q25 |  | bold stem, underlined stem | ok |
-| Q80 | Cybersecurity | SP | 2 options | a or c is selected for Q74 | Q81, Q82 | bold stem | ok |
+| Q80 | Cybersecurity | SP | 2 options | a or c is selected for Q74 | Q81, Q82 | bold stem | **error** |
 | Q81 | Cybersecurity | SP | 5 options | a is selected for Q80 |  | bold stem | ok |
 | Q82 | Cybersecurity | SP | 5 options | b is selected for Q80 |  | bold stem | ok |
 | Q83 | Cybersecurity | SP | 5 options | always |  | bold stem, underlined stem | ok |

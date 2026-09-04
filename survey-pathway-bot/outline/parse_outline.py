@@ -135,9 +135,17 @@ def parse(path):
         if t.upper() == 'SURVEY QUESTIONS':
             started = True
             continue
-        if not started:
-            continue
         num = numbering(el)
+        if not started:
+            # Not every questionnaire carries a SURVEY QUESTIONS marker — the
+            # first level-0 item of a question list starts the survey body,
+            # and the section heading seen just before it still counts.
+            if t.isupper() and len(t) < 60:
+                section = t
+            if num and num[0] == '0' and num[1] in qlists:
+                started = True
+            else:
+                continue
 
         if num and num[0] == '0' and num[1] in qlists:
             questions.append({
@@ -211,14 +219,23 @@ def rules(questions):
         blob = ' '.join([q['raw']] + q.get('notes', []))
         for m in re.finditer(r'\[Terminate ([^\]]+)\]', blob, re.I):
             out.append({'type': 'terminate', 'q': q['q'], 'rule': m.group(1).strip()})
-        for m in re.finditer(r'\[(?:Display|Show|Ask) if ([^\]]+)\]', blob, re.I):
+        for m in re.finditer(r'\[TERMINATE if([^\]]*)\]?', blob):
+            out.append({'type': 'terminate', 'q': q['q'], 'rule': ('if' + m.group(1)).strip(' :')})
+        # Two gate phrasings exist across questionnaires: "[Display if a is
+        # selected for Q10]" and the terser "[If a selected in Q5]" (with
+        # AND/OR/NOT compounds). Both make display rules.
+        for m in re.finditer(r'\[(?:(?:Display|Show|Ask) if|If) ([^\]]+)\]', blob, re.I):
             rule = m.group(1).strip()
-            # Each clause is "<letters> is selected ... for/at Qn"; a rule may
-            # carry several, joined by AND/OR.
-            clauses = re.findall(r'([a-z](?:\s*[-–]\s*[a-z])?(?:\s*,\s*[a-z])*)\s+(?:is|are)\s+(?:NOT\s+)?selected[^Q]*?(Q\d+)', rule, re.I)
+            clauses = re.findall(
+                r'([a-z0-9](?:\s*[-–]\s*[a-z0-9])?(?:\s*(?:,|OR)\s*[a-z0-9])*)\s+'
+                r'(?:is\s+|are\s+)?((?:NOT\s+)?(?:displayed\s+and\s+)?(?:NOT\s+)?)selected[^Q]*?(Q\d+)',
+                rule, re.I)
             if clauses:
-                for letters, dep in clauses:
-                    out.append({'type': 'display', 'q': q['q'], 'rule': rule, 'dependsOn': dep, 'letters': letters.strip()})
+                for letters, negation, dep in clauses:
+                    # letters of a NOT-selected clause are not qualifying
+                    # answers — carry the clause but leave letters unset
+                    out.append({'type': 'display', 'q': q['q'], 'rule': rule, 'dependsOn': dep,
+                                'letters': None if re.search(r'NOT', negation, re.I) else letters.strip()})
             else:
                 dep = re.search(r'(Q\d+)', rule)
                 out.append({'type': 'display', 'q': q['q'], 'rule': rule, 'dependsOn': dep.group(1) if dep else None})
@@ -229,13 +246,25 @@ def rules(questions):
         for part, kind in ((q['options'], 'option'), (q.get('rows', []), 'row'), (q.get('columns', []), 'column')):
             for o in part:
                 for tag in o['tags']:
+                    if re.match(r'TERMINATE', tag):
+                        out.append({'type': 'terminate', 'q': q['q'], 'option': o['letter'],
+                                    'rule': f"if {o['letter']} ({o['text'][:40]}) is selected" + (
+                                        '' if tag.strip() == 'TERMINATE' else f' — {tag}')})
+                        continue
                     if re.match(r'(Show if|Display if|Display all|If |Exclusive|Anchor)', tag, re.I):
                         dep = re.search(r'(Q\d+)', tag)
-                        letters = re.search(r'([a-z](?:\s*[-–]\s*[a-z])?)\s+(?:is|are)', tag)
+                        letters = re.search(r'([a-z](?:\s*[-–]\s*[a-z])?)\s+(?:is\s+|are\s+)?(?:NOT\s+)?selected', tag)
                         out.append({'type': kind, 'q': q['q'], kind: o['letter'], 'rule': tag,
                                     'dependsOn': dep.group(1) if dep else None,
                                     'letters': letters.group(1).strip() if letters else None})
-    return out
+    # both terminate phrasings can match the same bracket — keep one of each
+    seen, unique = set(), []
+    for r in out:
+        key = json.dumps(r, sort_keys=True)
+        if key not in seen:
+            seen.add(key)
+            unique.append(r)
+    return unique
 
 
 WORD_NUM = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5}

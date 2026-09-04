@@ -1,5 +1,5 @@
 {
-  "source": "outline.docx",
+  "source": "770f93b4-2026.08.21_Activate_B2B_Survey_Outline__Questionnaire_Sent_to_Dynata.docx",
   "questionCount": 84,
   "questions": [
     {
@@ -27022,11 +27022,6 @@
       "rule": "select up to two"
     },
     {
-      "type": "limit",
-      "q": "Q13",
-      "rule": "select up to two"
-    },
-    {
       "type": "randomize",
       "q": "Q13",
       "rule": "randomize"
@@ -27080,11 +27075,6 @@
       "rule": "select up to two"
     },
     {
-      "type": "limit",
-      "q": "Q21",
-      "rule": "select up to two"
-    },
-    {
       "type": "randomize",
       "q": "Q21",
       "rule": "randomize"
@@ -27096,11 +27086,6 @@
       "rule": "Anchor",
       "dependsOn": null,
       "letters": null
-    },
-    {
-      "type": "limit",
-      "q": "Q22",
-      "rule": "select up to three"
     },
     {
       "type": "limit",
@@ -27792,11 +27777,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q31",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q31",
       "rule": "randomize"
@@ -27823,11 +27803,6 @@
       "rule": "i-v is selected for row x in Q26",
       "dependsOn": "Q26",
       "letters": "i-v"
-    },
-    {
-      "type": "limit",
-      "q": "Q32",
-      "rule": "select up to three"
     },
     {
       "type": "limit",
@@ -27868,11 +27843,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q33",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q33",
       "rule": "randomize"
@@ -27906,11 +27876,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q34",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q34",
       "rule": "randomize"
@@ -27930,11 +27895,6 @@
       "rule": "Exclusive",
       "dependsOn": null,
       "letters": null
-    },
-    {
-      "type": "limit",
-      "q": "Q36",
-      "rule": "select up to three"
     },
     {
       "type": "limit",
@@ -28007,11 +27967,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q39",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q39",
       "rule": "randomize"
@@ -28046,11 +28001,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q40",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q40",
       "rule": "randomize"
@@ -28078,11 +28028,6 @@
       "rule": "Exclusive",
       "dependsOn": null,
       "letters": null
-    },
-    {
-      "type": "limit",
-      "q": "Q41",
-      "rule": "select up to two"
     },
     {
       "type": "limit",
@@ -28248,11 +28193,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q53",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q53",
       "rule": "randomize"
@@ -28279,11 +28219,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q54",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q54",
       "rule": "randomize"
@@ -28302,7 +28237,7 @@
       "option": "h",
       "rule": "Show if c at Q53 is NOT selected",
       "dependsOn": "Q53",
-      "letters": null
+      "letters": "s"
     },
     {
       "type": "option",
@@ -28523,7 +28458,7 @@
       "row": "i",
       "rule": "If a selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "a"
     },
     {
       "type": "row",
@@ -28531,7 +28466,7 @@
       "row": "ii",
       "rule": "If b selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "b"
     },
     {
       "type": "row",
@@ -28539,7 +28474,7 @@
       "row": "iii",
       "rule": "If c selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "c"
     },
     {
       "type": "row",
@@ -28547,7 +28482,7 @@
       "row": "iv",
       "rule": "If d selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "d"
     },
     {
       "type": "row",
@@ -28555,7 +28490,7 @@
       "row": "v",
       "rule": "If e selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "e"
     },
     {
       "type": "row",
@@ -28563,7 +28498,7 @@
       "row": "vi",
       "rule": "If f selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "f"
     },
     {
       "type": "column",
@@ -28586,7 +28521,7 @@
       "row": "i",
       "rule": "If a selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "a"
     },
     {
       "type": "row",
@@ -28594,7 +28529,7 @@
       "row": "ii",
       "rule": "If b selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "b"
     },
     {
       "type": "row",
@@ -28602,7 +28537,7 @@
       "row": "iii",
       "rule": "If c selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "c"
     },
     {
       "type": "row",
@@ -28610,7 +28545,7 @@
       "row": "iv",
       "rule": "If d selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "d"
     },
     {
       "type": "row",
@@ -28618,7 +28553,7 @@
       "row": "v",
       "rule": "If e selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "e"
     },
     {
       "type": "row",
@@ -28626,7 +28561,7 @@
       "row": "vi",
       "rule": "If f selected at Q61",
       "dependsOn": "Q61",
-      "letters": null
+      "letters": "f"
     },
     {
       "type": "randomize",
@@ -28648,6 +28583,13 @@
       "rule": "Anchor",
       "dependsOn": null,
       "letters": null
+    },
+    {
+      "type": "display",
+      "q": "Q67",
+      "rule": "b is selected at Q66",
+      "dependsOn": "Q66",
+      "letters": "b"
     },
     {
       "type": "randomize",
@@ -28757,7 +28699,7 @@
       "option": "b",
       "rule": "If b or c selected at Q71",
       "dependsOn": "Q71",
-      "letters": null
+      "letters": "c"
     },
     {
       "type": "option",
@@ -28765,7 +28707,7 @@
       "option": "e",
       "rule": "If a or c selected at Q71",
       "dependsOn": "Q71",
-      "letters": null
+      "letters": "c"
     },
     {
       "type": "option",
@@ -28773,7 +28715,7 @@
       "option": "i",
       "rule": "If a or c selected at Q71",
       "dependsOn": "Q71",
-      "letters": null
+      "letters": "c"
     },
     {
       "type": "option",
@@ -28832,11 +28774,6 @@
       "rule": "select up to three"
     },
     {
-      "type": "limit",
-      "q": "Q77",
-      "rule": "select up to three"
-    },
-    {
       "type": "randomize",
       "q": "Q77",
       "rule": "randomize"
@@ -28863,11 +28800,6 @@
       "rule": "b is selected for Q76",
       "dependsOn": "Q76",
       "letters": "b"
-    },
-    {
-      "type": "limit",
-      "q": "Q78",
-      "rule": "select up to three"
     },
     {
       "type": "limit",
@@ -28907,7 +28839,7 @@
       "q": "Q80",
       "rule": "a or c is selected for Q74",
       "dependsOn": "Q74",
-      "letters": "c"
+      "letters": "a or c"
     },
     {
       "type": "display",
@@ -28969,6 +28901,18 @@
     }
   ],
   "documentFindings": [
+    {
+      "severity": "error",
+      "q": "Q54",
+      "issue": "refers to Q53 option(s) s, which Q53 does not have (it has a\u2013l)",
+      "detail": "Show if c at Q53 is NOT selected"
+    },
+    {
+      "severity": "error",
+      "q": "Q80",
+      "issue": "refers to Q74 option(s) or, which Q74 does not have (it has a\u2013c)",
+      "detail": "a or c is selected for Q74"
+    },
     {
       "severity": "warn",
       "q": "Q43",
