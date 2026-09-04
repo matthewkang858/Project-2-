@@ -794,12 +794,14 @@ createServer((req, res) => {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
       <form id="Page" name="Page">
+        <!-- cap stated in a separate banner, and a scenario stem with no money
+             words: only the page-level numeric cue can mark these boxes numeric -->
+        <div class="PageNote">You cannot enter a value over $10,000. If you would go higher, please write "10000" in the box.</div>
         <div class="QuestionOuter" id="QID90"><fieldset><legend>
-          <div class="QuestionText"><label class="ExportTag">Q34.</label> You cannot enter a value over $10,000.
-            How much money have you personally <b>spent</b> / <b>anticipate to spend</b> on online learning platforms?</div></legend>
+          <div class="QuestionText"><label class="ExportTag">Q34.</label> Imagine two platforms came together into one experience. What would you put here, today and looking ahead?</div></legend>
           <div class="QuestionBody">
-            <span class="LabelWrapper">Spent</span> <input type="text" name="QR~QID90~1~TEXT" id="QR~QID90~1~TEXT" value="">
-            <span class="LabelWrapper">Anticipate</span> <input type="text" name="QR~QID90~2~TEXT" id="QR~QID90~2~TEXT" value="">
+            <span class="LabelWrapper">Today</span> <input type="text" name="QR~QID90~1~TEXT" id="QR~QID90~1~TEXT" value="">
+            <span class="LabelWrapper">Ahead</span> <input type="text" name="QR~QID90~2~TEXT" id="QR~QID90~2~TEXT" value="">
           </div></fieldset></div>
         <div id="Buttons"><input id="PreviousButton" type="button" value="←" aria-label="Previous">
           <input id="NextButton" type="button" value="→" aria-label="Next"></div>
