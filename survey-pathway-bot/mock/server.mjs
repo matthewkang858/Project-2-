@@ -807,9 +807,17 @@ createServer((req, res) => {
           <input id="NextButton" type="button" value="→" aria-label="Next"></div>
       </form>
       <script>
+        // Like JFE: the engine keeps its own copy of each answer, updated from
+        // the input event — a bare el.value= without a real input event is not
+        // seen, so Next stays blocked (the actual Q55 stuck bug).
+        var state = {};
+        ['QR~QID90~1~TEXT','QR~QID90~2~TEXT'].forEach(function(id){
+          var el = document.getElementById(id);
+          el.addEventListener('input', function(){ state[id] = el.value; });
+        });
         document.getElementById('NextButton').addEventListener('mousedown', function(){
-          var a = document.getElementById('QR~QID90~1~TEXT').value.trim();
-          var b = document.getElementById('QR~QID90~2~TEXT').value.trim();
+          var a = (state['QR~QID90~1~TEXT']||'').trim();
+          var b = (state['QR~QID90~2~TEXT']||'').trim();
           function ok(x){ return /^\\d+(\\.\\d+)?$/.test(x) && Number(x) <= 10000; }
           if (!ok(a) || !ok(b)) {
             if (!document.querySelector('.ValidationError'))

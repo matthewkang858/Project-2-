@@ -838,8 +838,23 @@ function applyAnswer(q, candidate, doc) {
     const el = findControl(doc, q);
     if (!el) return false;
     el.focus?.();
-    el.value = candidate.value;
-    fire(el, ['input', 'change', 'blur']);
+    // Set through the prototype's native value setter so frameworks that wrap
+    // the property — and watchers (Qualtrics' QWatchTimer) that compare against
+    // their last-seen value — actually observe the change, then drive the full
+    // typing event sequence a plain `el.value =` skips.
+    const proto = el.tagName === 'TEXTAREA' ? win.HTMLTextAreaElement : win.HTMLInputElement;
+    const setter = proto && Object.getOwnPropertyDescriptor(proto.prototype, 'value')?.set;
+    if (setter) setter.call(el, candidate.value);
+    else el.value = candidate.value;
+    const lastCh = String(candidate.value).slice(-1) || '0';
+    el.dispatchEvent(new win.KeyboardEvent('keydown', { key: lastCh, bubbles: true }));
+    try {
+      el.dispatchEvent(new win.InputEvent('input', { bubbles: true, data: String(candidate.value), inputType: 'insertText' }));
+    } catch {
+      el.dispatchEvent(new win.Event('input', { bubbles: true }));
+    }
+    el.dispatchEvent(new win.KeyboardEvent('keyup', { key: lastCh, bubbles: true }));
+    fire(el, ['change', 'blur']);
     return String(el.value) === String(candidate.value);
   }
   if (candidate.kind === 'slide') {
