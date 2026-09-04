@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "4b16e50 2026-09-04 01:11";
+const SPB_BUILD = "677e509 2026-09-04 01:16";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -24,6 +24,7 @@ const DEFAULT_SELECTORS = {
     '#continue',
     'input[name="continue"]',
     'button[name="continue"]',
+    '#NextButton',
     'input[type="submit"]',
     'button[type="submit"]',
     '.btn-primary',
@@ -246,7 +247,8 @@ function pageModel(cfg, doc) {
     // LM1r2 …). The group is what carries "select up to two" and "must total
     // 100", so it has to be reconstructed.
     q.group = key
-      .replace(/([._-]\d+)+$/, '')   // ans32645.0.8 -> ans32645
+      .replace(/(~TEXT)$/i, '')      // Qualtrics other-specify: QR~QID12~5~TEXT
+      .replace(/([._~-]\d+)+$/, '')  // ans32645.0.8 -> ans32645, QR~QID12~5 -> QR~QID12
       .replace(/[rc]\d+$/i, '')      // Q1r1 -> Q1
       || key;
 
@@ -257,7 +259,9 @@ function pageModel(cfg, doc) {
       kind === 'radio' || kind === 'checkbox'
         ? els.some((e) => e.checked)
         : kind === 'select'
-          ? !!first.value
+          // a placeholder option can carry a real value (Qualtrics: "QR~…~null"),
+          // so "answered" means a non-blank, non-placeholder option is selected
+          ? !!first.value && !/~null$/.test(first.value) && !!clean(first.selectedOptions?.[0]?.text ?? '')
           : String(first.value ?? '') !== '';
 
     q.checkedValues =
@@ -284,12 +288,25 @@ function pageModel(cfg, doc) {
               /other|please specify/i.test(clean(optionLabel(e)))
           );
       }
+      // Qualtrics names the write-in after its own choice: QR~QID12~5~TEXT
+      // belongs to choice 5 of QR~QID12 (radio group) or QR~QID12~5 (checkbox).
+      if (!owner) {
+        const qm = key.match(/^(.*)~(\d+)~TEXT$/i);
+        if (qm)
+          owner = [...doc.querySelectorAll('input')].find(
+            (e) =>
+              (e.type === 'radio' || e.type === 'checkbox') &&
+              ((e.name === qm[1] && String(e.value) === qm[2]) || e.name === `${qm[1]}~${qm[2]}` || e.id === `${qm[1]}~${qm[2]}`)
+          );
+      }
       if (owner) q.ownedBy = { key: owner.name || owner.id, value: owner.value ?? '' };
     }
 
     if (kind === 'select') {
       q.options = [...first.options]
-        .filter((o) => o.value !== '' && !o.disabled)
+        // Qualtrics gives its blank placeholder a real value ("QR~…~null"),
+        // so empty text must disqualify too — selecting it is a non-answer.
+        .filter((o) => o.value !== '' && !o.disabled && clean(o.text) && !/~null$/.test(o.value))
         .map((o) => ({ value: o.value, label: clean(o.text), selector: q.selector }));
     } else if (kind === 'radio' || kind === 'checkbox') {
       q.options = els.map((e) => ({
@@ -416,7 +433,7 @@ function pageModel(cfg, doc) {
   const hasChoiceQuestion = questions.some((q) => ['radio', 'checkbox', 'select', 'slider'].includes(q.kind));
   if (pager && !hasChoiceQuestion) {
     const FWD = /^(continue|next|start|begin|proceed|submit|go on|ok|done|→|»|>>|›|>)$/i;
-    const BWD = /^(back|previous|prev|return|cancel|exit|«|<<|‹|<)$/i;
+    const BWD = /^(back|previous|prev|return|cancel|exit|←|«|<<|‹|<)$/i;
     const candidates = [...doc.querySelectorAll('button, [role="button"], a, div, li, span')].filter((el) => {
       if (!visible(el)) return false;
       // Only a RENDERED control inside disqualifies a clickable — players park
@@ -532,8 +549,8 @@ function pageModel(cfg, doc) {
     }
   }
   if (!next) {
-    const forward = cfg.nextText ? new RegExp(cfg.nextText, 'i') : /^(continue|next|start|begin|proceed|submit|go on|ok|done|→|»|>>)\b/i;
-    const backward = /^(back|previous|prev|return|cancel|exit|«|<<)\b/i;
+    const forward = cfg.nextText ? new RegExp(cfg.nextText, 'i') : /^(continue|next|start|begin|proceed|submit|go on|ok|done)\b|^(→|»|>>)$/i;
+    const backward = /^(back|previous|prev|return|cancel|exit)\b|^(←|«|<<)$/i;
     const clickable = [...doc.querySelectorAll('button, input[type="button"], input[type="submit"], a[role="button"], a.btn, [role="button"], .button, .btn')];
     const el = clickable.find((e) => {
       if (!visible(e) || e.disabled) return false;

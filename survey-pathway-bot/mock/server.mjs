@@ -693,6 +693,59 @@ createServer((req, res) => {
       </form></body></html>`);
     return;
   }
+  // Qualtrics JFE markup, as captured from a live survey: tilde-separated
+  // names (QR~QID1, checkbox rows QR~QID3~1, other-specify QR~QID2~3~TEXT), a
+  // dropdown whose blank placeholder carries a real value ("…~null"), and
+  // arrow-labelled #NextButton / #PreviousButton inputs.
+  if (req.url && req.url.split('?')[0] === '/qualtrics') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
+      <form method="POST" action="/qualtricscheck" id="Page">
+        <div class="QuestionOuter MC" id="QID1">
+          <label class="QuestionText" for="QR~QID1"><label class="ExportTag">Q1.</label> In which <b>state</b> do you reside?</label>
+          <div class="QuestionBody"><select class="Selection" name="QR~QID1" id="QR~QID1">
+            <option aria-label="Blank" value="QR~QID1~null"></option>
+            <option value="5">California</option><option value="44">Texas</option>
+            <option value="52">I do not live in the United States</option>
+          </select></div>
+        </div>
+        <div class="QuestionOuter MC" id="QID2">
+          <fieldset><legend><label class="QuestionText">Q2. What is your gender?</label></legend>
+          <label for="QR~QID2~1"><input type="radio" name="QR~QID2" id="QR~QID2~1" value="1"> Male</label>
+          <label for="QR~QID2~2"><input type="radio" name="QR~QID2" id="QR~QID2~2" value="2"> Female</label>
+          <label for="QR~QID2~3"><input type="radio" name="QR~QID2" id="QR~QID2~3" value="3"> Other (please specify)
+            <input type="text" name="QR~QID2~3~TEXT" id="QR~QID2~3~TEXT" value=""></label>
+          </fieldset>
+        </div>
+        <div class="QuestionOuter MC" id="QID3">
+          <fieldset><legend><label class="QuestionText">Q3. Which apply to you?</label></legend>
+          <label for="QR~QID3~1"><input type="checkbox" name="QR~QID3~1" id="QR~QID3~1" value="1"> I learn online</label>
+          <label for="QR~QID3~2"><input type="checkbox" name="QR~QID3~2" id="QR~QID3~2" value="2"> I take in-person classes</label>
+          <label for="QR~QID3~3"><input type="checkbox" name="QR~QID3~3" id="QR~QID3~3" value="3"> Neither</label>
+          </fieldset>
+        </div>
+        <div id="Buttons">
+          <input id="PreviousButton" class="PreviousButton Button" type="button" value="←" aria-label="Previous">
+          <input id="NextButton" class="NextButton Button" type="button" value="→" aria-label="Next" onclick="this.form.submit()">
+        </div>
+      </form></body></html>`);
+    return;
+  }
+  if (req.url === '/qualtricscheck') {
+    let raw = '';
+    req.on('data', (c) => (raw += c));
+    req.on('end', () => {
+      const form = new URLSearchParams(raw);
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      const state = form.get('QR~QID1') || '';
+      if (!state || /~null$/.test(state))
+        res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body><div class="ValidationError">Please answer this question.</div></body></html>`);
+      else if (form.get('QR~QID2~3~TEXT') && form.get('QR~QID2') !== '3')
+        res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body><div class="ValidationError">Please only specify text for the option you selected.</div></body></html>`);
+      else res.end(end('Thank you for completing this survey', 'Your responses have been recorded.'));
+    });
+    return;
+  }
   if (req.method === 'GET') {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
     res.end(render(1, {}));

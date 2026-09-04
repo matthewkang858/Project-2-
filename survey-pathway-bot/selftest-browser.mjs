@@ -128,6 +128,17 @@ try {
   check(typeof dbg.controlsInDom === 'number' && Array.isArray(dbg.buttonsOnPage), 'spb.debug() dumps what the page contains');
   await styled.close();
 
+  const qx = await ctx.newPage();
+  await qx.goto(URL_ + 'qualtrics');
+  await qx.evaluate(snippet);
+  const qxTraces = (await qx.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 3, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'qualtrics')) || [];
+  const qxComplete = qxTraces.filter((t) => t.outcome?.type === 'complete');
+  const qxBlankPicked = qxTraces.some((t) => t.decisions.some((d) => /~null/.test(d.chosen || '')));
+  const qxGroups = new Set(qxTraces.flatMap((t) => (t.steps || []).flatMap((s) => (s.questions || []).map((q) => q.key))));
+  check(qxComplete.length >= 2 && !qxBlankPicked, `snippet completes Qualtrics-style markup without picking the blank placeholder (${qxComplete.length}/3 complete)`);
+  check([...qxGroups].some((k) => k.startsWith('QR~QID3~')), 'snippet reads tilde-named Qualtrics checkboxes');
+  await qx.close();
+
   for (const [path, label, keys] of [
     ['limit', 'respects "select up to two"', null],
     ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],
