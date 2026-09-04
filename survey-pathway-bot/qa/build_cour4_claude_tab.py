@@ -21,6 +21,10 @@ live Q83+ to questionnaire Q82+ (see the Q82 comment).
 """
 import re
 import openpyxl
+from openpyxl.styles import PatternFill
+
+# red fill for boolean grid cells that encode a detected problem
+RED = PatternFill(fill_type="solid", fgColor="FFFF4C4C")
 
 SRC = "/root/.claude/uploads/c008ad0f-2509-568b-91ec-bf12d8f404a9/66fad3d8-COUR4_Consumer_Survey_QA.xlsx"
 OUT = "/tmp/claude-0/-home-user-Project-2-/c008ad0f-2509-568b-91ec-bf12d8f404a9/scratchpad/COUR4_Consumer_Survey_QA_Claude.xlsx"
@@ -161,7 +165,9 @@ SCOPE_NOTE = (
     "matched exactly; FALSE where not confirmed — a manual formatting pass is still worth "
     "doing.\n"
     "  • SP vs MP (F): live control type vs v15. TRUE on all reached questions — no SP/MP "
-    "mismatch was found.\n\n"
+    "mismatch was found.\n"
+    "Cells shaded RED are the flagged ones — a boolean that encodes a detected problem (all "
+    "in the Wording column on this pass); each has a matching comment.\n\n"
     "Left FALSE on purpose (a single path cannot judge these — see the JB/MK multi-run tabs): "
     "'Question not skippable' (C), 'Display logic' (G), 'Randomization/anchor' (H), "
     "'Exclusive logic' (I), 'Other logic' (J).\n"
@@ -201,6 +207,11 @@ def main():
         ws.cell(r, C["D"]).value = (n not in D_BAD)   # wording
         ws.cell(r, C["E"]).value = (n in E_OK)        # formatting
         ws.cell(r, C["F"]).value = (n in F_OK)        # SP vs MP
+        # red-highlight the boolean cell(s) that encode an actual finding.
+        # Only the Wording (D) column carries detected problems on this pass;
+        # E/F FALSE mean "not confirmed", not a defect, so they stay unfilled.
+        if n in D_BAD:
+            ws.cell(r, C["D"]).fill = RED
 
     for n, text in COMMENTS.items():
         r = row_of.get(n)
