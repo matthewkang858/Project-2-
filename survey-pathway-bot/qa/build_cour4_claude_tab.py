@@ -1,114 +1,207 @@
 #!/usr/bin/env python3
 """Build the "QA - Claude" reviewer tab in the COUR4 QA workbook.
 
-Findings are trace-grade: derived from one complete console-bot trace of the
-live Qualtrics survey (run-001, 109 steps, one path to completion). Each
-column-K comment below was cross-checked against the captured stem text,
-option labels, and per-option emphasis in that trace. Style mirrors the
-existing "QA - JB" / "QA - MK" tabs (prose comment per flagged row; blank =
-nothing flagged on that question on this pass).
+Trace-grade: everything below is derived from one complete console-bot trace
+of the live Qualtrics survey (run-001, 109 screens, one path to completion)
+and cross-checked, question by question, against the parsed v15 questionnaire
+spec (surveys/cour4/outline-spec.json).
+
+Boolean columns follow the JB/MK convention: TRUE = affirmatively verified /
+applies-and-passes on this pass; blank/FALSE = not positively confirmed (may
+be fine, may be flagged — see the comment). Columns filled here:
+  D (Wording matches)  - live stem + answer text read against v15
+  E (Formatting)       - live bold/underline compared to v15 emphasis
+  F (SP vs MP)         - live control type vs v15 SP/MP
+C, G, H, I, J are left blank: a single path cannot certify skippability,
+display-rule correctness, randomization/anchor order, or exclusive logic.
+
+The template's B column uses the LIVE Qualtrics numbering (it runs to Q119),
+so trace question numbers map straight onto rows; the extra live Q82 shifts
+live Q83+ to questionnaire Q82+ (see the Q82 comment).
 """
+import re
 import openpyxl
 
 SRC = "/root/.claude/uploads/c008ad0f-2509-568b-91ec-bf12d8f404a9/66fad3d8-COUR4_Consumer_Survey_QA.xlsx"
 OUT = "/tmp/claude-0/-home-user-Project-2-/c008ad0f-2509-568b-91ec-bf12d8f404a9/scratchpad/COUR4_Consumer_Survey_QA_Claude.xlsx"
 
-# row (in QA Template) -> column-K comment
+# --- verified from trace vs spec (see build notes) ---
+# live Q-numbers reached on this path
+REACHED = [1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,
+    28,29,31,33,34,35,36,37,38,40,41,42,43,55,56,57,60,61,62,63,64,65,69,70,71,
+    72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,99,
+    101,102,109,110,111,112,113,114,115,116,117,118,119]
+# SP/MP verified correct on every non-text reached question (0 mismatches / 80 checked)
+F_OK = [n for n in REACHED if n not in (14,34,35,55)]
+# live bold+underline set matched v15 emphasis exactly
+E_OK = [1,2,3,4,5,8,9,10,11,14,16,17,18,19,20,21,26,27,29,31,34,37,40,56,69,70,
+    71,72,73,74,75,76,79,80,83,85,87,88,90,93,96,99,101,102,110,111,112,113,114,
+    115,117,118,119]
+# wording / answer-text discrepancy vs v15 (these get D = FALSE)
+D_BAD = [4,6,9,10,25,27,28,36,38,40,41,42,57,61,64,65,82,87,92,94,109,112]
+
 COMMENTS = {
-    11: (  # Q6
+    4: (  # Q4
+        'Minor wording mismatch in the last option.\n'
+        'The live survey shows "Prefer not to answer"; the questionnaire (and Q3, Q110) '
+        'uses "Prefer not to say". Pick one and make it consistent.'
+    ),
+    6: (  # Q6
         'Two problems in the answer list (both also caught by JB and MK).\n'
         '1. Option b displays with no text at all — it comes through as just "2".\n'
         '2. Option c reads "I had did not have any control...". Drop the extra "had": '
         '"I did not have any control over which online learning platform I used".'
     ),
-    14: (  # Q9
-        'One answer option displays blank.\n'
-        'Only two of the three options render text — "I have personally paid for an online '
-        'learning platform in the last 2 years" and the "N/A – I have NOT paid..." option. '
-        'The middle option comes through with no text.'
+    9: (  # Q9
+        'One answer option displays blank (no text).\n'
+        'The option that fails to render is "I have used a stipend or reimbursement provided '
+        'by my employer, school/university, or other organization... in the last 2 years". '
+        'The other two options render fine.'
     ),
-    15: (  # Q10
-        'Three of the six answer options display blank.\n'
-        'Only "Certification or exam preparation materials...", "Coaching, tutoring, or '
-        'lessons...", and the "I have not personally paid for any of the above..." anchor '
-        'render text. The other three come through with no text.'
+    10: (  # Q10
+        'Three answer options display blank (no text).\n'
+        'The three that fail to render are:\n'
+        '• "Learning or skill-practice apps or platforms... (e.g., Duolingo Plus, Memrise, Busuu)"\n'
+        '• "Online learning platform that you chose on your own... (e.g., Udemy, Coursera, LinkedIn Learning)"\n'
+        '• "Live classes or programs (online or in person): instructor-led workshops, bootcamps, or cohort-based programs".'
     ),
-    30: (  # Q25
-        'One answer option displays blank.\n'
-        'Eight of the nine options render (including "Other"); one option in the middle of '
-        'the list comes through with no text.'
+    25: (  # Q25
+        'One answer option displays blank (no text).\n'
+        'The option that fails to render is "Preparing for a certification related to my job '
+        '(e.g., AWS Certified Solutions Architect, CompTIA A+, Microsoft Azure Fundamentals)".'
     ),
-    32: (  # Q27
-        'One answer option displays blank.\n'
-        'Seventeen of the eighteen options render; one comes through with no text.'
+    27: (  # Q27
+        'One answer option displays blank (no text).\n'
+        'The option that fails to render is "Physical Science and Engineering (robotics, '
+        'mechanical/electrical engineering, environmental science, chemistry, physics)".'
     ),
-    46: (  # Q38
-        'Two of the answer options display blank.\n'
-        'Only four options plus the "None of the above" anchor render text — the two that '
-        'come through blank are the subscription/plan options. This question gates a large '
-        'part of the pricing and concept section that follows (Q40+), so blank options here '
-        'risk mis-selection and knock-on routing errors. Worth fixing before anything else '
-        'in this block. (JB separately flagged the anchor settings on this question.)'
+    28: (  # Q28
+        'Stem wording differs from the questionnaire.\n'
+        'The live stem reads "...which of the following topics are you interested in studying '
+        'through an online learning platform?", but the answer grid is a Beginner / '
+        'Intermediate / Advanced level matrix. The questionnaire stem asks "...what level are '
+        'you most interested in studying for each of the following areas...". Confirm which '
+        'stem is intended — as shown, the stem and the answer grid don\'t line up.'
     ),
-    51: (  # Q42
+    36: (  # Q36
+        'Typo in option b (also caught by JB and MK).\n'
+        'Live: "...without setting a specific or plan budget". Questionnaire: "...without '
+        'setting a specific budget or plan". The last two words are swapped.'
+    ),
+    38: (  # Q38
+        'Stem word dropped, plus two blank answer options — and this question gates most of '
+        'the pricing/concept section that follows (Q40+), so it is worth fixing first.\n'
+        '1. Stem: live reads "...which of the following would you be interested in?"; the '
+        'questionnaire reads "...interested in purchasing?". The word "purchasing" is missing.\n'
+        '2. Two options display with no text: "A subscription to a personalized learning '
+        'experience that builds a learning path around your goals..." and "A verified skill '
+        'assessment that provides verified proof to employers...". (JB separately flagged the '
+        'anchor settings on this question.)'
+    ),
+    40: (  # Q40
+        'Typo in option c.\n'
+        'Live reads "Somewhat likely"; the rest of the scale is "...likely to pay" '
+        '(Extremely / Very / Slightly / Not at all likely to pay). Should be "Somewhat likely to pay".'
+    ),
+    41: (  # Q41
+        'Piped price is missing its currency symbol.\n'
+        'The stem renders "Would you be willing to pay 40.00 for this individual course..." — '
+        'no "$" in front of the number. It shows the same way at every price point in the '
+        'ladder. Same fault on Q61 and Q65 (the other willingness-to-pay threshold questions).'
+    ),
+    42: (  # Q42
         'Option b displays blank.\n'
-        'It comes through as just "2" on screen — same rendering fault as Q6 option b and '
-        'Q87 option b.'
+        'It comes through as just "2" on screen — same rendering fault as Q6 and Q87. The '
+        'missing option is "I would not purchase a course with limited access..." '
+        '(text confirmed against the questionnaire).'
     ),
-    69: (  # Q57
-        'Typo in the last answer option.\n'
-        'Option e reads "Not at interested". It should be "Not at all interested" to match '
-        'the scale used elsewhere in the survey (e.g. Q11).'
+    57: (  # Q57
+        'Typo in the last option.\n'
+        'Live reads "Not at interested". Should be "Not at all interested" to match the scale '
+        'used elsewhere (e.g. Q11).'
     ),
-    77: (  # Q64
+    61: (  # Q61
+        'Piped price is missing its currency symbol (same as Q41).\n'
+        'Stem renders "...willing to pay 87.00 for a verified skill assessment..." with no "$".'
+    ),
+    64: (  # Q64
         'Typo in option b.\n'
-        'It reads "Very likely likely to pay" — the word "likely" is duplicated. Should be '
+        'Live reads "Very likely likely to pay" — "likely" is duplicated. Should be '
         '"Very likely to pay".'
     ),
-    96: (  # Q82
+    65: (  # Q65
+        'Piped price is missing its currency symbol (same as Q41).\n'
+        'Stem renders "...willing to pay 50.00 per month for this subscription..." with no "$".'
+    ),
+    82: (  # Q82  (extra live question, no questionnaire equivalent)
         'Confirms JB/MK: this question is not in the questionnaire.\n'
         'The live survey has an extra single-select here ("When you think about what makes a '
-        'learning experience worth paying for, which of the following matters most to you?") '
-        'with 3 options carrying non-sequential value codes (1 / 4 / 5), which is itself a '
-        'sign options were deleted. It does not appear in v15, and it pushes every '
-        'downstream question one number higher in the live survey than in the questionnaire '
-        '(live Q119 = questionnaire Q118).'
+        'learning experience worth paying for, which of the following matters most to you?"), '
+        'with 3 options on non-sequential value codes (1 / 4 / 5 — itself a sign options were '
+        'deleted). It does not appear in v15, and it pushes every downstream question one '
+        'number higher in the live survey than in the questionnaire (live Q119 = '
+        'questionnaire Q118).'
     ),
-    101: (  # Q87
+    87: (  # Q87
         'Confirms JB/MK: option b displays blank.\n'
-        'It comes through as just "4" on screen. Note the option value codes also jump '
-        '(1 / 4 / 5 / 6), so only four options are present — confirm none were dropped.'
+        'It comes through as just "4" on screen; the missing option is "I would want partial '
+        'access (i.e., some features or content unlocked while others are gated)...". Note the '
+        'option value codes also jump (1 / 4 / 5 / 6), so only four options are present — '
+        'confirm none were dropped.'
     ),
-    106: (  # Q92
-        'Five of the eleven answer options display blank.\n'
-        'The ones that render are: "Access to vetted content...", "Human coaching, feedback, '
-        'and Q&A...", "Guided, hands-on projects, labs...", "Personalized learning '
-        'recommendations...", "Shareable digital credentials...", and "None of the above". '
-        'The other five come through with no text. (MK separately flagged that "None of the '
-        'above" is not exclusive here — that is a distinct issue from the blank labels.)'
+    92: (  # Q92
+        'Five answer options display blank (no text).\n'
+        'The five that fail to render are:\n'
+        '• "Career services (e.g., resume/interview prep, job placement...)"\n'
+        '• "Cohort-based or live learning with peers..."\n'
+        '• "AI-powered coaching, simulations, and role play..."\n'
+        '• "Interactive skills assessments that measure your current skill level..."\n'
+        '• "A personal record of the skills you build that you can keep, track, and share...".\n'
+        'The same five options render blank on Q94 too, so it is one broken option set reused '
+        'across both questions. (MK separately flagged that "None of the above" is not '
+        'exclusive here — a distinct issue.)'
     ),
-    108: (  # Q94
-        'Five of the fourteen answer options display blank.\n'
-        'Nine render (including "None of the above", "Guided, hands-on projects...", '
-        '"Access to vetted content...", "Human coaching...", "Shareable digital '
-        'credentials...", "Personalized learning recommendations...", "Realistic work task '
-        'simulations...", "Short, easy-to-digest videos...", and the "Curated updates on '
-        'what’s changing in your role industry..." option). The other five come through '
-        'with no text. (JB separately flagged the anchoring of "None of the above" here.)'
+    94: (  # Q94
+        'Five answer options display blank (no text) — the same broken option set as Q92:\n'
+        '"Career services...", "Cohort-based or live learning with peers...", "AI-powered '
+        'coaching, simulations, and role play...", "Interactive skills assessments...", and '
+        '"A personal record of the skills you build...". (JB separately flagged the anchoring '
+        'of "None of the above" here.)'
+    ),
+    109: (  # Q109  (live Q109 = questionnaire Q108)
+        'Confirms JB/MK: answer list and stem don\'t match the questionnaire.\n'
+        'Stem: live says "highest degree of education", the questionnaire says "highest level '
+        'of education". Options: the live list is 10 items in census wording ("Some high '
+        'school, no diploma"; "High school graduate, diploma or equivalent (e.g. GED)"; "Some '
+        'college credit, no degree"; ...), while the questionnaire lists 9 in different '
+        'wording ("High school diploma or GED"; "Some college, no degree").'
+    ),
+    112: (  # Q112  (live Q112 = questionnaire Q111)
+        'Confirms JB/MK: one answer option is missing.\n'
+        'The live survey has 9 options; the questionnaire has 10. The missing one is '
+        '"Prefer not to say".'
     ),
 }
 
 SCOPE_NOTE = (
     "QA - Claude (independent third-reviewer pass).\n"
-    "Built from one complete automated trace of the LIVE Qualtrics survey "
-    "(one path, run to completion, 109 screens). Comments below are limited to "
-    "issues observable on a single screen render: options that come through with "
-    "no display text, wording/typos, and answer-list counts on the questions this "
-    "path reached. A single path CANNOT assess randomization, anchor order, or "
-    "exclusive-select logic (those need repeated runs — see the JB/MK tabs, which "
-    "did multiple runs). 31 display-gated questions were not reached on this path "
-    "and are left blank here. A blank comment means nothing was flagged on that "
-    "question on this pass — not that it is signed off."
+    "Built from one complete automated trace of the LIVE Qualtrics survey (one path, run to "
+    "completion, 109 screens), then compared question-by-question against the v15 "
+    "questionnaire.\n\n"
+    "Boolean columns use the same convention as the JB/MK tabs: TRUE = checked and verified "
+    "on this pass; FALSE = not positively confirmed (not necessarily wrong — see the "
+    "comment). Filled here:\n"
+    "  • Wording (D): live stem + answer text read against v15. TRUE where they match; FALSE "
+    "where a discrepancy was found (see comment).\n"
+    "  • Formatting (E): live bold/underline compared to v15 emphasis. TRUE only where they "
+    "matched exactly; FALSE where not confirmed — a manual formatting pass is still worth "
+    "doing.\n"
+    "  • SP vs MP (F): live control type vs v15. TRUE on all reached questions — no SP/MP "
+    "mismatch was found.\n\n"
+    "Left FALSE on purpose (a single path cannot judge these — see the JB/MK multi-run tabs): "
+    "'Question not skippable' (C), 'Display logic' (G), 'Randomization/anchor' (H), "
+    "'Exclusive logic' (I), 'Other logic' (J).\n"
+    "31 display-gated questions were not reached on this path and are left FALSE throughout."
 )
 
 
@@ -117,19 +210,37 @@ def main():
     tmpl = wb["QA Template"]
     ws = wb.copy_worksheet(tmpl)
     ws.title = "QA - Claude"
-    # move it just after QA - MK for readability
     wb.move_sheet(ws, offset=-(wb.sheetnames.index("QA - Claude") - (wb.sheetnames.index("QA - MK") + 1)))
 
-    # scope note in K1 (same cell JB/MK use for their "how to read" note)
+    # map live Q-number -> row (template B column holds live numbering)
+    row_of = {}
+    for r in range(4, ws.max_row + 1):
+        b = ws.cell(r, 2).value
+        if isinstance(b, int):
+            row_of[b] = r
+        elif isinstance(b, str) and re.fullmatch(r"\d+", b.strip()):
+            row_of[int(b.strip())] = r
+
     ws["K1"] = SCOPE_NOTE
 
-    for row, text in COMMENTS.items():
-        ws.cell(row=row, column=11).value = text  # column K
+    C = {"D": 4, "E": 5, "F": 6}  # column indices
+    for n in REACHED:
+        r = row_of.get(n)
+        if not r:
+            continue
+        ws.cell(r, C["D"]).value = (n not in D_BAD)   # wording
+        ws.cell(r, C["E"]).value = (n in E_OK)        # formatting
+        ws.cell(r, C["F"]).value = (n in F_OK)        # SP vs MP
+
+    for n, text in COMMENTS.items():
+        r = row_of.get(n)
+        if r:
+            ws.cell(r, 11).value = text  # column K
 
     wb.save(OUT)
     print("wrote", OUT)
-    print("sheets:", wb.sheetnames)
-    print("comments written:", len(COMMENTS))
+    print("comments:", len(COMMENTS), "| D-flags:", len(D_BAD),
+          "| E=TRUE:", len(E_OK), "| F=TRUE:", len(F_OK))
 
 
 if __name__ == "__main__":
