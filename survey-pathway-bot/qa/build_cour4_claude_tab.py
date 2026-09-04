@@ -38,7 +38,14 @@ E_OK = [1,2,3,4,5,8,9,10,11,14,16,17,18,19,20,21,26,27,29,31,34,37,40,56,69,70,
     71,72,73,74,75,76,79,80,83,85,87,88,90,93,96,99,101,102,110,111,112,113,114,
     115,117,118,119]
 # wording / answer-text discrepancy vs v15 (these get D = FALSE)
-D_BAD = [4,6,9,10,25,27,28,36,38,40,41,42,57,61,64,65,82,87,92,94,109,112]
+# NOTE: the checkbox "blank option" flags (Q9/Q10/Q25/Q27/Q92/Q94) were REMOVED.
+# On those, the trace captured the option label as the literal word "Selected" (the
+# checkbox state) with empty emphasis, which is the bot's fall-back when it cannot
+# read an option's label element -- a capture artifact, not a real blank render.
+# Corroboration: JB/MK (two human reviewers) did not flag any of them, and confirmed
+# only the *radio* bare-number blanks (Q6="2", Q87="4"). Kept: real text/typo findings
+# and the human-corroborated radio blanks.
+D_BAD = [4,6,28,36,38,40,41,42,57,61,64,65,82,87,109,112]
 
 COMMENTS = {
     4: (  # Q4
@@ -51,29 +58,6 @@ COMMENTS = {
         '1. Option b displays with no text at all — it comes through as just "2".\n'
         '2. Option c reads "I had did not have any control...". Drop the extra "had": '
         '"I did not have any control over which online learning platform I used".'
-    ),
-    9: (  # Q9
-        'One answer option displays blank (no text).\n'
-        'The option that fails to render is "I have used a stipend or reimbursement provided '
-        'by my employer, school/university, or other organization... in the last 2 years". '
-        'The other two options render fine.'
-    ),
-    10: (  # Q10
-        'Three answer options display blank (no text).\n'
-        'The three that fail to render are:\n'
-        '• "Learning or skill-practice apps or platforms... (e.g., Duolingo Plus, Memrise, Busuu)"\n'
-        '• "Online learning platform that you chose on your own... (e.g., Udemy, Coursera, LinkedIn Learning)"\n'
-        '• "Live classes or programs (online or in person): instructor-led workshops, bootcamps, or cohort-based programs".'
-    ),
-    25: (  # Q25
-        'One answer option displays blank (no text).\n'
-        'The option that fails to render is "Preparing for a certification related to my job '
-        '(e.g., AWS Certified Solutions Architect, CompTIA A+, Microsoft Azure Fundamentals)".'
-    ),
-    27: (  # Q27
-        'One answer option displays blank (no text).\n'
-        'The option that fails to render is "Physical Science and Engineering (robotics, '
-        'mechanical/electrical engineering, environmental science, chemistry, physics)".'
     ),
     28: (  # Q28
         'Stem wording differs from the questionnaire.\n'
@@ -89,14 +73,11 @@ COMMENTS = {
         'setting a specific budget or plan". The last two words are swapped.'
     ),
     38: (  # Q38
-        'Stem word dropped, plus two blank answer options — and this question gates most of '
-        'the pricing/concept section that follows (Q40+), so it is worth fixing first.\n'
-        '1. Stem: live reads "...which of the following would you be interested in?"; the '
-        'questionnaire reads "...interested in purchasing?". The word "purchasing" is missing.\n'
-        '2. Two options display with no text: "A subscription to a personalized learning '
-        'experience that builds a learning path around your goals..." and "A verified skill '
-        'assessment that provides verified proof to employers...". (JB separately flagged the '
-        'anchor settings on this question.)'
+        'Stem is missing a word — and this question gates most of the pricing/concept section '
+        'that follows (Q40+).\n'
+        'Live reads "...which of the following would you be interested in?"; the questionnaire '
+        'reads "...interested in purchasing?". The word "purchasing" is missing. (JB '
+        'separately flagged the anchor settings on this question.)'
     ),
     40: (  # Q40
         'Typo in option c.\n'
@@ -104,16 +85,18 @@ COMMENTS = {
         '(Extremely / Very / Slightly / Not at all likely to pay). Should be "Somewhat likely to pay".'
     ),
     41: (  # Q41
-        'Piped price is missing its currency symbol.\n'
-        'The stem renders "Would you be willing to pay 40.00 for this individual course..." — '
-        'no "$" in front of the number. It shows the same way at every price point in the '
-        'ladder. Same fault on Q61 and Q65 (the other willingness-to-pay threshold questions).'
+        'Please confirm on screen: piped price may be missing its "$".\n'
+        'In the trace the stem came through as "Would you be willing to pay 40.00 for this '
+        'individual course..." — no "$" in front of the number, the same way at every price '
+        'point, and likewise on Q61 and Q65. The "$" renders fine elsewhere (e.g. Q4), so '
+        'this looks real, but worth a quick visual check since it is a piped value.'
     ),
     42: (  # Q42
-        'Option b displays blank.\n'
-        'It comes through as just "2" on screen — same rendering fault as Q6 and Q87. The '
-        'missing option is "I would not purchase a course with limited access..." '
-        '(text confirmed against the questionnaire).'
+        'Please confirm on screen: option b may display blank.\n'
+        'The automated trace read option b as just "2" — the same signature as the blank '
+        'options JB/MK confirmed on Q6 and Q87. The intended text is "I would not purchase a '
+        'course with limited access...". Q42 is display-gated, so it may not have been on the '
+        'path JB/MK reviewed; worth a look.'
     ),
     57: (  # Q57
         'Typo in the last option.\n'
@@ -121,8 +104,8 @@ COMMENTS = {
         'used elsewhere (e.g. Q11).'
     ),
     61: (  # Q61
-        'Piped price is missing its currency symbol (same as Q41).\n'
-        'Stem renders "...willing to pay 87.00 for a verified skill assessment..." with no "$".'
+        'Please confirm on screen: piped price may be missing its "$" (same as Q41).\n'
+        'Trace stem: "...willing to pay 87.00 for a verified skill assessment..." with no "$".'
     ),
     64: (  # Q64
         'Typo in option b.\n'
@@ -130,8 +113,8 @@ COMMENTS = {
         '"Very likely to pay".'
     ),
     65: (  # Q65
-        'Piped price is missing its currency symbol (same as Q41).\n'
-        'Stem renders "...willing to pay 50.00 per month for this subscription..." with no "$".'
+        'Please confirm on screen: piped price may be missing its "$" (same as Q41).\n'
+        'Trace stem: "...willing to pay 50.00 per month for this subscription..." with no "$".'
     ),
     82: (  # Q82  (extra live question, no questionnaire equivalent)
         'Confirms JB/MK: this question is not in the questionnaire.\n'
@@ -148,25 +131,6 @@ COMMENTS = {
         'access (i.e., some features or content unlocked while others are gated)...". Note the '
         'option value codes also jump (1 / 4 / 5 / 6), so only four options are present — '
         'confirm none were dropped.'
-    ),
-    92: (  # Q92
-        'Five answer options display blank (no text).\n'
-        'The five that fail to render are:\n'
-        '• "Career services (e.g., resume/interview prep, job placement...)"\n'
-        '• "Cohort-based or live learning with peers..."\n'
-        '• "AI-powered coaching, simulations, and role play..."\n'
-        '• "Interactive skills assessments that measure your current skill level..."\n'
-        '• "A personal record of the skills you build that you can keep, track, and share...".\n'
-        'The same five options render blank on Q94 too, so it is one broken option set reused '
-        'across both questions. (MK separately flagged that "None of the above" is not '
-        'exclusive here — a distinct issue.)'
-    ),
-    94: (  # Q94
-        'Five answer options display blank (no text) — the same broken option set as Q92:\n'
-        '"Career services...", "Cohort-based or live learning with peers...", "AI-powered '
-        'coaching, simulations, and role play...", "Interactive skills assessments...", and '
-        '"A personal record of the skills you build...". (JB separately flagged the anchoring '
-        'of "None of the above" here.)'
     ),
     109: (  # Q109  (live Q109 = questionnaire Q108)
         'Confirms JB/MK: answer list and stem don\'t match the questionnaire.\n'
@@ -201,7 +165,13 @@ SCOPE_NOTE = (
     "Left FALSE on purpose (a single path cannot judge these — see the JB/MK multi-run tabs): "
     "'Question not skippable' (C), 'Display logic' (G), 'Randomization/anchor' (H), "
     "'Exclusive logic' (I), 'Other logic' (J).\n"
-    "31 display-gated questions were not reached on this path and are left FALSE throughout."
+    "31 display-gated questions were not reached on this path and are left FALSE throughout.\n\n"
+    "Reliability note: this tab reports only blank/no-text answer options that show as a bare "
+    "value number on a single-select AND were independently confirmed by a human reviewer "
+    "(Q6, Q87). Automated 'blank option' flags on multi-selects were dropped as capture "
+    "artifacts — the tool logged the option's checkbox state ('Selected') rather than reading "
+    "its label, which is not evidence the option is blank on screen. Two items (Q41/Q61/Q65 "
+    "missing '$', Q42 option b) are marked 'confirm on screen' rather than asserted."
 )
 
 
