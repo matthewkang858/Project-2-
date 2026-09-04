@@ -190,6 +190,19 @@ try {
   check(bdTraces.some((t) => t.outcome?.type === 'complete'), 'explore() still captures a full path when the end blocks Back');
   await bd.close();
 
+  // maxForward: on a dead-end-terminal survey, capping each walk before the end
+  // lets exploration sweep many branches in one session without stranding.
+  const cap = await ctx.newPage();
+  await cap.goto(URL_);
+  await cap.evaluate(snippet);
+  const capTraces = (await cap.evaluate(async (u) => await spb.explore({ url: u, maxRuns: 6, maxForward: 3, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'backtrack?deadend=1')) || [];
+  const capKeys = new Set(capTraces.flatMap((t) => (t.steps || []).flatMap((s) => (s.questions || []).map((q) => q.key))));
+  const capGatedBoth = capTraces.some((t) => (t.steps || []).some((s) => (s.questions || []).some((q) => q.key === 'QR~BQ3'))) &&
+    capTraces.some((t) => !(t.steps || []).some((s) => (s.questions || []).some((q) => q.key === 'QR~BQ3')));
+  check(capTraces.length >= 3, `maxForward lets explore() sweep multiple branches past a dead-end terminal (${capTraces.length} runs)`);
+  check(capGatedBoth, 'maxForward run still covers both arms of the gated question without submitting the end');
+  await cap.close();
+
   for (const [path, label, keys] of [
     ['limit', 'respects "select up to two"', null],
     ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],
