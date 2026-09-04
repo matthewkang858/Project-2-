@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "98bbcef 2026-09-04 03:08";
+const SPB_BUILD = "72bcf1e 2026-09-04 03:42";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -31,6 +31,8 @@ const DEFAULT_SELECTORS = {
     'button.next',
     'a.next',
   ],
+  // Back / previous controls, for single-session backtracking exploration.
+  prevButtons: ['#PreviousButton', 'input[name="PreviousButton"]', 'button.previous', 'a.previous', '.PreviousButton'],
   // Page text that means "this run is over".
   terminalPatterns: {
     complete: [
@@ -601,6 +603,27 @@ function pageModel(cfg, doc) {
     if (el) next = { selector: cssFor(el), label: clean(el.innerText || el.value || ''), matched: 'text' };
   }
 
+  // Back button — needed for single-session exploration, where the only way to
+  // revisit an earlier page is to walk back (the survey cannot be reloaded).
+  let prev = null;
+  for (const sel of cfg.prevButtons || DEFAULT_SELECTORS.prevButtons) {
+    const el = [...doc.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
+    if (el && (!next || cssFor(el) !== next.selector)) {
+      prev = { selector: cssFor(el), label: clean(el.innerText || el.value || '') };
+      break;
+    }
+  }
+  if (!prev) {
+    const backward = /^(back|previous|prev|go back|return)\b|^(←|«|<<|‹)$/i;
+    const el = [...doc.querySelectorAll('button, input[type="button"], a[role="button"], [role="button"], .button, .btn')].find((e) => {
+      if (!visible(e) || e.disabled) return false;
+      if (next && cssFor(e) === next.selector) return false;
+      const label = clean(e.innerText || e.value || e.getAttribute('aria-label') || '');
+      return label && backward.test(label);
+    });
+    if (el) prev = { selector: cssFor(el), label: clean(el.innerText || el.value || '') };
+  }
+
   const bodyText = clean(doc.body?.innerText || '');
   const lower = bodyText.toLowerCase();
   let outcome = null;
@@ -622,6 +645,7 @@ function pageModel(cfg, doc) {
     heading,
     questions,
     next,
+    prev,
     outcome,
     bodyText: bodyText.slice(0, 4000),
   };
@@ -965,15 +989,11 @@ function applyAnswer(q, candidate, doc) {
   return el.checked || marked;
 }
 
-// Click the forward button described by a page model. Some engines (Qualtrics
-// JFE) bind their Next control through their own event system and ignore a bare
-// synthetic click, so drive it the way a person would — a full pointer/mouse/
-// click sequence — and fall back to focus + Enter.
-function clickNext(model, doc) {
-  if (!model.next) return false;
-  doc = doc || document;
-  const win = doc.defaultView || window;
-  const el = doc.querySelector(model.next.selector);
+// Drive a navigation button the way a person would. Some engines (Qualtrics
+// JFE) bind their controls through their own event system and ignore a bare
+// synthetic click, so fire a full pointer/mouse/click sequence plus a
+// focus+Enter fallback.
+function pressButton(el, win) {
   if (!el) return false;
   const Pointer = win.PointerEvent || win.MouseEvent;
   for (const type of ['pointerover', 'pointerenter', 'pointerdown', 'mousedown', 'pointerup', 'mouseup'])
@@ -983,6 +1003,22 @@ function clickNext(model, doc) {
   for (const type of ['keydown', 'keypress', 'keyup'])
     el.dispatchEvent(new win.KeyboardEvent(type, { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
   return true;
+}
+
+// Click the forward button described by a page model.
+function clickNext(model, doc) {
+  if (!model.next) return false;
+  doc = doc || document;
+  const el = doc.querySelector(model.next.selector);
+  return pressButton(el, doc.defaultView || window);
+}
+
+// Click the back button described by a page model.
+function clickPrev(model, doc) {
+  if (!model || !model.prev) return false;
+  doc = doc || document;
+  const el = doc.querySelector(model.prev.selector);
+  return pressButton(el, doc.defaultView || window);
 }
 
 // Everything a caller needs to read the current page in one call.
@@ -997,6 +1033,7 @@ function readPage(cfg, doc, depth) {
   const model = pageModel({
     questionContainers: c.questionContainers || DEFAULT_SELECTORS.questionContainers,
     nextButtons: c.nextButtons || DEFAULT_SELECTORS.nextButtons,
+    prevButtons: c.prevButtons || DEFAULT_SELECTORS.prevButtons,
     terminalPatterns: c.terminalPatterns || DEFAULT_SELECTORS.terminalPatterns,
     nextText: c.nextText,
   }, root);
@@ -1064,6 +1101,7 @@ globalThis.SPB_CORE = {
   describe,
   applyAnswer,
   clickNext,
+  clickPrev,
 };
 
 // Report rendering — shared by the CLI (report.mjs) and the Chrome extension's
@@ -1362,6 +1400,7 @@ const spb = {
   help() {
     console.log(`spb.check()                 is this page the survey, and can it be framed?
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
+spb.explore({ maxRuns: 20 }) single-session survey (CAPTCHA / no-restart): backtracks with the Back button
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
 spb.stop()                  end the run now and keep what was recorded
 spb.debug()                 what the bot can and cannot see on this page
@@ -1484,6 +1523,37 @@ spb.reset()                 clear stored state`);
       return d;
     };
 
+    // Single-session surveys (a CAPTCHA at the top, or one-response ballot-box
+    // prevention) cannot be reloaded to restart — reloading resumes or blocks
+    // the same session. Instead the run walks BACK to the first page between
+    // traversals. `firstFp` marks the top; back-nav stops when it reaches a page
+    // with no Back button or that fingerprint.
+    const singleSession = !!(opts.singleSession ?? cfg.singleSession);
+    let firstFp = null;
+    const backToStart = async () => {
+      for (let i = 0; i < maxSteps; i++) {
+        let m;
+        try { m = C.readPage(cfg.selectors, docOf()); } catch { await sleep(300); continue; }
+        if (firstFp && m.fingerprint === firstFp) return true;
+        // A dead-end terminal (thank-you screen) with no Back is unrecoverable.
+        if (m.isTerminal && !m.prev) return false;
+        if (!m.isTerminal && !m.prev) return true; // page 1 has no Back button
+        const before = m.fingerprint + '|' + m.url;
+        C.clickPrev(m, C.docFor(m, docOf()));
+        const until = Date.now() + timeout;
+        let moved = false;
+        while (Date.now() < until) {
+          await sleep(200);
+          try {
+            const now = C.readPage(cfg.selectors, docOf());
+            if (now.fingerprint + '|' + now.url !== before) { moved = true; break; }
+          } catch { /* mid-navigation */ }
+        }
+        if (!moved) return !m.isTerminal; // stuck going back: at start unless stranded on terminal
+      }
+      return false;
+    };
+
     try {
       await load(startUrl);
       docOf().querySelector('body');
@@ -1502,6 +1572,7 @@ spb.reset()                 clear stored state`);
       await sleep(300);
       first = C.readPage(cfg.selectors, docOf());
     }
+    firstFp = first.fingerprint;
     // A welcome page legitimately has no questions — what matters is whether
     // there is any way forward from it.
     if (!first.questions.length && !first.next) {
@@ -1517,6 +1588,12 @@ spb.reset()                 clear stored state`);
     }
 
     const state = { queue: [[]], seen: [''], traces: [] };
+    // Pages whose forward click ends the survey. In single-session mode the
+    // final page can be submitted only once (its terminal screen usually blocks
+    // Back), so after the first completion later runs stop at this edge instead
+    // of re-submitting — that keeps a page to rewind from and reveals branches
+    // that live before the end.
+    const terminalEdges = new Set();
     let runs = 0;
     this._abort = false;
     while (state.queue.length && runs < maxRuns && !this._abort) {
@@ -1527,9 +1604,27 @@ spb.reset()                 clear stored state`);
       let di = 0;
       let type = 'maxsteps';
       let text = '';
+      let pendingEdge = null; // fingerprint of the page we last clicked forward from
 
       try {
-        if (runs > 1) await load(startUrl);
+        if (runs > 1) {
+          if (singleSession) {
+            const ok = await backToStart();
+            if (!ok) {
+              // Could not get back to the top (a dead-end terminal, or Back is
+              // disabled): stop cleanly with the traversals already captured.
+              runs--; // this plan never ran
+              console.warn(
+                '%csingle-session exploration cannot rewind past this page (the survey blocks Back here, ' +
+                  'likely the final "response recorded" screen). Stopping with the paths captured so far.',
+                'font-weight:bold'
+              );
+              break;
+            }
+          } else {
+            await load(startUrl);
+          }
+        }
         const answered = new Set();
         const visits = new Map(); // how often each page has come round
         const validationRetried = new Set(); // pages re-answered after an error
@@ -1563,6 +1658,10 @@ spb.reset()                 clear stored state`);
             });
             type = model.outcome || (model.stuck ? 'stuck' : 'end');
             text = model.bodyText.slice(0, 600);
+            // Remember the page that led here so later single-session runs stop
+            // before re-submitting it (only a real completion counts as an edge,
+            // not a screen-out we deliberately avoid).
+            if (pendingEdge && (model.outcome === 'complete' || !model.outcome)) terminalEdges.add(pendingEdge);
             break;
           }
           const target = C.docFor(model, doc);
@@ -1624,7 +1723,17 @@ const lost = ans.planned.filter((d) => {
             break;
           }
 
+          // In single-session mode, don't re-submit the final page — its
+          // terminal screen usually blocks Back and would strand exploration.
+          // This page is answered and its branch captured; treat it as a leaf.
+          if (singleSession && terminalEdges.has(current.fingerprint)) {
+            type = 'complete';
+            text = 'reached the final page again — stopped before re-submitting so exploration can continue';
+            break;
+          }
+
           const before = current.fingerprint + '|' + current.url;
+          pendingEdge = current.fingerprint;
           C.clickNext(current, C.docFor(current, docOf()));
           const deadline = Date.now() + timeout;
           let moved = false;
@@ -1728,6 +1837,15 @@ const lost = ans.planned.filter((d) => {
       'font-weight:bold'
     );
     return state.traces;
+  },
+
+  // Explore a survey that cannot be reloaded to restart — a CAPTCHA at the top,
+  // or one-response ballot-box prevention. Same breadth-first branch coverage
+  // as auto(), but between traversals it walks BACK to the first page with the
+  // survey's own Back button instead of reloading, and it submits the final
+  // page only once so later branches never strand on the terminal screen.
+  async explore(opts = {}) {
+    return this.auto({ ...opts, singleSession: true });
   },
 
   // Hand the wheel to the user for a widget the bot cannot drive — a drag-only
