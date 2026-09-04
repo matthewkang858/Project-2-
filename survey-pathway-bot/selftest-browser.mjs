@@ -162,6 +162,34 @@ try {
   check(qnVals.every((v) => !/test/i.test(v)), 'snippet never types "Test" into a numeric field');
   await qn.close();
 
+  // Single-session exploration: a survey that cannot be reloaded (ballot-box
+  // wall on reload) with a Back button and a display-gated question (BQ3 shows
+  // only when BQ2="Yes"). explore() must backtrack, cover both branches, and
+  // never trip the reload wall.
+  const bt = await ctx.newPage();
+  await bt.goto(URL_); // base page, so the iframe is the only load of /backtrack (shared tab sessionStorage)
+  await bt.evaluate(snippet);
+  const btTraces = (await bt.evaluate(async (u) => await spb.explore({ url: u, maxRuns: 6, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'backtrack')) || [];
+  const btKeys = new Set(btTraces.flatMap((t) => (t.steps || []).flatMap((s) => (s.questions || []).map((q) => q.key))));
+  const btComplete = btTraces.filter((t) => t.outcome?.type === 'complete').length;
+  const sawGated = btTraces.some((t) => (t.steps || []).some((s) => (s.questions || []).some((q) => q.key === 'QR~BQ3')));
+  const sawUngated = btTraces.some((t) => !(t.steps || []).some((s) => (s.questions || []).some((q) => q.key === 'QR~BQ3')));
+  const noWall = !btTraces.some((t) => /already responded/i.test(t.outcome?.text || ''));
+  check(btComplete >= 2, `explore() completes multiple paths in one session (${btComplete} complete)`);
+  check(btKeys.has('QR~BQ1') && btKeys.has('QR~BQ4'), 'explore() covers the shared questions');
+  check(sawGated && sawUngated, 'explore() covers both arms of a display-gated question (BQ3 shown and skipped)');
+  check(noWall, 'explore() never reloads into the ballot-box wall');
+  await bt.close();
+
+  // Graceful degrade: when the thank-you page blocks Back, explore() still
+  // returns the one completed path instead of erroring.
+  const bd = await ctx.newPage();
+  await bd.goto(URL_);
+  await bd.evaluate(snippet);
+  const bdTraces = (await bd.evaluate(async (u) => await spb.explore({ url: u, maxRuns: 6, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'backtrack?deadend=1')) || [];
+  check(bdTraces.some((t) => t.outcome?.type === 'complete'), 'explore() still captures a full path when the end blocks Back');
+  await bd.close();
+
   for (const [path, label, keys] of [
     ['limit', 'respects "select up to two"', null],
     ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],

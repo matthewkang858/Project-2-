@@ -829,6 +829,83 @@ createServer((req, res) => {
       </script></body></html>`);
     return;
   }
+  // Single-session survey with a real Back button and a display-gated question,
+  // driven entirely client-side (like Qualtrics JFE): navigation never reloads.
+  // A reload hits a ballot-box "already responded" wall (sessionStorage), so a
+  // bot that tries to restart by reloading fails — only backtracking works.
+  // ?deadend=1 makes the thank-you screen block Back (graceful-degrade case).
+  if (req.url && req.url.split('?')[0] === '/backtrack') {
+    const deadend = /deadend=1/.test(req.url);
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
+      <form id="Page" name="Page">
+        <div id="Questions"></div>
+        <div id="Buttons">
+          <input id="PreviousButton" type="button" value="←" aria-label="Previous">
+          <input id="NextButton" type="button" value="→" aria-label="Next">
+        </div>
+      </form>
+      <script>
+      (function(){
+        var DEADEND = ${deadend ? 'true' : 'false'};
+        try {
+          if (sessionStorage.getItem('bt_started')) {
+            document.body.innerHTML = '<h2>You have already responded to this survey.</h2>';
+            return;
+          }
+          sessionStorage.setItem('bt_started','1');
+        } catch(e){}
+        // Q3 is shown only when Q2 = "Yes".
+        var QS = [
+          { key:'BQ1', text:'Which describes you?', opts:['Student','Professional'] },
+          { key:'BQ2', text:'Do you use an online platform?', opts:['Yes','No'] },
+          { key:'BQ3', gateOn:function(s){ return s.BQ2==='1'; }, text:'Which platform?', opts:['Coursera','Udemy'] },
+          { key:'BQ4', text:'How satisfied are you?', opts:['High','Low'] }
+        ];
+        var state = {};      // key -> chosen value ("1"-based index as string)
+        var order = [];      // history of visited question indices, for Back
+        var cur = 0;
+        var Q = document.getElementById('Questions');
+        function visible(i){ var q=QS[i]; return !q.gateOn || q.gateOn(state); }
+        function nextIndex(from){ for(var i=from+1;i<QS.length;i++) if(visible(i)) return i; return QS.length; }
+        function render(){
+          var q = QS[cur];
+          Q.innerHTML = '<div class="QuestionOuter" id="'+q.key+'"><fieldset><legend>'+
+            '<div class="QuestionText"><label class="ExportTag">Q'+(cur+1)+'.</label> '+q.text+'</div></legend>'+
+            '<ul class="ChoiceStructure">'+ q.opts.map(function(o,i){
+              var v=String(i+1), sel = state[q.key]===v ? ' checked' : '';
+              return '<li class="Selection"><input class="radio" type="radio" name="QR~'+q.key+'" id="QR~'+q.key+'~'+v+'" value="'+v+'"'+sel+'>'+
+                '<label for="QR~'+q.key+'~'+v+'" class="q-radio" aria-hidden="true"></label>'+
+                '<span class="LabelWrapper"><label for="QR~'+q.key+'~'+v+'" class="SingleAnswer"><span>'+o+'</span></label></span></li>';
+            }).join('') + '</ul></fieldset></div>';
+          document.getElementById('PreviousButton').style.visibility = order.length ? 'visible' : 'hidden';
+          document.getElementById('NextButton').style.display = ''; // restore after a completion+Back
+        }
+        function readSel(){ var c=document.querySelector('input[name="QR~'+QS[cur].key+'"]:checked'); return c?c.value:null; }
+        document.getElementById('NextButton').addEventListener('mousedown', function(){
+          var v = readSel();
+          if (!v){ if(!document.querySelector('.ValidationError')) Q.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please answer.</div>'); return; }
+          state[QS[cur].key] = v;
+          var ni = nextIndex(cur);
+          if (ni >= QS.length){
+            // A real end screen has no forward button; Back survives only when
+            // the survey allows returning from the thank-you page.
+            document.getElementById('NextButton').style.display = 'none';
+            document.getElementById('PreviousButton').style.visibility = DEADEND ? 'hidden' : 'visible';
+            Q.innerHTML = '<h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p>';
+            return;
+          }
+          order.push(cur); cur = ni; render();
+        });
+        document.getElementById('PreviousButton').addEventListener('mousedown', function(){
+          if (!order.length) return;
+          cur = order.pop(); render();
+        });
+        render();
+      })();
+      </script></body></html>`);
+    return;
+  }
   if (req.url === '/qualtricscheck') {
     let raw = '';
     req.on('data', (c) => (raw += c));

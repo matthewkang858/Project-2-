@@ -26,6 +26,8 @@ const DEFAULT_SELECTORS = {
     'button.next',
     'a.next',
   ],
+  // Back / previous controls, for single-session backtracking exploration.
+  prevButtons: ['#PreviousButton', 'input[name="PreviousButton"]', 'button.previous', 'a.previous', '.PreviousButton'],
   // Page text that means "this run is over".
   terminalPatterns: {
     complete: [
@@ -596,6 +598,27 @@ function pageModel(cfg, doc) {
     if (el) next = { selector: cssFor(el), label: clean(el.innerText || el.value || ''), matched: 'text' };
   }
 
+  // Back button — needed for single-session exploration, where the only way to
+  // revisit an earlier page is to walk back (the survey cannot be reloaded).
+  let prev = null;
+  for (const sel of cfg.prevButtons || DEFAULT_SELECTORS.prevButtons) {
+    const el = [...doc.querySelectorAll(sel)].find((e) => visible(e) && !e.disabled);
+    if (el && (!next || cssFor(el) !== next.selector)) {
+      prev = { selector: cssFor(el), label: clean(el.innerText || el.value || '') };
+      break;
+    }
+  }
+  if (!prev) {
+    const backward = /^(back|previous|prev|go back|return)\b|^(←|«|<<|‹)$/i;
+    const el = [...doc.querySelectorAll('button, input[type="button"], a[role="button"], [role="button"], .button, .btn')].find((e) => {
+      if (!visible(e) || e.disabled) return false;
+      if (next && cssFor(e) === next.selector) return false;
+      const label = clean(e.innerText || e.value || e.getAttribute('aria-label') || '');
+      return label && backward.test(label);
+    });
+    if (el) prev = { selector: cssFor(el), label: clean(el.innerText || el.value || '') };
+  }
+
   const bodyText = clean(doc.body?.innerText || '');
   const lower = bodyText.toLowerCase();
   let outcome = null;
@@ -617,6 +640,7 @@ function pageModel(cfg, doc) {
     heading,
     questions,
     next,
+    prev,
     outcome,
     bodyText: bodyText.slice(0, 4000),
   };
@@ -960,15 +984,11 @@ function applyAnswer(q, candidate, doc) {
   return el.checked || marked;
 }
 
-// Click the forward button described by a page model. Some engines (Qualtrics
-// JFE) bind their Next control through their own event system and ignore a bare
-// synthetic click, so drive it the way a person would — a full pointer/mouse/
-// click sequence — and fall back to focus + Enter.
-function clickNext(model, doc) {
-  if (!model.next) return false;
-  doc = doc || document;
-  const win = doc.defaultView || window;
-  const el = doc.querySelector(model.next.selector);
+// Drive a navigation button the way a person would. Some engines (Qualtrics
+// JFE) bind their controls through their own event system and ignore a bare
+// synthetic click, so fire a full pointer/mouse/click sequence plus a
+// focus+Enter fallback.
+function pressButton(el, win) {
   if (!el) return false;
   const Pointer = win.PointerEvent || win.MouseEvent;
   for (const type of ['pointerover', 'pointerenter', 'pointerdown', 'mousedown', 'pointerup', 'mouseup'])
@@ -978,6 +998,22 @@ function clickNext(model, doc) {
   for (const type of ['keydown', 'keypress', 'keyup'])
     el.dispatchEvent(new win.KeyboardEvent(type, { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
   return true;
+}
+
+// Click the forward button described by a page model.
+function clickNext(model, doc) {
+  if (!model.next) return false;
+  doc = doc || document;
+  const el = doc.querySelector(model.next.selector);
+  return pressButton(el, doc.defaultView || window);
+}
+
+// Click the back button described by a page model.
+function clickPrev(model, doc) {
+  if (!model || !model.prev) return false;
+  doc = doc || document;
+  const el = doc.querySelector(model.prev.selector);
+  return pressButton(el, doc.defaultView || window);
 }
 
 // Everything a caller needs to read the current page in one call.
@@ -992,6 +1028,7 @@ function readPage(cfg, doc, depth) {
   const model = pageModel({
     questionContainers: c.questionContainers || DEFAULT_SELECTORS.questionContainers,
     nextButtons: c.nextButtons || DEFAULT_SELECTORS.nextButtons,
+    prevButtons: c.prevButtons || DEFAULT_SELECTORS.prevButtons,
     terminalPatterns: c.terminalPatterns || DEFAULT_SELECTORS.terminalPatterns,
     nextText: c.nextText,
   }, root);
@@ -1059,4 +1096,5 @@ globalThis.SPB_CORE = {
   describe,
   applyAnswer,
   clickNext,
+  clickPrev,
 };

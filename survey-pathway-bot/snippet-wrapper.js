@@ -128,6 +128,7 @@ const spb = {
   help() {
     console.log(`spb.check()                 is this page the survey, and can it be framed?
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
+spb.explore({ maxRuns: 20 }) single-session survey (CAPTCHA / no-restart): backtracks with the Back button
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
 spb.stop()                  end the run now and keep what was recorded
 spb.debug()                 what the bot can and cannot see on this page
@@ -250,6 +251,37 @@ spb.reset()                 clear stored state`);
       return d;
     };
 
+    // Single-session surveys (a CAPTCHA at the top, or one-response ballot-box
+    // prevention) cannot be reloaded to restart — reloading resumes or blocks
+    // the same session. Instead the run walks BACK to the first page between
+    // traversals. `firstFp` marks the top; back-nav stops when it reaches a page
+    // with no Back button or that fingerprint.
+    const singleSession = !!(opts.singleSession ?? cfg.singleSession);
+    let firstFp = null;
+    const backToStart = async () => {
+      for (let i = 0; i < maxSteps; i++) {
+        let m;
+        try { m = C.readPage(cfg.selectors, docOf()); } catch { await sleep(300); continue; }
+        if (firstFp && m.fingerprint === firstFp) return true;
+        // A dead-end terminal (thank-you screen) with no Back is unrecoverable.
+        if (m.isTerminal && !m.prev) return false;
+        if (!m.isTerminal && !m.prev) return true; // page 1 has no Back button
+        const before = m.fingerprint + '|' + m.url;
+        C.clickPrev(m, C.docFor(m, docOf()));
+        const until = Date.now() + timeout;
+        let moved = false;
+        while (Date.now() < until) {
+          await sleep(200);
+          try {
+            const now = C.readPage(cfg.selectors, docOf());
+            if (now.fingerprint + '|' + now.url !== before) { moved = true; break; }
+          } catch { /* mid-navigation */ }
+        }
+        if (!moved) return !m.isTerminal; // stuck going back: at start unless stranded on terminal
+      }
+      return false;
+    };
+
     try {
       await load(startUrl);
       docOf().querySelector('body');
@@ -268,6 +300,7 @@ spb.reset()                 clear stored state`);
       await sleep(300);
       first = C.readPage(cfg.selectors, docOf());
     }
+    firstFp = first.fingerprint;
     // A welcome page legitimately has no questions — what matters is whether
     // there is any way forward from it.
     if (!first.questions.length && !first.next) {
@@ -283,6 +316,12 @@ spb.reset()                 clear stored state`);
     }
 
     const state = { queue: [[]], seen: [''], traces: [] };
+    // Pages whose forward click ends the survey. In single-session mode the
+    // final page can be submitted only once (its terminal screen usually blocks
+    // Back), so after the first completion later runs stop at this edge instead
+    // of re-submitting — that keeps a page to rewind from and reveals branches
+    // that live before the end.
+    const terminalEdges = new Set();
     let runs = 0;
     this._abort = false;
     while (state.queue.length && runs < maxRuns && !this._abort) {
@@ -293,9 +332,27 @@ spb.reset()                 clear stored state`);
       let di = 0;
       let type = 'maxsteps';
       let text = '';
+      let pendingEdge = null; // fingerprint of the page we last clicked forward from
 
       try {
-        if (runs > 1) await load(startUrl);
+        if (runs > 1) {
+          if (singleSession) {
+            const ok = await backToStart();
+            if (!ok) {
+              // Could not get back to the top (a dead-end terminal, or Back is
+              // disabled): stop cleanly with the traversals already captured.
+              runs--; // this plan never ran
+              console.warn(
+                '%csingle-session exploration cannot rewind past this page (the survey blocks Back here, ' +
+                  'likely the final "response recorded" screen). Stopping with the paths captured so far.',
+                'font-weight:bold'
+              );
+              break;
+            }
+          } else {
+            await load(startUrl);
+          }
+        }
         const answered = new Set();
         const visits = new Map(); // how often each page has come round
         const validationRetried = new Set(); // pages re-answered after an error
@@ -329,6 +386,10 @@ spb.reset()                 clear stored state`);
             });
             type = model.outcome || (model.stuck ? 'stuck' : 'end');
             text = model.bodyText.slice(0, 600);
+            // Remember the page that led here so later single-session runs stop
+            // before re-submitting it (only a real completion counts as an edge,
+            // not a screen-out we deliberately avoid).
+            if (pendingEdge && (model.outcome === 'complete' || !model.outcome)) terminalEdges.add(pendingEdge);
             break;
           }
           const target = C.docFor(model, doc);
@@ -390,7 +451,17 @@ const lost = ans.planned.filter((d) => {
             break;
           }
 
+          // In single-session mode, don't re-submit the final page — its
+          // terminal screen usually blocks Back and would strand exploration.
+          // This page is answered and its branch captured; treat it as a leaf.
+          if (singleSession && terminalEdges.has(current.fingerprint)) {
+            type = 'complete';
+            text = 'reached the final page again — stopped before re-submitting so exploration can continue';
+            break;
+          }
+
           const before = current.fingerprint + '|' + current.url;
+          pendingEdge = current.fingerprint;
           C.clickNext(current, C.docFor(current, docOf()));
           const deadline = Date.now() + timeout;
           let moved = false;
@@ -494,6 +565,15 @@ const lost = ans.planned.filter((d) => {
       'font-weight:bold'
     );
     return state.traces;
+  },
+
+  // Explore a survey that cannot be reloaded to restart — a CAPTCHA at the top,
+  // or one-response ballot-box prevention. Same breadth-first branch coverage
+  // as auto(), but between traversals it walks BACK to the first page with the
+  // survey's own Back button instead of reloading, and it submits the final
+  // page only once so later branches never strand on the terminal screen.
+  async explore(opts = {}) {
+    return this.auto({ ...opts, singleSession: true });
   },
 
   // Hand the wheel to the user for a widget the bot cannot drive — a drag-only
