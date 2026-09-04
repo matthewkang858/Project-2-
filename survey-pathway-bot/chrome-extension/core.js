@@ -861,20 +861,35 @@ function applyAnswer(q, candidate, doc) {
   const el = findControl(doc, q, opt);
   if (!el) return false;
   // With a hidden input the player listens on the wrapper that stands in for
-  // it — a <label>, or just a styled <div>. Click that, then fall back to
-  // clicking and finally forcing the control itself.
+  // it — a <label>, or just a styled <div>. Some engines (Qualtrics) re-render
+  // the control from their own runtime state after every change, wiping a
+  // synthetic `.checked`; that state only updates from a full event sequence,
+  // so drive the visible stand-in the way a real click would, like the
+  // button path does.
   const box = el.getBoundingClientRect();
   const hidden = box.width <= 2 || box.height <= 2 || (doc.defaultView || window).getComputedStyle(el).opacity === '0';
+  // Prefer the label that a person actually sees/clicks. A `for`-linked label
+  // that renders empty (Qualtrics' styled q-radio overlay) is a poor target,
+  // so take a non-empty labelled one when there is a choice.
+  const labelled = el.id ? [...doc.querySelectorAll(`label[for="${CSS.escape(el.id)}"]`)] : [];
+  const hasText = (l) => (l.innerText || l.textContent || '').trim() !== '';
   const wrapper =
-    (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label') || wrapperFor(el);
-  if (hidden && wrapper) wrapper.click();
-  if (!el.checked) el.click();
+    labelled.find(hasText) || labelled[0] || el.closest('label') || wrapperFor(el);
+  const Pointer = win.PointerEvent || win.MouseEvent;
+  const clickLike = (target) => {
+    if (!target) return;
+    for (const type of ['pointerdown', 'mousedown', 'pointerup', 'mouseup'])
+      target.dispatchEvent(new (type.startsWith('pointer') ? Pointer : win.MouseEvent)(type, { bubbles: true, cancelable: true, view: win }));
+    target.click();
+  };
+  if (hidden && wrapper) clickLike(wrapper);
+  if (!el.checked) clickLike(el);
   if (!el.checked) {
     el.checked = true;
     fire(el, ['input', 'change']);
   }
   const marked = wrapper
-    ? wrapper.getAttribute('aria-checked') === 'true' || /\b(selected|checked|active)\b/i.test(wrapper.className || '')
+    ? wrapper.getAttribute('aria-checked') === 'true' || /\b(selected|checked|active|q-checked)\b/i.test(wrapper.className || '')
     : false;
   return el.checked || marked;
 }

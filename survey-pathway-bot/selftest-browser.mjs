@@ -139,6 +139,19 @@ try {
   check([...qxGroups].some((k) => k.startsWith('QR~QID3~')), 'snippet reads tilde-named Qualtrics checkboxes');
   await qx.close();
 
+  // Qualtrics radio list (SAVR): opacity:0 input under an empty q-radio overlay,
+  // text in a separate label, and Next gated on the engine's own change-driven
+  // state rather than input.checked.
+  const qr = await ctx.newPage();
+  await qr.goto(URL_ + 'qradio');
+  await qr.evaluate(snippet);
+  const qrTraces = (await qr.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 2, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'qradio')) || [];
+  const qrComplete = qrTraces.filter((t) => t.outcome?.type === 'complete');
+  const qrLabels = new Set(qrTraces.flatMap((t) => t.decisions.map((d) => d.chosen || '')));
+  check(qrComplete.length === 2, `snippet completes a Qualtrics radio list (${qrComplete.length}/2 complete)`);
+  check([...qrLabels].some((l) => /\$20,000/.test(l)), 'snippet captures Qualtrics radio option text past the empty overlay label');
+  await qr.close();
+
   for (const [path, label, keys] of [
     ['limit', 'respects "select up to two"', null],
     ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],

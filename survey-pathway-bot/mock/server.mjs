@@ -731,6 +731,55 @@ createServer((req, res) => {
       </form></body></html>`);
     return;
   }
+  // Faithful Qualtrics radio-list page (SAVR): real input overlaid by an empty
+  // label.q-radio, answer text in a separate SingleAnswer label, input hidden
+  // by opacity, and — like the live engine — the page validates against its OWN
+  // runtime state (updated on the input's change event), not input.checked.
+  if (req.url && req.url.split('?')[0] === '/qradio') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const choices = [
+      [1, 'Less than $20,000'], [2, '$20,000 to $39,999'], [3, '$40,000 to $59,999'],
+      [8, 'More than $200,000'], [11, 'Prefer not to answer'],
+    ];
+    const li = choices.map(([v, t]) => `
+      <li class="Selection"> <input class="radio QWatchTimer" type="radio" name="QR~QID99" id="QR~QID99~${v}" value="${v}">
+        <label for="QR~QID99~${v}" class="q-radio" aria-hidden="true"></label>
+        <span class="LabelWrapper"><label for="QR~QID99~${v}" class="SingleAnswer ChoiceTextPositionLeft"><span>${t}</span></label></span>
+        <div class="clear"></div> </li>`).join('');
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title>
+      <style>input.radio{opacity:0;position:absolute;left:-5px;width:20px;height:20px}
+             .q-radio{display:inline-block;width:18px;height:18px;border:1px solid #999;border-radius:50%;vertical-align:middle}
+             .q-radio.q-checked{background:#0b6ed0}</style></head><body>
+      <form id="Page" name="Page">
+        <div class="QuestionOuter MC" id="QID99"><fieldset><legend>
+          <div class="QuestionText"><label class="ExportTag">Q4.</label> What is your <b>annual household income before tax</b>?</div></legend>
+          <div class="QuestionBody"><ul class="ChoiceStructure">${li}</ul></div>
+        </fieldset></div>
+        <div id="Buttons"><input id="PreviousButton" type="button" value="←" aria-label="Previous">
+          <input id="NextButton" type="button" value="→" aria-label="Next"></div>
+      </form>
+      <script>
+        // Qualtrics-like runtime: track selection in JS state on change, mirror
+        // the q-checked class, and gate Next on that state (not on .checked).
+        var picked = null;
+        [].forEach.call(document.querySelectorAll('input.radio'), function(inp){
+          inp.addEventListener('change', function(){
+            picked = inp.value;
+            [].forEach.call(document.querySelectorAll('.q-radio'), function(l){ l.classList.remove('q-checked'); });
+            var vis = document.querySelector('label.q-radio[for="'+inp.id+'"]');
+            if (vis) vis.classList.add('q-checked');
+          });
+        });
+        document.getElementById('NextButton').addEventListener('click', function(){
+          if (!picked) {
+            document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please answer this question.</div>');
+            return;
+          }
+          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>Thank you for completing this survey</h2><p>Your responses have been recorded.</p>'); document.close();
+        });
+      </script></body></html>`);
+    return;
+  }
   if (req.url === '/qualtricscheck') {
     let raw = '';
     req.on('data', (c) => (raw += c));
