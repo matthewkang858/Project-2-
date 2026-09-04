@@ -787,6 +787,38 @@ createServer((req, res) => {
       </script></body></html>`);
     return;
   }
+  // Qualtrics numeric money write-in (two ~TEXT boxes, plain type=text but the
+  // wording + validation banner cap the value). A word or an over-max number
+  // is rejected, mirroring the live Q34 that stalled the bot.
+  if (req.url && req.url.split('?')[0] === '/qnumeric') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
+      <form id="Page" name="Page">
+        <div class="QuestionOuter" id="QID90"><fieldset><legend>
+          <div class="QuestionText"><label class="ExportTag">Q34.</label> You cannot enter a value over $10,000.
+            How much money have you personally <b>spent</b> / <b>anticipate to spend</b> on online learning platforms?</div></legend>
+          <div class="QuestionBody">
+            <span class="LabelWrapper">Spent</span> <input type="text" name="QR~QID90~1~TEXT" id="QR~QID90~1~TEXT" value="">
+            <span class="LabelWrapper">Anticipate</span> <input type="text" name="QR~QID90~2~TEXT" id="QR~QID90~2~TEXT" value="">
+          </div></fieldset></div>
+        <div id="Buttons"><input id="PreviousButton" type="button" value="←" aria-label="Previous">
+          <input id="NextButton" type="button" value="→" aria-label="Next"></div>
+      </form>
+      <script>
+        document.getElementById('NextButton').addEventListener('mousedown', function(){
+          var a = document.getElementById('QR~QID90~1~TEXT').value.trim();
+          var b = document.getElementById('QR~QID90~2~TEXT').value.trim();
+          function ok(x){ return /^\\d+(\\.\\d+)?$/.test(x) && Number(x) <= 10000; }
+          if (!ok(a) || !ok(b)) {
+            if (!document.querySelector('.ValidationError'))
+              document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please enter a valid number no greater than $10,000.</div>');
+            return;
+          }
+          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>Thank you for completing this survey</h2><p>Your responses have been recorded.</p>'); document.close();
+        });
+      </script></body></html>`);
+    return;
+  }
   if (req.url === '/qualtricscheck') {
     let raw = '';
     req.on('data', (c) => (raw += c));

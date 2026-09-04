@@ -152,6 +152,16 @@ try {
   check([...qrLabels].some((l) => /\$20,000/.test(l)), 'snippet captures Qualtrics radio option text past the empty overlay label');
   await qr.close();
 
+  // Numeric money write-in that rejects words and over-max values.
+  const qn = await ctx.newPage();
+  await qn.goto(URL_ + 'qnumeric');
+  await qn.evaluate(snippet);
+  const qnTraces = (await qn.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 1, config: { delay: 0, manualTimeout: 0 } }), URL_ + 'qnumeric')) || [];
+  const qnVals = qnTraces.flatMap((t) => t.decisions.map((d) => d.chosen || ''));
+  check(qnTraces.some((t) => t.outcome?.type === 'complete'), 'snippet completes a numeric money write-in (fills a number, not "Test")');
+  check(qnVals.every((v) => !/test/i.test(v)), 'snippet never types "Test" into a numeric field');
+  await qn.close();
+
   for (const [path, label, keys] of [
     ['limit', 'respects "select up to two"', null],
     ['pager', 'answers every card of a carousel grid', ['PG1r1', 'PG1r2', 'PG1r3']],

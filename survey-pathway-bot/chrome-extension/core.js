@@ -302,6 +302,24 @@ function pageModel(cfg, doc) {
       if (owner) q.ownedBy = { key: owner.name || owner.id, value: owner.value ?? '' };
     }
 
+    // A free-text box that actually wants a number: type=number, a numeric
+    // inputmode/pattern, or wording that asks for money/count/percentage.
+    // Typing a word into it is an instant validation error, so mark it and
+    // remember any ceiling the field or its wording states.
+    if (kind === 'text' || kind === 'number') {
+      const im = (first.getAttribute('inputmode') || '').toLowerCase();
+      const pat = first.getAttribute('pattern') || '';
+      q.numeric =
+        kind === 'number' ||
+        ['numeric', 'decimal', 'tel'].includes(im) ||
+        /\[?0-9/.test(pat) ||
+        /how much|how many|number of|percentage|\bamount|dollars?|\bspen[dt]|budget|\bprice|\bcost\b|\bvalue\b|\$|per (?:month|year|week)/i.test(q.label || '');
+      const maxAttr = first.getAttribute('max');
+      if (maxAttr && !isNaN(+maxAttr)) q.numMax = Number(maxAttr);
+      const minAttr = first.getAttribute('min');
+      if (minAttr && !isNaN(+minAttr)) q.numMin = Number(minAttr);
+    }
+
     if (kind === 'select') {
       q.options = [...first.options]
         // Qualtrics gives its blank placeholder a real value ("QR~…~null"),
@@ -340,6 +358,12 @@ function pageModel(cfg, doc) {
       numberIn(scope, /top (\w+) /i) ??
       null;
     q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
+    // A max stated only in wording or the validation banner ("You cannot enter
+    // a value over $10,000").
+    if (q.numeric && q.numMax == null) {
+      const m = scope.match(/(?:over|exceed|more than|greater than|maximum(?: of)?|no more than|up to)\s*\$?\s*([\d,]{1,12})/i);
+      if (m) q.numMax = Number(m[1].replace(/,/g, ''));
+    }
   }
   // A group of numeric fields on a "what percentage…" question is a
   // sum-to-100 allocation even when the page only says so after a failed
@@ -671,6 +695,14 @@ function candidates(q, config = {}) {
   // Free-text style.
   if (rule?.values?.length) return rule.values.map((v) => ({ kind: 'value', value: String(v) }));
   if (rule?.value != null) return [{ kind: 'value', value: String(rule.value) }];
+  // A numeric write-in gets a modest number, clamped to any stated bounds —
+  // never the word "Test", which fails a number field's validation.
+  if (q.numeric) {
+    let v = 30;
+    if (q.numMax != null) v = Math.min(v, q.numMax);
+    if (q.numMin != null) v = Math.max(v, q.numMin);
+    return [{ kind: 'value', value: String(v) }];
+  }
   const fallback = config.values?.[q.kind] ?? DEFAULT_VALUES[q.kind] ?? 'Test';
   return [{ kind: 'value', value: String(fallback) }];
 }
