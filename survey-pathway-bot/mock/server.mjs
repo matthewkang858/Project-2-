@@ -748,8 +748,12 @@ createServer((req, res) => {
         <div class="clear"></div> </li>`).join('');
     res.end(`<!doctype html><html><head><title>Qualtrics Survey</title>
       <style>input.radio{opacity:0;position:absolute;left:-5px;width:20px;height:20px}
-             .q-radio{display:inline-block;width:18px;height:18px;border:1px solid #999;border-radius:50%;vertical-align:middle}
-             .q-radio.q-checked{background:#0b6ed0}</style></head><body>
+             /* like the real JFE overlay: a 0-box label whose circle is drawn
+                by a pseudo-element, so the label itself is not "visible" and the
+                only on-screen stand-in is the SingleAnswer text label */
+             .q-radio{position:absolute;width:0;height:0;overflow:hidden}
+             .q-radio::before{content:'';position:absolute;width:16px;height:16px;border:1px solid #999;border-radius:50%}
+             .SingleAnswer{display:inline-block;padding-left:26px}</style></head><body>
       <form id="Page" name="Page">
         <div class="QuestionOuter MC" id="QID99"><fieldset><legend>
           <div class="QuestionText"><label class="ExportTag">Q4.</label> What is your <b>annual household income before tax</b>?</div></legend>

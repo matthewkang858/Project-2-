@@ -159,8 +159,19 @@ function pageModel(cfg, doc) {
     const w = win.innerWidth || 1e5;
     return r.width > 0 && r.height > 0 && r.right > -50 && r.left < w + 50;
   };
+  // Every label that could stand in for this control. A control can carry more
+  // than one `label[for]` — Qualtrics pairs an empty, 0-box styled radio
+  // overlay with a second label that holds the visible answer text — so the
+  // stand-in is whichever label actually renders on screen, not just the first.
+  const labelsFor = (el) => {
+    const labs = el.id ? [...doc.querySelectorAll(`label[for="${CSS.escape(el.id)}"]`)] : [];
+    const wrap = el.closest('label');
+    if (wrap && !labs.includes(wrap)) labs.push(wrap);
+    return labs;
+  };
+  const visibleLabel = (el) => labelsFor(el).find((l) => visible(l) && onScreen(l)) || null;
   const standIn = (el) => {
-    const lab = (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
+    const lab = visibleLabel(el) || labelsFor(el)[0];
     if (lab) return lab;
     let node = el.parentElement;
     for (let up = 0; node && up < 4; up++, node = node.parentElement) {
@@ -170,16 +181,10 @@ function pageModel(cfg, doc) {
   };
   const answerable = (el) => {
     if (visible(el) && onScreen(el)) return true;
-    // A control with no layout box at all is inside a hidden subtree — a
-    // carousel card waiting its turn — unless a label standing in for it is on
-    // screen.
-    if (!rendered(el)) {
-      const lab = (el.id && doc.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
-      return rendered(lab) && visible(lab) && onScreen(lab);
-    }
-    // Rendered but invisible or parked off-screen: answerable exactly when a
-    // visible on-screen element stands in for it. A honeypot has no such
-    // stand-in — nothing visible wraps it alone.
+    // Otherwise answerable exactly when something visible stands in for it: a
+    // label carrying the answer text, or a styled wrapper. A carousel card
+    // waiting its turn (whole subtree hidden) and a honeypot (parked off
+    // screen, nothing visible around it) both have no such stand-in.
     const sub = standIn(el);
     return !!sub && visible(sub) && onScreen(sub);
   };
