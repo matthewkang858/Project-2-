@@ -1,0 +1,46 @@
+{
+  "_comment": "Run config for the COUR4 consumer survey (Qualtrics). Pins qualifying screener answers so exploration survives to the end; terminates themselves get their own one-off runs.",
+  "_derived": [
+    "Q1: pinned to California — 'I do not live in the US' terminates",
+    "Q2: pinned to age 35 — under-18 terminates",
+    "Q3: branching across Male/Female/Other — 'Prefer not to say' terminates",
+    "Q4: any real income bracket — 'Prefer not to say' terminates",
+    "attention checks: the correct answer is 4 (random-number decoys terminate)",
+    "WTP write-ins: $25, within the $0-300 validation"
+  ],
+  "delay": 400,
+  "maxSteps": 400,
+  "answers": [
+    {
+      "match": "state\\W+do\\W+you\\W+currently\\W+reside",
+      "_q": "Q1",
+      "fixed": "^California$"
+    },
+    {
+      "match": "What\\W+is\\W+your\\W+age",
+      "_q": "Q2",
+      "fixed": "^35$"
+    },
+    {
+      "match": "What\\W+is\\W+your\\W+gender",
+      "_q": "Q3",
+      "options": "^Male$|^Female$|^Other$"
+    },
+    {
+      "match": "annual\\W+household\\W+income",
+      "_q": "Q4",
+      "options": "\\$"
+    },
+    {
+      "match": "attention|select\\W+(?:the\\W+)?number",
+      "_q": "attention checks",
+      "fixed": "^4$",
+      "_note": "exactly 4 — the decoys (random numbers, 44) all terminate"
+    },
+    {
+      "match": "per\\W+month|willing\\W+to\\W+pay|would\\W+you\\W+pay",
+      "_q": "WTP write-ins",
+      "value": 25
+    }
+  ]
+}
