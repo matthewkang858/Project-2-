@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "72bcf1e 2026-09-04 03:42";
+const SPB_BUILD = "4c83fc7 2026-09-04 04:06";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -1401,6 +1401,7 @@ const spb = {
     console.log(`spb.check()                 is this page the survey, and can it be framed?
 spb.auto({ maxRuns: 20 })   explore every pathway automatically (iframe mode)
 spb.explore({ maxRuns: 20 }) single-session survey (CAPTCHA / no-restart): backtracks with the Back button
+spb.explore({ maxForward: N }) when the end screen blocks Back: stop each path N pages early so branches can still be swept
 spb.plan({ maxRuns: 20 })   step-through mode: re-run this snippet on each page
 spb.stop()                  end the run now and keep what was recorded
 spb.debug()                 what the bot can and cannot see on this page
@@ -1497,6 +1498,8 @@ spb.reset()                 clear stored state`);
     const delay = Number(cfg.delay ?? 300);
     const timeout = Number(cfg.stepTimeout ?? 20000);
     const maxSteps = Number(cfg.maxSteps ?? 200);
+    // Optional: stop each forward walk after N pages, before the survey's end.
+    const maxForward = Number(opts.maxForward ?? cfg.maxForward ?? 0);
 
     const frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin');
@@ -1729,6 +1732,16 @@ const lost = ans.planned.filter((d) => {
           if (singleSession && terminalEdges.has(current.fingerprint)) {
             type = 'complete';
             text = 'reached the final page again — stopped before re-submitting so exploration can continue';
+            break;
+          }
+          // Hard page cap: when the survey's end screen blocks Back, submitting
+          // the last page strands the whole session. maxForward stops each walk
+          // short of the end (never submitting), so the bot can keep backtracking
+          // to sweep other branches. The final few questions come from a
+          // separate full run's traces instead.
+          if (maxForward && steps.length >= maxForward) {
+            type = 'capped';
+            text = `stopped at maxForward=${maxForward} pages, before the survey's end, so back-navigation stays possible`;
             break;
           }
 
