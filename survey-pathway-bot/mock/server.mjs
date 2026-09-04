@@ -782,7 +782,7 @@ createServer((req, res) => {
             document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please answer this question.</div>');
             return;
           }
-          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>Thank you for completing this survey</h2><p>Your responses have been recorded.</p>'); document.close();
+          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p>'); document.close();
         });
       </script></body></html>`);
     return;
@@ -824,7 +824,7 @@ createServer((req, res) => {
               document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please enter a valid number no greater than $10,000.</div>');
             return;
           }
-          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>Thank you for completing this survey</h2><p>Your responses have been recorded.</p>'); document.close();
+          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p>'); document.close();
         });
       </script></body></html>`);
     return;
