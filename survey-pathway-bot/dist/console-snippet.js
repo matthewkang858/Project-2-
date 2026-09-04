@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "c7213ae 2026-09-04 01:48";
+const SPB_BUILD = "1d2ed32 2026-09-04 01:51";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -899,12 +899,23 @@ function applyAnswer(q, candidate, doc) {
   return el.checked || marked;
 }
 
-// Click the forward button described by a page model.
+// Click the forward button described by a page model. Some engines (Qualtrics
+// JFE) bind their Next control through their own event system and ignore a bare
+// synthetic click, so drive it the way a person would — a full pointer/mouse/
+// click sequence — and fall back to focus + Enter.
 function clickNext(model, doc) {
   if (!model.next) return false;
-  const el = (doc || document).querySelector(model.next.selector);
+  doc = doc || document;
+  const win = doc.defaultView || window;
+  const el = doc.querySelector(model.next.selector);
   if (!el) return false;
+  const Pointer = win.PointerEvent || win.MouseEvent;
+  for (const type of ['pointerover', 'pointerenter', 'pointerdown', 'mousedown', 'pointerup', 'mouseup'])
+    el.dispatchEvent(new (type.startsWith('pointer') ? Pointer : win.MouseEvent)(type, { bubbles: true, cancelable: true, view: win }));
+  el.focus?.();
   el.click();
+  for (const type of ['keydown', 'keypress', 'keyup'])
+    el.dispatchEvent(new win.KeyboardEvent(type, { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
   return true;
 }
 

@@ -770,7 +770,10 @@ createServer((req, res) => {
             if (vis) vis.classList.add('q-checked');
           });
         });
-        document.getElementById('NextButton').addEventListener('click', function(){
+        // Like JFE, the Next control is driven by its own pointer handler, not
+        // by a bare synthetic click — bind on mousedown so a plain .click()
+        // alone does NOT advance (that was the real stuck bug).
+        document.getElementById('NextButton').addEventListener('mousedown', function(){
           if (!picked) {
             document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError" style="color:#e9730c">Please answer this question.</div>');
             return;
