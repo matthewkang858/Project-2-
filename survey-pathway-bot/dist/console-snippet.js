@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "695514b 2026-09-04 02:57";
+const SPB_BUILD = "98bbcef 2026-09-04 03:08";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -35,8 +35,11 @@ const DEFAULT_SELECTORS = {
   terminalPatterns: {
     complete: [
       'thank you for completing', 'thanks for completing', 'survey is complete', 'survey completed',
-      'thanks for taking', 'thank you for taking', 'your responses have been recorded',
-      'completed the survey', 'already completed', 'please close the window',
+      'thanks for taking', 'thank you for taking', 'thank you for your time', 'thank you for participating',
+      // Qualtrics' default end screen says "Your response has been recorded" —
+      // singular — so match both, and the response-recorded phrase on its own.
+      'response has been recorded', 'responses have been recorded',
+      'completed the survey', 'already completed', 'please close the window', 'has been recorded',
     ],
     quota: ['quota', 'we have enough', 'group is full'],
     terminate: ['do not qualify', "don't qualify", 'not qualify', 'screened out', 'unfortunately', "we're sorry", 'we are sorry', 'no longer available'],
@@ -601,7 +604,10 @@ function pageModel(cfg, doc) {
   const bodyText = clean(doc.body?.innerText || '');
   const lower = bodyText.toLowerCase();
   let outcome = null;
-  for (const [name, pats] of Object.entries(cfg.terminalPatterns)) {
+  // Disqualification wins over completion: a screen-out that also says
+  // "thank you for your time" is a terminate, not a complete.
+  for (const name of ['terminate', 'quota', 'complete']) {
+    const pats = cfg.terminalPatterns[name] || [];
     if (pats.some((p) => lower.includes(p))) { outcome = name; break; }
   }
 
