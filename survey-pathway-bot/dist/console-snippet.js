@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "4f7e030 2026-09-04 02:28";
+const SPB_BUILD = "b781ee0 2026-09-04 02:43";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -352,6 +352,12 @@ function pageModel(cfg, doc) {
     const raw = (m[1] || '').toLowerCase();
     return WORD_NUMBER[raw] ?? (Number(raw) || null);
   };
+  // A numeric-entry instruction near the question ("You cannot enter a value
+  // over $300", 'please write "300" in the box') is a strong signal even when
+  // the ask is phrased as a scenario with no money words in the stem itself.
+  const pageTxt = clean(doc.body ? doc.body.innerText : '').slice(0, 4000);
+  const numCue = /cannot enter a value|value over \$?\d|no more than \$?\d|writ(?:e|ing)\s+["“']?\s*\d|enter a (?:value|number|amount|dollar)/i.test(pageTxt);
+  const pageCap = pageTxt.match(/(?:over|exceed|more than|greater than|maximum(?: of)?|no more than|up to)\s*\$?\s*([\d,]{1,12})/i);
   for (const q of questions) {
     const scope = clean(
       [q.label, ...[...doc.querySelectorAll('.error, .alert, [class*="error"]')].map((e) => clean(e.innerText))].join(' ')
@@ -363,10 +369,12 @@ function pageModel(cfg, doc) {
       numberIn(scope, /top (\w+) /i) ??
       null;
     q.sumTo = numberIn(scope, /(?:must (?:equal|total)|sum to|add up to|total(?:s|ling)? to)\s*(\d+)/i);
-    // A max stated only in wording or the validation banner ("You cannot enter
-    // a value over $10,000").
+    // A numeric write-in the stem alone did not flag.
+    if ((q.kind === 'text' || q.kind === 'number') && !q.numeric && numCue) q.numeric = true;
+    // A max stated in wording or a validation/instruction banner ("You cannot
+    // enter a value over $10,000"), whether beside the field or page-level.
     if (q.numeric && q.numMax == null) {
-      const m = scope.match(/(?:over|exceed|more than|greater than|maximum(?: of)?|no more than|up to)\s*\$?\s*([\d,]{1,12})/i);
+      const m = scope.match(/(?:over|exceed|more than|greater than|maximum(?: of)?|no more than|up to)\s*\$?\s*([\d,]{1,12})/i) || pageCap;
       if (m) q.numMax = Number(m[1].replace(/,/g, ''));
     }
   }
