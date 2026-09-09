@@ -63,13 +63,13 @@ The two agree closely for UK/France/Germany/Japan. They differ for the US
 (18.50M vs 14.84M at Year 10), because this notebook's Year-3 target is ~27%
 above the workbook's 2029.
 
-## Open item: a one-year offset outside the US
+## Non-US targets lead the workbook by a year — intentional
 
-The US lines up on the calendar — notebook period 12 is the end of year 3, and
+The US lines up on the calendar: notebook period 12 is the end of year 3, and
 its 8.574M target sits against the workbook's 2029.
 
-The other four do not. Their period 8 and 12 targets match the workbook's
-**2029 and 2030** almost exactly:
+The other four sit a year ahead. Their period 8 and 12 targets track the
+workbook's **2029 and 2030**:
 
 | | P8 target | workbook 2029 | P12 target | workbook 2030 |
 |---|---:|---:|---:|---:|
@@ -78,11 +78,27 @@ The other four do not. Their period 8 and 12 targets match the workbook's
 | Germany | 0.3851 | 0.3587 | 0.7681 | 0.7574 |
 | Japan | 0.6226 | 0.4993 | 1.2374 | 1.0502 |
 
-But with launch at period 5 (2028), periods 8 and 12 are calendar **2028 and
-2029**. So either those four launch a year later than period 5, or their targets
-sit four periods too early. `pl_year_three` takes the targets at face value
-(maps them to 2030); return `2029` there to treat the periods as authoritative
-instead.
+With launch at period 5 (2028), periods 8 and 12 are calendar 2028 and 2029 —
+so the non-US plan is deliberately more aggressive than the workbook. Confirmed
+intentional; the targets are taken at face value and `pl_year_three` maps them
+to 2030.
+
+## How much does CEILING_BASIS actually move things
+
+Years 1–3 are pinned by the targets under either basis, so the two can only
+diverge from Year 4 on. Section 6 of the cell prints this and writes it to a
+`Basis_Sensitivity` sheet:
+
+| | Y10 "multiple" | Y10 "absolute" | Y10 gap |
+|---|---:|---:|---:|
+| US | 18.50 | 14.84 | +24.7% |
+| Japan | 2.52 | 2.15 | +17.1% |
+| Germany | 1.60 | 1.58 | +1.4% |
+| France | 1.20 | 1.19 | +1.0% |
+| UK | 1.95 | 1.94 | +0.7% |
+
+So the choice is really only a US and Japan question; the other three are
+settled to within about a percent.
 
 ## Knobs
 
