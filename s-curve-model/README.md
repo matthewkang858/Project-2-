@@ -124,8 +124,68 @@ mid-horizon and re-accelerating — a double hump, not an S. In log space a
 constant-percentage decay is curvature-free, so a clean monotone S is the
 natural answer. It also matches how the workbook itself extrapolates awareness.
 
+## Ex-US
+
+![Ex-US](ex_us_s_curve.png)
+
+Still an S without the US: quarterly adds rise, peak at period 10, then decay.
+Ex-US aggregate goes 3.47M (Y3) → 5.88M (Y5) → 7.28M (Y10), about 28% of a
+25.8M global Y10. Two caveats — the S is lopsided (~4 quarters of acceleration
+against ~30 of deceleration), and the toe is a step rather than a curve: each
+country jumps from 0 straight to its launch MAU at period 5, so the aggregate
+goes 0 → 0.68M in one quarter. That comes from `simulate_maus` seeding
+`start_mau` at the launch period; the workbook's unused "Quarter Spread" inputs
+(three-quarter 0.333 for the US 2027, four-quarter 0.25 otherwise) look like
+they exist to phase that in.
+
+## The P&L workbook, filled to 2036
+
+`UMG2_Video_PL_Model_v135MK_10yr.xlsx` is v135MK with its empty year columns
+filled in. The sheet was already laid out through 2036 (column O) but only
+populated to 2032, so the gap was exactly the missing years:
+
+* **Country blocks** (US, UK, France, Germany, Japan) — columns **L:O
+  (2033–2036)**, all seven rows each.
+* **Global summary** — columns **K:O (2032–2036)**, total plus the five shares.
+
+Filled with **live formulas continuing each row's own pattern**, not pasted
+values, so the model stays auditable. `%Aware` continues the workbook's own
+decaying-growth extrapolation; Gen Pop and SOM keep growing off the population
+table (their `INDEX`/`MATCH` ranges are widened to column O in the new columns
+only — the originals stop at J/2032 and would return `#N/A` past it).
+
+Resulting Total User Population (M):
+
+| | 2033 | 2034 | 2035 | 2036 |
+|---|---:|---:|---:|---:|
+| US | 14.15 | 14.48 | 14.66 | 14.78 |
+| UK | 1.78 | 1.87 | 1.91 | 1.94 |
+| France | 1.10 | 1.15 | 1.17 | 1.18 |
+| Germany | 1.48 | 1.54 | 1.57 | 1.58 |
+| Japan | 2.03 | 2.11 | 2.13 | 2.14 |
+| **Global** | **20.55** | **21.15** | **21.45** | **21.61** |
+
+The US share settles at 68.4% by 2036, down from 100% at launch.
+
+Reproduce and check:
+
+```
+python fill_pl_model_10yr.py <source.xlsx> <dest.xlsx>
+python verify_pl_model_10yr.py <dest.xlsx>
+```
+
+The verifier requires every new formula to be the previous column's formula
+with its relative refs shifted one column right — same recursion, next year —
+and checks nothing is left blank and number formats carried. 170 cells, 0
+mismatches.
+
+Two notes on the file. Only one pre-existing cell differs from the original
+(`C124`, a float re-serialized at the 16th digit — identical in double
+precision). And openpyxl writes formulas without cached values, so the numbers
+appear once Excel or Sheets recalculates on open.
+
 ## Output
 
-`growth_model_s_curve_P40_US_UK_FR_DE_JP.xlsx`, four sheets:
+`growth_model_s_curve_P40_US_UK_FR_DE_JP.xlsx`, five sheets:
 `Growth_Percentages`, `MAUs_Absolute`, `Starting_Acq_Rates` (all 40 periods,
-same layout as before) and a new `Yearly_Summary`.
+same layout as before), `Yearly_Summary` and `Basis_Sensitivity`.
