@@ -23,6 +23,16 @@ export function specSurvey(req, res) {
     res.end(`no spec for ${id}`);
     return;
   }
+  // ?variant=alt renders the alternatives a live build might use instead of
+  // the questionnaire's literal text and the plain markup (see ALT below).
+  const alt = /[?&]variant=alt\b/.test(req.url);
+  if (alt) {
+    for (const q of spec.questions) {
+      if (q.q === 'Q4') q.text = 'What is your ZIP code?';
+      for (const c of q.columns || []) c.text = c.text.replace(/^2-3 times$/, '2–3 times');
+    }
+    for (const c of spec.attentionChecks || []) if (c.q === 'AC2') c.text = 'Please select the number 4.';
+  }
   const gates = {};
   for (const r of spec.rules) if (r.type === 'display') (gates[r.q] = gates[r.q] || new Set()).add(r.rule);
   const data = {
@@ -30,6 +40,7 @@ export function specSurvey(req, res) {
     checks: spec.attentionChecks || [],
     blocks: (spec.textBlocks || []).filter((b) => b.kind === 'text'),
     gates: Object.fromEntries(Object.entries(gates).map(([k, v]) => [k, [...v]])),
+    alt,
   };
   res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
   res.end(`<!doctype html><html><head><meta charset="utf-8"><title>Qualtrics Survey</title>
@@ -192,6 +203,7 @@ const CLIENT = String.raw`
           } else cols.forEach(function (c) {
             var id = base + '~' + (ri + 1) + '~' + c.v;
             if (numeric && !tagged(c, /^Exclusive/i)) h += '<td><label for="' + id + '~TEXT">' + esc(c.text) + '</label><input type="text" name="' + id + '~TEXT" id="' + id + '~TEXT"></td>';
+            else if (numeric && S.alt) h += '<td><input type="radio" name="' + base + '~' + (ri + 1) + '~X" id="' + id + '" value="' + c.v + '">' + cellLabel(id, c.text) + '</td>';
             else if (numeric || mp) h += '<td><input type="checkbox" name="' + id + '" id="' + id + '" value="' + c.v + '">' + cellLabel(id, c.text) + '</td>';
             else h += '<td><input type="radio" name="' + base + '~' + (ri + 1) + '" id="' + id + '" value="' + c.v + '">' + cellLabel(id, c.text) + '</td>';
           });
@@ -204,12 +216,17 @@ const CLIENT = String.raw`
         CUR.opts = opts;
         var dropdown = (q.tags || []).indexOf('Dropdown') >= 0;
         if (dropdown) {
-          var choices = /age/i.test(q.text) ? ['Under 18'].concat(Array.from({ length: 83 }, function (_, k) { return String(18 + k); })) : STATES;
+          var choices = /age/i.test(q.text)
+            ? (S.alt ? ['17 or younger', '18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'] : ['Under 18'].concat(Array.from({ length: 83 }, function (_, k) { return String(18 + k); })))
+            : STATES;
           h += '<select name="' + base + '" id="' + base + '"><option value="' + base + '~null"></option>' + choices.map(function (c, k) { return '<option value="' + (k + 1) + '">' + esc(c) + '</option>'; }).join('') + '</select>';
         } else if (q.type === 'Open' || (q.tags || []).indexOf('Write-in') >= 0 || q.type === 'Numeric') {
+          var mcText = S.alt && q.type === 'Numeric' && opts.some(function (o) { return tagged(o, /^Exclusive/i); });
           opts.forEach(function (o) {
             var id = base + '~' + o.v;
-            if (tagged(o, /^Exclusive/i)) h += '<div><input type="checkbox" name="' + id + '" id="' + id + '" value="' + o.v + '">' + cellLabel(id, o.text) + '</div>';
+            if (mcText) h += '<li><input type="checkbox" name="' + id + '" id="' + id + '" value="' + o.v + '">' + cellLabel(id, o.text) +
+              (tagged(o, /^Exclusive/i) ? '' : ' <input type="text" name="' + id + '~TEXT" id="' + id + '~TEXT">') + '</li>';
+            else if (tagged(o, /^Exclusive/i)) h += '<div><input type="checkbox" name="' + id + '" id="' + id + '" value="' + o.v + '">' + cellLabel(id, o.text) + '</div>';
             else h += '<div><label for="' + id + '~TEXT">' + esc(o.text || '') + '</label> <input type="text" name="' + id + '~TEXT" id="' + id + '~TEXT"></div>';
           });
         } else {
@@ -266,13 +283,23 @@ const CLIENT = String.raw`
     if (dd && dd.tagName === 'SELECT') {
       if (/null$/.test(dd.value)) return err('Please choose an answer.');
       var txt = dd.options[dd.selectedIndex].text;
-      if (/^Under 18$|do not live/i.test(txt)) return terminate();
+      if (/^Under 18$|^17 or younger$|do not live/i.test(txt)) return terminate();
       ANS[q.q] = ['a']; return true;
     }
     var chosen = [], typed = 0, excl2 = false, zip = /ZIP/i.test(q.text);
     for (var k = 0; k < CUR.opts.length; k++) {
       var o = CUR.opts[k], oid = base + '~' + o.v;
       var tb = el(oid + '~TEXT');
+      var own = el(oid);
+      if (tb && own && own.type === 'checkbox') {
+        // multiple-answer choice with its own text box (alt build)
+        var vv = tb.value.trim();
+        if (own.checked) {
+          if (!/^\d+(\.\d+)?$/.test(vv) || Number(vv) > maxOf(q, o)) return err('Please enter a valid amount.');
+          typed++; chosen.push(o.letter);
+        } else if (vv) return err('Please select the choice you typed an amount for.');
+        continue;
+      }
       if (tb) {
         var v = tb.value.trim();
         if (v) {

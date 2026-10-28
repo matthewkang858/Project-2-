@@ -1,5 +1,5 @@
 {
-  "_comment": "Coverage paths for ARE01 / COSM v8. The survey is single-session (CAPTCHA), so each path is one forward walk in its own session: open the link, pass the CAPTCHA, paste the snippet, paste the path's block. Every display gate in Q1-Q102 is opened by at least one path and closed by at least one other. Pins go in front of survey-config.json's rules (the first matching rule wins). `limit` = how many of the named boxes to tick on that question.",
+  "_comment": "Coverage paths for ARE01 / COSM v8. The survey is single-session (CAPTCHA), so each path is one forward walk in its own session: open the link, pass the CAPTCHA, paste the snippet, paste the path's block. Every display gate in Q1-Q102 is opened by at least one path and closed by at least one other, each gate's own condition is exercised (not just its parent being hidden), and the a-d gates are tested at their boundary ('Slightly …' answers). Pins go in front of survey-config.json's rules (the first matching rule wins). `limit` = how many of the named boxes to tick.",
   "paths": [
     {
       "id": "P1",
@@ -57,7 +57,7 @@
         {
           "match": "total\\W+have\\W+you\\W+visited[\\s\\S]*\\bCosm\\b",
           "_q": "Q37 Cosm row",
-          "fixed": "2-3 times"
+          "fixed": "\\b(?:2|two)\\W+(?:to\\W+)?(?:3|three)\\b"
         },
         {
           "match": "total\\W+have\\W+you\\W+visited[\\s\\S]*\\bSphere\\b",
@@ -78,7 +78,7 @@
         {
           "match": "types\\W+of\\W+content\\W+would\\W+you\\W+be\\W+interested\\W+in\\W+viewing",
           "_q": "Q67, Q68",
-          "fixed": "my local team|New-release movies|Live concert simulcasts|Performing arts",
+          "fixed": "my local team|New\\W*release\\W+movies|Live concert simulcasts|Performing arts",
           "limit": 4
         }
       ]
@@ -86,10 +86,13 @@
     {
       "id": "P2",
       "name": "Knows Cosm, never been, not interested",
-      "purpose": "The 'no' side of every big gate: aware of Cosm but never visited (Q45), not a sports fan, no movies at a theater, venues visited once and unlikely to return, not interested in Cosm, no substitutes, no event planning.",
+      "purpose": "The 'no' side of every big gate: aware of Cosm but never visited (Q45); goes to movies but never in a premium format (Q35 closed on its own gate); someone else paid for every activity (Q20 closed on its own gate); not a sports fan; venues visited once and unlikely to return; not interested in Cosm; no substitutes; no event planning.",
       "expectShown": [
         "Q15",
         "Q16",
+        "Q18",
+        "Q19",
+        "Q34",
         "Q36",
         "Q37",
         "Q39",
@@ -102,7 +105,10 @@
         "Q91"
       ],
       "expectHidden": [
-        "Q30-Q35",
+        "Q20",
+        "Q21",
+        "Q30-Q33",
+        "Q35",
         "Q38",
         "Q40",
         "Q46-Q49",
@@ -130,8 +136,18 @@
         {
           "match": "out\\W+of\\W+home\\W+entertainment\\W+activities\\W+have\\W+you\\W+participated",
           "_q": "Q17",
-          "fixed": "live music events|interactive or themed exhibits",
-          "limit": 2
+          "fixed": "live music events|interactive or themed exhibits|movies at a movie theater",
+          "limit": 3
+        },
+        {
+          "match": "who\\W+paid\\W+for\\W+you\\W+to\\W+attend",
+          "_q": "Q19 (every row)",
+          "fixed": "^\\s*My company"
+        },
+        {
+          "match": "watched\\W+a\\W+movie\\W+in\\W+any\\W+of\\W+the\\W+following\\W+premium",
+          "_q": "Q34",
+          "fixed": "have not watched a movie in a premium|^\\s*N/A"
         },
         {
           "match": "level\\W+of\\W+fandom",
@@ -172,8 +188,8 @@
     },
     {
       "id": "P3",
-      "name": "New to these venues, Dome only",
-      "purpose": "Partial gates: no venue awareness (whole venue deep-dive skipped), no out-of-home activities, fan who only watches at home, likely to visit the Dome but not the Hall or Deck, movie/concert content only (no sports leagues), no Cosm Club, no merchandise, private events only.",
+      "name": "New to these venues, Dome only (boundary answers)",
+      "purpose": "Partial gates: no venue awareness (whole venue deep-dive skipped), no out-of-home activities, fan who only watches at home, only slightly likely to visit the Dome but not the Hall or Deck, movie/concert content only (no sports leagues), no Cosm Club, no merchandise, private events only — 'Slightly' answers test that the a-d gates include d.",
       "expectShown": [
         "Q24",
         "Q29",
@@ -226,7 +242,7 @@
         {
           "match": "types\\W+of\\W+content\\W+would\\W+you\\W+be\\W+interested\\W+in\\W+viewing",
           "_q": "Q67",
-          "fixed": "New-release movies|Recorded concerts",
+          "fixed": "New\\W*release\\W+movies|Recorded concerts",
           "limit": 2
         },
         {
@@ -242,44 +258,97 @@
         {
           "match": "involved\\W+in\\W+planning",
           "_q": "Q91",
-          "fixed": "private event"
+          "fixed": "^\\s*Yes\\b[\\s\\S]*private\\W+event"
+        },
+        {
+          "match": "likely\\W+would\\W+you\\W+be\\W+to\\W+visit\\W+each\\W+of\\W+the\\W+following\\W+spaces[\\s\\S]*The\\W+Dome\\b",
+          "_q": "Q62 Dome row (tests the a-d boundary)",
+          "fixed": "Slightly likely"
+        },
+        {
+          "match": "hosting\\W+a\\W+corporate\\W+or\\W+private\\W+event",
+          "_q": "Q92 (tests the a-d boundary)",
+          "fixed": "Slightly interested"
         }
       ]
     },
     {
       "id": "P4",
-      "name": "Hall only, out-of-market sports (optional)",
-      "purpose": "The Hall-side mirror of P3: likely to visit the Hall but not the Dome, so Q68/Q70/Q72 show and Q67/Q69/Q71 do not, and Q73 opens from Q72 (out-of-market sports) rather than Q71.",
+      "name": "Cosm visitor, Hall only, boundary answers",
+      "purpose": "Cosm visitor whose past visits replaced game/activity venues — the only path that exercises Q47's 'g not selected in Q46' clause, Q48's a-e gate and Q59 being skipped while their parents are on screen; likely to visit only the Hall, so Q68/Q70/Q72 show and Q67/Q69/Q71 do not, and Q73 opens from Q72; rooftop-bar goer who personally pays but spends on nothing (Q21 closed on its own gate); 'Slightly …' answers on Q60, Q87 annual membership and Q89 test the a-d boundary; not interested in hosting events (Q93 closed while Q92 is shown).",
       "expectShown": [
+        "Q15",
+        "Q16",
+        "Q18",
+        "Q19",
+        "Q20",
+        "Q36",
+        "Q37",
+        "Q39",
+        "Q41-Q44",
+        "Q46",
+        "Q49",
+        "Q50-Q58",
         "Q60-Q66",
         "Q68",
         "Q70",
         "Q72",
-        "Q73"
+        "Q73",
+        "Q87",
+        "Q88",
+        "Q89",
+        "Q90",
+        "Q92"
       ],
       "expectHidden": [
-        "Q18-Q23",
-        "Q25-Q28",
+        "Q21",
         "Q30-Q35",
+        "Q38",
+        "Q40",
+        "Q45",
+        "Q47",
+        "Q48",
+        "Q59",
         "Q67",
         "Q69",
-        "Q71"
+        "Q71",
+        "Q93"
       ],
       "answers": [
         {
           "match": "are\\W+you\\W+aware\\W+of",
           "_q": "Q13, Q14",
-          "fixed": "^\\s*None of the above"
+          "fixed": "^\\s*(Cosm|None of the above)\\b"
+        },
+        {
+          "match": "have\\W+you\\W+ever\\W+attended",
+          "_q": "Q15",
+          "fixed": "^\\s*Cosm\\b"
         },
         {
           "match": "out\\W+of\\W+home\\W+entertainment\\W+activities\\W+have\\W+you\\W+participated",
           "_q": "Q17",
-          "fixed": "^\\s*None of the above"
+          "fixed": "rooftop bar"
+        },
+        {
+          "match": "personally\\W+spend\\W+money\\W+on",
+          "_q": "Q20 (every row)",
+          "fixed": "I do not typically spend"
         },
         {
           "match": "level\\W+of\\W+fandom",
           "_q": "Q29 (every row)",
           "fixed": "^\\s*Not a fan"
+        },
+        {
+          "match": "past\\W+visits\\W+to\\W+Cosm\\W+replaced",
+          "_q": "Q46",
+          "fixed": "game or activity venues"
+        },
+        {
+          "match": "interested\\W+are\\W+you\\W+in\\W+attending\\W+Cosm",
+          "_q": "Q60 (tests the a-d boundary)",
+          "fixed": "Slightly interested"
         },
         {
           "match": "likely\\W+would\\W+you\\W+be\\W+to\\W+visit\\W+each\\W+of\\W+the\\W+following\\W+spaces[\\s\\S]*The\\W+(Dome|Deck)\\b",
@@ -291,6 +360,21 @@
           "_q": "Q68",
           "fixed": "teams outside|Esports",
           "limit": 2
+        },
+        {
+          "match": "ways\\W+to\\W+purchase\\W+tickets[\\s\\S]*Annual\\W+membership",
+          "_q": "Q87 annual-membership row (tests the a-d boundary)",
+          "fixed": "Slightly interested"
+        },
+        {
+          "match": "purchasing\\W+merchandise",
+          "_q": "Q89 (tests the a-d boundary)",
+          "fixed": "Slightly interested"
+        },
+        {
+          "match": "hosting\\W+a\\W+corporate\\W+or\\W+private\\W+event",
+          "_q": "Q92 (closes Q93 while Q92 is shown)",
+          "fixed": "Not at all interested"
         }
       ]
     }
@@ -301,7 +385,7 @@
       "answer": "Under 18 (or any age below 18)",
       "pin": {
         "match": "What\\W+is\\W+your\\W+age",
-        "fixed": "Under|^1[0-7]$"
+        "fixed": "\\bunder\\b|younger|less than|below|<\\s*18|^\\s*\\d{1,2}\\s*[-–]\\s*17\\b|^\\s*(1[0-7]|[0-9])\\b(?!\\s*[-–+])"
       }
     },
     {
@@ -332,7 +416,7 @@
       "q": "AC1",
       "answer": "Egg",
       "pin": {
-        "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+a\\W+vegetable",
+        "match": "\\bvegetable\\b",
         "fixed": "^Egg$"
       }
     },
@@ -340,7 +424,7 @@
       "q": "AC2",
       "answer": "44",
       "pin": {
-        "match": "select\\W+the\\W+number\\W+four",
+        "match": "\\bnumber\\W+(?:four|4)\\b|paying\\W+attention|select\\W+(?:the\\W+)?(?:number\\W+)?(?:four|4)\\b",
         "fixed": "^44$"
       }
     },
@@ -348,7 +432,7 @@
       "q": "AC3",
       "answer": "Chair",
       "pin": {
-        "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+an\\W+animal",
+        "match": "\\ban?\\W+animal\\b",
         "fixed": "^Chair$"
       }
     }

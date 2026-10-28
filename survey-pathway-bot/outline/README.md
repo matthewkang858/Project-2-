@@ -123,6 +123,12 @@ python3 outline/simulate_paths.py surveys/are01/outline-spec.json \
 # path's exact config through the real snippet in Chromium
 node mock-walk.mjs surveys/are01
 
+# …and against a variant build that renders what a live build might do
+# instead of the questionnaire's literal text: bracketed ages, "What is your ZIP
+# code?", "select the number 4", "2–3 times", an amount box inside a
+# multiple-answer choice, radios for a "would not attend" column
+node mock-walk.mjs surveys/are01 --alt
+
 # paste-ready blocks for the live run
 python3 outline/build_run_blocks.py surveys/are01 "the ARE01 survey"   # -> surveys/are01/RUN.md
 ```

@@ -1,30 +1,33 @@
 {
-  "_comment": "Run config for the ARE01 / COSM consumer survey (questionnaire v8). Applies to every path: pins the screeners' qualifying answers, passes the three attention checks and fills the dollar write-ins, so a walk reaches the end. Path-specific pins live in paths.json; outline/build_run_blocks.py puts the two together into paste-ready blocks. Order matters: the first rule whose `match` fits a question wins, so path pins go in front of these.",
+  "_comment": "Run config for the ARE01 / COSM consumer survey (questionnaire v8). Applies to every path: pins the screeners' qualifying answers, passes the three attention checks and fills the dollar write-ins, so a walk reaches the end. Path-specific pins live in paths.json; outline/build_run_blocks.py puts the two together into paste-ready blocks. Order matters: the first rule whose `match` fits a question wins, so path pins go in front of these. Matches are deliberately loose (a distinctive word or two) so they survive small wording changes between the questionnaire and the live build.",
   "_derived": [
-    "Q1 age (dropdown): 35 — under 18 terminates",
+    "Q1 age (dropdown): 35 — under 18 terminates. Also accepts '35 years', '35-44' style brackets",
     "Q2 gender: Male/Female/Other — 'Prefer not to answer' terminates",
     "Q3 state (dropdown): California — 'I do not live in the United States' terminates",
     "Q4 ZIP (must be a US postal code): 90301, Inglewood CA — the Cosm Los Angeles market, and consistent with Q3",
     "Q5 income: $75,000 to $99,999 — 'Prefer not to answer' terminates",
-    "Attention checks (p.44 TERMINATE criteria): AC1 Broccoli, AC2 the number 4, AC3 Dog — every other answer terminates",
-    "Dollar write-ins Q21/Q83/Q84/Q88/Q99: amounts inside the stated $0-$10,000 / $0-$1,000 ranges; the exclusive 'I would not pay / attend / spend' box beside each is left unticked (fixed: '(?!)' never matches, so a checkbox stays blank while the amount box gets `value`)"
+    "Attention checks (p.44 TERMINATE criteria): AC1 Broccoli, AC2 the number 4, AC3 Dog — every other answer terminates. Matched on the distinctive word only (vegetable / number four / animal)",
+    "Q21: $25 per category. Q83/Q99: $40 per ticket type, with `skip` so the 'I would not attend at any price' column stays blank whether it is built as checkboxes or radios",
+    "Q84 / Q88: the 'Amount per …' choice is ticked (needed if Qualtrics builds it as a multiple-answer choice with a text box; a no-op if it is a plain box) and $20 / $120 typed; the exclusive 'I would not …' choice stays blank",
+    "Last rule: if an 'I would not …' box is built as its own question with no stem, it is still left blank"
   ],
   "delay": 400,
   "maxSteps": 400,
   "answers": [
-    { "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+a\\W+vegetable", "_q": "AC1", "fixed": "^Broccoli$" },
-    { "match": "select\\W+the\\W+number\\W+four", "_q": "AC2", "fixed": "^4$" },
-    { "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+an\\W+animal", "_q": "AC3", "fixed": "^Dog$" },
+    { "match": "\\bvegetable\\b", "_q": "AC1", "fixed": "^\\s*Broccoli\\s*$" },
+    { "match": "\\bnumber\\W+(?:four|4)\\b|paying\\W+attention|select\\W+(?:the\\W+)?(?:number\\W+)?(?:four|4)\\b", "_q": "AC2", "fixed": "^\\s*(?:4|four)\\s*$" },
+    { "match": "\\ban?\\W+animal\\b", "_q": "AC3", "fixed": "^\\s*Dog\\s*$" },
 
-    { "match": "What\\W+is\\W+your\\W+age", "_q": "Q1", "fixed": "^35$" },
-    { "match": "What\\W+is\\W+your\\W+gender", "_q": "Q2", "options": "^Male$|^Female$|^Other$" },
-    { "match": "state\\W+do\\W+you\\W+currently\\W+reside", "_q": "Q3", "fixed": "^California$" },
-    { "match": "5\\W*digit\\W+ZIP", "_q": "Q4", "value": "90301" },
+    { "match": "What\\W+is\\W+your\\W+age", "_q": "Q1", "fixed": "\\b35\\b|^\\s*(?:2[5-9]|3\\d|4\\d)\\s*(?:-|–|to\\b)" },
+    { "match": "What\\W+is\\W+your\\W+gender", "_q": "Q2", "options": "^\\s*(?:Male|Female|Other)\\s*$" },
+    { "match": "state\\W+do\\W+you\\W+currently\\W+reside", "_q": "Q3", "fixed": "^\\s*California\\s*$" },
+    { "match": "\\bzip|postal\\W*code", "_q": "Q4", "value": "90301" },
     { "match": "annual\\W+household\\W+income", "_q": "Q5", "fixed": "75,000" },
 
     { "match": "how\\W+much\\W+was\\W+spent\\W+per\\W+person", "_q": "Q21", "value": 25 },
-    { "match": "willing\\W+to\\W+pay\\W+per\\W+person\\W+to\\W+attend", "_q": "Q83, Q99", "fixed": "(?!)", "value": 40 },
-    { "match": "willing\\W+to\\W+spend\\W+per\\W+person\\W+on\\W+food", "_q": "Q84", "fixed": "(?!)", "value": 20 },
-    { "match": "Cosm\\W+Club\\W+is\\W+an\\W+annual\\W+membership", "_q": "Q88", "fixed": "(?!)", "value": 120 }
+    { "match": "willing\\W+to\\W+pay\\W+per\\W+person\\W+to\\W+attend", "_q": "Q83, Q99", "skip": true, "value": 40 },
+    { "match": "willing\\W+to\\W+spend\\W+per\\W+person\\W+on\\W+food", "_q": "Q84", "fixed": "Amount\\W+per\\b", "value": 20 },
+    { "match": "Cosm\\W+Club\\W+is\\W+an\\W+annual\\W+membership", "_q": "Q88", "fixed": "Amount\\W+per\\b", "value": 120 },
+    { "match": "^\\s*(?:Q\\d[\\w.-]*\\s*)?(?:I\\W+would\\W+not\\W+(?:attend\\W+at\\W+any\\W+price|spend\\W+money\\W+on\\W+this|pay\\W+for\\W+this\\W+membership)\\b|$)", "_q": "Q83/Q84/Q88/Q99 'I would not …' box built as a question with no stem", "skip": true }
   ]
 }
