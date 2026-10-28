@@ -53,17 +53,50 @@ def qualifying(rule, question):
     return [o for o in question['options'] if o['letter'] in out]
 
 
+PLACEHOLDER = re.compile(r'^(dropdown with|\[?numeric|$)', re.I)
+
+
+def survivors(question):
+    """Options with no [TERMINATE] tag — the answers that keep the interview alive."""
+    return [o for o in question['options']
+            if not any(t.upper().startswith('TERMINATE') for t in o['tags'])]
+
+
 def main(spec_path, out_path):
     spec = json.load(open(spec_path))
     questions = {q['q']: q for q in spec['questions']}
+    for c in spec.get('attentionChecks', []):
+        questions.setdefault(c['q'], c)
     answers = []
     notes = []
+    done = set()
+
+    # Attention checks: every wrong answer terminates, so pin the right one.
+    for c in spec.get('attentionChecks', []):
+        right = survivors(c)
+        if len(right) == 1:
+            answers.append({'match': phrase(c['text']), '_q': c['q'],
+                            'fixed': '^' + re.escape(right[0]['text']) + '$',
+                            '_why': 'attention check — every other answer terminates'})
+            notes.append(f"{c['q']}: pinned to \"{right[0]['text']}\" — the passing answer")
+            done.add(c['q'])
 
     for rule in spec['rules']:
-        if rule['type'] != 'terminate':
+        if rule['type'] != 'terminate' or rule['q'] in done:
             continue
         q = questions[rule['q']]
-        opts = qualifying(rule, q)
+        if rule.get('option'):
+            # Option-level tag ("d. Prefer not to answer [TERMINATE]"): every
+            # untagged option qualifies. A placeholder option ("Dropdown with
+            # ages", a numeric box) cannot be matched on the live page by its
+            # text — it needs a hand-written pin, so say so instead of guessing.
+            done.add(rule['q'])
+            opts = survivors(q)
+            if not opts or all(PLACEHOLDER.match(o['text']) for o in opts):
+                notes.append(f"{rule['q']}: terminate \"{rule['rule'][:60]}\" sits on a placeholder option — pin this one by hand")
+                continue
+        else:
+            opts = qualifying(rule, q)
         if not opts:
             continue
         entry = {'match': phrase(q['text']), '_q': rule['q'], '_why': f"[Terminate {rule['rule']}]"}

@@ -135,6 +135,7 @@ spb.stop()                  end the run now and keep what was recorded
 spb.debug()                 what the bot can and cannot see on this page
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
+spb.saveTraces()            save the full traces (JSON) — needed for wording/formatting QA
 spb.inspect()               what the bot sees on this page
 spb.fill({ S1: 2 })         answer this page  ·  spb.step() answer + Next
 spb.capture()               record answers you picked  ·  spb.scenario('name') export them
@@ -857,6 +858,23 @@ const lost = ans.planned.filter((d) => {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     console.log(`saved ${name}`);
+  },
+
+  // The traces carry full question text, every option label and the page's
+  // bold/underline — what wording and formatting QA needs, and what the
+  // truncated Markdown report cannot give. Returns the JSON as well.
+  saveTraces(name = 'spb-traces.json') {
+    const traces = this.allTraces();
+    if (!traces.length) return console.log('no traversals recorded yet.');
+    const json = JSON.stringify({ traces });
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    console.log(`saved ${name} (${traces.length} traversal(s))`);
+    return json;
   },
 
   reset() {

@@ -74,6 +74,64 @@ spb.auto({ maxRuns: 15, config: { "answers": [ /* survey-config.json's answers a
 With the CLI: `node explore.mjs --url <link> --config outline/survey-config.json`.
 Regenerate after any questionnaire change: `python3 outline/gen_config.py`.
 
+`gen_config.py` reads both terminate styles — "[Terminate if they do not select
+a-c]" on the question, and "[TERMINATE]" on the option itself — plus the
+spec's attention checks (every wrong answer terminates, so the right one is
+pinned). A terminate on a placeholder option ("Dropdown with ages") is listed
+for a hand-written pin instead of guessed.
+
+Rule keys the bot understands, per entry of `answers` (the first entry whose
+`match` fits the question label wins — put specific pins before broad ones):
+`fixed` (pick the option whose *label* matches; on a multi-select, tick only
+matching boxes), `limit` (how many matching boxes to tick on that question),
+`options` (choose among matching options), `skip`, `value` / `values` (typed
+answers, slider positions). `fixed: "(?!)"` never matches: on a write-in with an
+exclusive "I would not pay" box, it leaves the box blank while `value` fills
+the amount.
+
+## A PDF questionnaire
+
+```bash
+python3 -m pip install pymupdf
+python3 outline/parse_outline_pdf.py questionnaire.pdf surveys/<id>/outline-spec.json
+```
+
+Same spec as the Word parser. Questions are the "12." lines, options "a." …
+"cc.", nested "i." … "x." items are a dropdown's own choices, `[Columns]` /
+`[Rows]` / `[Dropdowns]` switch a grid's blocks. Bold comes from the fonts and
+underline from the rules drawn under the glyphs — character by character, so a
+partly underlined phrase is exact. Blue text is programmer logic, red quotas,
+orange-highlighted options are recorded (`highlight: "orange"`). Attention
+checks and [TEXT] blocks are kept in their own lists with their position, and
+everything after the questionnaire (an earlier outline, parameters, notes) is
+ignored. `outline/gates.py` parses this family's gates — two-letter options
+(`a-bb`), row-scoped answers (`for row a or b in Q71 or Q72`), AND / NOT.
+
+## Planning and rehearsing coverage paths
+
+For a single-session survey (CAPTCHA), each path is one walk in its own
+session. `surveys/<id>/paths.json` lists the paths — each path's pins plus the
+questions it should show and skip.
+
+```bash
+# dry run: walk the questionnaire with each path's config the way the bot
+# answers, evaluate every gate, and check each path against its intent
+python3 outline/simulate_paths.py surveys/are01/outline-spec.json \
+    surveys/are01/survey-config.json surveys/are01/paths.json --report surveys/are01/DRYRUN.md
+
+# rehearsal: serve the questionnaire as a Qualtrics-style mock and run every
+# path's exact config through the real snippet in Chromium
+node mock-walk.mjs surveys/are01
+
+# paste-ready blocks for the live run
+python3 outline/build_run_blocks.py surveys/are01 "the ARE01 survey"   # -> surveys/are01/RUN.md
+```
+
+The dry run flags pins that never apply, pins that match no option, gates that
+depend on an unpinned randomized question, and any question no path reaches
+or no path skips. The rehearsal checks what the bot actually saw against the
+dry run, page by page.
+
 ## Filling the QA workbook
 
 `qa/fill_qa.py` writes the per-question columns of the QA workbook from the same

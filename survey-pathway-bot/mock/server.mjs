@@ -10,6 +10,7 @@
 // question that some routes never reach.
 
 import { createServer } from 'node:http';
+import { specSurvey } from './spec-survey.mjs';
 
 const PORT = Number(process.argv[2] ?? 8099);
 const enc = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
@@ -93,6 +94,7 @@ function nextPage(submitted, st) {
 }
 
 createServer((req, res) => {
+  if (req.url && req.url.startsWith('/spec/')) return specSurvey(req, res);
   // A stand-in for the login/interstitial wall a real survey host puts in front
   // of a test link: a page with no questions and no forward button.
   if (req.url && req.url.startsWith('/wall')) {
@@ -825,6 +827,69 @@ createServer((req, res) => {
             return;
           }
           document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p>'); document.close();
+        });
+      </script></body></html>`);
+    return;
+  }
+  // Attention check with Qualtrics recode values: the decoy listed first has
+  // recode VALUE 4, the right answer has LABEL "4" (value 2). A rule
+  // fixed: "^4$" must go by what the respondent sees, not the recode.
+  if (req.url && req.url.split('?')[0] === '/qvalue') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const opts = [['4', '12'], ['1', '3'], ['2', '4'], ['5', '44']]; // [recode value, shown label], in shuffled page order
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
+      <form id="Page" name="Page">
+        <div class="QuestionOuter" id="QID80"><fieldset><legend>
+          <div class="QuestionText">To prove you are paying attention, please select the number four.</div></legend>
+          <ul class="ChoiceStructure">${opts.map(([v, l]) => `<li><input type="radio" name="QR~QID80" id="QR~QID80~${v}" value="${v}"><label for="QR~QID80~${v}" class="SingleAnswer"><span>${l}</span></label></li>`).join('')}</ul>
+          </fieldset></div>
+        <div id="Buttons"><input id="NextButton" type="button" value="→" aria-label="Next"></div>
+      </form>
+      <script>
+        document.getElementById('NextButton').addEventListener('mousedown', function(){
+          var c = document.querySelector('input[name="QR~QID80"]:checked');
+          if (!c) return;
+          document.open();
+          document.write(c.value === '2'
+            ? '<!doctype html><title>Qualtrics Survey</title><body><h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p>'
+            : '<!doctype html><title>Qualtrics Survey</title><body><h2>Unfortunately, you do not qualify for this survey.</h2>');
+          document.close();
+        });
+      </script></body></html>`);
+    return;
+  }
+  // Qualtrics "MP per row" matrix: one checkbox per cell, named
+  // QR~QID70~<row>~<col>, forced response per row — plus a select-all list
+  // where a config rule names exactly which boxes to tick (rule.limit).
+  if (req.url && req.url.split('?')[0] === '/qmatrix') {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    const rows = ['Live sports', 'Movies', 'Concerts'];
+    const cols = ['I personally paid to go', 'My company paid', 'Someone else paid'];
+    const cell = (r, c) => `<td><input type="checkbox" name="QR~QID70~${r}~${c}" id="QR~QID70~${r}~${c}" value="${c}"><label for="QR~QID70~${r}~${c}" class="q-checkbox"></label></td>`;
+    const list = ['Alpha Arcade', 'Cosm', 'Sphere', 'Live sports games featuring teams outside my local area (e.g., watching an away game, a rival from another market, or a national broadcast with fans of both teams)', 'None of the above'];
+    res.end(`<!doctype html><html><head><title>Qualtrics Survey</title></head><body>
+      <form id="Page" name="Page">
+        <div class="QuestionOuter" id="QID70"><fieldset><legend>
+          <div class="QuestionText"><label class="ExportTag">Q19.</label> Who paid for you to attend each of the following activities? Please select all that apply per row.</div></legend>
+          <table class="ChoiceStructure"><thead><tr><th></th>${cols.map((c) => `<th class="Answers">${c}</th>`).join('')}</tr></thead><tbody>
+          ${rows.map((r, i) => `<tr class="ChoiceRow"><th class="c1"><span class="LabelWrapper"><label>${r}</label></span></th>${cols.map((_, j) => cell(i + 1, j + 1)).join('')}</tr>`).join('')}
+          </tbody></table></fieldset></div>
+        <div class="QuestionOuter" id="QID71"><fieldset><legend>
+          <div class="QuestionText"><label class="ExportTag">Q13.</label> Which of the following are you aware of? Please select all that apply.</div></legend>
+          <ul class="ChoiceStructure">${list.map((l, i) => `<li><input type="checkbox" name="QR~QID71~${i + 1}" id="QR~QID71~${i + 1}" value="${i + 1}"><label for="QR~QID71~${i + 1}" class="q-checkbox"></label><label for="QR~QID71~${i + 1}" class="SingleAnswer"><span>${l}</span></label></li>`).join('')}</ul>
+          </fieldset></div>
+        <div id="Buttons"><input id="NextButton" type="button" value="→" aria-label="Next"></div>
+      </form>
+      <script>
+        document.getElementById('NextButton').addEventListener('mousedown', function(){
+          var missing = [1,2,3].filter(function(r){ return ![1,2,3].some(function(c){ return document.getElementById('QR~QID70~'+r+'~'+c).checked; }); });
+          if (missing.length) {
+            if (!document.querySelector('.ValidationError'))
+              document.body.insertAdjacentHTML('afterbegin','<div class="ValidationError">Please answer every row.</div>');
+            return;
+          }
+          var picked = [1,2,3,4,5].filter(function(i){ return document.getElementById('QR~QID71~'+i).checked; }).join(',');
+          document.open(); document.write('<!doctype html><title>Qualtrics Survey</title><body><h2>We thank you for your time spent taking this survey.</h2><p>Your response has been recorded.</p><p id="picked">aware='+picked+'</p>'); document.close();
         });
       </script></body></html>`);
     return;

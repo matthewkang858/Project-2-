@@ -162,6 +162,36 @@ try {
   check(qnVals.every((v) => !/test/i.test(v)), 'snippet never types "Test" into a numeric field');
   await qn.close();
 
+  // A pinned answer goes by the label the respondent sees, not the recode
+  // value: on a randomized attention check the decoy can carry value 4.
+  const qv = await ctx.newPage();
+  await qv.goto(URL_ + 'qvalue');
+  await qv.evaluate(snippet);
+  const qvTraces = (await qv.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 1, config: { delay: 0, manualTimeout: 0,
+    answers: [{ match: 'select\\W+the\\W+number\\W+four', fixed: '^4$' }] } }), URL_ + 'qvalue')) || [];
+  check(qvTraces.some((t) => t.outcome?.type === 'complete'),
+    `fixed: "^4$" picks the option labelled 4, not the decoy whose recode value is 4 (${qvTraces.map((t) => t.outcome?.type).join(',')})`);
+  await qv.close();
+
+  // Qualtrics MP-per-row matrix (forced response per row) + a select-all list
+  // where one rule names the boxes to tick and how many (rule.limit).
+  const qm = await ctx.newPage();
+  await qm.goto(URL_ + 'qmatrix');
+  await qm.evaluate(snippet);
+  const qmTraces = (await qm.evaluate(async (u) => await spb.auto({ url: u, maxRuns: 1, config: { delay: 0, manualTimeout: 0,
+    answers: [{ match: 'are\\W+you\\W+aware\\W+of', fixed: '^Cosm$|^Sphere$|teams outside', limit: 3 }] } }), URL_ + 'qmatrix')) || [];
+  const qmDone = qmTraces.find((t) => t.outcome?.type === 'complete');
+  const qmTicked = (qmTraces[0]?.decisions || []).filter((d) => /^QR~QID70~/.test(d.key) && d.chosen && !/^\(/.test(d.chosen)).map((d) => d.key);
+  const qmRows = new Set(qmTicked.map((k) => k.split('~')[2]));
+  check(!!qmDone && qmRows.size === 3, `snippet ticks a box in every row of a Qualtrics MP-per-row matrix (${qmRows.size}/3 rows)`);
+  // deduped: a page re-answered after a validation error logs its picks again
+  const qmAware = [...new Set((qmTraces[0]?.decisions || []).filter((d) => /^QR~QID71~/.test(d.key) && d.chosen && !/^\(/.test(d.chosen)).map((d) => d.chosen))];
+  check(qmAware.length === 3 && qmAware.some((c) => /Cosm/.test(c)) && qmAware.some((c) => /Sphere/.test(c)) && qmAware.some((c) => /teams outside/.test(c)),
+    `a rule with fixed + limit ticks exactly the named boxes, long labels included (${qmAware.map((c) => c.slice(0, 30)).join(' / ') || 'none'})`);
+  const qmSaved = await qm.evaluate(() => { try { return JSON.parse(spb.saveTraces('t.json')).traces.length; } catch { return -1; } });
+  check(qmSaved >= 1, `spb.saveTraces() exports the traces as JSON (${qmSaved} traversal(s))`);
+  await qm.close();
+
   // Single-session exploration: a survey that cannot be reloaded (ballot-box
   // wall on reload) with a Back button and a display-gated question (BQ3 shows
   // only when BQ2="Yes"). explore() must backtrack, cover both branches, and

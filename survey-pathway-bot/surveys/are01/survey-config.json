@@ -1,0 +1,30 @@
+{
+  "_comment": "Run config for the ARE01 / COSM consumer survey (questionnaire v8). Applies to every path: pins the screeners' qualifying answers, passes the three attention checks and fills the dollar write-ins, so a walk reaches the end. Path-specific pins live in paths.json; outline/build_run_blocks.py puts the two together into paste-ready blocks. Order matters: the first rule whose `match` fits a question wins, so path pins go in front of these.",
+  "_derived": [
+    "Q1 age (dropdown): 35 — under 18 terminates",
+    "Q2 gender: Male/Female/Other — 'Prefer not to answer' terminates",
+    "Q3 state (dropdown): California — 'I do not live in the United States' terminates",
+    "Q4 ZIP (must be a US postal code): 90301, Inglewood CA — the Cosm Los Angeles market, and consistent with Q3",
+    "Q5 income: $75,000 to $99,999 — 'Prefer not to answer' terminates",
+    "Attention checks (p.44 TERMINATE criteria): AC1 Broccoli, AC2 the number 4, AC3 Dog — every other answer terminates",
+    "Dollar write-ins Q21/Q83/Q84/Q88/Q99: amounts inside the stated $0-$10,000 / $0-$1,000 ranges; the exclusive 'I would not pay / attend / spend' box beside each is left unticked (fixed: '(?!)' never matches, so a checkbox stays blank while the amount box gets `value`)"
+  ],
+  "delay": 400,
+  "maxSteps": 400,
+  "answers": [
+    { "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+a\\W+vegetable", "_q": "AC1", "fixed": "^Broccoli$" },
+    { "match": "select\\W+the\\W+number\\W+four", "_q": "AC2", "fixed": "^4$" },
+    { "match": "Which\\W+of\\W+the\\W+following\\W+is\\W+an\\W+animal", "_q": "AC3", "fixed": "^Dog$" },
+
+    { "match": "What\\W+is\\W+your\\W+age", "_q": "Q1", "fixed": "^35$" },
+    { "match": "What\\W+is\\W+your\\W+gender", "_q": "Q2", "options": "^Male$|^Female$|^Other$" },
+    { "match": "state\\W+do\\W+you\\W+currently\\W+reside", "_q": "Q3", "fixed": "^California$" },
+    { "match": "5\\W*digit\\W+ZIP", "_q": "Q4", "value": "90301" },
+    { "match": "annual\\W+household\\W+income", "_q": "Q5", "fixed": "75,000" },
+
+    { "match": "how\\W+much\\W+was\\W+spent\\W+per\\W+person", "_q": "Q21", "value": 25 },
+    { "match": "willing\\W+to\\W+pay\\W+per\\W+person\\W+to\\W+attend", "_q": "Q83, Q99", "fixed": "(?!)", "value": 40 },
+    { "match": "willing\\W+to\\W+spend\\W+per\\W+person\\W+on\\W+food", "_q": "Q84", "fixed": "(?!)", "value": 20 },
+    { "match": "Cosm\\W+Club\\W+is\\W+an\\W+annual\\W+membership", "_q": "Q88", "fixed": "(?!)", "value": 120 }
+  ]
+}

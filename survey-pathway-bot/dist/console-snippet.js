@@ -2,7 +2,7 @@
 // Paste into the DevTools console on a survey page, or save as a DevTools Snippet
 // (Sources ▸ Snippets ▸ New) and press Ctrl/Cmd+Enter to re-run it on each page.
 (() => {
-const SPB_BUILD = "4c83fc7 2026-09-04 04:06";
+const SPB_BUILD = "774abd6 2026-10-28 18:16";
 // Shared core — the only copy of "what is on this page and how do I answer it".
 //
 // Loaded three ways, so keep it dependency-free, ES5-ish and side-effect-free
@@ -112,16 +112,24 @@ function pageModel(cfg, doc) {
     return out;
   };
 
-  // Text of the label attached to a single control.
+  // Text of the label attached to a single control. Qualtrics gives each
+  // choice two labels: an empty styled overlay first, then the one holding the
+  // answer text — so take the first label that has text, however long. (Only
+  // reading the first meant long answers fell through to the 120-character
+  // cell fallback below and came out as the recode value: "2", or "Selected"
+  // for a checkbox.)
   const optionLabelEl = (el) => {
     if (el.id) {
-      const lab = doc.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-      if (lab && clean(lab.innerText)) return lab;
+      for (const lab of doc.querySelectorAll(`label[for="${CSS.escape(el.id)}"]`)) if (clean(lab.innerText)) return lab;
     }
     const wrap = el.closest('label');
     if (wrap && clean(wrap.innerText)) return wrap;
     const cell = el.closest('td, th, li, div');
-    if (cell && clean(cell.innerText) && clean(cell.innerText).length < 120) return cell;
+    const text = cell ? clean(cell.innerText) : '';
+    // A cell holding only this control is its label at any length; a shared
+    // cell's text is only trusted when short.
+    const sole = cell && cell.querySelectorAll('input, select, textarea').length === 1;
+    if (text && (text.length < 120 || (sole && text.length < 600))) return cell;
     return null;
   };
   const optionLabel = (el) => {
@@ -138,7 +146,7 @@ function pageModel(cfg, doc) {
       const box = el.closest(sel);
       if (!box) continue;
       const head = box.querySelector('legend, .qtitle, .question-text, .question-title, h1, h2, h3, h4, .title, p');
-      stem = clean(head?.innerText || '') || clean(box.innerText).slice(0, 300);
+      stem = clean(head?.innerText || '') || clean(box.innerText).slice(0, 1000);
       if (stem) {
         if (sink) sink.el = head || box;
         break;
@@ -149,10 +157,14 @@ function pageModel(cfg, doc) {
       const cell = row.querySelector('th') ?? row.querySelector('td');
       const rowLabel = clean(cell?.innerText || '');
       // Only a header cell, not the cell holding this very control.
+      // The whole stem is kept (up to 1000 characters): config rules match
+      // on it, and long stems carry their key words late ("Cosm Club is … It
+      // offers: • … What would you pay per year …"). The row label always
+      // survives, since it is what tells the rows of a grid apart.
       if (rowLabel && !cell.contains(el) && rowLabel.length < 120)
-        return (stem ? `${stem} — ${rowLabel}` : rowLabel).slice(0, 300);
+        return stem ? `${stem.slice(0, 1000)} — ${rowLabel}` : rowLabel;
     }
-    return stem.slice(0, 300);
+    return stem.slice(0, 1000);
   };
 
   // Survey players routinely hide the real control (opacity:0, a 1px box, or
@@ -261,6 +273,12 @@ function pageModel(cfg, doc) {
       .replace(/([._~-]\d+)+$/, '')  // ans32645.0.8 -> ans32645, QR~QID12~5 -> QR~QID12
       .replace(/[rc]\d+$/i, '')      // Q1r1 -> Q1
       || key;
+    // What a tick limit counts over. A Qualtrics multi-answer matrix names each
+    // cell QR~QID12~<row>~<col>, and both "select up to N" and forced response
+    // apply per row — counted over the whole grid, one tick would leave every
+    // other row blank.
+    const bare = key.replace(/~TEXT$/i, '');
+    q.limitGroup = /^QR~[^~]+~\d+~\d+$/.test(bare) ? bare.replace(/~\d+$/, '') : q.group;
 
     // Whether the respondent (or the bot) has already answered it — used to
     // avoid re-answering questions that stay on screen as a carousel reveals
@@ -693,15 +711,22 @@ function candidates(q, config = {}) {
 
   if (q.kind === 'radio' || q.kind === 'checkbox' || q.kind === 'select' || q.kind === 'buttons') {
     let opts = q.options.map((o, index) => ({ kind: 'option', index, value: o.value, label: o.label }));
+    // Rules go by what the respondent sees. The value is only a fallback: on
+    // Qualtrics it is the recode number, so "^4$" against values would pick
+    // whichever option happens to be recoded 4 — on a randomized attention
+    // check ("select the number four") that is a decoy, and a terminate.
+    const byLabel = (re) => (o) => re.test(o.label || '');
+    const byValue = (re) => (o) => re.test(o.value || '');
     if (rule?.options) {
       const re = new RegExp(rule.options, 'i');
-      const filtered = opts.filter((o) => re.test(o.value) || re.test(o.label));
-      if (filtered.length) opts = filtered;
+      const filtered = opts.filter(byLabel(re));
+      const fallback = filtered.length ? filtered : opts.filter(byValue(re));
+      if (fallback.length) opts = fallback;
     }
     if (rule?.skip) return [{ kind: 'noop', label: '(left unchecked)' }];
     if (rule?.fixed != null) {
       const re = new RegExp(rule.fixed, 'i');
-      const hit = opts.find((o) => re.test(o.value) || re.test(o.label));
+      const hit = opts.find(byLabel(re)) || opts.find(byValue(re));
       if (hit) return [hit];
       // No match: a multi-select names each box separately, so the fixed rule
       // matches the whole group and only the named box should be ticked — the
@@ -783,12 +808,19 @@ function planPage(model, plan, startDi, cfg, answered) {
     if (q.kind === 'checkbox' && chosen && chosen.kind === 'option') {
       // Default to a single box per question: ticking every box of a
       // "select up to two" question is the fastest way to a validation error.
-      const limit = q.limit ?? config.checkboxLimit ?? 1;
-      const used = ticked[q.group] || 0;
+      // A rule can ask for more on its own question ({ fixed: 'Cosm|Sphere',
+      // limit: 2 }) without raising the limit everywhere — never past what
+      // the question itself allows.
+      const rule = ruleFor(q, config);
+      const limit = rule?.limit != null
+        ? Math.min(Number(rule.limit), q.limit ?? Infinity)
+        : (q.limit ?? config.checkboxLimit ?? 1);
+      const unit = q.limitGroup || q.group;
+      const used = ticked[unit] || 0;
       if (used >= limit) {
         chosen = { kind: 'noop', label: `(limit of ${limit} reached)` };
         note = `limit ${limit}`;
-      } else ticked[q.group] = used + 1;
+      } else ticked[unit] = used + 1;
     }
 
     if (q.sumTo && (q.kind === 'number' || q.kind === 'text')) {
@@ -1407,6 +1439,7 @@ spb.stop()                  end the run now and keep what was recorded
 spb.debug()                 what the bot can and cannot see on this page
 spb.status()                where the current exploration is up to
 spb.report()                print the Markdown report   ·  spb.download() saves it
+spb.saveTraces()            save the full traces (JSON) — needed for wording/formatting QA
 spb.inspect()               what the bot sees on this page
 spb.fill({ S1: 2 })         answer this page  ·  spb.step() answer + Next
 spb.capture()               record answers you picked  ·  spb.scenario('name') export them
@@ -2129,6 +2162,23 @@ const lost = ans.planned.filter((d) => {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     console.log(`saved ${name}`);
+  },
+
+  // The traces carry full question text, every option label and the page's
+  // bold/underline — what wording and formatting QA needs, and what the
+  // truncated Markdown report cannot give. Returns the JSON as well.
+  saveTraces(name = 'spb-traces.json') {
+    const traces = this.allTraces();
+    if (!traces.length) return console.log('no traversals recorded yet.');
+    const json = JSON.stringify({ traces });
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    console.log(`saved ${name} (${traces.length} traversal(s))`);
+    return json;
   },
 
   reset() {

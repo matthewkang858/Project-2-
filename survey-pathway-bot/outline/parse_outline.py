@@ -19,7 +19,7 @@ from xml.etree import ElementTree as ET
 W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 ROMAN = [(10, 'x'), (9, 'ix'), (5, 'v'), (4, 'iv'), (1, 'i')]
-CATCH_ALL = re.compile(r"^(none of the above|other|i am not sure|not sure|i do not know|don'?t know|no role)", re.I)
+CATCH_ALL = re.compile(r"^(none\b|other\b|i am not sure|not sure|i do not know|don'?t know|no role|prefer not to|no preference|n/a\b)", re.I)
 
 
 def roman(n):
