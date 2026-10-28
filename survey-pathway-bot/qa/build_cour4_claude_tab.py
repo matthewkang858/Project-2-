@@ -42,14 +42,14 @@ E_OK = [1,2,3,4,5,8,9,10,11,14,16,17,18,19,20,21,26,27,29,31,34,37,40,56,69,70,
     71,72,73,74,75,76,79,80,83,85,87,88,90,93,96,99,101,102,110,111,112,113,114,
     115,117,118,119]
 # wording / answer-text discrepancy vs v15 (these get D = FALSE)
-# NOTE: the checkbox "blank option" flags (Q9/Q10/Q25/Q27/Q92/Q94) were REMOVED.
-# On those, the trace captured the option label as the literal word "Selected" (the
-# checkbox state) with empty emphasis, which is the bot's fall-back when it cannot
-# read an option's label element -- a capture artifact, not a real blank render.
-# Corroboration: JB/MK (two human reviewers) did not flag any of them, and confirmed
-# only the *radio* bare-number blanks (Q6="2", Q87="4"). Kept: real text/typo findings
-# and the human-corroborated radio blanks.
-D_BAD = [4,6,28,36,38,40,41,42,57,61,64,65,82,87,109,112]
+# Every "blank option" the trace showed — checkbox labels read as "Selected",
+# radio labels read as a bare number (Q6 b "2", Q42 b "2", Q87 b "4") — was a
+# bot capture bug, not the survey: core.js read only the first label[for]
+# (Qualtrics' empty overlay) and fell back to cell text under 120 characters,
+# so every option of 120+ characters came out as its value. The longest label
+# the trace captured is 119 characters; every "blank" is a 120+ character
+# option. Fixed in core.js; all blank-option flags are withdrawn here.
+D_BAD = [4,6,28,36,38,40,41,57,61,64,65,82,109,112]
 
 COMMENTS = {
     4: (  # Q4
@@ -58,9 +58,8 @@ COMMENTS = {
         'uses "Prefer not to say". Pick one and make it consistent.'
     ),
     6: (  # Q6
-        'Two problems in the answer list (both also caught by JB and MK).\n'
-        '1. Option b displays with no text at all — it comes through as just "2".\n'
-        '2. Option c reads "I had did not have any control...". Drop the extra "had": '
+        'Typo in option c (also caught by JB and MK).\n'
+        'It reads "I had did not have any control...". Drop the extra "had": '
         '"I did not have any control over which online learning platform I used".'
     ),
     28: (  # Q28
@@ -95,13 +94,6 @@ COMMENTS = {
         'point, and likewise on Q61 and Q65. The "$" renders fine elsewhere (e.g. Q4), so '
         'this looks real, but worth a quick visual check since it is a piped value.'
     ),
-    42: (  # Q42
-        'Please confirm on screen: option b may display blank.\n'
-        'The automated trace read option b as just "2" — the same signature as the blank '
-        'options JB/MK confirmed on Q6 and Q87. The intended text is "I would not purchase a '
-        'course with limited access...". Q42 is display-gated, so it may not have been on the '
-        'path JB/MK reviewed; worth a look.'
-    ),
     57: (  # Q57
         'Typo in the last option.\n'
         'Live reads "Not at interested". Should be "Not at all interested" to match the scale '
@@ -124,17 +116,9 @@ COMMENTS = {
         'Confirms JB/MK: this question is not in the questionnaire.\n'
         'The live survey has an extra single-select here ("When you think about what makes a '
         'learning experience worth paying for, which of the following matters most to you?"), '
-        'with 3 options on non-sequential value codes (1 / 4 / 5 — itself a sign options were '
-        'deleted). It does not appear in v15, and it pushes every downstream question one '
+        'with 3 options. It does not appear in v15, and it pushes every downstream question one '
         'number higher in the live survey than in the questionnaire (live Q119 = '
         'questionnaire Q118).'
-    ),
-    87: (  # Q87
-        'Confirms JB/MK: option b displays blank.\n'
-        'It comes through as just "4" on screen; the missing option is "I would want partial '
-        'access (i.e., some features or content unlocked while others are gated)...". Note the '
-        'option value codes also jump (1 / 4 / 5 / 6), so only four options are present — '
-        'confirm none were dropped.'
     ),
     109: (  # Q109  (live Q109 = questionnaire Q108)
         'Confirms JB/MK: answer list and stem don\'t match the questionnaire.\n'
@@ -172,12 +156,12 @@ SCOPE_NOTE = (
     "'Question not skippable' (C), 'Display logic' (G), 'Randomization/anchor' (H), "
     "'Exclusive logic' (I), 'Other logic' (J).\n"
     "31 display-gated questions were not reached on this path and are left FALSE throughout.\n\n"
-    "Reliability note: this tab reports only blank/no-text answer options that show as a bare "
-    "value number on a single-select AND were independently confirmed by a human reviewer "
-    "(Q6, Q87). Automated 'blank option' flags on multi-selects were dropped as capture "
-    "artifacts — the tool logged the option's checkbox state ('Selected') rather than reading "
-    "its label, which is not evidence the option is blank on screen. Two items (Q41/Q61/Q65 "
-    "missing '$', Q42 option b) are marked 'confirm on screen' rather than asserted."
+    "Reliability note: no answer option is reported as blank. Every option the automated "
+    "trace showed without text (a bare number on a single-select, the word 'Selected' on a "
+    "multi-select) was a capture bug in the tool, since fixed: it could not read answer text of "
+    "120 characters or more, and every such option came out that way (the longest text it "
+    "captured is 119 characters). Q41/Q61/Q65 (missing '$') are marked 'confirm on screen' "
+    "rather than asserted."
 )
 
 
