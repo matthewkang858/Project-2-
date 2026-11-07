@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9whp-abqride",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.cabq.gov/transit/gtfs/google_transit.zip"
+      },
+      "license": {
+        "url": "http://www.cabq.gov/abq-data/abq-data-disclaimer-1"
+      },
+      "tags": {
+        "gtfs_data_exchange": "abq-ride"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9whp-abqride",
+          "name": "City of Albuquerque Transit Department",
+          "short_name": "ABQ RIDE",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-abqride~rt"
+            },
+            {
+              "feed_onestop_id": "f-abqride~rt~alerts"
+            }
+          ],
+          "tags": {
+            "twitter_general": "abqride",
+            "us_ntd_id": "60019",
+            "wikidata_id": "Q580832"
+          }
+        }
+      ]
+    }
+  ]
+}

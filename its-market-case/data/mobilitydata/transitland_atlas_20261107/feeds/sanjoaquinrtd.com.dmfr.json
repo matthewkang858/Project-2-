@@ -1,0 +1,56 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9qc-sanjoaquinrtd",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://sanjoaquinrtd.com/RTD-GTFS/RTD-GTFS.zip",
+        "static_historic": [
+          "http://sjrtd.com/RTD-GTFS/RTD-GTFS.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-3.0",
+        "url": "http://sanjoaquinrtd.com/preview/terms-of-use/",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": " and schedule data provided by permission of San Joaquin RTD",
+        "attribution_instructions": "You must present the Data with the following legend, prominently displayed"
+      },
+      "tags": {
+        "calitp_dataset_id": "recGGy7HVkFGILMgO",
+        "gtfs_data_exchange": "san-joaquin-regional-transit-district-rtd"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qc-sanjoaquinregionaltransitdistrictrtd",
+          "name": "San Joaquin Regional Transit District",
+          "short_name": "RTD",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sanjoaquinrtd~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recZgWVXkpix390of",
+            "twitter_general": "sanjoaquinrtd",
+            "us_ntd_id": "90012",
+            "wikidata_id": "Q7414399"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sanjoaquinrtd~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://rtdgtfs.s3.us-west-1.amazonaws.com/VehiclePositions.pb",
+        "realtime_trip_updates": "https://rtdgtfs.s3.us-west-1.amazonaws.com/TripUpdates.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec4ZJuBhLMW1DUlU,recEinucZ66IpB2PR"
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-c28-nstranslinkca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs-static.translink.ca/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://gtfs.translink.ca/static/latest"
+        ]
+      },
+      "license": {
+        "url": "https://developer.translink.ca/ServicesGtfs/GtfsData",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "commercial_use_allowed": "yes",
+        "attribution_text": "Route and arrival data used in this product or service is provided by permission of TransLink. TransLink assumes no responsibility for the accuracy or currency of the Data used in this product or service.",
+        "attribution_instructions": "You must, unless otherwise agreed to by TransLink in writing, at all times present and identify the Data with the following legend, prominently displayed"
+      }
+    },
+    {
+      "id": "f-translink~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfsapi.translink.ca/v3/gtfsposition",
+        "realtime_trip_updates": "https://gtfsapi.translink.ca/v3/gtfsrealtime",
+        "realtime_alerts": "https://gtfsapi.translink.ca/v3/gtfsalerts"
+      },
+      "license": {
+        "url": "https://www.translink.ca/about-us/doing-business-with-translink/app-developer-resources/terms-of-use",
+        "redistribution_allowed": "yes",
+        "attribution_text": "Some of the data used in this product or service is provided by permission of TransLink. TransLink assumes no responsibility for the accuracy or currency of the Data used in this product or service."
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "apikey"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-c28-translink",
+      "name": "South Coast British Columbia Transportation Authority",
+      "short_name": "TransLink",
+      "website": "http://www.translink.ca",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-c28-nstranslinkca"
+        },
+        {
+          "feed_onestop_id": "f-translink~rt"
+        }
+      ],
+      "tags": {
+        "wikidata_id": "Q1142140"
+      }
+    }
+  ]
+}

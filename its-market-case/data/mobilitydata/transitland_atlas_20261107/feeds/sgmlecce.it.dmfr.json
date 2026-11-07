@@ -1,0 +1,40 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-srhv-sgmspa",
+      "supersedes_ids": [
+        "f-s-sgmspa"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.sgmlecce.it/images/Servizi_trasparenti/GTFS/google_transit.zip",
+        "static_historic": [
+          "http://dati.comune.lecce.it/trasporti/gtfs/google_transit.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://creativecommons.org/licenses/by/4.0/deed.it",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-srhv-sgmspa",
+          "supersedes_ids": [
+            "o-s-sgmspa"
+          ],
+          "name": "Società Gestione Multipla",
+          "short_name": "SGM",
+          "website": "https://www.sgmlecce.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "104"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

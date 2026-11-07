@@ -1,0 +1,45 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f0q2-greatersudburytransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://sudbury.tmix.se/gtfs/gtfs.zip",
+        "static_historic": [
+          "http://www.greatersudbury.ca/image/opendata/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "http://www.greatersudbury.ca/inside-city-hall/open-data/licence/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f0q2-greatersudburytransit",
+          "name": "Greater Sudbury Transit",
+          "website": "http://www.greatersudbury.ca/living/transit/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-f0q2-greatersudburytransit"
+            },
+            {
+              "feed_onestop_id": "f-f0q2-greatersudburytransit~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q5600768"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-f0q2-greatersudburytransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://sudbury.tmix.se/gtfs-realtime/vehiclepositions.pb",
+        "realtime_trip_updates": "https://sudbury.tmix.se/gtfs-realtime/tripupdates.pb",
+        "realtime_alerts": "https://sudbury.tmix.se/gtfs-realtime/alerts.pb"
+      }
+    }
+  ]
+}

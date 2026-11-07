@@ -98,7 +98,23 @@
   "fta_2026": "Inputs!$B$107",
   "fta_2027_house": "Inputs!$B$108",
   "fta_2027_ext": "Inputs!$B$109",
-  "fta_2027_req": "Inputs!$B$110"
+  "fta_2027_req": "Inputs!$B$110",
+  "app_ops": "Inputs!$B$112",
+  "app_info": "Inputs!$B$113",
+  "app_safety": "Inputs!$B$114",
+  "haircut_alt1": "Inputs!$B$115",
+  "haircut_alt2": "Inputs!$B$116",
+  "haircut_alt3": "Inputs!$B$117",
+  "vb_rev0": "Inputs!$B$119",
+  "vb_mult0": "Inputs!$B$120",
+  "vb_margin0": "Inputs!$B$121",
+  "vb_g": "Inputs!$B$122",
+  "vb_bolt": "Inputs!$B$123",
+  "vb_boltmult": "Inputs!$B$124",
+  "vb_hold": "Inputs!$B$125",
+  "vb_margin1": "Inputs!$B$126",
+  "vb_mult1": "Inputs!$B$127",
+  "vb_lev": "Inputs!$B$128"
  },
  "market_total_row": 27,
  "seg_rows": {
@@ -120,6 +136,40 @@
   "Asia-Pacific": 49,
   "Rest of world": 50
  },
+ "tier_rows": {
+  "core": 61,
+  "mainline": 62,
+  "total": 63
+ },
+ "open_rows": {
+  "closed": 67,
+  "held": 68,
+  "open": 69,
+  "total": 70
+ },
+ "app_rows": {
+  "ops": 74,
+  "info": 75,
+  "safety": 76
+ },
+ "sens_rows": {
+  "h0": 80,
+  "h15": 81,
+  "h20": 82,
+  "h25": 83
+ },
+ "thesis": {
+  "rev0": 5,
+  "ev0": 6,
+  "eq0": 9,
+  "bolt": 10,
+  "rev1": 11,
+  "ebitda1": 12,
+  "ev1": 13,
+  "evrev": 14,
+  "eq1": 16,
+  "moic": 17
+ },
  "forecast": {
   "seg": {
    "Bus": 25,
@@ -128,24 +178,35 @@
   },
   "seg_total": 28,
   "contest": 29,
+  "sam": 31,
+  "bridge": {
+   "start": 35,
+   "Bus and tram ITS: Europe": 36,
+   "Bus and tram ITS: North America": 37,
+   "Bus ITS: rest of world": 38,
+   "Urban signalling (CBTC) resignalling and new lines": 39,
+   "Mainline and commuter signalling (ETCS, interlockings, PTC)": 40,
+   "Other rail ITS (PIS, CCTV/APC, condition monitoring, detection)": 41,
+   "end": 42
+  },
   "geo": {
-   "North America": 33,
-   "Europe": 34,
-   "Asia-Pacific": 35,
-   "Rest of world": 36
+   "North America": 46,
+   "Europe": 47,
+   "Asia-Pacific": 48,
+   "Rest of world": 49
   },
   "comp": {
-   "Hardware": 40,
-   "Software": 41,
-   "Services": 42
+   "Hardware": 53,
+   "Software": 54,
+   "Services": 55
   },
   "scen": {
-   "Low": 47,
-   "Base": 48,
-   "High": 49,
-   "Contestable Low": 51,
-   "Contestable Base": 52,
-   "Contestable High": 53
+   "Low": 60,
+   "Base": 61,
+   "High": 62,
+   "Contestable Low": 64,
+   "Contestable Base": 65,
+   "Contestable High": 66
   },
   "first": 5,
   "last": 20

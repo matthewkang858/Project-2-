@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dqcq-regionaltransportationagencyofcentralmaryland",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.trilliumtransit.com/gtfs/centralmarylandrta-md-us/centralmarylandrta-md-us.zip"
+      },
+      "tags": {
+        "gtfs_data_exchange": "regional-transportation-agency-of-central-maryland"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcq-regionaltransportationagencyofcentralmaryland",
+          "name": "Regional Transportation Agency of Central Maryland",
+          "short_name": "RTA",
+          "website": "http://www.transitrta.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "2"
+            },
+            {
+              "feed_onestop_id": "f-dqcq-regionaltransportationagencyofcentralmaryland~rt"
+            },
+            {
+              "feed_onestop_id": "f-dqcq-regionaltransportationagencyofcentralmaryland~rt~alerts"
+            }
+          ],
+          "tags": {
+            "twitter_general": "transitRTA",
+            "us_ntd_id": "30048",
+            "wikidata_id": "Q17183238"
+          }
+        }
+      ]
+    }
+  ]
+}

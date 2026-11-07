@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u3jy-lodz",
+      "name": "Łódź GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cdn.zbiorkom.live/gtfs/lodz.zip",
+        "static_historic": [
+          "https://przyjazdy.pl/latest/lodz.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "MIT"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u3jy-mpk~lodz",
+          "name": "MPK-Łódź Sp. z o.o.",
+          "short_name": "MPK-Łódź",
+          "website": "http://www.mpk.lodz.pl/"
+        }
+      ]
+    },
+    {
+      "id": "f-u3mc-kutno",
+      "name": "Kutno GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cdn.zbiorkom.live/gtfs/kutno.zip"
+      },
+      "license": {
+        "spdx_identifier": "MIT"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u3mc-mzk~kutno",
+          "name": "Miejski Zakład Komunikacji Sp. z o.o. w Kutnie",
+          "short_name": "MZK Kutno",
+          "website": "https://mzk.kutno.pl/"
+        }
+      ]
+    }
+  ]
+}

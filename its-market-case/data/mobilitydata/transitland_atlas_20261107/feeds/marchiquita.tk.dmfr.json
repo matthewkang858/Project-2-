@@ -1,0 +1,18 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-6d6-marchiquitasrl",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://marchiquita.tk/mar.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-6d6-marchiquitasrl",
+          "name": "Mar Chiquita"
+        }
+      ]
+    }
+  ]
+}

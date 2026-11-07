@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhw-miamidadetransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.miamidade.gov/transit/googletransit/current/google_transit.zip"
+      },
+      "license": {
+        "url": "https://ftis.org/FTDEDisclaimer.aspx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "miami-dade-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhw-miamidadetransit",
+          "name": "Miami Dade Transit",
+          "website": "https://www.miamidade.gov/global/transportation/home.page",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-miamidadetransit~rt"
+            },
+            {
+              "feed_onestop_id": "f-miamidadetransit~rt~alerts"
+            }
+          ],
+          "tags": {
+            "twitter_general": "iRideMDT",
+            "us_ntd_id": "40034",
+            "wikidata_id": "Q23016561"
+          }
+        }
+      ]
+    }
+  ]
+}

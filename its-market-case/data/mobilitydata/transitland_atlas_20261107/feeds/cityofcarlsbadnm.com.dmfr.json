@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9tvbk-carlsbadmunicipaltransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/13685/CMTA_NM_GTFS.zip",
+        "static_historic": [
+          "https://cityofcarlsbadnm.com/download/municipal_transit_system/google_transit.zip",
+          "https://github.com/ethan-nelson/carlsbadnmtransit/blob/master/gtfs-odbl/carlsbadtransit-odbl.zip?raw=true",
+          "https://irp.cdn-website.com/f12fb9e8/files/uploaded/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9tvbk-carlsbadmunicipaltransitsystem",
+          "name": "Carlsbad Municipal Transit System",
+          "website": "https://www.cityofcarlsbadnm.com/carlsbad-municipal-transit-system",
+          "tags": {
+            "us_ntd_id": "60184"
+          }
+        }
+      ]
+    }
+  ]
+}

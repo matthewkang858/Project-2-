@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-esvpb-guaguasmunicipales",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.guaguas.com/transit/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-esvpb-guaguasmunicipales",
+          "name": "Guaguas Municipales",
+          "website": "http://www.guaguas.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "Guaguas"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ge2kx-straeto",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://opendata.straeto.is/data/gtfs/gtfs.zip"
+      },
+      "languages": [
+        "is"
+      ],
+      "license": {
+        "spdx_identifier": "OGL-UK-3.0",
+        "url": "https://www.straeto.is/uploads/files/134-ed60c2c158.docx",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ge2kx-straeto",
+          "name": "Strætó bs",
+          "website": "https://www.straeto.is/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ],
+          "tags": {
+            "twitter_general": "straetobs",
+            "wikidata_id": "Q966621"
+          }
+        }
+      ]
+    }
+  ]
+}

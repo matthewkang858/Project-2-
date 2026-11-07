@@ -1,0 +1,197 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-nvbw~bodo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/bodo.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~bwsbahnubahn",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/bwsbahnubahn.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~ding",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/ding.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~hnv",
+      "supersedes_ids": [
+        "f-nvh~de",
+        "f-nvbw~swhn"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/hnv.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~kvsh",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/kvsh.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~move",
+      "supersedes_ids": [
+        "f-nvbw~tuticket"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/move.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~naldo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/naldo.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~oam",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/oam.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~rvf",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/rvf.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~tgo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/tgo.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~vgc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/vgc.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~vhb",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/vhb.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~vpe",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/vpe.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    },
+    {
+      "id": "f-nvbw~vvs",
+      "supersedes_ids": [
+        "f-nvbw~filsland"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nvbw.de/fileadmin/user_upload/service/open_data/fahrplandaten_mit_liniennetz/vvs.zip"
+      },
+      "license": {
+        "url": "https://www.nvbw.de/open-data/fahrplandaten/fahrplandaten-mit-liniennetz",
+        "use_without_attribution": "no",
+        "share_alike_optional": "no",
+        "attribution_text": "NVBW GmbH data record and © OpenStreetMap"
+      }
+    }
+  ]
+}

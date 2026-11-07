@@ -1,0 +1,22 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-brandon~mb~ca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.brandon.ca/Transit/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-brandon~mb~ca",
+          "name": "Brandon Transit",
+          "website": "https://brandontransit.ca/",
+          "tags": {
+            "wikidata_id": "Q4957097"
+          }
+        }
+      ]
+    }
+  ]
+}

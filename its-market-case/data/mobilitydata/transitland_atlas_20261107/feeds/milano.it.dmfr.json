@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0nd-comunedimilano",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://dati.comune.milano.it/gtfs.zip",
+        "static_historic": [
+          "https://www.amat-mi.it/downloads/gtfs/gtfs.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://dati.comune.milano.it/dataset/ds929-orari-del-trasporto-pubblico-locale-nel-comune-di-milano-in-formato-gtfs",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0nd-comunedimilano",
+          "name": "Azienda Trasporti Milanesi",
+          "short_name": "ATM",
+          "website": "http://www.atm.it/"
+        }
+      ]
+    }
+  ]
+}

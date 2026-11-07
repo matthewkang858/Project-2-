@@ -1,0 +1,90 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-gcw-greater~manchester",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odata.tfgm.com/opendata/downloads/TfGMgtfsnew.zip",
+        "static_historic": [
+          "http://odata.tfgm.com/opendata/downloads/TfGMgtfs.zip#gtdf-out"
+        ]
+      },
+      "license": {
+        "url": "https://data.gov.uk/dataset/public-transport-schedules-gtfs/resource/e58f35d3-7404-4d70-b2d3-0eeb3143ccea",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Contains public sector information licensed under the Open Government Licence v3.0."
+      },
+      "operators": [
+        {
+          "onestop_id": "o-gcw-arrivanorthwest",
+          "name": "Arriva North West",
+          "website": "https://www.arrivabus.co.uk/north-west/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "7778471"
+            },
+            {
+              "gtfs_agency_id": "7778555"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-gcw-stagecoach",
+          "name": "Stagecoach",
+          "website": "https://www.stagecoachbus.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "7778570"
+            },
+            {
+              "gtfs_agency_id": "7778704"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-gcw2-beenetwork",
+          "name": "Bee Network",
+          "website": "https://tfgm.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "7778465"
+            },
+            {
+              "gtfs_agency_id": "7778467"
+            },
+            {
+              "gtfs_agency_id": "7778548"
+            },
+            {
+              "gtfs_agency_id": "7778550"
+            },
+            {
+              "gtfs_agency_id": "7778627"
+            },
+            {
+              "gtfs_agency_id": "7778634"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q111700725"
+          }
+        },
+        {
+          "onestop_id": "o-gcw2-metrolink",
+          "name": "Metrolink",
+          "website": "http://www.metrolink.co.uk/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "7778482"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q18548"
+          }
+        }
+      ]
+    }
+  ]
+}

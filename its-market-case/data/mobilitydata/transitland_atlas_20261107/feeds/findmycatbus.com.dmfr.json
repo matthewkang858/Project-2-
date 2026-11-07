@@ -1,0 +1,42 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-capitalareatransit~pa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cat.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://findmycatbus.com/gtfs"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-capitalareatransit~pa",
+          "name": "Capital Area Transit",
+          "short_name": "CAT",
+          "website": "https://www.cattransit.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-capitalareatransit~pa~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "CATTransit",
+            "us_ntd_id": "30014",
+            "wikidata_id": "Q5035468"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-capitalareatransit~pa~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition",
+        "realtime_trip_updates": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+        "realtime_alerts": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert"
+      }
+    }
+  ]
+}

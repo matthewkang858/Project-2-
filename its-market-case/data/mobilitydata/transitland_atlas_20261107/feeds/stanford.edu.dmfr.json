@@ -1,0 +1,26 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q9h-stanford~marguerite",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transportation-forms.stanford.edu/google/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recyXgAFIPCVHCsNF"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q9h-stanford~marguerite",
+          "name": "Stanford Marguerite Shuttle",
+          "website": "http://marguerite.stanford.edu",
+          "tags": {
+            "calitp_organization_id": "recAjJl5bQLfZ0sFK",
+            "wikidata_id": "Q7598772;Q107966493"
+          }
+        }
+      ]
+    }
+  ]
+}

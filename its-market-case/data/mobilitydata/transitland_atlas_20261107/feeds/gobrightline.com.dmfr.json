@@ -1,0 +1,53 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-brightline~trails",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://feed.gobrightline.com/bl_gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhx-brightlinetrainsllc",
+          "supersedes_ids": [
+            "o-brightline~fl~us"
+          ],
+          "name": "Brightline Trains LLC",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "BL"
+            },
+            {
+              "gtfs_agency_id": "EVENT"
+            },
+            {
+              "feed_onestop_id": "f-brightline~fl~us"
+            },
+            {
+              "feed_onestop_id": "f-brightline~fl~us~rt"
+            },
+            {
+              "feed_onestop_id": "f-brightline~fl~us~rt~alerts"
+            },
+            {
+              "feed_onestop_id": "f-brightline~trails~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "GoBrightline",
+            "wikidata_id": "Q27012668"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-brightline~trails~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://feed.gobrightline.com/position_updates.pb",
+        "realtime_trip_updates": "https://feed.gobrightline.com/trip_updates.pb"
+      }
+    }
+  ]
+}

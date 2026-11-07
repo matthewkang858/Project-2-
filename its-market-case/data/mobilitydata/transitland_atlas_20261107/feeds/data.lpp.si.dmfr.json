@@ -1,0 +1,25 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u24q-ljubljanskipotniškipromet",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.lpp.si/api/gtfs/feed.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u24q-ljubljanskipotniškipromet",
+          "name": "Ljubljanski Potniški Promet",
+          "short_name": "LPP",
+          "website": "http://www.lpp.si",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "lpp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

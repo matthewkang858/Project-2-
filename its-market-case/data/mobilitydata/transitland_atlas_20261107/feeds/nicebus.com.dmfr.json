@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dr5x-wwwnicebuscom",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nicebus.com/NICE/media/nicebus-gtfs/NICE_GTFS.zip"
+      },
+      "license": {
+        "url": "http://www.nicebus.com/NiceBus/media/NiceBus-Images/131030_Legal-Agreements.pdf"
+      },
+      "tags": {
+        "gtfs_data_exchange": "nassau-inter-county-express"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr5x-nassauinter~countyexpress",
+          "name": "Nassau Inter-County Express",
+          "short_name": "NICE Bus",
+          "website": "http://www.nicebus.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "LIBUS",
+              "feed_onestop_id": "f-dr5x-wwwnicebuscom"
+            },
+            {
+              "feed_onestop_id": "f-nice~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "thenicebus",
+            "us_ntd_id": "20206",
+            "wikidata_id": "Q6967576"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-nice~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_alerts": "http://nicebus.com/downloads/gtfs/NYC_NICE.proto"
+      }
+    }
+  ]
+}

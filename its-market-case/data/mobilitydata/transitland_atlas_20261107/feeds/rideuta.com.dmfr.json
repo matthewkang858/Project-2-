@@ -1,0 +1,45 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9x0-uta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfsfeed.rideuta.com/GTFS.zip"
+      },
+      "license": {
+        "url": "http://developer.rideuta.com/TermsOfUse.aspx",
+        "attribution_text": "Route and departure data provided by permission of UTA"
+      },
+      "tags": {
+        "gtfs_data_exchange": "utah-transit-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9x0-utahtransitauthority",
+          "name": "Utah Transit Authority",
+          "short_name": "UTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9x0-uta~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "RideUTA",
+            "us_ntd_id": "80001",
+            "wikidata_id": "Q7902494"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9x0-uta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://apps.rideuta.com/tms/gtfs/Vehicle",
+        "realtime_trip_updates": "https://apps.rideuta.com/tms/gtfs/TripUpdate",
+        "realtime_alerts": "https://apps.rideuta.com/tms/gtfs/Alert"
+      }
+    }
+  ]
+}

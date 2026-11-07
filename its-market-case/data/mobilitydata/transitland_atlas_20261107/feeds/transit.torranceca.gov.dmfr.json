@@ -1,0 +1,53 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q5b-torrancetransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transit.torranceca.gov/gtfs_feed",
+        "static_historic": [
+          "https://transit.torranceca.gov/home/showpublisheddocument/16673/638564236831470000",
+          "https://transit.torranceca.gov/home/showpublisheddocument/16673/638089508813700000"
+        ]
+      },
+      "license": {
+        "url": "https://transit.torranceca.gov/home/showpublisheddocument/6052/636308096437370000"
+      },
+      "tags": {
+        "gtfs_data_exchange": "torrance-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5b-torrancetransit",
+          "name": "Torrance Transit",
+          "website": "http://Transit.TorranceCA.gov",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-torrancetransit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recvzE9NXgGMmqcTH",
+            "developer_site": "https://transit.torranceca.gov/our-city/transit/services/general-transit-feed-specification",
+            "twitter_general": "TorranceTransit",
+            "us_ntd_id": "90010",
+            "wikidata_id": "Q7826932"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-torrancetransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://www.mybusinfo.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "http://www.mybusinfo.com/gtfsrt/trips",
+        "realtime_alerts": "http://www.mybusinfo.com/gtfsrt/alerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recInPXGBQumEPorL,recQ5SUcfsbee8YOb,recf7DZiuMd9xtZiG"
+      }
+    }
+  ]
+}

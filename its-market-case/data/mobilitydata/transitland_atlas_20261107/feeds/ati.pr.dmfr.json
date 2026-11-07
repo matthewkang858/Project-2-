@@ -1,0 +1,34 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-de30-ati",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://docs.pr.gov/files/ATI/DATOS_ABIERTOS/GTFS/PRITA_GTFS.zip",
+        "static_historic": [
+          "https://drive.google.com/uc?export=download&id=1bq0fZDWmKaaqgToplhy76LCabRocy_oF",
+          "http://ati.pr/wp-content/uploads/2016/04/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.ati.pr.gov/relaciones-comunidad?tab=DatosAbiertos#datos",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "commercial_use_allowed": "yes",
+        "attribution_instructions": "Si desarrollas una aplicación con nuestros datos, debe quedar claro que no está afiliada ni patrocinada por ATI, a menos que exista un acuerdo explícito."
+      },
+      "operators": [
+        {
+          "onestop_id": "o-de30-ati",
+          "name": "Autoridad de Transporte Integrado",
+          "short_name": "ATI",
+          "website": "https://www.ati.pr.gov/",
+          "tags": {
+            "us_ntd_id": "40094"
+          }
+        }
+      ]
+    }
+  ]
+}

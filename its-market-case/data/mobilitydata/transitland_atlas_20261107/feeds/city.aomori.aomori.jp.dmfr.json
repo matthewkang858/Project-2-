@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-xpk0-青森市営バス0305",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aomori.aomori.jp/kotsu-kanri/koutsu/oshirase/documents/gtfs-aomoricitybus.zip"
+      },
+      "license": {
+        "url": "https://creativecommons.org/licenses/by/4.0/deed"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-xpk0-青森市営バス0305",
+          "name": "青森市営バス",
+          "website": "http://www.city.aomori.aomori.jp/koutsu/top.html",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "4000020022012"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-xpk0-青森市市民バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aomori.aomori.jp/toshi-seisaku/opendata/documents/siminbus20190401.zip"
+      },
+      "license": {
+        "url": "https://creativecommons.org/licenses/by/4.0/deed"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-xpk0-青森市市民バス",
+          "name": "青森市市民バス",
+          "short_name": "市民バス",
+          "website": "http://www.city.aomori.aomori.jp/koho-kocho/kurashi-guide/koutu/bus/shimin.html",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "4000020022012"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

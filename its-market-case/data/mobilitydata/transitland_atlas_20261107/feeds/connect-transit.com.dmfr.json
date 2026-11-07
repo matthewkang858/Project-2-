@@ -1,0 +1,45 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-connecttransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://rideconnecttransit.com/gtfs-rt/vehiclepositions",
+        "realtime_trip_updates": "https://rideconnecttransit.com/gtfs-rt/tripupdates",
+        "realtime_alerts": "https://rideconnecttransit.com/gtfs-rt/alerts"
+      },
+      "license": {
+        "url": "https://gtfs-directory.syncromatics.com/"
+      }
+    },
+    {
+      "id": "f-dp0w-connecttransit~il~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rideconnecttransit.com/gtfs",
+        "static_historic": [
+          "https://www.connect-transit.com/civicax/filebank/blobdload.aspx?BlobID=23758",
+          "https://www.connect-transit.com/civicax/filebank/blobdload.aspx?BlobID=23519",
+          "http://data.trilliumtransit.com/gtfs/connecttransit-il-us/connecttransit-il-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dp0w-connecttransit",
+          "name": "Connect Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-connecttransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ConnectTransit",
+            "us_ntd_id": "50047",
+            "wikidata_id": "Q4928329"
+          }
+        }
+      ]
+    }
+  ]
+}

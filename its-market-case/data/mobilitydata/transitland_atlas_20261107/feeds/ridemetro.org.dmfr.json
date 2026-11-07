@@ -1,0 +1,56 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9vk-metropolitantransitauthorityofharriscounty",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://metro.resourcespace.com/pages/download.php?ref=4835&ext=zip",
+        "static_historic": [
+          "http://www.ridemetro.org/Downloads/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.ridemetro.org/Pages/DigitalAssets.aspx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "metropolitan-transit-authority-of-harris-county"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9vk-metropolitantransitauthorityofharriscounty",
+          "name": "Metropolitan Transit Authority of Harris County",
+          "short_name": "Houston Metro",
+          "website": "https://www.ridemetro.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-metropolitantransitauthorityofharriscounty~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "METROHouston",
+            "twitter_service_alerts": "METROHouAlerts",
+            "us_ntd_id": "60008",
+            "wikidata_id": "Q5015387"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-metropolitantransitauthorityofharriscounty~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://api.ridemetro.org/GtfsRealtime/TripUpdates",
+        "realtime_alerts": "https://api.ridemetro.org/v2alertspb/alerts.pb"
+      },
+      "license": {
+        "url": "https://api-portal.ridemetro.org/"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "subscription-key",
+        "info_url": "https://api-portal.ridemetro.org/signup"
+      }
+    }
+  ]
+}

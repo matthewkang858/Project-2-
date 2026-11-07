@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f2m6-rseaudetransportdelacapitalertc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cdn.rtcquebec.ca/Site_Internet/DonneesOuvertes/googletransit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f2m6-rseaudetransportdelacapitalertc",
+          "name": "Réseau de transport de la Capitale",
+          "short_name": "RTC",
+          "website": "http://www.rtcquebec.ca",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "RTC"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3456768"
+          }
+        }
+      ]
+    }
+  ]
+}

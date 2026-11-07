@@ -1,0 +1,32 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-jefferson~mn~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://hub-mndot-prod.camsys-apps.com/static/v1/gtfs/jefferson-mn-us/jefferson.zip"
+      }
+    },
+    {
+      "id": "f-land~to~air~mn~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://hub-mndot-prod.camsys-apps.com/static/v1/gtfs/l2a-static-mn-us/L2A.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-land~to~air~mn~us",
+          "name": "Land to Air Express",
+          "website": "https://ride.landtoairexpress.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "52",
+              "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

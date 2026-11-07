@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dqcn-montgomerycountymdrideon",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.montgomerycountymd.gov/DOT-Transit/Resources/Files/GTFS/RideOnGTFS.zip"
+      },
+      "license": {
+        "url": "https://www.montgomerycountymd.gov/mcg/user_rights.html"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcn-montgomerycountymdrideon",
+          "name": "Montgomery County Transit",
+          "short_name": "Ride On",
+          "website": "http://www.montgomerycountymd.gov/dot-transit/index.html",
+          "tags": {
+            "twitter_general": "Rideonmct",
+            "us_ntd_id": "30051",
+            "wikidata_id": "Q7332502"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhv-sarasotacountyareatransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://breezerider.tripsparkhost.com/static/google_transit.zip",
+        "static_historic": [
+          "https://breezerider.tripsparkhost.com/gtfs/Realtime/google_transit.zip",
+          "https://breezerider.tripsparkhost.com/GTFS/Route%2077%20-%20R08/google_transit.zip",
+          "https://breezerider.tripsparkhost.com/GTFS/2024WinterR01-Route77-R06/google_transit.zip",
+          "https://breezerider.tripsparkhost.com/gtfs/2024Spring%20V1%20-%2077%20R3%20Merge/google_transit.zip",
+          "https://scatmyride.tripsparkhost.com/gtfs/Spring2023/google_transit.zip",
+          "https://scatmyride.tripsparkhost.com/gtfs/2022WinterV2/google_transit.zip",
+          "https://ftis.org/PostFileDownload.aspx?id=457A0",
+          "ftp://ftp.scgov.net/pub/scat/SCATGTFS.zip",
+          "https://www.scgov.net/SCAT/Google/sarasotacounty-fl-us2016Nov.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "sarasota-county-area-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhv-sarasotacountyareatransit",
+          "name": "Sarasota County Area Transit",
+          "short_name": "Breeze Transit",
+          "website": "https://www.scgov.net/government/breeze-transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dhv-sarasotacountyareatransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "SRQCountyGov",
+            "us_ntd_id": "40046",
+            "wikidata_id": "Q7423226"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dhv-sarasotacountyareatransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://breezerider.tripsparkhost.com/gtfs/Realtime/GTFS_VehiclePositions.pb",
+        "realtime_trip_updates": "https://breezerider.tripsparkhost.com/gtfs/Realtime/GTFS_TripUpdates.pb",
+        "realtime_alerts": "https://breezerider.tripsparkhost.com/gtfs/Realtime/GTFS_ServiceAlerts.pb"
+      }
+    },
+    {
+      "id": "f-dnr-tta~regionalbus~nc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gotriangle.org/gtfs",
+        "static_historic": [
+          "https://gotriangle.tripsparkhost.com/gtfs/",
+          "https://data.trilliumtransit.com/gtfs/tta-regionalbus-nc-us/tta-regionalbus-nc-us.zip"
+        ]
+      },
+      "license": {
+        "url": "https://gotriangle.org/developer-terms-and-conditions",
+        "use_without_attribution": "no",
+        "attribution_text": "Except as otherwise noted, the content of this section is licensed under the Creative Commons Attribution 3.0 License"
+      }
+    },
+    {
+      "id": "f-dnr-tta~regionalbus~nc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gotriangle.tripsparkhost.com/gtfs/Realtime/GTFS_VehiclePositions.pb",
+        "realtime_trip_updates": "https://gotriangle.tripsparkhost.com/gtfs/Realtime/GTFS_TripUpdates.pb",
+        "realtime_alerts": "https://gotriangle.tripsparkhost.com/gtfs/Realtime/GTFS_ServiceAlerts.pb"
+      }
+    },
+    {
+      "id": "f-jackson~mi~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://myride.mijata.org/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://jacksonareatransit.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-jackson~mi~us",
+          "name": "Jackson Area Transportation Authority",
+          "short_name": "JATA",
+          "tags": {
+            "us_ntd_id": "50034",
+            "wikidata_id": "Q16976205"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-paducah~ky~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://myride.paducahtransit.com/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-paducah~ky~us",
+          "name": "Paducah Area Transit System",
+          "short_name": "PATS",
+          "website": "https://www.paducahtransit.com/",
+          "tags": {
+            "us_ntd_id": "41013"
+          }
+        }
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dnr-gotriangle",
+      "name": "Research Triangle Regional Public Transportation Authority",
+      "short_name": "GoTriangle",
+      "website": "https://gotriangle.org/",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-dnr-tta~regionalbus~nc~us"
+        },
+        {
+          "feed_onestop_id": "f-dnr-tta~regionalbus~nc~us~rt"
+        }
+      ],
+      "tags": {
+        "developer_site": "https://gotriangle.org/developer-resources",
+        "twitter_general": "GoTriangle",
+        "us_ntd_id": "40108",
+        "wikidata_id": "Q7840091"
+      }
+    }
+  ]
+}

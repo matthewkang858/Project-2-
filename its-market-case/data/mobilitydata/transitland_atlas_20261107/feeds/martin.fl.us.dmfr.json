@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhyf-martin~county",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://myride.martin.fl.us/GTFS/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhyf-martin~county",
+          "name": "Martin County Public Transit",
+          "short_name": "MARTY",
+          "website": "https://www.martin.fl.us/martin-county-services/bus-schedule-information",
+          "tags": {
+            "us_ntd_id": "40192",
+            "wikidata_id": "Q128408071"
+          }
+        }
+      ]
+    }
+  ]
+}

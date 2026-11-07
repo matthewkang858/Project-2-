@@ -1,0 +1,51 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q7-getbus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://eta.getbus.org/rtt/public/utility/gtfs.aspx"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec0As8vS0QExzIWW",
+        "gtfs_data_exchange": "golden-empire-transit-district",
+        "notes": "A second service-alerts endpoint exists at cdn.simplifytransit.com with stop-level detail. A gtfs-rt feed holds one alerts URL, and the Connexionz endpoint was taken so all three endpoint types come from one producer."
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q7-goldenempiretransitdistrict",
+          "name": "Golden Empire Transit District",
+          "short_name": "GET",
+          "website": "http://www.getbus.org/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-9q7-getbus~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recIh3vq8jwuuJlvL",
+            "twitter_general": "get_bus",
+            "us_ntd_id": "90004",
+            "wikidata_id": "Q5579372"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q7-getbus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://get.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition",
+        "realtime_trip_updates": "https://get.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+        "realtime_alerts": "https://cdn.simplifytransit.com/goldenempiretransit/alerts/service-alerts.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "recfBJuv3C7nL1ftd,recTLXEi5k32mrorM,recWa3m7yH3mEqB4a"
+      }
+    }
+  ]
+}

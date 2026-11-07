@@ -1,0 +1,662 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9rv2-valleyride",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://www.valleyregionaltransit.org/GTFS/vrt_transit1.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-3.0",
+        "url": "https://www.valleyregionaltransit.org/about-us/resources/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9rv2-valleyride",
+          "name": "Valley Regional Transit",
+          "short_name": "VRT",
+          "website": "http://www.valleyregionaltransit.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-valleyride~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ValleyRide",
+            "us_ntd_id": "00011",
+            "wikidata_id": "Q7912187"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9zep-siouxareametro~sd~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/siouxareametro.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/siouxareametro-sd-us/siouxareametro-sd-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "sioux-area-metro"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zep-siouxareametro",
+          "name": "Sioux Area Metro",
+          "short_name": "SAM",
+          "website": "https://siouxareametro.info/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9zep-siouxareametro~sd~us~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "citysiouxfalls",
+            "us_ntd_id": "80002",
+            "wikidata_id": "Q7525432"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9zep-siouxareametro~sd~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/siouxareametro.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/siouxareametro.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/siouxareametro.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-auburn~university",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/auburn.etaspot.net/gtfs.zip"
+      }
+    },
+    {
+      "id": "f-citibus~ia~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/citibuspublic.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/citibus-ia-us/citibus-ia-us--imap.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-citibus~ia~us",
+          "supersedes_ids": [
+            "o-9zrs-citibus"
+          ],
+          "name": "Davenport Citibus",
+          "website": "https://www.davenportiowa.com/services/citibus_transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-davenport~citi~bus"
+            }
+          ],
+          "tags": {
+            "twitter_general": "cityofdavenport",
+            "us_ntd_id": "70009",
+            "wikidata_id": "Q5230228"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-clarksville~tn~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.clarksvilletn.gov/DocumentCenter/View/7132/CTS-11252025-GTFS-Data",
+        "static_historic": [
+          "https://www.cityofclarksville.com/1126/CTS-Zip",
+          "https://s3.amazonaws.com/etatransit.gtfs/ctspublic.etaspot.net/gtfs.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-clarksville~tn~us",
+          "name": "Clarksville Transit System",
+          "short_name": "CTS",
+          "tags": {
+            "us_ntd_id": "40092",
+            "wikidata_id": "Q122639397"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnfq-bloomingtontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://data.bloomington.in.gov/dataset/5aca3228-b81b-4572-a45c-b05a30053949/resource/16145a82-0959-4922-93ae-14dcee02950c/download/export-2022-06-30t15-37-11.zip",
+          "https://data.bloomington.in.gov/dataset/5aca3228-b81b-4572-a45c-b05a30053949/resource/16145a82-0959-4922-93ae-14dcee02950c/download/googletransitfeed.zip",
+          "https://data.bloomington.in.gov/download/gief-ttiy/application%2Fx-zip-compressed"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "bloomington-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnfq-bloomingtontransit",
+          "name": "Bloomington Transit",
+          "short_name": "BT",
+          "website": "http://bloomingtontransit.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnfq-bloomingtontransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "BT_Transit",
+            "us_ntd_id": "50110",
+            "wikidata_id": "Q4928359"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnfq-bloomingtontransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-dnmy-appalcart",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/appalcart.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://gtfs.transitportal.org/CurrentGTFS/AppalCART_189/AppalCART.zip",
+          "https://gtfs.transitportal.org/CurrentGTFS/AppalCART_189/AppalCART_20220324.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnmy-appalcart",
+          "name": "Appalachian Campus Area Rapid Transit",
+          "short_name": "AppalCART",
+          "website": "https://www.appalcart.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnmy-appalcart~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "41127",
+            "wikidata_id": "Q16160659"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnmy-appalcart~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/appalcart.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/appalcart.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/appalcart.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-dq2-great",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/great.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://gtfs.transitportal.org/CurrentGTFS/Greenville%20Area%20Transit_221/Greenville.zip",
+          "https://gtfs.transitportal.org/CurrentGTFS/Greenville%20Area%20Transit_221/Greenville_20231026.zip",
+          "https://gtfs.transitportal.org/CurrentGTFS/Greenville%20Area%20Transit_221/Greenville_20190916.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dq2-great",
+          "name": "Greenville Area Transit",
+          "short_name": "GREAT",
+          "website": "https://www.greenvillenc.gov/government/public-works/great-bus-system",
+          "tags": {
+            "us_ntd_id": "40095"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dqb0q-charlottesvilleareatransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/catpublic.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://api.transloc.com/gtfs/charlottesville.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "charlottesville-transit-service"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqb0q-charlottesvilleareatransit",
+          "name": "Charlottesville Area Transit",
+          "short_name": "CAT",
+          "website": "http://www.charlottesville.org/transit",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-dqb0q-charlottesvilleareatransit~rt"
+            }
+          ],
+          "tags": {
+            "omd_provider_id": "charlottesville-area-transit",
+            "twitter_general": "RideWithCAT",
+            "us_ntd_id": "30036",
+            "wikidata_id": "Q5086235"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dqb0q-charlottesvilleareatransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/catpublic.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/catpublic.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/catpublic.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-dutchess~county~ny",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/dutchesscounty.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://s3.amazonaws.com/datatools-511ny/public/Dutchess_County_Transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr7-dutchesscounty",
+          "name": "Dutchess County",
+          "tags": {
+            "twitter_general": "DutchessCoGov",
+            "us_ntd_id": "20010",
+            "wikidata_id": "Q5317486"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-go~como",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/gocomotransit.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://www.gocomotransit.com/wp-content/uploads/2023/10/GTFS.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-go~como",
+          "name": "City of Columbia",
+          "short_name": "Go COMO",
+          "tags": {
+            "us_ntd_id": "70016",
+            "wikidata_id": "Q5149879"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-manteca~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/mantecatransit.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/manteca-ca-us/manteca-ca-us.zip",
+          "https://www.ci.manteca.ca.us/mantecatransit/googletransit/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "rec96Y6h7qof44gGF"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-manteca~transit",
+          "name": "Manteca Transit",
+          "website": "http://www.mantecatransit.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-manteca~transit~flex"
+            },
+            {
+              "feed_onestop_id": "f-manteca~transit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec8etsmgpnGTuigh",
+            "us_ntd_id": "90217",
+            "wikidata_id": "Q16981660"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-manteca~transit~flex",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.trilliumtransit.com/gtfs/manteca-ca-us/manteca-ca-us--flex-v2.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec12iqO4b6ByQSMM"
+      }
+    },
+    {
+      "id": "f-manteca~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/mantecatransit.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/mantecatransit.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/mantecatransit.etaspot.net/alerts.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "recXa3RoUgviUaLtr,reccctF82AAyJ3g4u,recwNS8irjDeGbe8R"
+      }
+    },
+    {
+      "id": "f-pee~dee~sc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/pdtransit.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://whereispdrta.com/gtfs"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-pee~dee~sc~us",
+          "name": "Pee Dee Regional Transportation Authority",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-pee~dee~sc~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40056",
+            "wikidata_id": "Q7160112"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-pee~dee~sc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/pdtransit.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/pdtransit.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/pdtransit.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-qline~mi~rt",
+      "supersedes_ids": [
+        "f-qline~mi~rt~alerts"
+      ],
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/qline.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/qline.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/qline.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-qline~mi~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/qline.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/qline-mi-us/qline-mi-us.zip"
+        ]
+      },
+      "license": {
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpsbv-qlinedetroit",
+          "name": "QLine",
+          "website": "https://qlinedetroit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-qline~mi~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "qlinedetroit",
+            "us_ntd_id": "50213",
+            "wikidata_id": "Q5265966"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-richland~county~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/rctpublic.etaspot.net/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-richland~county~transit",
+          "name": "Richland County Transit",
+          "website": "https://rctbuses.com/",
+          "tags": {
+            "us_ntd_id": "50090",
+            "wikidata_id": "Q7330624"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-stony~brook~university~ny~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/stonybrook.etaspot.net/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-stony~brook~university~ny~us",
+          "name": "Stony Brook University",
+          "website": "https://www.stonybrook.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-stony~brook~university~ny~us~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-stony~brook~university~ny~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/stonybrook.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/stonybrook.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/stonybrook.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-texas~state~san~marcos",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/bobcatshuttle.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://docs.gato.txst.edu/357013/gtfs.zip",
+          "https://gato-docs.its.txstate.edu/jcr:7afa7719-3973-4804-a666-61036a025185/TXST-20230117-v1_5-Static-Final.zip",
+          "https://gato-docs.its.txstate.edu/jcr:7afa7719-3973-4804-a666-61036a025185/Texas_State-20221118T180619Z-91e06767-3b45-473c-a296-d9e716028dda-f4ec3f53-4c22-400c-928d-cfb29198b6b4.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.shuttle.txst.edu/about/gtfs.html"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-texas~state~san~marcos",
+          "name": "Bobcat Transit",
+          "website": "https://www.shuttle.txst.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-texas~state~san~marcos~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "TXST_Transport",
+            "us_ntd_id": "60269"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-texas~state~san~marcos~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/bobcatshuttle.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/bobcatshuttle.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/bobcatshuttle.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-toledo~area~regional~transit~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/tarta.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "http://tarta.com/wp-content/uploads/gtfs/GTFS.zip"
+        ]
+      },
+      "license": {
+        "url": "https://tarta.com/gtfs/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpks-toledoarearegionaltransitauthority",
+          "name": "Toledo Area Regional Transit Authority",
+          "short_name": "TARTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-toledo~area~regional~transit~authority~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "TARTA_Toledo",
+            "us_ntd_id": "50022",
+            "wikidata_id": "Q7814150"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-toledo~area~regional~transit~authority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/tarta.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/tarta.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/tarta.etaspot.net/alerts.pb"
+      }
+    },
+    {
+      "id": "f-tracy~tracer",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/tracer.etaspot.net/gtfs.zip",
+        "static_historic": [
+          "https://passio3.com/CityofTracy/passioTransit/gtfs/google_transit.zip",
+          "https://www.cityoftracy.org/home/showpublisheddocument/17319/638442164296500000",
+          "https://www.cityoftracy.org/home/showpublisheddocument/16626/638342536313270000",
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/tracy-tracer.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recGY1oMe17QRchGZ"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q9ws-tracer",
+          "name": "City of Tracy",
+          "short_name": "TRACER",
+          "website": "https://www.cityoftracy.org/our-city/departments/mobility-and-housing/transportation/tracer-bus-service",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-tracy~tracer~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recdtVOFdFyypMSUL",
+            "twitter_general": "cityoftracy",
+            "us_ntd_id": "90197",
+            "wikidata_id": "Q7831176"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-tracy~tracer~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/tracer.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/tracer.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/tracer.etaspot.net/alerts.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "receEwZlSjBC63vAY,rec2G6mAvDqhqYDBF,recTqNGOWq7qMh1iY"
+      }
+    },
+    {
+      "id": "f-valleyride~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/position_updates.pb",
+        "realtime_trip_updates": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/trip_updates.pb",
+        "realtime_alerts": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/alerts.pb"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-3.0",
+        "url": "https://www.valleyregionaltransit.org/about-us/resources/"
+      }
+    },
+    {
+      "id": "f-yorktown~va~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://s3.amazonaws.com/etatransit.gtfs/historicyorktowntrolley.etaspot.net/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-yorktown~va~us",
+          "name": "Yorktown Trolley",
+          "website": "https://www.visityorktown.org/260/The-Yorktown-Trolley",
+          "tags": {
+            "us_ntd_id": "30203"
+          }
+        }
+      ]
+    }
+  ]
+}

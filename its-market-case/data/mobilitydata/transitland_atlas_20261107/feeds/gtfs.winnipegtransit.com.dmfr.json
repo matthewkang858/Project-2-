@@ -1,0 +1,22 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-cbfg-winnipegtransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gtfs.winnipegtransit.com/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cbfg-winnipegtransit",
+          "name": "Winnipeg Transit",
+          "website": "http://www.winnipegtransit.com",
+          "tags": {
+            "wikidata_id": "Q3569372"
+          }
+        }
+      ]
+    }
+  ]
+}

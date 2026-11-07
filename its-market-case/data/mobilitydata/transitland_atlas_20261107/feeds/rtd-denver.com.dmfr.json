@@ -1,0 +1,101 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9xj-rtd",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.rtd-denver.com/files/gtfs/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.rtd-denver.com/business-center/open-spatial-data/gtfs-license-agreement",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "regional-transportation-district"
+      }
+    },
+    {
+      "id": "f-denver~rtd~bustang",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.rtd-denver.com/files/gtfs/bustang-co-us.zip"
+      },
+      "license": {
+        "url": "https://www.rtd-denver.com/business-center/open-spatial-data/gtfs-license-agreement",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-denver~rtd~bustang",
+          "name": "Bustang",
+          "website": "https://ridebustang.com/bustang/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-denver~rtd~bustang~rt"
+            },
+            {
+              "gtfs_agency_id": "66",
+              "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-denver~rtd~bustang~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://www.rtd-denver.com/files/bustang/gtfs-rt/Bustang_VehiclePosition.pb",
+        "realtime_trip_updates": "https://www.rtd-denver.com/files/bustang/gtfs-rt/Bustang_TripUpdate.pb"
+      },
+      "license": {
+        "url": "https://www.rtd-denver.com/business-center/open-spatial-data/gtfs-realtime-license-agreement"
+      }
+    },
+    {
+      "id": "f-denver~rtd~flex",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.rtd-denver.com/files/gtfs/google_transit_flex.zip"
+      }
+    },
+    {
+      "id": "f-rtddenver~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb",
+        "realtime_trip_updates": "https://www.rtd-denver.com/files/gtfs-rt/TripUpdate.pb",
+        "realtime_alerts": "https://www.rtd-denver.com/files/gtfs-rt/Alerts.pb"
+      },
+      "license": {
+        "url": "https://www.rtd-denver.com/business-center/open-spatial-data/gtfs-realtime-license-agreement"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9xj-regionaltransportationdistrict",
+      "name": "Denver Regional Transportation District",
+      "short_name": "RTD",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9xj-rtd"
+        },
+        {
+          "feed_onestop_id": "f-denver~rtd~flex"
+        },
+        {
+          "feed_onestop_id": "f-rtddenver~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "RideRTD",
+        "us_ntd_id": "80006",
+        "wikidata_id": "Q7309183"
+      }
+    }
+  ]
+}

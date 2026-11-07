@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-warren~county~transit~authority~oh~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://tawc.rideralerts.com/InfoPoint/gtfs-zip.ashx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-warren~county~transit~authority~oh~us",
+          "name": "Warren County Transit Authority",
+          "short_name": "WCTA",
+          "website": "https://www.co.warren.oh.us/transit/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-warren~county~transit~authority~oh~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30124"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-warren~county~transit~authority~oh~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://tawc.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://tawc.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://tawc.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

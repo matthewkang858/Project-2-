@@ -1,0 +1,186 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-q-transperth~transalbany~transbunbury~transbusselton~transgera",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.transperth.wa.gov.au/TimetablePDFs/GoogleTransit/Production/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.transperth.wa.gov.au/About/Spatial-Data-Access"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-q9gbf-transalbany",
+          "name": "TransAlbany",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STR-ALB"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qd-transwa",
+          "name": "Transwa",
+          "website": "http://www.transwa.wa.gov.au",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "TRA-TRA"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qd1b-transbusselton",
+          "name": "TransBusselton",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STR-BSN"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qd46-transbunbury",
+          "name": "TransBunbury",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STR-BBY"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qd6-transperth",
+          "name": "Transperth",
+          "website": "http://www.transperth.wa.gov.au",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "PAT-CIR"
+            },
+            {
+              "gtfs_agency_id": "PAT-KAL"
+            },
+            {
+              "gtfs_agency_id": "PAT-MOR"
+            },
+            {
+              "gtfs_agency_id": "PAT-RRP"
+            },
+            {
+              "gtfs_agency_id": "PAT-SES"
+            },
+            {
+              "gtfs_agency_id": "PWT-FRY"
+            },
+            {
+              "gtfs_agency_id": "SCT-CIR"
+            },
+            {
+              "gtfs_agency_id": "SCT-FRE"
+            },
+            {
+              "gtfs_agency_id": "SCT-PCA"
+            },
+            {
+              "gtfs_agency_id": "SCT-ROC"
+            },
+            {
+              "gtfs_agency_id": "SCT-RRP"
+            },
+            {
+              "gtfs_agency_id": "SCT-SES"
+            },
+            {
+              "gtfs_agency_id": "SWA-CAN"
+            },
+            {
+              "gtfs_agency_id": "SWA-CIR"
+            },
+            {
+              "gtfs_agency_id": "SWA-CLA"
+            },
+            {
+              "gtfs_agency_id": "SWA-JCA"
+            },
+            {
+              "gtfs_agency_id": "SWA-JOO"
+            },
+            {
+              "gtfs_agency_id": "SWA-MAR"
+            },
+            {
+              "gtfs_agency_id": "SWA-MID"
+            },
+            {
+              "gtfs_agency_id": "SWA-MSH"
+            },
+            {
+              "gtfs_agency_id": "SWA-RRP"
+            },
+            {
+              "gtfs_agency_id": "SWA-SES"
+            },
+            {
+              "gtfs_agency_id": "SWA-SRI"
+            },
+            {
+              "gtfs_agency_id": "WES-RAI"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qdcs-transgeraldton",
+          "name": "TransGeraldton",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "PTR-GDN"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qdw-transgoldfields",
+          "name": "TransGoldfields",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STR-KLG"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qe8f6-transcarnarvon",
+          "name": "TransCarnarvon",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "CRS-CAR"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qs74-transkarratha",
+          "name": "TransKarratha",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "GWB-KAR"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-qskk-transhedland",
+          "name": "TransHedland",
+          "website": "http://www.pta.wa.gov.au/OurServices/RegionalTownBusServices/tabid/62/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "PHN-PTH"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

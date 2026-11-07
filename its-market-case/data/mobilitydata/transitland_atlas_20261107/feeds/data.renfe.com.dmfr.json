@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-cercanías~renfe~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfsrt.renfe.com/vehicle_positions.pb",
+        "realtime_trip_updates": "https://gtfsrt.renfe.com/trip_updates.pb",
+        "realtime_alerts": "https://gtfsrt.renfe.com/alerts.pb"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://data.renfe.com/dataset/ubicacion-vehiculos"
+      }
+    },
+    {
+      "id": "f-ez-renfeoperadora",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ssl.renfe.com/gtransit/Fichero_AV_LD/google_transit.zip",
+        "static_historic": [
+          "http://data.renfe.com/dataset/34be0058-3a3d-4ee1-89cd-512e1226f53f/resource/25d6b043-9e47-4f99-bd91-edd51d782450/download/google_transit.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://data.renfe.com/dataset/34be0058-3a3d-4ee1-89cd-512e1226f53f/resource/25d6b043-9e47-4f99-bd91-edd51d782450",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ez-renfeoperadora",
+          "name": "Renfe-Operadora",
+          "short_name": "Renfe",
+          "website": "http://www.renfe.com",
+          "tags": {
+            "wikidata_id": "Q2476154"
+          }
+        }
+      ]
+    }
+  ]
+}

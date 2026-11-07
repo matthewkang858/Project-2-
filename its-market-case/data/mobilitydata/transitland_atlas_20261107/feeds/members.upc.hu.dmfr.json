@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u2nr-dakkzrt~szkt",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://szegedimenetrend.hu/google_transit.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://napportal.kozut.hu/en/#/informations/toc/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u2nr-dakkzrt",
+          "name": "DAKK Zrt.",
+          "website": "http://www.tiszavolan.hu/Default.aspx",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u2nr4-szkt",
+          "name": "SZKT",
+          "website": "http://www.szkt.hu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

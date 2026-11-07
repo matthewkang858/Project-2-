@@ -1,0 +1,592 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-amibusintercomdelavireaunoireau~seau~amibus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.data.gouv.fr/api/1/datasets/r/fc31923a-0fde-486a-852a-f3321c7c99a5",
+        "static_historic": [
+          "https://transport.data.gouv.fr/resources/82316/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/tiva-urbain-reseau-urbain-a-vire-intercom-de-la-vire-au-noireau-2025-2026"
+      },
+      "tags": {
+        "udata_dataset": "tiva-urbain-reseau-urbain-a-vire-intercom-de-la-vire-au-noireau-2025-2026",
+        "udata_host": "www.data.gouv.fr"
+      }
+    },
+    {
+      "id": "f-autobuslangroisprtpartir~seau~linggo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80403/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-linggo-en-ville-petr-du-pays-de-langres"
+      }
+    },
+    {
+      "id": "f-bacs~ecouflant~cantenaypinard~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.data.gouv.fr/api/1/datasets/r/6246947e-4aed-442c-baef-a160465b76f1",
+        "static_historic": [
+          "https://transport.data.gouv.fr/resources/83579/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/bacs-de-ecouflant-cantenay-epinard-et-pruille"
+      },
+      "tags": {
+        "udata_dataset": "bacs-de-ecouflant-cantenay-epinard-et-pruille",
+        "udata_host": "www.data.gouv.fr"
+      }
+    },
+    {
+      "id": "f-elsa~seau~deslestat~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80401/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-elsa-petr-selestat-alsace-centrale"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0t6-elsa",
+          "name": "ELSA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-elsa~seau~deslestat~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-elsa~seau~deslestat~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-tis-selestat-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-elsa-petr-selestat-alsace-centrale"
+      }
+    },
+    {
+      "id": "f-fluograndest08~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80413/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-ardennes-08"
+      }
+    },
+    {
+      "id": "f-fluograndest10~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80415/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-aube-10"
+      }
+    },
+    {
+      "id": "f-fluograndest52~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/81989/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-haute-marne-52"
+      }
+    },
+    {
+      "id": "f-fluograndest54~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80423/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-meurthe-et-moselle-54"
+      }
+    },
+    {
+      "id": "f-fluograndest55~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80425/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-meuse-55"
+      }
+    },
+    {
+      "id": "f-fluograndest68~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80419/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-haut-rhin-68"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0t-fluograndest68",
+          "name": "REGION GRAND EST",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-fluograndest68~seau~interurbain~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-fluograndest68~seau~interurbain~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://proxy.transport.data.gouv.fr/resource/fluo-haut-rhin-68-gtfs-rt-vehicle-position",
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-haut-rhin-68-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/fluo-haut-rhin-68-gtfs-rt-alerts"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-haut-rhin-68"
+      }
+    },
+    {
+      "id": "f-fluograndest88~seau~interurbain",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80429/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-vosges-88"
+      }
+    },
+    {
+      "id": "f-forbus~seau~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80467/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0007-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0sz-forbus",
+          "name": "Forbus",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-forbus~seau~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-forbus~seau~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://proxy.transport.data.gouv.fr/resource/fluo-forbus-forbach-gtfs-rt-vehicle-position",
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-forbus-forbach-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0007-0000-1"
+      }
+    },
+    {
+      "id": "f-imagine~seau~depinal~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80461/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0009-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0s-imagine",
+          "name": "KEOLIS",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-imagine~seau~depinal~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-imagine~seau~depinal~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-imagine-epinal-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0009-0000-1"
+      }
+    },
+    {
+      "id": "f-keolis~seau~riv~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/83277/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-rivconnect-communaute-de-communes-rives-de-moselle"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0sru-keolis",
+          "name": "Riv'Connect",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-keolis~seau~riv~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-keolis~seau~riv~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-rivconnect-rives-de-moselle-gtfs-rt"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-rivconnect-communaute-de-communes-rives-de-moselle"
+      }
+    },
+    {
+      "id": "f-mocacommunautdecommunescauxaustreberthe~seau~moca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/82309/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/moca-communaute-de-communes-caux-austreberthe"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0b9v-mocacommunautédecommunescauxaustreberthe",
+          "name": "MOCA (Communauté de Communes Caux Austreberthe)",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-mocacommunautdecommunescauxaustreberthe~seau~moca~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-mocacommunautdecommunescauxaustreberthe~seau~moca~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://proxy.transport.data.gouv.fr/resource/moca-caux-austreberthe-gtfs-rt-vehicle-position",
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/moca-caux-austreberthe-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/moca-caux-austreberthe-gtfs-rt"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/moca-communaute-de-communes-caux-austreberthe"
+      }
+    },
+    {
+      "id": "f-mouvo~seau~mouv~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80443/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0012-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0dy-mouvéo",
+          "name": "Mouvéo",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-mouvo~seau~mouv~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-mouvo~seau~mouv~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-mouveo-eprenay-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0012-0000-1"
+      }
+    },
+    {
+      "id": "f-passo~seau~pass~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80439/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0041-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0t7d-passo",
+          "name": "KEOLIS",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-passo~seau~pass~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-passo~seau~pass~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-passo-obernai-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0041-0000-1"
+      }
+    },
+    {
+      "id": "f-paysdesecrins~seau~pays~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/83467/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/transports-en-commun-pays-des-ecrins"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-spux-paysdesecrins",
+          "name": "Pays des Ecrins",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-paysdesecrins~seau~pays~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-paysdesecrins~seau~pays~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://app.pysae.com/api/v2/groups/pays-des-ecrins/gtfs-rt",
+        "realtime_trip_updates": "https://app.pysae.com/api/v2/groups/pays-des-ecrins/gtfs-rt"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/transports-en-commun-pays-des-ecrins"
+      }
+    },
+    {
+      "id": "f-red~seau~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/83512/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-urbain-de-redon-agglomeration"
+      }
+    },
+    {
+      "id": "f-rezo~seau~dugrandverdun~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80772/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0011-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0ez-rezo",
+          "name": "REZO",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-rezo~seau~dugrandverdun~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-rezo~seau~dugrandverdun~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-rezo-verdun-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0011-0000-1"
+      }
+    },
+    {
+      "id": "f-rhdf59p3b~seau~arc~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/83396/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/gtfs-reseau-arc-en-ciel-secteur-nord-perimetre-caudresis-catesis"
+      }
+    },
+    {
+      "id": "f-sete~agglopole~mobilite~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://drive.google.com/uc?export=download&id=1PUISUlg0tpVFTdr7NOzJ2w9KthNXpQNn"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-bus-sete-agglopole-mobilite"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sete~agglopole~mobilite~fr",
+          "name": "Sète Agglopôle Mobilité",
+          "website": "https://www.mobilite.agglopole.fr/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sete~agglopole~mobilite~fr~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3519640"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sete~agglopole~mobilite~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://sete.ceccli.com/gtfs/VehiclePositions.pb",
+        "realtime_trip_updates": "https://sete.ceccli.com/gtfs/TripUpdates.pb",
+        "realtime_alerts": "https://sete.ceccli.com/gtfs/Alerts.pb"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-bus-sete-agglopole-mobilite"
+      }
+    },
+    {
+      "id": "f-sub~seau~moselleetmadon~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80431/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0039-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0sk-sub",
+          "name": "SUB Nancy",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sub~seau~moselleetmadon~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-sub~seau~moselleetmadon~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-sub-nancy-gtfs-rt-trip-update"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0039-0000-1"
+      }
+    },
+    {
+      "id": "f-tgemeusemoselle~seau~fil~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80445/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0038-0000-1"
+      }
+    },
+    {
+      "id": "f-ticea~seau~tic~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80477/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0010-0000-1"
+      }
+    },
+    {
+      "id": "f-trace~seau~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80479/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0004-0000-1"
+      }
+    },
+    {
+      "id": "f-tummnhildien~seau~tum~fr",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transport.data.gouv.fr/resources/80471/download"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0030-0000-1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dr28-wwwcatabuscom",
+      "supersedes_ids": [
+        "f-cata~pa~us"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://catabus.com/wp-content/uploads/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr28-cata",
+          "name": "Centre County Transit Authority",
+          "short_name": "CATA",
+          "website": "http://www.catabus.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dr28-wwwcatabuscom~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "CATABUS",
+            "us_ntd_id": "30054",
+            "wikidata_id": "Q5062227"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dr28-wwwcatabuscom~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://realtime.catabus.com/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://realtime.catabus.com/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://realtime.catabus.com/infopoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

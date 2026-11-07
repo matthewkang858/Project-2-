@@ -1,0 +1,1072 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-bctransit~100~mile~house",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=34"
+      }
+    },
+    {
+      "id": "f-bctransit~100~mile~house~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=34",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=34",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=34"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~ashcroft~cache~creek~clinton",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=38"
+      }
+    },
+    {
+      "id": "f-bctransit~ashcroft~cache~creek~clinton~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=38",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=38",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=38"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~clearwater",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=35"
+      }
+    },
+    {
+      "id": "f-bctransit~clearwater~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=35",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=35",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=35"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~east~kootenay~region",
+      "supersedes_ids": [
+        "f-c2v9t-bctransit~cranbrooktransitsystem"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=21"
+      }
+    },
+    {
+      "id": "f-bctransit~east~kootenay~region~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=21",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=21",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=21"
+      }
+    },
+    {
+      "id": "f-bctransit~fraser~valley~region",
+      "supersedes_ids": [
+        "f-c29p-bctransit~centralfraservalleytransitsystem",
+        "f-c29p-bctransit~fraservalleyexpress",
+        "f-c29r-bctransit~chilliwacktransitsystem"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=13"
+      }
+    },
+    {
+      "id": "f-bctransit~fraser~valley~region~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=13",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=13",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=13"
+      }
+    },
+    {
+      "id": "f-bctransit~hazeltons",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=26"
+      }
+    },
+    {
+      "id": "f-bctransit~hazeltons~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=26",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=26",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=26"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~merritt",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=37"
+      }
+    },
+    {
+      "id": "f-bctransit~merritt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=37",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=37",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=37"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~mount~waddington",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=17"
+      }
+    },
+    {
+      "id": "f-bctransit~mount~waddington~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=17",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=17",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=17"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~north~okanagan~region",
+      "supersedes_ids": [
+        "f-c2g-bctransit~vernonregionaltransitsystem"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=14"
+      }
+    },
+    {
+      "id": "f-bctransit~north~okanagan~region~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=14",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=14",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=14"
+      }
+    },
+    {
+      "id": "f-bctransit~pemberton~valley",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=50"
+      }
+    },
+    {
+      "id": "f-bctransit~pemberton~valley~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=50",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=50",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=50"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~port~alberni",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=11"
+      }
+    },
+    {
+      "id": "f-bctransit~port~alberni~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=11",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=11",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=11"
+      }
+    },
+    {
+      "id": "f-bctransit~powell~river",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=29",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/powell-river.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~powell~river~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=29",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=29",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=29"
+      }
+    },
+    {
+      "id": "f-bctransit~prince~rupert",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=23"
+      }
+    },
+    {
+      "id": "f-bctransit~prince~rupert~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=23",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=23",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=23"
+      }
+    },
+    {
+      "id": "f-bctransit~quesnel",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=32"
+      }
+    },
+    {
+      "id": "f-bctransit~quesnel~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=32",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=32",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=32"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~revelstoke",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=36"
+      }
+    },
+    {
+      "id": "f-bctransit~revelstoke~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=36",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=36",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=36"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~salt~spring~island",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=39"
+      }
+    },
+    {
+      "id": "f-bctransit~salt~spring~island~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=39",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=39",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=39"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~smithers",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=31"
+      }
+    },
+    {
+      "id": "f-bctransit~smithers~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=31",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=31",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=31"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~south~okanagan~similkameen",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=15"
+      }
+    },
+    {
+      "id": "f-bctransit~south~okanagan~similkameen~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=15",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=15",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=15"
+      }
+    },
+    {
+      "id": "f-bctransit~west~coast",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=51"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~west~coast~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=51",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=51",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=51"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-bctransit~williams~lake",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=33"
+      }
+    },
+    {
+      "id": "f-bctransit~williams~lake~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=33",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=33",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=33"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c0yu-bctransit~campbellrivertransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=12",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/campbell-river.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c0yu-bctransit~campbellrivertransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=12",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=12",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=12"
+      }
+    },
+    {
+      "id": "f-c0z-bctransit~rdntransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=41",
+        "static_historic": [
+          "http://nanaimo.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-rdn-transit-system"
+      }
+    },
+    {
+      "id": "f-c0z-bctransit~rdntransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=41",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=41",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=41"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c0z4-bctransit~comoxvalleytransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=45",
+        "static_historic": [
+          "http://comox.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-comox-valley-transit-system"
+      }
+    },
+    {
+      "id": "f-c0z4-bctransit~comoxvalleytransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=45",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=45",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=45"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~cowichanvalleyregionaltransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=10",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/cowichan-valley.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~cowichanvalleyregionaltransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=10",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=10",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=10"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~creston",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=16"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~creston~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=16",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=16",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=16"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~victoriaregionaltransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=48",
+        "static_historic": [
+          "http://victoria.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-victoria-regional-transit-system"
+      }
+    },
+    {
+      "id": "f-c28-bctransit~victoriaregionaltransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=48",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=48",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=48"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c2b1-bctransit~sunshinecoasttransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=18",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/sunshine-coast.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-sunshine-coast-transit-system"
+      }
+    },
+    {
+      "id": "f-c2b1-bctransit~sunshinecoasttransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=18",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=18",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=18"
+      }
+    },
+    {
+      "id": "f-c2b6v-bctransit~squamishtransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=43",
+        "static_historic": [
+          "http://squamish.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-squamish-transit-system"
+      }
+    },
+    {
+      "id": "f-c2b6v-bctransit~squamishtransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=43",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=43",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=43"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c2bt-bctransit~whistlertransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=44",
+        "static_historic": [
+          "http://whistler.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-whistler-transit-system"
+      }
+    },
+    {
+      "id": "f-c2bt-bctransit~whistlertransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=44",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=44",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=44"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c2g5-bctransit~kelownaregionaltransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=47",
+        "static_historic": [
+          "http://kelowna.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-kelowna-regional-transit-system"
+      }
+    },
+    {
+      "id": "f-c2g5-bctransit~kelownaregionaltransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=47",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=47",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=47"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c2u-bctransit~westkootenaytransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=20",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/west-kootenay.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c2u-bctransit~westkootenaytransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=20",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=20",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=20"
+      }
+    },
+    {
+      "id": "f-c342-bctransit~kamloopstransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=46",
+        "static_historic": [
+          "http://kamloops.mapstrat.com/current/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-kamloops-transit-system"
+      }
+    },
+    {
+      "id": "f-c342-bctransit~kamloopstransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=46",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=46",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=46"
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c38d-bctransit~princegeorgetransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=22",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/prince-george.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "bc-transit-prince-george-transit-system"
+      }
+    },
+    {
+      "id": "f-c38d-bctransit~princegeorgetransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=22",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=22",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=22"
+      }
+    },
+    {
+      "id": "f-c3fpf-bctransit~fortstjohntransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=28",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/fort-st-john.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c3fpf-bctransit~fortstjohntransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=28",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=28",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=28"
+      }
+    },
+    {
+      "id": "f-c3ft0-bctransit~dawsoncreektransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bct.tmix.se/Tmix.Cap.TdExport.WebApi/gtfs/?operatorIds=27",
+        "static_historic": [
+          "https://www.bctransit.com/data/gtfs/dawson-creek.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.bctransit.com/open-data/terms-of-use",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-c3ft0-bctransit~dawsoncreektransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bct.tmix.se/gtfs-realtime/vehicleupdates.pb?operatorIds=27",
+        "realtime_trip_updates": "https://bct.tmix.se/gtfs-realtime/tripupdates.pb?operatorIds=27",
+        "realtime_alerts": "https://bct.tmix.se/gtfs-realtime/alerts.pb?operatorIds=27"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-bctransit~ca",
+      "supersedes_ids": [
+        "o-c29p-bctransit~centralfraservalleytransitsystem",
+        "o-c29p-bctransit~fraservalleyexpress",
+        "o-c29r-bctransit~chilliwacktransitsystem",
+        "o-c0yu-bctransit~campbellrivertransitsystem",
+        "o-c0z-bctransit~rdntransitsystem",
+        "o-c0z4-bctransit~comoxvalleytransitsystem",
+        "o-c28-bctransit~cowichanvalleyregionaltransitsystem",
+        "o-c28-bctransit~victoriaregionaltransitsystem",
+        "o-c2b1-bctransit~sunshinecoasttransitsystem",
+        "o-c2b6v-bctransit~squamishtransitsystem",
+        "o-c2bt1-bctransit~whistlertransitsystem",
+        "o-c2g-bctransit~vernonregionaltransitsystem",
+        "o-c2g5-bctransit~kelownaregionaltransitsystem",
+        "o-c2u-bctransit~westkootenaytransitsystem",
+        "o-c2v9t-bctransit~cranbrooktransitsystem",
+        "o-c342-bctransit~kamloopstransitsystem",
+        "o-c38d-bctransit~princegeorgetransitsystem",
+        "o-c3fpf-bctransit~fortstjohntransitsystem",
+        "o-c3ft0-bctransit~dawsoncreektransitsystem"
+      ],
+      "name": "BCTransit",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-bctransit~100~mile~house"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~100~mile~house~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~ashcroft~cache~creek~clinton"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~ashcroft~cache~creek~clinton~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~clearwater"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~clearwater~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~east~kootenay~region"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~east~kootenay~region~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~fraser~valley~region"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~fraser~valley~region~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~hazeltons"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~hazeltons~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~merritt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~merritt~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~mount~waddington"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~mount~waddington~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~north~okanagan~region"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~north~okanagan~region~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~pemberton~valley"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~pemberton~valley~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~port~alberni"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~port~alberni~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~powell~river"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~powell~river~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~prince~rupert"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~prince~rupert~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~quesnel"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~quesnel~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~revelstoke"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~revelstoke~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~salt~spring~island"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~salt~spring~island~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~smithers"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~smithers~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~south~okanagan~similkameen"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~south~okanagan~similkameen~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~west~coast"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~west~coast~rt"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~williams~lake"
+        },
+        {
+          "feed_onestop_id": "f-bctransit~williams~lake~rt"
+        },
+        {
+          "feed_onestop_id": "f-c0yu-bctransit~campbellrivertransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c0yu-bctransit~campbellrivertransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c0z-bctransit~rdntransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c0z-bctransit~rdntransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c0z4-bctransit~comoxvalleytransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c0z4-bctransit~comoxvalleytransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~cowichanvalleyregionaltransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~cowichanvalleyregionaltransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~creston"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~creston~rt"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~victoriaregionaltransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c28-bctransit~victoriaregionaltransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c2b1-bctransit~sunshinecoasttransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c2b1-bctransit~sunshinecoasttransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c2b6v-bctransit~squamishtransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c2b6v-bctransit~squamishtransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c2bt-bctransit~whistlertransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c2bt-bctransit~whistlertransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c2g5-bctransit~kelownaregionaltransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c2g5-bctransit~kelownaregionaltransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c2u-bctransit~westkootenaytransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c2u-bctransit~westkootenaytransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c342-bctransit~kamloopstransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c342-bctransit~kamloopstransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c38d-bctransit~princegeorgetransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c38d-bctransit~princegeorgetransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c3fpf-bctransit~fortstjohntransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c3fpf-bctransit~fortstjohntransitsystem~rt"
+        },
+        {
+          "feed_onestop_id": "f-c3ft0-bctransit~dawsoncreektransitsystem"
+        },
+        {
+          "feed_onestop_id": "f-c3ft0-bctransit~dawsoncreektransitsystem~rt"
+        }
+      ]
+    }
+  ]
+}

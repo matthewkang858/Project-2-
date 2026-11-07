@@ -1,0 +1,133 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-gbrw-irigo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://chouette.enroute.mobi/api/v1/datas/Irigo/gtfs.zip",
+        "static_historic": [
+          "http://docdata.angers.fr/mobilite/Keolis_Irigo_Angers_20170911-20171223.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://transport.data.gouv.fr/datasets/angers-loire-metropole-reseau-irigo-gtfs-gtfs-rt-siri",
+        "share_alike_optional": "no"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-gbrw-irigo",
+          "name": "Irigo",
+          "website": "http://bustram.irigo.fr/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-gbrw-irigo~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-gbrw-irigo~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/irigo-angers-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/irigo-angers-gtfs-rt-alerts"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://transport.data.gouv.fr/datasets/angers-loire-metropole-reseau-irigo-gtfs-gtfs-rt",
+        "share_alike_optional": "no"
+      }
+    },
+    {
+      "id": "f-keolis~orleans~fr",
+      "supersedes_ids": [
+        "f-taoorlans~seau~tao~fr"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://chouette.enroute.mobi/api/v1/datas/keolis_orleans.gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/gtfs-netex-et-gtfs-rt-reseau-tao-orleans-metropole"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-keolis~orleans~fr",
+          "supersedes_ids": [
+            "o-keolis~orleans~gr"
+          ],
+          "name": "Transports de l'agglomération orléanaise",
+          "short_name": "TAO Orléans",
+          "website": "https://www.tao-mobilites.fr",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ORLEANS:Operator:TAO (Orléans)",
+              "feed_onestop_id": "f-filbleutours~agr~gat~fr"
+            },
+            {
+              "feed_onestop_id": "f-keolis~orleans~fr~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-keolis~orleans~fr~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://ara-api.enroute.mobi/tao/gtfs/trip-updates"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/gtfs-netex-et-gtfs-rt-reseau-tao-orleans-metropole"
+      }
+    },
+    {
+      "id": "f-spv-lignesdazur",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://chouette.enroute.mobi/api/v1/datas/OpendataRLA/gtfs.zip",
+        "static_historic": [
+          "https://transport.data.gouv.fr/resources/79642/download",
+          "http://opendata.nicecotedazur.org/data/dataset/export-quotidien-au-format-gtfs-du-reseau-de-transport-lignes-d-azur/resource/aacb4eea-d008-4b13-b17a-848b8ced7e03/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/donnees-statiques-et-dynamiques-du-reseau-de-transport-lignes-dazur",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "gtfs_data_exchange": "lignes-dazur"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-spv-lignesdazur",
+          "name": "Lignes d'Azur",
+          "website": "http://www.lignesdazur.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-spv-lignesdazur~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-spv-lignesdazur~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://ara-api.enroute.mobi/rla/gtfs/vehicle-positions",
+        "realtime_trip_updates": "https://ara-api.enroute.mobi/rla/gtfs/trip-updates"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/donnees-statiques-et-dynamiques-du-reseau-de-transport-lignes-dazur"
+      }
+    }
+  ]
+}

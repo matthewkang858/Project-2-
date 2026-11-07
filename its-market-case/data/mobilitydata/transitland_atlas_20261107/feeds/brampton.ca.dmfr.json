@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpz2-bramptontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/a355aabd5a8c490186bdce559c9c75fb/data",
+        "static_historic": [
+          "http://www.brampton.ca/EN/City-Hall/OpenGov/Open-Data-Catalogue/Documents/Google_Transit.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://brampton.maps.arcgis.com/home/item.html?id=a355aabd5a8c490186bdce559c9c75fb",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "brampton-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpz2-bramptontransit",
+          "name": "Brampton Transit",
+          "website": "http://www.bramptontransit.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dpz2-bramptontransit~rt"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://geohub.brampton.ca/pages/brampton-transit",
+            "omd_provider_id": "brampton-transit",
+            "wikidata_id": "Q4956262"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dpz2-bramptontransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs-rt-merge.prod.bt-cadavl.com/BramptonTransit/GTFS/merged_VehiclePosition.pb",
+        "realtime_trip_updates": "https://gtfs-rt-merge.prod.bt-cadavl.com/BramptonTransit/GTFS/merged_TripUpdate.pb",
+        "realtime_alerts": "https://gtfs-rt-merge.prod.bt-cadavl.com/BramptonTransit/GTFS/merged_Alert.pb"
+      }
+    }
+  ]
+}

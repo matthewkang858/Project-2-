@@ -1,0 +1,102 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9-amtrak~amtrakcalifornia~amtrakcharteredvehicle",
+      "supersedes_ids": [
+        "f-drk-wwwshorelineeastcom"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://content.amtrak.com/content/gtfs/GTFS.zip",
+        "static_historic": [
+          "http://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/amtrak.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recIHiLOHYXfVknaq"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9-amtrak",
+          "name": "Amtrak",
+          "website": "http://www.amtrak.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "51"
+            },
+            {
+              "feed_onestop_id": "f-amtrakvermonter~vt~us"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recKsb5FnJy70up78",
+            "twitter_general": "amtrak",
+            "twitter_service_alerts": "amtrakalerts",
+            "wikidata_id": "Q23239;Q4748907"
+          }
+        },
+        {
+          "onestop_id": "o-9-amtrakcharteredvehicle",
+          "name": "Amtrak Chartered Vehicle",
+          "website": "http://www.amtrak.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "28"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-9wk-roadrunnershuttle",
+          "name": "RoadRunneR Shuttle",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "147"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-9zp-executivetransportation",
+          "name": "Executive Transportation",
+          "website": "http://www.amtrak.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "117"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-dq0-sunwaycharters",
+          "name": "Sunway Charters",
+          "website": "http://www.amtrak.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1233"
+            },
+            {
+              "gtfs_agency_id": "53",
+              "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-drk-shorelineeast",
+          "name": "Shore Line East",
+          "short_name": "SLE",
+          "website": "http://www.shorelineeast.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1230"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://www.cttransit.com/about/developers",
+            "twitter_general": "ShoreLineEast",
+            "us_ntd_id": "10102",
+            "wikidata_id": "Q7501304"
+          }
+        }
+      ]
+    }
+  ]
+}

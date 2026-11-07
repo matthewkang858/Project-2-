@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f2k2-laregiedetransportencommundelavilledeshawiniganrtcs",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://app.mecatran.com/urb/ws/feed/c2l0ZT1zaGF3aW5pZ2FuO2NsaWVudD1zZWxmO2V4cGlyZT07dHlwZT1ndGZzO2tleT03MjQxM2QzMTNiMmM1ZTY2MWIwMzJlN2E0YTY4NWU0YTI1MzUwNzZi"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f2k2-laregiedetransportencommundelavilledeshawiniganrtcs",
+          "name": "Régie de transport en commun de Shawinigan",
+          "short_name": "RTCS",
+          "website": "https://www.shawinigan.ca/services-aux-citoyens/transport/transport-en-commun/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "16758067"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q85798278"
+          }
+        }
+      ]
+    }
+  ]
+}

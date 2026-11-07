@@ -1,0 +1,63 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dp8m-metrotransit~cityofmadison",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://transitdata.cityofmadison.com/GTFS/mmt_gtfs.zip"
+      },
+      "license": {
+        "url": "http://transitdata.cityofmadison.com/MetroTransitDataTermsOfUse.pdf",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes",
+        "attribution_text": "Data provided under license granted by City of Madison, WI, Metro Transit."
+      },
+      "tags": {
+        "gtfs_data_exchange": "metro-transit"
+      }
+    },
+    {
+      "id": "f-madison~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://metromap.cityofmadison.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://metromap.cityofmadison.com/gtfsrt/trips",
+        "realtime_alerts": "https://metromap.cityofmadison.com/gtfsrt/alerts"
+      },
+      "license": {
+        "url": "http://transitdata.cityofmadison.com/MetroTransitDataTermsOfUse.pdf",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes",
+        "attribution_text": "Data provided under license granted by City of Madison, WI, Metro Transit."
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dp8m-metrotransit~cityofmadison",
+      "name": "City of Madison Metro Transit",
+      "website": "http://www.mymetrobus.com",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "MMT",
+          "feed_onestop_id": "f-dp8m-metrotransit~cityofmadison"
+        },
+        {
+          "feed_onestop_id": "f-madison~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "mymetrobus",
+        "us_ntd_id": "50005",
+        "wikidata_id": "Q6728045"
+      }
+    }
+  ]
+}

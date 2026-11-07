@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-topeka~metro",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.remix.com/topeka_metro_ks_us.zip",
+        "static_historic": [
+          "https://drive.google.com/uc?export=download&id=1rzr_NmB1Ltulchli9131KmP-VqZj8lHd",
+          "https://drive.google.com/uc?export=download&id=1veXbafBUaB8T1neXPIb3ovfJ2llPTMjz",
+          "https://drive.google.com/uc?export=download&id=1Bk7B6o_kb89VyShoC9Ckbh6DCUpjwp5L",
+          "https://drive.google.com/uc?export=download&id=1dF5YFTKp3RVVLSk6k6ixWp4wBs_9vxsw"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9ygy-topekametro",
+          "name": "Topeka Metro",
+          "tags": {
+            "twitter_general": "TopekaMetro",
+            "us_ntd_id": "70014",
+            "wikidata_id": "Q7824819"
+          }
+        }
+      ]
+    }
+  ]
+}

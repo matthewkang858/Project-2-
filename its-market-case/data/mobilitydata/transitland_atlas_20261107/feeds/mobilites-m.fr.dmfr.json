@@ -1,0 +1,94 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-mobilites~m~bul",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/BUL"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      }
+    },
+    {
+      "id": "f-mobilites~m~c38",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/C38"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      }
+    },
+    {
+      "id": "f-mobilites~m~fun",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/FUN"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-mobilites~m~fun",
+          "name": "Funiculaire de Saint-Hilaire du Touvet",
+          "tags": {
+            "wikidata_id": "Q99601"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-mobilites~m~gsv",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/GSV"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      }
+    },
+    {
+      "id": "f-mobilites~m~mco",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/MCO"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      }
+    },
+    {
+      "id": "f-mobilites~m~tpv",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/TPV"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://data.mobilites-m.fr/donnees"
+      }
+    },
+    {
+      "id": "f-u0h0-tag",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.mobilites-m.fr/api/gtfs/SEM",
+        "static_historic": [
+          "http://www.metromobilite.fr/data/Horaires/SEM-GTFS.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://transport.data.gouv.fr/datasets/horaires-theoriques-du-reseau-tag"
+      }
+    }
+  ]
+}

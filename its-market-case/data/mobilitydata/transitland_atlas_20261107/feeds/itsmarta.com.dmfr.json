@@ -1,0 +1,53 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dnh-marta",
+      "supersedes_ids": [
+        "f-dn5bpc-atlantastreetcar"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://itsmarta.com/google_transit_feed/google_transit.zip",
+        "static_historic": [
+          "https://www.itsmarta.com/google_transit_feed/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "metropolitan-atlanta-rapid-transit-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnh-metropolitanatlantarapidtransitauthority",
+          "supersedes_ids": [
+            "o-dn5bpc-atlantastreetcar"
+          ],
+          "name": "Metropolitan Atlanta Rapid Transit Authority",
+          "short_name": "MARTA",
+          "website": "http://www.itsmarta.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnh-marta~rt"
+            }
+          ],
+          "tags": {
+            "omd_provider_id": "marta",
+            "twitter_general": "marta_explorers",
+            "twitter_service_alerts": "MARTAservice",
+            "us_ntd_id": "40022",
+            "wikidata_id": "Q1423792"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnh-marta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs-rt.itsmarta.com/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb",
+        "realtime_trip_updates": "https://gtfs-rt.itsmarta.com/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+        "realtime_alerts": "https://gtfs-rt.itsmarta.com/TMGTFSRealTimeWebService/alert/alerts.pb"
+      }
+    }
+  ]
+}

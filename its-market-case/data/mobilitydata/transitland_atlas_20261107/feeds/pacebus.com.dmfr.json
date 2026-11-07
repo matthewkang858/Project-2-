@@ -1,0 +1,53 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dp3-pace",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pacebus.com/gtfsdownload",
+        "static_historic": [
+          "https://public.pacebus.com/gtfs/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.pacebus.com/route-timetable-data-services",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "pace-suburban-bus-service"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dp3-pace",
+          "name": "Pace Suburban Bus",
+          "short_name": "Pace",
+          "website": "http://www.pacebus.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "PACE"
+            },
+            {
+              "feed_onestop_id": "f-dp3-pace~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "PaceSuburbanBus",
+            "us_ntd_id": "50113,50182",
+            "wikidata_id": "Q3360030"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dp3-pace~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://tmweb.pacebus.com/TMGTFSRealTimeWebService/vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://tmweb.pacebus.com/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+        "realtime_alerts": "https://tmweb.pacebus.com/TMGTFSRealTimeWebService/alert/alerts.pb"
+      }
+    }
+  ]
+}

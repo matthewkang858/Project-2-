@@ -1,0 +1,6014 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-0360005005779~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/360005005779"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1000020472093~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1000020472093"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-133~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sano.lg.jp/material/files/group/17/133.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1360001007585~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1360001007585"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1360002020959~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1360002020959"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1360003002626~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1360003002626"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1360003005018~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1360003005018"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1360003007856~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1360003007856"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-14~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/14.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-1~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/1.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2000020473537~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2000020473537"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2000020473545~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2000020473545"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2000020473553~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2000020473553"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-232025~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.okazaki.lg.jp/1550/1553/208000/p015630_d/fil/232025_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2360001000457~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2360001000457"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2360001013046~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2360001013046"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2360001015810~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2360001015810"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2360003002575~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2360003002575"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2360003005256~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/2360003005256"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-2~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/2.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-3000020472158~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/3000020472158"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-3360002008754~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/3360002008754"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-342114~gtfs~02kuritani~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://hiroshima-opendata.dataeye.jp/resource_download/10046"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-342114~gtfs~03sakaue~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://hiroshima-opendata.dataeye.jp/resource_download/10047"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4000020473031~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4000020473031"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4000020473618~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4000020473618"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4000020473758~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4000020473758"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-401005~odekakekotsugtfs~hiraodai~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.open-governmentdata.org/dataset/6d3d2393-ed7b-46eb-9340-dfb45ffc279d/resource/7ea49d9e-be72-4e86-849e-d160ae45bd3c/download/401005_odekakekotsugtfs_hiraodai.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-401005~odekakekotsugtfs~tsunemikitaku~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.open-governmentdata.org/dataset/6d387baa-dcfd-431d-a229-13b8670e07bf/resource/eaa79093-a1f8-4dbe-9bfd-ca7183419c72/download/401005_odekakekotsugtfs_tsunemikitaku.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-402257~ukihabasu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/be02305f-43ab-40b7-b8e2-1d460f5756d1/resource/2aa2b7c6-2671-472f-87f2-b6e5cc06e2e2/download/402257_ukihabasu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-402303tosengtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/2a380e2b-f584-425b-9385-24926b328296/resource/53252038-b26e-49c1-9de1-1fec6811e01a/download/402303tosengtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4360001000447~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4360001000447"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4360001000835~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4360001000835"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4360002020964~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4360002020964"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-4~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/4.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020472107~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020472107"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020472115~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020472115"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020472131~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020472131"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020473014~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020473014"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020473154~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020473154"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020473278~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020473278"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020473286~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020473286"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5000020473600~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5000020473600"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5290801024676~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5290801024676"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5360001014132~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5360001014132"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-5360003005096~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/5360003005096"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-6360001013190~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/6360001013190"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-6360002013009~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/6360002013009"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-6360003005178~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/6360003005178"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7000020473243~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7000020473243"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7000020473821~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7000020473821"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7011501003070~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7011501003070"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7360001012407~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7360001012407"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7360001012745~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7360001012745"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-7360003005301~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/7360003005301"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-8360003004772~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/8360003004772"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-9000020473596~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/9000020473596"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-9360001013023~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/9360001013023"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-9360001013238~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/9360001013238"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-9360003005217~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/9360003005217"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-abiracho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/7f011237-1284-4063-8c55-ba4945031793/download/abiracho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-asahikawa~denki~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/41ea2ac6-c6e4-47b2-9c1c-b482feaee17c/download/asahikawa_denki.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-asahi~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/asahi_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-atsuma~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/40e699d6-03c7-4191-b328-5e9c13841ab2/download/atsuma_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-awara~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/awara_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bankei~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/889906b8-eb1a-41c3-a7b3-75cd69aa891f/download/bankei_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-betsukaicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/469a1a00-020d-49f7-b5c1-e52dc9a6961e/download/betsukaicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bihoku~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/12/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-bonbus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/13/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-bus~city~yuzawa01~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-city-yuzawa01.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~city~yuzawa02~komachi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-city-yuzawa02-komachi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~hakusancity~ishikawa~jp~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.hakusan.lg.jp/_res/projects/default_project/_page_/001/003/950/bus-hakusancity-ishikawa-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~ikawatown~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-ikawatown.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~kagoshimacity~kagoshima~jp~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.kagoshima.lg.jp/ict/documents/bus-kagoshimacity-kagoshima-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~katagamicity~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-katagamicity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~nansyu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-nansyu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~nikaho~akita~jp~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-nikaho-akita-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~noshirocity~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-noshirocity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~ogacity~2~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.oga.akita.jp/material/files/group/2/bus-ogacity-2.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~yokotecity~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-yokotecity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-bus~yurihonjyocity~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-yurihonjyocity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-chitetsu~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/96fo9k5gmz6qwlk8xfjz0bo8vl6mhta9.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-chitetsu~tram~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/asr4jglw9sm038qq20h1pqxdg7eqk669.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-chugoku~jr~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/15/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-chusei~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/chusei/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-city~hatsukaichi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/19/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~kure~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/18/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~namerikawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.namerikawa.toyama.jp/material/files/group/10/city_namerikawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~fuchu~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/61a024ce-a377-4dd3-a3c0-b46183896597/download/city-toyama-fuchu-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~horikawaminami~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/5cb228a9-8a44-4db5-bbe5-3dcbabf1c1f6/download/city-toyama-horikawaminami-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~kureha~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/26db7690-aa7e-41b2-8596-0d8bdcd5c885/download/city-toyama-kureha-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~maidohaya~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/43903d9f-1d9c-42f0-bd01-8a5fc1cb828c/download/city-toyama-maidohaya-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~mizuhashi~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/ff01c4dd-14e7-4dbc-acea-09bff6b7d40e/download/city-toyama-mizuhashi-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~oyama~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/378bcf3e-8f32-477a-857d-2d3917b6e84d/download/city-toyama-oyama-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~yamada~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/665ab7b2-e434-4a4a-8175-32a433b60008/download/city-toyama-yamada-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~toyama~yatsuo~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opdt.city.toyama.lg.jp/dataset/8de65493-0af7-49d3-aab6-b495fc3ea2b0/resource/927992fb-e889-43cb-aa55-3bc3cab2e0aa/download/city-toyama-yatsuo-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-city~uozu~shimin~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.uozu.toyama.jp/contents/busdata/city_uozu_shimin_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-daiwa~kotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/yamato_kotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-dohoku~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a89a7707-f346-45e7-8f98-0da0f3332531/download/dohoku_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-dounan~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a70d369c-405c-4c25-996c-c70aa53682bc/download/dounan_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-echigokotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/echigokotsu/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-echizensi~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/echizensi_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-eiheiji~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/eiheiji_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-engan~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/0dd30c37-4d45-4a23-8f86-12b74f6e65e1/download/engan_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-engarucho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/cc6d76a4-3576-480e-a073-ef1bfa62eafa/download/engarucho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-etajima~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs-st.busit.jp/api/etajimabus"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-f1301702~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://shibuya-data.maps.arcgis.com/sharing/rest/content/items/185d0dbc980443b8b60e135349e2ae5e/data"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-f1600302~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/df1tjqcd97nqdl41rm7bal2fxv7gpe90.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-f1601102~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/endsdhfeo2xhkrx4pghgflixbj9zy35i.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-f1601402~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/etmkuksc9ynw52uhu4lr9bgfehxthea6.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-f1601801~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/hc26ot69inx8rzcfukozh69tklqodlnt.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-f3701203~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.kagawa.lg.jp/dataset/543/resource/7280/GTFS-JP.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-fukagawashi~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/2d439886-69ec-4bf9-9a12-9ee4014e3f3c/download/fukagawashi_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-furano~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/3623aa5b-7d0b-4621-a3c8-b09e55863d27/download/furano_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-geiyo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/11/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-gtfsdate~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.city.komaki.aichi.jp/material/files/group/88/gtfsdate.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~dmv~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2652/resource/7651/GTFSJP3_DMV.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~higashimiyoshi~cho~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2620/resource/13826/GTFSJP_Higashimiyoshi-cho.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~kaiyo~town~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2669/resource/7705/GTFSJP3_kaiyo-town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~kamihachiman~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2639/resource/7597/GTFSJP3_kamihachiman.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~kamikatsu~town~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2642/resource/7635/GTFSJP3_kamikatsu-town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~kitajima~town~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2641/resource/7634/GTFSJP3_kitajima-town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~matsushige~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2672/resource/13799/GTFSJP3_matsushige.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~miyoshi~city~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2643/resource/7636/GTFSJP3_miyoshi-city.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~naka~town~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2644/resource/7643/GTFSJP3_naka-town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~naruto~city~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2635/resource/7591/GTFSJP3_naruto-city.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~naruto~city~tosen~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2635/resource/7592/GTFSJP3_naruto-city_tosen.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~oujin~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2640/resource/7598/GTFSJP3_oujin.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~tokushimabus~anan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2647/resource/7646/GTFSJP3_tokushimabus_anan.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~tokushimabus~nanbu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2648/resource/7647/GTFSJP3_tokushimabus_nanbu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~tsurugi~town~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2637/resource/7594/GTFSJP3_tsurugi-town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp3~yoshinogawa~city~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2638/resource/7596/GTFSJP3_yoshinogawa-city.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp~seinan~shimaashi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFSJP-Seinan-Shimaashi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp~shimanto~city~demand~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFSJP-Shimanto-City-Demand.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfsjp~sukumo~hanachan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFSJP-Sukumo-Hanachan.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfstubame~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.city.sendai.jp/kokyo/documents/gtfstubame.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~abashiribus~current~data~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.abashiribus.com/open_data/gtfs_abashiribus_current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~abibus~nedo~root~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.abiko.chiba.jp/shisei/opendata/GTFS-JP.files/gtfs_Abibus_nedo_root.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~abibus~other~root~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.abiko.chiba.jp/shisei/opendata/GTFS-JP.files/gtfs_Abibus_other_root.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~aibus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.abiko.chiba.jp/shisei/opendata/GTFS-JP.files/gtfs_Aibus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~data~zip~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.suzaka.nagano.jp/opendata/file/gtfs_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~hekinan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.hekinan.lg.jp/material/files/group/3/GTFS.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~hokan~takeyakotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.takeyakoutu.jp/assets/gtfs-hokan-takeyakotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a0b5a3ab-5207-4974-94aa-7886afb138fc/download/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jpgeiyobus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.geiyo.co.jp/Unyu/gtfs/GTFS-JPgeiyobus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~akanbus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.akanbus.co.jp/gtfs/GTFS-JP-akanbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~gunbus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.gunbus.co.jp/GTFS/GTFS-JP_gunbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~kitamibus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://drive.google.com/uc?export=view&id=13MQ00Oq6pJgHpB2jz5nG1iay0fEyXpAj"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~nbaux~gunma~jp~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nagai-unyu.net/rosen/GTFS/aux/GTFS-JP_nbaux-gunma-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~tamarin~gunma~jp~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nagai-unyu.net/rosen/GTFS/tamarin/GTFS-JP_tamarin-gunma-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~jp~tokushima~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.city.tokushima.tokushima.jp/shisei/open-data/living/gtfs-jp.files/GTFS-JP.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~katsuyamashi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_katsuyamashi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~mb~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ncb.jp/route/GTFS/GTFS(MB).zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~nakatsu~city~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/GTFS_Nakatsu_city.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~obamashi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_obamashi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~sabae~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_sabae.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~tokushimabus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2646/resource/7704/GTFS_tokushimabus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gtfs~yonkoh~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://yonkoh.co.jp/wp/gtfs/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-gunkanjima~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/c507ab86-fa09-4ee6-91cd-d0a865a31229/resource/54ebdbe4-63ae-4f04-b2a3-094f9a04aee0/download/gunkanjima.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-haborocho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/635cdd26-246c-4bd7-a095-6705c1eebb91/download/haborocho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-haboro~enkai~ferry~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/b1535cdf-9798-4990-afe2-5c5c5bcdfdfa/download/haboro-enkai-ferry.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-heart~land~ferry~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/677e45d0-45d1-4eaf-a679-319cdbfaa89e/download/heart-land-ferry.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hehigashitani~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/HEHigashitani.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-higashine~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/higashine_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-higashi~izumo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/higashi-izumo.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hirobus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/9/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-hiroden~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/8/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-hiroko~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/10/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-hodap~南富良野町コミュニティ",
+      "supersedes_ids": [
+        "f-［hodap］~南富良野町コミュニティ"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/eb0afab2-3be9-4a54-8e13-703a3952cd89/download/minamifuranocho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-hodap~占冠村コミュニティ",
+      "supersedes_ids": [
+        "f-［hodap］~占冠村コミュニティ"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/03149b61-87e4-4b7c-b324-8421889a691f/download/shimukappumura_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-hodap~星野リゾート~トマム",
+      "supersedes_ids": [
+        "f-［hodap］~星野リゾート~トマム"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/3857221a-c7d0-409c-8e14-9b4b737d6587/download/hoshinoresorts_tomamu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-hokkaido~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/19e47509-3dac-4607-a595-61447226fa3b/download/hokkaido_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hokkaido~chuo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/dbadfccc-670e-49b9-be77-c3f346ee3160/download/hokkaido_chuo.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hokkaido~express~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/ccfd2358-c804-4cfe-b4fe-278c3f035c64/download/hokkaido-express_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hokkaido~ikedacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/bbeb17c6-b127-4437-a457-cff8969f5949/download/hokkaido_ikedacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hokkaido~kamikawacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/59c9f350-2419-46ce-9bab-4e86e21f396b/download/hokkaido_kamikawacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hokumon~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/226fe0ae-79af-4971-b15f-332770cdc9c1/download/hokumon_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hurue~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/hurue.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hwnishitani~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/HWNishitani.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-hyyakata~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/HYYakata.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-iga~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/iga/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-ikalliance~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/ikalliance/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-inbe~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/inbe.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-ise~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/ise/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-iwanaicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a3be17ab-40ab-4b7d-9051-03562baf2ed4/download/iwanaicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-iyoshi~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.iyo.lg.jp/keizaikoyou/matidukuri/documents/gtfs.zip"
+      }
+    },
+    {
+      "id": "f-joutetsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/fef98fef-6fe2-472f-bde3-9d4f0a509a4a/download/joutetsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-jr四国バス高知支店~大栃線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFSJP-Jrbus_Localbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-kaetsunou~gtfs~himi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/tdu8l9t46rifwo2vx8a5o1qede4g3xhc.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-kaetsunou~gtfs~ippan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/ufgq55b2oxb6i0b15r9ih9q82w3q3jj5.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-kaetsunou~gtfs~sekaiisan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/ix5so7pza4m5d5yo3ikbfv4xk4tms80x.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-kahoku~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/kahoku_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kaigan~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/kaigan_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kaminoyama~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/kaminoyama_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kanbaratetsudo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/kanbaratetsudo/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kaneyama~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/kaneyama_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kashima~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/kashima.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kibichuo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/kibichuo/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kimobetsucho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/7727a55e-856d-4a49-aaa4-4ae4a605ba47/download/kimobetsucho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kitamishi~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/d4ecb0d3-4b28-4fff-897f-f56979e9b5c9/download/kitamishi_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kubikijidosha~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/kubikijidosha/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kuriyamacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/2365427f-ee06-40cc-a7d0-364a31d7afc8/download/kuriyamacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kururin~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.city.nisshin.lg.jp/material/files/group/108/kururin-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kushiro~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/dd2557d2-39f9-4e03-8703-117c64eaabe2/download/kushiro_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kutchancho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/bd408ce3-8910-48bc-bf4c-1135cac7070a/download/kutchancho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-kuwana~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/kuwana/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-m1~miho~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/M1_Miho.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-makubetsucho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/95c715ca-21de-4206-a345-b781e0952dd0/download/makubetsucho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-mamurogawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/mamurogawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-matsusaka~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/matsusaka/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-meishi~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/4bddd9a6-5edf-4887-82aa-b61cb93afc9e/download/meishi_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-memurocho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/2a15bf71-a472-4e7b-9722-1e304ba8e400/download/memurocho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-mihama~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/mihama_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-mihonoseki~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/mihonoseki.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-miike~shimabara~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/2b03e4b2-83a1-4c53-b884-22c05e53da9a/resource/ea3aa42e-f03f-471b-850a-daa87c07e61b/download/miike-shimabara.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-mikasashi~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/b529697a-82c2-4f78-b6b1-19fce6c9c3dc/download/mikasashi_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-miyama~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/miyama_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-mogamigawakotsu~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/mogamigawakotsu_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-moritan~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/moritan_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-murayama~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/murayama_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nagai~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/nagai_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-naganumacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/16e0d070-789e-41ae-bc2a-0d0f7f63c80f/download/naganumacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-naiecho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/af325038-7d05-485d-9b71-85c19a3d96e7/download/naiecho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nakashibetsucho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/75e1e2db-ab48-4dfb-9514-1ebbc898791a/download/nakashibetsucho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nakayama~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/nakayama_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nanki~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/nanki/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nanyo~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/nanyo_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nayoroshi~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/4abe45b3-7390-4d7d-8bf1-e8c7230ab962/download/nayoroshi_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nebutango~current~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aomori.aomori.jp/toshi-seisaku/opendata/documents/nebutango_current.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-niigatakotsukanko~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/niigatakotsukanko/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-niigatakotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/niigatakotsu/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-niseko~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/c46f9cd8-4c92-42eb-89a5-26e3fabb1dce/download/niseko_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nishikawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/nishikawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nishin~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/nishin_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-nishiwaga~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mc.bus-vision.jp/gtfs/nishiwaga/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-noriaitaxi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/noriaitaxi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-obanazawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/obanazawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-obiun~kanko~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/edc6b615-7308-4bd0-bfe4-6b3a510f9fc0/download/obiun-kanko.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-oe~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/oe_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-oguni~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/oguni_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-ohkura~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/ohkura_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-okabo~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/okabo_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-okoppecho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/9f741a86-60e2-42b2-89d8-384be8bf50ba/download/okoppecho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-onoshiei~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/onoshiei_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-onosi~machinaka~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/onosi_machinaka_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-otofukecho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/2d430e06-7e0b-4ef7-86f3-64ccb709d270/download/otofukecho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-rankoshicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/595f0db5-9e55-43a5-8b85-74c3edcd7da7/download/rankoshicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sagae~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/sagae_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-saga~current~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://opendata.sagabus.info/saga-current.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sakaide~city~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sakaide.lg.jp/uploaded/library/sakaide_city_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sakaide~kotosan~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sakaide.lg.jp/uploaded/library/sakaide_kotosan_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sakaisi~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/sakaisi_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sakegawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/sakegawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sakou~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/sakou_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sanuki~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sanuki.kagawa.jp/wp-content/uploads/2022/11/sanuki_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-saromacho~com~zip~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/be66e348-db27-423f-8668-8b90b828c871/download/saromacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sasakikanko~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/17/current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-seikan~ferry~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/16a31295-1709-4e5e-abcf-fa17ae7853b7/download/seikan_ferry.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sharicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/e59d88f1-2236-41bb-ba8c-75fd4754af1a/download/sharicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shibetsu~kido~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a5702fbb-eac7-401c-8dff-e7675091fd26/download/shibetsu_kido.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shibus~current~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aomori.aomori.jp/toshi-seisaku/opendata/documents/shibus_current.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shihorocho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/3c8f82fe-c997-45c8-9307-c904b206a450/download/shihorocho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shimane~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/shimane.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shima~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/shima/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shimokawacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/fc98f52c-5dd9-4c55-b089-288eeba92044/download/shimokawacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shinji~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/shinji.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shinjo~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/shinjo_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shinshinotsu~kotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/ceb69900-431d-4bb7-9605-a3b74e829b56/download/shinshinotsu_kotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shiranukacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/f4f6deb3-e9ad-469e-aa39-38279bdbfeb0/download/shiranukacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shiraoicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/120a024f-c2b5-4183-aa90-802398e010fd/download/shiraoicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shirataka~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/shirataka_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-shonai~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/shonai_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-simizu~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/simizu_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-snh01~chokokuji~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/SNH01_Chokokuji.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-snn01~nishimagusakouminkan~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/SNN01_Nishimagusakouminkan.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sorachi~chuo~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/671debb1-44c5-4dea-99eb-be693911c50c/download/sorachi_chuo_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-sorachi~kotsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/9a28fbf9-69fe-4a5c-8d26-b12fc2440074/download/sorachi_kotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-soya~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/04e3efd7-29fd-4295-ab8d-d27933f94bbc/download/soya_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-syari~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/d93cb12c-390f-4215-891d-c250db8f26d0/download/syari_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-taikicho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/aa50ca49-dc3b-4c34-89ca-79749aeaaa21/download/taikicho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tainoura~nagasaki~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/80da3e1f-5e26-4b85-a9f1-61fa560b91b1/resource/5acda669-d9be-4610-9df0-0d82a098b579/download/tainoura-nagasaki_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tamayu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/tamayu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tendo~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/tendo_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tengakajika~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/tengakajika_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tobetsucho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/a3603010-da90-4228-8095-a42a31adf855/download/tobetsucho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-toeibus~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api-public.odpt.org/api/v4/files/Toei/data/ToeiBus-GTFS.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-togo~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/togo_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-town~nyuzen~noran~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.town.nyuzen.toyama.jp/material/files/group/3/town_nyuzen_noran_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "use_without_attribution": "yes"
+      }
+    },
+    {
+      "id": "f-toyotetsu~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs/toyotetsu/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-toyouracho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/c9fe757b-0756-424b-a8da-e3438798dd55/download/toyouracho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tsukigatacho~com~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/d5e7795d-6c36-4468-ac2c-245e7f3378e1/download/tsukigatacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tsuruga~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/tsuruga_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-tsuruoka~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/tsuruoka_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-uzura~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/uzura_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-wakasa~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/wakasa_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y021~kaminogouchi~masaki~for~masaki~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y021_Kaminogouchi_Masaki_for_Masaki.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y051~ohshimadai~kanayoshi~for~kanayoshi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y051_Ohshimadai_Kanayoshi_for_Kanayoshi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y052~ohshimadai~kanayoshi~for~ohshimadai~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y052_Ohshimadai_Kanayoshi_for_Ohshimadai.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y060~ohshima~ifuku~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y060_Ohshima_Ifuku.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y080~shin~yaba~west~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y080_Shin-Yaba_West.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y090~yamautsuri~north~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y090_Yamautsuri_North.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y100~yamautsuri~south~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y100_Yamautsuri_South.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-y121~urayabakei~for~kakisaka~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/Y121_Urayabakei_for_Kakisaka.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yakumo~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/yakumo.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yamagata~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/yamagata_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yamakobus~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/yamakobus_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yamanobe~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/yamanobe_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yanbaru~express~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://yanbaru-expressbus.com/wp-content/themes/ykb/download/gtfs/statics.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk01~tsukinoki~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK01_Tsukinoki.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk02~tokoro~ono~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK02_Tokoro-ono.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk03~ichibira~okudani~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK03_Ichibira_Okudani.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk04~nagaono~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK04_Nagaono.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk05~fukebaru~ohishitohge~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK05_Fukebaru_Ohishitohge.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yk06~moromiya~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YK06_Moromiya.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-ykk1~kii~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YKK1_Kii.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yokkaichi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/yokkaichi/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yokosuka~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.yokosuka.kanagawa.jp/0830/opendata/documents/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yonezawa~gtfs~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/yonezawa_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-ysw1~shinyabahigashi~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city-nakatsu.jp/doc/2019072300060/file_contents/YSW1_Shinyabahigashi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-yutetsu~bus~jp",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/594c9dd3-d356-4445-98e2-c480d49c9d65/download/yutetsu_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      }
+    },
+    {
+      "id": "f-おおのハートバスささき観光",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/17/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-おのみちバス20250924",
+      "supersedes_ids": [
+        "f-おのみちバス20250924～"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/53/current_data.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-おのみちバス20250924~1",
+      "supersedes_ids": [
+        "f-おのみちバス20250924～~1"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/53/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ことでんバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.kotoden.co.jp/publichtm/gtfs/gtfsdata/latest/gtfs_kb.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-さかわ~おち花~花ループバス",
+      "supersedes_ids": [
+        "f-さかわ~おち花＊花ループバス"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Niyodoblue_Shuttlebus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-つくば市~筑波地区支線型バスつくばね号",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.tsukuba.lg.jp/material/files/group/126/GTFS.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-とさでん交通~一般路線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Tosaden-Traffic_Regularbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ふじみ野市内循環バスふじみん号",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://cms2nd.nec.asp.lgwan.jp/material/local/1177/files/group/5/112453_basujoho.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ふれあいバス大府市循環バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.obu.aichi.jp/_res/projects/default_project/_page_/001/017/133/bus/obu-gtfs-current-data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-みよし市~さんさんバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aichi-miyoshi.lg.jp/shisei/opendata/documents/sansanbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ジャングリア~エクスプレス有限会社ダイトウ",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/8290002032402"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-フォーブル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/14/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-フジエクスプレス港区ちぃばす",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.buskita.com/gtfs/fxc/gtfs.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ボン~バスエイチ~ディー西広島",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/13/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-マリックスライン~クイーンコーラルプラス~クイーンコーラル８",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.ottop.databed.org/transitfeed/9340001004024"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-マルエーフェリー~鹿児島航路~フェリーあけぼの",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.ottop.databed.org/transitfeed/5340001010554"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-ミハマシャトルカート無料周遊バス沖縄県観光振興課",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/1000020470007_1"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-七戸町コミュニティバス~シャトルバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.town.shichinohe.lg.jp/gtfs-ShichinoheCommunityBus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-三朝町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/7.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-下仁田町~しもにたバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.town.shimonita.lg.jp/shimonita-bus/m01/gtfs.20230324.shimonita.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-両備バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs/ryobi/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-中国ジェイアールバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/15/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-中国バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/chugokubus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-中日本ツアーバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/cjt-bus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-中鉄バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/chutetsu/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-九州産交バス~産交バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://km.bus-vision.jp/gtfs/sankobus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-亀の井バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/b9319381-3841-4a1c-a796-33e7953b193a/resource/8d18cbd7-eef0-48c6-9fa3-eae936d56f40/download/gtfs08_kamenoibus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-亀の井バス~高速バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/4e332c7a-3ac9-4c7a-a4b0-f78665e635da/resource/be2e8be4-44d1-4a85-aea6-78c8147f41c5/download/gtfs10_highway03kamenoi.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-井笠バスカンパニー",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/ikasabus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-仁淀川町民バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Niyodogawa-Town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-仙台市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sendai.jp/joho-kikaku/shise/security/kokai/documents/gtfs-jp_sendaicitybus_current_data.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-仙台市営バス~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.sendai.jp/joho-kikaku/shise/security/kokai/documents/gtfs-jp_sendaicitybus_current_date.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-伊勢市コミュニティバスおかげバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/iseshi/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-佐川町~さかわぐるぐるバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Sakawa-Town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-備前市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/bizen-city/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-備北交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/12/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-入善町~入善町営バスのらんマイ~カー県サイト掲載版",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/5e0royc3l3tun4vpjie0qmqpfbztj08n.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-八頭町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/6.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-函館帝産バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/e407ed56-37c0-4d70-92d6-0fdd3a05aac7/download/gtfs_hakodateteisanbus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-加古川市~かこバス~かこバスミニ市サイト版",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata-api-kakogawa.jp/ckan/dataset/e6353d20-66e3-4d17-8cb4-dd91836d8195/resource/5773f858-07dc-4168-a2fc-0879ec273a84/download/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-北九州市~おでかけ交通~小倉南区東谷地区",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.open-governmentdata.org/dataset/0ae9bb0b-9aea-40e6-9cdf-486b9421bf33/resource/55618aea-0a7a-472d-bc61-d54757d8b35a/download/401005_odekakekotsugtfs_higashitani.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-北海道北見バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/ae0e85ab-b317-4acd-b982-2ceda019309f/download/kitami_bus-1.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-北海道拓殖バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/3870b272-dabb-4527-9d51-67afc2c9a2d5/download/gtfs_takushoku_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-十勝バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/9ad9de7f-73a9-4695-858f-c09cdf13437a/download/20211121gtfs-dia.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-十勝バス~一般路線コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.tokachibus.jp/download/20221205GTFS-dia.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-南砺市~なんバス南砺市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/u4kmkwax5vbrctr2rshqkh1wzyx6qr9u.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-南部町営ふれあいバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/11.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-可児市~yaoバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.kani.lg.jp/secure/12816/202303_yao_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-可児市~さつきバス~ｋバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.kani.lg.jp/secure/12816/202210_satuki_K_bus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-名古屋市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/c5794008-8053-42ab-99b9-ee7f6fdf9a9e/resource/90ceab55-f14f-4376-8c7a-088fcb49115e/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-呉市~生活バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/18/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-和光市内循環バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/5210"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-和歌山バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs/wakayama/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-和歌山バス那賀",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/wakayamabusnaga/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-四国交通~四交",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2651/resource/7652/source-url"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-国東観光バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/53ed44a0-0507-4002-aa9e-c4421d290dd4/resource/5469eca7-e04b-4fba-8cdd-208a4538a7e9/download/gtfs05_kunisakikanko.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-境港市~循環バス~202503",
+      "supersedes_ids": [
+        "f-境港市~循環バス～202503"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/10.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大交北部バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/1e5193a5-c771-419a-9e7a-903d45ced2f3/resource/dd886eca-3abb-4244-a866-a62f676ccb83/download/gtfs07_daikohokubu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大分バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/6b8c3167-971c-4c3c-ab84-4eae561be553/resource/9c3c2dbb-493a-40be-991d-44923919908c/download/gtfs01_oitabus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大分バス~高速バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/4e332c7a-3ac9-4c7a-a4b0-f78665e635da/resource/5713d7c2-b881-48e6-86b8-ed4eb0e9006f/download/gtfs10_highway01oitabus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大分交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/09f3116a-418d-42be-9bd5-4d395c7b3467/resource/899d5ccc-75ee-48a8-bc96-e241a6a0c0cd/download/gtfs04_oitakotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大分交通~高速バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/4e332c7a-3ac9-4c7a-a4b0-f78665e635da/resource/3ece7365-9739-4c5d-92a8-f008922325ff/download/gtfs10_highway02oitakotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大月町~まちなか循環線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Otsuki-Town.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-大野竹田バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/82f8e394-562d-4ccf-b279-cf31e2454d13/resource/c9321261-fa35-434a-8a6a-ad0c992b1194/download/gtfs02_oonotaketabus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-安芸市観光シャトルバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFS-Aki-Shuttlebus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-宮若市~飯塚市共同運行コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/341b6046-0030-4a78-a54d-87b1a1335563/resource/93fa1f38-d6d2-45bf-a774-56e1c3856494/download/230315miyawakaiizuka_gtfs-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富士急バス富士五湖と甲府市周辺~山梨県東部エリア",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.buskita.com/gtfs/fjb/gtfs.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富士急モビリティ御殿場市~裾野市~小山町周辺エリア",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.buskita.com/gtfs/fmo/gtfs.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富士急湘南バス神奈川県西部エリア",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.buskita.com/gtfs/fsy/gtfs.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~まいどはやバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/bcca7lwesg58h55hbg8rxgrhh34thn8h.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~八尾コミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/x2i6f55uhgavm2f8vcsneyo68bazl1sn.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~呉羽いきいきバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/9ivamh4rfhcseya2ngpj143qq5c1mv24.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~堀川南地域コミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/fy7q87srgu0a7r3cwuugahucqkpyezsj.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~大山コミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/nxd5vxqnlur54ak0mkoi2p8qt8lcrtvn.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~婦中コミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/aapqh2kbpttozqrhoscbjap43kez7dow.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~山田コミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/lbkdalq5p8wzy1szvrhmye8otage9q8h.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-富山市~水橋ふれあいコミュニティバス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/b724alggd7nnfmscvra8e8qjf0hq85r2.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-小矢部市~小矢部市営バスメルバス~乗合タクシー",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/8xvzsmuxou6kj8moe999t5r0dah953ov.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-山形鉄道",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/flower-liner_gtfs_1.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-岡垣コミュニティバスふれあい",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/18581c45-386a-4ddf-b60d-526e43e41046/resource/d8a94e2c-23eb-40d2-b4d1-e822e34e8dea/download/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-岡山市支線バス~flat八晃運輸",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/hakkou/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-岡山電気軌道路面電車",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://okdweb.jcld.jp/gtfs/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-岡電バス岡山電気軌道",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs/okaden/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-岩国市生活交通バス~由宇地区バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://yamaguchi-opendata.jp/ckan/dataset/2dbaeb43-5134-4880-90a3-62870504f1d3/resource/31d5dd9c-113c-4fc5-bfa6-31d832f830fc/download/352080_gtfs-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-川越市内循環バス川越シャトル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/91"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-川越町~ふれあいバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.town.kawagoe.mie.jp/wp-content/themes/kawagoecho/images/hureaibus202208.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-広島バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/9/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-広島交通~広交観光",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/10/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-広電バス広島電鉄",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/8/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-庄内交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/syonaikotsu_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-廿日市市~自主運行バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/19/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-徳島市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2649/url_resource/66/GTFS-JP.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-志賀町コミュニティバスしかばす",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.opendata.pref.ishikawa.lg.jp/dataset/65de3540-4781-4329-bc8f-634870e5a69c/resource/cfb1baaa-4808-408b-ab09-2f3a0a08aacb/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-恵庭市コミュニティ",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.hoda.jp/dataset/24d1dd70-5395-4d6b-b41f-0d83e8eabdb9/resource/5f05a49e-1bf0-4de3-918e-de6a1c6255b8/download/_gtfs-jp_202141_20211115131545-1.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-掛川市自主運行バス~市街地循環線北回りジーネット",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.shizuoka.jp/dataset/9718/resource/66108/shigaichijyunkan-kita202304.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-掛川市自主運行バス~市街地循環線北回りジーネット~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.shizuoka.jp/dataset/9718/resource/65791/shigaichijyunkan-kita.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-掛川市自主運行バス~掛川大須賀線ジーネット",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.shizuoka.jp/dataset/9718/resource/65789/kakegawaosuka.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-掛川市自主運行バス~掛川大須賀線ジーネット~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.shizuoka.jp/dataset/9718/resource/66106/kakegawaosuka202304.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日南町~巡回バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/12.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日本中央バス奥多野線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ncb.jp/route/GTFS/latest/GTFS(OT).zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日田バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/2dcbcc0d-6fbb-4c6b-9790-2f54ed41bf4f/resource/e37c6f56-ed8b-4032-a91f-4fc24639a18e/download/gtfs09_hitabus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日田バス~高速バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/4e332c7a-3ac9-4c7a-a4b0-f78665e635da/resource/17806124-f3bd-4146-b276-675133184953/download/gtfs10_highway04hita.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日野町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/13.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-日野町営バス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/e431dddb-dc3a-4699-b570-9d77043306fa/download/gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-春日部市コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/6515"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-朝日交通~阿戸熊野線~阿戸線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/54/current_data.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-朝日交通~阿戸熊野線~阿戸線~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/54/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-本庄市はにぽんシャトル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/1684"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-杉戸町町内巡回バスあいあい号",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/3750"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-東近江市コミュニティバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/faf0ff1b-fcba-4bd2-91bc-c6937db08c3c/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-松江市コミュニティバス~本庄~持田コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.docodemo-bus.net/opendata/honjo-mochida.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-栗東市コミュニティバスクリちゃん県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/4b30b3c0-034d-4184-8d8e-2c4f8a1a8975/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-桐生市~おりひめバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.kiryu.lg.jp/_res/common/opendata/1014528/20230320_kiryu_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-橋本市コミュニティバス~デマンドタクシー",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.hashimoto.lg.jp/material/files/group/67/hashimoto_gtfsjp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-永井バス永井運輸",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nagai-unyu.net/rosen/GTFS/aux/latest/GTFS-JP_nbaux-gunma-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-永井バス永井運輸独自拡張版gtfs",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nagai-unyu.net/rosen/GTFS/aux/latest/GTFS-JP_nbaux-gunma-jp_gyomu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-津幡町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ckan.opendata.pref.ishikawa.lg.jp/dataset/26e2ba58-a46f-4f53-8350-8588ad8aacf1/resource/8f63902b-c8f7-40e3-b5b7-0fe3d12f5950/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-浪岡地区コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.aomori.aomori.jp/n-somu/documents/namiokabus_current.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-湖南市コミュニティバスめぐるくん県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/5e2804f1-aa74-4f3d-a877-daa365429f08/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-滑川市~のる~my~car",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/jpxqjqmxqrbu47o2f45i84f3m43qkxzi.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-熊本バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://km.bus-vision.jp/gtfs/kumabus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-熊本都市バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://km.bus-vision.jp/gtfs/toshibus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-熊本電鉄バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://km.bus-vision.jp/gtfs/dentetsu/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-玉村町乗合タクシー~たまりん",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nagai-unyu.net/rosen/GTFS/tamarin/latest/GTFS-JP_tamarin-gunma-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-玖珠観光バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/b90a15f4-9680-4b7c-bcf9-d510d426e210/resource/d99bc99a-4358-4eab-af68-b140c12477a0/download/gtfs06_kusukanko.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-琴浦町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/8.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-由布市コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/bf767ad7-4651-42f8-a9b1-78874542e046/resource/9b537213-f309-4116-9952-53050ea768ba/download/gtfs11_combus13_yufu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-甲賀市コミュニティバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/1748c826-cdb3-4e42-af85-6b8781a4aaff/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-男鹿市内路線バス全路線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.oga.akita.jp/material/files/group/2/bus-ogacity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-石巻市~住民バス~市民バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://miyagi.dataeye.jp/resource_download/340"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-砺波市~砺波市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/70l7nwf33az6y13k4hzyc1gw679enkss.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-福鉄バス福井鉄道",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_fukutetu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-秋北バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-shuhokubus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-秋田中央交通~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/52/latest.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-秋田市マイタウン~バス中心市街地循環バスぐるる県バス協会掲載版",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/bus-akitacity.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-秩父市営バス浦山線川又線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.saitama.lg.jp/resource_download/1499"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-立山町~立山町営バス県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/8u3d410n3ioow5juxkce2ocg0vynisw7.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-竹富島交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api3.ottop.org/download/gtfs/ooXuXei4op7y/4360002021665"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-竹田市コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/bf767ad7-4651-42f8-a9b1-78874542e046/resource/0f39370a-d524-43f1-998b-d59c87c4e9ae/download/gtfs11_combus08_taketa.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-米子市循環バス米子市淀江町循環バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/9.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-網走バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.abashiribus.com/open_data/gtfs_abashiribus_latest.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-美波町~美波病院連絡バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.tokushima.lg.jp/dataset/2636/resource/7707/GTFSJP3_minami-town_20220601.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-羽咋市~市内循環バスるんるんバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.hakui.lg.jp/material/files/group/2/GTFS20230401.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-羽後交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.akita-bus.or.jp/~akita-gtfs/ugo-bus-jp.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-能美市~のみバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nomi.ishikawa.jp/www/contents/1683514558086/simple/GTFS_nomi_20230401.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-臼杵市コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/bf767ad7-4651-42f8-a9b1-78874542e046/resource/95513da5-7317-4b97-911a-5df29d387900/download/gtfs11_combus06_usuki.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-臼津交通",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/af52f355-1e78-405c-9d89-9df309bbb30f/resource/76e548c5-617e-4273-81f7-23499ec3aafe/download/gtfs03_kyushinkotsu.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-芸陽バス広島県バス協会サイト掲載版",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ajt-mobusta-gtfs.mcapps.jp/static/11/latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-若桜町営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/5.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-草津守山栗東くるっとバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/60630fde-20f8-4426-ac53-6a865d0ddf54/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-草津市まめバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/e4ea2950-0943-4591-93d7-2dbaf78fc9dc/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-菰野町かもしか号",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/komono/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-藤岡市~めぐるん",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.fujioka.gunma.jp/material/files/group/7/fujiokaGTFS.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-豊橋市地域生活バスコミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/toyohashishi/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-豊橋鉄道~渥美線~市内線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://loc.bus-vision.jp/gtfs_v2/toyohashitetsudo/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-赤磐市広域路線バス~市民バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.akaiwa.lg.jp/material/files/group/5/GTFS-JP.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-越前町コミュニティバス~フレンドリー号",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_fukui_ikedacho_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-越前町コミュニティバス~フレンドリー号~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.fukui.lg.jp/doc/dx-suishin/opendata/gtfs_jp_d/fil/gtfs_echizenchou_com.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-越後交通長岡地区",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/nagaoka/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-近江八幡市あかこんバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/cbc115a2-2798-47f3-9033-383bce7dce2d/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-野洲市コミュニティバスおのりやす県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/be6ed01b-16e3-4ad8-ad6c-0aec0a8a686a/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-金沢ふらっとバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://catalog-data.city.kanazawa.ishikawa.jp/dataset/1196beb4-f9f9-463c-9723-5b38d8127425/resource/191bd7bd-8e97-4919-b3ad-a87757993a79/download/20230401.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~小国地域生活交通~八王子線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-10.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~小国地域生活交通~大貝線オーケーバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-09.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~小国地域生活交通~法末線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-11.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~山古志地域クローバーバス~小千谷線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-06.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~山古志地域クローバーバス~小松倉線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-08.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~山古志地域クローバーバス~村松線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-05.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~山古志地域クローバーバス~種苧原線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-07.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~川口地域バス上川線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-12.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~川口地域バス木沢~和南津線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-14.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長岡市~川口地域バス西川口~田麦山線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.nagaoka.niigata.jp/shisei/cate10/gis/file/28-13.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-長浜市西浅井おでかけワゴン県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/b54a0fa2-b064-4c59-b2a3-766c0c51f5b7/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-階上町コミュニティバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.aomori.lg.jp/dataset/1596/resource/16908/gtfs_hashikamicho_com.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-階上町コミュニティバス~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.pref.aomori.lg.jp/dataset/1596/resource/19655/gtfs_hashikamicho_com_latest.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-鞆鉄道トモテツバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus-vision.jp/gtfs_v2/tomotetsubus/gtfsFeed"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-高岡市~高岡市公営バス福岡地域県サイト",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/hjzzrbhbq92r7qli46ygb4qjci7030gy.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-高島市コミュニティバス県ポータル",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bodik.jp/dataset/e3f3ad12-171c-442b-95b5-896f4b50e5a7/resource/36f2f369-a1e9-4e90-a22e-ee75caec11e2/download"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-高崎市内循環バスぐるりん~高崎アリーナシャトルバス~よしいバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.takasaki.gunma.jp/docs/2020060400037/files/bus-takasaki-gunma-jp_20230414.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-高松琴平電鉄ことでん",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.kotoden.co.jp/publichtm/gtfs/gtfsdata/gtfs_kd.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-高知観光コンベンション協会~my遊バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.kochi.lg.jp/opendata/docs/bosai_anzen_machizukuri/file_contents/GTFSJP-KVCA_MY-Yubus.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-魚津市~予約式あいのりタクシー~おもてなし魚津直行便",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.city.uozu.toyama.jp/attach/EDIT/062/062570.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-魚津市~予約式あいのりタクシー~おもてなし魚津直行便~1",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/glzk70eid2g89z8zos927s4emfxdvni4.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-魚津市~魚津市民バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/na9rrq16urut58g79ba13bil9ig1m9rh.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-鳥取市~循環バスくる梨ループ麒麟獅子気高循環線絹見線らっちゃんバス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://odp-pref-tottori.tori-info.co.jp/bus_data/3.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-SA-2.1-JP",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-鶴岡市~羽黒地域市営バス朝日地域市営バス",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.pref.yamagata.jp/documents/20978/tsuruoka_gtfs_1.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "use_without_attribution": "no"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-黒部市~市内路線バス新幹線生地線",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/y8rvyr2h3dtbz1tu0c2hm78teuvwqwcy.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    },
+    {
+      "id": "f-黒部市~市内路線バス石田三日市線~愛本コミュニティタクシー",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://toyama-pref.box.com/shared/static/3vqbuvgk41hq3k47bf8b5iit989vrbbl.zip"
+      },
+      "tags": {
+        "notes": "This feed record is managed in https://github.com/tshimada291/gtfs-jp-list-datecheck/blob/main/GTFS_fixedURL_LastModified.csv"
+      }
+    }
+  ]
+}

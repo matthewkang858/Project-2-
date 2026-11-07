@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-monroe~la~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://monroela.us/wp-content/uploads/2024/11/GTFS-10-8-24.zip",
+        "static_historic": [
+          "https://monroela.us/sites/default/files/gtfs_MTS.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-monroe~la~us",
+          "name": "Monroe Transit",
+          "website": "https://monroela.us/departments/public-works/bus-services-monroe-transit/",
+          "tags": {
+            "us_ntd_id": "60026"
+          }
+        }
+      ]
+    }
+  ]
+}

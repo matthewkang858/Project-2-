@@ -1,0 +1,61 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-catalinaflyer~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://github.com/LACMTA/los-angeles-regional-gtfs/raw/main/catalinaflyer-ca-us/catalinaflyer-ca-us.zip",
+          "https://data.trilliumtransit.com/gtfs/catalinaflyer-ca-us/catalinaflyer-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "status": "outdated"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-catalinaflyer~ca~us",
+          "name": "Catalina Flyer"
+        }
+      ]
+    },
+    {
+      "id": "f-lapuente~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/lapuente-ca-us/lapuente-ca-us.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/lapuente-ca-us/lapuente-ca-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-lapuente~ca~us",
+          "name": "La Puente LINK",
+          "website": "https://lapuente.org/transit-services/"
+        }
+      ]
+    },
+    {
+      "id": "f-playavistashuttle~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/playavistashuttle-ca-us/playavistashuttle-ca-us.zip",
+          "https://github.com/LACMTA/los-angeles-regional-gtfs/raw/main/playavistashuttle-ca-us/playavistashuttle-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "status": "outdated"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-playavistashuttle~ca~us",
+          "name": "Playa Vista Shuttle",
+          "website": "https://playavista.com/playa-vista-shuttle/"
+        }
+      ]
+    }
+  ]
+}

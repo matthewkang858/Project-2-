@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ezjm-empresamunicipaldetransportes",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://servicios.emtmadrid.es:8443/gtfs/transitemt.zip"
+      },
+      "tags": {
+        "gtfs_data_exchange": "madrid"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ezjm-empresamunicipaldetransportes",
+          "name": "Empresa Municipal de Transportes",
+          "short_name": "EMT Madrid",
+          "website": "http://www.emtmadrid.es",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "EMT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

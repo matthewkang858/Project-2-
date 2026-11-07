@@ -1,0 +1,60 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u3h-koleje~dolnoslaskie",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kd.kiedyprzyjedzie.pl/gtfs/kd_transitland/google_transit.zip",
+        "static_historic": [
+          "https://gtfs.i.kiedyprzyjedzie.pl/kd/google_transit.zip",
+          "https://mkuran.pl/gtfs/kolejedolnoslaskie.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.pl"
+      },
+      "authorization": {
+        "type": "basic_auth",
+        "info_url": "https://kolejedolnoslaskie.pl/rozklady-gtfs/"
+      }
+    },
+    {
+      "id": "f-u3h-koleje~dolnoslaskie~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://kd.kiedyprzyjedzie.pl/gtfs/kd_transitland/realtime.pb",
+        "realtime_trip_updates": "https://kd.kiedyprzyjedzie.pl/gtfs/kd_transitland/realtime.pb"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.pl"
+      },
+      "authorization": {
+        "type": "basic_auth",
+        "info_url": "https://kolejedolnoslaskie.pl/rozklady-gtfs/"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-u3h-koleje~dolnoslaskie",
+      "name": "Koleje Dolnośląskie",
+      "short_name": "KD",
+      "website": "https://kolejedolnoslaskie.pl/",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "KD",
+          "feed_onestop_id": "f-polish~trains"
+        },
+        {
+          "feed_onestop_id": "f-u3h-koleje~dolnoslaskie"
+        },
+        {
+          "feed_onestop_id": "f-u3h-koleje~dolnoslaskie~rt"
+        }
+      ]
+    }
+  ]
+}

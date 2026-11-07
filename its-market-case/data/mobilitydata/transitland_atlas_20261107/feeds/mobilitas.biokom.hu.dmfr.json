@@ -1,0 +1,23 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u2hy-biokomnonprofitkft",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mobilitas.biokom.hu/gtfs"
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://napportal.kozut.hu/en/#/informations/toc/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u2hy-biokomnonprofitkft",
+          "name": "BIOKOM Nonprofit Kft.",
+          "website": "http://mobilitas.biokom.hu"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-etgc-hf~urbano~hf~interurbano",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.horariosdofunchal.pt/googletransit.zip",
+        "static_historic": [
+          "http://www.horariosdofunchal.pt/google_transit.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.horariosdofunchal.pt/index.php?option=com_content&task=view&id=2022",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "mdb_source_id": "3104"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-etgc-hf~urbano",
+          "supersedes_ids": [
+            "o-etgf-hf~interurbano"
+          ],
+          "name": "Horários do Funchal",
+          "short_name": "HF",
+          "website": "https://www.horariosdofunchal.pt/",
+          "tags": {
+            "wikidata_id": "Q3572372"
+          }
+        }
+      ]
+    }
+  ]
+}

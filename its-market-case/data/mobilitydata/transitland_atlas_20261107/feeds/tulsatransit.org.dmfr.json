@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9y7v-metropolitantulsatransitauthority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Zip.ashx",
+        "static_historic": [
+          "http://gtfs.tulsatransit.org/google_transit.zip",
+          "http://www.tulsatransit.org/gtfs/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "metropolitan-tulsa-transit-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9y7v-metropolitantulsatransitauthority",
+          "name": "Metropolitan Tulsa Transit Authority",
+          "short_name": "Tulsa Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-metropolitantulsatransitauthority~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "TulsaTransit",
+            "us_ntd_id": "60018",
+            "wikidata_id": "Q6825293"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-metropolitantulsatransitauthority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      },
+      "license": {
+        "url": "https://gtfs.tulsatransit.org/"
+      }
+    }
+  ]
+}

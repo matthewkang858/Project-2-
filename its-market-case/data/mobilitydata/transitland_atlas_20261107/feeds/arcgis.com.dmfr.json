@@ -1,0 +1,66 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dnq-gastoniatransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/d44c866e95c24bafb23c12d15b4db525/data"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnq-gastoniatransit",
+          "name": "Gastonia Transit",
+          "website": "https://gastonianc.gov/city-bus-service",
+          "tags": {
+            "us_ntd_id": "40010",
+            "wikidata_id": "Q5526770"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dqct-annapolistransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/c307923d57ab4871aff79491b4a1bfd3/data",
+        "static_historic": [
+          "https://github.com/mobilityequity/maryland-local-gtfs/raw/master/Annapolis_GTFS.zip"
+        ]
+      },
+      "license": {
+        "url": "https://city-of-annapolis-open-data-portal-annapolis.hub.arcgis.com/datasets/annapolis-gtfs/about"
+      },
+      "tags": {
+        "gtfs_data_exchange": "annapolis-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqct-annapolistransit",
+          "name": "Annapolis Transit",
+          "tags": {
+            "us_ntd_id": "30040",
+            "wikidata_id": "Q4767978"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-norfolk~county~on~ca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/a0a9b1046f9e4d79a6aa0ccf7be081d9/data"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-norfolk~county~on~ca",
+          "name": "Ride Norfolk",
+          "website": "https://www.norfolkcounty.ca/transit/",
+          "tags": {
+            "wikidata_id": "Q7332498"
+          }
+        }
+      ]
+    }
+  ]
+}

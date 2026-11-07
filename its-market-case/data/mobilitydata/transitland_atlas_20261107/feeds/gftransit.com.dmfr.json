@@ -1,0 +1,25 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-great~falls~transit~district~mt",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/7935/GFT_GTFS.zip",
+        "static_historic": [
+          "https://irp.cdn-website.com/cc7aa934/files/uploaded/GFT_gtfs.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-great~falls~transit~district~mt",
+          "name": "Great Falls Transit District",
+          "short_name": "GFT",
+          "tags": {
+            "us_ntd_id": "80012"
+          }
+        }
+      ]
+    }
+  ]
+}

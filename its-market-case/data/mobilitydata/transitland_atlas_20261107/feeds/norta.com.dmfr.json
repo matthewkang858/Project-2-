@@ -1,0 +1,42 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9vrf-neworleansrta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.norta.com/RTA/media/GTFS/GTFS.zip",
+        "static_historic": [
+          "https://www.norta.com/OpnesourceData/Download",
+          "https://transitfeeds-data.s3-us-west-1.amazonaws.com/public/feeds/new-orleans-regional-transit-authority/336/20170801/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.norta.com/help-and-contacts/business-information/open-transit-data-(otd)"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "key",
+        "info_url": "https://www.norta.com/help-and-contacts/business-information/open-transit-data-(otd)"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9vrf-neworleansrta",
+          "name": "New Orleans Regional Transit Authority",
+          "short_name": "NORTA",
+          "website": "http://www.norta.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "NORTA"
+            }
+          ],
+          "tags": {
+            "twitter_general": "NewOrleansRTA",
+            "us_ntd_id": "60032",
+            "wikidata_id": "Q2138272"
+          }
+        }
+      ]
+    }
+  ]
+}

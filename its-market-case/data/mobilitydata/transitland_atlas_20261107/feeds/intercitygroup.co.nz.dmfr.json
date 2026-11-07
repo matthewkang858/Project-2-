@@ -1,0 +1,17 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-rb-atairporter380~manukauorangebus~tranzalpinerailway~abeltasm",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.intercitygroup.co.nz/transit/gtfs_base.zip"
+        ]
+      },
+      "tags": {
+        "status": "archived"
+      }
+    }
+  ]
+}

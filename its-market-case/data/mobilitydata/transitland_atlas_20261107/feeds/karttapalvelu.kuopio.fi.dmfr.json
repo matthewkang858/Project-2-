@@ -1,0 +1,32 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ue5-linja~karjalaoy~jääskeläisenautooy~pohjolanliikenneoy~kuop",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://karttapalvelu.kuopio.fi/google_transit/google_transit.zip"
+      },
+      "license": {
+        "url": "http://creativecommons.org/licenses/by/4.0/deed.fi",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ue5-vilkku",
+          "name": "Vilkku",
+          "website": "https://vilkku.kuopio.fi/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1111"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q127271012"
+          }
+        }
+      ]
+    }
+  ]
+}

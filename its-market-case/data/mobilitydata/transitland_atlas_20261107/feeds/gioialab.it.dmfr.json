@@ -1,0 +1,59 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sr5z-italy~societatrasportiprovincialespa",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.gioialab.it/openbus/opendata/stp"
+        ]
+      },
+      "license": {
+        "url": "http://www.gioialab.it",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sr5z-italy~societatrasportiprovincialespa",
+          "name": "Società Trasporti Provinciale",
+          "short_name": "STP",
+          "website": "http://www.stpspa.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "stp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-srk0-sitasud",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.gioialab.it/openbus/opendata/sita"
+        ]
+      },
+      "license": {
+        "url": "http://www.gioialab.it",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-srk0-italy~sitasud",
+          "name": "Sicurezza Trasporti Autolinne",
+          "short_name": "SITA Sud",
+          "website": "http://www.sitasudtrasporti.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "sita"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

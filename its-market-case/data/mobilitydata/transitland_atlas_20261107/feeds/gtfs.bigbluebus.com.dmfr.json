@@ -1,0 +1,67 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q5c-bigbluebus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.bigbluebus.com/gtfs/current.zip",
+        "static_historic": [
+          "http://gtfs.bigbluebus.com/current.zip"
+        ]
+      },
+      "license": {
+        "url": "http://gtfs.bigbluebus.com/terms-and-conditions",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "recpN1dPaxhZvZQV0",
+        "gtfs_data_exchange": "big-blue-bus"
+      }
+    },
+    {
+      "id": "f-bigbluebus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cleverapi.bigbluebus.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://cleverapi.bigbluebus.com/gtfsrt/trips",
+        "realtime_alerts": "https://cleverapi.bigbluebus.com/gtfsrt/alerts"
+      },
+      "license": {
+        "url": "http://gtfs.bigbluebus.com/terms-and-conditions",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "recECwj1xg2LIa6NF,recCATR5wx3jQdh8c,rec6N4uHrZxMSWuyi"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9q5c-bigbluebus",
+      "name": "Big Blue Bus",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9q5c-bigbluebus"
+        },
+        {
+          "feed_onestop_id": "f-bigbluebus~rt"
+        }
+      ],
+      "tags": {
+        "calitp_organization_id": "recJHFDLpGRMIFgnL",
+        "twitter_general": "SMBigBlueBus",
+        "us_ntd_id": "90008",
+        "wikidata_id": "Q4905149"
+      }
+    }
+  ]
+}

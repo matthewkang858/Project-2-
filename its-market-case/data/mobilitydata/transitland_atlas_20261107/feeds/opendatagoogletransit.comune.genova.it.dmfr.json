@@ -1,0 +1,26 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-spyk-amtgenova",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://opendatagoogletransit.comune.genova.it/downloads/google_transit.zip"
+      },
+      "license": {
+        "url": "https://creativecommons.org/licenses/by/4.0/deed.it",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "(C) AMT Genova"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-spyk-amtgenova",
+          "name": "Azienda Mobilità e Trasporti",
+          "short_name": "AMT",
+          "website": "http://www.amt.genova.it"
+        }
+      ]
+    }
+  ]
+}

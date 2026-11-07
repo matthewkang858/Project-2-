@@ -1,0 +1,32 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0x5-swunahverkehrulm~neu~ulmgmbh",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.swu.de/daten/SWU.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0x5-swunahverkehrulm~neu~ulmgmbh",
+          "name": "SWU Nahverkehr Ulm/Neu-Ulm",
+          "short_name": "SWU",
+          "website": "http://www.swu.de/privatkunden/swu-nahverkehr.html",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "gtfs_agency_id": "7623",
+              "feed_onestop_id": "f-delfi~de"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q130236683"
+          }
+        }
+      ]
+    }
+  ]
+}

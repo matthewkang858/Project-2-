@@ -1,0 +1,63 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-aléop~pays~de~la~loire",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://donnees.paysdelaloire.fr/data/pdl.zip"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/arrets-horaires-et-circuits-des-lignes-de-transports-aleop-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-aléop~pays~de~la~loire",
+          "name": "Transport Régional en Pays de la Loire",
+          "short_name": "Aléop",
+          "website": "https://aleop.paysdelaloire.fr/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ALEOP_44"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_49"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_53"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_72"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_85"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_LER"
+            },
+            {
+              "gtfs_agency_id": "ALEOP_YEU"
+            },
+            {
+              "feed_onestop_id": "f-aléop~pays~de~la~loire~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-aléop~pays~de~la~loire~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://proxy.transport.data.gouv.fr/resource/aleop-pdl-gtfs-rt-vehicle-position",
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/aleop-pdl-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/aleop-pdl-gtfs-rt-alerts"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/arrets-horaires-et-circuits-des-lignes-de-transports-aleop-1"
+      }
+    }
+  ]
+}

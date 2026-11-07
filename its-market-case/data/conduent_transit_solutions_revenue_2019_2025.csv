@@ -1,0 +1,8 @@
+year,transit_solutions_usd_m,road_usage_charging_usd_m,curbside_usd_m,public_safety_usd_m,commercial_vehicles_usd_m,total_transportation_usd_m,source_10k
+2019,254,327,107,83,10,781,10-K FY2021
+2020,248,318,72,73,8,719,10-K FY2021
+2021,262,327,82,67,8,746,10-K FY2021/FY2023
+2022,226,328,85,62,8,709,10-K FY2023
+2023,237,317,76,58,8,696,10-K FY2023 (FY2025 10-K restates transit 233 / total 558 after curbside+public safety moved to Divestitures)
+2024,341,244,,,1,586,10-K FY2025
+2025,371,238,,,,609,10-K FY2025; 8-K Oct-2026 pro forma: transit 371/341/237

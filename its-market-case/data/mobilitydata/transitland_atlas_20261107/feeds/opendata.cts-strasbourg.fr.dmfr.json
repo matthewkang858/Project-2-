@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0tk-cts",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.cts-strasbourg.eu/google_transit.zip",
+        "static_historic": [
+          "http://opendata.cts-strasbourg.fr/fichiers/gtfs/google_transit.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/donnees-theoriques-gtfs-et-temps-reel-siri-lite-du-reseau-cts"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0tk-cts",
+          "name": "Compagnie des Transports Strasbourgeois",
+          "short_name": "CTS",
+          "website": "http://www.cts-strasbourg.eu/",
+          "tags": {
+            "wikidata_id": "Q2990068"
+          }
+        }
+      ]
+    }
+  ]
+}

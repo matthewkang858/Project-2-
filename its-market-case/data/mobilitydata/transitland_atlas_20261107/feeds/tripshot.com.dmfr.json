@@ -1,0 +1,490 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q4-smat~ca~us",
+      "supersedes_ids": [
+        "f-9q4q-guadalupeflyer"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://smrt.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/smat-ca-us/smat-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recxPy2JOcDFGDo31"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q4-santamariaareatransit",
+          "supersedes_ids": [
+            "o-9q4q-guadalupeflyer"
+          ],
+          "name": "Santa Maria Area Transit",
+          "short_name": "SMAT",
+          "website": "http://www.cityofsantamaria.org/home/showdocument?id=6159",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9q4-smat~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec9zGMJgNnes75K1",
+            "twitter_general": "City_SantaMaria",
+            "us_ntd_id": "90087",
+            "wikidata_id": "Q7419673"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q4-smat~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://smrt.tripshot.com/v1/gtfs/realtime/vehiclePosition/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_trip_updates": "https://smrt.tripshot.com/v1/gtfs/realtime/tripUpdate/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_alerts": "https://smrt.tripshot.com/v1/gtfs/realtime/serviceAlert/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec5jwba3HQH6Al5A,recZn8N5AzdQl6Iaf,reclIe08iPVLniSrN"
+      }
+    },
+    {
+      "id": "f-9q7m-portervilletransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://porterville.tripshot.com/v1/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/porterville-ca-us/porterville-ca-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q7m5-portervilletransit",
+          "name": "Porterville Transit",
+          "website": "https://www.ci.porterville.ca.us/departments/porterville_transit/",
+          "tags": {
+            "twitter_general": "ridept",
+            "us_ntd_id": "90198",
+            "wikidata_id": "Q110682480"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q9hy-mountainview~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://mtma.tripshot.com/v1/gtfs/realtime/feed/mvgo?types=VehiclePosition",
+        "realtime_trip_updates": "https://mtma.tripshot.com/v1/gtfs/realtime/feed/mvgo?types=TripUpdate",
+        "realtime_alerts": "https://mtma.tripshot.com/v1/gtfs/realtime/feed/mvgo?types=Alert"
+      },
+      "license": {
+        "spdx_identifier": "ODC-By-1.0",
+        "url": "https://mvgo.org/developers/"
+      },
+      "tags": {
+        "calitp_dataset_id": "recNtUUkE1lTBMuxx,recfVZkAlyiqYJhdN,recyNG5DcdFZTVNf3",
+        "notes": "Transitland instead consumes f-sf~bay~area~rg~rt"
+      }
+    },
+    {
+      "id": "f-9qcs-rosevilletransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cityofroseville.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "static_historic": [
+          "https://iportal.sacrt.com/gtfs/Roseville/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recuSnC10vPfhAAs9"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qcs-rosevilletransit",
+          "name": "Roseville Transit",
+          "website": "https://www.roseville.ca.us/residents/roseville_transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-rosevilletransit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recUdTq5QiUjJRiAe",
+            "twitter_general": "RSVL_Transit",
+            "us_ntd_id": "90168",
+            "wikidata_id": "Q7368740"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-calabasas~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://calabasas.tripshot.com/v1/gtfs.zip",
+        "static_historic": [
+          "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/calabasas-ca-us/calabasas-ca-us.zip",
+          "https://data.trilliumtransit.com/gtfs/calabasas-ca-us/calabasas-ca-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5d5-calabasastransitsystem",
+          "name": "Calabasas Transit System",
+          "website": "https://www.cityofcalabasas.com/government/public-works/transportation-transit/public-transit-services",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-calabasas~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "90257"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-calabasas~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://calabasas.tripshot.com/v1/gtfs/realtime/vehiclePosition",
+        "realtime_trip_updates": "https://calabasas.tripshot.com/v1/gtfs/realtime/tripUpdate",
+        "realtime_alerts": "https://calabasas.tripshot.com/v1/gtfs/realtime/serviceAlert"
+      }
+    },
+    {
+      "id": "f-cgcta~mo~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cgcta.tripshot.com/v1/gtfs/feed/cgcta"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cgcta~mo~us",
+          "name": "Cape Girardeau County Transit Authority",
+          "short_name": "CGCTA",
+          "website": "https://www.cgcta.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-cgcta~mo~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "70051"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-cgcta~mo~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cgcta.tripshot.com/v1/gtfs/realtime/feed/cgcta?types=VehiclePosition",
+        "realtime_trip_updates": "https://cgcta.tripshot.com/v1/gtfs/realtime/feed/cgcta?types=TripUpdate",
+        "realtime_alerts": "https://cgcta.tripshot.com/v1/gtfs/realtime/feed/cgcta?types=Alert"
+      }
+    },
+    {
+      "id": "f-danville~il~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://danvillemasstransit.tripshot.com/v1/gtfs.zip",
+        "static_historic": [
+          "https://www.ridedmt.org/home/showpublisheddocument/1979/638712314709900000",
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/danville-il-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-danville~il~us",
+          "name": "Danville Mass Transit",
+          "short_name": "DMT",
+          "website": "https://www.ridedmt.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-danville~il~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50174",
+            "wikidata_id": "Q115938980"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-danville~il~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://danvillemasstransit.tripshot.com/v1/gtfs/realtime/vehiclePosition",
+        "realtime_trip_updates": "https://danvillemasstransit.tripshot.com/v1/gtfs/realtime/tripUpdate",
+        "realtime_alerts": "https://danvillemasstransit.tripshot.com/v1/gtfs/realtime/serviceAlert"
+      }
+    },
+    {
+      "id": "f-dj6m-okaloosacountytransit~fl~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://okaloosa.tripshot.com/v1/gtfs.zip",
+        "static_historic": [
+          "https://www.ecrider.org/wp-content/uploads/2025/09/Okaloosa-GTFS.zip",
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/refs/heads/master/okaloosa-county-fl.zip",
+          "https://goecrider.com/gtfs",
+          "https://data.trilliumtransit.com/gtfs/okaloosacountytransit-fl-us/okaloosacountytransit-fl-us.zip",
+          "https://www.ecrider.org/wp-content/uploads/Okaloosa-GTFS.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "emerald-coast-rider"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dj6m-emeraldcoastrider",
+          "name": "Okaloosa County Transit",
+          "short_name": "Emerald Coast Rider (ECR)",
+          "website": "http://ecrider.org/",
+          "tags": {
+            "us_ntd_id": "40128",
+            "wikidata_id": "Q7081750"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-lawrence~berkeley~national~lab",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://lbnl.tripshot.com/v1/gtfs.zip"
+      }
+    },
+    {
+      "id": "f-mckinney~avenue~transit~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mata.tripshot.com/v1/gtfs/feed/public"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-mckinney~avenue~transit~authority",
+          "name": "McKinney Avenue Transit Authority",
+          "short_name": "M-Line",
+          "website": "https://www.mata.org/",
+          "tags": {
+            "us_ntd_id": "60133"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-montclairstate~nj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://montclair.tripshot.com/v1/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-montclairstate~nj",
+          "name": "Montclair State University",
+          "website": "https://inside.montclair.edu/administration/university-facilities/shuttle-services",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-montclairstate~nj~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-montclairstate~nj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://montclair.tripshot.com/v1/gtfs/realtime/vehiclePosition",
+        "realtime_trip_updates": "https://montclair.tripshot.com/v1/gtfs/realtime/tripUpdate",
+        "realtime_alerts": "https://montclair.tripshot.com/v1/gtfs/realtime/serviceAlert"
+      }
+    },
+    {
+      "id": "f-princeton~tigertransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://princeton.tripshot.com/v1/gtfs.zip"
+      }
+    },
+    {
+      "id": "f-regional~transportation~authority~of~pima~county",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://sunshuttle.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-regional~transportation~authority~of~pima~county",
+          "name": "Regional Transportation Authority of Pima County",
+          "short_name": "RTA",
+          "website": "https://rtamobility.com/",
+          "tags": {
+            "us_ntd_id": "91122"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-rosevilletransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cityofroseville.tripshot.com/v1/gtfs/realtime/vehiclePosition/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_trip_updates": "https://cityofroseville.tripshot.com/v1/gtfs/realtime/tripUpdate/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_alerts": "https://cityofroseville.tripshot.com/v1/gtfs/realtime/serviceAlert/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec6ZYbM30VjK50bg,recL7GD5aQQMSFx4J,recNmNZ7gq58HboHW"
+      }
+    },
+    {
+      "id": "f-route130connection~nj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://route130connection.tripshot.com/v1/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-route130connection~nj",
+          "name": "Route 130 Connection",
+          "website": "https://gmtma.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-route130connection~nj~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "22944"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-route130connection~nj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://route130connection.tripshot.com/v1/gtfs/realtime/vehiclePosition",
+        "realtime_trip_updates": "https://route130connection.tripshot.com/v1/gtfs/realtime/tripUpdate",
+        "realtime_alerts": "https://route130connection.tripshot.com/v1/gtfs/realtime/serviceAlert"
+      }
+    },
+    {
+      "id": "f-rutgers~nj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rutgers.tripshot.com/v1/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-rutgers~nj",
+          "name": "Rutgers University",
+          "website": "https://ipo.rutgers.edu/dots",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-rutgers~nj~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q7382782"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-rutgers~nj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://rutgers.tripshot.com/v1/gtfs/realtime/vehiclePosition",
+        "realtime_trip_updates": "https://rutgers.tripshot.com/v1/gtfs/realtime/tripUpdate",
+        "realtime_alerts": "https://rutgers.tripshot.com/v1/gtfs/realtime/serviceAlert"
+      }
+    },
+    {
+      "id": "f-sanpedrotrolley~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://sanpedrotrolleys.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "recTVuf4OR6i99gOb"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sanpedrotrolley~ca~us",
+          "name": "San Pedro Trolley",
+          "website": "https://developsanpedro.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sanpedrotrolley~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recJM6YEszIqlBbrb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sanpedrotrolley~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://sanpedrotrolleys.tripshot.com/v1/gtfs/realtime/vehiclePosition/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_trip_updates": "https://sanpedrotrolleys.tripshot.com/v1/gtfs/realtime/tripUpdate/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_alerts": "https://sanpedrotrolleys.tripshot.com/v1/gtfs/realtime/serviceAlert/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec8MJj6vqUlqTbsK,recWHiVQBkVfEo7fl,recPEuiKSqGtMcaLe"
+      }
+    },
+    {
+      "id": "f-ucla~bruinbus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://uclabruinbus.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "recKceooDHiwbVLcW"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ucla~bruinbus",
+          "name": "UCLA BruinBus",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-ucla~bruinbus~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recBW9vkDYWIKPIu4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-ucla~bruinbus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://uclabruinbus.tripshot.com/v1/gtfs/realtime/vehiclePosition/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_trip_updates": "https://uclabruinbus.tripshot.com/v1/gtfs/realtime/tripUpdate/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "realtime_alerts": "https://uclabruinbus.tripshot.com/v1/gtfs/realtime/serviceAlert/CA558DDC-D7F2-4B48-9CAC-DEEA1134F820"
+      },
+      "tags": {
+        "calitp_dataset_id": "recLp16VSxAvuwjBs,recUWdVHfvw2sILFJ,recztu4PlWfwKIGmC"
+      }
+    },
+    {
+      "id": "f-ucsf~shuttle~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ucsf.tripshot.com/v1/gtfs.zip"
+      }
+    }
+  ]
+}

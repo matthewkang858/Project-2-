@@ -1,0 +1,41 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-saintpetersburg~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://transport.orgp.spb.ru/Portal/transport/internalapi/gtfs/realtime/vehicle"
+      }
+    },
+    {
+      "id": "f-udt-петербургский~метрополитен",
+      "supersedes_ids": [
+        "f-udt-Петербургский~метрополитен"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://transport.orgp.spb.ru/Portal/transport/internalapi/gtfs/feed.zip"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-udt-петербургский~метрополитен",
+      "supersedes_ids": [
+        "o-udt-Петербургский~метрополитен"
+      ],
+      "name": "Петербургский метрополитен",
+      "website": "http://orgp.spb.ru/",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-saintpetersburg~rt"
+        },
+        {
+          "gtfs_agency_id": "orgp",
+          "feed_onestop_id": "f-udt-петербургский~метрополитен"
+        }
+      ]
+    }
+  ]
+}

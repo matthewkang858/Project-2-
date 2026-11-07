@@ -1,0 +1,23 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-city~of~cerritos",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/cerritos/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-city~of~cerritos",
+          "name": "Cerritos On Wheels",
+          "short_name": "COW",
+          "website": "http://www.cerritos.us/RESIDENTS/transportation.php",
+          "tags": {
+            "us_ntd_id": "90259"
+          }
+        }
+      ]
+    }
+  ]
+}

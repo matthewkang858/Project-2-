@@ -1,0 +1,68 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u3h4-mpkautobusy~mpktramwaje~dla~sevibussiechnice~dlawiszniama",
+      "name": "Wrocław GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/OtwartyWroclaw_rozklad_jazdy_GTFS.zip",
+        "static_historic": [
+          "https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/1513602900.0_OtwartyWroclaw_rozklad_jazdy_GTFS.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://www.wroclaw.pl/open-data/pages/warunki-wykorzystania#public_no_restriction"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u3h4-dla",
+          "supersedes_ids": [
+            "o-u35g-sevibus~dlamiękinia",
+            "o-u3h4-dla~sevibussiechnice",
+            "o-u3h5-sevibus~dladługołęka",
+            "o-u3h55-dlawiszniamała"
+          ],
+          "name": "Dolnośląskie Linie Autobusowe Sp. z o.o.",
+          "short_name": "DLA",
+          "website": "https://dla.com.pl/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "29"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u3h4-klosok",
+          "name": "KŁOSOK Sp. z o.o. sp. k.",
+          "short_name": "KŁOSOK",
+          "website": "https://klosok.eu/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "28"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u3h4-mpk~wroclaw",
+          "supersedes_ids": [
+            "o-u3h4-mpkautobusy",
+            "o-u3h4-mpktramwaje"
+          ],
+          "name": "Miejskie Przedsiębiorstwo Komunikacyjne Sp. z o.o. (Wrocław)",
+          "short_name": "MPK Wrocław",
+          "website": "https://mpk.wroc.pl/kontakt",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "2"
+            },
+            {
+              "gtfs_agency_id": "3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

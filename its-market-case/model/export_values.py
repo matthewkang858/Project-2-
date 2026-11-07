@@ -29,6 +29,14 @@ for r in range(5, 45):
     lab = wbu.cell(r,1).value
     if lab and wbu.cell(r,2).value is not None: bu[lab] = wbu.cell(r,2).value
 out['bottom_up'] = bu
+out['tiers'] = {k: {'total': ws.cell(r,2).value, 'hw': ws.cell(r,3).value, 'sw': ws.cell(r,4).value, 'svc': ws.cell(r,5).value, 'share': ws.cell(r,6).value} for k, r in m['tier_rows'].items()}
+out['open'] = {k: {'total': ws.cell(r,2).value, 'na': ws.cell(r,3).value, 'eu': ws.cell(r,4).value, 'apac': ws.cell(r,5).value, 'row': ws.cell(r,6).value} for k, r in m['open_rows'].items()}
+out['apps'] = {k: {'value': ws.cell(r,2).value, 'share': ws.cell(r,3).value} for k, r in m['app_rows'].items()}
+out['sens'] = {k: {'haircut': ws.cell(r,1).value, 'bus_pool': ws.cell(r,2).value} for k, r in m['sens_rows'].items()}
+out['forecast_sam'] = {'cagr': wf.cell(f['sam'],5).value, 'values': [wf.cell(f['sam'],c).value for c in range(7,14)]}
+out['bridge'] = [{'label': wf.cell(r,1).value, 'delta': wf.cell(r,2).value, 'running': wf.cell(r,3).value, 'cagr': wf.cell(r,4).value, 'note': wf.cell(r,5).value} for r in range(f['bridge']['start'], f['bridge']['end']+1)]
+wt = wb['Thesis']
+out['thesis'] = {k: wt.cell(r,2).value for k, r in m['thesis'].items()}
 wi = wb['Inputs']
 inputs = {}
 for k, ref in m['inputs'].items():

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9qh-metrolinktrains",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "static_historic": [
+          "https://www.metrolinktrains.com/globalassets/about/mgtfs-may11-2018-sched-v2.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recR28oQlTW8GMJue",
+        "gtfs_data_exchange": "metrolink"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qh-metrolinktrains",
+          "name": "Metrolink",
+          "website": "http://www.metrolinktrains.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "Metrolink"
+            },
+            {
+              "feed_onestop_id": "f-metrolinktrains~alerts~rt"
+            },
+            {
+              "feed_onestop_id": "f-metrolinktrains~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "Metrolink",
+            "us_ntd_id": "90151",
+            "wikidata_id": "Q766647"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-metrolinktrains~alerts~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_alerts": "https://cdn.simplifytransit.com/metrolink/alerts/service-alerts.pb"
+      }
+    },
+    {
+      "id": "f-metrolinktrains~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://metrolink-gtfsrt.gbsdigital.us/feed/gtfsrt-vehicles",
+        "realtime_trip_updates": "https://metrolink-gtfsrt.gbsdigital.us/feed/gtfsrt-trips"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "X-Api-Key",
+        "info_url": "https://metrolinktrains.com/about/gtfs/gtfs-rt-access/"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec4SVs2IXP9qWaAh,recSPEmWO6552VGtQ"
+      }
+    }
+  ]
+}

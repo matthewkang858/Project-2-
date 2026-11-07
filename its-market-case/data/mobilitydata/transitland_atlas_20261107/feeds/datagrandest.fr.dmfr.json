@@ -1,0 +1,195 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-citura~grand~reims",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0031-0000/fluo-grand-est-rei-gtfs.zip",
+        "static_historic": [
+          "https://www.data.gouv.fr/fr/datasets/r/092e2a5c-cc75-462b-ae24-6c667ce6a345"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-grand-reims-mobilites-communaute-urbaine-du-grand-reims"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0fb-transdevreims",
+          "name": "Transdev Reims",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-citura~grand~reims~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-citura~grand~reims~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/fluo-citura-reims-gtfs-rt"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-grand-reims-mobilites-communaute-urbaine-du-grand-reims"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~ardennes",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0045-0000/fluo-grand-est-fluo08-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0045-0000"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~aube",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0046-0000/fluo-grand-est-fluo10-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0046-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~bas~rhin",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0049-0000/fluo-grand-est-fluo67-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0049-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~citéline",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0040-0000/fluo-grand-est-citeline-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0040-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~cmonbus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0006-0000/fluo-grand-est-cht-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0006-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~haute~marne",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0055-0000/fluo-grand-est-fluo52-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/offre-de-transport-du-reseau-fluo-grand-est-52-region-grand-est-dga-mobilites"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~haut~rhin",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0050-0000/fluo-grand-est-fluo68-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0050-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~marne",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0043-0000/fluo-grand-est-fluo51-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0043-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~meurthe~et~moselle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0051-0000/fluo-grand-est-fluo54-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0051-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~meuse",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0048-0000/fluo-grand-est-fluo55-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0048-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~moselle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0052-0000/fluo-grand-est-fluo57-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0052-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~solea",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0014-0000/fluo-grand-est-sitram-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0014-0000-1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0mp-solea",
+          "name": "SOLEA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-fluo~grand~est~solea~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-fluo~grand~est~solea~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/solea-mulhouse-gtfs-rt",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/solea-mulhouse-gtfs-rt-service-alert"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0014-0000-1"
+      }
+    },
+    {
+      "id": "f-fluo~grand~est~vosges",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.datagrandest.fr/metadata/fluo-grand-est/FR-200052264-T0042-0000/fluo-grand-est-fluo88-gtfs.zip"
+      },
+      "license": {
+        "url": "https://transport.data.gouv.fr/datasets/fr-200052264-t0042-0000-1"
+      }
+    }
+  ]
+}

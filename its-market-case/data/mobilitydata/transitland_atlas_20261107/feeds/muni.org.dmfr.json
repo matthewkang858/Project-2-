@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-bdvk-anchoragepeoplemover",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gtfs.muni.org/People_Mover.gtfs.zip"
+      },
+      "license": {
+        "url": "http://www.muni.org/Departments/transit/PeopleMover/Pages/GTFSDiscliamer.aspx",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Data provided courtesy of MOA"
+      },
+      "tags": {
+        "gtfs_data_exchange": "anchorage-people-mover"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bdvk-anchoragepeoplemover",
+          "name": "Anchorage People Mover",
+          "website": "http://www.peoplemover.org/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "Anchorage People Mover",
+              "feed_onestop_id": "f-bdvk-anchoragepeoplemover"
+            },
+            {
+              "feed_onestop_id": "f-peoplemover~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00012",
+            "wikidata_id": "Q7165908"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-peoplemover~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bustracker.muni.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://bustracker.muni.org/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://bustracker.muni.org/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

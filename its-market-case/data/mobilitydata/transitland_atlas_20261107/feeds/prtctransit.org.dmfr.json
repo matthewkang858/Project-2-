@@ -1,0 +1,34 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dqch-prtc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://omniride.com/omniride/assets/File/google_transit.zip"
+      },
+      "license": {
+        "url": "https://omniride.com/about/tools/"
+      },
+      "tags": {
+        "mdb_source_id": "1156"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqch-prtc",
+          "name": "Potomac and Rappahannock Transportation Commission",
+          "short_name": "OmniRide",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-omniride~va~us~flex"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30070",
+            "wikidata_id": "Q7235095"
+          }
+        }
+      ]
+    }
+  ]
+}

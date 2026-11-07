@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-fb6q-metrobus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.metrobustransit.ca/google/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-fb6q-metrobus",
+          "name": "Metrobus",
+          "website": "http://www.metrobus.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "MB"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

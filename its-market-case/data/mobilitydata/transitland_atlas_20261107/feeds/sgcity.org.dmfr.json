@@ -1,0 +1,35 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9qx5-suntran",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://apps.sgcityutah.gov/GTFS_2025-10-13.zip",
+        "static_historic": [
+          "https://enet.sgcity.org/GTFS_2025-10-13.zip",
+          "https://enet.sgcity.org/GTFS_2024-11-20.zip",
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/suntran-st-george-ut-us.zip",
+          "http://www.fivecounty.utah.gov/transit/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "suntran",
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qx5-suntran",
+          "name": "City of St. George",
+          "short_name": "SunTran",
+          "website": "https://sgcityutah.gov/services/suntran_bus_system/",
+          "tags": {
+            "twitter_general": "Cityofstgeorge",
+            "us_ntd_id": "80026",
+            "wikidata_id": "Q19878145"
+          }
+        }
+      ]
+    }
+  ]
+}

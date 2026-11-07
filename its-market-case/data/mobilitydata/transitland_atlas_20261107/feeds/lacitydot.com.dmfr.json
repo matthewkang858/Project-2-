@@ -1,0 +1,63 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q5-ladot",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ladotbus.com/gtfs"
+      },
+      "license": {
+        "url": "http://www.ladottransit.com/dla.html",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec4C3jVlVMVmxiNr"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5-ladot",
+          "name": "Los Angeles Department of Transportation",
+          "short_name": "LADOT",
+          "website": "http://www.ladottransit.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "183"
+            },
+            {
+              "gtfs_agency_id": "30"
+            },
+            {
+              "gtfs_agency_id": "45"
+            },
+            {
+              "gtfs_agency_id": "47"
+            },
+            {
+              "feed_onestop_id": "f-ladot~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec4pgjrmdhCh4z01",
+            "twitter_general": "LADOTofficial",
+            "us_ntd_id": "90147",
+            "wikidata_id": "Q3259703;Q112028960;Q112028995"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-ladot~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://ladotbus.com/gtfs-rt/vehiclepositions",
+        "realtime_trip_updates": "https://ladotbus.com/gtfs-rt/tripupdates",
+        "realtime_alerts": "https://ladotbus.com/gtfs-rt/alerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec5CVgik93TQBtfG,recaTIPA2NdUUM3q2,recpSlwXhVlJXNCIm"
+      }
+    }
+  ]
+}

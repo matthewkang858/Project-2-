@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f25e-societedetransportdelaval",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.stlaval.ca/datas/opendata/GTF_STL.zip",
+        "static_historic": [
+          "http://www.stl.laval.qc.ca/opendata/GTF_STL.zip"
+        ]
+      },
+      "license": {
+        "url": "https://stlaval.ca/a-propos/diffusion/donnees-ouvertes",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "societe-de-transport-de-laval"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f25e-societedetransportdelaval",
+          "name": "Société de transport de Laval",
+          "short_name": "STL",
+          "website": "https://stlaval.ca",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STL"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3488029"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-qqgfq-pemerintahkotabogorangkotankota",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://michielbdejong.com/angkots-gtfs.zip"
+      },
+      "license": {
+        "url": "https://creativecommons.org/share-your-work/public-domain/cc0/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-qqgfq-pemerintahkotabogorangkotankota",
+          "name": "Pemerintah Kota Bogor angkotan kota",
+          "website": "http://kotabogor.go.id/index.php/rute",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "DLLAJ"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

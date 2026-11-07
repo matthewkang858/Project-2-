@@ -1,0 +1,51 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpwz-guelphtransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://drive.usercontent.google.com/download?id=1SsCgQ0agO_EONavJoOuBPMlbcu2VcUs4&export=download",
+        "static_historic": [
+          "https://gismaps.guelph.ca/Pages/GTFS/google_transit.zip",
+          "http://guelph.ca/uploads/google/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://explore.guelph.ca/pages/terms-of-use"
+      },
+      "tags": {
+        "gtfs_data_exchange": "guelph-transit",
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpwz-guelphtransit",
+          "name": "Guelph Transit",
+          "website": "http://guelph.ca/transit",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "GT",
+              "feed_onestop_id": "f-dpwz-guelphtransit"
+            },
+            {
+              "feed_onestop_id": "f-guelph~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q5614797"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-guelph~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://glphprdtmgtfs.glphtrpcloud.com/tmgtfsrealtimewebservice/vehicle/vehiclepositions.pb",
+        "realtime_trip_updates": "https://glphprdtmgtfs.glphtrpcloud.com/tmgtfsrealtimewebservice/tripupdate/tripupdates.pb",
+        "realtime_alerts": "https://glphprdtmgtfs.glphtrpcloud.com/tmgtfsrealtimewebservice/alert/alerts.pb"
+      }
+    }
+  ]
+}

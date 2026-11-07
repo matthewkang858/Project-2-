@@ -1,0 +1,55 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-gbqu-semitan",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.nantesmetropole.fr/explore/dataset/244400404_transports_commun_naolib_nantes_metropole_gtfs/files/0cc0469a72de54ee045cb66d1a21de9e/download/",
+        "static_historic": [
+          "https://data.nantesmetropole.fr/explore/dataset/244400404_tan-arrets-horaires-circuits/files/16a1a0af5946619af621baa4ad9ee662/download/"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transports-collectifs-naolib",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-gbqu-semitan",
+          "name": "Société d'Economie Mixte des Transports de l'Agglomération Nantaise",
+          "short_name": "TAN",
+          "website": "http://www.tan.fr",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-gbqu-semitan~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q17519150"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-gbqu-semitan~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/naolib-nantes-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/naolib-nantes-gtfs-rt-alerts"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transports-collectifs-naolib"
+      }
+    }
+  ]
+}

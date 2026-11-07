@@ -1,0 +1,25 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0j-atap",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.magellanoprogetti.it/atap/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0j-atapspa",
+          "name": "Azienda Trasporti Automobilistici Pubblici delle Province di Biella e Vercelli",
+          "short_name": "ATAP",
+          "website": "http://www.atapspa.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ITRP-AG000005"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

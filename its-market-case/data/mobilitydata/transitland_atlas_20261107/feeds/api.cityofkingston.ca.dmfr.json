@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-drce-kingstontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api.cityofkingston.ca/gtfs/gtfs.zip"
+      },
+      "license": {
+        "url": "https://www.cityofkingston.ca/documents/10180/144997/GIS_OpenDataLicense.pdf/72f5a9ac-afbc-4fe3-959d-9111c9393bfa",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Contains information licensed under the Open Data Licence – City of Kingston."
+      },
+      "tags": {
+        "gtfs_data_exchange": "kingston-transit"
+      }
+    },
+    {
+      "id": "f-kingston~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.cityofkingston.ca/gtfs-realtime/vehicleupdates.pb",
+        "realtime_trip_updates": "https://api.cityofkingston.ca/gtfs-realtime/tripupdates.pb",
+        "realtime_alerts": "https://api.cityofkingston.ca/gtfs-realtime/alerts.pb"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-drce-kingstontransit",
+      "name": "Kingston Transit",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-drce-kingstontransit"
+        },
+        {
+          "feed_onestop_id": "f-kingston~rt"
+        }
+      ],
+      "tags": {
+        "us_ntd_id": "20191",
+        "wikidata_id": "Q6413628"
+      }
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-airpullman~spa",
+      "supersedes_ids": [
+        "f-airpullmanspa"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://usbshare.agenziatpl.it/index.php/s/dtBsk3WDE7NSFXb/download",
+        "static_historic": [
+          "https://usbshare.agenziatpl.it/index.php/s/NCX252ombsxjzzz/download/2025-01-03_Airpullman.zip",
+          "https://usbshare.agenziatpl.it/index.php/s/NCX252ombsxjzzz/download",
+          "https://usbshare.agenziatpl.it/index.php/s/yZm7PHy5T63p7tT",
+          "https://usbshare.agenziatpl.it/index.php/s/NbJofBZHDt9ba5a/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.agenziatpl.it/open-data/gtfs",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-airpullmanspa",
+          "name": "AirPullman",
+          "short_name": "AP",
+          "website": "https://www.airpullmanspa.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "AI"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-movibus~srl",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://usbshare.agenziatpl.it/index.php/s/jYyMt4YGDtdwfRp/download",
+        "static_historic": [
+          "https://usbshare.agenziatpl.it/index.php/s/awfA3t8jy3D46dM/download/2025-01-17_Movibus.zip",
+          "https://usbshare.agenziatpl.it/index.php/s/awfA3t8jy3D46dM",
+          "https://usbshare.agenziatpl.it/index.php/s/sQagm5K9qnnodjM",
+          "https://usbshare.agenziatpl.it/index.php/s/JPEynNb5JdzkKjA/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.agenziatpl.it/open-data/gtfs"
+      },
+      "tags": {
+        "unstable_url": "true"
+      }
+    },
+    {
+      "id": "f-net~nord~est~trasporti",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://usbshare.agenziatpl.it/index.php/s/m7xRwZY5mG2wpfx/download",
+        "static_historic": [
+          "https://usbshare.agenziatpl.it/index.php/s/k3Aera76R2BYjit/download/2025-04-30_NET.zip",
+          "https://usbshare.agenziatpl.it/index.php/s/Ps6wzT2aqEQk64r/download",
+          "https://usbshare.agenziatpl.it/index.php/s/XFHHHckZCs96XyR",
+          "https://usbshare.agenziatpl.it/index.php/s/qxsEya5ct7Ybepi",
+          "https://usbshare.agenziatpl.it/index.php/s/QFoa9H97KBJJFCR/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.agenziatpl.it/open-data/gtfs"
+      },
+      "tags": {
+        "unstable_url": "true"
+      }
+    },
+    {
+      "id": "f-pmt~pavia~milano~trasporti~srl",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://usbshare.agenziatpl.it/index.php/s/r93xAJ3f3KtnRF9/download",
+          "https://usbshare.agenziatpl.it/index.php/s/27tGrgCyfoB57re"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.agenziatpl.it/open-data/gtfs"
+      }
+    },
+    {
+      "id": "f-stav~spa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://usbshare.agenziatpl.it/index.php/s/dBEqMy7skGYZawS/download",
+        "static_historic": [
+          "https://usbshare.agenziatpl.it/index.php/s/PyRcXcc2iim7zof/download",
+          "https://usbshare.agenziatpl.it/index.php/s/T6WcmLD523eFEDZ",
+          "https://usbshare.agenziatpl.it/index.php/s/7TrBKenKYt9abnH/download"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.agenziatpl.it/open-data/gtfs"
+      },
+      "tags": {
+        "unstable_url": "true"
+      }
+    }
+  ]
+}

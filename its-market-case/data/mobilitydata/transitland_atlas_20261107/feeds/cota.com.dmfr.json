@@ -1,0 +1,51 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-cota~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs-rt.cota.vontascloud.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://gtfs-rt.cota.vontascloud.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "https://gtfs-rt.cota.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+      }
+    },
+    {
+      "id": "f-dphg-centralohiotransitauthority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.cota.com/data/cota.gtfs.zip"
+      },
+      "license": {
+        "url": "http://www.cota.com/data",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "central-ohio-transit-authority"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dphg-centralohiotransitauthority",
+      "name": "Central Ohio Transit Authority",
+      "short_name": "COTA",
+      "website": "http://www.cota.com",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-cota~rt"
+        },
+        {
+          "gtfs_agency_id": "COTA",
+          "feed_onestop_id": "f-dphg-centralohiotransitauthority"
+        }
+      ],
+      "tags": {
+        "twitter_general": "COTABus",
+        "us_ntd_id": "50016",
+        "wikidata_id": "Q5061543"
+      }
+    }
+  ]
+}

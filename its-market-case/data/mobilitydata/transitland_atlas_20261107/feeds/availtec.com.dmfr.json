@@ -1,0 +1,120 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9ydy-wichitatransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus.wichitatransit.org/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/blob/master/wichita-transit.zip?raw=true"
+        ]
+      },
+      "license": {
+        "url": "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/blob/master/wichita-transit-license.pdf",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9ydy-wichitatransit",
+          "name": "Wichita Transit",
+          "website": "http://www.wichitatransit.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9ydy-wichitatransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "wichitatransit",
+            "us_ntd_id": "70015",
+            "wikidata_id": "Q7998172"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9ydy-wichitatransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    },
+    {
+      "id": "f-dprp-eriemetropolitantransitauthority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://emta.availtec.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/eriemta-pa-us/eriemta-pa-us.zip"
+        ]
+      },
+      "license": {
+        "url": "https://ride-the-e.com/developerlicenseagreement/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dprp-eriemetropolitantransitauthority",
+          "name": "Erie Metropolitan Transit Authority",
+          "short_name": "EMTA",
+          "website": "http://www.ride-the-e.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dprp-eriemetropolitantransitauthority~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ride_the_e",
+            "us_ntd_id": "30013",
+            "wikidata_id": "Q5388327"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dprp-eriemetropolitantransitauthority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://emta.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://emta.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://emta.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      },
+      "license": {
+        "url": "https://ride-the-e.com/developerlicenseagreement/"
+      }
+    },
+    {
+      "id": "f-wave~mobile~al~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://realtimemobile.availtec.com/infopoint/gtfs-zip.ashx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-wave~mobile~al~us",
+          "name": "City of Mobile",
+          "short_name": "The Wave Transit System",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-wave~mobile~al~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40043"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-wave~mobile~al~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

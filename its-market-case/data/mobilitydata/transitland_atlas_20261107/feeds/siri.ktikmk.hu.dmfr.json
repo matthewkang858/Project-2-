@@ -1,0 +1,25 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u2wc-mvkzrt",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gtfs.cdata.hu/mvkzrt.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u2wc-mvkzrt",
+          "name": "Miskolc Városi Közlekedési",
+          "short_name": "MVK",
+          "website": "http://www.mvkzrt.hu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "31"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

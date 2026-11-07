@@ -1,0 +1,54 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-tulare~county~regional~transit~agency",
+      "supersedes_ids": [
+        "f-tulare~time",
+        "f-tulare~tcat"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.peaktransit.com/staticgtfs/120/gtfs.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/tcrta-ca-us/tcrta-ca-us.zip",
+          "https://tularecog.org/tcag/data-gis-modeling/gtfs-data/tulare-county-regional-transit-agency-tcrta-gtfs/"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recTGHiEo7XvyY4EG"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-tulare~county~regional~transit~agency",
+          "supersedes_ids": [
+            "o-tulare~tcat"
+          ],
+          "name": "Tulare County Regional Transit Agency",
+          "short_name": "TCRTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-tulare~county~regional~transit~agency~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec4YWVqVwJ9XqDbq",
+            "us_ntd_id": "90310",
+            "wikidata_id": "Q110722692"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-tulare~county~regional~transit~agency~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://data.peaktransit.com/gtfsrt/120/VehiclePosition.pb",
+        "realtime_trip_updates": "http://data.peaktransit.com/gtfsrt/120/TripUpdate.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "recUQFCoz1WLL5Tbv,recVb2zyyp4OmoQNG"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-lawrence~county~transit~oh~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ilcao.org/wp-content/uploads/2026/06/Fw_-Zip-File.zip",
+        "static_historic": [
+          "http://www.ilcao.org/wp-content/uploads/2024/06/LCTFeed.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-lawrence~county~transit~oh~us",
+          "name": "Lawrence County Transit",
+          "website": "https://lawrencecountytransit.com",
+          "tags": {
+            "us_ntd_id": "50186"
+          }
+        }
+      ]
+    }
+  ]
+}

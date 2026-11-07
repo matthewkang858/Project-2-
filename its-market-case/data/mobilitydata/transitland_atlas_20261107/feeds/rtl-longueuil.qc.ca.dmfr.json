@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f25f-rseaudetransportdelongueuil",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.rtl-longueuil.qc.ca/transit/latestfeed/RTL.zip"
+      },
+      "license": {
+        "url": "https://www.rtl-longueuil.qc.ca/en-CA/open-data/"
+      },
+      "tags": {
+        "gtfs_data_exchange": "rseau-de-transport-de-longueuil"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f25f-rseaudetransportdelongueuil",
+          "name": "Réseau de transport de Longueuil",
+          "short_name": "RTL",
+          "website": "http://www.rtl-longueuil.qc.ca",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "RTL"
+            },
+            {
+              "feed_onestop_id": "f-f25f-rseaudetransportdelongueuil~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3456767"
+          }
+        }
+      ]
+    }
+  ]
+}

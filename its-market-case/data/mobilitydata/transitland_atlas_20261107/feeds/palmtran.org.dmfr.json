@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhx-palmtran",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.palmtran.org/feed/google_transit.zip"
+      },
+      "license": {
+        "url": "https://ftis.org/FTDEDisclaimer.aspx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "palm-tran"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhx-palmtran",
+          "name": "Palm Tran",
+          "website": "http://www.palmtran.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "0"
+            },
+            {
+              "feed_onestop_id": "f-dhx-palmtran~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "palm_tran",
+            "us_ntd_id": "40037",
+            "wikidata_id": "Q7128083"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dhx-palmtran~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://www.palmtran.org/TripPlanner/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://www.palmtran.org/TripPlanner/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://www.palmtran.org/TripPlanner/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

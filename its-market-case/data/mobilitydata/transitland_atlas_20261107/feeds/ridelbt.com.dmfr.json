@@ -1,0 +1,67 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q5b-longbeachtransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/14866/google_transit.zip",
+        "static_historic": [
+          "https://drive.google.com/uc?export=download&id=1869EVa1z6m_iD6QmvRXyTHtYiaSUBROl",
+          "https://lbtransit.box.com/shared/static/aoyeskwmsa9g7pyg78q3xuioi0lgqe4f.zip",
+          "https://lbtransit.box.com/shared/static/a29r6bewfz8xnxjyd9w16orcz4d0zect.zip"
+        ]
+      },
+      "license": {
+        "url": "https://ridelbt.com/gtfs-feed/"
+      },
+      "tags": {
+        "calitp_dataset_id": "recCv3CF4elAx0dUg",
+        "gtfs_data_exchange": "long-beach-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5b-longbeachtransit",
+          "name": "Long Beach Transit",
+          "short_name": "LBT",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9q5b-longbeachtransit~water~taxi"
+            },
+            {
+              "feed_onestop_id": "f-longbeachtransit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec00qSzZL8KqiXAo",
+            "twitter_general": "lbtransit",
+            "us_ntd_id": "90023",
+            "wikidata_id": "Q6672372"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q5b-longbeachtransit~water~taxi",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://drive.google.com/uc?export=download&id=1RLNOptEwnCI1HQNvoFIhE8ZWPQQGuYk9"
+      },
+      "tags": {
+        "calitp_dataset_id": "recKMsaeOTscGTXKa"
+      }
+    },
+    {
+      "id": "f-longbeachtransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs-rt.lbt.vontascloud.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://gtfs-rt.lbt.vontascloud.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "https://gtfs-rt.lbt.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "reccG2CnUkZZ2Dnq3,recmkAfXaniBaoxCy,recW9f9tedv2oE5j0"
+      }
+    }
+  ]
+}

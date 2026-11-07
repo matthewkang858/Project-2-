@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-grand~poitiers~vitalis",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.grandpoitiers.fr/data-fair/api/v1/datasets/offre-de-transport-du-reseau-vitalis/metadata-attachments/gtfs.zip",
+        "static_historic": [
+          "https://data.grandpoitiers.fr/api/v2/catalog/datasets/mobilite-arret-services-theoriques-bus-hiver/files/400d7da94eaacb5e52c612f8ac28e420"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/mobilite-offre-de-transport-du-reseau-bus-gtfs-gtfs-rt"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-grand~poitiers~vitalis",
+          "name": "VITALIS",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-grand~poitiers~vitalis~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q2872528"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-grand~poitiers~vitalis~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://data.grandpoitiers.fr/data-fair/api/v1/datasets/offre-de-transport-du-reseau-vitalis/metadata-attachments/poitiers.pbf"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/mobilite-offre-de-transport-du-reseau-bus-gtfs-gtfs-rt"
+      }
+    }
+  ]
+}

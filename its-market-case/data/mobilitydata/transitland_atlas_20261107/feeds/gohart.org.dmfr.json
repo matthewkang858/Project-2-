@@ -1,0 +1,43 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhv-hillsborougharearegionaltransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.gohart.org/google/google_transit.zip"
+      },
+      "license": {
+        "url": "https://ftis.org/FTDEDisclaimer.aspx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "hillsborough-area-regional-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhv-hillsborougharearegionaltransit",
+          "name": "Hillsborough Area Regional Transit",
+          "short_name": "HART",
+          "website": "http://www.gohart.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-dhv-hillsborougharearegionaltransit~rt"
+            },
+            {
+              "feed_onestop_id": "f-dhv-hillsborougharearegionaltransit~streetcar~rt"
+            }
+          ],
+          "tags": {
+            "omd_provider_id": "hillsborough-area-regional-transit",
+            "twitter_general": "goHART",
+            "us_ntd_id": "40041",
+            "wikidata_id": "Q5763656"
+          }
+        }
+      ]
+    }
+  ]
+}

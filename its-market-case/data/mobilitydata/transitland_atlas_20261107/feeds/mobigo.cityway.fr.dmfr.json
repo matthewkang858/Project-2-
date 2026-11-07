@@ -1,0 +1,103 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-mobigo~côte~dor",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT21",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT21"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~doubs",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT25",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT25"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~haute~saône",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT70",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT70"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~jura",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT39",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT39"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~nièvre",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT58",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT58"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~saône~et~loire",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT71",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT71"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    },
+    {
+      "id": "f-mobigo~yonne",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://exs.mobigo2.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT89",
+        "static_historic": [
+          "https://exs.mobigo.cityway.fr/gtfs.aspx?key=OPENDATA&operatorCode=UT89"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/reseau-de-transport-interurbain-mobigo-en-bourgogne-franche-comte"
+      }
+    }
+  ]
+}

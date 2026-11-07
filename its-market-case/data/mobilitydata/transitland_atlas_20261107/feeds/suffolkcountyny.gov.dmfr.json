@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-drk-ny~suffolkcountytransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://tracksctbus.org/gtfs",
+        "static_historic": [
+          "https://www.suffolkcountyny.gov/Portals/0/formsdocs/publicworks/Zip/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.suffolkcountyny.gov/Departments/Public-Works/Transportation/General-Transit-Feed-Specification-Details"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-drk-ny~suffolkcountytransit",
+          "name": "Suffolk County Transit",
+          "short_name": "SCT",
+          "website": "http://www.sctbus.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "262"
+            },
+            {
+              "gtfs_agency_id": "265"
+            },
+            {
+              "gtfs_agency_id": "272"
+            },
+            {
+              "feed_onestop_id": "f-drk-ny~suffolkcountytransit~rt"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://www.suffolkcountyny.gov/Departments/Public-Works/Transportation/General-Transit-Feed-Specification-Details",
+            "twitter_general": "SCTBusInfo",
+            "us_ntd_id": "20072",
+            "wikidata_id": "Q7634561"
+          }
+        }
+      ]
+    }
+  ]
+}

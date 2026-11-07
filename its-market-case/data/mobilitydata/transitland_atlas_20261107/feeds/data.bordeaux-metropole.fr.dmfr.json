@@ -1,0 +1,57 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ezzx-tbc",
+      "supersedes_ids": [
+        "f-ezzx-tbc~bus"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bdx.mecatran.com/utw/ws/gtfsfeed/static/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt",
+        "static_historic": [
+          "http://data.bordeaux-metropole.fr/files.php?gid=67&format=14"
+        ]
+      },
+      "license": {
+        "url": "https://www.etalab.gouv.fr/licence-ouverte-open-licence/"
+      }
+    },
+    {
+      "id": "f-ezzx-tbc~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bdx.mecatran.com/utw/ws/gtfsfeed/vehicles/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt",
+        "realtime_trip_updates": "https://bdx.mecatran.com/utw/ws/gtfsfeed/realtime/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt",
+        "realtime_alerts": "https://bdx.mecatran.com/utw/ws/gtfsfeed/alerts/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt"
+      },
+      "license": {
+        "url": "https://www.etalab.gouv.fr/licence-ouverte-open-licence/"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-ezzx-tbc",
+      "supersedes_ids": [
+        "o-tbm"
+      ],
+      "name": "Transports Bordeaux Métropole",
+      "short_name": "TBM",
+      "website": "http://www.infotbm.com",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "1",
+          "feed_onestop_id": "f-ezzx-tbc"
+        },
+        {
+          "feed_onestop_id": "f-ezzx-tbc~rt"
+        },
+        {
+          "gtfs_agency_id": "BORDEAUX_METROPOLE:Operator:TBM",
+          "feed_onestop_id": "f-naq~pigma"
+        }
+      ]
+    }
+  ]
+}

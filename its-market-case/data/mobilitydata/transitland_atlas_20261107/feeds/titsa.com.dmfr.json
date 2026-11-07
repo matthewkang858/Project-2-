@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-eth-tenerife~titsa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.titsa.com/Google_transit.zip"
+      },
+      "license": {
+        "url": "http://www.tenerifedata.com/dataset/titsa-informacion-sobre-sistema-de-transporte"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-eth-tenerife~titsa",
+          "name": "TITSA",
+          "website": "http://www.titsa.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

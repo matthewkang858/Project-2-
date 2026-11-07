@@ -1,0 +1,130 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-addis~ababa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/addis-ababa/-/raw/master/Addis%20Ababa%20GTFS_2023/et-addisababa.zip"
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://gitlab.com/digitaltransport/data/africa/addis-ababa/-/blob/master/Addis%20Ababa%20GTFS_2023/README.md",
+        "share_alike_optional": "no"
+      }
+    },
+    {
+      "id": "f-bamako~sotrama",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/bamako/-/raw/main/gtfs_Public_Transport_Bamako_Sotrama_01_01_2020_06_42_48.zip"
+      },
+      "license": {
+        "url": "https://gitlab.com/digitaltransport/data/africa/bamako"
+      },
+      "tags": {
+        "unstable_url": "true"
+      }
+    },
+    {
+      "id": "f-ebvn-grand~abidjan",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/abidjan/raw/master/Donn%C3%A9es/abidjan.zip"
+      },
+      "languages": [
+        "fr"
+      ],
+      "license": {
+        "url": "https://opendatacommons.org/licenses/odbl/index.html",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Jungle Bus © OpenStreetMap contributors"
+      }
+    },
+    {
+      "id": "f-ebzz-amadepartmentoftransport",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/accra/raw/master/GTFS/GTFS_Accra.zip"
+      },
+      "license": {
+        "url": "https://opendatacommons.org/licenses/odbl/index.html",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Jungle Bus © OpenStreetMap contributors"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ebzz-amadepartmentoftransport",
+          "name": "AMA Department of Transport",
+          "website": "https://ama.gov.gh/department-details.php?d=MTU=",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "AMA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-kigali~dry",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/kigali/-/raw/main/GTFS%20Datasets/Kigali_GTFS.zip"
+      },
+      "license": {
+        "url": "https://gitlab.com/digitaltransport/data/africa/kigali/-/blob/main/README.md"
+      }
+    },
+    {
+      "id": "f-kinshasa~dry",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/kinshasa/-/raw/main/GTFS%20Datasets/Kinshasa_GTFS.zip"
+      },
+      "license": {
+        "url": "https://gitlab.com/digitaltransport/data/africa/kinshasa/-/blob/main/README.md"
+      }
+    },
+    {
+      "id": "f-kzf-nairobi~saccos",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/nairobi/-/raw/master/Data/GTFS.zip",
+        "static_historic": [
+          "http://www.s-e-w.net/nairobi/2017_Jan.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-kzf-nairobi~saccos",
+          "name": "Approved SACCOs of Nairobi as mapped by University of Nairobi C4D Lab",
+          "website": "http://www.digitalmatatus.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "UON"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-s0wz-socatur~taxisco",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gitlab.com/digitaltransport/data/africa/douala/-/raw/master/GTFS-SYSTRA/GTFS-SYSTRA.zip",
+        "static_historic": [
+          "https://git.digitaltransport4africa.org/places/douala/raw/master/GTFS-SYSTRA/GTFS-SYSTRA.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://gitlab.com/digitaltransport/data/africa/douala/-/blob/master/LICENSE",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "share_alike_optional": "no"
+      }
+    }
+  ]
+}

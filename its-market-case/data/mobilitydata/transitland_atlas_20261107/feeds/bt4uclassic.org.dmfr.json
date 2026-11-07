@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dnwg-blacksburgtransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.bt4uclassic.org/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnwg-blacksburgtransit",
+          "name": "Blacksburg Transit",
+          "short_name": "BT",
+          "tags": {
+            "twitter_general": "Ride_BT",
+            "us_ntd_id": "30091",
+            "wikidata_id": "Q4923343"
+          }
+        }
+      ]
+    }
+  ]
+}

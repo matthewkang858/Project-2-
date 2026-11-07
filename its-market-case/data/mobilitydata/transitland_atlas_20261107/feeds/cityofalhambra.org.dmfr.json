@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-alhambra~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/alhambraca/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://www.cityofalhambra.org/DocumentCenter/View/4979/alhambra-ca-us",
+          "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/alhambra-ca-us/alhambra-ca-us.zip",
+          "http://data.trilliumtransit.com/gtfs/alhambra-ca-us/alhambra-ca-us.zip",
+          "https://www.alhambraca.gov/DocumentCenter/View/6743/Alhambra-ACT-Bus-GTFS"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recOgBQUWhLBMXWji"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5cz-alhambracommunitytransit",
+          "name": "Alhambra Community Transit",
+          "short_name": "ACT",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-alhambra~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recNaKvzVQhGX1puu",
+            "us_ntd_id": "90247"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-alhambra~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/alhambraca/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/alhambraca/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/alhambraca/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recSU0ONiQzKzN3rw,recygwAZOv9pklgfb,rec72alUxsvIfDiL3"
+      }
+    }
+  ]
+}

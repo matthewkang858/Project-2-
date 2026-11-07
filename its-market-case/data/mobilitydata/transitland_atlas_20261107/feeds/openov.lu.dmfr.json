@@ -1,0 +1,89 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0-openov~lu",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/20261105-053451/gtfs-20261104-20261212.zip",
+        "static_historic": [
+          "http://openov.lu/data/gtfs/gtfs-openov-lu.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://data.public.lu/en/datasets/horaires-et-arrets-des-transport-publics-gtfs/",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "udata_dataset": "horaires-et-arrets-des-transport-publics-gtfs",
+        "udata_host": "data.public.lu",
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0-cfl",
+          "name": "Société Nationale des Chemins de Fer Luxembourgeois",
+          "short_name": "CFL",
+          "website": "http://cfl.lu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "11"
+            },
+            {
+              "gtfs_agency_id": "171"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0u-rgtr",
+          "name": "Régime Général des Transports Routiers",
+          "short_name": "RGTR",
+          "website": "http://mobiliteit.lu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0u1-tice",
+          "name": "Transport intercommunal de personnes dans le canton d'Esch-sur-Alzette",
+          "short_name": "TICE",
+          "website": "http://tice.lu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "16"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0u6-avl",
+          "name": "Autobus de la Ville de Luxembourg",
+          "short_name": "AVL",
+          "website": "http://autobus.lu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "6"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0u6-luxtram",
+          "name": "Luxtram S.A.",
+          "short_name": "Luxtram",
+          "website": "https://www.luxtram.lu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "111"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q108822589"
+          }
+        }
+      ]
+    }
+  ]
+}

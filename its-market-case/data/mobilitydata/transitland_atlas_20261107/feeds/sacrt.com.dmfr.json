@@ -1,0 +1,127 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9qcd-etranelkgrove",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://apps.sacrt.com/gtfs/eg/google_transit.zip",
+        "static_historic": [
+          "https://iportal.sacrt.com/gtfs/eg/google_transit.zip",
+          "https://elkgrovetransit.com/gtfs"
+        ]
+      },
+      "license": {
+        "url": "https://www.sacrt.com/gtfs/"
+      },
+      "tags": {
+        "calitp_dataset_id": "recDgiFPF6QarohKQ"
+      }
+    },
+    {
+      "id": "f-9qcd-etranelkgrove~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bustime.sacrt.com/EG_gtfsrt/vehicles",
+        "realtime_trip_updates": "https://bustime.sacrt.com/EG_gtfsrt/trips",
+        "realtime_alerts": "https://bustime.sacrt.com/EG_gtfsrt/alerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recvqxsAHSHA7Mcl5,recsM3EsZxgqQ4ynj,rec7ahAuuYhRbWvg5"
+      }
+    },
+    {
+      "id": "f-9qce-sacramentoregionaltransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://apps.sacrt.com/gtfs/srtd/google_transit.zip",
+        "static_historic": [
+          "https://iportal.sacrt.com/gtfs/SRTD/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "http://www.sacrt.com/schedules/gtfs.aspx",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "recbzZQUIdMmFvm1r",
+        "gtfs_data_exchange": "sacramento-regional-transit"
+      }
+    },
+    {
+      "id": "f-9qce-sacramentoregionaltransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bustime.sacrt.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://bustime.sacrt.com/gtfsrt/trips",
+        "realtime_alerts": "https://bustime.sacrt.com/gtfsrt/alerts"
+      },
+      "license": {
+        "url": "http://www.sacrt.com/schedules/gtfs.aspx",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "recTFThXtwGvqMmGK,recf964nGiOYSbKQg,recn4bCQFpQMD2PPv"
+      }
+    },
+    {
+      "id": "f-southcountytransitlink~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://apps.sacrt.com/gtfs/SCTLink/google_transit.zip",
+        "static_historic": [
+          "https://iportal.sacrt.com/gtfs/SCTLink/google_transit.zip",
+          "http://iportal.sacrt.com/gtfs/SCTLink/southcountytransitlink-ca-us.zip",
+          "https://data.trilliumtransit.com/gtfs/southcountytransitlink-ca-us/southcountytransitlink-ca-us.zip"
+        ]
+      },
+      "license": {
+        "url": "http://www.sacrt.com/schedules/gtfs.aspx"
+      },
+      "tags": {
+        "calitp_dataset_id": "recKYQPnCKuxQQ1B9"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qc-southcountytransitlink",
+          "name": "South County Transit Link",
+          "short_name": "SCT Link",
+          "website": "http://www.sctlink.com/",
+          "tags": {
+            "calitp_organization_id": "recsrpnpj2oZXBvE6",
+            "us_ntd_id": "90216",
+            "wikidata_id": "Q96406074"
+          }
+        }
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9qce-sacramentoregionaltransit",
+      "name": "Sacramento Regional Transit",
+      "short_name": "SacRT",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9qcd-etranelkgrove"
+        },
+        {
+          "feed_onestop_id": "f-9qcd-etranelkgrove~rt"
+        },
+        {
+          "feed_onestop_id": "f-9qce-sacramentoregionaltransit"
+        },
+        {
+          "feed_onestop_id": "f-9qce-sacramentoregionaltransit~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "RideSacRT",
+        "us_ntd_id": "90019",
+        "wikidata_id": "Q7397015"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-et5-transportesinsularlapalma",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/a00541a34b4b432aa7c9937f34b3e19e/data",
+        "static_historic": [
+          "http://www.files.opendatalapalma.es/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-et5-transportesinsularlapalma",
+          "name": "Transportes Insular La Palma",
+          "website": "http://transporteslapalma.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "5253"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dhx-tri~rail",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.tri-rail.com/gtfs.zip",
+        "static_historic": [
+          "https://www.tri-rail.com/gtdf/google_transit.zip",
+          "http://www.tri-rail.com/GTDF/Current/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "tri-rail"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhx-tri~rail",
+          "name": "South Florida Regional Transportation Authority",
+          "short_name": "Tri-Rail",
+          "website": "http://tri-rail.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dhx-tri~rail~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "Tri_Rail",
+            "us_ntd_id": "40077",
+            "wikidata_id": "Q2452212"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dhx-tri~rail~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://gtfsr.tri-rail.com/download.aspx?file=position_updates.pb",
+        "realtime_trip_updates": "http://gtfsr.tri-rail.com/download.aspx?file=trip_updates.pb",
+        "realtime_alerts": "http://gtfsr.tri-rail.com/download.aspx?file=alerts.pb"
+      }
+    }
+  ]
+}

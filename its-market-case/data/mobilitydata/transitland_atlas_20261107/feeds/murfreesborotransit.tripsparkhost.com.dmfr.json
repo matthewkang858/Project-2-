@@ -1,0 +1,22 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-murfreesboro~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://murfreesborotransit.tripsparkhost.com/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-city~of~murfreesboro",
+          "name": "City of Murfreesboro",
+          "website": "http://www.murfreesborotn.gov/248/Public-Transit---Rover-Bus-System",
+          "tags": {
+            "us_ntd_id": "40186"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dqchv-alexandriatransitcompanydash",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.dashbus.com/google_transit.zip",
+        "static_historic": [
+          "https://dashbus.com/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqchv-alexandriatransitcompanydash",
+          "name": "Alexandria Transit Company",
+          "short_name": "DASH",
+          "website": "http://www.dashbus.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dqchv-alexandriatransitcompanydash~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "dashbus",
+            "us_ntd_id": "30071",
+            "wikidata_id": "Q5204322"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dqchv-alexandriatransitcompanydash~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/alexandria-dash/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/alexandria-dash/gtfs-rt-trip-updates",
+        "realtime_alerts": "https://api.goswift.ly/real-time/alexandria-dash/gtfs-rt-alerts"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0sr-lemet~proxis",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.lemet.fr/documents/LEMET-gtfs.zip",
+        "static_historic": [
+          "https://si.metzmetropole.fr/fiches/opendata/gtfs_current.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fichiers-gtfs-eurometropole-de-metz"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0sr-lemet",
+          "name": "LE MET'",
+          "website": "http://lemet.fr",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "TAMM"
+            },
+            {
+              "feed_onestop_id": "f-u0sr-lemet~proxis~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-u0sr-lemet~proxis~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://proxy.transport.data.gouv.fr/resource/lemet-metz-gtfs-rt-vehicle-position",
+        "realtime_trip_updates": "https://proxy.transport.data.gouv.fr/resource/lemet-metz-gtfs-rt-trip-update",
+        "realtime_alerts": "https://proxy.transport.data.gouv.fr/resource/lemet-metz-gtfs-rt-service-alert"
+      },
+      "license": {
+        "spdx_identifier": "etalab-2.0",
+        "url": "https://transport.data.gouv.fr/datasets/fichiers-gtfs-eurometropole-de-metz"
+      }
+    }
+  ]
+}

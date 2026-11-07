@@ -1,0 +1,45 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpsc-detroitdepartmentoftransportation",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip"
+      },
+      "license": {
+        "url": "https://data.detroitmi.gov/datasets/1de3fec8cc894fdbbc03c5d31bca32d4",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "detroit-department-of-transportation"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpsc-detroitdepartmentoftransportation",
+          "name": "Detroit Department of Transportation",
+          "short_name": "DDOT",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dpsc-detroitdepartmentoftransportation~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50119",
+            "wikidata_id": "Q5265906"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dpsc-detroitdepartmentoftransportation~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://www.myddotbus.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://www.myddotbus.com/gtfsrt/trips",
+        "realtime_alerts": "https://www.myddotbus.com/gtfsrt/alerts"
+      }
+    }
+  ]
+}

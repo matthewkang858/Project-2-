@@ -1,0 +1,25 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-middlesex~county~on~ca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://drive.usercontent.google.com/download?id=1pCs6qk9nHvP7ff18AJZas2dQVB3kF28l&export=download",
+        "static_historic": [
+          "https://drive.usercontent.google.com/download?id=1pwtm7_zptX1LoB07n36jJqayZtmvyoYM"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-middlesex~county~on~ca",
+          "name": "Middlesex County Connect",
+          "website": "https://www.middlesex.ca/schedules-maps-fares"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dre-cdta",
+      "supersedes_ids": [
+        "f-drew-greaterglensfallstransitsystem"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.cdta.org/schedules/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.cdta.org/developer-license-agreement/169",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "cdta"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dre-cdta",
+          "name": "Capital District Transportation Authority",
+          "short_name": "CDTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dre-cdta~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "cdta",
+            "us_ntd_id": "20002",
+            "wikidata_id": "Q5035551"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dre-cdta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://gtfs.cdta.org:8080/gtfsrealtime/VehiclePositions",
+        "realtime_trip_updates": "http://gtfs.cdta.org:8080/gtfsrealtime/TripUpdates"
+      }
+    }
+  ]
+}

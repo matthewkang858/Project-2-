@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-djmu-jacksonvilletransportationauthority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ride.jtafla.com/gtfs-archive/gtfs.zip",
+        "static_historic": [
+          "https://schedules.jtafla.com/schedulesgtfs/download"
+        ]
+      },
+      "license": {
+        "url": "https://ftis.org/FTDEDisclaimer.aspx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "jacksonville-transportation-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-djmu-jacksonvilletransportationauthority",
+          "name": "Jacksonville Transportation Authority",
+          "short_name": "JTA",
+          "website": "http://www.jtafla.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-djmu-jacksonvilletransportationauthority~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "JTAFLA",
+            "us_ntd_id": "40040",
+            "wikidata_id": "Q15051623"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-djmu-jacksonvilletransportationauthority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://bustime.jtafla.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://bustime.jtafla.com/gtfsrt/trips",
+        "realtime_alerts": "https://bustime.jtafla.com/gtfsrt/alerts"
+      }
+    }
+  ]
+}

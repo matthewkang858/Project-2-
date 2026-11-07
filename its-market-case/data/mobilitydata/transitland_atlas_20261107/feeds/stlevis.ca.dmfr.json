@@ -1,0 +1,26 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-societedetransportdelevis",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.stlevis.ca/sites/default/files/public/assets/gtfs/transit/gtfs_stlevis.zip"
+      },
+      "license": {
+        "url": "https://www.stlevis.ca/stlevis/donnees-ouvertes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-societedetransportdelevis",
+          "name": "Société de transport de Levís",
+          "short_name": "STLevís",
+          "website": "https://www.stlevis.ca/stlevis/donnees-ouvertes",
+          "tags": {
+            "wikidata_id": "Q3488027"
+          }
+        }
+      ]
+    }
+  ]
+}

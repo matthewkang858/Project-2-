@@ -1,0 +1,31 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-cyride",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.cyride.net/gtf/gtfs.zip"
+      },
+      "license": {
+        "url": "https://iowa-gtfs.com/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zmr-cyride",
+          "name": "CyRide",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "CYRIDE"
+            }
+          ],
+          "tags": {
+            "twitter_general": "cyride",
+            "us_ntd_id": "70041",
+            "wikidata_id": "Q5197282"
+          }
+        }
+      ]
+    }
+  ]
+}

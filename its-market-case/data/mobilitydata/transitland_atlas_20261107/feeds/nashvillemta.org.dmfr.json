@@ -1,0 +1,52 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dn6-regionaltransportationauthorityofmiddletennessee~nashville",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.wegotransit.com/GoogleExport/Google_Transit.zip",
+        "static_historic": [
+          "http://www.nashvillemta.org/GoogleExport/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.nashvillemta.org/Nashville-MTA-Developer-Data-Request.asp"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dn6-nashvillemetropolitantransitauthority",
+          "supersedes_ids": [
+            "o-dn6-regionaltransportationauthorityofmiddletennessee",
+            "o-dn6-wegopublictransit"
+          ],
+          "name": "Nashville Metropolitan Transit Authority",
+          "short_name": "WeGo Public Transit",
+          "website": "https://www.wegotransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-nashvillemta~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "WeGoTransit",
+            "us_ntd_id": "40004",
+            "wikidata_id": "Q6966980"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-nashvillemta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb",
+        "realtime_trip_updates": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+        "realtime_alerts": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/alert/alerts.pb"
+      },
+      "license": {
+        "url": "https://www.nashvillemta.org/Nashville-MTA-Developer-Data-Request.asp"
+      }
+    }
+  ]
+}

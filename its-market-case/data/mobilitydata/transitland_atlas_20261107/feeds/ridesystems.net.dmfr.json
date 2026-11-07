@@ -1,0 +1,924 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-353northclark",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://353NorthClark.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-353northclark",
+          "name": "353 North Clark"
+        }
+      ]
+    },
+    {
+      "id": "f-9q4g-westmontcollege",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://westmontcollege.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q4g-westmontcollege",
+          "name": "Westmont College",
+          "website": "https://www.westmont.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-9q5c-crownwest",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://crownwest.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5c-crownwest",
+          "name": "Crown West"
+        }
+      ]
+    },
+    {
+      "id": "f-9q5c-greenwoodhoa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://greenwoodhoa.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5c-greenwoodhoa",
+          "name": "Greenwood HOA"
+        }
+      ]
+    },
+    {
+      "id": "f-9q5c-universalstudioshollywood",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://universalstudioshollywood.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5c-universalstudioshollywood",
+          "name": "Universal Studios Hollywood",
+          "website": "https://www.universalstudioshollywood.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-9ry8-mountainridestransportationauthoritymrta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mountainrides.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/mountainrides-id-us/mountainrides-id-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "mountain-rides-transportation-authority-mrta"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9ry8-mountainridestransportationauthoritymrta",
+          "name": "Mountain Rides Transportation Authority",
+          "short_name": "MRTA",
+          "website": "http://www.mountainrides.org/",
+          "tags": {
+            "twitter_general": "mountainrides",
+            "us_ntd_id": "00311"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9tbh-slcairport",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://slcairport.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9tbh-slcairport",
+          "name": "SLC Airport",
+          "website": "https://slcairport.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-9vg4-utsouthwesternmedicalcenter",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://utsw.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9vg4-utsouthwesternmedicalcenter",
+          "name": "UT Southwestern Medical Center",
+          "website": "https://www.utsouthwestern.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-9vk1-riceuniversity",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://rice.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9vk1-riceuniversity",
+          "name": "Rice University",
+          "website": "https://www.rice.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-9xhg-winterpark~co~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://theliftwp.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/winterpark-co-us/winterpark-co-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9xhg-thelift",
+          "name": "Town of Winter Park",
+          "short_name": "The Lift",
+          "website": "https://www.theliftwp.com/",
+          "tags": {
+            "us_ntd_id": "88225"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9yyh-shuttleict",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://shuttleict.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9yyh-shuttleict",
+          "name": "Shuttle ICT",
+          "website": "https://www.flywichita.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-9z0b-eppleyairfield",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://eppleyairfield.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9z0b-eppleyairfield",
+          "name": "Eppley Airport",
+          "website": "https://www.flyoma.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-aashuttlelax",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://aashuttlelax.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-aashuttlelax",
+          "name": "ABM American Airlines - LAX"
+        }
+      ]
+    },
+    {
+      "id": "f-ahn~pa~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://AHN.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ahn~pa~us",
+          "name": "AHN Allegheny Health"
+        }
+      ]
+    },
+    {
+      "id": "f-atlanta~airlines~terminal~company",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://AATC.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-atlanta~airlines~terminal~company",
+          "name": "Atlanta Airlines Terminal Company"
+        }
+      ]
+    },
+    {
+      "id": "f-bfzc-cityofwhitehorse~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://whitehorse.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://data.whitehorse.ca/Google_transit_Feed_Docs.zip",
+          "http://ww3.whitehorse.ca/Features/GIS/GoogleTransit/Google_transit_feed_docs.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bfzc-cityofwhitehorse~transit",
+          "name": "Whitehorse Transit",
+          "website": "http://www.whitehorse.ca/transit"
+        }
+      ]
+    },
+    {
+      "id": "f-bhcc~ma~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://bhcc.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bhcc~ma~us",
+          "name": "Bunker Hill Community College"
+        }
+      ]
+    },
+    {
+      "id": "f-brownsville~tx~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://brownsvillemetro.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-brownsville~tx~us",
+          "name": "Brownsville Metro",
+          "short_name": "B Metro",
+          "website": "https://www.brownsvilletx.gov/2422/Metro",
+          "tags": {
+            "us_ntd_id": "60014",
+            "wikidata_id": "Q4976783"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-calplazashuttles",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://CalPlazaShuttles.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-calplazashuttles",
+          "name": "City National 2Cal"
+        }
+      ]
+    },
+    {
+      "id": "f-cattracks~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cattracks.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "tags": {
+        "calitp_dataset_id": "recM9Mc64Isx2bbki"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cattracks~ca~us",
+          "name": "University of California, Merced",
+          "short_name": "CatTracks",
+          "tags": {
+            "calitp_organization_id": "recaOcdHA5QVgmlhF"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-citynationalplazala",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://CityNationalPlazaLA.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-citynationalplazala",
+          "name": "City National Plaza LA"
+        }
+      ]
+    },
+    {
+      "id": "f-city~of~bowling~green",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gobg.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-city~of~bowling~green",
+          "name": "City of Bowling Green",
+          "short_name": "GoBG Transit",
+          "website": "https://www.letsgobg.com/",
+          "tags": {
+            "us_ntd_id": "40184"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-coast~rta~sc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://coastrta.transloc.com/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "http://coastrtaridetracker.com/Secure/Admin/Reports/GTFSDownload.aspx"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-coast~rta~sc~us",
+          "name": "Waccamaw Regional Transportation Authority",
+          "short_name": "Coast RTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-coast~rta~sc~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40102",
+            "wikidata_id": "Q5138200"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-coast~rta~sc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://coastrta.transloc.com/subscriptions/gtfsrt/vehicles.ashx"
+      }
+    },
+    {
+      "id": "f-dn5b-georgiatechtrolley~stingershuttles",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://bus.gatech.edu/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://passio3.com/gatech/passioTransit/gtfs/google_transit.zip",
+          "http://documents.atlantaregional.com/transitdata/gtfs_GT.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dn5b-georgiatechtrolley~stingershuttles",
+          "name": "Georgia Tech Stinger Bus",
+          "website": "https://pts.gatech.edu/",
+          "tags": {
+            "twitter_general": "gt_park_trans"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnjj-clemson~sc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://catbus.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/clemson-sc-us/clemson-sc-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "clemson-area-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnjj-clemsonareatransit",
+          "name": "Clemson Area Transit",
+          "short_name": "CATbus",
+          "tags": {
+            "twitter_general": "catclemson",
+            "us_ntd_id": "40208",
+            "wikidata_id": "Q5131543"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnm4-gspshuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gspshuttle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnm4-gspshuttle",
+          "name": "Greenville-Spartanburg Airport",
+          "website": "https://gspairport.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-dqc1-dullesairport",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://dullesairport.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqc1-dullesairport",
+          "name": "Dulles Airport Public",
+          "website": "https://www.flydulles.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-dqc2-freddiemac",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://freddiemac.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqc2-freddiemac",
+          "name": "Freddie Mac",
+          "website": "https://www.freddiemac.com/"
+        }
+      ]
+    },
+    {
+      "id": "f-dqc2-georgemasonuniversity",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mason.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqc2-georgemasonuniversity",
+          "name": "George Mason University",
+          "website": "https://transportation.gmu.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-dqcj-howarduniversity",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://howarduniversity.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcj-howarduniversity",
+          "name": "Howard University",
+          "short_name": "Tag B Howard University",
+          "website": "https://www.howard.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-dqcj-kingfarm",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kingfarm.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcj-kingfarm",
+          "name": "King Farm"
+        }
+      ]
+    },
+    {
+      "id": "f-dqcj-montgomerycollege",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://montgomerycollege.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcj-montgomerycollege",
+          "name": "Montgomery College",
+          "website": "https://www.montgomerycollege.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-dr1m-yorkcollegeofpennsylvania",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ycpshuttle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr1m-yorkcollegeofpennsylvania",
+          "name": "York College of Pennsylvania",
+          "website": "https://www.ycp.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-dr4x-lasalleuniversity",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://lasalle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr4x-lasalleuniversity",
+          "name": "La Salle University",
+          "website": "https://www.lasalle.edu/"
+        }
+      ]
+    },
+    {
+      "id": "f-fond~du~lac",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.fonddulac.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-fond~du~lac",
+          "name": "Fond du Lac Area Transit",
+          "website": "https://www.fdl.wi.gov/transit/riding-the-bus/",
+          "tags": {
+            "us_ntd_id": "50171"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-furmansaferide",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://FurmanSafeRide.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-furmansaferide",
+          "name": "Furman University Safe Ride"
+        }
+      ]
+    },
+    {
+      "id": "f-indian~river~county",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://indianrivertransit.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://golineirt.com/GTFS.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-indian~river~county",
+          "name": "Indian River County",
+          "short_name": "GoLine",
+          "website": "https://golineirt.com",
+          "tags": {
+            "us_ntd_id": "40104"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-kaiser~permanente~east~bay~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kp-eastbay-shuttle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      }
+    },
+    {
+      "id": "f-lax~flyaway",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://laxtransportation.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://www.flylax.com/-/media/flylax/flyaway/gtfs/google_transit.ashx"
+        ]
+      },
+      "license": {
+        "url": "https://www.flylax.com/flyaway-bus/faqs"
+      },
+      "tags": {
+        "calitp_dataset_id": "recrpeEPgjJRZ50Q9"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-lax~shuttles",
+          "name": "LAX Shuttles",
+          "website": "https://www.flylax.com/lax-traffic-and-ground-transportation",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-lax~flyaway~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recdLxGPqFmJLG21a"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-lax~flyaway~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://laxtransportation.ridesystems.net/subscriptions/gtfsrt/vehicles.ashx"
+      },
+      "tags": {
+        "calitp_dataset_id": "recrQo5GKohV4b5Q1"
+      }
+    },
+    {
+      "id": "f-mcallen~tx~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cityofmcallen.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-mcallen~tx~us",
+          "name": "Metro McAllen",
+          "website": "https://www.mcallen.net/metro/",
+          "tags": {
+            "us_ntd_id": "60099"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-midland~odessa~urban~transit~district",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ezrider.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-midland~odessa~urban~transit~district",
+          "name": "Midland-Odessa Urban Transit District",
+          "short_name": "EZ Rider",
+          "tags": {
+            "us_ntd_id": "60097"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-mission~viejo~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mvshuttle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "tags": {
+        "calitp_dataset_id": "recQKQ5nDdc2PvLfS"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-missionviejo~ca~us",
+          "name": "City of Mission Viejo",
+          "short_name": "MV Shuttle",
+          "website": "https://cityofmissionviejo.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-mission~viejo~shuttle~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "reckGS8egMZryjbX7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-mission~viejo~shuttle~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://mvshuttle.ridesystems.net/subscriptions/gtfsrt/vehicles.ashx"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec977R8McVseCdg9"
+      }
+    },
+    {
+      "id": "f-muckleshoot~wa~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://muckleshoottransit.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/muckleshoot-wa-us/muckleshoot-wa-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-muckleshoottransit",
+          "name": "Muckleshoot Tribal Transit",
+          "tags": {
+            "us_ntd_id": "00407"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-osu~stillwater~community~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://okstate.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-osu~stillwater~community~transit",
+          "name": "OSU-Stillwater Community Transit",
+          "website": "https://parking.okstate.edu/transit/",
+          "tags": {
+            "us_ntd_id": "60160"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-parkmsyexpress",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://parkmsyexpress.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-parkmsyexpress",
+          "name": "New Orleans Airport"
+        }
+      ]
+    },
+    {
+      "id": "f-premieruch",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://premieruch.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-premieruch",
+          "name": "UCHealth Memorial North"
+        }
+      ]
+    },
+    {
+      "id": "f-richmond~airport~va~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://richmond.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-richmond~airport~va~us",
+          "name": "Richmond Airport"
+        }
+      ]
+    },
+    {
+      "id": "f-slc~deltahardstand",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://DeltaHardstand.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-slc~deltahardstand",
+          "name": "Delta Hardstand"
+        }
+      ]
+    },
+    {
+      "id": "f-south~padre~island",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://southpadreisland.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-south~padre~island",
+          "name": "South Padre Island Metro",
+          "website": "https://www.myspi.org/department/index.php?structureid=34",
+          "tags": {
+            "us_ntd_id": "60173"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-tysonstowers",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://TysonsTowers.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-tysonstowers",
+          "name": "Tysons Towers"
+        }
+      ]
+    },
+    {
+      "id": "f-university~of~houston",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.cougarline.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-uh~cougar~line",
+          "name": "University of Houston",
+          "short_name": "Cougar Line",
+          "website": "https://www.uh.edu/parking/cougar-line/"
+        }
+      ]
+    },
+    {
+      "id": "f-university~of~maryland~baltimore",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://umb.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-university~of~maryland~baltimore",
+          "name": "University of Maryland, Baltimore"
+        }
+      ]
+    },
+    {
+      "id": "f-uofhdowntownshuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://UOfHDowntownShuttle.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-uofhdowntownshuttle",
+          "name": "University of Houston Downtown"
+        }
+      ]
+    },
+    {
+      "id": "f-utrgv~tx~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://UTRGV.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-utrgv~tx~us",
+          "name": "University of Texas Rio Grande Valley",
+          "tags": {
+            "us_ntd_id": "60273"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-waco~silo~tx~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://WacoSilo.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      }
+    },
+    {
+      "id": "f-waco~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://wacotransit.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-waco~transit",
+          "name": "Waco Transit System",
+          "short_name": "WTS",
+          "website": "https://www.waco-texas.com/Departments/Transit-System",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-waco~silo~tx~us"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "60012"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-gadsden~al~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://coggis.cityofgadsden.com/Public/Transportion/COG_trips.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-gadsden~al~us",
+          "name": "Gadsden Transit Services",
+          "short_name": "GTS",
+          "website": "https://www.cityofgadsden.com/249/Transportation",
+          "tags": {
+            "us_ntd_id": "40049"
+          }
+        }
+      ]
+    }
+  ]
+}

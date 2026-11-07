@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ez3f-metrodoporto",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.metrodoporto.pt/metrodoporto/uploads/document/file/693/horarios_gtfs_08_04_2024.zip",
+        "static_historic": [
+          "https://www.metrodoporto.pt/metrodoporto/uploads/document/file/550/google_transit_dez2021.zip",
+          "https://www.metrodoporto.pt/uploads/document/file/470/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ez3f-metrodoporto",
+          "name": "Metro do Porto",
+          "website": "http://www.metrodoporto.pt",
+          "tags": {
+            "needs_agency_id": "f-ez3f-metrodoporto"
+          }
+        }
+      ]
+    }
+  ]
+}

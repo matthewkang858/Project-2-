@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-eyce-fertagus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip",
+        "static_historic": [
+          "https://www.transporlis.pt/desktopmodules/trp_opendata/ajax/downloadFile.ashx?op=13&u=web",
+          "http://www.transporlis.pt/Portals/0/OpenData/gtfs/zip/13/gtfs_13.zip"
+        ]
+      },
+      "license": {
+        "url": "https://nap-portugal.imt-ip.pt/nap/multimodalsupplydetail/185"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-eyce-fertagus",
+          "name": "Fertagus",
+          "website": "https://www.fertagus.pt/",
+          "tags": {
+            "wikidata_id": "Q1408210"
+          }
+        }
+      ]
+    }
+  ]
+}

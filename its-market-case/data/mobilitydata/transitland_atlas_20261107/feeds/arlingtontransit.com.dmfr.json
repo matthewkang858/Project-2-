@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-art~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://realtime.arlingtontransit.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://realtime.arlingtontransit.com/gtfsrt/trips"
+      }
+    },
+    {
+      "id": "f-dqcjj-arlingtontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arlingtontransit.com/shared/content/gtfs/art/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.arlingtonva.us/terms-conditions/"
+      },
+      "tags": {
+        "gtfs_data_exchange": "arlington-transit"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dqcjj-arlingtontransit",
+      "name": "Arlington Transit",
+      "short_name": "ART",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-art~rt"
+        },
+        {
+          "feed_onestop_id": "f-dqcjj-arlingtontransit"
+        }
+      ],
+      "tags": {
+        "developer_site": "https://www.arlingtontransit.com/riding-art/rider-tools/tools-for-developers/",
+        "twitter_general": "art_alert",
+        "us_ntd_id": "30080",
+        "wikidata_id": "Q4792406"
+      }
+    }
+  ]
+}

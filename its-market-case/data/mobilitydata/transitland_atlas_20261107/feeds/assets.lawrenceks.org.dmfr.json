@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9yum-kuonwheels~lawrencetransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://assets.lawrenceks.org/transit/KU-LTS_GTFS.zip",
+        "static_historic": [
+          "https://assets.lawrenceks.org/assets/gis/google-transit/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9yum-kuonwheels~lawrencetransitsystem",
+          "name": "KU on Wheels & Lawrence Transit System",
+          "short_name": "Lawrence Transit",
+          "website": "http://www.lawrencetransit.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "KULTS"
+            }
+          ],
+          "tags": {
+            "twitter_general": "transitku",
+            "us_ntd_id": "70044,70048",
+            "wikidata_id": "Q6504681"
+          }
+        }
+      ]
+    }
+  ]
+}

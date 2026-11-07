@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u05-tcl~systral",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://download.data.grandlyon.com/files/rdata/tcl_sytral.tcltheorique/GTFS_TCL.ZIP"
+      },
+      "license": {
+        "url": "https://data.grandlyon.com/cgu",
+        "use_without_attribution": "no"
+      },
+      "authorization": {
+        "type": "basic_auth",
+        "info_url": "https://data.grandlyon.com/portail/fr/connexion"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u05-tcl~systral",
+          "name": "Transports en Commun Lyonnais",
+          "short_name": "TCL",
+          "website": "https://www.tcl.fr",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q8700"
+          }
+        }
+      ]
+    }
+  ]
+}

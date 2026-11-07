@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-butte~regional~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://planmyride.blinetransit.com/gtfsrealtime/google_transit.zip",
+        "static_historic": [
+          "http://www.blinetransit.com/documents/Google%20Transit/google_transit.zip",
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/butte-regional-transit.zip",
+          "https://d16k74nzx9emoe.cloudfront.net/c4326823-2c12-4f59-82f1-3fc4d987e12b/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recm6LcXTquVutuAW"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-butte~regional~transit",
+          "name": "Butte Regional Transit",
+          "short_name": "B-Line",
+          "website": "http://www.blinetransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-butte~regional~transit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recf7l9tozKXOmqqZ",
+            "us_ntd_id": "90208",
+            "wikidata_id": "Q5002811"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-butte~regional~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_VehiclePositions.pb",
+        "realtime_trip_updates": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_TripUpdates.pb",
+        "realtime_alerts": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_ServiceAlerts.pb"
+      },
+      "tags": {
+        "calitp_dataset_id": "recBr3SkyTj5DbNTD,recvadoc7iwfzG4QX,recxINsJhDmxbWMNF"
+      }
+    }
+  ]
+}

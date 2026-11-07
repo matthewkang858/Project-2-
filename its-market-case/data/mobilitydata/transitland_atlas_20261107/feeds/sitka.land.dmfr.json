@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-bfpu-theride",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://transit.sitka.land/the-ride/transit_feed.zip",
+        "static_historic": [
+          "https://www.sitka.land/transit/the-ride/transit_feed.zip",
+          "https://www.jfactory.xyz/gtfs/the-ride/transit_feed.zip",
+          "http://jfact0ry.com/theRIDE/transit_feed.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bfpu-theride",
+          "name": "RIDE Sitka",
+          "website": "http://ridesitka.com",
+          "tags": {
+            "us_ntd_id": "00014"
+          }
+        }
+      ]
+    }
+  ]
+}

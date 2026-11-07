@@ -1,0 +1,33 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-met~transit~ia",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.trilliumtransit.com/gtfs/cedarfalls-ia-us/cedarfalls-ia-us.zip",
+        "static_historic": [
+          "https://www.mettransit.org/sites/default/files/GTFS_Transit_20241025.zip",
+          "http://mettransit.org/sites/default/files/MET_Transit_GTFS.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.mettransit.org/how-to-use-real-time-map"
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zw3-metropolitantransitauthorityofblackhawkcounty",
+          "name": "Metropolitan Transit Authority of Black Hawk County",
+          "short_name": "MET",
+          "tags": {
+            "us_ntd_id": "70013",
+            "wikidata_id": "Q6825282"
+          }
+        }
+      ]
+    }
+  ]
+}

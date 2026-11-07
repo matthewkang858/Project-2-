@@ -1,0 +1,22 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-ville~de~drummondville",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://geomatique.drummondville.ca/GTFS/GTFS_DMV.zip"
+      },
+      "languages": [
+        "fr-CA"
+      ],
+      "operators": [
+        {
+          "onestop_id": "o-ville~de~drummondville",
+          "name": "Ville de Drummondville",
+          "website": "https://www.drummondville.ca/mobilite/transport-en-commun/"
+        }
+      ]
+    }
+  ]
+}

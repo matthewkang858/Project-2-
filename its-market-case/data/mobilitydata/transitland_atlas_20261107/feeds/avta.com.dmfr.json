@@ -1,0 +1,44 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-antelope~valley~transit~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.avta.com/userfiles/files/AVTA_GTFS.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recOJo4hgdBYwyMSG"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-antelope~valley~transit~authority",
+          "name": "Antelope Valley Transit Authority",
+          "short_name": "AVTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-antelope~valley~transit~authority~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recxsWR0KRrQTdjmg",
+            "us_ntd_id": "90121",
+            "wikidata_id": "Q4771209"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-antelope~valley~transit~authority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://track-it.avta.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://track-it.avta.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://track-it.avta.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      },
+      "tags": {
+        "calitp_dataset_id": "recWxaHMlMLEFO1Xh,rech4kJy8Ly80UrGc,recyEJ9DoDOruOPSf"
+      }
+    }
+  ]
+}

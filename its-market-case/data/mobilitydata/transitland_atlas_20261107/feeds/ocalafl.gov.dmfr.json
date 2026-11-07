@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-djjt-suntran~fl~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://realtimesuntran.availtec.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/suntran-fl-us.zip",
+          "https://www.ocalafl.gov/home/showpublisheddocument/27081/638753842142700000",
+          "https://www.ocalafl.gov/home/showpublisheddocument/30354/639053877658815322"
+        ]
+      }
+    },
+    {
+      "id": "f-djjt-suntran~fl~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://realtimesuntran.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://realtimesuntran.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://realtimesuntran.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-djjt-suntrancityofocala",
+      "name": "Ocala SunTran",
+      "website": "http://www.ocalafl.org/suntran",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-djjt-suntran~fl~us"
+        },
+        {
+          "feed_onestop_id": "f-djjt-suntran~fl~us~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "CityofOcalaFL",
+        "us_ntd_id": "40120",
+        "wikidata_id": "Q5123847"
+      }
+    }
+  ]
+}

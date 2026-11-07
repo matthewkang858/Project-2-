@@ -1,0 +1,68 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9y69-embark",
+      "supersedes_ids": [
+        "f-embarknorman~ok"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mna.mecatran.com/utw/ws/gtfsfeed/static/okc?apiKey=6a3b186a334d1e3e064f42782f6002520e60394c",
+        "static_historic": [
+          "https://embarkok.com/data/gtfs/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.embarkok.com/transit-data-resources"
+      },
+      "tags": {
+        "gtfs_data_exchange": "embark"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9y69-embark",
+          "supersedes_ids": [
+            "o-embarknorman~ok"
+          ],
+          "name": "Central Oklahoma Transportation and Parking Authority",
+          "short_name": "EMBARK",
+          "website": "http://embarkok.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "60017"
+            },
+            {
+              "gtfs_agency_id": "60017-FB"
+            },
+            {
+              "gtfs_agency_id": "66341"
+            },
+            {
+              "feed_onestop_id": "f-embarknorman~ok~rt"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://embarkok.com/business/developer-resources/",
+            "twitter_general": "embarkok",
+            "us_ntd_id": "60017,66341",
+            "wikidata_id": "Q6824747"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-embarknorman~ok~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://app.mecatran.com/utw/ws/gtfsfeed/vehicles/embarkok",
+        "realtime_trip_updates": "https://app.mecatran.com/utw/ws/gtfsfeed/realtime/embarkok"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "apiKey",
+        "info_url": "https://embarkok.com/business/developer-resources/developer-registration"
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u2s1vm0ergtc~bratislava",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/aba12fd2cbac4843bc7406151bc66106/data",
+        "static_historic": [
+          "https://opendata.bratislava.sk/dataset/download/cestovny-poriadok-20230227/1",
+          "https://opendata.bratislava.sk/dataset/download/cestovny-poriadok-20220725/1"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://data.bratislava.sk/datasets/aba12fd2cbac4843bc7406151bc66106/about",
+        "use_without_attribution": "no"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u2s1-dopravnýpodnikbratislavaas",
+          "name": "Dopravný podnik Bratislava",
+          "short_name": "DPB",
+          "website": "https://dpb.sk",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "88",
+              "feed_onestop_id": "f-vor~at"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q685601"
+          }
+        }
+      ]
+    }
+  ]
+}

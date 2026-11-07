@@ -1,0 +1,33 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f81y-codiactranspo",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www7.moncton.ca/opendata/google_transit.zip",
+        "static_historic": [
+          "http://www.moncton.ca/gtfs/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://moncton.maps.arcgis.com/sharing/rest/content/items/3ec310926cbd436cbaa609d8ee9fac15/data"
+      },
+      "tags": {
+        "gtfs_data_exchange": "codiac-transpo"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f81y-codiactranspo",
+          "name": "Codiac Transpo",
+          "website": "http://www.codiactranspo.ca",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "Codiac Transpo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

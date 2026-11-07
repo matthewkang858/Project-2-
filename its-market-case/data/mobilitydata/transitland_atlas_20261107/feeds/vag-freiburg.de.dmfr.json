@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0t9-tunibergexpress~freiburgerverkehrsag~rastreisen",
+      "supersedes_ids": [
+        "f-vagfr~de"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.vag-freiburg.de/fileadmin/gtfs/VAGFR.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0t3-tunibergexpress",
+          "name": "Tuniberg Express",
+          "website": "https://www.vag-freiburg.de/fahrplan-linien/fahrplanauskunft.html",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "3"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0t9-freiburgerverkehrsag",
+          "name": "Freiburger Verkehrs AG",
+          "short_name": "VAG",
+          "website": "https://www.vag-freiburg.de/fahrplan-linien/fahrplanauskunft.html",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "gtfs_agency_id": "7642",
+              "feed_onestop_id": "f-delfi~de"
+            },
+            {
+              "gtfs_agency_id": "7641",
+              "feed_onestop_id": "f-delfi~de"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q881285"
+          }
+        }
+      ]
+    }
+  ]
+}

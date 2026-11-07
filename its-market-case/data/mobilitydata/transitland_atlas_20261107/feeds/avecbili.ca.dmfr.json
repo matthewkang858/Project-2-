@@ -1,0 +1,34 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-avecbili~mrc~nicolet~yamaska",
+      "supersedes_ids": [
+        "f-avecbili~mrc~nicolet-yamaska"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://avecbili.ca/wp/wp-content/uploads/2024/04/BILI_GTFS.zip",
+          "https://avecbili.ca/wp/wp-content/uploads/2024/02/bili_conforme_gtfs.zip"
+        ]
+      },
+      "languages": [
+        "fr-CA"
+      ],
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-avecbili~mrc~nicolet~yamaska",
+          "supersedes_ids": [
+            "o-avecbili~mrc~nicolet-yamaska"
+          ],
+          "name": "Bili",
+          "website": "https://avecbili.ca"
+        }
+      ]
+    }
+  ]
+}

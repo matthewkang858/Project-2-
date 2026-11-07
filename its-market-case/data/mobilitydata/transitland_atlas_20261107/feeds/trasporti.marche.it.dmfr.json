@@ -1,0 +1,74 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sr-trenitalia~contrammobilitascpa~trasfersocconsarl~adriabussp",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.trasporti.marche.it/downloads/opendata/GTFS_TRASPORTI_UNIFICATO_13-07-2016.zip"
+        ]
+      },
+      "license": {
+        "url": "http://creativecommons.org/licenses/by-nc-nd/3.0/it/",
+        "use_without_attribution": "no",
+        "create_derived_product": "no"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sr9-contrammobilitascpa",
+          "name": "Contram Mobilita",
+          "short_name": "Contram",
+          "website": "http://www.contrammobilita.it/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "CONTRAM"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-sr9-socconsortileatma",
+          "name": "Azienda Trasporti e Mobilità di Ancona e Provincia",
+          "short_name": "ATMA",
+          "website": "http://www.atmaancona.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ATMA"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-sr9-startspa",
+          "name": "Start",
+          "website": "http://www.startspa.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "START"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-sr9-trasfersocconsarl",
+          "name": "Trasfer",
+          "website": "http://www.trasfer.eu/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "TRASFER"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-src-adriabusspa",
+          "name": "Adriabus SpA",
+          "short_name": "Adriabus",
+          "website": "http://www.adriabus.eu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ADRIABUS"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

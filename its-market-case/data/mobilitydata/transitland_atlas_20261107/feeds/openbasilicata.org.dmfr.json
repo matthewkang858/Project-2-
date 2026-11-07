@@ -1,0 +1,31 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sr5p-wemapp",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.openbasilicata.org/dataset/ad8b732b-ca9a-4e5b-9ab3-494c268947aa/resource/11216eba-7762-4c8a-b1f8-8f74ddea3b0a/download/Potenzagtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "http://opendefinition.org/licenses/odc-odbl/",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "OdBL"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sr5p-wemapp",
+          "name": "Città di Potenza",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "wemapp"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q9-monterey~salinastransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mst.org/google/google_transit.zip"
+      },
+      "license": {
+        "url": "https://mst.org/about-mst/developer-resources/"
+      },
+      "tags": {
+        "calitp_dataset_id": "recysP9m9kjCJwHZe",
+        "gtfs_data_exchange": "monterey-salinas-transit"
+      }
+    },
+    {
+      "id": "f-mst~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs.mst.org/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://gtfs.mst.org/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "https://gtfs.mst.org/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+      },
+      "license": {
+        "url": "https://mst.org/about-mst/developer-resources/"
+      },
+      "tags": {
+        "calitp_dataset_id": "recLBjtJxGokGX3EJ,recZdHZYs1FCbVE8I,recfovgB6S0jcgqXn"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9q9-monterey~salinastransit",
+      "name": "Monterey-Salinas Transit",
+      "short_name": "MST",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9q9-monterey~salinastransit"
+        },
+        {
+          "feed_onestop_id": "f-mst~rt"
+        }
+      ],
+      "tags": {
+        "calitp_organization_id": "receZJ9sEnP9vy3g0",
+        "twitter_general": "MST_BUS",
+        "us_ntd_id": "90062",
+        "wikidata_id": "Q16982191"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-coast~transit~ms~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://coasttransit.com/wp-content/uploads/2026/03/CTA_MS_GTFS-1.zip",
+        "static_historic": [
+          "https://coasttransit.com/wp-content/uploads/2024/02/cta_gtfs-2024-1.zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-coast~transit~ms~us",
+          "name": "Mississippi Coast Transportation Authority",
+          "short_name": "Coast Transit Authority",
+          "website": "https://coasttransit.com",
+          "tags": {
+            "us_ntd_id": "40014",
+            "wikidata_id": "Q5138212"
+          }
+        }
+      ]
+    }
+  ]
+}

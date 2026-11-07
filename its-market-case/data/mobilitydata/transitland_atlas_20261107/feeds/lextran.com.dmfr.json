@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dngb-lextran",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mystop.lextran.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://lextran.com/wp-content/uploads/2022/12/google_transit.zip",
+          "https://lextran.com/wp-content/uploads/2022/08/GTFS-8-17-2022.zip",
+          "https://lextran.com/wp-content/uploads/2021/05/GTFS.zip",
+          "https://lextran.com/wp-content/uploads/2023/05/GTFS.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "lanta"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dngb-lextran",
+          "name": "Lexington Transit Authority",
+          "short_name": "Lextran",
+          "website": "http://lextran.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dngb-lextran~rt"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://lextran.com/gtfs/",
+            "twitter_general": "Lextran",
+            "us_ntd_id": "40017",
+            "wikidata_id": "Q6537504"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dngb-lextran~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://mystop.lextran.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://mystop.lextran.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://mystop.lextran.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

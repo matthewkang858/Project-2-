@@ -1,0 +1,29 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-butler~county~rta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.buztrakr.com/gtfs",
+        "static_historic": [
+          "https://www.butlercountyrta.com/wp-content/uploads/2019/11/Bcrta-GTFS-1.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.butlercountyrta.com/gtfs-download/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dp5b-butlercountyregionaltransitauthority",
+          "name": "Butler County Regional Transit Authority",
+          "short_name": "BCRTA",
+          "tags": {
+            "us_ntd_id": "50157,50019",
+            "wikidata_id": "Q107710675"
+          }
+        }
+      ]
+    }
+  ]
+}

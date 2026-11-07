@@ -1,0 +1,79 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9-flixbus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gtfs.gis.flix.tech/gtfs_generic_us.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recl3IyQX2prWsBVj"
+      }
+    },
+    {
+      "id": "f-u-flixbus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://gtfs.gis.flix.tech/gtfs_generic_eu.zip",
+        "static_historic": [
+          "https://transport.beta.gouv.fr/resources/11681/download",
+          "http://data.ndovloket.nl/flixbus/flixbus-eu.zip"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "ODbL-1.0",
+        "url": "https://transport.data.gouv.fr/datasets/flixbus-horaires-theoriques-du-reseau-europeen-1"
+      },
+      "tags": {
+        "mdb_source_id": "853"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-greyhound~flix",
+      "name": "Greyhound",
+      "website": "https://www.greyhound.com",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "GREYHOUND-us",
+          "feed_onestop_id": "f-9-flixbus"
+        },
+        {
+          "gtfs_agency_id": "11",
+          "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+        }
+      ],
+      "tags": {
+        "wikidata_id": "Q755309"
+      }
+    },
+    {
+      "onestop_id": "o-u-flixbus",
+      "name": "Flixbus",
+      "website": "https://www.flixbus.com/",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "FLIXBUS-us",
+          "feed_onestop_id": "f-9-flixbus"
+        },
+        {
+          "gtfs_agency_id": "FLIXBUS-eu",
+          "feed_onestop_id": "f-u-flixbus"
+        },
+        {
+          "gtfs_agency_id": "FLIXTRAIN-eu",
+          "feed_onestop_id": "f-u-flixbus"
+        },
+        {
+          "gtfs_agency_id": "70",
+          "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+        }
+      ],
+      "tags": {
+        "wikidata_id": "Q15712258;Q1881378"
+      }
+    }
+  ]
+}

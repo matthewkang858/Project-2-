@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpz-durhamregiontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://maps.durham.ca/OpenDataGTFS/GTFS_Durham_TXT.zip"
+      },
+      "license": {
+        "url": "http://www.durham.ca/departments/corpservices/it/GIS/OpenDataLicenceAgreement.pdf"
+      },
+      "tags": {
+        "gtfs_data_exchange": "durham-region-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpz-durhamregiontransit",
+          "name": "Durham Region Transit",
+          "short_name": "DRT",
+          "website": "http://www.durhamregiontransit.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dpz-durhamregiontransit~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q5316548"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dpz-durhamregiontransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://drtonline.durhamregiontransit.com/gtfsrealtime/VehiclePositions",
+        "realtime_trip_updates": "https://drtonline.durhamregiontransit.com/gtfsrealtime/TripUpdates",
+        "realtime_alerts": "https://maps.durham.ca/OpenDataGTFS/alerts.pb"
+      },
+      "license": {
+        "url": "http://www.durham.ca/departments/corpservices/it/GIS/OpenDataLicenceAgreement.pdf"
+      }
+    }
+  ]
+}

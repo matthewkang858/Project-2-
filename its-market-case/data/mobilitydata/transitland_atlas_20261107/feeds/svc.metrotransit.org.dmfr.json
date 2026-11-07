@@ -1,0 +1,141 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9zv-twin~cities~minnesota",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://svc.metrotransit.org/mtgtfs/gtfs.zip"
+      },
+      "license": {
+        "url": "https://svc.metrotransit.org",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zvx-southwesttransit",
+          "name": "SouthWest Transit",
+          "website": "http://www.swtransit.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "6"
+            },
+            {
+              "feed_onestop_id": "f-twin~cities~minnesota~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "SWTransit",
+            "us_ntd_id": "50518",
+            "wikidata_id": "Q7565334"
+          }
+        },
+        {
+          "onestop_id": "o-9zvxq-airportmac",
+          "name": "MSP Metropolitan Airports Commission (MAC)",
+          "website": "http://www.mspairport.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "10"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-9zvxy-universityofminnesota",
+          "name": "University of Minnesota",
+          "website": "http://www.umn.edu",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "11"
+            },
+            {
+              "feed_onestop_id": "f-twin~cities~minnesota~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "umnpts",
+            "us_ntd_id": "50515",
+            "wikidata_id": "Q7895789"
+          }
+        },
+        {
+          "onestop_id": "o-cbj8-maplegrove",
+          "name": "Maple Grove",
+          "website": "http://www.ci.maple-grove.mn.us",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "4"
+            },
+            {
+              "feed_onestop_id": "f-twin~cities~minnesota~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "maplegrovemngov",
+            "us_ntd_id": "50517",
+            "wikidata_id": "Q6753895"
+          }
+        },
+        {
+          "onestop_id": "o-cbj8-plymouth",
+          "name": "Plymouth",
+          "website": "http://www2.ci.plymouth.mn.us",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "5"
+            },
+            {
+              "feed_onestop_id": "f-twin~cities~minnesota~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "PlymouthMN_gov",
+            "us_ntd_id": "50516",
+            "wikidata_id": "Q7205829"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-twin~cities~minnesota~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb",
+        "realtime_trip_updates": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb",
+        "realtime_alerts": "https://svc.metrotransit.org/mtgtfs/alerts.pb"
+      },
+      "license": {
+        "url": "https://svc.metrotransit.org",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9zv-metrotransit",
+      "supersedes_ids": [
+        "o-9zvw-metro"
+      ],
+      "name": "Metro Transit",
+      "website": "http://www.metrotransit.org",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "2",
+          "feed_onestop_id": "f-9zv-twin~cities~minnesota"
+        },
+        {
+          "feed_onestop_id": "f-twin~cities~minnesota~rt"
+        }
+      ],
+      "tags": {
+        "omd_provider_id": "metro-transit",
+        "twitter_general": "MetroTransitMN",
+        "twitter_service_alerts": "MT_MN_Alerts",
+        "us_ntd_id": "50027",
+        "wikidata_id": "Q3307442"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-c3r1-red~deer~alberta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.reddeer.ca/datasets/gtfsdatafeed/download/zip",
+        "static_historic": [
+          "https://webmap.reddeer.ca/transit/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://data.reddeer.ca/About",
+        "use_without_attribution": "no",
+        "attribution_instructions": "Contains information licensed under the Open Government Licence – The City of Red Deer"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c3r1-red~deer~alberta",
+          "name": "Red Deer Transit",
+          "website": "http://www.reddeer.ca/city-services/transit/",
+          "tags": {
+            "wikidata_id": "Q7304013"
+          }
+        }
+      ]
+    }
+  ]
+}

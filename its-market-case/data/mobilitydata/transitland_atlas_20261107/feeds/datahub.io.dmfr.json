@@ -1,0 +1,174 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sgg5z-gr~προαστιακόςσιδηρόδρομοςπατρών",
+      "supersedes_ids": [
+        "f-sgg5z-gr~ΠροστιακόςΣιδηρόδρομοςΠατρών",
+        "f-sgg5z-gr~προστιακόςσιδηρόδρομοςπατρών"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/angelou/proastiakos-patras-gtfs-20171128/r/prostiakos-patras-gtfs-20171128.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sgg5z-gr~προαστιακόςσιδηρόδρομοςπατρών",
+          "supersedes_ids": [
+            "o-sgg5z-gr~ΠροστιακόςΣιδηρόδρομοςΠατρών",
+            "o-sgg5z-gr~προστιακόςσιδηρόδρομοςπατρών"
+          ],
+          "name": "Προαστιακός Σιδηρόδρομος Πατρών",
+          "short_name": "Suburban Railway of Patras",
+          "website": "https://www.hellenictrain.gr/en/patras-suburban-railway",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ProastiakosPatras"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3536559"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sqz-greece~κτελνζακυνθουαε",
+      "supersedes_ids": [
+        "f-sqz-greece~ΚΤΕΛΝzΑΚΥΝΘΟΥΑΕ",
+        "f-sqz-greece~κτελνzακυνθουαε"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/angelou/ktel-zakynthou-gtfs-20171128/r/ktel-zakynthou-gtfs-20171128.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sqz-greece~κτελνζακυνθουαε",
+          "supersedes_ids": [
+            "o-sqz-greece~ΚΤΕΛΝzΑΚΥΝΘΟΥΑΕ"
+          ],
+          "name": "ΚΤΕΛ Ν. ΖΑΚΥΝΘΟΥ Α.Ε.",
+          "website": "http://ktel-zakynthos.gr/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "KTELZakynthou"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-sqz-greece~υπεραστικοκτελνθεσπρωτιας",
+      "supersedes_ids": [
+        "f-sqz-greece~ΥΠΕΡΑΣΤΙΚΟΚΤΕΛΝΘΕΣΠΡΩΤΙΑΣ"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/angelou/ktel-thesprotias-gtfs-20171128/r/ktel-thesprotias-gtfs-20171128.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sqz-greece~υπεραστικοκτελνθεσπρωτιας",
+          "supersedes_ids": [
+            "o-sqz-greece~ΥΠΕΡΑΣΤΙΚΟΚΤΕΛΝΘΕΣΠΡΩΤΙΑΣ"
+          ],
+          "name": "ΥΠΕΡΑΣΤΙΚΟ ΚΤΕΛ Ν. ΘΕΣΠΡΩΤΙΑΣ",
+          "website": "https://www.ktel-thesprotias.gr/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "KTELThesprotias"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-sr7-societatrasportiprovincialespa",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/dataset/289cecea-0162-4ef7-bfab-7872299defa8/resource/8e7992ee-ac03-4b09-a0a9-4a54ba367336/download/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "http://egov.comune.gioiadelcolle.ba.it/servizio-bus/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sr7-societatrasportiprovincialespa",
+          "name": "Società Trasporti Provinciale S.p.A.",
+          "website": "http://www.stpspa.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "stp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-srk0-autolineescoppio",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/dataset/289cecea-0162-4ef7-bfab-7872299defa8/resource/f2537ad4-4943-433a-a5a8-fc7db433f30b/download/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "http://www.gioialab.it",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-srk0-autolineescoppio",
+          "name": "Autolinee Scoppio",
+          "website": "http://www.autolineescoppio.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "sco"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-srk01-comunedigioiadelcolle",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "https://datahub.io/dataset/289cecea-0162-4ef7-bfab-7872299defa8/resource/e2b2a650-eb84-4153-ae13-697da9c738fc/download/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "http://egov.comune.gioiadelcolle.ba.it/servizio-bus/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-srk01-comunedigioiadelcolle",
+          "name": "Comune di Gioia del Colle",
+          "website": "http://www.comune.gioiadelcolle.ba.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "gdc"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

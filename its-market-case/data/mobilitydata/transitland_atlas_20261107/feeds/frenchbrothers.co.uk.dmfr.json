@@ -1,0 +1,28 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-gcps-frenchbrothersltd",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.frenchbrothers.co.uk/link/transport/google_transit.zip"
+      },
+      "license": {
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-gcps-frenchbrothersltd",
+          "name": "French Brothers Ltd",
+          "website": "https://www.frenchbrothers.co.uk/public-trips/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "FrenchBrothersLtd"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

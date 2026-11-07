@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dn5b-cobbavl",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cobb.rideralerts.com/InfoPoint/GTFS-Zip.ashx",
+        "static_historic": [
+          "https://www.arcgis.com/sharing/rest/content/items/1ce8e370a12c41b5854d8baa21f8451c/data"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://opendata.atlantaregional.com/datasets/1ce8e370a12c41b5854d8baa21f8451c/about",
+        "use_without_attribution": "no"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dn5b-cobbavl",
+          "name": "Cobb Community Transit",
+          "short_name": "CCT",
+          "website": "http://www.cobbcct.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dn5b-cobbavl~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "cobbdot",
+            "us_ntd_id": "40078",
+            "wikidata_id": "Q5138753"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dn5b-cobbavl~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cobb.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://cobb.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://cobb.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      },
+      "tags": {
+        "mdb_source_id": "3194,3195,3196"
+      }
+    }
+  ]
+}

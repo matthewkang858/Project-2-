@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9zvw-mvta~metro",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://srv.mvta.com/InfoPoint/GTFS-Zip.ashx",
+        "static_historic": [
+          "http://ride.mvta.com/InfoPoint/GTFS-Zip.ashx",
+          "http://wiki.mvta.com/files/Home/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zvw-mvta",
+          "name": "Minnesota Valley Transit Authority",
+          "short_name": "MVTA",
+          "website": "http://www.mvta.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "0"
+            },
+            {
+              "feed_onestop_id": "f-9zvw-mvta~metro~rt"
+            }
+          ],
+          "tags": {
+            "notes": "Metro Transit's regional feed is sometimes suggested as covering MVTA. It does not: it carries eight agencies, none of them MVTA, and shares 0 of 2,749 trip IDs with the registered MVTA static.",
+            "omd_provider_id": "minnesota-valley-transit-authority",
+            "twitter_general": "mvtatransit",
+            "us_ntd_id": "50519",
+            "wikidata_id": "Q6868609"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9zvw-mvta~metro~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://srv.mvta.com/infoPoint/GTFS-realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://srv.mvta.com/infoPoint/GTFS-realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://srv.mvta.com/infoPoint/GTFS-realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

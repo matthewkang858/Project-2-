@@ -1,0 +1,63 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9yzg-metrostlouis",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://metrostlouis.org/Transit/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.metrostlouis.org/developer-resources/"
+      },
+      "tags": {
+        "gtfs_data_exchange": "metro-st-louis"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9yzg-metrostlouis",
+          "name": "Metro St. Louis",
+          "website": "http://www.metrostlouis.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9yzg-metrostlouis"
+            },
+            {
+              "feed_onestop_id": "f-saintlouis~rt"
+            },
+            {
+              "feed_onestop_id": "f-stl~loop~trolley"
+            }
+          ],
+          "tags": {
+            "twitter_general": "STLMetro",
+            "us_ntd_id": "70006",
+            "wikidata_id": "Q4902339"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-saintlouis~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://www.metrostlouis.org/RealTimeData/StlRealTimeVehicles.pb",
+        "realtime_trip_updates": "https://www.metrostlouis.org/RealTimeData/StlRealTimeTrips.pb",
+        "realtime_alerts": "https://www.metrostlouis.org/RealTimeData/StlRealTimeAlerts.pb"
+      },
+      "license": {
+        "url": "https://www.metrostlouis.org/developer-resources/"
+      }
+    },
+    {
+      "id": "f-stl~loop~trolley",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://files.looptrolley.com/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.looptrolley.com/resources"
+      }
+    }
+  ]
+}

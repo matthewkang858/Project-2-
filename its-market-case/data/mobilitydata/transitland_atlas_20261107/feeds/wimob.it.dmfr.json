@@ -1,0 +1,15 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-eave~wimob~it",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.wimob.it/cfile/download.php?file=google-transit.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0"
+      }
+    }
+  ]
+}

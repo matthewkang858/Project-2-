@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u25k-zagrebačkielektričnitramvaj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://zet.hr/gtfs-scheduled/latest"
+      },
+      "license": {
+        "url": "https://data.gov.hr/otvorena-dozvola",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Public dataset by ZET provided under Open license, dataset source http://www.zet.hr/odredbe/datoteke-u-gtfs-formatu/669"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u25k-zagrebačkielektričnitramvaj",
+          "name": "Zagrebački Električni Tramvaj",
+          "short_name": "ZET",
+          "website": "http://www.zet.hr",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "0"
+            },
+            {
+              "feed_onestop_id": "f-u25k-zagrebačkielektričnitramvaj~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-u25k-zagrebačkielektričnitramvaj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_trip_updates": "https://zet.hr/gtfs-rt-protobuf"
+      },
+      "license": {
+        "url": "https://data.gov.hr/otvorena-dozvola",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Public dataset by ZET provided under Open license, dataset source http://www.zet.hr/odredbe/datoteke-u-gtfs-formatu/669"
+      }
+    }
+  ]
+}

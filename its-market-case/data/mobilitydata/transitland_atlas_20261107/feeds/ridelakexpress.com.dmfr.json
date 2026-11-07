@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-djjg-lakecounty",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://ridelakexpress.com/gtfs/gtfs.zip",
+        "static_historic": [
+          "https://ftis.org/PostFileDownload.aspx?id=667A0",
+          "http://www.ftis.org/PostFileDownload.aspx?id=160A0",
+          "https://ftis.org/PostFileDownload.aspx?id=450A0"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-djjg-lakecounty",
+          "name": "Lake County Office of Transit Service",
+          "short_name": "LakeXpress",
+          "website": "http://www.ridelakexpress.com",
+          "tags": {
+            "twitter_general": "lakexpress",
+            "us_ntd_id": "40158",
+            "wikidata_id": "Q6474640"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u20f-alilagunaspa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.alilaguna.it/attuale/alilaguna.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u20f-alilagunaspa",
+          "name": "Alilaguna",
+          "website": "http://www.alilaguna.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ALILAGUNA"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

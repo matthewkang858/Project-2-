@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-burt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://opendata.burlington.ca/gtfs-rt/GTFS_VehiclePositions.pb",
+        "realtime_trip_updates": "https://opendata.burlington.ca/gtfs-rt/GTFS_TripUpdates.pb",
+        "realtime_alerts": "https://opendata.burlington.ca/gtfs-rt/GTFS_ServiceAlerts.pb"
+      },
+      "license": {
+        "url": "https://www.burlington.ca/en/services-for-you/resources/initiative%20projects/open_data/termsofuse.pdf"
+      }
+    },
+    {
+      "id": "f-dpxq-burlingtontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.burlington.ca/gtfs-rt/GTFS_Data.zip"
+      },
+      "license": {
+        "url": "https://www.burlington.ca/en/services-for-you/resources/initiative%20projects/open_data/termsofuse.pdf"
+      },
+      "tags": {
+        "gtfs_data_exchange": "burlington-transit"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dpxq-burlingtontransit",
+      "name": "Burlington Transit",
+      "website": "http://www.burlington.ca/transit",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-burt~rt"
+        },
+        {
+          "gtfs_agency_id": "BURT",
+          "feed_onestop_id": "f-dpxq-burlingtontransit"
+        }
+      ],
+      "tags": {
+        "developer_site": "https://navburl-burlington.opendata.arcgis.com/documents/transit-schedule-data-gtfs/explore",
+        "wikidata_id": "Q2928517"
+      }
+    }
+  ]
+}

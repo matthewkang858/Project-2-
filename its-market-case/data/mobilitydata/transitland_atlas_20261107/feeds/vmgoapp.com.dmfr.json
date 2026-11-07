@@ -1,0 +1,43 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dnx-roanoke~va~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://vmgoapp.com/gtfs"
+      },
+      "tags": {
+        "feed_id": "roanoke-va-us",
+        "gtfs_data_exchange": "radar-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnx5-valleymetroroanoke",
+          "name": "Valley Metro Roanoke",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "163"
+            },
+            {
+              "feed_onestop_id": "f-dnx-roanoke~va~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30007",
+            "wikidata_id": "Q7912141"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnx-roanoke~va~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://vmgoapp.com/gtfs-rt/vehiclepositions",
+        "realtime_trip_updates": "https://vmgoapp.com/gtfs-rt/tripupdates",
+        "realtime_alerts": "https://vmgoapp.com/gtfs-rt/alerts"
+      }
+    }
+  ]
+}

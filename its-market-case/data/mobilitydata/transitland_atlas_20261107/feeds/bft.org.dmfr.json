@@ -1,0 +1,42 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-c25p-benfranklintransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://myride.bft.org/Static/google_transit.zip",
+        "static_historic": [
+          "http://realtime.bft.org/Static/google_transit.zip",
+          "https://www.bft.org/gtfs/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c25p-benfranklintransit",
+          "name": "Ben Franklin Transit",
+          "short_name": "BFT",
+          "website": "http://www.bft.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-c25p-benfranklintransit~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00018",
+            "wikidata_id": "Q4885675"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c25p-benfranklintransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://myride.bft.org/Realtime/GTFS_VehiclePositions.pb",
+        "realtime_trip_updates": "https://myride.bft.org/Realtime/GTFS_TripUpdates.pb",
+        "realtime_alerts": "https://myride.bft.org/Realtime/GTFS_ServiceAlerts.pb"
+      }
+    }
+  ]
+}

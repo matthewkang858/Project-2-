@@ -1,0 +1,26 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9zyy-eauclairetransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.ect.cadavl.com/ECT/GTFS/GTFS_ECT.zip",
+        "static_historic": [
+          "http://www-ecbus-org.site.atfni.com/build_data_feed.phtml"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zyy-eauclairetransit",
+          "name": "Eau Claire Transit",
+          "tags": {
+            "twitter_general": "cityofeauclaire",
+            "us_ntd_id": "50099",
+            "wikidata_id": "Q5331438"
+          }
+        }
+      ]
+    }
+  ]
+}

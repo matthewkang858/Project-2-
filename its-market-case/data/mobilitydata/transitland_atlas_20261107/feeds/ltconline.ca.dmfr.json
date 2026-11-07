@@ -1,0 +1,58 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpwh-londontransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.londontransit.ca/gtfsfeed/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.londontransit.ca/open-data/ltcs-open-data-terms-of-use/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes"
+      },
+      "tags": {
+        "mdb_source_id": "2"
+      }
+    },
+    {
+      "id": "f-dpwh-londontransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://gtfs.ltconline.ca/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "http://gtfs.ltconline.ca/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "http://gtfs.ltconline.ca/Alert/Alerts.pb"
+      },
+      "license": {
+        "url": "https://www.londontransit.ca/open-data/ltcs-open-data-terms-of-use/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dpwh-londontransit",
+      "name": "London Transit",
+      "short_name": "LTC",
+      "website": "https://www.londontransit.ca",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-dpwh-londontransit"
+        },
+        {
+          "feed_onestop_id": "f-dpwh-londontransit~rt"
+        }
+      ],
+      "tags": {
+        "omd_provider_id": "london-transit-commission",
+        "wikidata_id": "Q6670860"
+      }
+    }
+  ]
+}

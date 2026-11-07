@@ -1,0 +1,50 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-loudouncounty~va~us",
+      "supersedes_ids": [
+        "f-loudouncounty~md~us"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.loudoun.gov/loudountransitgtfs",
+        "static_historic": [
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/loudouncounty-md-us.zip"
+        ]
+      },
+      "license": {
+        "url": "https://drpt.virginia.gov/data/gtfs-feed-clearinghouse/"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqbv-loudouncountytransit",
+          "name": "Loudoun County Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-loudouncounty~va~us~flex"
+            }
+          ],
+          "tags": {
+            "twitter_general": "LoudounCoGovt",
+            "us_ntd_id": "30081",
+            "wikidata_id": "Q6686032"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-loudouncounty~va~us~flex",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.trilliumtransit.com/gtfs/loudouncounty-va-us/loudouncounty-va-us--flex-v2.zip"
+      },
+      "license": {
+        "url": "https://drpt.virginia.gov/data/gtfs-feed-clearinghouse/"
+      },
+      "tags": {
+        "mdb_source_id": "2411"
+      }
+    }
+  ]
+}

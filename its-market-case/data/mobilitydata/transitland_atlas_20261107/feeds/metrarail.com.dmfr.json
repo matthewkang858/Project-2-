@@ -1,0 +1,62 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dp3-metra",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://schedules.metrarail.com/gtfs/schedule.zip",
+        "static_historic": [
+          "https://gtfsapi.metrarail.com/gtfs/raw/schedule.zip"
+        ]
+      },
+      "license": {
+        "url": "https://metra.com/gtfs-realtime-api-key-request-license-agreement",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "metra"
+      }
+    },
+    {
+      "id": "f-metra~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfspublic.metrarr.com/gtfs/public/positions",
+        "realtime_trip_updates": "https://gtfspublic.metrarr.com/gtfs/public/tripupdates",
+        "realtime_alerts": "https://gtfspublic.metrarr.com/gtfs/public/alerts"
+      },
+      "license": {
+        "url": "https://metra.com/gtfs-realtime-api-key-request-license-agreement",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "api_token",
+        "info_url": "https://metra.com/metra-gtfs-api"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dp3-metra",
+      "name": "Metra",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "METRA",
+          "feed_onestop_id": "f-dp3-metra"
+        },
+        {
+          "feed_onestop_id": "f-metra~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "Metra",
+        "us_ntd_id": "50118",
+        "wikidata_id": "Q1814208"
+      }
+    }
+  ]
+}

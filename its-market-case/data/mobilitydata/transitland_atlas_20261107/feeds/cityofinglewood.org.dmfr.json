@@ -1,0 +1,15 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-inglewood~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.cityofinglewood.org/gtfs",
+        "static_historic": [
+          "https://github.com/LACMTA/los-angeles-regional-gtfs/raw/main/inglewood-ca-us/inglewood-ca-us.zip"
+        ]
+      }
+    }
+  ]
+}

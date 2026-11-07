@@ -36,7 +36,7 @@ function newDeck() {
     objects: [
       { placeholder: { options: { name: 'title', type: 'title', x: 0.45, y: 0.32, w: 11.6, h: 0.95, fontSize: 20, bold: true, color: C.text1, valign: 'top', align: 'left', margin: 0, isTextBox: true }, text: '' } },
       { placeholder: { options: { name: 'tracker', type: 'body', x: 11.1, y: 0.18, w: 1.8, h: 0.3, fontSize: 9, color: C.text2, align: 'right', margin: 0 }, text: '' } },
-      { placeholder: { options: { name: 'source', type: 'body', x: 0.45, y: 6.88, w: 11.4, h: 0.42, fontSize: 8, color: C.text2, valign: 'top', margin: 0 }, text: '' } },
+      { placeholder: { options: { name: 'source', type: 'body', x: 0.45, y: 6.9, w: 12.45, h: 0.3, fontSize: 8.5, color: C.text2, valign: 'top', margin: 0 }, text: '' } },
       { text: { text: 'Public ITS market case', options: { x: 0.45, y: 7.22, w: 4, h: 0.2, fontSize: 8, color: C.text2, margin: 0, isTextBox: true } } },
     ],
     slideNumber: { x: 12.5, y: 7.18, w: 0.4, h: 0.25, fontSize: 8, color: HEX.dk2, align: 'right' },

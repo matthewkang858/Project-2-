@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f-viarail~traindecharlevoix",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.viarail.ca/sites/all/files/gtfs/viarail.zip"
+      },
+      "license": {
+        "url": "https://open.canada.ca/en/open-government-licence-canada"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f-viarail",
+          "name": "VIA Rail",
+          "website": "http://www.viarail.ca",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q876720"
+          }
+        }
+      ]
+    }
+  ]
+}

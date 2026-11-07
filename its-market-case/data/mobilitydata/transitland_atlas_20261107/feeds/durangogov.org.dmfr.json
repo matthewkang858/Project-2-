@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-durango~transit~co",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://durangogov.org/DocumentCenter/View/17688/Durango-Transit-GTFS-Data"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-durango~transit~co",
+          "name": "Durango Transit",
+          "website": "https://co-durango.civicplus.com/333/Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-durango~transit~co~flex"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "80206"
+          }
+        }
+      ]
+    }
+  ]
+}

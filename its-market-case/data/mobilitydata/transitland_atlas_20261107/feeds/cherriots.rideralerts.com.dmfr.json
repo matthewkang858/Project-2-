@@ -1,0 +1,48 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9rb-cherriots",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://cherriots.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://www.cherriots.org/media/doc/gtfs.zip",
+          "http://www.cherriots.org/developer/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.cherriots.org/datalicense/"
+      },
+      "tags": {
+        "gtfs_data_exchange": "cherriots"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9rb-cherriots",
+          "name": "Cherriots",
+          "website": "http://www.cherriots.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9rb-cherriots~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "Cherriots",
+            "us_ntd_id": "00025",
+            "wikidata_id": "Q7404020"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9rb-cherriots~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://cherriots.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://cherriots.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://cherriots.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      }
+    }
+  ]
+}

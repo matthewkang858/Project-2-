@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dp9-milwaukeecountytransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kamino.mcts.org/gtfs/google_transit.zip"
+      },
+      "license": {
+        "url": "https://www.ridemcts.com/policies/developer-terms"
+      },
+      "tags": {
+        "gtfs_data_exchange": "milwaukee-county-transit-system"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dp9-milwaukeecountytransitsystem",
+          "name": "Milwaukee County Transit System",
+          "short_name": "MCTS",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dp9-milwaukeecountytransitsystem~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "RideMCTS",
+            "us_ntd_id": "50008",
+            "wikidata_id": "Q1935975"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dp9-milwaukeecountytransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://realtime.ridemcts.com/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://realtime.ridemcts.com/gtfsrt/trips",
+        "realtime_alerts": "https://realtime.ridemcts.com/gtfsrt/alerts"
+      },
+      "license": {
+        "url": "https://www.ridemcts.com/policies/developer-terms"
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-piercetransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/vehicle-positions-for-agency/3.pb",
+        "realtime_trip_updates": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/trip-updates-for-agency/3.pb",
+        "realtime_alerts": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/alerts-for-agency/3.pb"
+      },
+      "license": {
+        "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/transit-data-terms-use"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "key",
+        "info_url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd"
+      }
+    },
+    {
+      "id": "f-soundtransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/vehicle-positions-for-agency/40.pb",
+        "realtime_trip_updates": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/trip-updates-for-agency/40.pb",
+        "realtime_alerts": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/alerts-for-agency/40.pb"
+      },
+      "license": {
+        "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/transit-data-terms-use"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "key",
+        "info_url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd"
+      }
+    },
+    {
+      "id": "f-wsf~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/vehicle-positions-for-agency/95.pb",
+        "realtime_trip_updates": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/trip-updates-for-agency/95.pb",
+        "realtime_alerts": "http://api.pugetsound.onebusaway.org/api/gtfs_realtime/alerts-for-agency/95.pb"
+      },
+      "license": {
+        "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/transit-data-terms-use"
+      },
+      "authorization": {
+        "type": "query_param",
+        "param_name": "key",
+        "info_url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd"
+      }
+    }
+  ]
+}

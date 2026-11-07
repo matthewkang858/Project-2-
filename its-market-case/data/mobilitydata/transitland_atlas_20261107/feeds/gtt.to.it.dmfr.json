@@ -1,0 +1,86 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u0j-torino",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.gtt.to.it/open_data/gtt_gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://aperto.comune.torino.it/dataset/feed-gtfs-trasporti-gtt/resource/88035475-b429-40de-ba64-99de232d6327"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u0j-gruppotorinesetrasporti",
+          "name": "GTT Servizio Ferroviario",
+          "short_name": "GTT",
+          "website": "http://www.gtt.to.it/cms/percorari/ferrovie",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "F"
+            },
+            {
+              "feed_onestop_id": "f-u0j-torino~rt"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0j-gttservizioextraurbano",
+          "name": "GTT servizio extraurbano",
+          "short_name": "GTT",
+          "website": "http://www.gtt.to.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "E"
+            },
+            {
+              "feed_onestop_id": "f-u0j-torino~rt"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0j2-gruppotorinesetrasporti",
+          "name": "GTT Servizio Urbano",
+          "short_name": "GTT",
+          "website": "http://www.gtt.to.it/cms/percorari/urbano",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "U"
+            },
+            {
+              "feed_onestop_id": "f-u0j-torino~rt"
+            }
+          ]
+        },
+        {
+          "onestop_id": "o-u0j2-gttservizituristici",
+          "name": "GTT Servizi Turistici",
+          "website": "http://www.gtt.to.it/cms/turismo",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "T"
+            },
+            {
+              "feed_onestop_id": "f-u0j-torino~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-u0j-torino~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://percorsieorari.gtt.to.it/das_gtfsrt/vehicle_position.aspx",
+        "realtime_trip_updates": "https://percorsieorari.gtt.to.it/das_gtfsrt/trip_update.aspx",
+        "realtime_alerts": "https://percorsieorari.gtt.to.it/das_gtfsrt/alerts.aspx"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://aperto.comune.torino.it/dataset/feed-gtfs-real-time-trasporti-gtt/resource/724982f5-cf5a-4f3d-ac87-a2456bd2e90c"
+      }
+    }
+  ]
+}

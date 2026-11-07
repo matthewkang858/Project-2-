@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-santee~wateree~rta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://santeebus.com/gtfs"
+      }
+    },
+    {
+      "id": "f-santee~wateree~rta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://santeebus.com/gtfs-rt/vehiclepositions",
+        "realtime_trip_updates": "https://santeebus.com/gtfs-rt/tripupdates",
+        "realtime_alerts": "https://santeebus.com/gtfs-rt/alerts"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dnn-santeewatereerta",
+      "name": "Santee Wateree RTA",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "159",
+          "feed_onestop_id": "f-santee~wateree~rta"
+        },
+        {
+          "feed_onestop_id": "f-santee~wateree~rta~rt"
+        }
+      ],
+      "tags": {
+        "us_ntd_id": "40100"
+      }
+    }
+  ]
+}

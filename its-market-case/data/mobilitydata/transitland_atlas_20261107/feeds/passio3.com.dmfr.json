@@ -1,0 +1,2729 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9mu-irvine~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/irvine/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recmhbGSG7kKeYBFt"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9mu-irvine~ca~us",
+          "name": "City of Irvine",
+          "short_name": "Irvine CONNECT",
+          "website": "https://www.cityofirvine.org/transportation/irvine-connect",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-irvine~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recK4si1uIoj6HfrO"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q5cs-newportbeach~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/newportbeach/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recOGtZNl9tHEl2ip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5cs-newportbeach",
+          "name": "City of Newport Beach",
+          "short_name": "Balboa Peninsula Trolley",
+          "website": "https://www.newportbeachca.gov/government/departments/public-works/municipal-operations/trolley",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9q5cs-newportbeach~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rectXzoXm6gBuNBHK"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q5cs-newportbeach~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/newportbeach/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/newportbeach/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/newportbeach/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recMnCcxbyiDqp17h,recNGWH5lOgZmkZ69,recdjfzBLPNHp9jGB"
+      }
+    },
+    {
+      "id": "f-9q5cx-montereypark~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/montereyp/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/montereypark-ca-us/montereypark-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recuk7BRnwba1kMkL"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q5cx-spiritbus",
+          "name": "City of Monterey Park",
+          "short_name": "Spirit Bus",
+          "website": "http://www.montereypark.ca.gov/549/Spirit-Bus",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9q5cx-montereypark~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "reccAVEcMntkbh6aY",
+            "twitter_general": "CityofMPK",
+            "us_ntd_id": "90286",
+            "wikidata_id": "Q6905333"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9q5cx-montereypark~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recEg3GdrfqV6xKN4,recYsIZSJI6EhsdAU,reclLaGbHdpLjdbz9"
+      }
+    },
+    {
+      "id": "f-9qc-yubasutter~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/yubasutter/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/yubasutter-ca-us/yubasutter-ca-us.zip"
+        ]
+      },
+      "license": {
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec2psueiMQBfcyhS"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qc-yuba~suttertransit",
+          "name": "Yuba-Sutter Transit",
+          "website": "https://www.yubasuttertransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9qc-yubasutter~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rech0BusKA17h0vuL",
+            "twitter_general": "yubacounty",
+            "us_ntd_id": "90061",
+            "wikidata_id": "Q8060099"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9qc-yubasutter~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/yubasutter/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/yubasutter/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/yubasutter/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "receyg50PkhMStDaI,recqcwM98sEoKatI8,rec7y3xDGsUaKyXXV"
+      }
+    },
+    {
+      "id": "f-9qdc-clovistransit~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/clovis/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/clovistransit-ca-us/clovistransit-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recd1BPlfHYvT1z7A"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qdc-clovistransit",
+          "name": "Clovis Transit",
+          "website": "https://clovistransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9qdc-clovistransit~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec2JrGQTZZh54ieL",
+            "twitter_general": "clovistransit",
+            "us_ntd_id": "90313",
+            "wikidata_id": "Q113396103;Q130391671"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9qdc-clovistransit~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/clovis/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/clovis/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/clovis/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recVL13N87zkRZ87W,recmowdKj7sPPptkO,recqjUaD33227CWQX"
+      }
+    },
+    {
+      "id": "f-9rc-cascadeseast~or~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/cet/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://oregon-gtfs.trilliumtransit.com/gtfs_data/cascadeseast-or-us/cascadeseast-or-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "cascades-east-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9rc-cascadeseasttransit",
+          "name": "Cascades East Transit",
+          "short_name": "CET",
+          "website": "https://www.caravanairporttransportation.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "61"
+            },
+            {
+              "feed_onestop_id": "f-9rc-cascadeseast~or~us~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ridecet",
+            "us_ntd_id": "00057"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9rc-cascadeseast~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/cet/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/cet/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/cet/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-9vxz-jatran~ms~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/jtran/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/jatran-ms-us/jatran-ms-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "jatran"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9vxz-jatran",
+          "name": "City of Jackson",
+          "short_name": "JTRAN",
+          "website": "https://ridejtran.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9vxz-jatran~ms~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40015",
+            "wikidata_id": "Q6117777"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-9vxz-jatran~ms~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/jtran/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/jtran/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/jtran/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-9xj5s-viamobilityservices~co~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/viaboulder/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/viamobilityservices-co-us/viamobilityservices-co-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9xj5s-viamobilityservices",
+          "name": "Via Mobility Services",
+          "website": "https://viacolorado.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-9xj5s-viamobilityservices~co~us~rt"
+            },
+            {
+              "feed_onestop_id": "f-9xj5s-viamobilityservices~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-9xj5s-viamobilityservices~co~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-9xj5s-viamobilityservices~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-arcadia~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ArcadiaCity/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/arcadia-ca-us/arcadia-ca-us.zip",
+          "https://data.trilliumtransit.com/gtfs/arcadia-ca-us/arcadia-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "rec3vKuTZlmB8kgtS"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qh44-arcadiatransit",
+          "name": "Arcadia Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-arcadia~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recjaoK08lDmhjQga",
+            "us_ntd_id": "90044"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-arcadia~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ArcadiaCity/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ArcadiaCity/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ArcadiaCity/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recchEd4c0FkDeFsJ,recrmivgmJrXixcVo,recvPLHAg10ZwsNeM"
+      }
+    },
+    {
+      "id": "f-baldwinpark~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/baldwinpark/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/baldwinpark-ca-us/baldwinpark-ca-us.zip",
+          "https://data.trilliumtransit.com/gtfs/baldwinpark-ca-us/baldwinpark-ca-us.zip",
+          "https://baldwinpark.tectransit.com/api/public/fixedRoute/gtfs"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recnKkYbXz2ct55bd"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qh1g-baldwinparktransit",
+          "name": "Baldwin Park Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-baldwinpark~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec2mqmTSs2fd2Ogc",
+            "twitter_general": "BaldwinParkCA",
+            "us_ntd_id": "90251"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-baldwinpark~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/baldwinpark/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/baldwinpark/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/baldwinpark/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec2pKTVTBoV1BSP5,recfKXedWi5JJgErC,recIwS17xZuZhqfyf"
+      }
+    },
+    {
+      "id": "f-bangor~me~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/bangor/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bangor~me~us",
+          "name": "Bangor Community Connector",
+          "website": "https://bangormaine.gov/634/Community-Connector",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-bangor~me~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "10096"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-bangor~me~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/bangor/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/bangor/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/bangor/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-beckley~wv~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/beckley/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-beckley~wv~us",
+          "name": "New River Transit Authority",
+          "short_name": "NRT",
+          "website": "https://newrivertransitauthority.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-beckley~wv~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30199"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-beckley~wv~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/beckley/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/beckley/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/beckley/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-billings~mt~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/billings/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-billings~mt~us",
+          "name": "Billings Metropolitan Transit",
+          "short_name": "MET",
+          "website": "https://www.billingsmt.gov/3042/MET",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-billings~mt~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "80004",
+            "wikidata_id": "Q4911950"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-billings~mt~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/billings/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/billings/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/billings/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-bismarck~nd~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/bisman/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bismarck~nd~us",
+          "name": "Bis-Man Transit",
+          "website": "https://bismantransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-bismarck~nd~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "80019",
+            "wikidata_id": "Q113039730"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-bismarck~nd~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/bisman/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/bisman/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/bisman/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-brockton~ma~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/brockton/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/brockton/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/brockton/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-c214-sandy~or~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/sandyor/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://oregon-gtfs.trilliumtransit.com/gtfs_data/sandy-or-us/sandy-or-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c214-sandyareametro",
+          "supersedes_ids": [
+            "o-c213-mthoodexpress",
+            "o-c20c-sandyareametro"
+          ],
+          "name": "Sandy Area Metro",
+          "short_name": "SAM",
+          "website": "https://www.ci.sandy.or.us/transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-c214-sandy~or~us~rt"
+            },
+            {
+              "gtfs_agency_id": "86",
+              "feed_onestop_id": "f-sandy~or~us~flex"
+            }
+          ],
+          "tags": {
+            "twitter_general": "CityofSandyOR",
+            "us_ntd_id": "00389",
+            "wikidata_id": "Q7417136"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c214-sandy~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-c28-islandtransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/islandtransit/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/islandtransit-wa-us/islandtransit-wa-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c28-islandtransit",
+          "name": "Island Transit",
+          "website": "http://www.islandtransit.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-c28-islandtransit~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00298",
+            "wikidata_id": "Q16980701"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c28-islandtransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/islandtransit/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/islandtransit/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/islandtransit/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-c2qft-udash~mt~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/montanau/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/udash-mt-us/udash-mt-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "mountain-line-mutd"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c2qft-udash~universityofmontana",
+          "name": "University of Montana",
+          "short_name": "UDASH",
+          "website": "https://www.umt.edu/transportation-parking-services/bus/default.php",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-c2qft-udash~mt~us~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "udash",
+            "us_ntd_id": "80107"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c2qft-udash~mt~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/montanau/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/montanau/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/montanau/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-casper~wy~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/casper/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/11555/CATTransit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-casper~wy~us",
+          "name": "Casper Area Transit",
+          "website": "https://www.casperareatransit.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-casper~wy~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "80013"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-casper~wy~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/casper/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/casper/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/casper/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-chapman~university~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/chapman/passioTransit/gtfs/google_transit.zip"
+      }
+    },
+    {
+      "id": "f-chemung~c~tran",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/chemung/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://s3.amazonaws.com/datatools-511ny/public/Chemung_C_TRAN.zip",
+          "https://s3.amazonaws.com/datatools-511ny/public/Chemung_C_Tran.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr3-ctran",
+          "name": "C TRAN",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-chemung~c~tran~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "20005",
+            "wikidata_id": "Q5014662"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-chemung~c~tran~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/chemung/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/chemung/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/chemung/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-cityofashland~ky~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ashlandky/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/12026/AshlandABS_GTFS.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cityofashland~ky~us",
+          "name": "Ashland Bus System",
+          "tags": {
+            "us_ntd_id": "40016",
+            "wikidata_id": "Q4805227"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-clackamascounty~or~us",
+      "supersedes_ids": [
+        "f-c20f-cccxpress~or~us"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/clackamas/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://oregon-gtfs.trilliumtransit.com/gtfs_data/clackamascounty-or-us/clackamascounty-or-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-clackamascounty~or~us",
+          "supersedes_ids": [
+            "o-c20f-cccxpress",
+            "o-c20-clackamascounty"
+          ],
+          "name": "Clackamas County Connects Shuttle",
+          "short_name": "ClackCo",
+          "website": "https://www.clackamas.us/h3s/connects-shuttle",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-clackamascounty~or~us~flex"
+            },
+            {
+              "feed_onestop_id": "f-clackamascounty~or~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00363"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-clackamascounty~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-concho~valley~tx~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/conchovt/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-concho~valley~tx~us",
+          "name": "Concho Valley Transit District",
+          "short_name": "CVTD",
+          "website": "https://www.cvtd.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-concho~valley~tx~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "60102"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-concho~valley~tx~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/conchovt/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/conchovt/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/conchovt/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-connect~douglas~ga~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/douglas/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-connect~douglas~ga~us",
+          "name": "Connect Douglas",
+          "website": "https://connectdouglas.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-connect~douglas~ga~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40082"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-connect~douglas~ga~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/douglas/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/douglas/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/douglas/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-cooperative~alliance~for~seacoast~transportation",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/COAST/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cooperative~alliance~for~seacoast~transportation",
+          "name": "Cooperative Alliance For Seacoast Transportation",
+          "short_name": "COAST",
+          "website": "https://coastbus.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-cooperative~alliance~for~seacoast~transportation~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "10086",
+            "wikidata_id": "Q5167873"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-cooperative~alliance~for~seacoast~transportation~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/COAST/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/COAST/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/COAST/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-csulbshuttle~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/longbeachcal/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recKRp5JUc1C7mlLl"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-csulbshuttle~ca~us",
+          "name": "Cal State Long Beach Shuttle",
+          "website": "https://www.csulb.edu/parking-transportation",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-csulbshuttle~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recgTWOUlAuVUbNv4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-csulbshuttle~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/longbeachcal/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/longbeachcal/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/longbeachcal/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recinqIMt9BC0zmdf,recEaUONCb8hodhsI,recVAWO9PiYdIpYaz"
+      }
+    },
+    {
+      "id": "f-cuats~tn~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/cuats/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://www.sethratransit.org/s/SETHRA_GTFS.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-cuats~tn~us",
+          "name": "Cleveland Urban Area Transit System",
+          "short_name": "CUATS",
+          "website": "https://www.sethratransit.org/about-cuats",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-cuats~tn~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40989"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-cuats~tn~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/cuats/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/cuats/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/cuats/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-danapointtrolley~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/dptrolley/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recpEJ0xyQY8kuQPb"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-danapointtrolley~ca~us",
+          "name": "Dana Point Trolley",
+          "website": "https://www.danapoint.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-danapointtrolley~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "receSouvQI31vHz4D"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-danapointtrolley~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/dptrolley/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/dptrolley/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/dptrolley/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec2jBhy6LnYSoSzc,recvulkn7FYJYLpKq,recdFUVVPFZvOQK7w"
+      }
+    },
+    {
+      "id": "f-dhvrs-bullrunner",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/usf/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://github.com/CUTR-at-USF/bullrunner-gtfs-realtime-generator/raw/master/bullrunner-gtfs.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dhvrs-usfbullrunner",
+          "name": "USF Bull Runner",
+          "website": "http://www.usf.edu/administrative-services/parking",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dhvrs-bullrunner~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "usfpts"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dhvrs-bullrunner~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/usf/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/usf/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/usf/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dnq8-ninertransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/uncc/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnq8-ninertransit",
+          "name": "UNC Charlotte",
+          "short_name": "Niner Transit",
+          "website": "https://pats.charlotte.edu/transportation/niner-transit-bus-service/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnq8-ninertransit"
+            },
+            {
+              "feed_onestop_id": "f-dnq8-ninertransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "CLT_PATS"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnq8-ninertransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/uncc/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/uncc/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/uncc/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dnq9-ckrider~nc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/concordKat/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://passio3.com/concordk/passioTransit/gtfs/google_transit.zip",
+          "https://data.trilliumtransit.com/gtfs/ckrider-nc-us/ckrider-nc-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnq9-concordkannapolisareatransit",
+          "name": "Concord Kannapolis Area Transit",
+          "short_name": "Rider",
+          "website": "https://ckrider.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnq9-ckrider~nc~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40167",
+            "wikidata_id": "Q5158814"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnq9-ckrider~nc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/concordk/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/concordk/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/concordk/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dnvx-athenspublictransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/athenstransit/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://hosted-gtfs-feeds.s3.amazonaws.com/HAPCAP/gtfs.zip",
+          "http://www.athenstransit.org/code/wp-content/athenstransit-athens-oh-us/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnvx-athenspublictransit",
+          "name": "Athens Public Transit",
+          "short_name": "APT",
+          "website": "http://www.athenstransit.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnvx-athenspublictransit~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "hapcap",
+            "us_ntd_id": "50278",
+            "wikidata_id": "Q124349927"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnvx-athenspublictransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/athenstransit/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/athenstransit/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/athenstransit/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dnwe-radford~va~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/radford/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/radford-va-us/radford-va-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "radford-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnwe-radfordtransit",
+          "name": "Radford Transit",
+          "website": "http://www.radfordtransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnwe-radford~va~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30200"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnwe-radford~va~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/radford/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/radford/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/radford/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dnzft-harrisonburghdpt",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/harrisonburg/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://harrisonburgva.gov/sites/default/files/Transit/files/gtfs/google_transit_Working%20%281%29.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnzft-harrisonburghdpt",
+          "name": "Harrisonburg HDPT",
+          "short_name": "HDPT",
+          "website": "https://www.harrisonburgva.gov/bus-routes",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dnzft-harrisonburghdpt~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "rideHDPT",
+            "us_ntd_id": "30094",
+            "wikidata_id": "Q5666203"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dnzft-harrisonburghdpt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/harrisonburg/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/harrisonburg/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/harrisonburg/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dp89-beloittransit~wi~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/beloit/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://data.trilliumtransit.com/gtfs/beloittransit-wi-us/beloittransit-wi-us.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "beloit-transit-system"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dp89-beloittransitsystem",
+          "name": "Beloit Transit System",
+          "website": "https://www.beloittransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dp89-beloittransit~wi~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50109",
+            "wikidata_id": "Q4884499"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dp89-beloittransit~wi~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/beloit/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/beloit/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/beloit/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dq0v-jacksonvilletransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/jacksonville/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dq0v-jacksonvilletransit",
+          "name": "City of Jacksonville",
+          "short_name": "Jacksonville Transit",
+          "website": "https://www.jacksonvillenc.gov/921/Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dq0v-jacksonvilletransit~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40166"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dq0v-jacksonvilletransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dq259-ncsu~wolfline~nc~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ncstateuni/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://api.transloc.com/gtfs/ncsu.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dq259-ncsuwolfline",
+          "name": "North Carolina State University",
+          "short_name": "Wolfline",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dq259-ncsu~wolfline~nc~us~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "NCStateTranspo",
+            "us_ntd_id": "40147",
+            "wikidata_id": "Q8030170"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dq259-ncsu~wolfline~nc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dqcx8-charmcitycirculator",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/charmcity/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://transportation.baltimorecity.gov/files/cccgtfs824zip",
+          "https://transportation.baltimorecity.gov/gtfsfile",
+          "https://github.com/mobilityequity/maryland-local-gtfs/raw/master/CCC_GTFS.zip"
+        ]
+      },
+      "license": {
+        "url": "https://transportation.baltimorecity.gov/charm-city-circulator/developer-resources"
+      },
+      "tags": {
+        "gtfs_data_exchange": "charm-city-circulator"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dqcx8-charmcitycirculator",
+          "name": "Charm City Circulator",
+          "short_name": "CCC",
+          "website": "http://www.charmcitycirculator.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dqcx8-charmcitycirculator~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "charmcitycirc",
+            "us_ntd_id": "30201",
+            "wikidata_id": "Q5086389"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dqcx8-charmcitycirculator~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/charmcity/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/charmcity/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/charmcity/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dr1b-harfordtransitlink",
+      "supersedes_ids": [
+        "f-hartford~county~md"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/harford/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://github.com/mobilityequity/maryland-local-gtfs/raw/master/Harford_GTFS.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "harford-transit-link"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr1b-harfordtransitlink",
+          "name": "Harford Transit LINK",
+          "website": "http://www.harfordtransit.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dr1b-harfordtransitlink~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "HarfordCountyMD",
+            "us_ntd_id": "30074",
+            "wikidata_id": "Q5657016"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dr1b-harfordtransitlink~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/harford/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/harford/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/harford/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-dr41-ceciltransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/cecil/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://www.ccgov.org/home/showpublisheddocument/51736/638418521708670000",
+          "https://www.ccgov.org/home/showpublisheddocument/50900/638330494895530000",
+          "https://github.com/mobilityequity/maryland-local-gtfs/raw/master/Cecil_GTFS.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "cecil-transit"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr41-ceciltransit",
+          "name": "Cecil Transit",
+          "website": "https://www.ccgov.org/government/community-services/cecil-transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dr41-ceciltransit~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30108",
+            "wikidata_id": "Q52162155"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dr41-ceciltransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/cecil/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/cecil/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/cecil/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-drs-franklinregionaltransitauthority~ma~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/frta/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/frta/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/frta/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-drsf-montachusett~ma~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/montachusett/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/montachusett/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/montachusett/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-east~tennessee~human~resource~agency~inc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ethra/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://www.lakewaytransit.com/_files/archives/880354_3dae1835a9c04b40ac803540a92adf83.zip?dn=export-2023-11-27T08-41-59.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-east~tennessee~human~resource~agency~inc",
+          "name": "East Tennessee Human Resource Agency (ETHRA)",
+          "short_name": "Lakeway Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-east~tennessee~human~resource~agency~inc~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40190"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-east~tennessee~human~resource~agency~inc~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ethra/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ethra/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ethra/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-edmond~ok~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/edmond/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://www.edmondok.gov/DocumentCenter/View/9799/GTFS-1"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-edmond~ok~us",
+          "name": "Citylink Edmond",
+          "website": "https://www.edmondok.gov/205/Citylink-Edmond",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-edmond~ok~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "60118"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-edmond~ok~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/edmond/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/edmond/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/edmond/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-ewr~airport~shuttles~nj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ewrpanynj/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr5px-portauthorityofnewyorkandnewjersey",
+          "name": "Port Authority of New York and New Jersey",
+          "website": "https://www.newarkairport.com/at-airport/airtrain-and-shuttles",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-ewr~airport~shuttles~nj~rt"
+            },
+            {
+              "feed_onestop_id": "f-newark~airtrain~nj"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q908666;Q542145"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-ewr~airport~shuttles~nj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ewrpanynj/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ewrpanynj/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ewrpanynj/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-florida~gulf~coast~university",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/fgcu/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-florida~gulf~coast~university",
+          "name": "Florida Gulf Coast University",
+          "short_name": "FGCU",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-florida~gulf~coast~university~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-florida~gulf~coast~university~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/fgcu/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/fgcu/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/fgcu/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-fresnostatebulldogexpress~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/fresnostate/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recQHT6jwWMUsCoP4"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-fresnostatebulldogexpress~ca~us",
+          "name": "Fresno State Bulldog Express",
+          "website": "https://www.fresnostate.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-fresnostatebulldogexpress~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recoQlk5crf3n72AS"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-fresnostatebulldogexpress~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/fresnostate/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/fresnostate/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/fresnostate/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recOYzIswaAjShoKU,rectQzm6pjHTWyWEH,recfaZvB6ue4W3Zbs"
+      }
+    },
+    {
+      "id": "f-hartransit~ct~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/hart/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/hartransit-ct-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-hartransit~ct~us",
+          "name": "Housatonic Area Regional Transit",
+          "short_name": "HARTransit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-hartransit~ct~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "10051",
+            "wikidata_id": "Q5913491"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-hartransit~ct~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/hart/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/hart/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/hart/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-harvard~university",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/harvard/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-harvard~university",
+          "name": "Harvard University",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-harvard~university~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-harvard~university~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/harvard/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/harvard/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/harvard/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-hendry~co~bocc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/hendrycounty/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-hendry~co~bocc",
+          "name": "Hendry County Transit System",
+          "short_name": "STREAM",
+          "website": "https://www.hendryfla.net/county_engineer/fixed_route_services.php",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-hendry~co~bocc~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "44980"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-hendry~co~bocc~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/hendrycounty/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/hendrycounty/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/hendrycounty/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-hoboken~nj",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/hoboken/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-hoboken~nj",
+          "name": "City of Hoboken",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-hoboken~nj~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-hoboken~nj~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/hoboken/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/hoboken/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/hoboken/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-irvine~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/irvine/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/irvine/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/irvine/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec951WQq370EpPcJ,recTILNSKoLczx1Ma,reczSNWH78RKP9RPU"
+      }
+    },
+    {
+      "id": "f-jax~il~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/JCMTD/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-jax~il~us",
+          "name": "Jackson County Mass Transit District",
+          "short_name": "JAX Mass Transit",
+          "website": "https://ridejax.com/",
+          "tags": {
+            "us_ntd_id": "50204",
+            "wikidata_id": "Q122574540"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-kootenai~citylink",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/kootenai/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-kootenai~citylink",
+          "name": "Kootenai Citylink",
+          "website": "https://www.kcgov.us/486/Transit-Services",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-kootenai~citylink~rt"
+            },
+            {
+              "feed_onestop_id": "f-kootenai~citylink~rural"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00055,00053",
+            "wikidata_id": "Q22058969"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-kootenai~citylink~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/kootenai/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/kootenai/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/kootenai/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-kootenai~citylink~rural",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/citylinkrural/passioTransit/gtfs/google_transit.zip"
+      }
+    },
+    {
+      "id": "f-lagunanigueltrolley~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/lntrolley/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec0vu7IhqsZqB0sp"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-lagunanigueltrolley~ca~us",
+          "name": "Laguna Niguel Trolley",
+          "website": "https://www.cityoflagunaniguel.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-lagunanigueltrolley~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recwBSFrVmbeGqn0g"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-lagunanigueltrolley~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/lntrolley/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/lntrolley/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/lntrolley/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recQLDXjKovsvOUuT,recr4oCgojKtQYuy2,recxf69Q8Am78hxUK"
+      }
+    },
+    {
+      "id": "f-las~cruces~road~runner",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/roadrunner/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://mjcaction.com/MJC_GTFS_Public/lascrucesroadrunner_google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9tsp-roadrunnertransit",
+          "name": "RoadRUNNER Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-las~cruces~road~runner~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "clcgov",
+            "us_ntd_id": "60049",
+            "wikidata_id": "Q7339261"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-las~cruces~road~runner~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/roadrunner/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/roadrunner/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/roadrunner/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-macog",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/macog/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://macog.com/google/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-macog",
+          "name": "Interurban Trolley",
+          "website": "http://www.interurbantrolley.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-macog~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50149"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-macog~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/macog/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/macog/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/macog/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-mercy~college",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/mercy/passioTransit/gtfs/google_transit.zip"
+      }
+    },
+    {
+      "id": "f-north~fork~area~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/northfork/passioTransit/gtfs/google_transit.zip"
+      }
+    },
+    {
+      "id": "f-olean~area~transit~system",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/oats/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://s3.amazonaws.com/datatools-511ny/public/Olean_Area_Transit_System.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr2p-oleanareatransitsystem",
+          "name": "Olean Area Transit System",
+          "short_name": "OATS",
+          "website": "https://cityofolean.org/olean-area-transit-system/",
+          "tags": {
+            "twitter_general": "oatsolean",
+            "us_ntd_id": "20975"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-ozark~regional~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ozark/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ozark~regional~transit",
+          "name": "Ozark Regional Transit",
+          "short_name": "ORT",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-ozark~regional~transit~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "60072",
+            "wikidata_id": "Q7116506"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-ozark~regional~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ozark/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ozark/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ozark/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-pepperdineuniversity~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/pepperdine/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec2GLwKJ0H3nUQXe"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-pepperdineuniversity~ca~us",
+          "name": "Pepperdine University",
+          "website": "https://www.pepperdine.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-pepperdineuniversity~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recgJ1yxWPKvQM1eZ"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-pepperdineuniversity~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/pepperdine/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/pepperdine/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/pepperdine/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recFQZ4ZIEBaA3QfT"
+      }
+    },
+    {
+      "id": "f-portage~area~regional~transportation~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/parta/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://spotparta.com/gtfs/google_transit.zip",
+          "https://592f5f98-5029-425f-ac4d-0774faecf068.filesusr.com/archives/f64377_81ed397719364abbb0aa6a97a1dbf1c9.zip?dn=12_17google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpq-parta",
+          "name": "Portage Area Regional Transportation Authority",
+          "short_name": "PARTA",
+          "website": "https://www.partaonline.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-portage~area~regional~transportation~authority~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "PortageAreaRTA",
+            "us_ntd_id": "50021",
+            "wikidata_id": "Q7231402"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-portage~area~regional~transportation~authority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/parta/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/parta/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/parta/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-regional~public~transportation~inc",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/smart/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/11599/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-regional~public~transportation~inc",
+          "name": "Regional Public Transportation, Inc.",
+          "short_name": "SMART Transit",
+          "website": "https://www.smarttransit.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-regional~public~transportation~inc~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00347"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-regional~public~transportation~inc~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/smart/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/smart/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/smart/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-rochester~institute~of~technology",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ritech/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://api.transloc.com/gtfs/rit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-rochester~institute~of~technology",
+          "name": "Rochester Institute of Technology",
+          "short_name": "RIT",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-rochester~institute~of~technology~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-rochester~institute~of~technology~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/ritech/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/ritech/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/ritech/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-rosemead~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/rosemead/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://raw.githubusercontent.com/LACMTA/los-angeles-regional-gtfs/main/rosemead-ca-us/rosemead-ca-us.zip",
+          "http://data.trilliumtransit.com/gtfs/rosemead-ca-us/rosemead-ca-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qh1b-rosemeadexplorer",
+          "name": "Rosemead Explorer",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-rosemead~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "90289"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-rosemead~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/rosemead/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/rosemead/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/rosemead/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-sanclementetrolley~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/sctrolley/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "reczUaXBG1N3dnMo1"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sanclementetrolley~ca~us",
+          "name": "San Clemente Trolley",
+          "website": "https://www.san-clemente.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sanclementetrolley~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recwtQ7m3C59jbnrc"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sanclementetrolley~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/sctrolley/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/sctrolley/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/sctrolley/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recse7hhrByIeRDsf,recbultmLj3mWX2gE,recZfAwb1gHrnCkDG"
+      }
+    },
+    {
+      "id": "f-sanjuancapistrano~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/scjtrolley/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://gtfs.calitp.org/production/SanJuanCapistranoGTFS.zip",
+          "https://data.trilliumtransit.com/gtfs/sanjuancapistrano-ca-us/sanjuancapistrano-ca-us.zip",
+          "http://www.sanjuancapistrano.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recaJzpRj5YzgowSc"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sanjuancapistrano~ca~us",
+          "name": "San Juan Capistrano",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sanjuancapistrano~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recEHMkhVmzSWO9nZ"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sanjuancapistrano~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/scjtrolley/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/scjtrolley/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/scjtrolley/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recNqhffRLThgd99j,recsuH6zDESiMSWAG,reccoOym8zoSja1OV"
+      }
+    },
+    {
+      "id": "f-sb~transpo~in~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/transpo/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sb~transpo~in~us",
+          "name": "South Bend Public Transportation Corporation",
+          "short_name": "Transpo",
+          "website": "https://www.sbtranspo.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-sb~transpo~in~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50052",
+            "wikidata_id": "Q7566310"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-sb~transpo~in~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/transpo/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/transpo/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/transpo/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-selkirks~pend~oreille~transit~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/spotbus/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/11599/google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-selkirks~pend~oreille~transit~authority",
+          "name": "Selkirks-Pend Oreille Transit Authority",
+          "short_name": "SPOT Bus",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-selkirks~pend~oreille~transit~authority~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "00341"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-selkirks~pend~oreille~transit~authority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/spotbus/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/spotbus/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/spotbus/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-seneca~nation~of~indians",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/senecanation/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-seneca~nation~of~indians",
+          "name": "Seneca Nation of Indians",
+          "website": "https://senecatransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-seneca~nation~of~indians~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "22929"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-seneca~nation~of~indians~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/senecanation/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/senecanation/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/senecanation/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-spokanetribe~wa~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/spokanetribe/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-spokanetribe~wa~us",
+          "name": "Spokane Tribe of Indians",
+          "tags": {
+            "us_ntd_id": "00207"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-stevens~point~wi",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/centraltrans/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-stevens~point~wi",
+          "name": "Stevens Point Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-stevens~point~wi~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50359"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-stevens~point~wi~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/centraltrans/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/centraltrans/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/centraltrans/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-st~lawrence~county~ny",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/stlawrence/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://s3.amazonaws.com/datatools-511ny/public/St_Lawrence_County_Public_Transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-st~lawrence~county~ny",
+          "name": "St. Lawrence County Public Transit",
+          "website": "https://www.slcnypublictransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-st~lawrence~county~ny~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "20991"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-st~lawrence~county~ny~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/stlawrence/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/stlawrence/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/stlawrence/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-towson~loop",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/towson/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-towson~loop",
+          "name": "Towson Loop",
+          "website": "https://www.baltcoloop.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-towson~loop~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "30130"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-towson~loop~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/towson/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/towson/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/towson/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-tuscaloosa~county~parking~and~transit~authority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/tuscaloosatransit/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-tuscaloosa~county~parking~and~transit~authority",
+          "name": "Tuscaloosa Transit Authority",
+          "short_name": "TTA",
+          "website": "http://www.tuscaloosatransit.com/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-tuscaloosa~county~parking~and~transit~authority~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "40045"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-tuscaloosa~county~parking~and~transit~authority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/tuscaloosatransit/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/tuscaloosatransit/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/tuscaloosatransit/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-uchra~tn~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/uchra/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-uchra~tn~us",
+          "name": "Upper Cumberland Human Resource Agency",
+          "website": "https://www.uchra.org/",
+          "tags": {
+            "us_ntd_id": "40978"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-uga~ga~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/uga/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/uga-ga-us.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dnh9n-universityofgeorgia",
+          "name": "University of Georgia",
+          "short_name": "UGA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-uga~ga~us~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "UGA_TPS",
+            "us_ntd_id": "40180",
+            "wikidata_id": "Q7864605"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-uga~ga~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/uga/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/uga/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/uga/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-universityofarkansas~ar~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/UofArkansas/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-universityofarkansas~ar~us",
+          "name": "University of Arkansas",
+          "website": "https://parking.uark.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-universityofarkansas~ar~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "60062",
+            "wikidata_id": "Q7299644"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-universityofarkansas~ar~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/UofArkansas/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/UofArkansas/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/UofArkansas/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-universityofsandiegotram~ca~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/UofSanDTram/passioTransit/gtfs/google_transit.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec1j64PrdW6UWP3d"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-universityofsandiegotram~ca~us",
+          "name": "University of San Diego Tram Services",
+          "website": "https://www.sandiego.edu/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-universityofsandiegotram~ca~us~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "rec95jQfgwy7Nka0m"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-universityofsandiegotram~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/UofSanDTram/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/UofSanDTram/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/UofSanDTram/passioTransit/gtfs/realtime/serviceAlerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recZQFyHGBQbPK3VX,recqgSBSNOMDoHHtu,recwU0OEYdvjnHhoG"
+      }
+    },
+    {
+      "id": "f-university~of~chicago",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/chicago/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-university~of~chicago",
+          "name": "University of Chicago",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-university~of~chicago~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-university~of~chicago~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/chicago/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/chicago/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/chicago/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-university~of~connecticut",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/uconn/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-university~of~connecticut",
+          "name": "University of Connecticut / Windham Region Transit District",
+          "short_name": "UConn / WRTD",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-university~of~connecticut~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "10149"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-university~of~connecticut~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://passio3.com/uconn/passioTransit/gtfs/realtime/vehiclePositions",
+        "realtime_trip_updates": "https://passio3.com/uconn/passioTransit/gtfs/realtime/tripUpdates",
+        "realtime_alerts": "https://passio3.com/uconn/passioTransit/gtfs/realtime/serviceAlerts"
+      }
+    },
+    {
+      "id": "f-vincennestrolley~in~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/ymcavango/passioTransit/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-vincennestrolley~in~us",
+          "name": "Vincennes Trolley",
+          "tags": {
+            "us_ntd_id": "50392"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-yellowknife~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://passio3.com/yellowknife/passioTransit/gtfs/google_transit.zip",
+        "static_historic": [
+          "https://cityexplorer.yellowknife.ca/gtfs/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.yellowknife.ca/en/doing-business/doing-business-open-data.aspx",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-yellowknife~transit",
+          "name": "Yellowknife Transit",
+          "website": "https://www.yellowknife.ca/en/living-here/transit.aspx"
+        }
+      ]
+    }
+  ]
+}

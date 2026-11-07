@@ -1,0 +1,44 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpe-therapid",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://connect.ridetherapid.org/InfoPoint/gtfs-zip.ashx"
+      },
+      "tags": {
+        "gtfs_data_exchange": "the-rapid"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpe-therapid",
+          "name": "The Rapid",
+          "website": "http://www.ridetherapid.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "0"
+            },
+            {
+              "feed_onestop_id": "f-dpe-therapid~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "TheRapid",
+            "us_ntd_id": "50033",
+            "wikidata_id": "Q14716158"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dpe-therapid~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?&Type=Alert"
+      }
+    }
+  ]
+}

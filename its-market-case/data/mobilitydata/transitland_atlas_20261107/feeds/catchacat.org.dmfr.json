@@ -1,0 +1,54 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-djwq-chathamareatransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://catchacat.org/wp-content/uploads/CAT_S70_GTFSExport_2026-08-27.zip",
+        "static_historic": [
+          "https://catchacat.org/wp-content/uploads/GTFS-1.zip",
+          "https://catchacat.org/wp-content/uploads/GTFS.zip",
+          "https://catchacat.org/wp-content/uploads/March-2024-GTFS-3624.zip",
+          "https://www.catchacat.org/wp-content/uploads/CAT_GTFS_Nov2023Pick.zip#GTFS/GTFSExport.zip",
+          "https://www.catchacat.org/wp-content/uploads/GTFS_Files.zip#GTFS/GTFSExport.zip",
+          "https://www.catchacat.org/wp-content/uploads/GTFS_Files.zip#GTFS%207/GTFSExport.zip",
+          "https://www.catchacat.org/wp-content/uploads/3-2023-GTFSExport.zip",
+          "https://www.catchacat.org/wp-content/uploads/2022/11/GTFSExport.zip",
+          "https://www.catchacat.org/wp-content/uploads/2019/07/shapes.zip",
+          "https://www.catchacat.org/wp-content/uploads/2019/07/cat_gtfs_06-07-2021.zip",
+          "http://cvlassets.s3.amazonaws.com/savmetro20161107%20(1).zip"
+        ]
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-djwq-chathamareatransit",
+          "name": "Chatham Area Transit",
+          "short_name": "CAT",
+          "website": "http://www.catchacat.org",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-djwq-chathamareatransit~ferry"
+            }
+          ],
+          "tags": {
+            "developer_site": "https://www.catchacat.org/developer-resources/",
+            "twitter_general": "ChathamTransit",
+            "us_ntd_id": "40025",
+            "wikidata_id": "Q5087631"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-djwq-chathamareatransit~ferry",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://catchacat.org/wp-content/uploads/GTFSferry.zip"
+      }
+    }
+  ]
+}

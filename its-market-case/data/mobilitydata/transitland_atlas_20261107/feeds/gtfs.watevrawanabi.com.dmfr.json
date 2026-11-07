@@ -1,0 +1,52 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-d2a2~mi~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.watevrawanabi.com/d2a2-dax-gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-d2a2~mi~us",
+          "supersedes_ids": [
+            "o-dps-detroitannarborexpress"
+          ],
+          "name": "D2A2",
+          "website": "https://www.d2a2.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "NB:Agent:2"
+            },
+            {
+              "gtfs_agency_id": "1591",
+              "feed_onestop_id": "f-dps-michiganflyer~mi~us"
+            },
+            {
+              "gtfs_agency_id": "5",
+              "feed_onestop_id": "f-utel~uiuc~intercity~bus"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50571",
+            "wikidata_id": "Q132430197"
+          }
+        },
+        {
+          "onestop_id": "o-dax~mi~us",
+          "name": "DAX",
+          "website": "https://www.dax-bus.com/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "NB:Agent:3"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50571"
+          }
+        }
+      ]
+    }
+  ]
+}

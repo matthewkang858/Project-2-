@@ -1,0 +1,43 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-broome~county~ny~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS.zip",
+        "static_historic": [
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_081623.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_041723.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_030623_B.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_121222.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_091922.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_081122.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_012222.zip",
+          "https://gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_031221.zip",
+          "https://www.gobroomecounty.com/sites/default/files/dept/transit/BCT_GTFS_091721.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.gobroomecounty.com/transit/gtfs"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dr6p-broomecounty",
+          "name": "Broome County",
+          "website": "https://www.gobroomecounty.com/transit",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "4464"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ridebctransit",
+            "us_ntd_id": "20003",
+            "wikidata_id": "Q4975274"
+          }
+        }
+      ]
+    }
+  ]
+}

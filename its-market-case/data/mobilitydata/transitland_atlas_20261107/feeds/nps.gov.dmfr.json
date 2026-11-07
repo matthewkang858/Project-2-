@@ -1,0 +1,289 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-acadia~national~park~island~explorer",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://islandexplorertracker.availtec.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://www.nps.gov/external-resources/gtfs/acad/island-explorer.zip"
+        ]
+      },
+      "tags": {
+        "notes": "Taken from the operator's own vendor export, which is also where the realtime comes from, rather than the National Park Service copy of the same eleven routes. The NPS directory still lists its copy, so it recurs in any diff against that page."
+      },
+      "operators": [
+        {
+          "onestop_id": "o-acadia~national~park~island~explorer",
+          "name": "Acadia National Park",
+          "short_name": "Island Explorer",
+          "website": "https://www.nps.gov/acad/planyourvisit/island-explorer.htm",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-acadia~national~park~island~explorer~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "10175"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-acadia~national~park~island~explorer~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://islandexplorertracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=VehiclePosition&serverid=0",
+        "realtime_trip_updates": "https://islandexplorertracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=TripUpdate",
+        "realtime_alerts": "https://islandexplorertracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=Alert"
+      }
+    },
+    {
+      "id": "f-alcatraz~cruises~ferry",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/alca/alcatraz-cruises-ferry.zip"
+      },
+      "license": {
+        "url": "https://www.nps.gov/subjects/developer/gtfs.htm"
+      }
+    },
+    {
+      "id": "f-bandalier~national~monument",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/band/bandalier-national-monument.zip"
+      }
+    },
+    {
+      "id": "f-bandelier~national~monument~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/band/bandelier-national-monument.zip"
+      }
+    },
+    {
+      "id": "f-boston~light~tour",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/boha/boston-light-tour.zip"
+      },
+      "tags": {
+        "status": "archived"
+      }
+    },
+    {
+      "id": "f-bryce~canyon~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/brca/bryce-canyon-shuttle.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-bryce~canyon~shuttle",
+          "name": "Bryce Canyon National Park Shuttle",
+          "website": "https://www.nps.gov/brca/planyourvisit/shuttle.htm",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-bryce~canyon~shuttle~rt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-bryce~canyon~shuttle~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://brycecanyonshuttle.com/subscriptions/gtfsrt/vehicles.ashx"
+      }
+    },
+    {
+      "id": "f-cape~lookout~national~seashore",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/calo/calo-ferry-service.zip"
+      }
+    },
+    {
+      "id": "f-denali~national~park",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/dena/dena-shuttle.zip"
+      }
+    },
+    {
+      "id": "f-dpmf-nps~cuva~scenic~rail",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://nationalparkservice.github.io/nps-gtfs/cuva/scenic-rail/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpmf-cuyahogavalleyscenicrailroad",
+          "name": "Cuyahoga Valley Scenic Railroad",
+          "website": "http://www.cvsr.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "NPS_CUVA_CVSR"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q5197082"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-drt8-nps~boha~ferries",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/boha/boston-harbor-islands-ferry.zip",
+        "static_historic": [
+          "http://nationalparkservice.github.io/nps-gtfs/boha/ferries/gtfs.zip"
+        ]
+      },
+      "license": {
+        "url": "https://www.nps.gov/subjects/developer/gtfs.htm"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-drt8-bostonharborislandsnationalandstatepark",
+          "name": "Boston Harbor Islands National and State Park",
+          "website": "http://www.bostonharborislands.org/",
+          "tags": {
+            "twitter_general": "34islandsboston"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-drto~ferry~service",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/drto/drto-ferry-service.zip"
+      },
+      "license": {
+        "url": "https://www.nps.gov/subjects/developer/gtfs.htm"
+      }
+    },
+    {
+      "id": "f-fort~matanzas~national~monument",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/foma/foma-ferry-service.zip"
+      }
+    },
+    {
+      "id": "f-fort~sumter~national~historic~park",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/fosu/fosu-ferry-service.zip"
+      }
+    },
+    {
+      "id": "f-giant~forest~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/seki/giant-forest-shuttle.zip"
+      }
+    },
+    {
+      "id": "f-glacier~national~park",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/glac/going-to-the-sun-road-shuttle.zip"
+      }
+    },
+    {
+      "id": "f-grand~canyon~nps~south~rim",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/grca/south-rim-shuttle-service.zip"
+      }
+    },
+    {
+      "id": "f-guis~ferry~service~fl",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/guis/guis-ferry-service-fl.zip"
+      }
+    },
+    {
+      "id": "f-guis~ferry~service~ms",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/guis/guis-ferry-service-ms.zip"
+      }
+    },
+    {
+      "id": "f-hafe~shuttle~transport",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/hafe/hafe-shuttle-transport.zip"
+      }
+    },
+    {
+      "id": "f-mariposa~grove~shuttle~service",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/yose/mariposa-grove-shuttle-service.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recpEJ0uCsaR2FMEb"
+      }
+    },
+    {
+      "id": "f-rocky~mountain~national~park~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/romo/rocky-mountain-national-park-shuttle.zip"
+      },
+      "license": {
+        "url": "https://www.nps.gov/subjects/developer/gtfs.htm"
+      }
+    },
+    {
+      "id": "f-statue~of~liberty~ferries",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/stli/statue-of-liberty-ferries.zip"
+      }
+    },
+    {
+      "id": "f-thompson~island~ferry",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/boha/cathleen-stone-island-ferry.zip",
+        "static_historic": [
+          "https://www.nps.gov/external-resources/gtfs/boha/thompson-island-ferry.zip"
+        ]
+      }
+    },
+    {
+      "id": "f-yosemite~valley~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/yose/yosemite-valley-shuttle.zip"
+      },
+      "tags": {
+        "calitp_dataset_id": "recarEIfU9dLgoAfg"
+      }
+    },
+    {
+      "id": "f-zion~canyon~shuttle",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.nps.gov/external-resources/gtfs/zion/zion-canyon-shuttle.zip"
+      }
+    }
+  ]
+}

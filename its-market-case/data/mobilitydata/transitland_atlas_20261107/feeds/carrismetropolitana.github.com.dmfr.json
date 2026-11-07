@@ -1,0 +1,75 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-carris~metropolitana~pt",
+      "supersedes_ids": [
+        "f-eyck-carris",
+        "f-sulfertagus",
+        "f-eyce-tst",
+        "f-eyck-rodoviáriadelisboa",
+        "f-eyck-carris~a2",
+        "f-eyck-carris~a3",
+        "f-eyck-carris~a4"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://api.carrismetropolitana.pt/gtfs",
+        "static_historic": [
+          "https://github.com/carrismetropolitana/gtfs/raw/live/CarrisMetropolitana.zip",
+          "https://github.com/carrismetropolitana/gtfs/raw/latest/CM_GTFS_A1.zip"
+        ]
+      },
+      "license": {
+        "url": "https://dados.gov.pt/pt/datasets/gtfs-carris-metropolitana/"
+      }
+    },
+    {
+      "id": "f-carris~metropolitana~pt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "http://api.carrismetropolitana.pt/vehicles.pb",
+        "realtime_alerts": "http://api.carrismetropolitana.pt/alerts.pb"
+      },
+      "license": {
+        "url": "https://dados.gov.pt/pt/datasets/gtfs-carris-metropolitana/"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-eyc-carrismetropolitana",
+      "supersedes_ids": [
+        "o-eyck-carris"
+      ],
+      "name": "Carris Metropolitana",
+      "short_name": "CMetropolitana",
+      "website": "https://www.carrismetropolitana.pt/",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "41",
+          "feed_onestop_id": "f-carris~metropolitana~pt"
+        },
+        {
+          "gtfs_agency_id": "42",
+          "feed_onestop_id": "f-carris~metropolitana~pt"
+        },
+        {
+          "gtfs_agency_id": "43",
+          "feed_onestop_id": "f-carris~metropolitana~pt"
+        },
+        {
+          "gtfs_agency_id": "44",
+          "feed_onestop_id": "f-carris~metropolitana~pt"
+        },
+        {
+          "feed_onestop_id": "f-carris~metropolitana~pt~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "CMetropolitana_",
+        "wikidata_id": "Q111611112"
+      }
+    }
+  ]
+}

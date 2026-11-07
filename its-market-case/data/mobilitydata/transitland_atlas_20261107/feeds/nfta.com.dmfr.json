@@ -1,0 +1,46 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpx-wwwnftacom",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://metro.nfta.com/__googletransit/google_transit.zip",
+        "static_historic": [
+          "http://www.nfta.com/metro/__googletransit/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://metro.nfta.com/contact-us/developer-tools"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpx-nfta~metro",
+          "name": "Niagara Frontier Transportation Authority",
+          "short_name": "NFTA Metro",
+          "website": "http://www.nfta.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-dpx-wwwnftacom~rail"
+            }
+          ],
+          "tags": {
+            "twitter_general": "NFTAMetro",
+            "us_ntd_id": "20004",
+            "wikidata_id": "Q15114900"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dpx-wwwnftacom~rail",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://metro.nfta.com/__googletransit/rail/google_transit.zip"
+      },
+      "license": {
+        "url": "https://metro.nfta.com/contact-us/developer-tools"
+      }
+    }
+  ]
+}

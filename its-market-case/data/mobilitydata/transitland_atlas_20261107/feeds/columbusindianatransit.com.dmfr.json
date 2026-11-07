@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-columbus~in~us",
+      "supersedes_ids": [
+        "f-columBUS~in"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://columbusindianatransit.com/gtfs"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-columbus~in~us",
+          "supersedes_ids": [
+            "o-columBUS~in"
+          ],
+          "name": "City of Columbus",
+          "short_name": "ColumBUS",
+          "website": "https://www.columbus.in.gov/columbus-transit/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-columbus~in~us~rt"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "50177"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-columbus~in~us~rt",
+      "supersedes_ids": [
+        "f-columBUS~in~rt",
+        "f-f-columBUS~in~rt"
+      ],
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://columbusindianatransit.com/gtfs-rt/vehiclepositions",
+        "realtime_trip_updates": "https://columbusindianatransit.com/gtfs-rt/tripupdates",
+        "realtime_alerts": "https://columbusindianatransit.com/gtfs-rt/alerts"
+      }
+    }
+  ]
+}

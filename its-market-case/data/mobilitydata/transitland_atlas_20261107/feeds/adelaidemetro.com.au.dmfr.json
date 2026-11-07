@@ -1,0 +1,66 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-r1f-adelaidemetrocomau",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
+      },
+      "license": {
+        "url": "http://creativecommons.org/licenses/by/4.0",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Department of Planning, Transport and Infrastructure, Government of South Australia"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-r1f-adelaidemetrorailcommissioner",
+          "name": "Adelaide Metro",
+          "website": "https://www.adelaidemetro.com.au/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "2"
+            },
+            {
+              "gtfs_agency_id": "3"
+            },
+            {
+              "gtfs_agency_id": "4"
+            },
+            {
+              "gtfs_agency_id": "5"
+            },
+            {
+              "gtfs_agency_id": "8"
+            },
+            {
+              "feed_onestop_id": "f-r1f-adelaidemetrocomau~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q4681753"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-r1f-adelaidemetrocomau~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions",
+        "realtime_trip_updates": "https://gtfs.adelaidemetro.com.au/v1/realtime/trip_updates",
+        "realtime_alerts": "https://gtfs.adelaidemetro.com.au/v1/realtime/service_alerts"
+      },
+      "license": {
+        "url": "http://creativecommons.org/licenses/by/4.0",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Department of Planning, Transport and Infrastructure, Government of South Australia"
+      },
+      "tags": {
+        "mdb_source_id": "1772,1773,1774"
+      }
+    }
+  ]
+}

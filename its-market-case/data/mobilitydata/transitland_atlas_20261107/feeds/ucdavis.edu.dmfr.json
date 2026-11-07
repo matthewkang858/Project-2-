@@ -1,0 +1,32 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9qc7-unitransdavis",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://unitrans.ucdavis.edu/media/gtfs/Unitrans_GTFS.zip",
+        "static_historic": [
+          "http://iportal.sacrt.com/GTFS/Unitrans/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "https://unitrans.ucdavis.edu/about/gtfs/"
+      },
+      "tags": {
+        "gtfs_data_exchange": "unitrans-davis"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9qc7-unitransdavis",
+          "name": "Unitrans",
+          "tags": {
+            "twitter_general": "asucdunitrans",
+            "us_ntd_id": "90142",
+            "wikidata_id": "Q7893703"
+          }
+        }
+      ]
+    }
+  ]
+}

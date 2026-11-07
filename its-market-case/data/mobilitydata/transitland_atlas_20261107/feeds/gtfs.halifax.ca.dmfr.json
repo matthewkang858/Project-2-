@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dxfy-halifaxtransit~hrm",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.halifax.ca/static/google_transit.zip"
+      },
+      "license": {
+        "url": "https://data-hrm.hub.arcgis.com/pages/open-data-licence",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Contains information licenced under the Open Government Licence — Halifax."
+      },
+      "tags": {
+        "gtfs_data_exchange": "halifax-transit"
+      }
+    },
+    {
+      "id": "f-halifax~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://gtfs.halifax.ca/realtime/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "https://gtfs.halifax.ca/realtime/Alert/Alerts.pb"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-dxfy-halifaxtransit~hrm",
+      "name": "Halifax Transit",
+      "website": "https://www.halifax.ca/metrotransit/",
+      "associated_feeds": [
+        {
+          "gtfs_agency_id": "Halifax",
+          "feed_onestop_id": "f-dxfy-halifaxtransit~hrm"
+        },
+        {
+          "feed_onestop_id": "f-halifax~rt"
+        }
+      ],
+      "tags": {
+        "wikidata_id": "Q14875719"
+      }
+    }
+  ]
+}

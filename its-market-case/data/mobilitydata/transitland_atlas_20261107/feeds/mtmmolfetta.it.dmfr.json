@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sr7f3-mtmmobilitaetrasportimolfetta",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://www.mtmmolfetta.it/transit/mtm-feed-gtfs.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sr7f3-mtmmobilitaetrasportimolfetta",
+          "name": "Mobilità e Trasporti Molfetta",
+          "short_name": "MTM",
+          "website": "http://www.mtmmolfetta.it",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "MTM"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

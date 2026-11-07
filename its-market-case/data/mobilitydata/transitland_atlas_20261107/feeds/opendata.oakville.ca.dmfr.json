@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpxr-oakvilletransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.arcgis.com/sharing/rest/content/items/d78a1c1ad6a940009de8b68839a8f606/data"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpxr-oakvilletransit",
+          "name": "Oakville Transit",
+          "website": "http://www.oakvilletransit.ca/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q7074262"
+          }
+        }
+      ]
+    }
+  ]
+}

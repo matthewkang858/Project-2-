@@ -1,0 +1,60 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q9-modesto~ca~us",
+      "supersedes_ids": [
+        "f-9qd-stanislaus~ca~us"
+      ],
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://stanrta.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "https://stanrta.org/preview-gtfs.zip",
+          "http://data.trilliumtransit.com/gtfs/modesto-ca-us/modesto-ca-us.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recOpFlZv8Sc2baWH",
+        "gtfs_data_exchange": "modesto-area-express"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q9-modestoareaexpress",
+          "supersedes_ids": [
+            "o-9q9-stanislausmetroaltransit",
+            "o-9q9vz-ceresareatransit"
+          ],
+          "name": "Stanislaus Regional Transit Authority (StanRTA)",
+          "short_name": "The S",
+          "website": "https://stanrta.org/",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-modestoareaexpress~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recSiaaMmBXW7fUZS",
+            "developer_site": "https://www.stanrta.org/431/GTFS-Information-Datasets",
+            "omd_provider_id": "modesto-area-express",
+            "twitter_general": "StanRTARideTheS",
+            "us_ntd_id": "90007",
+            "wikidata_id": "Q112664203"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-modestoareaexpress~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+        "realtime_trip_updates": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+        "realtime_alerts": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec9dFMIRliW5blli,recfa6aLduDAFWZ3V,recxB2HLngt7YNayS"
+      }
+    }
+  ]
+}

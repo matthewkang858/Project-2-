@@ -1,0 +1,56 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-f25d-socitdetransportdemontral",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "http://www.stm.info/en/about/developers/terms-use",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-f25d-socitdetransportdemontral",
+          "name": "Société de transport de Montréal",
+          "short_name": "STM",
+          "website": "http://www.stm.info",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "STM"
+            },
+            {
+              "feed_onestop_id": "f-f25d-socitdetransportdemontral~rt"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q1817151"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-f25d-socitdetransportdemontral~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.stm.info/pub/od/gtfs-rt/ic/v2/vehiclePositions",
+        "realtime_trip_updates": "https://api.stm.info/pub/od/gtfs-rt/ic/v2/tripUpdates"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://www.stm.info/en/about/developers/terms-use",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "apiKey",
+        "info_url": "https://www.stm.info/en/about/developers"
+      }
+    }
+  ]
+}

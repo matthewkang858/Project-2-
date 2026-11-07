@@ -1,0 +1,31 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9zx9-thejule",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://myride.cityofdubuque.org/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://www.cityofdubuque.org/gtfs.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9zx9-thejule",
+          "name": "The Jule",
+          "website": "https://www.cityofdubuque.org/274/Transit",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "b36b1527-b91b-42a5-8611-263718d0203b"
+            }
+          ],
+          "tags": {
+            "us_ntd_id": "70011",
+            "wikidata_id": "Q7743801"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1124 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9pp-humboldtcounty~ca~us~redwood~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/redwood/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/redwood/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recIg76w1Uz3wzC96,recJtytKScRro9Eb2"
+      }
+    },
+    {
+      "id": "f-9pz-lincolncounty~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/lincoln-county/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/lincoln-county/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-9q-easternsierra~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/esta/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/esta/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recb07iBVkhjVU1mT,recrKEq9S3xx0yo2Q"
+      }
+    },
+    {
+      "id": "f-9qb-laketransit~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/lake-county/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/lake-county/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "reco6i6kbQtC7ncqJ,recorVqm3jRIQTfGt"
+      }
+    },
+    {
+      "id": "f-9qhc-beaumont~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/beaumont/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/beaumont/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec6VkbyniH0fBzZM,recHKxK6LiS8Xorwo"
+      }
+    },
+    {
+      "id": "f-9r0-redding~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/redding/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/redding/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recCozqcNIs2OMyEH,recSpycJF4N6040SV"
+      }
+    },
+    {
+      "id": "f-9r0-trinity~ca~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/trinity-county/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/trinity-county/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-9rb-benton~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/ocwcog-benton/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/ocwcog-benton/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-9rbm-linx~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/ocwcog-linx/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/ocwcog-linx/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-9rbmy-albanytransitsystem~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/ocwcog-albany-linn/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/ocwcog-albany-linn/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-9rbs-linnshuttle~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/ocwcog-linn-shuttle/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/ocwcog-linn-shuttle/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-abqride~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/abq-ride/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/abq-ride/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-advancetransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/advance-transit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/advance-transit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-ata~bus~ks~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/flint-hills-ata/gtfs-rt-vehicle-positions/",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/flint-hills-ata/gtfs-rt-trip-updates/"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-banning~pass~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/banning/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/banning/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec7xYoeXvc0HPXlk,recW46RI7r3j8KsRj"
+      }
+    },
+    {
+      "id": "f-baytowntrolley~fl~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/bay-town-trolley/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/bay-town-trolley/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-brightline~fl~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/brightline-fl-us/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/brightline-fl-us/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-c20-tillamook~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/tillamook/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/tillamook/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-c20dz-washingtonparkshuttle~or~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/washington-park/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/washington-park/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-central~transit~wa~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/central-transit-wa/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/central-transit-wa/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-chittendoncounty~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/green-mountain/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/green-mountain/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-cityandboroughofjuneau~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/juneau/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/juneau/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-cuboulder~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/cu-boulder/gtfs-rt-vehicle-positions/",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/cu-boulder/gtfs-rt-trip-updates/"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dentoncountytransportationauthority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/dcta/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/dcta/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dhv-hillsborougharearegionaltransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/tampa/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/tampa/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dhv-hillsborougharearegionaltransit~streetcar~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/tampa-streetcar/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/tampa-streetcar/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-djz4-carta~sc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/bcdcog/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/bcdcog/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dnm6-asheville~nc~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/art-asheville/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/art-asheville/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dq-mtamaryland~bus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/mta-maryland/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/mta-maryland/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dq-mtamaryland~commuterbus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/mta-maryland-commuter-bus/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/mta-maryland-commuter-bus/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dq-mtamaryland~raillink~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/mta-maryland-light-rail/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/mta-maryland-light-rail/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dq-mtamaryland~subwaylink~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/mta-maryland-metro/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/mta-maryland-metro/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dqc-thebusofprincegeorgescounty~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/prince-george-thebus/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/prince-george-thebus/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dqcq-regionaltransportationagencyofcentralmaryland~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/rtamaryland/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/rtamaryland/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dr0b-transitservicesoffrederickcounty~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/frederick-county-transit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/frederick-county-transit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dr4-dartfirststatewood~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/delaware/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/delaware/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-drk-ny~suffolkcountytransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/suffolk-county/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/suffolk-county/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dru-tri~valleytransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/trivalleytransit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/trivalleytransit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dru-vttranslines~vt~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/vermont-translines/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/vermont-translines/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-dvtamoover~vt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/moover/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/moover/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-goose~creek~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/goose-creek-transit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/goose-creek-transit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-greenmtncn~vt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/bennington-gmcn/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/bennington-gmcn/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-gunnisonvalleyrta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/gunnison/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/gunnison/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-kcata~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/kcata/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/kcata/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-kerncounty~ca~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/kern-transit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/kern-transit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec0CzK7RL5ERDkeM,rec8TY9vbjPaNzXIJ"
+      }
+    },
+    {
+      "id": "f-lasvegasloop~nv~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/city-las-vegas/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/city-las-vegas/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-lubbock~tx~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/lubbock-citibus/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/lubbock-citibus/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-madera~county~connection~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/madera/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/madera/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recDWDaWPQyVZpHZp,recbwnxXlFPZxVH7C"
+      }
+    },
+    {
+      "id": "f-metro~losangeles~bus~rt",
+      "supersedes_ids": [
+        "f-metro~losangeles~rt"
+      ],
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/lametro/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/lametro/gtfs-rt-trip-updates",
+        "realtime_alerts": "https://api.goswift.ly/real-time/lametro/gtfs-rt-alerts"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recLhHXhuUL2t9Qpj,rectUboB2NipaQROx"
+      }
+    },
+    {
+      "id": "f-metro~losangeles~rail~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/lametro-rail/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/lametro-rail/gtfs-rt-trip-updates",
+        "realtime_alerts": "https://api.goswift.ly/real-time/lametro-rail/gtfs-rt-alerts"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recNneb2aYt7n7CEy,recbOzJc4ZjFkRY40"
+      }
+    },
+    {
+      "id": "f-miamibeach~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/city-of-miami-beach/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/city-of-miami-beach/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-miamidadetransit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/miami/gtfs-rt-vehicle-positions/",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/miami/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-nevadacountygoldcountrystage~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/gold-country-stage/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/gold-country-stage/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recIC4dVvnK53RRXs,receKe08WE1HdHOYM"
+      }
+    },
+    {
+      "id": "f-northcountrytransitdistrict~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/nctd/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/nctd/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recZWjKIo5ZRn1VLe,reckeLoeR9eBNtkGE"
+      }
+    },
+    {
+      "id": "f-redwood~coast~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/redwood-coast-rct/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/redwood-coast-rct/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "recV0QoMjhToTIDFl,recePahnhQ4E43PAs"
+      }
+    },
+    {
+      "id": "f-rtcsnv~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/las-vegas-rtc/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/las-vegas-rtc/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-ruralcommunity~vt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/rct/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/rct/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-seattlechildrenshospitalshuttle~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/seattle-childrens/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/seattle-childrens/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-smart~mi~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/detroit-smartbus/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/detroit-smartbus/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-sunsetempiretransportationdistrict~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/setd/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/setd/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-tahoe~ca~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/bluego/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/bluego/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-thebus~hi~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/thebus/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/thebus/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-thebus~vt~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/marble-valley/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/marble-valley/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-trivalley~vt~us~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/trivalleytransit/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/trivalleytransit/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-turlock~ca~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/turlock/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/turlock/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      },
+      "tags": {
+        "calitp_dataset_id": "rec2BvTc9IirZujM7,recyfkwfhf3lIqRV1"
+      }
+    },
+    {
+      "id": "f-wata~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/wata/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/wata/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-xtrafik~se~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/se-xtrafik/gtfs-rt-vehicle-positions/",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/se-xtrafik/gtfs-rt-trip-updates/"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    }
+  ]
+}

@@ -143,11 +143,11 @@ rail_regions = ['Europe', 'China', 'APAC ex-China', 'North America', 'CIS/Eurasi
 ccs_share = [0.46, 0.21, 0.11, 0.13, 0.04, 0.05]
 pax_share = [0.83, 0.80, 0.77, 0.46, 0.40, 0.64]
 urban_share = [0.16, 0.45, 0.29, 0.57, 0.50, 0.63]
-ccs_cagr_base = [0.060, 0.035, 0.065, 0.055, 0.020, 0.060]
+ccs_cagr_base = [0.050, 0.035, 0.065, 0.055, 0.020, 0.055]
 ccs_share_src = 'SCI 2026: Europe almost half of ~EUR 20bn; China >65% of Asia; SCI world rail market regional weights (NA 13%); GMI NA 27% kept as sensitivity. research/21_gap section B.'
 pax_src = 'Passenger share of CCS by region: Europe from Eurostat train-km (83% passenger) ; China HSR + metro ; NA = commuter/Amtrak share of PTC plus 100% of urban CBTC ; CIS freight-dominant. research/21_gap section C (analyst proxy, low-medium confidence).'
 urban_src = 'Urban (metro + LRT) share of passenger CCS from km x unit-cost bottom-up on UITP network km and research/12 unit costs; cross-checked with GMI CBTC USD 4.9bn. research/21_gap section D.'
-cagr_src = 'Regional base CAGRs: Europe modernisation-led (ERTMS, DSD EUR 6.3bn, CP7), China new-build decelerating (investment -8.9% in 2024), APAC ex-China metro build-out (India ~1,000 km under construction), NA CBTC programmes (MTA USD 5.4bn 2025-29, BART, WMATA), CIS flat, RoW Gulf/LatAm metros. research/03, 07, 14, 21_gap.'
+cagr_src = 'Nominal USD at constant 2025 FX. Regional base CAGRs: Europe 5.0% = midpoint of SCI 4.6% nominal (2023-28) and UNIFE realised 5.7% real (2021-23 to 2023-25), below vendor reports (6-9%) given ERTMS slippage (ERTMS, DSD EUR 6.3bn, CP7), China new-build decelerating (investment -8.9% in 2024), APAC ex-China metro build-out (India ~1,000 km under construction), NA CBTC programmes (MTA USD 5.4bn 2025-29, BART, WMATA), CIS flat, RoW Gulf/LatAm metros. research/03, 07, 14, 21_gap.'
 for i, reg in enumerate(rail_regions):
     inp('ccs_sh_%d' % i, 'CCS regional share: %s' % reg, ccs_share[i], '% of world CCS', ccs_share_src if i == 0 else 'See Europe row.', FMT_PCT)
 for i, reg in enumerate(rail_regions):
@@ -203,6 +203,26 @@ inp('fta_2026', 'Total FTA appropriations FY2026 (computed from P.L. 119-75)', 2
 inp('fta_2027_house', 'FY2027 scenario: House BUILD America 250 Act (H.R. 8870) as authorised', 20.0, 'USD bn', 'USD 16.87bn Mass Transit Account + 3.0 CIG authorised + 0.15 WMATA; 18.7 if CIG appropriated at FY2026 rate. No Low-No, no advance appropriations. Stalled as of Nov 2026. research/25_gap.', FMT_BN)
 inp('fta_2027_ext', 'FY2027 scenario: flat extension without IIJA advance appropriations', 16.7, 'USD bn', 'Surface Transportation Extension Act 2026 (P.L. 119-103) continues FY2026 levels to 11 Dec 2026 but not the USD 4.25bn Division J tranche. research/25_gap.', FMT_BN)
 inp('fta_2027_req', "FY2027 scenario: President's request", 16.3, 'USD bn', 'FY2027 Budget Appendix: USD 14.95bn formula limitation, CIG 1.215, no TIG/ASAP. research/25_gap.', FMT_BN)
+
+section('Bus pool by application (GMI APTS application mix, ex-ticketing) and haircut sensitivity')
+inp('app_ops', 'GMI application share: traffic/operations management + fleet management', 0.553, '% of APTS', 'GMI application split: traffic management 30.1% (in an APTS context = operations/headway control), fleet management 25.2%, ticketing 24.2%, information dissemination 11.2%, passenger safety 9.3%. research/17_gap 4.3.', FMT_PCT)
+inp('app_info', 'GMI application share: public information dissemination', 0.112, '% of APTS', 'Same.', FMT_PCT)
+inp('app_safety', 'GMI application share: passenger safety and security', 0.093, '% of APTS', 'Same.', FMT_PCT)
+inp('haircut_alt1', 'Haircut sensitivity: alternative 1', 0.0, '%', 'No haircut (Berg fare-inclusive).', FMT_PCT)
+inp('haircut_alt2', 'Haircut sensitivity: alternative 2', 0.15, '%', 'GMI electronic-payment technology share 14.7%.', FMT_PCT)
+inp('haircut_alt3', 'Haircut sensitivity: alternative 3', 0.25, '%', 'GMI ticketing application share 24.2%.', FMT_PCT)
+
+section('Illustrative buy-and-build value bridge (thesis sheet; analyst assumptions, blue)')
+inp('vb_rev0', 'Entry: platform revenue (founder-owned mid-market bus ITS / scheduling vendor)', 60, 'USD m', 'Illustrative; private mid-market vendors (Avail, GIRO, Hanover, ETA, Passio) are USD 20-100m revenue businesses (research/08, 32_gap).', FMT_M)
+inp('vb_mult0', 'Entry: EV / revenue', 2.0, 'x', 'Integrator band 1.0-2.6x revenue (INIT 1.0x, IVU 2.6x, Knorr-Alstom NA ~2.1x). research/26_gap.', FMT_X)
+inp('vb_margin0', 'Entry: EBITDA margin', 0.15, '%', 'INIT EBITDA margin 14.9% (2025); mid-market integrators 10-18%. research/17.', FMT_PCT)
+inp('vb_g', 'Organic revenue growth p.a. (hold period)', 0.08, '%', 'Above the NA bus base (5%) on SaaS overlay cross-sell, enforcement/ZEB modules and long-tail wins; below Via/INIT 24-29%.', FMT_PCT)
+inp('vb_bolt', 'Bolt-on revenue acquired over the hold (cumulative)', 40, 'USD m', 'Two to three point-solution bolt-ons (APC, PIS, enforcement) at 1-2x revenue.', FMT_M)
+inp('vb_boltmult', 'Bolt-on EV / revenue', 1.5, 'x', 'Modaxo-Conduent 0.44x to Knorr-Alstom 2.1x.', FMT_X)
+inp('vb_hold', 'Hold period', 5, 'years', '', '0')
+inp('vb_margin1', 'Exit: EBITDA margin (after cloud re-platforming and mix shift)', 0.22, '%', 'IVU 14% EBIT / ~18% EBITDA with 52% recurring; Trimble segments 20-34%; target 22%.', FMT_PCT)
+inp('vb_mult1', 'Exit: EV / EBITDA', 14, 'x', 'IVU 15.2x, Trimble 12.0x, Cubic LBO 15.7x; strategic buyers (Hitachi, Siemens, Modaxo, Via). research/26_gap.', FMT_X)
+inp('vb_lev', 'Net debt at entry as multiple of EBITDA', 2.5, 'x', 'Deliberately modest: Cubic failed at ~11x. research/10, 26_gap.', FMT_X)
 
 INPUT_LAST_ROW = row[0]
 
@@ -363,6 +383,66 @@ c = wm['C%d' % r]; c.value = '=%s' % R['fare_high']; c.number_format = FMT_BN; c
 wm.cell(row=r, column=1, value='Rail CCS incl. freight (UNIFE anchor, USD)').font = BLACK
 c = wm['B%d' % r]; c.value = '=%s*%s' % (R['unife_cc'], fx); c.number_format = FMT_BN; c.font = GREEN; r += 1
 wm.cell(row=r, column=1, value='Helper column H holds the block tag used by SUMIF.').font = NOTE
+r += 2
+wm.cell(row=r, column=1, value='Investor view 1: two-tier market (who buys)').font = H2; r += 1
+hdr(wm, r, ['Tier', 'Total', 'Hardware', 'Software', 'Services', 'Share of total']); r += 1
+TIER_ROWS = {}
+wm.cell(row=r, column=1, value='Transit-operator ITS core (bus and tram ITS + urban signalling + other rail ITS)').font = BLACK
+for j, col in enumerate('BCDE'):
+    c = wm['%s%d' % (col, r)]; c.value = '=%s%d+%s%d+%s%d' % (col, seg_rows['Bus'], col, seg_rows['Rail CCS urban'], col, seg_rows['Rail other']); c.font = BLACK; c.number_format = FMT_BN
+c = wm['F%d' % r]; c.value = '=B%d/$B$%d' % (r, TOTAL_ROW); c.number_format = FMT_PCT
+TIER_ROWS['core'] = r; r += 1
+wm.cell(row=r, column=1, value='Mainline and commuter passenger signalling (infrastructure-manager and railway buyers)').font = BLACK
+for j, col in enumerate('BCDE'):
+    c = wm['%s%d' % (col, r)]; c.value = '=%s%d' % (col, seg_rows['Rail CCS mainline']); c.font = BLACK; c.number_format = FMT_BN
+c = wm['F%d' % r]; c.value = '=B%d/$B$%d' % (r, TOTAL_ROW); c.number_format = FMT_PCT
+TIER_ROWS['mainline'] = r; r += 1
+wm.cell(row=r, column=1, value='Public ITS, brief scope (both tiers)').font = BOLD
+for j, col in enumerate('BCDE'):
+    c = wm['%s%d' % (col, r)]; c.value = '=%s%d+%s%d' % (col, r - 2, col, r - 1); c.font = BOLD; c.number_format = FMT_BN
+TIER_ROWS['total'] = r; r += 2
+
+wm.cell(row=r, column=1, value='Investor view 2: openness to a new entrant (USD bn)').font = H2; r += 1
+hdr(wm, r, ['Tier', 'Total', 'North America', 'Europe', 'Asia-Pacific', 'Rest of world']); r += 1
+OPEN_ROWS = {}
+def geo_sum(blocks, comps):
+    # sum over market rows of block in blocks and component columns comps for a geography (SUMIFS per component)
+    parts = []
+    for b in blocks:
+        for col in comps:
+            parts.append('SUMIFS($%s$%d:$%s$%d,$F$%d:$F$%d,"GEO",$H$%d:$H$%d,"%s")' % (col, first, col, last, first, last, first, last, b))
+    return '+'.join(parts)
+geos4 = ['North America', 'Europe', 'Asia-Pacific', 'Rest of world']
+for key, lab, blocks, comps in [('closed', 'Closed: signalling cores (urban and mainline), SIL-4 certified, 3-4 suppliers', ['Rail CCS urban', 'Rail CCS mainline'], 'BCDE'[1:]), ('held', 'Incumbent-held, displaceable at refresh: onboard and wayside hardware in bus and other rail ITS', ['Bus', 'Rail other'], 'C'), ('open', 'Open: software and services in bus and other rail ITS (asset-light SAM)', ['Bus', 'Rail other'], 'DE')]:
+    wm.cell(row=r, column=1, value=lab).font = BLACK
+    for j, geo in enumerate(geos4):
+        f = '=' + geo_sum(blocks, comps).replace('"GEO"', '"%s"' % geo)
+        c = wm.cell(row=r, column=3 + j, value=f); c.font = BLACK; c.number_format = FMT_BN
+    c = wm['B%d' % r]; c.value = '=SUM(C%d:F%d)' % (r, r); c.font = BOLD; c.number_format = FMT_BN
+    OPEN_ROWS[key] = r; r += 1
+wm.cell(row=r, column=1, value='Total (ties to core total)').font = BOLD
+for col in 'BCDEF':
+    c = wm['%s%d' % (col, r)]; c.value = '=SUM(%s%d:%s%d)' % (col, r - 3, col, r - 1); c.font = BOLD; c.number_format = FMT_BN
+OPEN_ROWS['total'] = r; r += 2
+
+wm.cell(row=r, column=1, value='Investor view 3: bus and tram ITS pool by application (GMI application mix applied ex-ticketing)').font = H2; r += 1
+hdr(wm, r, ['Application', 'Value', 'Share of bus pool']); r += 1
+APP_ROWS = {}
+den = '(%s+%s+%s)' % (R['app_ops'], R['app_info'], R['app_safety'])
+for key, lab, ref in [('ops', 'Operations and fleet management (CAD/AVL, scheduling, dispatch, headway control)', R['app_ops']), ('info', 'Passenger information', R['app_info']), ('safety', 'Safety, security and surveillance (video, enforcement, incident detection)', R['app_safety'])]:
+    wm.cell(row=r, column=1, value=lab).font = BLACK
+    c = wm['B%d' % r]; c.value = '=B%d*%s/%s' % (seg_rows['Bus'], ref, den); c.font = BLACK; c.number_format = FMT_BN
+    c = wm['C%d' % r]; c.value = '=B%d/B%d' % (r, seg_rows['Bus']); c.number_format = FMT_PCT
+    APP_ROWS[key] = r; r += 1
+r += 1
+wm.cell(row=r, column=1, value='Sensitivity: bus and tram ITS pool (global, USD bn) by ex-fare haircut').font = H2; r += 1
+hdr(wm, r, ['Haircut', 'Bus pool', 'Note']); r += 1
+SENS_ROWS = {}
+for key, ref, note in [('h0', R['haircut_alt1'], 'Berg fare-inclusive'), ('h15', R['haircut_alt2'], 'GMI electronic-payment share'), ('h20', R['haircut'], 'Base case'), ('h25', R['haircut_alt3'], 'GMI ticketing application share')]:
+    c = wm['A%d' % r]; c.value = '=%s' % ref; c.number_format = FMT_PCT; c.font = GREEN
+    c = wm['B%d' % r]; c.value = '=(%s+%s)*%s*(1+%s)*(1-%s)' % (R['berg_eu'], R['berg_na'], fx, R['row_scale'], ref); c.font = BLACK; c.number_format = FMT_BN
+    wm.cell(row=r, column=3, value=note).font = NOTE
+    SENS_ROWS[key] = r; r += 1
 
 # fill TopDown chain links
 wt['B%d' % TD_CHAIN['Rail CCS passenger (UNIFE anchor x regional passenger shares)']] = '=Market_2025!B%d' % CCS_ROW
@@ -444,6 +524,43 @@ for k in range(7):
     c = wf['%s%d' % (col, r)]; c.value = '=%s%d+%s%d' % (col, FSEG['Bus'], col, FSEG['Rail other']); c.font = BOLD; c.number_format = FMT_BN
 c = wf['E%d' % r]; c.value = '=(M%d/G%d)^(1/6)-1' % (r, r); c.number_format = FMT_PCT; c.font = BOLD
 FCONTEST = r; r += 2
+
+wf.cell(row=r, column=1, value='Open software and services SAM (bus + other rail ITS software and services; bus mix shifts to software)').font = BOLD
+for k in range(7):
+    col = get_column_letter(7 + k)
+    t = '(%s$4-$G$4)/6' % col
+    bus_sw_t = '(%s+(%s-%s)*%s)' % (R['bus_sw'], R['bus_sw_2031'], R['bus_sw'], t)
+    bus_svc = '(1-%s-%s)' % (R['bus_hw'], R['bus_sw'])
+    c = wf['%s%d' % (col, r)]; c.value = '=%s%d*(%s+%s)+%s%d*(1-%s)' % (col, FSEG['Bus'], bus_sw_t, bus_svc, col, FSEG['Rail other'], R['ro_hw']); c.font = BOLD; c.number_format = FMT_BN
+c = wf['E%d' % r]; c.value = '=(M%d/G%d)^(1/6)-1' % (r, r); c.number_format = FMT_PCT; c.font = BOLD
+FSAM = r; r += 2
+wf.cell(row=r, column=1, value='Growth bridge 2025 to 2031, base case (USD bn): what the increase is made of').font = H2; r += 1
+hdr(wf, r, ['Step', 'Delta', 'Running total', 'CAGR', 'Note']); r += 1
+BRIDGE = {}
+wf.cell(row=r, column=1, value='2025 market').font = BOLD
+c = wf['C%d' % r]; c.value = '=G%d' % FSEG_TOTAL; c.font = BOLD; c.number_format = FMT_BN
+BRIDGE['start'] = r; r += 1
+bridge_steps = [
+    ('Bus and tram ITS: Europe', '=M%d-G%d' % (ffirst, ffirst), '=E%d' % ffirst, 'ZEB turnover, ITxPT refresh, UK bus settlement'),
+    ('Bus and tram ITS: North America', '=M%d-G%d' % (ffirst + 1, ffirst + 1), '=E%d' % (ffirst + 1), '24k buses past useful life, 2004-12 CAD/AVL cohort, AI enforcement'),
+    ('Bus ITS: rest of world', '=M%d-G%d+M%d-G%d' % (ffirst + 2, ffirst + 2, ffirst + 3, ffirst + 3), '=E%d' % (ffirst + 2), 'China smart-bus retrofits, India e-bus procurement, Gulf networks'),
+    ('Urban signalling (CBTC) resignalling and new lines', '=' + '+'.join('Market_2025!B%d*((1+E%d)^6-1)' % (block_rows['Rail CCS urban'][i], ffirst + 4 + i) for i in range(6)), '', 'NYC USD 5.4bn 2025-29, London, Paris, Toronto, Copenhagen GoA4, Asian metro build-out'),
+    ('Mainline and commuter signalling (ETCS, interlockings, PTC)', '=' + '+'.join('Market_2025!B%d*((1+E%d)^6-1)' % (block_rows['Rail CCS mainline'][i], ffirst + 4 + i) for i in range(6)), '', 'ERTMS EUR 85-100bn remaining cost, DB EUR 6.3bn frameworks, FRMCS from 2027'),
+    ('Other rail ITS (PIS, CCTV/APC, condition monitoring, detection)', '=M%d-G%d' % (FSEG['Rail other'], FSEG['Rail other']), '=E%d' % FSEG['Rail other'], 'Rolling-stock renewal, predictive maintenance fleet-wide, cyber'),
+]
+for lab, f, cg, note in bridge_steps:
+    wf.cell(row=r, column=1, value=lab).font = BLACK
+    c = wf['B%d' % r]; c.value = f; c.font = BLACK; c.number_format = FMT_BN
+    c = wf['C%d' % r]; c.value = '=C%d+B%d' % (r - 1, r); c.font = BLACK; c.number_format = FMT_BN
+    if cg:
+        c = wf['D%d' % r]; c.value = cg; c.font = GREEN; c.number_format = FMT_PCT
+    wf.cell(row=r, column=5, value=note).font = NOTE
+    BRIDGE[lab] = r; r += 1
+wf.cell(row=r, column=1, value='2031 market (check vs forecast total)').font = BOLD
+c = wf['C%d' % r]; c.value = '=C%d' % (r - 1); c.font = BOLD; c.number_format = FMT_BN
+c = wf['D%d' % r]; c.value = '=ROUND(C%d-M%d,6)' % (r, FSEG_TOTAL); c.font = NOTE; c.number_format = '0.000000'
+wf.cell(row=r, column=5, value='D = difference to Forecast total, should be 0').font = NOTE
+BRIDGE['end'] = r; r += 2
 
 wf.cell(row=r, column=1, value='Summary by geography (USD bn)').font = H2; r += 1
 hdr(wf, r, ['Geography', '', '', '', 'CAGR 25-31', '', *[str(y) for y in years]]); r += 1
@@ -689,9 +806,9 @@ title(wdl, 'Transactions and trading multiples', 'Disclosed values only; multipl
 setw(wdl, [16, 30, 26, 16, 14, 14, 44, 18])
 hdr(wdl, 4, ['Date', 'Target', 'Acquirer / investor', 'Value', 'EV/Revenue', 'EV/EBITDA', 'Note', 'Source file'])
 deals = [
-    ('May 2021', 'Cubic Corp (take-private)', 'Veritas Capital / Evergreen (Elliott)', 'USD ~3.0bn EV', '~1.9x', '15.7x NTM', 'USD 1.8bn funded debt (~11x FY2020 EBITDA); 2025 recap, 2026 interest deferral', '10, 18, 26_gap'),
-    ('May 2024', 'Thales Ground Transportation Systems', 'Hitachi Rail', 'EUR 1,660m', '~0.9-1.0x', 'n/d', 'Ex-GTS generated JPY 391bn (EUR 2.3bn) at 11.4% EBITA in FY2025; remedy sale of mainline units to MERMEC', '09, 22_gap'),
-    ('Sep 2024', 'Alstom Signaling North America', 'Knorr-Bremse', 'USD 690m', '~2.2x', 'n/d', '~EUR 300m revenue, ~16% EBIT; conventional wayside', '22_gap'),
+    ('May 2021', 'Cubic Corp (take-private)', 'Veritas Capital / Evergreen (Elliott)', 'USD ~2.8bn EV at the USD 70 offer; closed at USD 75/share, ~USD 3.0bn', '~1.9x FY2020 sales (at 2.8bn); ~2.0x at 3.0bn', '15.7x NTM at USD 70 (Raymond James); ~16.5x at close', 'USD 1.8bn funded debt (~11x FY2020 adj. EBITDA); 2025 recap, Jan 2026 interest deferral, ~USD 2.1bn debt', '10, 18, 26_gap, 90_verification c26'),
+    ('May 2024', 'Thales Ground Transportation Systems', 'Hitachi Rail', 'EUR 1,660m', '~0.7x FY2025 ex-GTS revenue (EUR 2.3bn); standalone Thales GTS revenue at signing not retrievable', 'n/d', 'Ex-GTS generated JPY 391bn (EUR 2.3bn) at 11.4% EBITA in FY2025; remedy sale of mainline units to MERMEC', '09, 22_gap'),
+    ('Sep 2024', 'Alstom Signaling North America', 'Knorr-Bremse', 'USD 690m', '~2.1x (EUR 300m revenue at 1.08)', 'n/d', '~EUR 300m revenue, ~16% EBIT; conventional wayside', '22_gap'),
     ('Dec 2025', 'Frauscher (train detection)', 'Wabtec', 'USD ~792m', 'n/d', 'n/d', 'Axle counters and wheel sensors', '09, 22_gap'),
     ('Jul 2025', 'Evident Inspection Technologies', 'Wabtec', 'USD 1,788m', 'n/d', '15.9x CY24', 'Adjacent inspection', '10'),
     ('May 2026', 'MERMEC signalling and diagnostics businesses', 'Siemens Mobility', 'undisclosed', 'n/d', 'n/d', '~EUR 430m FY25 revenue, 1,700 staff', '22_gap'),
@@ -699,7 +816,7 @@ deals = [
     ('Oct 2026', 'Conduent Public Transit (Novvan, Routeward)', 'Modaxo / Constellation Software', 'USD 164m', '~0.44x', 'n/d', 'Unit revenue USD 371m (2025) incl. fare collection; 2,000 staff', '08, 18'),
     ('Jan 2025', 'Flowbird', 'EasyPark Group (Arrive)', 'undisclosed', 'n/d', 'n/d', 'Fare and parking (adjacent)', '10'),
     ('2024', 'Safe Fleet (incl. Seon)', 'Clarience / Genstar', 'undisclosed', 'n/d', 'n/d', 'Onboard video', '08'),
-    ('Sep 2025', 'Via Transportation IPO', 'Public markets (NYSE)', 'USD 3.65bn headline', '~10.8x trailing at IPO; 5.6x LTM now', 'n.m.', 'Revenue USD 434m (+29%), adj. EBITDA -8%; EV ~USD 2.75bn (6 Nov 2026)', '10, 26_gap'),
+    ('Sep 2025', 'Via Transportation IPO', 'Public markets (NYSE)', 'USD 3.65bn headline', '~10.8x trailing at IPO; 5.6x LTM (USD 492m) / 6.3x FY2025 (USD 434m) now', 'n.m.', 'FY2025 revenue USD 434m (+29%), adj. EBITDA -8%; EV ~USD 2.75bn (6 Nov 2026)', '10, 26_gap'),
     ('May 2022', 'Optibus Series D', 'Insight, Bessemer, Pitango', 'USD 100m at USD 1.3bn', 'n/d (est. 15-20x ARR)', 'n.m.', 'First public-transport unicorn', '10'),
     ('Jul 2024', 'Hayden AI Series C', 'TPG Rise Fund', 'USD 90m (~USD 400m post)', 'n/d', 'n.m.', 'AI enforcement', '10'),
     ('May 2025', 'Swiftly growth round', 'Cove Hill, JMI', 'undisclosed', 'n/d', 'n.m.', 'Acquired Hopthru (2024), TextMarks (2026)', '08'),
@@ -716,8 +833,8 @@ r += 1
 wdl.cell(row=r, column=1, value='Trading multiples, observed 6 Nov 2026 (EV / LTM)').font = H2; r += 1
 hdr(wdl, r, ['Bucket', 'Company', 'EV/Revenue', 'EV/EBITDA', 'Growth', 'Margin', 'Read-across', '']); r += 1
 tm = [
-    ('Transit ITS integrator', 'INIT SE', '1.0x', '7.0x', '+24% (2025)', '9.9% EBIT', 'De-rated after Nov 2026 EBIT cut; project/hardware mix'),
-    ('Transit ITS software', 'IVU Traffic Technologies', '2.6x', '15.2x', '+10%', '12.4% EBIT', 'Software premium inside the integrator bucket (52% recurring)'),
+    ('Transit ITS integrator', 'INIT SE (EV EUR 0.38bn)', '1.0x', '7.0x', '+24% (2025)', '9.9% EBIT', 'De-rated after Nov 2026 EBIT cut; project/hardware mix'),
+    ('Transit ITS software', 'IVU Traffic Technologies (EV EUR 0.43bn)', '2.6x', '15.2x', '+10%', '12.4% EBIT', 'Software premium inside the integrator bucket (52% recurring)'),
     ('Transit SaaS', 'Via Transportation', '5.6x', 'n.m.', '+27-29%', '-8% adj. EBITDA', 'Loss-making growth; 18% below IPO price'),
     ('Horizontal fleet SaaS', 'Samsara', '12.3x', 'n.m.', '+30%', 'n/d', 'Ceiling for software multiples'),
     ('Rail OEM / signalling', 'Siemens AG', '3.1x', '17.9x', 'n/d', '8.3% (Mobility)', 'Valued on backlog and margin quality'),
@@ -786,13 +903,13 @@ hdr(wr, 4, ['Risk / barrier', 'Type', 'Likelihood', 'Impact', 'Score', 'Evidence
 risks = [
     ('Incumbency and 15-25 year system lives', 'Barrier', 5, 5, 'LA Metro ATMS I 2004-2025; TfL iBus 2009-2024; INIT contracts up to 20 years, rates risk of new entrants low; Modaxo never sells; Clever serves 8 of top-10 NA agencies', 'Coexist-then-displace: overlay products on legacy CAD/AVL; buy an installed base', '11, 17, 18'),
     ('Public procurement cycle and protests', 'Barrier', 5, 4, '2-4 years award-to-live; 2 CFR 200 competition rules; LA Metro 2016 plan to 2028 go-live; awards subject to protest', 'Cooperative purchasing (Sourcewell, state contracts), distributors (Carahsoft), pilot-to-scale', '11'),
-    ('Rail safety certification and three-player signalling oligopoly', 'Barrier', 5, 5, 'SIL-4, ERA/FRA type approval, 25-30 year service tails; Siemens/Hitachi/Alstom ~two-thirds ex-China; 10-30 year frameworks', 'Avoid signalling cores; target adjacencies (condition monitoring, cyber, telecom migration, onboard)', '09, 12, 22_gap'),
+    ('Rail safety certification and four-player signalling oligopoly (three ex-China)', 'Barrier', 5, 5, 'SIL-4, ERA/FRA type approval, 25-30 year service tails; Siemens, Hitachi, Alstom, CRSC each 13-22% of world CCS, big three ~two-thirds ex-China; 10-30 year frameworks', 'Avoid signalling cores; target adjacencies (condition monitoring, cyber, telecom migration, onboard)', '09, 12, 22_gap'),
     ('US federal funding reset', 'Market', 4, 4, 'IIJA advance appropriations lapsed; CR implies ~20% transit cut; House bill -14%; FTA staff -30%', 'Sell opex-light SaaS with fast payback; weight toward formula-funded refresh and state-funded agencies', '06, 25_gap'),
     ('SaaS eligibility under 80/20 capital grants', 'Market', 3, 3, '49 USC 5302 capital definition covers leasing and preventive maintenance; FTA declined to add SaaS guidance (2025); House bill would add explicit SaaS clause', 'Structure subscriptions as leases/preventive maintenance; track H.R. 8870', '17, 25_gap'),
     ('ERTMS and resignalling slippage', 'Market', 4, 3, 'EC: deployment significantly behind schedule; UK CP7 ETCS cut 35%; DB withdrew 2024 migration strategy; Kavach dates slipped', 'Phase revenue on committed frameworks, not plans', '07, 14'),
     ('Buy America / BABA for hardware', 'Barrier', 4, 3, '>70% domestic content and US final assembly for rolling-stock-related equipment; 55% for manufactured products; OIG scrutiny', 'Software-led entry; US contract manufacturing partner (INIT runs two Virginia plants)', '11'),
     ('Cybersecurity compliance and incidents', 'Both', 4, 3, 'TSA rule USD 1.26bn/10 years on passenger rail; TfL 2024 GBP 39m impact; TTC 2021 ransomware took down CAD/AVL', 'Certify early (ISO 27001, SOC 2, IEC 62443); sell cyber as a service line', '06, 11'),
-    ('Agency capacity and long tail', 'Market', 4, 3, '773 US agencies with <50 buses hold 16% of fleet; FTA and agency staffing shortages; LA Metro paid USD 10.8m for programme support', 'Low-touch, hosted, templated delivery; state-level deals', '04, 11'),
+    ('Agency capacity and long tail', 'Market', 4, 3, '772 US agencies with <50 buses hold 16% of fleet; FTA and agency staffing shortages; LA Metro paid USD 10.8m for programme support', 'Low-touch, hosted, templated delivery; state-level deals', '04, 11'),
     ('Hardware tariffs and supply', 'Market', 3, 2, '2025-26 tariff whipsaw (China 145% to 10%; steel 50%); INIT margin miss partly tariff-driven', 'Asset-light; hardware partners carry inventory risk', '11'),
     ('Leverage in hardware-heavy integrators', 'Investment', 3, 4, 'Cubic LBO ~11x EBITDA debt, 2025 recap, interest deferral; Alstom profit warning; Kapsch standstill', 'Do not lever project businesses; underwrite on recurring revenue only', '10, 26_gap'),
     ('Supplier failure and counterparty scrutiny', 'Market', 2, 3, 'Proterra Chapter 11 (2023), Nova Bus US exit; tenders now weigh financial capacity and escrow', 'Balance-sheet strength, continuity terms, escrowed code', '11'),
@@ -814,6 +931,52 @@ for rec in risks:
     r += 1
 
 # ----------------------------------------------------------------------------
+# THESIS: illustrative buy-and-build bridge and target long-list
+# ----------------------------------------------------------------------------
+wth = wb.create_sheet('Thesis')
+title(wth, 'Investment thesis support: illustrative buy-and-build value bridge and target long-list', 'Illustrative only; inputs on the Inputs sheet (blue). Not a valuation.')
+setw(wth, [56, 16, 12, 70])
+hdr(wth, 4, ['Item', 'Value', 'Unit', 'Formula / note'])
+r = 5
+def trow(lab, f, unit, note, fmt=FMT_M, bold=False, font=BLACK):
+    global r
+    wth.cell(row=r, column=1, value=lab).font = BOLD if bold else BLACK
+    c = wth.cell(row=r, column=2, value=f); c.font = font; c.number_format = fmt
+    wth.cell(row=r, column=3, value=unit).font = BLACK
+    n = wth.cell(row=r, column=4, value=note); n.font = NOTE; n.alignment = WRAP
+    r += 1; return r - 1
+t_rev0 = trow('Entry revenue', '=%s' % R['vb_rev0'], 'USD m', 'Inputs', FMT_M, font=GREEN)
+t_ev0 = trow('Entry enterprise value', '=B%d*%s' % (t_rev0, R['vb_mult0']), 'USD m', 'revenue x EV/revenue')
+t_ebitda0 = trow('Entry EBITDA', '=B%d*%s' % (t_rev0, R['vb_margin0']), 'USD m', 'revenue x margin')
+t_debt0 = trow('Net debt at entry', '=B%d*%s' % (t_ebitda0, R['vb_lev']), 'USD m', 'EBITDA x leverage')
+t_eq0 = trow('Equity invested at entry', '=B%d-B%d' % (t_ev0, t_debt0), 'USD m', 'EV - net debt', bold=True)
+t_bolt = trow('Bolt-on acquisitions (EV paid)', '=%s*%s' % (R['vb_bolt'], R['vb_boltmult']), 'USD m', 'bolt-on revenue x multiple; assumed equity-funded')
+t_rev1 = trow('Exit revenue', '=B%d*(1+%s)^%s+%s' % (t_rev0, R['vb_g'], R['vb_hold'], R['vb_bolt']), 'USD m', 'organic compounding plus bolt-on revenue')
+t_ebitda1 = trow('Exit EBITDA', '=B%d*%s' % (t_rev1, R['vb_margin1']), 'USD m', 'exit revenue x exit margin')
+t_ev1 = trow('Exit enterprise value', '=B%d*%s' % (t_ebitda1, R['vb_mult1']), 'USD m', 'EBITDA x EV/EBITDA')
+t_evrev = trow('Implied exit EV / revenue', '=B%d/B%d' % (t_ev1, t_rev1), 'x', 'cross-check against SaaS 5-6x and integrator 1-2.6x bands', FMT_X)
+t_debt1 = trow('Net debt at exit (assumes cash flow repays half of entry debt)', '=B%d*0.5' % t_debt0, 'USD m', 'simplifying assumption')
+t_eq1 = trow('Equity value at exit', '=B%d-B%d' % (t_ev1, t_debt1), 'USD m', 'EV - net debt', bold=True)
+t_moic = trow('Gross MOIC (exit equity / (entry equity + bolt-on EV))', '=B%d/(B%d+B%d)' % (t_eq1, t_eq0, t_bolt), 'x', 'before fees and carry', FMT_X, bold=True)
+trow('Gross IRR', '=B%d^(1/%s)-1' % (t_moic, R['vb_hold']), '%', 'over the hold period', FMT_PCT, bold=True)
+r += 1
+wth.cell(row=r, column=1, value='Target long-list (private mid-market bus ITS vendors; revenue to be confirmed in diligence)').font = H2; r += 1
+hdr(wth, r, ['Company', 'Ownership / stage', 'Fit', 'What is known (research file)']); r += 1
+targets = [
+    ('Avail Technologies (US)', 'Employee-owned (67% moving to 100%); new CEO 2025', 'CAD/AVL and ITS for mid-size US agencies; largest real-time feed footprint among NA vendors (GTFS-RT census)', 'Founded 1999; PennDOT statewide contract; revenue n/d (08, 33_gap)'),
+    ('GIRO (Canada)', 'Founder-led since the 1970s', 'HASTUS scheduling in 30+ countries; the scheduling layer incumbents lack', 'Revenue n/d (08)'),
+    ('Hanover Displays (UK)', 'Family-owned, 40 years', 'Onboard displays and signage in 80+ countries; hardware channel partner or bolt-on', 'Companies House accounts (32_gap)'),
+    ('ETA Transit Systems (US)', 'Private, founder-owned', 'CAD/AVL and real-time for small and mid-size agencies', 'Founded 2003; revenue n/d (08)'),
+    ('Passio Technologies / Ecolane (US)', 'Private (Transit Technologies LLC)', 'Real-time and paratransit software for the long tail', 'Passio 23 providers / 66 feeds in GTFS-RT census (33_gap)'),
+    ('Luminator Technology Group (US)', 'Private equity', 'Displays, video and infotainment; repositioning to digital partner (Sep 2026)', 'Revenue n/d (08)'),
+]
+for rec in targets:
+    for j, v in enumerate(rec):
+        c = wth.cell(row=r, column=j + 1, value=v); c.font = BLACK; c.alignment = WRAP; c.border = BOX
+    wth.row_dimensions[r].height = 34
+    r += 1
+
+# ----------------------------------------------------------------------------
 # final: fonts on headers, freeze panes, save
 # ----------------------------------------------------------------------------
 for s in wb.worksheets:
@@ -824,5 +987,7 @@ print('saved', OUT)
 # export registry for the deck builder
 import json
 json.dump({'inputs': R, 'market_total_row': TOTAL_ROW, 'seg_rows': seg_rows, 'contest_row': CONTEST_ROW, 'ccs_row': CCS_ROW, 'comp_rows': COMP_ROWS, 'geo_rows': GEO_ROWS,
-           'forecast': {'seg': FSEG, 'seg_total': FSEG_TOTAL, 'contest': FCONTEST, 'geo': FGEO, 'comp': FCOMP, 'scen': FSCEN, 'first': ffirst, 'last': flast}},
+           'tier_rows': TIER_ROWS, 'open_rows': OPEN_ROWS, 'app_rows': APP_ROWS, 'sens_rows': SENS_ROWS,
+           'thesis': {'rev0': t_rev0, 'ev0': t_ev0, 'eq0': t_eq0, 'bolt': t_bolt, 'rev1': t_rev1, 'ebitda1': t_ebitda1, 'ev1': t_ev1, 'evrev': t_evrev, 'eq1': t_eq1, 'moic': t_moic},
+           'forecast': {'seg': FSEG, 'seg_total': FSEG_TOTAL, 'contest': FCONTEST, 'sam': FSAM, 'bridge': BRIDGE, 'geo': FGEO, 'comp': FCOMP, 'scen': FSCEN, 'first': ffirst, 'last': flast}},
           open(os.path.join(HERE, 'model_map.json'), 'w'), indent=1)

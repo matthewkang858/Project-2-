@@ -1,0 +1,44 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9mu-northcountytransitdistrict",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://lfportal.nctd.org/staticGTFS/google_transit.zip",
+        "static_historic": [
+          "http://www.gonctd.com/google_transit.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recltDJn10nOSilgD",
+        "gtfs_data_exchange": "north-county-transit-district"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9mu-northcountytransitdistrict",
+          "name": "North County Transit District",
+          "short_name": "NCTD",
+          "website": "http://www.gonctd.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "NCTD"
+            },
+            {
+              "feed_onestop_id": "f-northcountrytransitdistrict~rt"
+            },
+            {
+              "feed_onestop_id": "f-northcountrytransitdistrict~rt~alerts"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "recRBcrX4ZvTyvSnm",
+            "twitter_general": "GoNCTD",
+            "us_ntd_id": "90030",
+            "wikidata_id": "Q7054956;Q5138375"
+          }
+        }
+      ]
+    }
+  ]
+}

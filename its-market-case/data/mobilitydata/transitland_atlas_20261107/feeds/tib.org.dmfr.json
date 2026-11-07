@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-sp4-consorcidemallorca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.tib.org/documents/30683/96569/ctm-mallorca-es.zip/3d94d08e-b214-62d2-7b8c-ef3bebb9a8c0"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-sp4-consorcidemallorca",
+          "name": "Consorci de Mallorca",
+          "short_name": "CTM",
+          "website": "http://www.tib.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "50"
+            },
+            {
+              "gtfs_agency_id": "51"
+            },
+            {
+              "gtfs_agency_id": "52"
+            },
+            {
+              "gtfs_agency_id": "54"
+            },
+            {
+              "gtfs_agency_id": "CTMR4"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

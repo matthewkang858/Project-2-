@@ -1,0 +1,33 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-u3j-lodzka~kolej~aglomeracyjna",
+      "name": "Łódzka Kolej Aglomeracyjna GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kolej-lka.pl/pliki/pn0e6eg45qcl4hd5/gtfs-2025-2026/zip/",
+        "static_historic": [
+          "https://kolej-lka.pl/pliki/pn0e6eg45qcl4hd5/gtfs-2024-2025/zip/",
+          "https://kolej-lka.pl/pliki/pn0e6eg45qcl4hd5/gtfs-2022-2023/zip/"
+        ]
+      },
+      "license": {
+        "spdx_identifier": "CC0-1.0",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.pl",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "unstable_url": "true"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-u3j-lodzka~kolej~aglomeracyjna",
+          "name": "Łódzka Kolej Aglomeracyjna",
+          "short_name": "ŁKA",
+          "website": "https://lka.lodzkie.pl/"
+        }
+      ]
+    }
+  ]
+}

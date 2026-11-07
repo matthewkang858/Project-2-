@@ -1,0 +1,41 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dph4-greaterdaytonrta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://proc.greaterdaytonrta.org/gtfs/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dph4-greaterdaytonrta",
+          "name": "Greater Dayton RTA",
+          "website": "http://www.i-riderta.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "1"
+            },
+            {
+              "feed_onestop_id": "f-dph4-greaterdaytonrta~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "GDRTA",
+            "us_ntd_id": "50017",
+            "wikidata_id": "Q5600523"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-dph4-greaterdaytonrta~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://ridetime.greaterdaytonrta.org/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://ridetime.greaterdaytonrta.org/gtfsrt/trips",
+        "realtime_alerts": "https://ridetime.greaterdaytonrta.org/gtfsrt/alerts"
+      }
+    }
+  ]
+}

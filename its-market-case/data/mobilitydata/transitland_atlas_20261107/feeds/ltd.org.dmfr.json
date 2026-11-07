@@ -1,0 +1,47 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9rb-lanetransitdistrict",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://feed.ltd.org/TMGTFSRealTimeWebService/GTFS/google_transit.zip",
+        "static_historic": [
+          "https://www.ltd.org/files/library/ltdgtfs.zip"
+        ]
+      },
+      "tags": {
+        "gtfs_data_exchange": "lane-transit-district"
+      }
+    },
+    {
+      "id": "f-ltd~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://feed.ltd.org/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
+        "realtime_trip_updates": "https://feed.ltd.org/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+        "realtime_alerts": "https://feed.ltd.org/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9rb-lanetransitdistrict",
+      "name": "Lane Transit District",
+      "short_name": "LTD",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9rb-lanetransitdistrict"
+        },
+        {
+          "feed_onestop_id": "f-ltd~rt"
+        }
+      ],
+      "tags": {
+        "twitter_general": "lanetransit",
+        "us_ntd_id": "00007",
+        "wikidata_id": "Q6485453"
+      }
+    }
+  ]
+}

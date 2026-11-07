@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dng1-transitauthorityofrivercity",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://tarc.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+        "static_historic": [
+          "http://googletransit.ridetarc.org/feed/google_transit.zip"
+        ]
+      },
+      "license": {
+        "url": "http://googletransit.ridetarc.org/feed/Developer%20License%20Agreeement.pdf",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes"
+      },
+      "tags": {
+        "gtfs_data_exchange": "transit-authority-of-river-city"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dng1-transitauthorityofrivercity",
+          "name": "Transit Authority of River City",
+          "short_name": "TARC",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-tarc~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "ridetarc",
+            "us_ntd_id": "40018",
+            "wikidata_id": "Q3537637"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-tarc~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://tarc.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition",
+        "realtime_trip_updates": "https://tarc.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+        "realtime_alerts": "https://tarc.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert"
+      }
+    }
+  ]
+}

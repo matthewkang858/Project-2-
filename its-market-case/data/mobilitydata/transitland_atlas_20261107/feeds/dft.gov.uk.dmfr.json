@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-bus~dft~gov~uk",
+      "supersedes_ids": [
+        "f-gcpv-transportforlondon"
+      ],
+      "name": "United Kingdom Department for Transport Bus Open Data Service",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.bus-data.dft.gov.uk/timetable/download/gtfs-file/all/"
+      },
+      "license": {
+        "url": "https://data.bus-data.dft.gov.uk/guidance/requirements/",
+        "use_without_attribution": "yes",
+        "create_derived_product": "yes",
+        "redistribution_allowed": "yes",
+        "commercial_use_allowed": "yes",
+        "share_alike_optional": "yes"
+      }
+    }
+  ]
+}

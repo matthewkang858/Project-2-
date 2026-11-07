@@ -1,0 +1,348 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9wgu-gunnisonvalleyrta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mjcaction.com/MJC_GTFS_Public/gunnisonrta_google_transit.zip"
+      },
+      "tags": {
+        "gtfs_data_exchange": "gunnison-valley-rta",
+        "managed_by": "mjc"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9wgu-gunnisonvalleyrta",
+          "name": "Gunnison Valley RTA",
+          "website": "http://www.gunnisonvalleyrta.org",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "GVRTA"
+            },
+            {
+              "feed_onestop_id": "f-gunnisonvalleyrta~co~us~flex"
+            },
+            {
+              "feed_onestop_id": "f-gunnisonvalleyrta~rt"
+            }
+          ],
+          "tags": {
+            "twitter_general": "gunnisonrta1",
+            "us_ntd_id": "80150"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c22-graysharbortransit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mjcaction.com/MJC_GTFS_Public/graysharbor_google_transit.zip"
+      },
+      "tags": {
+        "managed_by": "mjc"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c22-graysharbortransit",
+          "name": "Grays Harbor Transit",
+          "website": "http://www.ghtransit.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ght"
+            }
+          ],
+          "tags": {
+            "twitter_general": "realghtransit",
+            "us_ntd_id": "00314",
+            "wikidata_id": "Q25000402"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c28-clallamtransitsystem",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mjcaction.com/MJC_GTFS_Public/clallam_google_transit.zip"
+      },
+      "tags": {
+        "managed_by": "mjc"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c28-clallamtransitsystem",
+          "name": "Clallam Transit System",
+          "website": "http://www.clallamtransit.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "CTS"
+            }
+          ],
+          "tags": {
+            "twitter_general": "clallamtransit",
+            "us_ntd_id": "00303",
+            "wikidata_id": "Q5125418"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c28-jeffersontransitauthority",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mjcaction.com/MJC_GTFS_Public/jefferson_google_transit.zip"
+      },
+      "license": {
+        "url": "https://jeffersontransit.com/wp-content/uploads//Jefferson-Transit-Authority-data-terms-of-use.pdf"
+      },
+      "tags": {
+        "gtfs_data_exchange": "jefferson-transit-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c28-jeffersontransitauthority",
+          "name": "Jefferson Transit Authority",
+          "website": "http://www.jeffersontransit.com",
+          "tags": {
+            "twitter_general": "JTAtransit",
+            "us_ntd_id": "00316",
+            "wikidata_id": "Q6175698"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-c284-blackballferryline",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "http://mjcaction.com/MJC_GTFS_Public/blackball_google_transit.zip"
+      },
+      "tags": {
+        "gtfs_data_exchange": "black-ball-ferry-line",
+        "managed_by": "mjc"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c284-blackballferryline",
+          "name": "Black Ball Ferry Line",
+          "website": "http://cohoferry.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "blackball"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-central~transit~wa",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://data.trilliumtransit.com/gtfs/ellensburg-wa-us/ellensburg-wa-us.zip",
+        "static_historic": [
+          "http://mjcaction.com/MJC_GTFS_Public/centraltransit_google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-c2672-centraltransitellensburg",
+          "name": "Ellensburg Central Transit",
+          "website": "https://ci.ellensburg.wa.us/1051/Ellensburg-Central-Transit",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-central~transit~wa~rt"
+            },
+            {
+              "feed_onestop_id": "f-central~transit~wa~rt~alerts"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f-ihanktowantransit~sd~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/ihanktowan_sd_gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-ihanktowantransit~sd~us",
+          "name": "Ihanktowan Transit",
+          "tags": {
+            "us_ntd_id": "88194"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-mountainexpress~crestedbutte~co~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/MountainExpress_google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-mountainexpress~crestedbutte~co~us",
+          "name": "Mountain Express",
+          "website": "https://www.mtnexp.org/",
+          "tags": {
+            "us_ntd_id": "80159"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-mountain~express",
+      "spec": "gtfs",
+      "urls": {
+        "static_historic": [
+          "http://mjcaction.com/MJC_GTFS_Public/cb_mtnexpress_google_transit.zip"
+        ]
+      },
+      "tags": {
+        "status": "outdated"
+      }
+    },
+    {
+      "id": "f-sandusky",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/sandusky_google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpm5-sanduskytransitsystem",
+          "name": "Sandusky Transit System",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "sts"
+            }
+          ],
+          "tags": {
+            "twitter_general": "sanduskytransit",
+            "us_ntd_id": "50164",
+            "wikidata_id": "Q136687844"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-santa~fe~trails",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://santafenm.gov/media/files/public_works/gtfs.zip",
+        "static_historic": [
+          "http://mjcaction.com/MJC_GTFS_Public/santafetrails_google_transit.zip"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9wkd-santafetrails",
+          "name": "Santa Fe Trails",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "11679215"
+            }
+          ],
+          "tags": {
+            "twitter_general": "santafegov",
+            "us_ntd_id": "60077",
+            "wikidata_id": "Q7419573"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-santa~ynez~valley~transit",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://app.mecatran.com/urb/ws/feed/c2l0ZT1zeXZ0O2NsaWVudD1zZWxmO2V4cGlyZT07dHlwZT1ndGZzO2tleT00MjcwNzQ0ZTY4NTAzOTMyMDIxMDdjNzI0MDRkMzYyNTM4MzI0YzI0",
+        "static_historic": [
+          "http://mjcaction.com/MJC_GTFS_Public/syvt_google_transit.zip"
+        ]
+      },
+      "tags": {
+        "calitp_dataset_id": "recuWhPXfxMatv6rL"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9q4s-a11214029",
+          "name": "Santa Ynez Valley Transit",
+          "website": "https://www.syvt.com",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-santa~ynez~valley~transit~rt"
+            }
+          ],
+          "tags": {
+            "calitp_organization_id": "reckp33bhAuZlmO1M",
+            "twitter_general": "cityofsolvang",
+            "us_ntd_id": "91028",
+            "wikidata_id": "Q101538719"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-santa~ynez~valley~transit~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://lat-long-prototype.wl.r.appspot.com/vehicle-positions.pb?agency=santa-ynez-valley-transit"
+      }
+    },
+    {
+      "id": "f-show~low~az",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/showlow_gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-show~low~az",
+          "name": "City of Show Low",
+          "website": "https://www.showlowaz.gov/page/public-transportation-services",
+          "tags": {
+            "us_ntd_id": "91001"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-south~central~regional~transit~district",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/scrtd_google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-south~central~regional~transit~district",
+          "name": "South Central Regional Transit District",
+          "website": "https://scrtd.org",
+          "tags": {
+            "us_ntd_id": "66283",
+            "wikidata_id": "Q107335262"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-utetribepublictransit~ut~us",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://mjcaction.com/MJC_GTFS_Public/utetribe_gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-utetribepublictransit~ut~us",
+          "name": "Ute Tribe Public Transit",
+          "tags": {
+            "us_ntd_id": "88200"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-drk-seastreak",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://seastreak.com/api/transit/google_transit.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-drk-seastreak",
+          "name": "Seastreak",
+          "website": "https://seastreak.com",
+          "tags": {
+            "twitter_general": "SeaStreakFerry",
+            "us_ntd_id": "20226",
+            "wikidata_id": "Q7439820"
+          }
+        }
+      ]
+    }
+  ]
+}

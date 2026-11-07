@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9yreb-jet",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://letsgo.jonesboro.org/gtfs/google_transit.zip",
+        "static_historic": [
+          "http://www.jonesboro.org/DocumentCenter/View/2432"
+        ]
+      },
+      "operators": [
+        {
+          "onestop_id": "o-9yreb-jet",
+          "name": "Jonesboro Economical Transportation",
+          "short_name": "JET",
+          "tags": {
+            "twitter_general": "CityofJonesboro",
+            "us_ntd_id": "60104",
+            "wikidata_id": "Q6275373"
+          }
+        }
+      ]
+    }
+  ]
+}

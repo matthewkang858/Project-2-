@@ -1,0 +1,49 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-koleje~małopolskie",
+      "name": "Koleje Małopolskie GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kolejemalopolskie.com.pl/rozklady_jazdy/kml-ska-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://dane.gov.pl/pl/dataset/3083,transport-wojewodztwa-malopolskiego/resource/46165/table",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      }
+    },
+    {
+      "id": "f-u2y-koleje~małopolskie~ald",
+      "name": "Koleje Małopolskie ALD GTFS",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://kolejemalopolskie.com.pl/rozklady_jazdy/ald-gtfs.zip"
+      },
+      "license": {
+        "spdx_identifier": "CC-BY-4.0",
+        "url": "https://dane.gov.pl/pl/dataset/3083,transport-wojewodztwa-malopolskiego/resource/46165/table",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-u2y-koleje~małopolskie",
+      "name": "Koleje Małopolskie",
+      "short_name": "KMŁ",
+      "website": "https://www.kolejemalopolskie.com.pl/",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-koleje~małopolskie"
+        },
+        {
+          "feed_onestop_id": "f-u2y-koleje~małopolskie~ald"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-9q5c-culvercitybus",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://web.culvercity.org/gtfs/gtfsexport.zip",
+        "static_historic": [
+          "https://www.culvercity.gov/files/assets/public/v/9/documents/information-technology/maps/gtfsexport.zip",
+          "https://www.culvercity.org/files/assets/public/documents/information-technology/maps/gtfsexport.zip",
+          "https://www.culvercity.org/files/assets/public/documents/information-technology/maps/gtfsexport-feb2022.zip",
+          "https://www.culvercity.org/files/assets/public/documents/information-technology/maps/culvergtfs_06_01_2021.zip",
+          "https://www.culvercity.org/home/showdocument?id=18229",
+          "http://www.culvercity.org/home/showdocument?id=5747"
+        ]
+      },
+      "license": {
+        "url": "https://www.culvercity.gov/City-Hall/Departments/IT/Download-GIS-Data"
+      },
+      "tags": {
+        "calitp_dataset_id": "recHtz00FiGEClITt"
+      }
+    },
+    {
+      "id": "f-culvercitybus~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://nextccbus.org/gtfsrt/vehicles",
+        "realtime_trip_updates": "https://nextccbus.org/gtfsrt/trips",
+        "realtime_alerts": "https://nextccbus.org/gtfsrt/alerts"
+      },
+      "tags": {
+        "calitp_dataset_id": "recV5W6xScqPIJPBq,recbTHlRCOHh5qNVI,recwcAy44U35vUarE"
+      }
+    }
+  ],
+  "operators": [
+    {
+      "onestop_id": "o-9q5c-culvercitybus",
+      "name": "Culver CityBus",
+      "website": "https://www.culvercitybus.com/",
+      "associated_feeds": [
+        {
+          "feed_onestop_id": "f-9q5c-culvercitybus"
+        },
+        {
+          "feed_onestop_id": "f-culvercitybus~rt"
+        }
+      ],
+      "tags": {
+        "calitp_organization_id": "rec5ome04BbA9uf4y",
+        "twitter_general": "culvercitybus",
+        "us_ntd_id": "90039",
+        "wikidata_id": "Q5193719"
+      }
+    }
+  ]
+}

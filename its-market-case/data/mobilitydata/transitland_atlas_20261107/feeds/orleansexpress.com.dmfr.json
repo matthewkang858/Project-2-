@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-orleans~express~ca",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://gtfs.keolis.ca/gtfs.zip"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-orleans~express~ca",
+          "name": "Orléans Express",
+          "website": "https://www.orleansexpress.com",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "ORLE"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q3356500"
+          }
+        }
+      ]
+    }
+  ]
+}

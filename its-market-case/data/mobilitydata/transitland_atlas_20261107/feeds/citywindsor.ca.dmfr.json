@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpsb-transitwindsor",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://opendata.citywindsor.ca/Uploads/google_transit.zip"
+      },
+      "license": {
+        "url": "http://www.citywindsor.ca/opendata/Documents/OpenDataTermsofUse.pdf",
+        "use_without_attribution": "no",
+        "create_derived_product": "yes",
+        "attribution_text": "Contains information licensed under the Open Government Licence – The Corporation of the City of\nWindsor."
+      },
+      "tags": {
+        "gtfs_data_exchange": "transit-windsor"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpsb-transitwindsor",
+          "name": "Transit Windsor",
+          "website": "http://www.citywindsor.ca/transitwindsor?/",
+          "associated_feeds": [
+            {
+              "gtfs_agency_id": "Transit Windsor"
+            }
+          ],
+          "tags": {
+            "wikidata_id": "Q4845445"
+          }
+        }
+      ]
+    }
+  ]
+}

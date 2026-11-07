@@ -1,0 +1,64 @@
+{
+  "$schema": "https://dmfr.transit.land/json-schema/dmfr.schema-v0.6.0.json",
+  "feeds": [
+    {
+      "id": "f-dpmg-rta",
+      "spec": "gtfs",
+      "urls": {
+        "static_current": "https://www.riderta.com/sites/default/files/gtfs/latest/google_transit.zip"
+      },
+      "license": {
+        "url": "http://www.riderta.com/developers"
+      },
+      "tags": {
+        "gtfs_data_exchange": "greater-cleveland-regional-transit-authority"
+      },
+      "operators": [
+        {
+          "onestop_id": "o-dpmg-greaterclevelandregionaltransitauthority",
+          "name": "Greater Cleveland Regional Transit Authority",
+          "short_name": "GCRTA",
+          "associated_feeds": [
+            {
+              "feed_onestop_id": "f-greaterclevelandregionaltransitauthority~rt"
+            },
+            {
+              "feed_onestop_id": "f-greaterclevelandregionaltransitauthority~rt~alerts"
+            }
+          ],
+          "tags": {
+            "twitter_general": "GCRTA",
+            "us_ntd_id": "50015",
+            "wikidata_id": "Q1544412"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f-greaterclevelandregionaltransitauthority~rt",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_vehicle_positions": "https://api.goswift.ly/real-time/cleveland/gtfs-rt-vehicle-positions",
+        "realtime_trip_updates": "https://api.goswift.ly/real-time/cleveland/gtfs-rt-trip-updates"
+      },
+      "license": {
+        "url": "https://www.goswift.ly/api-license"
+      },
+      "authorization": {
+        "type": "header",
+        "param_name": "Authorization",
+        "info_url": "https://goswift.ly/realtime-api-key"
+      }
+    },
+    {
+      "id": "f-greaterclevelandregionaltransitauthority~rt~alerts",
+      "spec": "gtfs-rt",
+      "urls": {
+        "realtime_alerts": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+      },
+      "license": {
+        "url": "http://www.riderta.com/developers"
+      }
+    }
+  ]
+}

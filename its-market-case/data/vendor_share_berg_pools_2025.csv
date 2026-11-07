@@ -1,0 +1,43 @@
+pool,vendor,gross_regional_rev_eur_m,in_scope_factor,attributed_eur_m,share_of_pool_pct,basis,confidence
+NA,Trapeze / Vontas / TripSpark / TransLoc / Routematch (Modaxo legacy),313.5,0.8,250.8,20.6,"ASSUMPTION: ~2,000 NA staff (Modaxo 3,500 pre-Conduent less ~550 identified European + ~100 other) x USD 175k revenue/employee = USD 350m (range 250-450); 80% in Berg scope (ex EAM for rail/airports, non-transit)",low
+NA,Clever Devices (Hitachi MMS),161.2,0.95,153.2,12.6,Hitachi: >USD 220m projected 2026; ASSUMPTION 2025 = USD 200m (c.10% growth) x 90% NA; 95% in scope (small rail PIS/Brazil),medium
+NA,"Conduent Transit (Novvan + Routeward, Modaxo from Oct-2026)",232.6,0.65,151.2,12.4,10-K/8-K: USD 371m global 2025; ASSUMPTION 70% NA (ops also in EU/AU/ME/LatAm); 65% in scope (fleet mgmt ~30% fully + bus-level fare equipment/back-office; mega-AFC programme operations partly outside Berg scope),medium-low
+NA,INIT (North America),130.8,0.85,111.2,9.1,INIT AR2025 regional revenue EUR 130.8m (high); 85% in scope (MARTA/Houston fare projects are rail+bus AFC; ~15% treated as outside),high (revenue) / medium (factor)
+NA,"Cubic Transportation Systems (NA: Umo, NextBus legacy, bus validators, back-office; ex mega-AFC)",434.5,0.25,108.6,8.9,"Moody's 2021: LTM revenue USD 1.47bn, ~60% transit -> ~USD 880m CTS; ASSUMPTION 55% NA (USD 485m); only 25% in Berg bus/tram scope (OMNY/Clipper/Ventra mega-AFC largely outside)",low
+NA,Luminator Technology Group (NA),123.2,0.7,86.2,7.1,"Aggregator estimates USD 189-311m -> midpoint USD 250m; ASSUMPTION 55% NA; 70% in scope (ex aerospace lighting, rail)",low
+NA,Via Transportation (US+Canada software/platform portion),277.4,0.2,55.5,4.5,10-K: US revenue USD 309.7m; ASSUMPTION only ~20% is software/platform in an ITS definition (rest = tech-enabled service operations),low
+NA,Masabi (NA),45.1,1.0,45.1,3.7,Group accounts: NA GBP 37.6m; fare SaaS is inside Berg scope (ticketing); 100%,high (rev) / medium (scope)
+NA,"GIRO (HASTUS, NA)",51.7,0.8,41.4,3.4,Aggregator USD 115.5m (range 25-115); ASSUMPTION 50% NA; 80% in scope (ex rail crew/postal),low
+NA,Avail Technologies,21.9,1.0,21.9,1.8,Aggregator USD 24.5m; 100% US bus CAD/AVL,low
+NA,Spare Labs (NA),19.6,1.0,19.6,1.6,Aggregator USD 25.7m (2023); 85% NA,low
+NA,Vix Technology (NA),18.7,1.0,18.7,1.5,"Group accounts: NA USD 20.9m (Phoenix, Edmonton); 100%",high (rev) / medium (scope)
+NA,Hanover Displays (NA),16.7,0.95,15.9,1.3,Group turnover GBP 92.8m; geography undisclosed; ASSUMPTION 15% NA (US production facility),low
+NA,GMV ITS (NA),15.3,0.9,13.8,1.1,"Group EUR 510m; ASSUMPTION ITS division ~10% (400+ of 3,880 FTE) and 30% NA (record US year); 90% in scope",low
+NA,Optibus (NA),13.3,1.0,13.3,1.1,Aggregator USD 59.6m global (2024); ASSUMPTION 25% NA (UK sub-group covers UK/EU/LatAm),low
+NA,Swiftly,10.7,1.0,10.7,0.9,Aggregator USD 8.4-11.9m; use 11.9 (headcount suggests higher),low
+NA,ETA Transit Systems,5.0,1.0,5.0,0.4,Aggregator USD 5.6m,low
+NA,Passio Technologies,4.5,1.0,4.5,0.4,Aggregator USD 3-25m; use 5,low
+EU,INIT (Germany + Europe ex-DE),173.7,0.9,156.3,6.1,INIT AR2025: DE 95.7 + EU ex-DE 78.0 = EUR 173.7m (high); 90% in scope (incl. DILAX; small rail/other),high (rev) / medium (factor)
+EU,"Trapeze / Modaxo Europe (CH, UK x2, DE, DK, FARA NO, other)",145.1,0.85,123.3,4.8,"Statutory: Trapeze Group (UK) GBP 11.05m + Trapeze ITS UK GBP 16.35m + Trapeze Germany GmbH EUR 9.8m + Modaxo Europe A/S DKK 47.5m + FARA NOK 222m; ASSUMPTIONS: Trapeze Switzerland EUR 55m (250 staff x EUR 220k) + other European Modaxo units (PL, SISCOG, Cammax, AEP, SS Telematica) EUR 20m; 85% in scope",low-medium
+EU,IVU Traffic Technologies,134.7,0.85,114.5,4.5,FY2025 revenue EUR 149.7m (file 08/26); ASSUMPTION 90% Europe; 85% in scope (ex rail/logistics modules),medium
+EU,Hanover Displays (UK + Europe),83.5,0.95,79.3,3.1,Group GBP 92.8m; ASSUMPTION 75% UK+Europe; 95% in scope,medium-low
+EU,Flowbird Transport Ltd (UK) + Flowbird SAS transport (FR),63.8,1.0,63.8,2.5,"Filed: UK GBP 16.06m + Europe 3.79m = 19.84m; ASSUMPTION Flowbird SAS transport share EUR 40m (SAS turnover EUR 212m 2024 per aggregator, mostly parking); 100% in scope (bus ticketing)",medium (UK) / low (FR)
+EU,Cubic Transportation Systems Ltd (UK),212.3,0.25,53.1,2.1,Filed accounts GBP 177.1m (high); ASSUMPTION 25% in Berg bus/tram scope (TfL RCC ~50% is a multimodal mega-AFC operations contract; TMS traffic management outside),low
+EU,"Scheidt & Bachmann Fare Collection Systems (Europe, bus-level share)",119.0,0.4,47.6,1.9,"Group EUR 528.7m (2024); ASSUMPTIONS: FCS division 30%, Europe 75%, bus/tram-level share 40% (rest rail/regional AFC)",low
+EU,Vix Technology (Europe),49.2,0.9,44.2,1.7,Group accounts: Europe USD 54.9m (UK GBP 30.6m + Brussels etc.); 90% in scope (Rail Gates/rail share excluded),high (rev) / medium (scope)
+EU,Indra Mobility (Europe bus-ITS share),199.0,0.2,39.8,1.6,Indra FY2025 Mobility EUR 398m; ASSUMPTIONS 50% Europe and 20% bus ITS (rest tolling/traffic/rail),low
+EU,Luminator Europe (LTG Sweden + DE/IT units),40.4,0.9,36.3,1.4,Filed: LTG Sweden AB SEK 279.5m (FY Feb-25); ASSUMPTION Luminator GmbH/Italy EUR 15m; 90% in scope,medium-low
+EU,Ticketer (Corvia),31.6,1.0,31.6,1.2,"Filed accounts GBP 26.35m, UK 100%; 100% in scope (ETMs + fleet/RTPI; fare-heavy)",high (rev) / medium (scope)
+EU,HaCon (Siemens Mobility) - journey planning,58.5,0.5,29.2,1.1,"ASSUMPTION ~500 staff (file 08) x EUR 130k = EUR 65m, 90% Europe; 50% in scope (bus/multimodal journey planning vs rail)",low
+EU,GMV ITS (Europe),30.6,0.9,27.6,1.1,"As NA row: ITS ~10% of group, 60% Europe (Spain, Cyprus), 90% in scope",low
+EU,Consat Telematics,25.3,1.0,25.3,1.0,Filed company accounts SEK 278.9m (group block SEK 370.7m possible); 100% in scope,high (rev)
+EU,MENTZ (journey planning/DIVA),25.4,0.9,22.9,0.9,Implisense extract EUR 25.4m (2024); 90% in scope,low-medium
+EU,"Via Transportation (Germany + other Europe, platform portion)",96.9,0.2,19.4,0.8,10-K: Germany USD 83.5m + 60% of other USD 41.1m; 20% platform share,low
+EU,Icomera (bus share; AB external + UK),46.2,0.4,18.5,0.7,ASSUMPTIONS: Icomera AB external sales ~50% of SEK 440m (rest intra-group) + Icomera UK GBP 21.9m; only 40% bus (UK ~80% rail),low
+EU,ATRON electronic,17.5,1.0,17.5,0.7,ASSUMPTION 97 staff (2023) x EUR 180k = EUR 17.5m (registry class EUR 10-50m); 100% in scope,low
+EU,Optibus (UK + Europe),16.7,1.0,16.7,0.7,UK sub-group accounts: UK USD 10.4m + Europe 8.2m (2024); 100% in scope,high (rev)
+EU,Hogia Public Transport Systems + Products,15.6,1.0,15.6,0.6,Filed SEK 171.7m combined; 100%,high (rev)
+EU,Thoreb,12.8,1.0,12.8,0.5,Filed AB Thoreb SEK 141.3m; 100%,high (rev)
+EU,Masabi (Europe/RoW),5.1,1.0,5.1,0.2,Group accounts RoW GBP 4.3m (mainly Europe),high (rev)
+EU,Pilotfish Networks,3.5,1.0,3.5,0.1,Filed SEK 38.3m,high (rev)
+EU,Saga Tenix,2.1,1.0,2.1,0.1,Filed NOK 22.6m,high (rev)
