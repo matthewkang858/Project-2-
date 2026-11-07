@@ -147,10 +147,12 @@ def main():
     ov_exclude = set()     # agency keys to exclude (non-transit shuttles etc.)
     ov_sor = {}            # ntd_id or agency key -> (system_of_record, source)
     ov_alias = {}          # provider/operator name -> canonical agency name (merge sub-systems)
+    ov_exclude_provider = set()  # (scope,key) feed records to drop entirely (non-transit shuttles, ferries, foreign)
     if a.overrides and os.path.exists(a.overrides):
         for r in csv.DictReader(open(a.overrides, encoding="utf-8")):
             sc, key, field, val = r["scope"].strip(), r["key"].strip(), r["field"].strip(), r["value"].strip()
-            if field == "ntd_id": ov_provider_ntd[(sc, key)] = val.zfill(5)
+            if field == "ntd_id": ov_provider_ntd[(sc, key)] = "NONE" if val.upper() == "NONE" else "|".join(v.strip().zfill(5) for v in val.split("|") if v.strip())
+            elif field == "exclude_record": ov_exclude_provider.add((sc, key))
             elif field == "vendor": ov_vendor[key] = val
             elif field == "country": ov_country[key] = val
             elif field == "exclude": ov_exclude.add(key)
@@ -241,18 +243,32 @@ def main():
         if fd["spec"] != "gtfs-rt":
             continue
         oids = ops_for_feed(fid)
-        ntd_ids = [atlas_ops[o]["ntd"] for o in oids if atlas_ops.get(o, {}).get("ntd")]
-        opnames = [atlas_ops[o]["name"] for o in oids if atlas_ops.get(o, {}).get("name")]
+        # one logical "operator slot" per operator; each operator may carry several NTD IDs (comma-separated tag)
+        op_slots = []
+        for o in oids:
+            op = atlas_ops.get(o, {})
+            raw = (op.get("ntd") or "").replace(";", ",")
+            ids = [x.strip().zfill(5) for x in raw.split(",") if x.strip()]
+            if ids:
+                for nid_ in ids: op_slots.append((o, op.get("name") or o, nid_))
+            else:
+                op_slots.append((o, op.get("name") or o, ""))
+        if not op_slots: op_slots = [("", fid, "")]
+        ntd_ids = [x[2] for x in op_slots if x[2]]
+        opnames = [x[1] for x in op_slots]
+        US_ONLY_GROUPS = ("passio3.com", "tripshot.com", "ridesystems.net", "syncromatics.com", "availtec.com", "rideralerts.com", "connexionz.net", "cadavl.com")
         for k in ("realtime_vehicle_positions", "realtime_trip_updates", "realtime_alerts"):
-            u = fd["urls"].get(k)
-            if not u:
-                continue
+          u = fd["urls"].get(k)
+          if not u:
+              continue
+          for (oid_slot, opname_slot, nid_slot) in op_slots:
             ent = {"realtime_vehicle_positions": "vp", "realtime_trip_updates": "tu", "realtime_alerts": "sa"}[k]
             vendor, rule, conf, host = classify(u, fd["group"])
             # country inference
             country = ov_country.get(fid, "")
             if not country:
-                if ntd_ids: country = "US"
+                if nid_slot: country = "US"
+                elif any(fd["group"].endswith(g + ".dmfr.json") for g in US_ONLY_GROUPS) and "~ca" not in fid: country = "US"
                 elif u.strip().lower().rstrip("/") in mdb_url_country: country = mdb_url_country[u.strip().lower().rstrip("/")]["location.country_code"]
                 elif host in mdb_hosts_country and not is_shared_host(host): country = mdb_hosts_country[host]
                 elif re.search(r"~(on|qc|bc|ab|mb|sk|ns|nb|nl|pe|yt|nt|nu)~ca(~rt)?$", fid) or fid.endswith("~ca~rt") or fid.endswith("~ca") or host.endswith(".ca") or fd["group"].endswith(".ca.dmfr.json"): country = "CA"
@@ -262,10 +278,10 @@ def main():
             if not country:
                 atlas_unresolved.append((fid, host, fd["group"], ";".join(opnames)))
             feed_records.append({
-                "source": "transitland_atlas", "feed_id": fid, "agency_name_raw": "; ".join(opnames) if opnames else fid, "country": country,
+                "source": "transitland_atlas", "feed_id": fid, "agency_name_raw": opname_slot, "country": country,
                 "state": "", "municipality": "", "entity_type": ent, "status": "active", "is_official": "", "url": u, "host": host,
                 "vendor_publishing_layer": vendor, "rule": rule, "rule_confidence": conf, "atlas_group": fd["group"],
-                "static_reference": "", "redirect_id": "", "contact_email_domain": "", "ntd_id_atlas": "|".join(sorted(set(ntd_ids))), "atlas_operator": "|".join(oids),
+                "static_reference": "", "redirect_id": "", "contact_email_domain": "", "ntd_id_atlas": nid_slot, "atlas_operator": oid_slot,
             })
     with open(os.path.join(review_dir, "review_atlas_unresolved_country.tsv"), "w", encoding="utf-8") as fh:
         for x in atlas_unresolved: fh.write("\t".join(x) + "\n")
@@ -296,18 +312,43 @@ def main():
         if best[1] >= 0.55: return (best[0], "name_state_match_%.2f" % best[1])
         return ("", "")
     match_log = []
+    def canon_name(name):
+        n = ov_alias.get(name, name)
+        if re.match(r"^BC Transit\b", n): n = "BC Transit"
+        if re.match(r"^Exo\b", n, re.I): n = "exo"
+        if re.match(r"^Maryland Transit Administration", n): n = "Maryland Transit Administration"
+        if re.match(r"^Toronto Transit Commission", n): n = "Toronto Transit Commission"
+        return n
+    # fan-out: a provider override "A|B" duplicates the feed record for each NTD id
+    expanded = []
+    for fr in feed_records:
+        key = ("mdb_provider", fr["agency_name_raw"]) if fr["source"] == "mobilitydata" else ("atlas_feed", fr["feed_id"])
+        if key in ov_exclude_provider: continue
+        ov = ov_provider_ntd.get(key, "")
+        if ov and ov != "NONE" and "|" in ov:
+            for nid_ in ov.split("|"):
+                fr2 = dict(fr); fr2["_forced_ntd"] = nid_; expanded.append(fr2)
+        elif ov and ov != "NONE":
+            fr["_forced_ntd"] = ov; expanded.append(fr)
+        elif ov == "NONE":
+            fr["_forced_ntd"] = "NONE"; expanded.append(fr)
+        else:
+            fr["_forced_ntd"] = ""; expanded.append(fr)
+    feed_records = expanded
     for fr in feed_records:
         nid, how = "", ""
-        if fr["source"] == "mobilitydata":
+        if fr["_forced_ntd"] == "NONE":
+            nid, how = "", "override_no_ntd"
+        elif fr["_forced_ntd"]:
+            nid, how = fr["_forced_ntd"], "override"
+        elif fr["source"] == "mobilitydata":
             key = ("mdb_provider", fr["agency_name_raw"])
-            if key in ov_provider_ntd: nid, how = ov_provider_ntd[key], "override"
+            if False: pass
             elif fr["url"].strip().lower().rstrip("/") in atlas_url_ntd: nid, how = atlas_url_ntd[fr["url"].strip().lower().rstrip("/")], "atlas_url_match"
             elif fr["host"] in atlas_host_ntd and len(atlas_host_ntd[fr["host"]]) == 1: nid, how = next(iter(atlas_host_ntd[fr["host"]])), "atlas_host_match"
             elif fr["country"] == "US": nid, how = match_ntd_by_name(fr["agency_name_raw"], fr["state"], fr["municipality"])
         else:
-            key = ("atlas_feed", fr["feed_id"])
-            if key in ov_provider_ntd: nid, how = ov_provider_ntd[key], "override"
-            elif fr["ntd_id_atlas"]: nid, how = fr["ntd_id_atlas"].split("|")[0], "atlas_ntd_tag"
+            if fr["ntd_id_atlas"]: nid, how = fr["ntd_id_atlas"], "atlas_ntd_tag"
         if nid and nid not in ntd: nid, how = "", "ntd_id_not_in_bus_file:" + nid
         fr["ntd_id"] = nid; fr["ntd_match_method"] = how
         if nid:
@@ -315,11 +356,20 @@ def main():
         else:
             fr["ntd_agency"] = ""; fr["active_fullsize_bus"] = ""; fr["tier"] = ""
         # agency key
-        canon = ov_alias.get(fr["agency_name_raw"], fr["agency_name_raw"])
-        if fr["source"] == "transitland_atlas" and not nid and fr["atlas_operator"]:
-            canon = ov_alias.get(canon, canon)
+        canon = canon_name(fr["agency_name_raw"])
         fr["agency_key"] = ("ntd:" + nid) if nid else ("name:" + fr["country"] + ":" + (fr["state"] or "") + ":" + norm_name(canon))
         match_log.append((fr["source"], fr["agency_name_raw"], fr["state"], fr["country"], nid, how, fr["agency_key"]))
+    # de-duplicate non-NTD agencies across catalogs by exact URL, then by non-shared host (Canada and non-NTD US)
+    url_key = {}; host_key = {}
+    for fr in feed_records:
+        if fr["source"] == "mobilitydata" and not fr["ntd_id"]:
+            url_key.setdefault(fr["url"].strip().lower().rstrip("/"), fr["agency_key"])
+            if not is_shared_host(fr["host"]): host_key.setdefault(fr["host"], fr["agency_key"])
+    for fr in feed_records:
+        if fr["source"] == "transitland_atlas" and not fr["ntd_id"]:
+            u = fr["url"].strip().lower().rstrip("/")
+            if u in url_key: fr["agency_key"] = url_key[u]; fr["ntd_match_method"] = "dedup_mdb_url"
+            elif fr["host"] in host_key: fr["agency_key"] = host_key[fr["host"]]; fr["ntd_match_method"] = "dedup_mdb_host"
 
     with open(os.path.join(a.outdir, "gtfs_rt_feeds_classified.csv"), "w", newline="", encoding="utf-8") as fh:
         cols = ["source","feed_id","agency_name_raw","country","state","municipality","entity_type","status","is_official","url","host","vendor_publishing_layer","rule","rule_confidence","atlas_group","ntd_id","ntd_match_method","ntd_agency","active_fullsize_bus","tier","agency_key","static_reference","redirect_id","contact_email_domain","atlas_operator"]
@@ -394,16 +444,21 @@ def main():
     share_rows = []
     for country in ("US", "CA"):
         sub = [r for r in rows_out if r["country"] == country]
-        tiers = sorted(set(r["fleet_tier"] for r in sub if r["fleet_tier"])) + [""] if country == "US" else [""]
-        for tier in tiers + ["ALL"]:
-            tsub = [r for r in sub if (tier == "ALL" or r["fleet_tier"] == tier)]
-            if country == "US" and tier != "ALL" and tier == "": tsub = [r for r in sub if not r["fleet_tier"]]
+        tiers = ["1: 1-49", "2: 50-249", "3: 250-999", "4: 1000+", "ALL (tiers 1-4)", "memo: NTD agencies with 0 full-size buses", "memo: catalog agencies not in NTD bus file"] if country == "US" else ["ALL (no fleet universe)"]
+        for tier in tiers:
+            if country == "US":
+                if tier == "ALL (tiers 1-4)": tsub = [r for r in sub if r["fleet_tier"] in ("1: 1-49", "2: 50-249", "3: 250-999", "4: 1000+")]
+                elif tier.startswith("memo: NTD agencies with 0"): tsub = [r for r in sub if r["ntd_id"] and r["fleet_tier"] not in ("1: 1-49", "2: 50-249", "3: 250-999", "4: 1000+")]
+                elif tier.startswith("memo: catalog"): tsub = [r for r in sub if not r["ntd_id"]]
+                else: tsub = [r for r in sub if r["fleet_tier"] == tier]
+            else:
+                tsub = sub
             n_ag = len(tsub); fleet_tot = sum(float(r["active_fullsize_bus_ntd2025"] or 0) for r in tsub)
             fam = collections.defaultdict(lambda: [0, 0.0])
             for r in tsub:
                 f = vendor_family(r["primary_rt_publisher"]); fam[f][0] += 1; fam[f][1] += float(r["active_fullsize_bus_ntd2025"] or 0)
             for f, (n, fl) in sorted(fam.items(), key=lambda x: -x[1][1] if country == "US" else -x[1][0]):
-                share_rows.append({"country": country, "fleet_tier": tier if tier else ("not in NTD bus file" if country == "US" else "n/a (no fleet universe)"), "vendor_family": f, "agencies": n, "agency_share_pct": round(100 * n / n_ag, 1) if n_ag else "", "active_fullsize_buses": int(fl), "fleet_share_pct": round(100 * fl / fleet_tot, 1) if fleet_tot else "", "universe_agencies": n_ag, "universe_buses": int(fleet_tot)})
+                share_rows.append({"country": country, "fleet_tier": tier, "vendor_family": f, "agencies": n, "agency_share_pct": round(100 * n / n_ag, 1) if n_ag else "", "active_fullsize_buses": int(fl), "fleet_share_pct": round(100 * fl / fleet_tot, 1) if fleet_tot else "", "universe_agencies": n_ag, "universe_buses": int(fleet_tot)})
     with open(os.path.join(a.outdir, "gtfs_rt_vendor_share_by_tier.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(share_rows[0].keys())); w.writeheader()
         for r in share_rows: w.writerow(r)
