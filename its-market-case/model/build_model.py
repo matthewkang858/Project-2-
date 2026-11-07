@@ -118,6 +118,8 @@ inp('gmi_sh_apac', 'GMI APTS regional share: Asia-Pacific', 0.172, '% of global'
 inp('gmi_sh_latam', 'GMI APTS regional share: Latin America', 0.050, '% of global', 'Same.', FMT_PCT)
 inp('gmi_sh_mea', 'GMI APTS regional share: Middle East and Africa', 0.039, '% of global', 'Same.', FMT_PCT)
 inp('row_scale', 'DERIVED: rest-of-world bus ITS as multiple of Berg EU+NA', '=(%s+%s+%s)/(%s+%s)' % (R['gmi_sh_apac'], R['gmi_sh_latam'], R['gmi_sh_mea'], R['gmi_sh_na'], R['gmi_sh_eu']), 'x', 'Scales Berg EU+NA to the rest of the world using GMI regional mix (26.1% / 73.9%). Low confidence: GMI mix is all-mode APTS. Cross-check: ~1.3-1.6m non-US/EU transit buses (China 630k) at a much lower per-bus intensity (research/05, 37_gap).', '0.000', derived=True)
+inp('row_bu_low', 'Rest-of-world bus ITS bottom-up cross-check: low', 0.9, 'USD bn', 'research/37_gap: sourced transit fleets (China 658k, Japan 64.6k, India 147k, Poland 12.8k, Spain 14.3k, HK 5.9k, Singapore 5.8k, Mexico 8.2k...) x tiered all-in intensity (high-income APAC USD 2.5-4k, Gulf 4-6k, China 0.7-1.2k, India 0.25-0.6k, formal LatAm 1-2k per transit bus-year) = USD 0.9-1.6bn (China 0.45-0.75bn). Fare-inclusive scope comparable to Berg.', FMT_BN)
+inp('row_bu_high', 'Rest-of-world bus ITS bottom-up cross-check: high', 1.6, 'USD bn', 'Same.', FMT_BN)
 inp('row_apac_share', 'Share of rest-of-world bus ITS in Asia-Pacific', '=%s/(%s+%s+%s)' % (R['gmi_sh_apac'], R['gmi_sh_apac'], R['gmi_sh_latam'], R['gmi_sh_mea']), '%', 'DERIVED from GMI regional shares (APAC / (APAC + LatAm + MEA)).', FMT_PCT, derived=True)
 inp('bus_hw', 'Bus ITS component mix 2025: hardware', 0.468, '% of value', 'GMI APTS component split 2025: hardware 46.8%, software 33.0%, services 20.1%. research/17_gap 4.1.', FMT_PCT)
 inp('bus_sw', 'Bus ITS component mix 2025: software', 0.330, '% of value', 'Same.', FMT_PCT)
@@ -389,6 +391,11 @@ c = wm['B%d' % r]; c.value = '=(%s+%s)*%s*(1+%s)' % (R['berg_eu'], R['berg_na'],
 wm.cell(row=r, column=1, value='Electronic fare collection market (adjacent), range').font = BLACK
 c = wm['B%d' % r]; c.value = '=%s' % R['fare_low']; c.number_format = FMT_BN; c.font = GREEN
 c = wm['C%d' % r]; c.value = '=%s' % R['fare_high']; c.number_format = FMT_BN; c.font = GREEN; r += 1
+wm.cell(row=r, column=1, value='Rest-of-world bus ITS, top-down (GMI-scaled, fare-inclusive) vs bottom-up range (fleet x tiered intensity, research/37_gap)').font = BLACK
+c = wm['B%d' % r]; c.value = '=(%s+%s)*%s*%s' % (R['berg_eu'], R['berg_na'], fx, R['row_scale']); c.number_format = FMT_BN; c.font = GREEN
+c = wm['C%d' % r]; c.value = '=%s' % R['row_bu_low']; c.number_format = FMT_BN; c.font = GREEN
+c = wm['D%d' % r]; c.value = '=%s' % R['row_bu_high']; c.number_format = FMT_BN; c.font = GREEN
+wm.cell(row=r, column=5, value='top-down sits in the upper half of the bottom-up range').font = NOTE; r += 1
 wm.cell(row=r, column=1, value='Rail CCS incl. freight (UNIFE anchor, USD)').font = BLACK
 c = wm['B%d' % r]; c.value = '=%s*%s' % (R['unife_cc'], fx); c.number_format = FMT_BN; c.font = GREEN; r += 1
 wm.cell(row=r, column=1, value='Helper column H holds the block tag used by SUMIF.').font = NOTE

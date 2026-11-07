@@ -967,6 +967,8 @@
   "gmi_sh_latam": 0.05,
   "gmi_sh_mea": 0.039,
   "row_scale": 0.3531799729364,
+  "row_bu_low": 0.9,
+  "row_bu_high": 1.6,
   "row_apac_share": 0.659003831417625,
   "bus_hw": 0.468,
   "bus_sw": 0.33,
