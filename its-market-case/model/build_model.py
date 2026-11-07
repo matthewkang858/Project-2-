@@ -232,7 +232,8 @@ inp('vb_bolt', 'Bolt-on revenue acquired over the hold (cumulative)', 40, 'USD m
 inp('vb_boltmult', 'Bolt-on EV / revenue', 1.5, 'x', 'Modaxo-Conduent 0.44x to Knorr-Alstom 2.1x.', FMT_X)
 inp('vb_hold', 'Hold period', 5, 'years', '', '0')
 inp('vb_margin1', 'Exit: EBITDA margin (after cloud re-platforming and mix shift)', 0.22, '%', 'IVU 14% EBIT / ~18% EBITDA with 52% recurring; Trimble segments 20-34%; target 22%.', FMT_PCT)
-inp('vb_mult1', 'Exit: EV / EBITDA', 14, 'x', 'IVU 15.2x, Trimble 12.0x, Cubic LBO 15.7x; strategic buyers (Hitachi, Siemens, Modaxo, Via). research/26_gap.', FMT_X)
+inp('vb_mult1', 'Exit case B (software re-rating): EV / EBITDA', 12, 'x', 'IVU 15.2x (52% recurring), Trimble 12.0x, Iteris precedent set median 15.8x LTM EBITDA; requires recurring mix >50% and double-digit growth. research/26_gap, 34_gap.', FMT_X)
+inp('vb_evrev_a', 'Exit case A (integrator precedent): EV / revenue', 1.6, 'x', 'Hitachi paid USD 302m plus USD 45m debt repayment for Clever Devices (Jul 2026) = 1.4x equity / 1.6x total cash on projected 2026 revenue of USD 220m (Hitachi Q1 FY2026 results, subsequent-events note); Thales GTS 1.0x revenue / 13.7x EBIT; Conduent transit 0.44x. research/34_gap.', FMT_X)
 inp('vb_lev', 'Net debt at entry as multiple of EBITDA', 2.5, 'x', 'Deliberately modest: Cubic failed at ~11x. research/10, 26_gap.', FMT_X)
 
 INPUT_LAST_ROW = row[0]
@@ -734,9 +735,9 @@ setw(wd, [34, 16, 9, 8, 56, 40])
 hdr(wd, 4, ['Driver', 'Segment', 'Direction', 'Impact', 'Quantified evidence', 'Source (research file)'])
 drivers = [
     ('Fleet replacement wave', 'Bus NA', '+', 'H', '24,143 US full-size buses reach useful-life benchmark 2026-31 on top of 12,644 already past it; bus rolling-stock capex USD 4.24bn in 2025 (+75% in two years); each new bus is a factory-fit for CAD/AVL, APC, cameras, signs', 'NTD 2025 (04, 16)'),
-    ('Legacy CAD/AVL end of life', 'Bus NA/EU', '+', 'H', 'Systems installed 2004-2012 now replaced (LA Metro ATMS I 2004 to ATMS II 2025, USD 129.8m; TfL iBus 2009 to iBus2 2024, GBP 160m); ~12,000 US buses on 2009-16 platforms (TriMet, Denver, NJ Transit, Miami-Dade, Broward, AC Transit, Phoenix, TTC, King County, TransLink) reach 15-20 years in 2026-31 = USD 0.3-0.5bn of full-replacement awards; only 6% of 75+ surveyed agencies would strongly recommend their CAD/AVL (vendor-cited survey)', '11, 12, 13, 31_gap'),
+    ('Legacy CAD/AVL end of life', 'Bus NA/EU', '+', 'H', 'Systems installed 2004-2012 now replaced (LA Metro ATMS I 2004 to ATMS II 2025, USD 129.8m; TfL iBus 2009 to iBus2 2024, GBP 160m); ~12,000 US buses on 2009-16 platforms (TriMet, Denver, NJ Transit, Miami-Dade, Broward, AC Transit, Phoenix, TTC, King County, TransLink) reach 15-20 years in 2026-31 = USD 0.3-0.5bn of full-replacement awards; Swiftly cites a third-party survey in which only 6% of 75+ agencies would strongly recommend their CAD/AVL (unverified: no author or method published); Caltrans/Rebel 2024 survey of 42 California providers finds agencies staying with vendors they are only somewhat satisfied with', '11, 12, 13, 31_gap, 34_gap'),
     ('Zero-emission bus turnover', 'Bus EU/NA', '+', 'M', 'EU: 60% of city-bus registrations zero-emission in 2025 (11,607 BEBs, +48%); Clean Vehicles Directive 65% clean share 2026-30; US: 8,116 full-size ZEBs funded/ordered (+16%); e-bus ITS sub-market EUR 150m (2024) growing 21-27% p.a.', '05, 07, 17_gap'),
-    ('AI enforcement and safety video', 'Bus', '+', 'M', 'MTA ACE from 123 (2019) to 1,900+ buses (2026), USD 141m contract, target 2,000+ by 2027; Hayden AI 2,500+ buses, 11 US agencies; FRA inward/outward cameras on lead locomotives by Oct 2027; self-funding via citations (NYC >400k tickets in five months)', '12, 13'),
+    ('AI enforcement and safety video', 'Bus', '+', 'M', 'MTA ACE from 123 (2019) to 1,900+ buses (2026); Hayden AI contract B62049 = USD 29.3m capital + USD 272.4m operating, Sep 2022 to Dec 2027 (USD 301.7m; the USD 141m of April 2024 was a modification, not the total); Hayden AI 2,500+ buses, 11 US agencies; FRA inward/outward cameras on lead locomotives by Oct 2027; self-funding via citations (NYC >400k tickets in five months)', '12, 13, 34_gap'),
     ('US federal funding reset', 'Bus/rail NA', '-', 'H', 'IIJA advance appropriations (USD 4.25bn/yr) lapsed 30 Sep 2026; extension to 11 Dec 2026 implies ~20% transit and ~82% rail cut while it runs; House bill -14% vs IIJA, no Low-No; FY2027 request -22%; formula funds (5307 +10% in House bill) favour refresh over expansion', '06, 25_gap'),
     ('State fiscal-cliff packages', 'Bus/rail NA', '+/-', 'M', 'Illinois USD 1.5bn/yr (NITA), Bay Area ~USD 1bn/yr for 14 years (RM, Nov 2026), NY MTA USD 68.4bn 2025-29 plan; Pennsylvania unresolved (SEPTA USD 192m structural deficit, capital raided for operations)', '06'),
     ('ERTMS/ETCS mandate', 'Rail EU', '+', 'H', 'EUR 75-85bn trackside + EUR 10-15bn onboard remaining to complete TEN-T; only ~10% (12,400 km) equipped and 19% of fleet fitted at end-2024; core km still to equip by 2030: 21,940 (Poland 3,742, Italy 2,993, Germany 2,694); EC unit cost ~EUR 850k/km incl. interlockings; non-US resignalling pipeline 2026-31 EUR 35.8bn base (EUR 20.6-54.7bn), 55-60% committed; EC: significantly behind schedule', '07, 36_gap'),
@@ -791,8 +792,8 @@ comps = [
     ('Cubic Transportation Systems', 'US', 'Veritas / Evergreen (Elliott) since 2021', 'Fare systems, Umo, NextBus real-time', 'FY2019 USD 850m (last public)', '9.1% op. margin (FY2019)', 'LBO at 15.7x NTM EBITDA; ~USD 2.1bn debt, 2025 recap, Jan 2026 interest deferral; lost Miami/Sacramento to Masabi', '10, 26_gap'),
     ('IVU Traffic Technologies', 'Germany', 'Listed', 'Scheduling, dispatch, ticketing software (DACH)', 'EUR 150m; 2026 >EUR 160m', '12.4% EBIT', '52% recurring; trades 2.6x revenue / 15x EBITDA: market pays for software mix', '08, 26_gap'),
     ('Equans (Ineo), GMV, Indra, ETRA', 'France / Spain', 'Bouygues; private; listed', 'Bus and tram ITS integration in France, Iberia, LatAm, US (GMV Syncromatics)', 'n/d', 'n/d', 'Equans: Metrolinx, Brampton; GMV: LADOT USD 43m renewal', '08, 12'),
-    ('Avail Technologies, GIRO, Hanover, Luminator, ETA, Passio', 'US / Canada / UK', 'Avail ESOP; GIRO founder-led; Hanover founder-owned; Luminator Audax PE (since 2014)', 'Mid-market CAD/AVL, scheduling (HASTUS), displays, onboard hardware', 'Hanover GBP 92.8m (2025, +28%, 362 staff; Companies House); others aggregator estimates only (+/-50%): Avail ~USD 25m, GIRO USD 25-115m, Passio USD 3-25m, ETA ~USD 6m', 'Hanover 17% operating margin, 58% gross', 'Ageing private assets = bolt-on pipeline; Luminator repositioning from hardware to digital (Sep 2026)', '08, 32_gap'),
-    ('Swiftly', 'US', 'VC/growth (Cove Hill, JMI)', 'Real-time, analytics, now cloud CAD/AVL', 'n/d (200+ agencies)', 'n/d', 'Overlay on legacy CAD/AVL at 100+ agencies; cites survey that only 6% strongly recommend their CAD/AVL', '08, 13'),
+    ('Avail Technologies, GIRO, Hanover, Luminator, ETA, Passio', 'US / Canada / UK', 'Avail ESOP; GIRO founder-led; Hanover founder-owned; Luminator Audax PE (since 2014)', 'Mid-market CAD/AVL, scheduling (HASTUS), displays, onboard hardware', 'Hanover GBP 92.8m (2025, +28%, 362 staff; Companies House); others aggregator estimates only (+/-50%): Avail ~USD 25m, GIRO USD 25-115m, Passio USD 3-25m, ETA ~USD 6m', 'Hanover 17% operating margin, 58% gross', 'Ageing private assets = bolt-on pipeline; Avail is the leading real-time publisher in the 50-249-bus tier (32 of 149 agencies, 20% of its fleet; GTFS-RT census); Luminator repositioning from hardware to digital (Sep 2026)', '08, 32_gap, 33_gap'),
+    ('Swiftly', 'US', 'VC/growth (Cove Hill, JMI)', 'Real-time, analytics, now cloud CAD/AVL', 'n/d (200+ agencies claimed; GTFS-RT census: primary publisher for 40-49 US NTD bus agencies, 7,800-9,900 buses, 12-15% of the US fleet)', 'n/d', 'Overlay on legacy CAD/AVL measured at 26+ US agencies (on Clever, INIT, Vontas, Avail, GMV, Equans systems of record); largest attributed publisher in the 250-999 tier', '08, 13, 33_gap'),
     ('Optibus', 'Israel', 'VC (Insight, Bessemer, Pitango)', 'Scheduling, planning, EV scheduling, real-time suite', 'est. USD 60-75m ARR', 'n/d', 'USD 1.3bn valuation (2022); Carahsoft public-sector channel', '08, 10'),
     ('Via Transportation', 'US', 'NYSE (IPO Sep 2025)', 'On-demand, paratransit, planning (Remix), Citymapper', 'USD 434m (+29%); ARR USD 543m', '40% gross; adj. EBITDA ~breakeven Q4 2026', 'EV ~USD 2.75bn = 5.6x LTM revenue; 821 customers; targets fleets <250 vehicles', '10, 18, 26_gap'),
     ('Hayden AI', 'US', 'VC (TPG Rise, Drawdown)', 'AI bus-lane and bus-stop enforcement cameras', 'n/d', 'n/d', '2,500+ buses, 11 US agencies, MTA USD 141m contract; ~USD 400m post-money (2024)', '10, 13'),
@@ -805,6 +806,7 @@ for rec in comps:
     wc.row_dimensions[r].height = 64
     r += 1
 r += 1
+wc.cell(row=r, column=1, value='GTFS-Realtime publishing census (research/33_gap; data/gtfs_rt_vendor_share_by_tier.csv): 616 of 977 US NTD bus agencies (63%, 21% of full-size buses) publish no real-time feed; 50-249-bus tier: Avail 32 agencies, Clever 19, Swiftly 11, Trapeze/Vontas 8-14, 36 agencies with no feed; feed hosting attributes the publishing layer, not necessarily the CAD/AVL contract.').font = NOTE; r += 2
 wc.cell(row=r, column=1, value='Indicative share arithmetic (formulas on Inputs; derived, directional only)').font = H2; r += 1
 hdr(wc, r, ['Pool', 'Pool size (USD bn)', 'Vendor', 'Vendor revenue (USD bn)', 'Indicative share', '', 'Note']); r += 1
 sh = [
@@ -834,13 +836,13 @@ setw(wdl, [16, 30, 26, 16, 14, 14, 44, 18])
 hdr(wdl, 4, ['Date', 'Target', 'Acquirer / investor', 'Value', 'EV/Revenue', 'EV/EBITDA', 'Note', 'Source file'])
 deals = [
     ('May 2021', 'Cubic Corp (take-private)', 'Veritas Capital / Evergreen (Elliott)', 'USD ~2.8bn EV at the USD 70 offer; closed at USD 75/share, ~USD 3.0bn', '~1.9x FY2020 sales (at 2.8bn); ~2.0x at 3.0bn', '15.7x NTM at USD 70 (Raymond James); ~16.5x at close', 'USD 1.8bn funded debt (~11x FY2020 adj. EBITDA); 2025 recap; three straight quarterly interest deferrals to Jul 2026; Fitch CC (Aug 2026), Moody\'s Ca on term loans; Cubic UK lost TfL contract (Jul 2025)', '10, 18, 26_gap, 32_gap, 90_verification c26'),
-    ('May 2024', 'Thales Ground Transportation Systems', 'Hitachi Rail', 'EUR 1,660m', '~0.7x FY2025 ex-GTS revenue (EUR 2.3bn); standalone Thales GTS revenue at signing not retrievable', 'n/d', 'Ex-GTS generated JPY 391bn (EUR 2.3bn) at 11.4% EBITA in FY2025; remedy sale of mainline units to MERMEC', '09, 22_gap'),
+    ('May 2024', 'Thales Ground Transportation Systems', 'Hitachi Rail', 'EUR 1,660m', '1.04x FY2020 revenue (EUR 1.6bn) / 0.98x LTM H1-2021 (EUR 1.7bn)', '13.7x LTM EBIT (EUR 121m, 7.3% margin); Hitachi guided ~10x forward EV/EBIT', 'Thales URD discontinued-operations note; ex-GTS generated JPY 391bn (EUR 2.3bn) at 11.4% EBITA in FY2025 under Hitachi; remedy sale of mainline units to MERMEC', '09, 22_gap, 34_gap'),
     ('Sep 2024', 'Alstom Signaling North America', 'Knorr-Bremse', 'USD 690m', '~2.1x (EUR 300m revenue at 1.08)', 'n/d', '~EUR 300m revenue, ~16% EBIT; conventional wayside', '22_gap'),
-    ('Dec 2025', 'Frauscher (train detection)', 'Wabtec', 'USD ~792m', 'n/d', 'n/d', 'Axle counters and wheel sensors', '09, 22_gap'),
+    ('Dec 2025', 'Frauscher (train detection)', 'Wabtec', 'EUR 675m (USD ~792m)', '4.7x 2025E revenue (EUR 145m)', '12.4x 2025E EBITDA after run-rate synergies', 'Axle counters and wheel sensors; component specialist premium', '09, 22_gap, 34_gap'),
     ('Jul 2025', 'Evident Inspection Technologies', 'Wabtec', 'USD 1,788m', 'n/d', '15.9x CY24', 'Adjacent inspection', '10'),
     ('May 2026', 'MERMEC signalling and diagnostics businesses', 'Siemens Mobility', 'undisclosed', 'n/d', 'n/d', '~EUR 430m FY25 revenue, 1,700 staff', '22_gap'),
-    ('Jul 2026', 'Clever Devices', 'Hitachi Rail', 'undisclosed', 'n/d', 'n/d', 'Projected 2026 revenue >USD 220m (the USD 220m figure is revenue, not price); 8 of top-10 NA agencies', '08, 10, 34_gap'),
-    ('Oct 2026', 'Conduent Public Transit (Novvan, Routeward)', 'Modaxo / Constellation Software', 'USD 164m', '~0.44x', 'n/d', 'Unit revenue USD 371m (2025) incl. fare collection; 2,000 staff', '08, 18'),
+    ('Jul 2026', 'Clever Devices', 'Hitachi Rail', 'USD 302m consideration + USD 45m debt repaid (USD 347m)', '1.4x equity / 1.6x total on projected 2026 revenue USD 220m', 'n/d', 'Hitachi Q1 FY2026 consolidated results (29 Jul 2026), subsequent-events note; signed 31 Mar 2026, closed 1 Jul 2026; 8 of top-10 NA agencies; the only completed strategic exit of a core bus-ITS platform', '34_gap'),
+    ('Oct 2026', 'Conduent Public Transit (Novvan, Routeward)', 'Modaxo / Constellation Software', 'USD 164m', '0.44x 2025 revenue (USD 371m)', '~5.1x direct (unallocated) EBITDA (~USD 32m); 9.1x pre-tax income', 'Loss-making at segment level (~-5% pre-tax); fare-heavy; 2,000 staff', '08, 18, 32_gap, 34_gap'),
     ('Jan 2025', 'Flowbird', 'EasyPark Group (Arrive)', 'undisclosed', 'n/d', 'n/d', 'Fare and parking (adjacent)', '10'),
     ('2024', 'Safe Fleet (incl. Seon)', 'Clarience / Genstar', 'undisclosed', 'n/d', 'n/d', 'Onboard video', '08'),
     ('Sep 2025', 'Via Transportation IPO', 'Public markets (NYSE)', 'USD 3.65bn headline', '~10.8x trailing at IPO; 5.6x LTM (USD 492m) / 6.3x FY2025 (USD 434m) now', 'n.m.', 'FY2025 revenue USD 434m (+29%), adj. EBITDA -8%; EV ~USD 2.75bn (6 Nov 2026)', '10, 26_gap'),
@@ -848,7 +850,7 @@ deals = [
     ('Jul 2024', 'Hayden AI Series C', 'TPG Rise Fund', 'USD 90m (~USD 400m post)', 'n/d', 'n.m.', 'AI enforcement', '10'),
     ('May 2025', 'Swiftly growth round', 'Cove Hill, JMI', 'undisclosed', 'n/d', 'n.m.', 'Acquired Hopthru (2024), TextMarks (2026)', '08'),
     ('Sep 2024', 'INIT acquires DILAX', 'INIT SE', 'undisclosed', 'n/d', 'n/d', '~EUR 20m revenue APC specialist', '08'),
-    ('Nov 2024', 'Iteris', 'Almaviva', 'USD ~335m', '~1.9x', 'n/d', 'Adjacent roadway ITS', '10'),
+    ('Nov 2024', 'Iteris', 'Almaviva', 'USD ~335m (aggregate value ~USD 314.5m)', '1.83x FY2024 revenue', '24.4x FY2024 adj. EBITDA; 12.1x CY2025E; fairness-opinion precedent set 10.1-19.1x LTM EBITDA (median 15.8x)', 'Adjacent roadway ITS; DEFM14A', '10, 34_gap'),
 ]
 r = 5
 for rec in deals:
@@ -980,12 +982,17 @@ t_eq0 = trow('Equity invested at entry', '=B%d-B%d' % (t_ev0, t_debt0), 'USD m',
 t_bolt = trow('Bolt-on acquisitions (EV paid)', '=%s*%s' % (R['vb_bolt'], R['vb_boltmult']), 'USD m', 'bolt-on revenue x multiple; assumed equity-funded')
 t_rev1 = trow('Exit revenue', '=B%d*(1+%s)^%s+%s' % (t_rev0, R['vb_g'], R['vb_hold'], R['vb_bolt']), 'USD m', 'organic compounding plus bolt-on revenue')
 t_ebitda1 = trow('Exit EBITDA', '=B%d*%s' % (t_rev1, R['vb_margin1']), 'USD m', 'exit revenue x exit margin')
-t_ev1 = trow('Exit enterprise value', '=B%d*%s' % (t_ebitda1, R['vb_mult1']), 'USD m', 'EBITDA x EV/EBITDA')
-t_evrev = trow('Implied exit EV / revenue', '=B%d/B%d' % (t_ev1, t_rev1), 'x', 'cross-check against SaaS 5-6x and integrator 1-2.6x bands', FMT_X)
 t_debt1 = trow('Net debt at exit (assumes cash flow repays half of entry debt)', '=B%d*0.5' % t_debt0, 'USD m', 'simplifying assumption')
-t_eq1 = trow('Equity value at exit', '=B%d-B%d' % (t_ev1, t_debt1), 'USD m', 'EV - net debt', bold=True)
-t_moic = trow('Gross MOIC (exit equity / (entry equity + bolt-on EV))', '=B%d/(B%d+B%d)' % (t_eq1, t_eq0, t_bolt), 'x', 'before fees and carry', FMT_X, bold=True)
-trow('Gross IRR', '=B%d^(1/%s)-1' % (t_moic, R['vb_hold']), '%', 'over the hold period', FMT_PCT, bold=True)
+t_eva = trow('Exit case A: enterprise value at integrator precedent', '=B%d*%s' % (t_rev1, R['vb_evrev_a']), 'USD m', 'exit revenue x 1.6x (Clever Devices precedent, research/34_gap)', FMT_M, bold=True)
+t_eqa = trow('Exit case A: equity value', '=B%d-B%d' % (t_eva, t_debt1), 'USD m', 'EV - net debt')
+t_moica = trow('Exit case A: gross MOIC', '=B%d/(B%d+B%d)' % (t_eqa, t_eq0, t_bolt), 'x', 'exit equity / (entry equity + bolt-on EV); before fees', FMT_X, bold=True)
+t_irra = trow('Exit case A: gross IRR', '=B%d^(1/%s)-1' % (t_moica, R['vb_hold']), '%', '', FMT_PCT)
+t_ev1 = trow('Exit case B: enterprise value at software re-rating', '=B%d*%s' % (t_ebitda1, R['vb_mult1']), 'USD m', 'EBITDA x EV/EBITDA (IVU-like)', FMT_M, bold=True)
+t_evrev = trow('Exit case B: implied EV / revenue', '=B%d/B%d' % (t_ev1, t_rev1), 'x', 'compare IVU 2.6x, Via 5.6x', FMT_X)
+t_eq1 = trow('Exit case B: equity value', '=B%d-B%d' % (t_ev1, t_debt1), 'USD m', 'EV - net debt')
+t_moic = trow('Exit case B: gross MOIC', '=B%d/(B%d+B%d)' % (t_eq1, t_eq0, t_bolt), 'x', 'before fees and carry', FMT_X, bold=True)
+trow('Exit case B: gross IRR', '=B%d^(1/%s)-1' % (t_moic, R['vb_hold']), '%', 'over the hold period', FMT_PCT, bold=True)
+trow('Read-across', '', '', 'Case A shows that buying an integrator and growing it without changing its business model returns little: the Clever precedent (1.6x revenue) barely covers entry plus bolt-ons. The thesis only works if the recurring, software-led mix earns an IVU-like multiple (case B), which is therefore the central thing to believe and to diligence.', '@')
 r += 1
 wth.cell(row=r, column=1, value='Target long-list (private mid-market bus ITS vendors; revenue to be confirmed in diligence)').font = H2; r += 1
 hdr(wth, r, ['Company', 'Ownership / stage', 'Fit', 'What is known (research file)']); r += 1
@@ -1015,6 +1022,6 @@ print('saved', OUT)
 import json
 json.dump({'inputs': R, 'market_total_row': TOTAL_ROW, 'seg_rows': seg_rows, 'contest_row': CONTEST_ROW, 'ccs_row': CCS_ROW, 'comp_rows': COMP_ROWS, 'geo_rows': GEO_ROWS,
            'tier_rows': TIER_ROWS, 'open_rows': OPEN_ROWS, 'app_rows': APP_ROWS, 'sens_rows': SENS_ROWS,
-           'thesis': {'rev0': t_rev0, 'ev0': t_ev0, 'eq0': t_eq0, 'bolt': t_bolt, 'rev1': t_rev1, 'ebitda1': t_ebitda1, 'ev1': t_ev1, 'evrev': t_evrev, 'eq1': t_eq1, 'moic': t_moic},
+           'thesis': {'rev0': t_rev0, 'ev0': t_ev0, 'eq0': t_eq0, 'bolt': t_bolt, 'rev1': t_rev1, 'ebitda1': t_ebitda1, 'ev1': t_ev1, 'evrev': t_evrev, 'eq1': t_eq1, 'moic': t_moic, 'eva': t_eva, 'eqa': t_eqa, 'moica': t_moica, 'irra': t_irra},
            'forecast': {'seg': FSEG, 'seg_total': FSEG_TOTAL, 'contest': FCONTEST, 'sam': FSAM, 'bridge': BRIDGE, 'geo': FGEO, 'comp': FCOMP, 'scen': FSCEN, 'first': ffirst, 'last': flast}},
           open(os.path.join(HERE, 'model_map.json'), 'w'), indent=1)

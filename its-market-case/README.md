@@ -10,8 +10,8 @@ Deliverables for the written case: market size and segmentation, drivers and est
 | `model/Public_ITS_Market_Model.xlsx` | Live-formula model: Inputs (all assumptions with sources), TopDown (third-party estimates and scope reconciliation), Market_2025 (segment x component x geography, two-tier and openness views, bus pool by application, haircut sensitivity), Forecast (2025-2031 with scenario selector, open-pool SAM, growth bridge), BottomUp_NA (NTD fleet x unit economics), Drivers, Competitors, Deals_Comps, Benchmarks (122 contract awards), Risks, Thesis (illustrative buy-and-build bridge, target long-list). |
 | `01_synthesis.md` | The sizing logic and storyline in prose, with the research file that holds each source. |
 | `00_case_plan.md` | Segmentation framework, model architecture and slide storyline used to organise the work. |
-| `research/` | 18 research sweeps, gap-fill notes and `90_verification.md` (30 load-bearing claims re-checked against sources: 25 verified, 3 scope caveats, 2 corrected). Every figure carries its URL. |
-| `data/` | Derived tables: FTA NTD 2025 agency tiers, fleets, communication and information capex by mode and year; contract benchmarks; (raw NTD downloads are not committed). |
+| `research/` | 18 research sweeps, 9 gap-fill notes (31-37 plus 17/21/22/25/26) and `90_verification.md` (30 load-bearing claims re-checked against sources: 25 verified, 3 scope caveats, 2 corrected; plus post-verification updates on the Clever Devices price and the MTA ACE contract). Every figure carries its URL. |
+| `data/` | Derived tables: FTA NTD 2025 agency tiers, fleets, communication and information capex by mode and year; 228 contract-award benchmarks; GTFS-Realtime vendor census (agency-level, by tier, feed migrations); non-US bus fleets by country; rail resignalling pipeline (raw NTD and MobilityData downloads are not committed). |
 
 ## Regenerating
 

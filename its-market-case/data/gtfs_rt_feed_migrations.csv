@@ -1,0 +1,968 @@
+evidence,feed_file,provider,date,old_host,new_host,old_vendor,new_vendor,vendor_changed,commit
+catalog_git_feed_first_added,us-new-mexico-abq-ride-gtfs-rt-tu-1469.json,ABQ RIDE,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-new-mexico-abq-ride-gtfs-rt-vp-1470.json,ABQ RIDE,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_redirect,tfs-150->mdb-1372,ART,2022-05-26,realtime.commuterpage.com,realtime.arlingtontransit.com,Connexionz,Clever Devices (BusTime) / Hitachi MMS,yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-maine-island-explorer-gtfs-rt-sa-3212.json,Acadia National Park - Island Explorer,2026-06-12,,islandexplorertracker.availtec.com,,Avail Technologies,,2d47a235cb
+catalog_git_feed_first_added,us-maine-island-explorer-gtfs-rt-vp-3214.json,Acadia National Park - Island Explorer,2026-06-12,,islandexplorertracker.availtec.com,,Avail Technologies,,2d47a235cb
+catalog_git_feed_first_added,us-new-hampshire-advance-transit-at-gtfs-rt-tu-1651.json,Advance Transit (AT),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-new-hampshire-advance-transit-at-gtfs-rt-vp-1650.json,Advance Transit (AT),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-alameda-contra-costa-transit-district-ac-transit-gtfs-rt-sa-1400.json,Alameda-Contra Costa Transit District (AC Transit),2022-05-26,,api.actransit.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-california-alameda-contra-costa-transit-district-ac-transit-gtfs-rt-tu-1401.json,Alameda-Contra Costa Transit District (AC Transit),2022-05-26,,api.actransit.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-alameda-contra-costa-transit-district-ac-transit-gtfs-rt-vp-1399.json,Alameda-Contra Costa Transit District (AC Transit),2022-05-26,,api.actransit.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-alexandria-dash-gtfs-rt-sa-2843.json,Alexandria Transit Company (DASH),2025-09-29,,api.goswift.ly,,Swiftly,,0e47e8dfe0
+catalog_git_feed_first_added,us-virginia-alexandria-dash-gtfs-rt-tu-2844.json,Alexandria Transit Company (DASH),2025-09-29,,api.goswift.ly,,Swiftly,,0e47e8dfe0
+catalog_git_feed_first_added,us-virginia-alexandria-dash-gtfs-rt-vp-2845.json,Alexandria Transit Company (DASH),2025-09-29,,api.goswift.ly,,Swiftly,,0e47e8dfe0
+catalog_git_feed_first_added,us-alaska-anchorage-people-mover-gtfs-rt-vp-1656.json,Anchorage People Mover,2022-05-26,,gtfs-rt.codeforanchorage.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-arlington-transit-gtfs-rt-tu-1372.json,Arlington Transit,2022-05-26,,realtime.arlingtontransit.com,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-arlington-transit-gtfs-rt-v-p-1790.json,Arlington Transit,2022-07-27,,realtime.arlingtontransit.com,,Clever Devices (BusTime) / Hitachi MMS,,ee538afabd
+catalog_git_url_change,us-virginia-arlington-transit-gtfs-rt-tu-1372.json,Arlington Transit,2023-11-07,realtime.commuterpage.com,realtime.arlingtontransit.com,Connexionz,Clever Devices (BusTime) / Hitachi MMS,yes,ff65086f07
+catalog_git_feed_first_added,us-north-carolina-asheville-rides-transit-gtfs-rt-sa-1765.json,Asheville Rides Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-north-carolina-asheville-rides-transit-gtfs-rt-tu-1763.json,Asheville Rides Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-north-carolina-asheville-rides-transit-gtfs-rt-vp-1764.json,Asheville Rides Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-avalon-transit-gtfs-rt-tu-1729.json,Avalon Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-avalon-transit-gtfs-rt-vp-1728.json,Avalon Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-100-mile-house-gtfs-rt-sa-2495.json,BC Transit (100 Mile House),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-100-mile-house-gtfs-rt-tu-2496.json,BC Transit (100 Mile House),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-100-mile-house-gtfs-rt-vp-2497.json,BC Transit (100 Mile House),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-ashcroft-cache-creek-clinton-gtfs-rt-sa-2492.json,BC Transit (Ashcroft-Cache-Creek-Clinton),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-ashcroft-cache-creek-clinton-gtfs-rt-tu-2493.json,BC Transit (Ashcroft-Cache-Creek-Clinton),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-ashcroft-cache-creek-clinton-gtfs-rt-vp-2494.json,BC Transit (Ashcroft-Cache-Creek-Clinton),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-buckley-nechako-gtfs-rt-sa-2511.json,BC Transit (Bulkley-Nechako | Prince George),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-buckley-nechako-gtfs-rt-tu-2512.json,BC Transit (Bulkley-Nechako | Prince George),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-buckley-nechako-gtfs-rt-vp-2513.json,BC Transit (Bulkley-Nechako | Prince George),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-campbell-river-transit-gtfs-rt-sa-1376.json,BC Transit (Campbell River Transit),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-campbell-river-transit-gtfs-rt-tu-1377.json,BC Transit (Campbell River Transit),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-campbell-river-transit-gtfs-rt-vp-1378.json,BC Transit (Campbell River Transit),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-central-fraser-valley-gtfs-rt-sa-2507.json,BC Transit (Central Fraser Valley| Chilliwack| Agassiz-Harrison | Hope),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-central-fraser-valley-gtfs-rt-tu-2516.json,BC Transit (Central Fraser Valley| Chilliwack| Agassiz-Harrison | Hope),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-central-fraser-valley-gtfs-rt-vp-2517.json,BC Transit (Central Fraser Valley| Chilliwack| Agassiz-Harrison | Hope),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-clearwater-gtfs-rt-sa-2509.json,BC Transit (Clearwater),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-clearwater-gtfs-rt-tu-2506.json,BC Transit (Clearwater),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-clearwater-gtfs-rt-vp-2518.json,BC Transit (Clearwater),2025-04-17,,bct.tmix.se,,Consat Telematics,,6c6364805f
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-columbia-valley-gtfs-rt-sa-2521.json,BC Transit (Columbia Valley | Cranbrook | Elk Valley | Kimberley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-columbia-valley-gtfs-rt-tu-2522.json,BC Transit (Columbia Valley | Cranbrook | Elk Valley | Kimberley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-columbia-valley-gtfs-rt-vp-2523.json,BC Transit (Columbia Valley | Cranbrook | Elk Valley | Kimberley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-sa-1388.json,BC Transit (Comox Valley Transit System),2022-05-26,,comox.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-tu-1389.json,BC Transit (Comox Valley Transit System),2022-05-26,,comox.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-vp-1387.json,BC Transit (Comox Valley Transit System),2022-05-26,,comox.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-gtfs-rt-sa-2525.json,BC Transit (Comox Valley Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-gtfs-rt-tu-2526.json,BC Transit (Comox Valley Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-comox-valley-gtfs-rt-vp-2527.json,BC Transit (Comox Valley Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-sa-1388.json,BC Transit (Comox Valley Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-tu-1389.json,BC Transit (Comox Valley Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-comox-valley-transit-system-gtfs-rt-vp-1387.json,BC Transit (Comox Valley Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_redirect,mdb-1387->mdb-2527,BC Transit (Comox Valley Transit System),2025-04-22,comox.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1388->mdb-2525,BC Transit (Comox Valley Transit System),2025-04-22,comox.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1389->mdb-2526,BC Transit (Comox Valley Transit System),2025-04-22,comox.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-cowichan-valley-regional-transit-system-gtfs-rt-sa-1380.json,BC Transit (Cowichan Valley Regional Transit System),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-cowichan-valley-regional-transit-system-gtfs-rt-tu-1381.json,BC Transit (Cowichan Valley Regional Transit System),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-cowichan-valley-regional-transit-system-gtfs-rt-vp-1379.json,BC Transit (Cowichan Valley Regional Transit System),2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-creston-valley-gtfs-rt-sa-2537.json,BC Transit (Creston Valley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-creston-valley-gtfs-rt-tu-2538.json,BC Transit (Creston Valley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-creston-valley-gtfs-rt-vp-2539.json,BC Transit (Creston Valley),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-dawson-creek-gtfs-rt-sa-2540.json,BC Transit (Dawson Creek),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-dawson-creek-gtfs-rt-tu-2541.json,BC Transit (Dawson Creek),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-dawson-creek-gtfs-rt-vp-2542.json,BC Transit (Dawson Creek),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-fort-st-john-gtfs-rt-sa-2548.json,BC Transit (Fort St. John),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-fort-st-john-gtfs-rt-tu-2549.json,BC Transit (Fort St. John),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-fort-st-john-gtfs-rt-vp-2550.json,BC Transit (Fort St. John),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-hazelton-gtfs-rt-sa-2479.json,BC Transit (Hazelton | Kitimat | Terrace),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-hazelton-gtfs-rt-tu-2478.json,BC Transit (Hazelton | Kitimat | Terrace),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-hazelton-gtfs-rt-vp-2477.json,BC Transit (Hazelton | Kitimat | Terrace),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-sa-1391.json,BC Transit (Kamloops Transit System),2022-05-26,,kamloops.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-tu-1392.json,BC Transit (Kamloops Transit System),2022-05-26,,kamloops.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-vp-1390.json,BC Transit (Kamloops Transit System),2022-05-26,,kamloops.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-sa-1391.json,BC Transit (Kamloops Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-sa-2552.json,BC Transit (Kamloops Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-tu-1392.json,BC Transit (Kamloops Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-tu-2553.json,BC Transit (Kamloops Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-vp-1390.json,BC Transit (Kamloops Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kamloops-transit-system-gtfs-rt-vp-2554.json,BC Transit (Kamloops Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_redirect,mdb-1390->mdb-2554,BC Transit (Kamloops Transit System),2025-04-22,kamloops.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1391->mdb-2552,BC Transit (Kamloops Transit System),2025-04-22,kamloops.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1392->mdb-2553,BC Transit (Kamloops Transit System),2025-04-22,kamloops.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-sa-1393.json,BC Transit (Kelowna Regional Transit System),2022-05-26,,kelowna.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-tu-1394.json,BC Transit (Kelowna Regional Transit System),2022-05-26,,kelowna.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-vp-1395.json,BC Transit (Kelowna Regional Transit System),2022-05-26,,kelowna.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-sa-1393.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-sa-2556.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-tu-1394.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-tu-2557.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-vp-1395.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,,,,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-kelowna-regional-transit-system-gtfs-rt-vp-2558.json,BC Transit (Kelowna Regional Transit System),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_redirect,mdb-1393->mdb-2556,BC Transit (Kelowna Regional Transit System),2025-04-22,kelowna.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1394->mdb-2557,BC Transit (Kelowna Regional Transit System),2025-04-22,kelowna.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_redirect,mdb-1395->mdb-2558,BC Transit (Kelowna Regional Transit System),2025-04-22,kelowna.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-22;old_feed_deprecated:2025-04-22
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-meritt-gtfs-rt-sa-2501.json,BC Transit (Merritt),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-meritt-gtfs-rt-tu-2502.json,BC Transit (Merritt),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-meritt-gtfs-rt-vp-2503.json,BC Transit (Merritt),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-mount-waddington-gtfs-rt-sa-2489.json,BC Transit (Mount Waddington),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-mount-waddington-gtfs-rt-tu-2490.json,BC Transit (Mount Waddington),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-mount-waddington-gtfs-rt-vp-2491.json,BC Transit (Mount Waddington),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-nanaimo-gtfs-rt-sa-2474.json,BC Transit (Nanaimo),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-nanaimo-gtfs-rt-tu-2475.json,BC Transit (Nanaimo),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-nanaimo-gtfs-rt-vp-2476.json,BC Transit (Nanaimo),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-pemberton-valley-gtfs-rt-sa-2498.json,BC Transit (Pemberton Valley),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-pemberton-valley-gtfs-rt-tu-2499.json,BC Transit (Pemberton Valley),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-pemberton-valley-gtfs-rt-vp-2500.json,BC Transit (Pemberton Valley),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-port-edward-gtfs-rt-sa-2544.json,BC Transit (Port Edward | Prince Rupert),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-port-edward-gtfs-rt-tu-2545.json,BC Transit (Port Edward | Prince Rupert),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-port-edward-gtfs-rt-vp-2546.json,BC Transit (Port Edward | Prince Rupert),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-powell-river-gtfs-rt-sa-2530.json,BC Transit (Powell River),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-powell-river-gtfs-rt-tu-2531.json,BC Transit (Powell River),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-powell-river-gtfs-rt-vp-2559.json,BC Transit (Powell River),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-quesnel-gtfs-rt-sa-2480.json,BC Transit (Quesnel),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-quesnel-gtfs-rt-tu-2481.json,BC Transit (Quesnel),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-quesnel-gtfs-rt-vp-2482.json,BC Transit (Quesnel),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-revelstoke-gtfs-rt-sa-2483.json,BC Transit (Revelstoke),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-revelstoke-gtfs-rt-tu-2484.json,BC Transit (Revelstoke),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-revelstoke-gtfs-rt-vp-2485.json,BC Transit (Revelstoke),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-salt-spring-island-gtfs-rt-sa-2486.json,BC Transit (Salt Spring Island),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-salt-spring-island-gtfs-rt-tu-2487.json,BC Transit (Salt Spring Island),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-salt-spring-island-gtfs-rt-vp-2488.json,BC Transit (Salt Spring Island),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-shuswap-gtfs-rt-sa-2533.json,BC Transit (Shuswap | Vernon),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-shuswap-gtfs-rt-tu-2534.json,BC Transit (Shuswap | Vernon),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-shuswap-gtfs-rt-vp-2535.json,BC Transit (Shuswap | Vernon),2025-04-22,,bct.tmix.se,,Consat Telematics,,4d6dc3bcda
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-smithers-gtfs-rt-sa-2504.json,BC Transit (Smithers),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-smithers-gtfs-rt-tu-2505.json,BC Transit (Smithers),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-smithers-gtfs-rt-vp-2465.json,BC Transit (Smithers),2025-04-16,,bct.tmix.se,,Consat Telematics,,074cdde100
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-south-okanagan-similkameen-gtfs-rt-sa-2560.json,BC Transit (South Okanagan-Similkameen),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-south-okanagan-similkameen-gtfs-rt-tu-2561.json,BC Transit (South Okanagan-Similkameen),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-south-okanagan-similkameen-gtfs-rt-vp-2562.json,BC Transit (South Okanagan-Similkameen),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-sa-1409.json,BC Transit (Squamish),2022-05-26,,squamish.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-tu-1410.json,BC Transit (Squamish),2022-05-26,,squamish.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-vp-1408.json,BC Transit (Squamish),2022-05-26,,squamish.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-squamish-gtfs-rt-sa-1409.json,BC Transit (Squamish),2025-04-23,,,,,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-sa-2564.json,BC Transit (Squamish),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-squamish-gtfs-rt-tu-1410.json,BC Transit (Squamish),2025-04-23,,,,,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-tu-2565.json,BC Transit (Squamish),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-squamish-gtfs-rt-vp-1408.json,BC Transit (Squamish),2025-04-23,,,,,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-squamish-gtfs-rt-vp-2566.json,BC Transit (Squamish),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_redirect,mdb-1408->mdb-2566,BC Transit (Squamish),2025-04-23,squamish.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1409->mdb-2564,BC Transit (Squamish),2025-04-23,squamish.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1410->mdb-2565,BC Transit (Squamish),2025-04-23,squamish.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-sunshine-coast-gtfs-rt-sa-2568.json,BC Transit (Sunshine Coast Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-sunshine-coast-gtfs-rt-tu-2569.json,BC Transit (Sunshine Coast Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-sunshine-coast-gtfs-rt-vp-2570.json,BC Transit (Sunshine Coast Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-sa-1397.json,BC Transit (Victoria Regional Transit System),2022-05-26,,victoria.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-tu-1398.json,BC Transit (Victoria Regional Transit System),2022-05-26,,victoria.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-vp-1396.json,BC Transit (Victoria Regional Transit System),2022-05-26,,victoria.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-gtfs-rt-sa-2572.json,BC Transit (Victoria Regional Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-gtfs-rt-tu-2573.json,BC Transit (Victoria Regional Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-victoria-gtfs-rt-vp-2574.json,BC Transit (Victoria Regional Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-sa-1397.json,BC Transit (Victoria Regional Transit System),2025-04-23,,,,,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-tu-1398.json,BC Transit (Victoria Regional Transit System),2025-04-23,,,,,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-victoria-regional-transit-system-gtfs-rt-vp-1396.json,BC Transit (Victoria Regional Transit System),2025-04-23,,,,,,f549505235
+catalog_redirect,mdb-1396->mdb-2574,BC Transit (Victoria Regional Transit System),2025-04-23,victoria.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1397->mdb-2572,BC Transit (Victoria Regional Transit System),2025-04-23,victoria.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1398->mdb-2573,BC Transit (Victoria Regional Transit System),2025-04-23,victoria.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west coast-gtfs-rt-sa-2576.json,BC Transit (West Coast),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west coast-gtfs-rt-tu-2577.json,BC Transit (West Coast),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west coast-gtfs-rt-vp-2578.json,BC Transit (West Coast),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west-kootenay-gtfs-rt-sa-2580.json,BC Transit (West Kootenay Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west-kootenay-gtfs-rt-tu-2581.json,BC Transit (West Kootenay Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-west-kootenay-gtfs-rt-vp-2582.json,BC Transit (West Kootenay Transit System),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-sa-1412.json,BC Transit (Whistler Transit System),2022-05-26,,whistler.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-tu-1413.json,BC Transit (Whistler Transit System),2022-05-26,,whistler.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-vp-1411.json,BC Transit (Whistler Transit System),2022-05-26,,whistler.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-sa-1412.json,BC Transit (Whistler Transit System),2025-04-23,,,,,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-tu-1413.json,BC Transit (Whistler Transit System),2025-04-23,,,,,,f549505235
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-whistler-transit-system-gtfs-rt-vp-1411.json,BC Transit (Whistler Transit System),2025-04-23,,,,,,f549505235
+catalog_redirect,mdb-1411->mdb-2586,BC Transit (Whistler Transit System),2025-04-23,whistler.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1412->mdb-2584,BC Transit (Whistler Transit System),2025-04-23,whistler.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_redirect,mdb-1413->mdb-2585,BC Transit (Whistler Transit System),2025-04-23,whistler.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-23;old_feed_deprecated:2025-04-23
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-gtfs-rt-sa-2584.json,BC Transit (Whistler),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-gtfs-rt-tu-2585.json,BC Transit (Whistler),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-whistler-gtfs-rt-vp-2586.json,BC Transit (Whistler),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-williams-lake-gtfs-rt-sa-2588.json,BC Transit (Williams Lake),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-williams-lake-gtfs-rt-tu-2589.json,BC Transit (Williams Lake),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-williams-lake-gtfs-rt-vp-2590.json,BC Transit (Williams Lake),2025-04-23,,bct.tmix.se,,Consat Telematics,,f549505235
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-sa-1403.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2022-05-26,,nanaimo.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-tu-1404.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2022-05-26,,nanaimo.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-vp-1402.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2022-05-26,,nanaimo.mapstrat.com,,Strategic Mapping (Mapstrat),,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-sa-1403.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,,,,,,074cdde100
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-tu-1404.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,,,,,,074cdde100
+catalog_git_status_deprecated,ca-british-columbia-bc-transit-regional-district-of-nanaimo-rdn-transit-system-gtfs-rt-vp-1402.json,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,,,,,,074cdde100
+catalog_redirect,mdb-1402->mdb-2476,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,nanaimo.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-16;old_feed_deprecated:2025-04-16
+catalog_redirect,mdb-1403->mdb-2474,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,nanaimo.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-16;old_feed_deprecated:2025-04-16
+catalog_redirect,mdb-1404->mdb-2475,BC Transit - Regional District of Nanaimo (RDN) Transit System,2025-04-16,nanaimo.mapstrat.com,bct.tmix.se,Strategic Mapping (Mapstrat),Consat Telematics,yes,new_feed_added:2025-04-16;old_feed_deprecated:2025-04-16
+catalog_git_feed_first_added,ca-ontario-barrie-transit-gtfs-rt-sa-1383.json,Barrie Transit,2022-05-26,,www.myridebarrie.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-barrie-transit-gtfs-rt-tu-1384.json,Barrie Transit,2022-05-26,,www.myridebarrie.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-barrie-transit-gtfs-rt-vp-1382.json,Barrie Transit,2022-05-26,,www.myridebarrie.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-california-bay-area-rapid-transit-bart-gtfs-rt-sa-1385.json,Bay Area Rapid Transit (BART),2022-05-26,,api.bart.gov,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-bay-area-rapid-transit-bart-gtfs-rt-tu-1386.json,Bay Area Rapid Transit (BART),2022-05-26,,api.bart.gov,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-bay-town-trolley-gtfs-rt-tu-1598.json,Bay Town Trolley,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-bay-town-trolley-gtfs-rt-vp-1599.json,Bay Town Trolley,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-beach-cities-transit-gtfs-rt-sa-1565.json,Beach Cities Transit,2022-05-26,,redondobeachbct.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-beach-cities-transit-gtfs-rt-tu-1564.json,Beach Cities Transit,2022-05-26,,redondobeachbct.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-beach-cities-transit-gtfs-rt-vp-1566.json,Beach Cities Transit,2022-05-26,,redondobeachbct.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-ben-franklin-transit-gtfs-rt-sa-2123.json,Ben Franklin Transit,2024-10-15,,myride.bft.org,,Agency-hosted / unattributed,,38c7a00bcc
+catalog_git_feed_first_added,us-washington-ben-franklin-transit-gtfs-rt-tu-2124.json,Ben Franklin Transit,2024-10-15,,myride.bft.org,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,38c7a00bcc
+catalog_git_feed_first_added,us-washington-ben-franklin-transit-gtfs-rt-vp-2125.json,Ben Franklin Transit,2024-10-15,,myride.bft.org,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,38c7a00bcc
+catalog_git_feed_first_added,us-oregon-benton-area-transportation-gtfs-rt-sa-1762.json,Benton Area Transportation,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-benton-area-transportation-gtfs-rt-tu-1760.json,Benton Area Transportation,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-benton-area-transportation-gtfs-rt-vp-1761.json,Benton Area Transportation,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-big-blue-bus-gtfs-rt-sa-1437.json,Big Blue Bus,2022-05-26,,gtfs.bigbluebus.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-big-blue-bus-gtfs-rt-tu-1438.json,Big Blue Bus,2022-05-26,,gtfs.bigbluebus.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-big-blue-bus-gtfs-rt-vp-1436.json,Big Blue Bus,2022-05-26,,gtfs.bigbluebus.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-hallandale-beach-broward-county-transit-gtfs-rt-sa-3476.json,Broward County Transit,2026-08-17,,myride2.broward.org,,Agency-hosted / unattributed,,5f55499a2e
+catalog_git_feed_first_added,us-florida-hallandale-beach-broward-county-transit-gtfs-rt-vp-3475.json,Broward County Transit,2026-08-17,,myride2.broward.org,,Agency-hosted / unattributed,,5f55499a2e
+catalog_git_feed_first_added,us-florida-hallandale-beach-broward-county-transit-gtfs-rt-tu-3524.json,Broward County Transit,2026-10-13,,myride2.broward.org,,Agency-hosted / unattributed,,5fe0132b33
+catalog_redirect,tld-6889-tu->mdb-3527,Broward County Transit,2026-10-13,bctmyride-buspas.com:8080,data.peaktransit.com,Agency-hosted / unattributed,Peak Transit,yes,new_feed_added:2026-10-13;old_feed_deprecated:
+catalog_git_feed_first_added,ca-ontario-burlington-transit-gtfs-rt-sa-1418.json,Burlington Transit,2022-05-26,,opendata.burlington.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-burlington-transit-gtfs-rt-tu-1419.json,Burlington Transit,2022-05-26,,opendata.burlington.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-burlington-transit-gtfs-rt-vp-1417.json,Burlington Transit,2022-05-26,,opendata.burlington.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-california-butte-regional-transit-gtfs-rt-sa-2429.json,Butte Regional Transit (B-Line),2025-03-31,,planmyride.blinetransit.com,,Agency-hosted / unattributed,,32badf2fc8
+catalog_git_feed_first_added,us-california-butte-regional-transit-gtfs-rt-tu-2427.json,Butte Regional Transit (B-Line),2025-03-31,,planmyride.blinetransit.com,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,32badf2fc8
+catalog_git_feed_first_added,us-california-butte-regional-transit-gtfs-rt-vp-2428.json,Butte Regional Transit (B-Line),2025-03-31,,planmyride.blinetransit.com,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,32badf2fc8
+catalog_git_feed_first_added,us-washington-c-tran-gtfs-rt-tu-1922.json,C-TRAN,2023-07-04,,gtfs-rt.c-tran.org,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,6dd8d3aff6
+catalog_git_feed_first_added,us-washington-c-tran-gtfs-rt-vp-1921.json,C-TRAN,2023-07-04,,gtfs-rt.c-tran.org,,Agency-hosted / unattributed,,6dd8d3aff6
+catalog_redirect,tfs-500->mdb-2423,CT Transit Hartford,2025-03-31,65.213.12.244,cttprdtmgtfs.ctttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-03-31;old_feed_deprecated:
+catalog_redirect,tfs-501->mdb-2422,CT Transit Hartford,2025-03-31,65.213.12.244,cttprdtmgtfs.ctttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-03-31;old_feed_deprecated:
+catalog_redirect,tfs-502->mdb-2424,CT Transit Hartford,2025-03-31,65.213.12.244,cttprdtmgtfs.ctttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-03-31;old_feed_deprecated:
+catalog_git_feed_first_added,ca-alberta-calgary-transit-gtfs-rt-sa-1421.json,Calgary Transit,2022-05-26,,transitdata.calgary.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-alberta-calgary-transit-gtfs-rt-tu-1422.json,Calgary Transit,2022-05-26,,transitdata.calgary.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-alberta-calgary-transit-gtfs-rt-vp-1420.json,Calgary Transit,2022-05-26,,transitdata.calgary.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-california-caltrain-gtfs-rt-sa-3055.json,Caltrain,2026-02-18,,api.511.org,,MTC 511 (regional aggregator),,5d1b1eb1d2
+catalog_git_feed_first_added,us-california-california-caltrain-gtfs-rt-tu-3054.json,Caltrain,2026-02-18,,api.511.org,,MTC 511 (regional aggregator),,5d1b1eb1d2
+catalog_git_feed_first_added,us-california-california-caltrain-gtfs-rt-vp-3053.json,Caltrain,2026-02-18,,api.511.org,,MTC 511 (regional aggregator),,5d1b1eb1d2
+catalog_git_feed_first_added,us-michigan-capital-area-transportation-authority-gtfs-rt-sa-1425.json,Capital Area Transportation Authority,2022-05-26,,developers.cata.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-capital-area-transportation-authority-gtfs-rt-tu-1426.json,Capital Area Transportation Authority,2022-05-26,,developers.cata.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-capital-area-transportation-authority-gtfs-rt-vp-1424.json,Capital Area Transportation Authority,2022-05-26,,developers.cata.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-capital-district-transportation-authority-gtfs-rt-sa-2701.json,Capital District Transportation Authority,2025-07-09,,www.cdta.org,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,fe26801122
+catalog_git_feed_first_added,us-new-york-capital-district-transportation-authority-gtfs-rt-tu-2699.json,Capital District Transportation Authority,2025-07-09,,gtfs.cdta.org:8080,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,fe26801122
+catalog_git_feed_first_added,us-new-york-capital-district-transportation-authority-gtfs-rt-vp-2700.json,Capital District Transportation Authority,2025-07-09,,gtfs.cdta.org:8080,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,fe26801122
+catalog_git_feed_first_added,us-texas-capital-metro-gtfs-rt-sa-1428.json,Capital Metro,2022-05-26,,data.texas.gov,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-texas-capital-metro-gtfs-rt-tu-1429.json,Capital Metro,2022-05-26,,data.texas.gov,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-texas-capital-metro-gtfs-rt-vp-1427.json,Capital Metro,2022-05-26,,data.texas.gov,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_redirect,tfs-665->mdb-1429,Capital Metro,2022-05-26,data.texas.gov,data.texas.gov,Agency-hosted / unattributed,Agency-hosted / unattributed,no,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-alaska-capital-transit-gtfs-rt-tu-1672.json,Capital Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-alaska-capital-transit-gtfs-rt-vp-1673.json,Capital Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-cascades-east-transit-gtfs-rt-sa-1482.json,Cascades East Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-cascades-east-transit-gtfs-rt-tu-1483.json,Cascades East Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-cascades-east-transit-gtfs-rt-vp-1484.json,Cascades East Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_status_deprecated,us-oregon-cascades-east-transit-gtfs-rt-sa-1482.json,Cascades East Transit,2025-04-07,,,,,,3561029b6b
+catalog_git_status_deprecated,us-oregon-cascades-east-transit-gtfs-rt-tu-1483.json,Cascades East Transit,2025-04-07,,,,,,3561029b6b
+catalog_git_status_deprecated,us-oregon-cascades-east-transit-gtfs-rt-vp-1484.json,Cascades East Transit,2025-04-07,,,,,,3561029b6b
+catalog_redirect,mdb-1482->tld-4067-sa,Cascades East Transit,2025-04-07,gtfs-realtime.trilliumtransit.com,passio3.com,Trillium (Optibus) - alerts,Passio Technologies,yes,new_feed_added:;old_feed_deprecated:2025-04-07
+catalog_redirect,mdb-1483->tld-4067-tu,Cascades East Transit,2025-04-07,api.goswift.ly,passio3.com,Swiftly,Passio Technologies,yes,new_feed_added:;old_feed_deprecated:2025-04-07
+catalog_redirect,mdb-1484->tld-4067-vp,Cascades East Transit,2025-04-07,api.goswift.ly,passio3.com,Swiftly,Passio Technologies,yes,new_feed_added:;old_feed_deprecated:2025-04-07
+catalog_git_feed_first_added,us-maryland-cecil-transit-gtfs-rt-sa-3078.json,Cecil Transit,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-maryland-cecil-transit-gtfs-rt-tu-3079.json,Cecil Transit,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-maryland-cecil-transit-gtfs-rt-vp-3080.json,Cecil Transit,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-florida-central-florida-regional-transit-authority-lynx-gtfs-rt-sa-1768.json,Central Florida Regional Transit Authority (LYNX),2022-05-26,,gtfsrt.golynx.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-central-florida-regional-transit-authority-lynx-gtfs-rt-tu-1767.json,Central Florida Regional Transit Authority (LYNX),2022-05-26,,gtfsrt.golynx.com,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-florida-central-florida-regional-transit-authority-lynx-gtfs-rt-vp-1766.json,Central Florida Regional Transit Authority (LYNX),2022-05-26,,gtfsrt.golynx.com,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-central-ohio-transit-authority-gtfs-rt-sa-1431.json,Central Ohio Transit Authority,2022-05-26,,realtime.cota.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-central-ohio-transit-authority-gtfs-rt-tu-1432.json,Central Ohio Transit Authority,2022-05-26,,realtime.cota.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-central-ohio-transit-authority-gtfs-rt-vp-1430.json,Central Ohio Transit Authority,2022-05-26,,realtime.cota.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-illinois-champaign-urbana-gtfs-rt-sa-2887.json,Champaign-Urbana Mass Transit District,2025-11-25,,gtfs-rt.mtd.org,,Agency-hosted / unattributed,,7e4bd990dd
+catalog_git_feed_first_added,us-illinois-champaign-urbana-gtfs-rt-tu-2888.json,Champaign-Urbana Mass Transit District,2025-11-25,,gtfs-rt.mtd.org,,Agency-hosted / unattributed,,7e4bd990dd
+catalog_git_feed_first_added,us-illinois-champaign-urbana-gtfs-rt-vp-2889.json,Champaign-Urbana Mass Transit District,2025-11-25,,gtfs-rt.mtd.org,,Agency-hosted / unattributed,,7e4bd990dd
+catalog_git_feed_first_added,us-south-carolina-charleston-area-regional-transportation-authority-gtfs-rt-sa-1736.json,Charleston Area Regional Transportation Authority,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-south-carolina-charleston-area-regional-transportation-authority-gtfs-rt-tu-1735.json,Charleston Area Regional Transportation Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-south-carolina-charleston-area-regional-transportation-authority-gtfs-rt-vp-1737.json,Charleston Area Regional Transportation Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-cincinnati-metro-gtfs-rt-sa-1490.json,Cincinnati Metro,2022-05-26,,tmgtfsprd.sorttrpcloud.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-cincinnati-metro-gtfs-rt-tu-1488.json,Cincinnati Metro,2022-05-26,,tmgtfsprd.sorttrpcloud.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-cincinnati-metro-gtfs-rt-vp-1489.json,Cincinnati Metro,2022-05-26,,tmgtfsprd.sorttrpcloud.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_redirect,tfs-544->mdb-1489,Cincinnati Metro,2022-05-26,developer.go-metro.com,tmgtfsprd.sorttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_redirect,tfs-545->mdb-1488,Cincinnati Metro,2022-05-26,developer.go-metro.com,tmgtfsprd.sorttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-california-city-of-banning-pass-transit-system-gtfs-rt-sa-1479.json,City of Banning Pass Transit System,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-california-city-of-banning-pass-transit-system-gtfs-rt-tu-1480.json,City of Banning Pass Transit System,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-city-of-banning-pass-transit-system-gtfs-rt-vp-1481.json,City of Banning Pass Transit System,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-city-of-corvallis-gtfs-rt-tu-1455.json,City of Corvallis,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-city-of-corvallis-gtfs-rt-vp-1454.json,City of Corvallis,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-city-of-seattle-streetcar-gtfs-rt-sa-1547.json,City of Seattle - Streetcar,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-city-of-seattle-streetcar-gtfs-rt-tu-1548.json,City of Seattle - Streetcar,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-city-of-seattle-streetcar-gtfs-rt-vp-1546.json,City of Seattle - Streetcar,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-indiana-kokomo-city-line-trolley-gtfs-rt-vp-3431.json,City-Line Trolley (City of Kokomo),2026-08-04,,drive.google.com,,Agency-hosted / unattributed,,2847547e73
+catalog_git_feed_first_added,us-indiana-kokomo-city-line-trolly-gtfs-rt-tu-3430.json,City-Line Trolley (City of Kokomo),2026-08-04,,drive.google.com,,Agency-hosted / unattributed,,2847547e73
+catalog_git_feed_first_added,us-or-clackco-connects-gtfs-rt-tu-2743.json,ClackCo Connects (Clackamas County),2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-or-clackco-connects-gtfs-rt-vp-2744.json,ClackCo Connects (Clackamas County),2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-oregon-clackco-connects-gtfs-rt-sa-2742.json,ClackCo Connects (Clackamas County),2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-california-clovis-transit-gtfs-rt-sa-2895.json,Clovis Transit,2025-11-25,,passio3.com,,Passio Technologies,,7e4bd990dd
+catalog_git_feed_first_added,us-california-clovis-transit-gtfs-rt-tu-2896.json,Clovis Transit,2025-11-25,,passio3.com,,Passio Technologies,,7e4bd990dd
+catalog_git_feed_first_added,us-california-clovis-transit-gtfs-rt-vp-2897.json,Clovis Transit,2025-11-25,,passio3.com,,Passio Technologies,,7e4bd990dd
+catalog_git_feed_first_added,us-georgia-cobblinc-gtfs-rt-3195.json,CobbLinc,2026-06-02,,cobb.rideralerts.com,,Avail Technologies,,5df4ac4b44
+catalog_git_feed_first_added,us-georgia-cobblinc-gtfs-rt-3196.json,CobbLinc,2026-06-02,,cobb.rideralerts.com,,Avail Technologies,,5df4ac4b44
+catalog_git_feed_first_added,us-georgia-cobblinc-gtfs-rt-sa-3194.json,CobbLinc,2026-06-02,,cobb.rideralerts.com,,Avail Technologies,,5df4ac4b44
+catalog_git_feed_first_added,us-california-commerce-municipal-bus-lines-gtfs-rt-sa-1796.json,Commerce Municipal Bus Lines,2022-07-27,,citycommbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,ee538afabd
+catalog_git_feed_first_added,us-california-commerce-municipal-bus-lines-gtfs-rt-tu-1795.json,Commerce Municipal Bus Lines,2022-07-27,,citycommbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,ee538afabd
+catalog_git_feed_first_added,us-california-commerce-municipal-bus-lines-gtfs-rt-vp-1794.json,Commerce Municipal Bus Lines,2022-07-27,,citycommbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,ee538afabd
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-sa-1449.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-sa-1535.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-tu-1450.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-tu-1536.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-vp-1448.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-community-transit-gtfs-rt-vp-1534.json,Community Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_redirect,mdb-1534->mdb-1448,Community Transit,2022-05-26,s3.amazonaws.com,s3.amazonaws.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Swiftly (probable: S3 '-realtime-prod' bucket pattern),no,new_feed_added:2022-05-26;old_feed_deprecated:2026-06-05
+catalog_redirect,mdb-1535->mdb-1449,Community Transit,2022-05-26,s3.amazonaws.com,s3.amazonaws.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Swiftly (probable: S3 '-realtime-prod' bucket pattern),no,new_feed_added:2022-05-26;old_feed_deprecated:2026-10-26
+catalog_redirect,mdb-1536->mdb-1450,Community Transit,2022-05-26,s3.amazonaws.com,s3.amazonaws.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Swiftly (probable: S3 '-realtime-prod' bucket pattern),no,new_feed_added:2022-05-26;old_feed_deprecated:2026-10-26
+catalog_git_status_deprecated,us-washington-community-transit-gtfs-rt-vp-1534.json,Community Transit,2026-06-05,,,,,,8e582d0916
+catalog_git_status_deprecated,us-washington-community-transit-gtfs-rt-sa-1535.json,Community Transit,2026-10-26,,,,,,bdca922779
+catalog_git_status_deprecated,us-washington-community-transit-gtfs-rt-tu-1536.json,Community Transit,2026-10-26,,,,,,bdca922779
+catalog_redirect,tld-4437-vp->mdb-2422,Connecticut Department of Transportation (ConnDOT),2025-03-31,cttprdtmgtfs.ctttrpcloud.com,cttprdtmgtfs.ctttrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-03-31;old_feed_deprecated:
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-sa-1452.json,Connecticut Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-tu-1453.json,Connecticut Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-vp-1451.json,Connecticut Transit,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_status_deprecated,us-connecticut-connecticut-transit-gtfs-rt-sa-1452.json,Connecticut Transit,2025-03-31,,,,,,32badf2fc8
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-sa-2424.json,Connecticut Transit,2025-03-31,,cttprdtmgtfs.ctttrpcloud.com,,Trapeze / Vontas (TransitMaster),,32badf2fc8
+catalog_git_status_deprecated,us-connecticut-connecticut-transit-gtfs-rt-tu-1453.json,Connecticut Transit,2025-03-31,,,,,,32badf2fc8
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-tu-2423.json,Connecticut Transit,2025-03-31,,cttprdtmgtfs.ctttrpcloud.com,,Trapeze / Vontas (TransitMaster),,32badf2fc8
+catalog_git_status_deprecated,us-connecticut-connecticut-transit-gtfs-rt-vp-1451.json,Connecticut Transit,2025-03-31,,,,,,32badf2fc8
+catalog_git_feed_first_added,us-connecticut-connecticut-transit-gtfs-rt-vp-2422.json,Connecticut Transit,2025-03-31,,cttprdtmgtfs.ctttrpcloud.com,,Trapeze / Vontas (TransitMaster),,32badf2fc8
+catalog_redirect,mdb-1451->mdb-2422,Connecticut Transit,2025-03-31,s3.amazonaws.com,cttprdtmgtfs.ctttrpcloud.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Trapeze / Vontas (TransitMaster),yes,new_feed_added:2025-03-31;old_feed_deprecated:2025-03-31
+catalog_redirect,mdb-1452->mdb-2424,Connecticut Transit,2025-03-31,s3.amazonaws.com,cttprdtmgtfs.ctttrpcloud.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Trapeze / Vontas (TransitMaster),yes,new_feed_added:2025-03-31;old_feed_deprecated:2025-03-31
+catalog_redirect,mdb-1453->mdb-2423,Connecticut Transit,2025-03-31,s3.amazonaws.com,cttprdtmgtfs.ctttrpcloud.com,Swiftly (probable: S3 '-realtime-prod' bucket pattern),Trapeze / Vontas (TransitMaster),yes,new_feed_added:2025-03-31;old_feed_deprecated:2025-03-31
+catalog_git_feed_first_added,us-district-of-columbia-dc-streetcar-gtfs-rt-sa-1726.json,DC Streetcar,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-district-of-columbia-dc-streetcar-gtfs-rt-tu-1727.json,DC Streetcar,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-district-of-columbia-dc-streetcar-gtfs-rt-vp-1725.json,DC Streetcar,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-texas-denton-county-transportation-authority-gtfs-rt-tu-1457.json,Denton County Transportation Authority,2022-05-26,,api.transitime.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-texas-denton-county-transportation-authority-gtfs-rt-vp-1456.json,Denton County Transportation Authority,2022-05-26,,api.transitime.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-iowa-des-moines-dart-gtfs-rt-sa-1769.json,Des Moines Area Regional Transit Authority (DART),2022-05-26,,www.ridedart.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-iowa-des-moines-dart-gtfs-rt-tu-1770.json,Des Moines Area Regional Transit Authority (DART),2022-05-26,,www.ridedart.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-iowa-des-moines-dart-gtfs-rt-vp-1771.json,Des Moines Area Regional Transit Authority (DART),2022-05-26,,www.ridedart.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-reds-meadow-shuttle-gtfs-rt-tu-3216.json,Devils Postpile National Monument — Reds Meadow Shuttle,2026-06-12,,api.goswift.ly,,Swiftly,,2d47a235cb
+catalog_git_feed_first_added,us-reds-meadow-shuttle-gtfs-rt-vp-3217.json,Devils Postpile National Monument — Reds Meadow Shuttle,2026-06-12,,api.goswift.ly,,Swiftly,,2d47a235cb
+catalog_git_feed_first_added,us-minnesota-duluth-transit-gtfs-rt-sa-1462.json,Duluth Transit,2022-05-26,,duluthtransit.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-minnesota-duluth-transit-gtfs-rt-tu-1463.json,Duluth Transit,2022-05-26,,duluthtransit.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-minnesota-duluth-transit-gtfs-rt-vp-1461.json,Duluth Transit,2022-05-26,,duluthtransit.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-durham-region-transit-gtfs-rt-sa-1467.json,Durham Region Transit,2022-05-26,,maps.durham.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-durham-region-transit-gtfs-rt-tu-1468.json,Durham Region Transit,2022-05-26,,drtonline.durhamregiontransit.com,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-durham-region-transit-gtfs-rt-vp-1466.json,Durham Region Transit,2022-05-26,,drtonline.durhamregiontransit.com,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b
+catalog_redirect,tfs-575->mdb-1498,ETS,2022-05-26,data.edmonton.ca,gtfs.edmonton.ca,Agency-hosted / unattributed,Trapeze / Vontas (TransitMaster),yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_redirect,tfs-576->mdb-1496,ETS,2022-05-26,data.edmonton.ca,gtfs.edmonton.ca,Agency-hosted / unattributed,Trapeze / Vontas (TransitMaster),yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_redirect,tfs-890->mdb-1497,ETS,2022-05-26,data.edmonton.ca,gtfs.edmonton.ca,Agency-hosted / unattributed,Trapeze / Vontas (TransitMaster),yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-california-eastern-sierra-transit-authority-gtfs-rt-tu-1758.json,Eastern Sierra Transit Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-eastern-sierra-transit-authority-gtfs-rt-vp-1759.json,Eastern Sierra Transit Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-alberta-edmonton-transit-system-gtfs-rt-sa-1497.json,Edmonton Transit System,2022-05-26,,gtfs.edmonton.ca,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,ca-alberta-edmonton-transit-system-gtfs-rt-tu-1498.json,Edmonton Transit System,2022-05-26,,gtfs.edmonton.ca,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,ca-alberta-edmonton-transit-system-gtfs-rt-vp-1496.json,Edmonton Transit System,2022-05-26,,gtfs.edmonton.ca,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-texas-el-paso-transportation-authority-gtfs-rt-tu-3203.json,El Paso Transportation Authority,2026-06-05,,data.peaktransit.com,,Peak Transit,,2de5a99f06
+catalog_git_feed_first_added,us-texas-el-paso-transportation-authority-gtfs-rt-vp-3204.json,El Paso Transportation Authority,2026-06-05,,data.peaktransit.com,,Peak Transit,,2de5a99f06
+catalog_git_feed_first_added,us-texas-el-paso-transportation-authority-gtfs-rt-sa-3420.json,El Paso Transportation Authority,2026-08-04,,data.peaktransit.com,,Peak Transit,,2847547e73
+catalog_git_feed_first_added,us-washington-ellensburg-central-transit-gtfs-rt-sa-1584.json,Ellensburg Central Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-ellensburg-central-transit-gtfs-rt-tu-1585.json,Ellensburg Central Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-ellensburg-central-transit-gtfs-rt-vp-1583.json,Ellensburg Central Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-emery-go-round-gtfs-rt-sa-2225.json,Emery Go-Round,2024-11-26,,emerygoround.tripshot.com,,TripShot,,2a6865d068
+catalog_git_feed_first_added,us-california-emery-go-round-gtfs-rt-tu-2226.json,Emery Go-Round,2024-11-26,,emerygoround.tripshot.com,,TripShot,,2a6865d068
+catalog_git_feed_first_added,us-california-emery-go-round-gtfs-rt-vp-2227.json,Emery Go-Round,2024-11-26,,emerygoround.tripshot.com,,TripShot,,2a6865d068
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-sa-1550.json,Everett Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-tu-1551.json,Everett Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-vp-1549.json,Everett Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_status_deprecated,us-washington-everett-transit-gtfs-rt-sa-1550.json,Everett Transit,2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-sa-3072.json,Everett Transit,2026-02-18,,everett.mapstrat.com,,Strategic Mapping (Mapstrat),,5d1b1eb1d2
+catalog_git_status_deprecated,us-washington-everett-transit-gtfs-rt-tu-1551.json,Everett Transit,2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-tu-3073.json,Everett Transit,2026-02-18,,everett.mapstrat.com,,Strategic Mapping (Mapstrat),,5d1b1eb1d2
+catalog_git_status_deprecated,us-washington-everett-transit-gtfs-rt-vp-1549.json,Everett Transit,2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-washington-everett-transit-gtfs-rt-vp-3074.json,Everett Transit,2026-02-18,,everett.mapstrat.com,,Strategic Mapping (Mapstrat),,5d1b1eb1d2
+catalog_redirect,mdb-1549->mdb-3074,Everett Transit,2026-02-18,api.pugetsound.onebusaway.org,everett.mapstrat.com,OneBusAway / TheTransitClock (open source),Strategic Mapping (Mapstrat),yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_redirect,mdb-1550->mdb-3072,Everett Transit,2026-02-18,api.pugetsound.onebusaway.org,everett.mapstrat.com,OneBusAway / TheTransitClock (open source),Strategic Mapping (Mapstrat),yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_redirect,mdb-1551->mdb-3073,Everett Transit,2026-02-18,api.pugetsound.onebusaway.org,everett.mapstrat.com,OneBusAway / TheTransitClock (open source),Strategic Mapping (Mapstrat),yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-sa-1334.json,Exo,2022-05-25,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,9e6087859d
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-vp-1333.json,Exo,2022-05-25,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,9e6087859d
+catalog_git_url_change,ca-quebec-exo-trains-gtfs-rt-sa-1334.json,Exo,2022-05-26,www.hart.org,opendata.exo.quebec,Agency-hosted / unattributed,exo (agency) - Chrono SAEIV,yes,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-tu-1335.json,Exo,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_url_change,ca-quebec-exo-trains-gtfs-rt-vp-1333.json,Exo,2022-05-26,www.hart.org,opendata.exo.quebec,Agency-hosted / unattributed,exo (agency) - Chrono SAEIV,yes,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-trains-gtfs-rt-sa-1334.json,Exo,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-sa-3015.json,Exo,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-trains-gtfs-rt-tu-1335.json,Exo,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-tu-3016.json,Exo,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-trains-gtfs-rt-vp-1333.json,Exo,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-trains-gtfs-rt-vp-3017.json,Exo,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1333->mdb-3017,Exo,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1334->mdb-3015,Exo,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1335->mdb-3016,Exo,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-sa-1364.json,Exo Chambly-Richelieu-Carignan,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-tu-1363.json,Exo Chambly-Richelieu-Carignan,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-vp-1365.json,Exo Chambly-Richelieu-Carignan,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-sa-1364.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-sa-3024.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-tu-1363.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-tu-3025.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-vp-1365.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-chambly-richelieu-carignan-gtfs-rt-vp-3026.json,Exo Chambly-Richelieu-Carignan,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1363->mdb-3025,Exo Chambly-Richelieu-Carignan,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1364->mdb-3024,Exo Chambly-Richelieu-Carignan,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1365->mdb-3026,Exo Chambly-Richelieu-Carignan,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-haut-saint-laurent-gtfs-rt-sa-1367.json,Exo Haut-Saint-Laurent,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-haut-saint-laurent-gtfs-rt-tu-1366.json,Exo Haut-Saint-Laurent,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-haut-saint-laurent-gtfs-rt-vp-1368.json,Exo Haut-Saint-Laurent,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-sa-1340.json,Exo L'Assomption,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-tu-1339.json,Exo L'Assomption,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-vp-1341.json,Exo L'Assomption,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-lassomption-gtfs-rt-sa-1340.json,Exo L'Assomption,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-sa-3009.json,Exo L'Assomption,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-lassomption-gtfs-rt-tu-1339.json,Exo L'Assomption,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-tu-3010.json,Exo L'Assomption,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-lassomption-gtfs-rt-vp-1341.json,Exo L'Assomption,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-lassomption-gtfs-rt-vp-3011.json,Exo L'Assomption,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1339->mdb-3010,Exo L'Assomption,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1340->mdb-3009,Exo L'Assomption,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1341->mdb-3011,Exo L'Assomption,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-sa-1352.json,Exo La Presqu'île,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-tu-1351.json,Exo La Presqu'île,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-vp-1353.json,Exo La Presqu'île,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-la-presquile-gtfs-rt-sa-1352.json,Exo La Presqu'île,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-sa-3030.json,Exo La Presqu'île,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-la-presquile-gtfs-rt-tu-1351.json,Exo La Presqu'île,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-tu-2998.json,Exo La Presqu'île,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-la-presquile-gtfs-rt-vp-1353.json,Exo La Presqu'île,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-la-presquile-gtfs-rt-vp-2999.json,Exo La Presqu'île,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1351->mdb-2998,Exo La Presqu'île,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1352->mdb-3030,Exo La Presqu'île,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1353->mdb-2999,Exo La Presqu'île,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-sa-1337.json,Exo Laurentides,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-tu-1336.json,Exo Laurentides,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-vp-1338.json,Exo Laurentides,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-laurentides-gtfs-rt-sa-1337.json,Exo Laurentides,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-sa-3027.json,Exo Laurentides,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-laurentides-gtfs-rt-tu-1336.json,Exo Laurentides,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-tu-3028.json,Exo Laurentides,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-laurentides-gtfs-rt-vp-1338.json,Exo Laurentides,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-laurentides-gtfs-rt-vp-3029.json,Exo Laurentides,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1336->mdb-3028,Exo Laurentides,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1337->mdb-3027,Exo Laurentides,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1338->mdb-3029,Exo Laurentides,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-le-richelain-gtfs-rt-sa-1370.json,Exo Le Richelain,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-le-richelain-gtfs-rt-tu-1369.json,Exo Le Richelain,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-le-richelain-gtfs-rt-vp-1371.json,Exo Le Richelain,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-le-richelain-gtfs-rt-sa-1370.json,Exo Le Richelain,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-le-richelain-gtfs-rt-tu-1369.json,Exo Le Richelain,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-le-richelain-gtfs-rt-vp-1371.json,Exo Le Richelain,2026-01-29,,,,,,4294d74749
+catalog_redirect,mdb-1369->mdb-3022,Exo Le Richelain,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1370->mdb-3021,Exo Le Richelain,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1371->mdb-3023,Exo Le Richelain,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-richelain-et-roussillon-gtfs-rt-sa-3021.json,Exo Le Richelain et Roussillon,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-richelain-et-roussillon-gtfs-rt-tu-3022.json,Exo Le Richelain et Roussillon,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-richelain-et-roussillon-gtfs-rt-vp-3023.json,Exo Le Richelain et Roussillon,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-les-moulins-gtfs-rt-sa-1343.json,Exo Les Moulins,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-les-moulins-gtfs-rt-tu-1342.json,Exo Les Moulins,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-les-moulins-gtfs-rt-vp-1344.json,Exo Les Moulins,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-les-moulins-gtfs-rt-sa-1343.json,Exo Les Moulins,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-les-moulins-gtfs-rt-tu-1342.json,Exo Les Moulins,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-les-moulins-gtfs-rt-vp-1344.json,Exo Les Moulins,2026-01-29,,,,,,4294d74749
+catalog_redirect,mdb-1342->mdb-3013,Exo Les Moulins,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1343->mdb-3012,Exo Les Moulins,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1344->mdb-3014,Exo Les Moulins,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-roussillon-gtfs-rt-sa-1349.json,Exo Roussillon,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-roussillon-gtfs-rt-tu-1348.json,Exo Roussillon,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-roussillon-gtfs-rt-vp-1350.json,Exo Roussillon,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-roussillon-gtfs-rt-sa-1349.json,Exo Roussillon,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-roussillon-gtfs-rt-tu-1348.json,Exo Roussillon,2026-01-29,,,,,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-roussillon-gtfs-rt-vp-1350.json,Exo Roussillon,2026-01-29,,,,,,4294d74749
+catalog_redirect,mdb-1348->mdb-3022,Exo Roussillon,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1349->mdb-3021,Exo Roussillon,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1350->mdb-3023,Exo Roussillon,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-sa-1358.json,Exo Sorel-Varennes,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-tu-1357.json,Exo Sorel-Varennes,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-vp-1359.json,Exo Sorel-Varennes,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-sorel-varennes-gtfs-rt-sa-1358.json,Exo Sorel-Varennes,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-sa-3000.json,Exo Sorel-Varennes,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-sorel-varennes-gtfs-rt-tu-1357.json,Exo Sorel-Varennes,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-tu-3001.json,Exo Sorel-Varennes,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-sorel-varennes-gtfs-rt-vp-1359.json,Exo Sorel-Varennes,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sorel-varennes-gtfs-rt-vp-3002.json,Exo Sorel-Varennes,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1357->mdb-3001,Exo Sorel-Varennes,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1358->mdb-3000,Exo Sorel-Varennes,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1359->mdb-3002,Exo Sorel-Varennes,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-sa-1355.json,Exo Sud-ouest,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-tu-1354.json,Exo Sud-ouest,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-vp-1356.json,Exo Sud-ouest,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-sud-ouest-gtfs-rt-sa-1355.json,Exo Sud-ouest,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-sa-3003.json,Exo Sud-ouest,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-sud-ouest-gtfs-rt-tu-1354.json,Exo Sud-ouest,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-tu-3004.json,Exo Sud-ouest,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-sud-ouest-gtfs-rt-vp-1356.json,Exo Sud-ouest,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-sud-ouest-gtfs-rt-vp-3005.json,Exo Sud-ouest,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1354->mdb-3004,Exo Sud-ouest,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1355->mdb-3003,Exo Sud-ouest,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1356->mdb-3005,Exo Sud-ouest,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-terrebonne-mascouche-gtfs-rt-sa-3012.json,Exo Terrebonne-Mascouche,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-terrebonne-mascouche-gtfs-rt-tu-3013.json,Exo Terrebonne-Mascouche,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-terrebonne-mascouche-gtfs-rt-vp-3014.json,Exo Terrebonne-Mascouche,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-sa-1346.json,Exo Vallée du Richelieu,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-tu-1345.json,Exo Vallée du Richelieu,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-vp-1347.json,Exo Vallée du Richelieu,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-sa-1346.json,Exo Vallée du Richelieu,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-sa-3006.json,Exo Vallée du Richelieu,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-tu-1345.json,Exo Vallée du Richelieu,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-tu-3007.json,Exo Vallée du Richelieu,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-vp-1347.json,Exo Vallée du Richelieu,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-vallee-du-richelieu-gtfs-rt-vp-3008.json,Exo Vallée du Richelieu,2026-01-29,,exo.chrono-saeiv.com,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1345->mdb-3007,Exo Vallée du Richelieu,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1346->mdb-3006,Exo Vallée du Richelieu,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1347->mdb-3008,Exo Vallée du Richelieu,2026-01-29,opendata.exo.quebec,exo.chrono-saeiv.com,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-sa-1361.json,Exo Ville de Sainte-Julie,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-tu-1360.json,Exo Ville de Sainte-Julie,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-vp-1362.json,Exo Ville de Sainte-Julie,2022-05-26,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,439e1b9f5b
+catalog_git_status_deprecated,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-sa-1361.json,Exo Ville de Sainte-Julie,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-sa-3018.json,Exo Ville de Sainte-Julie,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-tu-1360.json,Exo Ville de Sainte-Julie,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-tu-3019.json,Exo Ville de Sainte-Julie,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_git_status_deprecated,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-vp-1362.json,Exo Ville de Sainte-Julie,2026-01-29,,,,,,4294d74749
+catalog_git_feed_first_added,ca-quebec-exo-ville-de-sainte-julie-gtfs-rt-vp-3020.json,Exo Ville de Sainte-Julie,2026-01-29,,opendata.exo.quebec,,exo (agency) - Chrono SAEIV,,4294d74749
+catalog_redirect,mdb-1360->mdb-3019,Exo Ville de Sainte-Julie,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1361->mdb-3018,Exo Ville de Sainte-Julie,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_redirect,mdb-1362->mdb-3020,Exo Ville de Sainte-Julie,2026-01-29,opendata.exo.quebec,opendata.exo.quebec,exo (agency) - Chrono SAEIV,exo (agency) - Chrono SAEIV,no,new_feed_added:2026-01-29;old_feed_deprecated:2026-01-29
+catalog_git_feed_first_added,us-california-foothill-transit-gtfs-rt-sa-2228.json,Foothill Transit,2024-11-26,,foothill_3rdparty.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-foothill-transit-gtfs-rt-tu-2230.json,Foothill Transit,2024-11-26,,foothill_3rdparty.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-foothill-transit-gtfs-rt-vp-2229.json,Foothill Transit,2024-11-26,,foothill_3rdparty.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-maryland-frederick-country-transit-gtfs-rt-tu-3069.json,Frederick County TransIT,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-maryland-frederick-country-transit-gtfs-rt-vp-3070.json,Frederick County TransIT,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_redirect,tfs-623->mdb-1521,GRT,2022-05-26,192.237.29.212:8080,webapps.regionofwaterloo.ca,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),Agency-hosted / unattributed,yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_redirect,tfs-624->mdb-1520,GRT,2022-05-26,192.237.29.212:8080,webapps.regionofwaterloo.ca,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),Agency-hosted / unattributed,yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-north-carolina-godurham-gtfs-rt-tu-1464.json,GoDurham,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-north-carolina-godurham-gtfs-rt-vp-1465.json,GoDurham,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-grand-river-transit-gtfs-rt-tu-1520.json,Grand River Transit,2022-05-26,,webapps.regionofwaterloo.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-grand-river-transit-gtfs-rt-vp-1521.json,Grand River Transit,2022-05-26,,webapps.regionofwaterloo.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-grand-river-transit-gtfs-rt-sa-3447.json,Grand River Transit,2026-08-12,,webapps.regionofwaterloo.ca,,Agency-hosted / unattributed,,c062f97a2c
+catalog_git_feed_first_added,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-sa-1525.json,Greater Cleveland Regional Transit Authority,2022-05-26,,gtfs.gcrta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-tu-1524.json,Greater Cleveland Regional Transit Authority,2022-05-26,,gtfs.gcrta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-vp-1526.json,Greater Cleveland Regional Transit Authority,2022-05-26,,gtfs.gcrta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_status_deprecated,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-sa-1525.json,Greater Cleveland Regional Transit Authority,2026-07-31,,,,,,a4757f69f1
+catalog_git_status_deprecated,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-tu-1524.json,Greater Cleveland Regional Transit Authority,2026-07-31,,,,,,a4757f69f1
+catalog_git_status_deprecated,us-ohio-greater-cleveland-regional-transit-authority-gtfs-rt-vp-1526.json,Greater Cleveland Regional Transit Authority,2026-07-31,,,,,,a4757f69f1
+catalog_redirect,mdb-1524->mdb-3411,Greater Cleveland Regional Transit Authority,2026-07-31,gtfs.gcrta.org,gtfs-rt.gcrta.vontascloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2026-07-31;old_feed_deprecated:2026-07-31
+catalog_redirect,mdb-1525->mdb-3413,Greater Cleveland Regional Transit Authority,2026-07-31,gtfs.gcrta.org,gtfs-rt.gcrta.vontascloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2026-07-31;old_feed_deprecated:2026-07-31
+catalog_redirect,mdb-1526->mdb-3410,Greater Cleveland Regional Transit Authority,2026-07-31,gtfs.gcrta.org,gtfs-rt.gcrta.vontascloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2026-07-31;old_feed_deprecated:2026-07-31
+catalog_git_feed_first_added,us-ohio-cleveland-gcrta-gtfs-rt-sa-3413.json,Greater Cleveland Regional Transit Authority (GCRTA),2026-07-31,,gtfs-rt.gcrta.vontascloud.com,,Trapeze / Vontas (TransitMaster),,a4757f69f1
+catalog_git_feed_first_added,us-ohio-cleveland-gcrta-gtfs-rt-tu-3411.json,Greater Cleveland Regional Transit Authority (GCRTA),2026-07-31,,gtfs-rt.gcrta.vontascloud.com,,Trapeze / Vontas (TransitMaster),,a4757f69f1
+catalog_git_feed_first_added,us-ohio-cleveland-gcrta-gtfs-rt-vp-3410.json,Greater Cleveland Regional Transit Authority (GCRTA),2026-07-31,,gtfs-rt.gcrta.vontascloud.com,,Trapeze / Vontas (TransitMaster),,a4757f69f1
+catalog_git_feed_first_added,us-maine-portland-metro-bus-gtfs-rt-sa-2643.json,Greater Portland Metro Bus,2025-05-22,,gtfsrt.gptd.cadavl.com,,Equans / Ineo Systrans (Navineo),,77da47e698
+catalog_git_feed_first_added,us-maine-portland-metro-bus-gtfs-rt-tu-2644.json,Greater Portland Metro Bus,2025-05-22,,gtfsrt.gptd.cadavl.com,,Equans / Ineo Systrans (Navineo),,77da47e698
+catalog_git_feed_first_added,us-maine-portland-metro-bus-gtfs-rt-vp-2645.json,Greater Portland Metro Bus,2025-05-22,,gtfsrt.gptd.cadavl.com,,Equans / Ineo Systrans (Navineo),,77da47e698
+catalog_git_feed_first_added,us-vermont-green-mountain-community-network-gtfs-rt-tu-1513.json,Green Mountain Community Network,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-green-mountain-community-network-gtfs-rt-vp-1512.json,Green Mountain Community Network,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-green-mountain-transit-agency-gtfs-rt-tu-1515.json,Green Mountain Transit Agency,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-green-mountain-transit-agency-gtfs-rt-vp-1514.json,Green Mountain Transit Agency,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-guelph-transit-gtfs-rt-sa-2593.json,Guelph Transit,2025-04-24,,glphprdtmgtfs.glphtrpcloud.com,,Trapeze / Vontas (TransitMaster),,0ad739c6f4
+catalog_git_feed_first_added,ca-ontario-guelph-transit-gtfs-rt-tu-2594.json,Guelph Transit,2025-04-24,,glphprdtmgtfs.glphtrpcloud.com,,Trapeze / Vontas (TransitMaster),,0ad739c6f4
+catalog_git_feed_first_added,ca-ontario-guelph-transit-gtfs-rt-vp-2592.json,Guelph Transit,2025-04-24,,glphprdtmgtfs.glphtrpcloud.com,,Trapeze / Vontas (TransitMaster),,0ad739c6f4
+catalog_redirect,tfs-965->mdb-2593,Guelph Transit,2025-04-24,transitgtfs.guelph.ca:9780,glphprdtmgtfs.glphtrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-04-24;old_feed_deprecated:
+catalog_redirect,tfs-966->mdb-2594,Guelph Transit,2025-04-24,transitgtfs.guelph.ca:9780,glphprdtmgtfs.glphtrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-04-24;old_feed_deprecated:
+catalog_redirect,tfs-967->mdb-2592,Guelph Transit,2025-04-24,transitgtfs.guelph.ca:9780,glphprdtmgtfs.glphtrpcloud.com,Trapeze / Vontas (TransitMaster),Trapeze / Vontas (TransitMaster),no,new_feed_added:2025-04-24;old_feed_deprecated:
+catalog_git_feed_first_added,us-colorado-gunnison-valley-transportation-authority-rta-gtfs-rt-tu-1582.json,Gunnison Valley Transportation Authority (RTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-colorado-gunnison-valley-transportation-authority-rta-gtfs-rt-vp-1581.json,Gunnison Valley Transportation Authority (RTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-nova-scotia-halifax-transit-gtfs-rt-sa-1606.json,Halifax Transit,2022-05-26,,gtfs.halifax.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-nova-scotia-halifax-transit-gtfs-rt-tu-1605.json,Halifax Transit,2022-05-26,,gtfs.halifax.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-nova-scotia-halifax-transit-gtfs-rt-vp-1607.json,Halifax Transit,2022-05-26,,gtfs.halifax.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-hamilton-street-railway-gtfs-rt-sa-1459.json,Hamilton Street Railway,2022-05-26,,opendata.hamilton.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-hamilton-street-railway-gtfs-rt-tu-1460.json,Hamilton Street Railway,2022-05-26,,opendata.hamilton.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-hamilton-street-railway-gtfs-rt-vp-1458.json,Hamilton Street Railway,2022-05-26,,opendata.hamilton.ca,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-florida-hillsborough-area-regional-transit-gtfs-rt-tu-1527.json,Hillsborough Area Regional Transit,2022-05-26,,api.tampa.onebusaway.org:8088,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-florida-hillsborough-area-regional-transit-gtfs-rt-vp-1528.json,Hillsborough Area Regional Transit,2022-05-26,,api.tampa.onebusaway.org:8088,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-california-redwood-transit-system-gtfs-rt-sa-1494.json,Humboldt Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-california-redwood-transit-system-gtfs-rt-tu-1495.json,Humboldt Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-redwood-transit-system-gtfs-rt-vp-1493.json,Humboldt Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-intercity-transit-gtfs-rt-sa-1538.json,Intercity Transit,2022-05-26,,its.rideralerts.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-intercity-transit-gtfs-rt-tu-1539.json,Intercity Transit,2022-05-26,,its.rideralerts.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-intercity-transit-gtfs-rt-vp-1537.json,Intercity Transit,2022-05-26,,its.rideralerts.com,,Avail Technologies,,439e1b9f5b
+catalog_git_url_change,us-washington-intercity-transit-gtfs-rt-sa-1538.json,Intercity Transit,2022-11-14,api.pugetsound.onebusaway.org,its.rideralerts.com,OneBusAway / TheTransitClock (open source),Avail Technologies,yes,425dd5e7aa
+catalog_git_url_change,us-washington-intercity-transit-gtfs-rt-tu-1539.json,Intercity Transit,2022-11-14,api.pugetsound.onebusaway.org,its.rideralerts.com,OneBusAway / TheTransitClock (open source),Avail Technologies,yes,425dd5e7aa
+catalog_git_url_change,us-washington-intercity-transit-gtfs-rt-vp-1537.json,Intercity Transit,2022-11-14,api.pugetsound.onebusaway.org,its.rideralerts.com,OneBusAway / TheTransitClock (open source),Avail Technologies,yes,425dd5e7aa
+catalog_git_feed_first_added,us-missouri-kansas-city-area-transportation-authority-kcata-gtfs-rt-tu-1684.json,Kansas City Area Transportation Authority (KCATA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-missouri-kansas-city-area-transportation-authority-kcata-gtfs-rt-vp-1685.json,Kansas City Area Transportation Authority (KCATA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-kern-transit-gtfs-rt-tu-1509.json,Kern Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-kern-transit-gtfs-rt-vp-1508.json,Kern Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-king-county-metro-gtfs-rt-sa-1541.json,King County Metro,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-king-county-metro-gtfs-rt-tu-1540.json,King County Metro,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-king-county-metro-gtfs-rt-vp-1542.json,King County Metro,2022-05-26,,s3.amazonaws.com,,Swiftly (probable: S3 '-realtime-prod' bucket pattern),,439e1b9f5b
+catalog_git_url_change,us-washington-king-county-metro-gtfs-rt-sa-1541.json,King County Metro,2022-11-14,api.pugetsound.onebusaway.org,s3.amazonaws.com,OneBusAway / TheTransitClock (open source),Swiftly (probable: S3 '-realtime-prod' bucket pattern),yes,425dd5e7aa
+catalog_git_url_change,us-washington-king-county-metro-gtfs-rt-tu-1540.json,King County Metro,2022-11-14,api.pugetsound.onebusaway.org,s3.amazonaws.com,OneBusAway / TheTransitClock (open source),Swiftly (probable: S3 '-realtime-prod' bucket pattern),yes,425dd5e7aa
+catalog_git_url_change,us-washington-king-county-metro-gtfs-rt-vp-1542.json,King County Metro,2022-11-14,api.pugetsound.onebusaway.org,s3.amazonaws.com,OneBusAway / TheTransitClock (open source),Swiftly (probable: S3 '-realtime-prod' bucket pattern),yes,425dd5e7aa
+catalog_git_feed_first_added,ca-ontario-kingston-transit-gtfs-rt-sa-1434.json,Kingston Transit,2022-05-26,,api.cityofkingston.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-kingston-transit-gtfs-rt-tu-1435.json,Kingston Transit,2022-05-26,,api.cityofkingston.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-kingston-transit-gtfs-rt-vp-1433.json,Kingston Transit,2022-05-26,,api.cityofkingston.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-kitsap-transit-gtfs-rt-sa-2694.json,Kitsap Transit,2025-07-09,,cdn.simplifytransit.com,,SimplifyTransit (alerts),,fe26801122
+catalog_git_feed_first_added,us-washington-kitsap-transit-gtfs-rt-tu-2692.json,Kitsap Transit,2025-07-09,,kttracker.com,,Clever Devices (BusTime) / Hitachi MMS,,fe26801122
+catalog_git_feed_first_added,us-washington-kitsap-transit-gtfs-rt-vp-2693.json,Kitsap Transit,2025-07-09,,kttracker.com,,Clever Devices (BusTime) / Hitachi MMS,,fe26801122
+catalog_git_feed_first_added,us-tennessee-knoxville-area-transit-kat-gtfs-rt-sa-3515.json,Knoxville Area Transit (KAT),2026-09-30,,knoxville.syncromatics.com,,GMV Syncromatics,,e45142dc4d
+catalog_git_feed_first_added,us-tennessee-knoxville-area-transit-kat-gtfs-rt-tu-3514.json,Knoxville Area Transit (KAT),2026-09-30,,knoxville.syncromatics.com,,GMV Syncromatics,,e45142dc4d
+catalog_git_feed_first_added,us-tennessee-knoxville-area-transit-kat-gtfs-rt-vp-3513.json,Knoxville Area Transit (KAT),2026-09-30,,knoxville.syncromatics.com,,GMV Syncromatics,,e45142dc4d
+catalog_git_feed_first_added,us-california-la-metro-gtfs-rt-tu-1575.json,LA Metro,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-la-metro-gtfs-rt-vp-1574.json,LA Metro,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-lake-transit-authority-gtfs-rt-tu-1492.json,Lake Transit Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-lake-transit-authority-gtfs-rt-vp-1491.json,Lake Transit Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-lane-transit-district-gtfs-rt-sa-1559.json,Lane Transit District,2022-05-26,,feed.ltd.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-lane-transit-district-gtfs-rt-tu-1558.json,Lane Transit District,2022-05-26,,feed.ltd.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-lane-transit-district-gtfs-rt-vp-1560.json,Lane Transit District,2022-05-26,,feed.ltd.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_status_deprecated,us-oregon-lane-transit-district-gtfs-rt-vp-1560.json,Lane Transit District,2026-05-19,,,,,,26dbd95071
+catalog_redirect,mdb-1560->mdb-3148,Lane Transit District,2026-05-19,feed.ltd.org,feed.ltd.org,Agency-hosted / unattributed,Trapeze / Vontas (TransitMaster),yes,new_feed_added:2026-05-19;old_feed_deprecated:2026-05-19
+catalog_git_feed_first_added,us-oregon-lane-transit-district-gtfs-rt-vp-3148.json,Lane Transit District LTD,2026-05-19,,feed.ltd.org,,Trapeze / Vontas (TransitMaster),,26dbd95071
+catalog_git_feed_first_added,us-oregon-lincoln-county-transit-gtfs-rt-sa-1501.json,Lincoln County Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-lincoln-county-transit-gtfs-rt-tu-1500.json,Lincoln County Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-lincoln-county-transit-gtfs-rt-vp-1499.json,Lincoln County Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-linn-shuttle-gtfs-rt-tu-1752.json,Linn Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-linn-shuttle-gtfs-rt-vp-1751.json,Linn Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-london-transit-commission-gtfs-rt-sa-1562.json,London Transit Commission,2022-05-26,,gtfs.ltconline.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-london-transit-commission-gtfs-rt-tu-1563.json,London Transit Commission,2022-05-26,,gtfs.ltconline.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-london-transit-commission-gtfs-rt-vp-1561.json,London Transit Commission,2022-05-26,,gtfs.ltconline.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_redirect,tfs-118->mdb-1600,MARTA,2022-05-26,onebusaway.gatech.edu:8080,gtfs-rt.itsmarta.com,OneBusAway / TheTransitClock (open source),Trapeze / Vontas (TransitMaster),yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_redirect,tfs-119->mdb-1601,MARTA,2022-05-26,onebusaway.gatech.edu:8080,gtfs-rt.itsmarta.com,OneBusAway / TheTransitClock (open source),Trapeze / Vontas (TransitMaster),yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-vermont-moover-gtfs-rt-tu-1723.json,MOOver!,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-moover-gtfs-rt-vp-1724.json,MOOver!,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-madera-county-connection-gtfs-rt-sa-1757.json,Madera County Connection,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-california-madera-county-connection-gtfs-rt-tu-1755.json,Madera County Connection,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-madera-county-connection-gtfs-rt-vp-1756.json,Madera County Connection,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-marble-valley-regional-transit-district-mvrtd-gtfs-rt-tu-1503.json,Marble Valley Regional Transit District (MVRTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-marble-valley-regional-transit-district-mvrtd-gtfs-rt-vp-1502.json,Marble Valley Regional Transit District (MVRTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-sa-1579.json,Marin County Transit District (MCTD),2022-05-26,,marintransit.net,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-tu-1580.json,Marin County Transit District (MCTD),2022-05-26,,marintransit.net,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-vp-1578.json,Marin County Transit District (MCTD),2022-05-26,,marintransit.net,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_status_deprecated,us-california-marin-county-transit-district-mctd-gtfs-rt-sa-1579.json,Marin County Transit District (MCTD),2026-03-11,,,,,,378eb7f144
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-sa-3092.json,Marin County Transit District (MCTD),2026-03-11,,gtfsrt.marintransit.cadavl.com,,Equans / Ineo Systrans (Navineo),,378eb7f144
+catalog_git_status_deprecated,us-california-marin-county-transit-district-mctd-gtfs-rt-tu-1580.json,Marin County Transit District (MCTD),2026-03-11,,,,,,378eb7f144
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-tu-3090.json,Marin County Transit District (MCTD),2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_status_deprecated,us-california-marin-county-transit-district-mctd-gtfs-rt-vp-1578.json,Marin County Transit District (MCTD),2026-03-11,,,,,,378eb7f144
+catalog_git_feed_first_added,us-california-marin-county-transit-district-mctd-gtfs-rt-vp-3091.json,Marin County Transit District (MCTD),2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_redirect,mdb-1578->mdb-3091,Marin County Transit District (MCTD),2026-03-11,marintransit.net,api.goswift.ly,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),Swiftly,yes,new_feed_added:2026-03-11;old_feed_deprecated:2026-03-11
+catalog_redirect,mdb-1579->mdb-3092,Marin County Transit District (MCTD),2026-03-11,marintransit.net,gtfsrt.marintransit.cadavl.com,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),Equans / Ineo Systrans (Navineo),yes,new_feed_added:2026-03-11;old_feed_deprecated:2026-03-11
+catalog_redirect,mdb-1580->mdb-3090,Marin County Transit District (MCTD),2026-03-11,marintransit.net,api.goswift.ly,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),Swiftly,yes,new_feed_added:2026-03-11;old_feed_deprecated:2026-03-11
+catalog_git_feed_first_added,us-maryland-marc-train-gtfs-rt-vp-tu-1619.json,Maryland Transit Administration,2022-05-26,,mdotmta-gtfs-rt.s3.amazonaws.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-maryland-transit-administration-commuter-bus-gtfs-rt-tu-3084.json,Maryland Transit Administration (MTA) Commuter Bus,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-commuter-bus-gtfs-rt-vp-3085.json,Maryland Transit Administration (MTA) Commuter Bus,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-light-rail-gtfs-rt-tu-3086.json,Maryland Transit Administration (MTA) Light Rail,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-light-rail-gtfs-rt-vp-3087.json,Maryland Transit Administration (MTA) Light Rail,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-local-bus-gtfs-rt-tu-3088.json,Maryland Transit Administration (MTA) Local Bus,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-local-bus-gtfs-rt-vp-3089.json,Maryland Transit Administration (MTA) Local Bus,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-metro-gtfs-rt-tu-3082.json,Maryland Transit Administration (MTA) Metro,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-maryland-transit-administration-metro-gtfs-rt-vp-3083.json,Maryland Transit Administration (MTA) Metro,2026-03-11,,api.goswift.ly,,Swiftly,,378eb7f144
+catalog_git_feed_first_added,us-massachusetts-massachusetts-bay-transportation-authority-mbta-gtfs-rt-sa-1603.json,Massachusetts Bay Transportation Authority (MBTA),2022-05-26,,cdn.mbta.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-massachusetts-massachusetts-bay-transportation-authority-mbta-gtfs-rt-tu-1604.json,Massachusetts Bay Transportation Authority (MBTA),2022-05-26,,cdn.mbta.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-massachusetts-massachusetts-bay-transportation-authority-mbta-gtfs-rt-vp-1602.json,Massachusetts Bay Transportation Authority (MBTA),2022-05-26,,cdn.mbta.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-merced-county-transit-the-bus-gtfs-rt-sa-1507.json,Merced County Transit (The Bus),2022-05-26,,thebuslive.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-merced-county-transit-the-bus-gtfs-rt-vp-1506.json,Merced County Transit (The Bus),2022-05-26,,thebuslive.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-massachusetts-merrimack-valley-regional-transit-authority-mvrta-gtfs-rt-tu-1517.json,Merrimack Valley Regional Transit Authority (MVRTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-massachusetts-merrimack-valley-regional-transit-authority-mvrta-gtfs-rt-vp-1516.json,Merrimack Valley Regional Transit Authority (MVRTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-illinois-chicago-metra-gtfs-rt-sa-3351.json,Metra,2026-07-09,,gtfspublic.metrarr.com,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,us-illinois-chicago-metra-gtfs-rt-tu-3352.json,Metra,2026-07-09,,gtfspublic.metrarr.com,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,us-illinois-chicago-metra-gtfs-rt-vp-3353.json,Metra,2026-07-09,,gtfspublic.metrarr.com,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,us-missouri-metro-st-louis-gtfs-rt-sa-1415.json,Metro St. Louis,2022-05-26,,www.metrostlouis.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-missouri-metro-st-louis-gtfs-rt-tu-1416.json,Metro St. Louis,2022-05-26,,www.metrostlouis.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-missouri-metro-st-louis-gtfs-rt-vp-1414.json,Metro St. Louis,2022-05-26,,www.metrostlouis.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-minnesota-metro-transit-gtfs-rt-sa-1682.json,Metro Transit,2022-05-26,,svc.metrotransit.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-minnesota-metro-transit-gtfs-rt-tu-1681.json,Metro Transit,2022-05-26,,svc.metrotransit.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-minnesota-metro-transit-gtfs-rt-vp-1683.json,Metro Transit,2022-05-26,,svc.metrotransit.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-sa-1609.json,Metro Transit,2022-05-26,,transitdata.cityofmadison.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-tu-1608.json,Metro Transit,2022-05-26,,transitdata.cityofmadison.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-vp-1610.json,Metro Transit,2022-05-26,,transitdata.cityofmadison.com,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_status_deprecated,us-wisconsin-metro-transit-gtfs-rt-sa-1609.json,Metro Transit,2024-08-29,,,,,,e826b33845
+catalog_git_status_deprecated,us-wisconsin-metro-transit-gtfs-rt-tu-1608.json,Metro Transit,2024-08-29,,,,,,e826b33845
+catalog_git_status_deprecated,us-wisconsin-metro-transit-gtfs-rt-vp-1610.json,Metro Transit,2024-08-29,,,,,,e826b33845
+catalog_redirect,mdb-1608->mdb-2096,Metro Transit,2024-08-29,transitdata.cityofmadison.com,metromap.cityofmadison.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Clever Devices (BusTime) / Hitachi MMS,yes,new_feed_added:2024-08-29;old_feed_deprecated:2024-08-29
+catalog_redirect,mdb-1609->mdb-2095,Metro Transit,2024-08-29,transitdata.cityofmadison.com,metromap.cityofmadison.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Clever Devices (BusTime) / Hitachi MMS,yes,new_feed_added:2024-08-29;old_feed_deprecated:2024-08-29
+catalog_redirect,mdb-1610->mdb-2097,Metro Transit,2024-08-29,transitdata.cityofmadison.com,metromap.cityofmadison.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Clever Devices (BusTime) / Hitachi MMS,yes,new_feed_added:2024-08-29;old_feed_deprecated:2024-08-29
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-sa-2095.json,Metro Transit - City of Madison,2024-08-29,,metromap.cityofmadison.com,,Clever Devices (BusTime) / Hitachi MMS,,e826b33845
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-tu-2096.json,Metro Transit - City of Madison,2024-08-29,,metromap.cityofmadison.com,,Clever Devices (BusTime) / Hitachi MMS,,e826b33845
+catalog_git_feed_first_added,us-wisconsin-metro-transit-gtfs-rt-vp-2097.json,Metro Transit - City of Madison,2024-08-29,,metromap.cityofmadison.com,,Clever Devices (BusTime) / Hitachi MMS,,e826b33845
+catalog_git_feed_first_added,us-california-la-metrolink-gtfs-rt-sa-2891.json,MetroLink,2025-11-25,,cdn.simplifytransit.com,,SimplifyTransit (alerts),,7e4bd990dd
+catalog_git_feed_first_added,us-california-la-metrolink-gtfs-rt-tu-2892.json,MetroLink,2025-11-25,,metrolink-gtfsrt.gbsdigital.us,,Agency-hosted / unattributed,,7e4bd990dd
+catalog_git_feed_first_added,us-california-la-metrolink-gtfs-rt-vp-2893.json,MetroLink,2025-11-25,,metrolink-gtfsrt.gbsdigital.us,,Agency-hosted / unattributed,,7e4bd990dd
+catalog_git_feed_first_added,us-georgia-metropolitan-atlanta-rapid-transit-authority-marta-gtfs-rt-tu-1600.json,Metropolitan Atlanta Rapid Transit Authority (MARTA),2022-05-26,,gtfs-rt.itsmarta.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-georgia-metropolitan-atlanta-rapid-transit-authority-marta-gtfs-rt-vp-1601.json,Metropolitan Atlanta Rapid Transit Authority (MARTA),2022-05-26,,gtfs-rt.itsmarta.com,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-bus-gtfs-rt-sa-1628.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-long-island-rail-road-gtfs-rt-sa-1625.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-long-island-rail-road-gtfs-rt-vp-tu-1624.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-metro-north-railroad-gtfs-rt-sa-1626.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-metro-north-railroad-gtfs-rt-tu-1627.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-1-gtfs-rt-vp-tu-1635.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-ace-lines-gtfs-rt-vp-tu-1630.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-bdfm-lines-gtfs-rt-vp-tu-1631.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-g-line-gtfs-rt-vp-tu-1632.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-gtfs-rt-sa-1629.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-jz-lines-gtfs-rt-vp-tu-1633.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-l-train-gtfs-rt-vp-tu-1636.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-subway-nqrw-lines-gtfs-rt-vp-tu-1634.json,Metropolitan Transit Authority (MTA),2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-miway-gtfs-rt-tu-1611.json,MiWay,2022-05-26,,www.miapp.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-miway-gtfs-rt-vp-1612.json,MiWay,2022-05-26,,www.miapp.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-florida-miami-dade-transit-gtfs-rt-tu-1738.json,Miami Dade Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-miami-dade-transit-gtfs-rt-vp-1739.json,Miami Dade Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-connecticut-middletown-area-transit-gtfs-rt-vp-2271.json,Middletown Area Transit,2024-11-27,,passio3.com,,Passio Technologies,,d0064b13ec
+catalog_git_feed_first_added,us-wisconsin-milwaukee-county-transit-system-rt-sa-2129.json,Milwaukee County Transit System (MCTS),2024-10-25,,realtime.ridemcts.com,,Clever Devices (BusTime) / Hitachi MMS,,7cae73d166
+catalog_git_feed_first_added,us-wisconsin-milwaukee-county-transit-system-rt-tu-2128.json,Milwaukee County Transit System (MCTS),2024-10-25,,realtime.ridemcts.com,,Clever Devices (BusTime) / Hitachi MMS,,7cae73d166
+catalog_git_feed_first_added,us-wisconsin-milwaukee-county-transit-system-gtfs-rt-vp-2130.json,Milwaukee County Transit System (MCTS),2025-02-24,,realtime.ridemcts.com,,Clever Devices (BusTime) / Hitachi MMS,,a06e3eadad
+catalog_git_feed_first_added,us-minnesota--gtfs-rt-vp-1969.json,Minnesota Valley Transit Authority,2023-11-07,,srv.mvta.com,,Avail Technologies,,ff65086f07
+catalog_git_feed_first_added,us-pennsylvania-monroe-county-transportation-authority-mcta-gtfs-rt-3435.json,Monroe County Transportation Authority (MCTA),2026-08-12,,ponytracker.availtec.com,,Avail Technologies,,c062f97a2c
+catalog_git_feed_first_added,us-pennsylvania-monroe-county-transportation-authority-mcta-gtfs-rt-3436.json,Monroe County Transportation Authority (MCTA),2026-08-12,,ponytracker.availtec.com,,Avail Technologies,,c062f97a2c
+catalog_git_feed_first_added,us-pennsylvania-monroe-county-transportation-authority-mcta-gtfs-rt-3437.json,Monroe County Transportation Authority (MCTA),2026-08-12,,ponytracker.availtec.com,,Avail Technologies,,c062f97a2c
+catalog_git_feed_first_added,us-california-montebello-bus-lines-gtfs-rt-sa-2217.json,Montebello Bus Lines,2024-11-26,,mbl.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-montebello-bus-lines-gtfs-rt-tu-2219.json,Montebello Bus Lines,2024-11-26,,mbl.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-montebello-bus-lines-gtfs-rt-vp-2218.json,Montebello Bus Lines,2024-11-26,,mbl.rideralerts.com,,Avail Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-monterey-salinas-transit-gtfs-rt-sa-1617.json,Monterey-Salinas Transit,2022-05-26,,206.128.158.191,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-california-monterey-salinas-transit-gtfs-rt-tu-1618.json,Monterey-Salinas Transit,2022-05-26,,206.128.158.191,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-california-monterey-salinas-transit-gtfs-rt-vp-1616.json,Monterey-Salinas Transit,2022-05-26,,206.128.158.191,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-motion-gtfs-rt-tu-3071.json,Motion,2026-02-18,,20.19.98.194:8328,,Agency-hosted / unattributed,,5d1b1eb1d2
+catalog_git_feed_first_added,us-arizona-mountain-line-gtfs-rt-sa-1982.json,Mountain Line Transit,2024-02-06,,mountainline.syncromatics.com,,GMV Syncromatics,,89786c0237
+catalog_git_feed_first_added,us-arizona-mountain-line-gtfs-rt-tu-1981.json,Mountain Line Transit,2024-02-06,,mountainline.syncromatics.com,,GMV Syncromatics,,89786c0237
+catalog_git_feed_first_added,us-arizona-mountain-line-gtfs-rt-vp-1980.json,Mountain Line Transit,2024-02-06,,mountainline.syncromatics.com,,GMV Syncromatics,,89786c0237
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-sa-1532.json,Mountain View Transportation Management Association (MVgo),2022-05-26,,ridemvgo.org,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-tu-1533.json,Mountain View Transportation Management Association (MVgo),2022-05-26,,ridemvgo.org,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-vp-1531.json,Mountain View Transportation Management Association (MVgo),2022-05-26,,ridemvgo.org,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_status_deprecated,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-sa-1532.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,,,,,9c2c34b4e8
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-sa-2111.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,mtma.tripshot.com,,TripShot,,9c2c34b4e8
+catalog_git_status_deprecated,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-tu-1533.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,,,,,9c2c34b4e8
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-tu-2109.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,mtma.tripshot.com,,TripShot,,9c2c34b4e8
+catalog_git_status_deprecated,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-vp-1531.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,,,,,9c2c34b4e8
+catalog_git_feed_first_added,us-california-mountain-view-transportation-management-association-mvgo-gtfs-rt-vp-2110.json,Mountain View Transportation Management Association (MVgo),2024-10-11,,mtma.tripshot.com,,TripShot,,9c2c34b4e8
+catalog_redirect,mdb-1531->mdb-2110,Mountain View Transportation Management Association (MVgo),2024-10-11,ridemvgo.org,mtma.tripshot.com,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),TripShot,yes,new_feed_added:2024-10-11;old_feed_deprecated:2024-10-11
+catalog_redirect,mdb-1532->mdb-2111,Mountain View Transportation Management Association (MVgo),2024-10-11,ridemvgo.org,mtma.tripshot.com,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),TripShot,yes,new_feed_added:2024-10-11;old_feed_deprecated:2024-10-11
+catalog_redirect,mdb-1533->mdb-2109,Mountain View Transportation Management Association (MVgo),2024-10-11,ridemvgo.org,mtma.tripshot.com,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),TripShot,yes,new_feed_added:2024-10-11;old_feed_deprecated:2024-10-11
+catalog_git_feed_first_added,us-new-york-ny-waterway-gtfs-rt-sa-3197.json,NY Waterway,2026-06-04,,nywaterway.connexionz.net,,Connexionz,,175cd837aa
+catalog_git_feed_first_added,us-new-york-ny-waterway-gtfs-rt-tu-3198.json,NY Waterway,2026-06-04,,nywaterway.connexionz.net,,Connexionz,,175cd837aa
+catalog_git_feed_first_added,us-new-york-ny-waterway-gtfs-rt-tu-3200.json,NY Waterway,2026-06-04,,nywaterway.connexionz.net,,Connexionz,,175cd837aa
+catalog_git_feed_first_added,us-new-york-ny-waterway-gtfs-rt-vp-3199.json,NY Waterway,2026-06-04,,nywaterway.connexionz.net,,Connexionz,,175cd837aa
+catalog_git_feed_first_added,us-new-york-nyc-ferry-gtfs-rt-sa-1639.json,NYC Ferry,2022-05-26,,nycferry.connexionz.net,,Connexionz,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nyc-ferry-gtfs-rt-tu-1638.json,NYC Ferry,2022-05-26,,nycferry.connexionz.net,,Connexionz,,439e1b9f5b
+catalog_git_feed_first_added,us-tennessee-nashville-metropolitan-transit-authority-nashville-mta-gtfs-rt-sa-1621.json,Nashville MTA WeGo Public Transit,2022-05-26,,transitdata.nashvillemta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-tennessee-nashville-metropolitan-transit-authority-nashville-mta-gtfs-rt-tu-1620.json,Nashville MTA WeGo Public Transit,2022-05-26,,transitdata.nashvillemta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-tennessee-nashville-metropolitan-transit-authority-nashville-mta-gtfs-rt-vp-1622.json,Nashville MTA WeGo Public Transit,2022-05-26,,transitdata.nashvillemta.org,,Trapeze / Vontas (TransitMaster),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-nassau-inter-county-express-nice-bus-gtfs-rt-sa-1623.json,Nassau Inter-County Express (NICE Bus),2022-05-26,,nicebus.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-nevada-county-connects-gold-country-stage-gtfs-rt-sa-1670.json,Nevada County Connects (Gold Country Stage),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-nevada-county-connects-gold-country-stage-gtfs-rt-tu-1669.json,Nevada County Connects (Gold Country Stage),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-nevada-county-connects-gold-country-stage-gtfs-rt-vp-1671.json,Nevada County Connects (Gold Country Stage),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-north-county-transit-district-nctd-gtfs-rt-sa-1440.json,North County Transit District (NCTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-north-county-transit-district-nctd-gtfs-rt-tu-1441.json,North County Transit District (NCTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-north-county-transit-district-nctd-gtfs-rt-vp-1439.json,North County Transit District (NCTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-orange-county-transportation-authority-octa-gtfs-rt-sa-1642.json,Orange County Transportation Authority (OCTA),2022-05-26,,api.octa.net,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-orange-county-transportation-authority-octa-gtfs-rt-tu-1641.json,Orange County Transportation Authority (OCTA),2022-05-26,,api.octa.net,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-orange-county-transportation-authority-octa-gtfs-rt-vp-1643.json,Orange County Transportation Authority (OCTA),2022-05-26,,api.octa.net,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-ottawa-carleton-regional-transit-commission-oc-transpo-gtfs-rt-tu-2870.json,Ottawa-Carleton Regional Transit Commission (OC Transpo),2025-11-12,,nextrip-public-api.azure-api.net,,Agency-hosted / unattributed,,b49a504735
+catalog_git_feed_first_added,ca-ontario-ottawa-carleton-regional-transit-commission-oc-transpo-gtfs-rt-vp-2869.json,Ottawa-Carleton Regional Transit Commission (OC Transpo),2025-11-12,,nextrip-public-api.azure-api.net,,Agency-hosted / unattributed,,b49a504735
+catalog_git_feed_first_added,us-california-pasadena-transit-gtfs-rt-sa-1654.json,Pasadena Transit,2022-05-26,,rt.pasadenatransit.net,,Connexionz,,439e1b9f5b
+catalog_git_feed_first_added,us-california-pasadena-transit-gtfs-rt-tu-1655.json,Pasadena Transit,2022-05-26,,rt.pasadenatransit.net,,Connexionz,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-pierce-transit-gtfs-rt-sa-1544.json,Pierce Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-pierce-transit-gtfs-rt-tu-1543.json,Pierce Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-pierce-transit-gtfs-rt-vp-1545.json,Pierce Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-massachusetts-pioneer-valley-transit-authority-pvta-gtfs-rt-sa-2671.json,Pioneer Valley Transit Authority,2025-06-09,,api.goswift.ly,,Swiftly,,bee69ab2c4
+catalog_git_feed_first_added,us-massachusetts-pioneer-valley-transit-authority-pvta-gtfs-rt-tu-2669.json,Pioneer Valley Transit Authority,2025-06-09,,api.goswift.ly,,Swiftly,,bee69ab2c4
+catalog_git_feed_first_added,us-massachusetts-pioneer-valley-transit-authority-pvta-gtfs-rt-vp-2670.json,Pioneer Valley Transit Authority,2025-06-09,,api.goswift.ly,,Swiftly,,bee69ab2c4
+catalog_git_feed_first_added,ca-british-columbia-port-alberni-gtfs-rt-sa-1406.json,Port Alberni,2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-port-alberni-gtfs-rt-tu-1407.json,Port Alberni,2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-port-alberni-gtfs-rt-vp-1405.json,Port Alberni,2022-05-26,,bct.tmix.se,,Consat Telematics,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-bus-gtfs-rt-sa-1716.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-bus-gtfs-rt-tu-1715.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-bus-gtfs-rt-vp-1714.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-rail-gtfs-rt-sa-1713.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-rail-gtfs-rt-tu-1712.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-port-authority-of-allegheny-county-rail-gtfs-rt-vp-1711.json,Port Authority of Allegheny County,2022-05-26,,truetime.portauthority.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-qline-detroit-gtfs-rt-sa-1572.json,Qline Detroit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-qline-detroit-gtfs-rt-tu-1573.json,Qline Detroit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-qline-detroit-gtfs-rt-vp-1571.json,Qline Detroit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-redding-area-bus-authority-gtfs-rt-sa-1485.json,Redding Area Bus Authority,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-california-redding-area-bus-authority-gtfs-rt-tu-1487.json,Redding Area Bus Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-redding-area-bus-authority-gtfs-rt-vp-1486.json,Redding Area Bus Authority,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-maryland-regional-transportation-agency-of-central-maryland-rta-gtfs-rt-sa-1658.json,Regional Transportation Agency of Central Maryland (RTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-maryland-regional-transportation-agency-of-central-maryland-rta-gtfs-rt-tu-1659.json,Regional Transportation Agency of Central Maryland (RTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-maryland-regional-transportation-agency-of-central-maryland-rta-gtfs-rt-vp-1657.json,Regional Transportation Agency of Central Maryland (RTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-regional-transportation-commission-of-southern-nevada-rtc-gtfs-rt-sa-1667.json,Regional Transportation Commission of Southern Nevada (RTC),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-regional-transportation-commission-of-southern-nevada-rtc-gtfs-rt-tu-1666.json,Regional Transportation Commission of Southern Nevada (RTC),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-regional-transportation-commission-of-southern-nevada-rtc-gtfs-rt-vp-1668.json,Regional Transportation Commission of Southern Nevada (RTC),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_redirect,tfs-1097->mdb-1666,Regional Transportation Commission of Southern Nevada (RTC),2022-05-26,rtcws.rtcsnv.com,api.goswift.ly,Agency-hosted / unattributed,Swiftly,yes,new_feed_added:2022-05-26;old_feed_deprecated:
+catalog_git_feed_first_added,us-colorado-regional-transportation-district-rtd-gtfs-rt-sa-1677.json,Regional Transportation District (RTD),2022-05-26,,www.rtd-denver.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-colorado-regional-transportation-district-rtd-gtfs-rt-tu-1676.json,Regional Transportation District (RTD),2022-05-26,,www.rtd-denver.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-colorado-regional-transportation-district-rtd-gtfs-rt-vp-1678.json,Regional Transportation District (RTD),2022-05-26,,www.rtd-denver.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-rhode-island-rhode-island-public-transit-authority-gtfs-rt-sa-1661.json,Rhode Island Public Transit Authority,2022-05-26,,realtime.ripta.com:81,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-rhode-island-rhode-island-public-transit-authority-gtfs-rt-tu-1660.json,Rhode Island Public Transit Authority,2022-05-26,,realtime.ripta.com:81,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-rhode-island-rhode-island-public-transit-authority-gtfs-rt-vp-1662.json,Rhode Island Public Transit Authority,2022-05-26,,realtime.ripta.com:81,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-riverside-transit-agency-gtfs-rt-sa-1664.json,Riverside Transit Agency,2022-05-26,,rtabus.com,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-california-riverside-transit-agency-gtfs-rt-tu-1663.json,Riverside Transit Agency,2022-05-26,,rtabus.com,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-california-riverside-transit-agency-gtfs-rt-vp-1665.json,Riverside Transit Agency,2022-05-26,,rtabus.com,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-rochester-genesee-regional-transportation-authority-rgrta-gtfs-rt-vp-1775.json,Rochester-Genesee Regional Transportation Authority (RGRTA),2022-05-26,,api.rgrta.com,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-or-rogue-valley-transportation-district-gtfs-rt-sa-3456.json,Rogue Valley Transportation District,2026-08-12,,gtfsrt.rvtd.cadavl.com,,Equans / Ineo Systrans (Navineo),,c062f97a2c
+catalog_git_feed_first_added,us-or-rogue-valley-transportation-district-gtfs-rt-tu-3457.json,Rogue Valley Transportation District,2026-08-12,,gtfsrt.rvtd.cadavl.com,,Equans / Ineo Systrans (Navineo),,c062f97a2c
+catalog_git_feed_first_added,us-or-rogue-valley-transportation-district-gtfs-rt-vp-3458.json,Rogue Valley Transportation District,2026-08-12,,gtfsrt.rvtd.cadavl.com,,Equans / Ineo Systrans (Navineo),,c062f97a2c
+catalog_git_feed_first_added,us-vermont-rural-community-transportation-rct-gtfs-rt-tu-1679.json,Rural Community Transportation (RCT),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-rural-community-transportation-rct-gtfs-rt-vp-1680.json,Rural Community Transportation (RCT),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-transcollines-gtfs-rt-tu-1472.json,Régie intermunicipale de transport des Collines (Transcollines),2022-05-26,,67.212.79.244:8080,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-transcollines-gtfs-rt-vp-1471.json,Régie intermunicipale de transport des Collines (Transcollines),2022-05-26,,67.212.79.244:8080,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-stm-gtfs-rt-sa-3345.json,STM,2026-07-09,,api.stm.info,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,ca-quebec-stm-gtfs-rt-tu-3346.json,STM,2026-07-09,,api.stm.info,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,ca-quebec-stm-gtfs-rt-vp-3347.json,STM,2026-07-09,,api.stm.info,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_feed_first_added,us-california-sf-bay-ferry-gtfs-rt-sa-3616.json,San Francisco Bay Ferry,2026-10-26,,api.goswift.ly,,Swiftly,,256544b241
+catalog_git_feed_first_added,us-california-sf-bay-ferry-gtfs-rt-tu-3617.json,San Francisco Bay Ferry,2026-10-26,,api.goswift.ly,,Swiftly,,256544b241
+catalog_git_feed_first_added,us-california-sf-bay-ferry-gtfs-rt-vp-3618.json,San Francisco Bay Ferry,2026-10-26,,api.goswift.ly,,Swiftly,,256544b241
+catalog_git_feed_first_added,us-california-sfmta-gtfs-rt-sa-1844.json,San Francisco Municipal Transportation Agency (SFMTA - Muni),2022-11-14,,api.511.org,,MTC 511 (regional aggregator),,425dd5e7aa
+catalog_git_feed_first_added,us-california-sfmta-gtfs-rt-tu-1845.json,San Francisco Municipal Transportation Agency (SFMTA - Muni),2022-11-14,,api.511.org,,MTC 511 (regional aggregator),,425dd5e7aa
+catalog_git_feed_first_added,us-california-sfmta-gtfs-rt-vp-1843.json,San Francisco Municipal Transportation Agency (SFMTA - Muni),2022-11-14,,api.511.org,,MTC 511 (regional aggregator),,425dd5e7aa
+catalog_git_feed_first_added,us-california-san-joaquin-regional-transit-district-rtd-gtfs-rt-tu-1687.json,San Joaquin Regional Transit District (RTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-san-joaquin-regional-transit-district-rtd-gtfs-rt-vp-1688.json,San Joaquin Regional Transit District (RTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-sandy-area-metro-gtfs-rt-sa-2745.json,Sandy Area Metro,2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-oregon-sandy-area-metro-gtfs-rt-tu-2746.json,Sandy Area Metro,2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-oregon-sandy-area-metro-gtfs-rt-vp-2747.json,Sandy Area Metro,2025-07-24,,passio3.com,,Passio Technologies,,4058dea121
+catalog_git_feed_first_added,us-california-santa-clara-valley-transportation-authority-vta-gtfs-rt-tu-1742.json,Santa Clara Valley Transportation Authority (VTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-santa-clara-valley-transportation-authority-vta-gtfs-rt-vp-1743.json,Santa Clara Valley Transportation Authority (VTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-santa-cruz-metro-scmtd-gtfs-rt-s-a-1912.json,Santa Cruz Metro (SCMTD),2023-05-19,,rt.scmetro.org,,Clever Devices (BusTime) / Hitachi MMS,,7290d8ecc6
+catalog_git_feed_first_added,us-california-santa-cruz-metro-scmtd-gtfs-rt-t-u-1911.json,Santa Cruz Metro (SCMTD),2023-05-19,,rt.scmetro.org,,Clever Devices (BusTime) / Hitachi MMS,,7290d8ecc6
+catalog_git_feed_first_added,us-california-santa-cruz-metro-scmtd-gtfs-rt-v-p-1910.json,Santa Cruz Metro (SCMTD),2023-05-19,,rt.scmetro.org,,Clever Devices (BusTime) / Hitachi MMS,,7290d8ecc6
+catalog_git_feed_first_added,ca-saskatchewan-saskatoon-transit-gtfs-rt-sa-1446.json,Saskatoon Transit,2022-05-26,,apps2.saskatoon.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-saskatchewan-saskatoon-transit-gtfs-rt-tu-1447.json,Saskatoon Transit,2022-05-26,,apps2.saskatoon.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-saskatchewan-saskatoon-transit-gtfs-rt-vp-1445.json,Saskatoon Transit,2022-05-26,,apps2.saskatoon.ca,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-seattle-childrens-hospital-shuttle-gtfs-rt-tu-1674.json,Seattle Children's Hospital Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-seattle-childrens-hospital-shuttle-gtfs-rt-vp-1675.json,Seattle Children's Hospital Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-maryland-pittsville-shore-transit-gtfs-rt-sa-3444.json,Shore Transit,2026-08-12,,myride.shoretransit.org,,Agency-hosted / unattributed,,c062f97a2c
+catalog_git_feed_first_added,us-maryland-pittsville-shore-transit-gtfs-rt-tu-3442.json,Shore Transit,2026-08-12,,myride.shoretransit.org,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,c062f97a2c
+catalog_git_feed_first_added,us-maryland-pittsville-shore-transit-gtfs-rt-vp-3443.json,Shore Transit,2026-08-12,,myride.shoretransit.org,,Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming),,c062f97a2c
+catalog_git_feed_first_added,us-louisiana-shreveport-area-transit-system-sportran-gtfs-rt-sa-1475.json,Shreveport Area Transit System (SporTran),2022-05-26,,sportranbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-louisiana-shreveport-area-transit-system-sportran-gtfs-rt-tu-1473.json,Shreveport Area Transit System (SporTran),2022-05-26,,sportranbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-louisiana-shreveport-area-transit-system-sportran-gtfs-rt-vp-1474.json,Shreveport Area Transit System (SporTran),2022-05-26,,sportranbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,ca-quebec-sorel-tracy-stc-gtfs-rt-tu-sa-vp-2380.json,Société de transport collectif de Pierre-De Saurel,2025-02-25,,zenbus.net,,Zenbus,,ad675bd3dd
+catalog_git_feed_first_added,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-tu-1577.json,Sonoma Marin Area Rail Transit (SMART),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-vp-1576.json,Sonoma Marin Area Rail Transit (SMART),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_status_deprecated,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-tu-1577.json,Sonoma Marin Area Rail Transit (SMART),2026-06-29,,,,,,5a1daab670
+catalog_git_status_deprecated,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-vp-1576.json,Sonoma Marin Area Rail Transit (SMART),2026-06-29,,,,,,5a1daab670
+catalog_redirect,mdb-1576->mdb-3224,Sonoma Marin Area Rail Transit (SMART),2026-06-29,api.goswift.ly,api.511.org,Swiftly,MTC 511 (regional aggregator),yes,new_feed_added:2026-06-29;old_feed_deprecated:2026-06-29
+catalog_redirect,mdb-1577->mdb-3223,Sonoma Marin Area Rail Transit (SMART),2026-06-29,api.goswift.ly,api.511.org,Swiftly,MTC 511 (regional aggregator),yes,new_feed_added:2026-06-29;old_feed_deprecated:2026-06-29
+catalog_git_feed_first_added,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-tu-3223.json,Sonoma-Marin Area Rail Transit (SMART),2026-06-29,,api.511.org,,MTC 511 (regional aggregator),,5a1daab670
+catalog_git_feed_first_added,us-california-sonoma-marin-area-rail-transit-smart-gtfs-rt-vp-3224.json,Sonoma-Marin Area Rail Transit (SMART),2026-06-29,,api.511.org,,MTC 511 (regional aggregator),,5a1daab670
+catalog_git_feed_first_added,us-washington-sound-transit-gtfs-rt-sa-1553.json,Sound Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-sound-transit-gtfs-rt-tu-1554.json,Sound Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-sound-transit-gtfs-rt-vp-1552.json,Sound Transit,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-indiana-south-bend-gtfs-rt-sa-3075.json,South Bend Public Transportation Corporation,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-indiana-south-bend-gtfs-rt-tu-3076.json,South Bend Public Transportation Corporation,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-indiana-south-bend-gtfs-rt-vp-3077.json,South Bend Public Transportation Corporation,2026-02-18,,passio3.com,,Passio Technologies,,5d1b1eb1d2
+catalog_git_feed_first_added,us-oregon-south-metro-area-regional-transit-smart-gtfs-rt-tu-2697.json,South Metro Area Regional Transit (SMART),2025-07-09,,mysmartbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,fe26801122
+catalog_git_feed_first_added,us-oregon-south-metro-area-regional-transit-smart-gtfs-rt-vp-2707.json,South Metro Area Regional Transit (SMART),2025-07-09,,mysmartbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,95dbc66996
+catalog_git_feed_first_added,us-oregon-south-metro-area-regional-transit-smart-gtfs-rt-sa-3414.json,South Metro Area Regional Transit (SMART),2026-07-31,,mysmartbus.com,,GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern),,05d918c9f8
+catalog_git_feed_first_added,us-maine-portland-south-portland-gtfs-rt-sa-2646.json,South Portland,2025-05-22,,api.goswift.ly,,Swiftly,,77da47e698
+catalog_git_feed_first_added,us-maine-south-portland-gtfs-rt-vp-2647.json,South Portland,2025-05-22,,api.goswift.ly,,Swiftly,,77da47e698
+catalog_git_feed_first_added,us-maine-south-portland-gtfs-rt-tu-3415.json,South Portland,2026-07-31,,api.goswift.ly,,Swiftly,,05d918c9f8
+catalog_git_feed_first_added,us-pennsylvania-septa-bus-gtfs-rt-tu-1570.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-septa-bus-gtfs-rt-vp-1569.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-septa-rail-gtfs-rt-tu-1568.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-septa-rail-gtfs-rt-vp-1567.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-pennsylvania-septa-bus-gtfs-rt-sa-2410.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2025-03-31,,www3.septa.org,,Agency-hosted / unattributed,,43ae9f4073
+catalog_git_feed_first_added,us-pennsylvania-septa-rail-gtfs-rt-sa-2409.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2025-03-31,,www3.septa.org,,Agency-hosted / unattributed,,43ae9f4073
+catalog_git_status_deprecated,us-pennsylvania-septa-bus-gtfs-rt-tu-1570.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-pennsylvania-septa-bus-gtfs-rt-tu-3062.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,www3.septa.org,,Agency-hosted / unattributed,,5d1b1eb1d2
+catalog_git_status_deprecated,us-pennsylvania-septa-bus-gtfs-rt-vp-1569.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-pennsylvania-septa-bus-gtfs-rt-vp-3063.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,www3.septa.org,,Agency-hosted / unattributed,,5d1b1eb1d2
+catalog_git_status_deprecated,us-pennsylvania-septa-rail-gtfs-rt-tu-1568.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-pennsylvania-septa-rail-gtfs-rt-tu-3061.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,www3.septa.org,,Agency-hosted / unattributed,,5d1b1eb1d2
+catalog_git_status_deprecated,us-pennsylvania-septa-rail-gtfs-rt-vp-1567.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,,,,,5d1b1eb1d2
+catalog_git_feed_first_added,us-pennsylvania-septa-rail-gtfs-rt-vp-3060.json,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,,www3.septa.org,,Agency-hosted / unattributed,,5d1b1eb1d2
+catalog_redirect,mdb-1567->mdb-3060,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,api.goswift.ly,www3.septa.org,Swiftly,Agency-hosted / unattributed,yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_redirect,mdb-1568->mdb-3061,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,api.goswift.ly,www3.septa.org,Swiftly,Agency-hosted / unattributed,yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_redirect,mdb-1569->mdb-3063,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,api.goswift.ly,www3.septa.org,Swiftly,Agency-hosted / unattributed,yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_redirect,mdb-1570->mdb-3062,Southeastern Pennsylvania Transportation Authority (SEPTA),2026-02-18,api.goswift.ly,www3.septa.org,Swiftly,Agency-hosted / unattributed,yes,new_feed_added:2026-02-18;old_feed_deprecated:2026-02-18
+catalog_git_feed_first_added,us-california-spirit-bus-gtfs-rt-sa-2222.json,Spirit Bus,2024-11-26,,passio3.com,,Passio Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-spirit-bus-gtfs-rt-tu-2220.json,Spirit Bus,2024-11-26,,passio3.com,,Passio Technologies,,2a6865d068
+catalog_git_feed_first_added,us-california-spirit-bus-gtfs-rt-vp-2221.json,Spirit Bus,2024-11-26,,passio3.com,,Passio Technologies,,2a6865d068
+catalog_git_feed_first_added,us-illinois-springfield-mass-transit-district-smtd-gtfs-rt-sa-1779.json,Springfield Mass Transit District (SMTD),2022-05-26,,ride.smtd.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-illinois-springfield-mass-transit-district-smtd-gtfs-rt-tu-1780.json,Springfield Mass Transit District (SMTD),2022-05-26,,ride.smtd.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-illinois-springfield-mass-transit-district-smtd-gtfs-rt-vp-1781.json,Springfield Mass Transit District (SMTD),2022-05-26,,ride.smtd.org,,Clever Devices (BusTime) / Hitachi MMS,,439e1b9f5b
+catalog_git_feed_first_added,us-california-stanislaus-regional-transit-authority-stanrta-gtfs-rt-sa-1615.json,Stanislaus Regional Transit Authority (StanRTA),2022-05-26,,max.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-california-stanislaus-regional-transit-authority-stanrta-gtfs-rt-tu-1613.json,Stanislaus Regional Transit Authority (StanRTA),2022-05-26,,max.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-california-stanislaus-regional-transit-authority-stanrta-gtfs-rt-vp-1614.json,Stanislaus Regional Transit Authority (StanRTA),2022-05-26,,max.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-staten-island-railway-gtfs-rt-vp-tu-1637.json,Staten Island Railway,2022-05-26,,api-endpoint.mta.info,,MTA NY in-house (camsys / OBA-derived),,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-suburban-mobility-authority-for-regional-transit-smart-gtfs-rt-sa-1443.json,Suburban Mobility Authority for Regional Transit (SMART),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-suburban-mobility-authority-for-regional-transit-smart-gtfs-rt-tu-1444.json,Suburban Mobility Authority for Regional Transit (SMART),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-michigan-suburban-mobility-authority-for-regional-transit-smart-gtfs-rt-vp-1442.json,Suburban Mobility Authority for Regional Transit (SMART),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-suffolk-county-transit-gtfs-rt-tu-1529.json,Suffolk County Transit,2022-05-26,,gtfsrealtime.suffolkcountyny.gov:8080,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-suffolk-county-transit-gtfs-rt-vp-1530.json,Suffolk County Transit,2022-05-26,,gtfsrealtime.suffolkcountyny.gov:8080,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-sunset-empire-transportation-district-gtfs-rt-tu-1505.json,Sunset Empire Transportation District,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-sunset-empire-transportation-district-gtfs-rt-vp-1504.json,Sunset Empire Transportation District,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-nevada-tahoe-transportation-district-ttd-gtfs-rt-tu-1652.json,Tahoe Transportation District (TTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-nevada-tahoe-transportation-district-ttd-gtfs-rt-vp-1653.json,Tahoe Transportation District (TTD),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-the-current-gtfs-rt-tu-1511.json,The Current,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-the-current-gtfs-rt-vp-1510.json,The Current,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-hawaii-thebus-gtfs-rt-tu-1519.json,TheBus,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-hawaii-thebus-gtfs-rt-vp-1518.json,TheBus,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-thousand-oaks-transit-gtfs-rt-sa-1689.json,Thousand Oaks Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-thunder-bay-transit-gtfs-rt-sa-1691.json,Thunder Bay Transit,2022-05-26,,api.nextlift.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-thunder-bay-transit-gtfs-rt-tu-1692.json,Thunder Bay Transit,2022-05-26,,api.nextlift.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-thunder-bay-transit-gtfs-rt-vp-1690.json,Thunder Bay Transit,2022-05-26,,api.nextlift.ca,,Consat Telematics (probable: 'vehicleupdates.pb' naming),,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-tillamook-county-transportation-district-gtfs-rt-sa-1477.json,Tillamook County Transportation District,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-tillamook-county-transportation-district-gtfs-rt-tu-1476.json,Tillamook County Transportation District,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-tillamook-county-transportation-district-gtfs-rt-vp-1478.json,Tillamook County Transportation District,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-tompkins-consolidated-area-transit-tcat-gtfs-rt-sa-1648.json,Tompkins Consolidated Area Transit (TCAT),2022-05-26,,realtimetcatbus.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-tompkins-consolidated-area-transit-tcat-gtfs-rt-tu-1647.json,Tompkins Consolidated Area Transit (TCAT),2022-05-26,,realtimetcatbus.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-new-york-tompkins-consolidated-area-transit-tcat-gtfs-rt-vp-1649.json,Tompkins Consolidated Area Transit (TCAT),2022-05-26,,realtimetcatbus.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-toronto-transit-commission-gtfs-rt-vp-2140.json,Toronto Transit Commission (TTC),2024-10-25,,bustime.ttc.ca,,Clever Devices (BusTime) / Hitachi MMS,,149609ed47
+catalog_git_feed_first_added,us-maryland-towson-loop-gtfs-rt-s-a-1786.json,Towson Loop,2022-06-28,,passio3.com,,Passio Technologies,,e2d7b59bfc
+catalog_git_feed_first_added,us-maryland-towson-loop-gtfs-rt-t-u-1785.json,Towson Loop,2022-06-28,,passio3.com,,Passio Technologies,,e2d7b59bfc
+catalog_git_feed_first_added,us-maryland-towson-loop-gtfs-rt-v-p-1787.json,Towson Loop,2022-06-28,,passio3.com,,Passio Technologies,,e2d7b59bfc
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-sa-1706.json,TransLink Vancouver,2022-05-26,,gtfs.translink.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-tu-1707.json,TransLink Vancouver,2022-05-26,,gtfs.translink.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-vp-1705.json,TransLink Vancouver,2022-05-26,,gtfs.translink.ca,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_status_deprecated,ca-british-columbia-translink-vancouver-gtfs-rt-sa-1706.json,TransLink Vancouver,2026-07-09,,,,,,e966554ac7
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-sa-3348.json,TransLink Vancouver,2026-07-09,,gtfsapi.translink.ca,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_status_deprecated,ca-british-columbia-translink-vancouver-gtfs-rt-tu-1707.json,TransLink Vancouver,2026-07-09,,,,,,e966554ac7
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-tu-3349.json,TransLink Vancouver,2026-07-09,,gtfsapi.translink.ca,,Agency-hosted / unattributed,,e966554ac7
+catalog_git_status_deprecated,ca-british-columbia-translink-vancouver-gtfs-rt-vp-1705.json,TransLink Vancouver,2026-07-09,,,,,,e966554ac7
+catalog_git_feed_first_added,ca-british-columbia-translink-vancouver-gtfs-rt-vp-3350.json,TransLink Vancouver,2026-07-09,,gtfsapi.translink.ca,,Agency-hosted / unattributed,,e966554ac7
+catalog_redirect,mdb-1705->mdb-3350,TransLink Vancouver,2026-07-09,gtfs.translink.ca,gtfsapi.translink.ca,Agency-hosted / unattributed,Agency-hosted / unattributed,no,new_feed_added:2026-07-09;old_feed_deprecated:2026-07-09
+catalog_redirect,mdb-1706->mdb-3348,TransLink Vancouver,2026-07-09,gtfs.translink.ca,gtfsapi.translink.ca,Agency-hosted / unattributed,Agency-hosted / unattributed,no,new_feed_added:2026-07-09;old_feed_deprecated:2026-07-09
+catalog_redirect,mdb-1707->mdb-3349,TransLink Vancouver,2026-07-09,gtfs.translink.ca,gtfsapi.translink.ca,Agency-hosted / unattributed,Agency-hosted / unattributed,no,new_feed_added:2026-07-09;old_feed_deprecated:2026-07-09
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-northern-kentucky-tank-gtfs-rt-sa-1694.json,Transit Authority of Northern Kentucky (TANK),2022-05-26,,66.42.202.74:89,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-northern-kentucky-tank-gtfs-rt-tu-1693.json,Transit Authority of Northern Kentucky (TANK),2022-05-26,,66.42.202.74:89,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-northern-kentucky-tank-gtfs-rt-vp-1695.json,Transit Authority of Northern Kentucky (TANK),2022-05-26,,66.42.202.74:89,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-sa-1697.json,Transit Authority of River City (TARC),2022-05-26,,gtfsrealtime.ridetarc.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-tu-1696.json,Transit Authority of River City (TARC),2022-05-26,,gtfsrealtime.ridetarc.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-vp-1698.json,Transit Authority of River City (TARC),2022-05-26,,gtfsrealtime.ridetarc.org,,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),,439e1b9f5b
+catalog_git_feed_first_added,us-kentucky-tarc-gtfs-rt-sa-2663.json,Transit Authority of River City (TARC),2025-06-04,,tarc.rideralerts.com,,Avail Technologies,,3c7bc1cf2e
+catalog_git_feed_first_added,us-kentucky-tarc-gtfs-rt-tu-2664.json,Transit Authority of River City (TARC),2025-06-04,,tarc.rideralerts.com,,Avail Technologies,,3c7bc1cf2e
+catalog_git_feed_first_added,us-kentucky-tarc-gtfs-rt-vp-2665.json,Transit Authority of River City (TARC),2025-06-04,,tarc.rideralerts.com,,Avail Technologies,,3c7bc1cf2e
+catalog_git_status_deprecated,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-sa-1697.json,Transit Authority of River City (TARC),2025-06-04,,,,,,3c7bc1cf2e
+catalog_git_status_deprecated,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-tu-1696.json,Transit Authority of River City (TARC),2025-06-04,,,,,,3c7bc1cf2e
+catalog_git_status_deprecated,us-kentucky-transit-authority-of-river-city-tarc-gtfs-rt-vp-1698.json,Transit Authority of River City (TARC),2025-06-04,,,,,,3c7bc1cf2e
+catalog_redirect,mdb-1696->mdb-2664,Transit Authority of River City (TARC),2025-06-04,gtfsrealtime.ridetarc.org,tarc.rideralerts.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Avail Technologies,yes,new_feed_added:2025-06-04;old_feed_deprecated:2025-06-04
+catalog_redirect,mdb-1697->mdb-2663,Transit Authority of River City (TARC),2025-06-04,gtfsrealtime.ridetarc.org,tarc.rideralerts.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Avail Technologies,yes,new_feed_added:2025-06-04;old_feed_deprecated:2025-06-04
+catalog_redirect,mdb-1698->mdb-2665,Transit Authority of River City (TARC),2025-06-04,gtfsrealtime.ridetarc.org,tarc.rideralerts.com,Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming),Avail Technologies,yes,new_feed_added:2025-06-04;old_feed_deprecated:2025-06-04
+catalog_git_feed_first_added,us-california-tri-delta-transit-gtfs-rt-sa-1977.json,Tri Delta Transit,2024-01-22,,api.511.org,,MTC 511 (regional aggregator),,3fe6c0da6f
+catalog_git_feed_first_added,us-california-tri-delta-transit-gtfs-rt-tp-1975.json,Tri Delta Transit,2024-01-22,,api.511.org,,MTC 511 (regional aggregator),,3fe6c0da6f
+catalog_git_feed_first_added,us-california-tri-delta-transit-gtfs-rt-vp-1976.json,Tri Delta Transit,2024-01-22,,api.511.org,,MTC 511 (regional aggregator),,3fe6c0da6f
+catalog_git_feed_first_added,us-vermont-tri-valley-transit-gtfs-rt-tu-1754.json,Tri-Valley Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-vermont-tri-valley-transit-gtfs-rt-vp-1753.json,Tri-Valley Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-trimet-gtfs-rt-sa-1709.json,TriMet,2022-05-26,,developer.trimet.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-trimet-gtfs-rt-tu-1708.json,TriMet,2022-05-26,,developer.trimet.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-trimet-gtfs-rt-vp-1710.json,TriMet,2022-05-26,,developer.trimet.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-california-turlock-transit-gtfs-rt-sa-1719.json,Turlock Transit,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-california-turlock-transit-gtfs-rt-tu-1718.json,Turlock Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-turlock-transit-gtfs-rt-vp-1717.json,Turlock Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-georgia-university-of-georgia-gtfs-rt-sa-2633.json,University of Georgia,2025-05-19,,passio3.com,,Passio Technologies,,860ec0a5ee
+catalog_git_feed_first_added,us-georgia-university-of-georgia-gtfs-rt-tu-2617.json,University of Georgia,2025-05-19,,passio3.com,,Passio Technologies,,860ec0a5ee
+catalog_git_feed_first_added,us-georgia-university-of-georgia-gtfs-rt-vp-2619.json,University of Georgia,2025-05-19,,passio3.com,,Passio Technologies,,860ec0a5ee
+catalog_git_feed_first_added,us-minnesota-uofm-gtfs-rt-sa-3526.json,University of Minnesota,2026-10-13,,data.peaktransit.com,,Peak Transit,,5fe0132b33
+catalog_git_feed_first_added,us-minnesota-uofm-gtfs-rt-tu-3527.json,University of Minnesota,2026-10-13,,data.peaktransit.com,,Peak Transit,,5fe0132b33
+catalog_git_feed_first_added,us-minnesota-uofm-gtfs-rt-vp-3528.json,University of Minnesota,2026-10-13,,data.peaktransit.com,,Peak Transit,,5fe0132b33
+catalog_git_feed_first_added,us-california-vine-transit-gtfs-rt-tu-1522.json,VINE Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-california-vine-transit-gtfs-rt-vp-1523.json,VINE Transit,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-arizona-valley-metro-gtfs-rt-sa-1721.json,Valley Metro,2022-05-26,,app.mecatran.com,,Mecatran,,439e1b9f5b
+catalog_git_feed_first_added,us-arizona-valley-metro-gtfs-rt-tu-1720.json,Valley Metro,2022-05-26,,app.mecatran.com,,Mecatran,,439e1b9f5b
+catalog_git_feed_first_added,us-arizona-valley-metro-gtfs-rt-vp-1722.json,Valley Metro,2022-05-26,,app.mecatran.com,,Mecatran,,439e1b9f5b
+catalog_git_feed_first_added,us-idaho-valley-regional-transit-gtfs-rt-sa-2452.json,Valley Regional Transit,2025-04-11,,s3.amazonaws.com,,ETA Transit Systems,,44ca5c2797
+catalog_git_feed_first_added,us-idaho-valley-regional-transit-gtfs-rt-tu-2453.json,Valley Regional Transit,2025-04-11,,s3.amazonaws.com,,ETA Transit Systems,,44ca5c2797
+catalog_git_feed_first_added,us-idaho-valley-regional-transit-gtfs-rt-vp-2454.json,Valley Regional Transit,2025-04-11,,s3.amazonaws.com,,ETA Transit Systems,,44ca5c2797
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-sa-1731.json,Via Mobility,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-tu-1730.json,Via Mobility,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-vp-1732.json,Via Mobility,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_status_deprecated,us-colorado-via-mobility-gtfs-rt-sa-1731.json,Via Mobility,2025-03-27,,,,,,a8d734b27e
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-sa-2396.json,Via Mobility,2025-03-27,,passio3.com,,Passio Technologies,,a8d734b27e
+catalog_git_status_deprecated,us-colorado-via-mobility-gtfs-rt-tu-1730.json,Via Mobility,2025-03-27,,,,,,a8d734b27e
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-tu-2397.json,Via Mobility,2025-03-27,,passio3.com,,Passio Technologies,,a8d734b27e
+catalog_git_status_deprecated,us-colorado-via-mobility-gtfs-rt-vp-1732.json,Via Mobility,2025-03-27,,,,,,a8d734b27e
+catalog_git_feed_first_added,us-colorado-via-mobility-gtfs-rt-vp-2398.json,Via Mobility,2025-03-27,,passio3.com,,Passio Technologies,,a8d734b27e
+catalog_redirect,mdb-1730->mdb-2397,Via Mobility,2025-03-27,api.goswift.ly,passio3.com,Swiftly,Passio Technologies,yes,new_feed_added:2025-03-27;old_feed_deprecated:2025-03-27
+catalog_redirect,mdb-1731->mdb-2396,Via Mobility,2025-03-27,api.goswift.ly,passio3.com,Swiftly,Passio Technologies,yes,new_feed_added:2025-03-27;old_feed_deprecated:2025-03-27
+catalog_redirect,mdb-1732->mdb-2398,Via Mobility,2025-03-27,api.goswift.ly,passio3.com,Swiftly,Passio Technologies,yes,new_feed_added:2025-03-27;old_feed_deprecated:2025-03-27
+catalog_git_feed_first_added,us-virginia-virginia-railway-express-gtfs-rt-tu-1733.json,Virginia Railway Express,2022-05-26,,www.vre.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-virginia-railway-express-gtfs-rt-vp-1734.json,Virginia Railway Express,2022-05-26,,www.vre.org,,Agency-hosted / unattributed,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-votran-gtfs-rt-tu-1741.json,Votran,2022-05-26,,realtimevotran.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-florida-votran-gtfs-rt-vp-1740.json,Votran,2022-05-26,,realtimevotran.availtec.com,,Avail Technologies,,439e1b9f5b
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-sa-1848.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-sa-1851.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-tu-1849.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-tu-1852.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-vp-1850.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-district-of-columbia-washington-metropolitan-area-transit-authority-wmata-gtfs-rt-vp-1853.json,Washington Metropolitan Area Transit Authority (WMATA),2022-11-17,,api.wmata.com,,Agency-hosted / unattributed,,181527d168
+catalog_git_feed_first_added,us-oregon-washington-park-shuttle-gtfs-rt-sa-1745.json,Washington Park Shuttle,2022-05-26,,gtfs-realtime.trilliumtransit.com,,Trillium (Optibus) - alerts,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-washington-park-shuttle-gtfs-rt-tu-1744.json,Washington Park Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-oregon-washington-park-shuttle-gtfs-rt-vp-1746.json,Washington Park Shuttle,2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-washington-washington-state-ferries-gtfs-rt-sa-1556.json,Washington State Ferries,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-washington-state-ferries-gtfs-rt-tu-1557.json,Washington State Ferries,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-washington-washington-state-ferries-gtfs-rt-vp-1555.json,Washington State Ferries,2022-05-26,,api.pugetsound.onebusaway.org,,OneBusAway / TheTransitClock (open source),,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-williamsburg-area-transit-authority-wata-gtfs-rt-tu-1747.json,Williamsburg Area Transit Authority (WATA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,us-virginia-williamsburg-area-transit-authority-wata-gtfs-rt-vp-1748.json,Williamsburg Area Transit Authority (WATA),2022-05-26,,api.goswift.ly,,Swiftly,,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-york-region-transit-gtfs-rt-tu-1749.json,York Region Transit,2022-05-26,,rtu.york.ca,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b
+catalog_git_feed_first_added,ca-ontario-york-region-transit-gtfs-rt-vp-1750.json,York Region Transit,2022-05-26,,rtu.york.ca,,INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern),,439e1b9f5b

@@ -125,7 +125,8 @@
   "vb_hold": "Inputs!$B$136",
   "vb_margin1": "Inputs!$B$137",
   "vb_mult1": "Inputs!$B$138",
-  "vb_lev": "Inputs!$B$139"
+  "vb_evrev_a": "Inputs!$B$139",
+  "vb_lev": "Inputs!$B$140"
  },
  "market_total_row": 27,
  "seg_rows": {
@@ -176,10 +177,14 @@
   "bolt": 10,
   "rev1": 11,
   "ebitda1": 12,
-  "ev1": 13,
-  "evrev": 14,
-  "eq1": 16,
-  "moic": 17
+  "ev1": 18,
+  "evrev": 19,
+  "eq1": 20,
+  "moic": 21,
+  "eva": 14,
+  "eqa": 15,
+  "moica": 16,
+  "irra": 17
  },
  "forecast": {
   "seg": {

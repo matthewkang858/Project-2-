@@ -65,7 +65,7 @@ RULES = [
     R("swiftly_s3_pattern", "Swiftly (probable: S3 '-realtime-prod' bucket pattern)", "low", lambda h, p, u: "amazonaws.com" in h and bool(re.search(r"/[a-z0-9-]+-(realtime|alerts)-prod/", u))),
     R("gmv_gtfs_rt_path", "GMV Syncromatics (probable: '/gtfs-rt/vehiclepositions' path pattern)", "medium", lambda h, p, u: bool(re.search(r"/gtfs-rt/(alerts|tripupdates|vehiclepositions)$", p))),
     R("init_path", "INIT (probable: '/gtfsrealtime/TripUpdates|VehiclePositions' path pattern)", "medium", lambda h, p, u: bool(re.search(r"/gtfsrealtime/(TripUpdates|VehiclePositions|ServiceAlerts)$", urlparse(u).path))),
-    R("tm_dir_naming", "Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming)", "low", lambda h, p, u: bool(re.search(r"/(alert/alerts|tripupdate/tripupdates|vehicle/vehiclepositions)\.pb$", p))),
+    R("tm_dir_naming", "Trapeze / Vontas (probable: 'Alert/Alerts.pb' directory naming)", "medium", lambda h, p, u: bool(re.search(r"/(alert/alerts|tripupdate/tripupdates|vehicle/vehiclepositions)\.pb$", p))),
     R("gtfs_underscore_naming", "Modaxo TripSpark/Trapeze (probable: 'GTFS_TripUpdates.pb' naming)", "low", lambda h, p, u: bool(re.search(r"gtfs_(serviceAlerts|tripupdates|vehiclepositions)\.pb$", p))),
     R("consat_vehicleupdates_naming", "Consat Telematics (probable: 'vehicleupdates.pb' naming)", "low", lambda h, p, u: p.endswith("/gtfs-realtime/vehicleupdates.pb") or p.endswith("/gtfs-realtime/tripupdates.pb") or p.endswith("/gtfs-realtime/alerts.pb")),
 ]
@@ -314,7 +314,7 @@ def main():
     match_log = []
     def canon_name(name):
         n = ov_alias.get(name, name)
-        if re.match(r"^BC Transit\b", n): n = "BC Transit"
+        if re.match(r"^BC ?Transit\b", n): n = "BC Transit"
         if re.match(r"^Exo\b", n, re.I): n = "exo"
         if re.match(r"^Maryland Transit Administration", n): n = "Maryland Transit Administration"
         if re.match(r"^Toronto Transit Commission", n): n = "Toronto Transit Commission"
@@ -323,8 +323,9 @@ def main():
     expanded = []
     for fr in feed_records:
         key = ("mdb_provider", fr["agency_name_raw"]) if fr["source"] == "mobilitydata" else ("atlas_feed", fr["feed_id"])
-        if key in ov_exclude_provider: continue
-        ov = ov_provider_ntd.get(key, "")
+        key_st = ("mdb_provider", fr["agency_name_raw"] + "||" + (fr["state"] or "")) if fr["source"] == "mobilitydata" else key
+        if key in ov_exclude_provider or key_st in ov_exclude_provider: continue
+        ov = ov_provider_ntd.get(key_st, "") or ov_provider_ntd.get(key, "")
         if ov and ov != "NONE" and "|" in ov:
             for nid_ in ov.split("|"):
                 fr2 = dict(fr); fr2["_forced_ntd"] = nid_; expanded.append(fr2)
@@ -357,7 +358,8 @@ def main():
             fr["ntd_agency"] = ""; fr["active_fullsize_bus"] = ""; fr["tier"] = ""
         # agency key
         canon = canon_name(fr["agency_name_raw"])
-        fr["agency_key"] = ("ntd:" + nid) if nid else ("name:" + fr["country"] + ":" + (fr["state"] or "") + ":" + norm_name(canon))
+        # Canada: province is only present in the MobilityData catalog, so key Canadian agencies on name alone
+        fr["agency_key"] = ("ntd:" + nid) if nid else ("name:" + fr["country"] + ":" + ((fr["state"] or "") if fr["country"] != "CA" else "") + ":" + norm_name(canon))
         match_log.append((fr["source"], fr["agency_name_raw"], fr["state"], fr["country"], nid, how, fr["agency_key"]))
     # de-duplicate non-NTD agencies across catalogs by exact URL, then by non-shared host (Canada and non-NTD US)
     url_key = {}; host_key = {}
@@ -435,11 +437,21 @@ def main():
         w = csv.DictWriter(fh, fieldnames=list(rows_out[0].keys())); w.writeheader()
         for r in rows_out: w.writerow(r)
 
+    # ---- top-100 NTD manual-review table ----
+    top = [r for r in rows_out if r["country"] == "US" and r["ntd_id"]]
+    top.sort(key=lambda r: -float(r["active_fullsize_bus_ntd2025"] or 0))
+    with open(os.path.join(a.outdir, "gtfs_rt_top100_ntd_review.csv"), "w", newline="", encoding="utf-8") as fh:
+        cols = ["rank", "ntd_id", "ntd_agency", "state", "active_fullsize_bus_ntd2025", "fleet_tier", "primary_rt_publisher", "all_vp_tu_vendors_active", "hosts", "catalog_sources", "rule_confidence_set", "cad_avl_system_of_record", "system_of_record_source", "overlay_flag"]
+        w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore"); w.writeheader()
+        for i, r in enumerate(top[:100]):
+            r2 = dict(r); r2["rank"] = i + 1; w.writerow(r2)
+
     # ---- vendor share tables ----
     def vendor_family(v):
         v = v or ""
-        for key, fam in [("Swiftly","Swiftly"),("Passio","Passio"),("Avail","Avail"),("Trapeze","Trapeze/Vontas (Modaxo)"),("Modaxo TripSpark","TripSpark/Trapeze (Modaxo, probable)"),("TripSpark","TripSpark (Modaxo)"),("Clever","Clever Devices / Hitachi MMS"),("Consat","Consat Telematics"),("Systrans","Equans / Ineo Systrans"),("Connexionz","Connexionz"),("GMV","GMV Syncromatics"),("INIT","INIT (probable)"),("Strategic Mapping","Strategic Mapping"),("OneBusAway","OneBusAway / open source"),("ETA","ETA Transit"),("Peak","Peak Transit"),("TripShot","TripShot"),("Mecatran","Mecatran"),("Zenbus","Zenbus"),("Trillium","Trillium (Optibus) alerts-only"),("MTC 511","MTC 511 aggregator"),("MTA NY","MTA NY in-house"),("exo","exo in-house"),("Civilia","Civilia"),("Hub'Up","Hub'Up"),("Cubic","Cubic Umo"),("TransLoc","TransLoc"),("DoubleMap","DoubleMap"),("SimplifyTransit","SimplifyTransit"),("Agency-hosted","Agency-hosted / unattributed"),("NO PUBLIC","No public feed (whitespace)"),("(alerts-only)","Alerts-only feed"),("(deprecated-only)","Deprecated feed only")]:
-            if key.lower() in v.lower(): return fam
+        suffix = " (probable)" if "probable" in v.lower() else ""
+        for key, fam in [("Swiftly","Swiftly"),("Passio","Passio"),("Avail","Avail"),("Trapeze","Trapeze/Vontas (Modaxo)"),("Modaxo TripSpark","TripSpark/Trapeze (Modaxo, probable)"),("TripSpark","TripSpark (Modaxo)"),("Clever","Clever Devices / Hitachi MMS"),("Consat","Consat Telematics"),("Systrans","Equans / Ineo Systrans"),("Connexionz","Connexionz"),("GMV","GMV Syncromatics"),("INIT","INIT"),("Strategic Mapping","Strategic Mapping"),("OneBusAway","OneBusAway / open source"),("ETA","ETA Transit"),("Peak","Peak Transit"),("TripShot","TripShot"),("Mecatran","Mecatran"),("Zenbus","Zenbus"),("Trillium","Trillium (Optibus) alerts-only"),("MTC 511","MTC 511 aggregator"),("MTA NY","MTA NY in-house"),("exo","exo in-house"),("Civilia","Civilia"),("Hub'Up","Hub'Up"),("Cubic","Cubic Umo"),("TransLoc","TransLoc"),("DoubleMap","DoubleMap"),("SimplifyTransit","SimplifyTransit"),("Agency-hosted","Agency-hosted / unattributed"),("NO PUBLIC","No public feed (whitespace)"),("(alerts-only)","Alerts-only feed"),("(deprecated-only)","Deprecated feed only")]:
+            if key.lower() in v.lower(): return fam + (suffix if fam not in ("No public feed (whitespace)", "Agency-hosted / unattributed") else "")
         return v
     share_rows = []
     for country in ("US", "CA"):
@@ -493,14 +505,23 @@ def main():
             curr = sets[-1]["url"] if sets else ""
             cv, _, _, _ = classify(curr)
             mig.append({"evidence": "catalog_git_feed_first_added", "feed_file": f, "provider": prov, "date": first_date, "old_host": "", "new_host": host_of(curr), "old_vendor": "", "new_vendor": cv, "vendor_changed": "", "commit": added[0]["commit"][:10]})
-    # redirects
+    # redirects (dated with the new feed's first-added commit and the old feed's deprecation commit)
+    sid_added = {}; sid_deprecated = {}
+    for f, evs in hist.items():
+        sid = str(evs[0]["mdb_source_id"])
+        for e in evs:
+            if e["event"] == "file_added": sid_added[sid] = e["date"][:10]
+            if e["event"] == "status_set" and e["url"] == "deprecated": sid_deprecated[sid] = e["date"][:10]
+    def sid_of(mdb_id):
+        m = re.search(r"(\d+)$", mdb_id or ""); return m.group(1) if m else ""
     for r in mdb_rt:
         if r["redirect.id"]:
             for rid in r["redirect.id"].split("|"):
                 new = mdb_by_id.get(rid.strip())
                 if not new: continue
                 ov_, _, _, _ = classify(r["urls.direct_download"]); nv_, _, _, _ = classify(new["urls.direct_download"])
-                mig.append({"evidence": "catalog_redirect", "feed_file": r["id"] + "->" + rid.strip(), "provider": r["provider"], "date": "", "old_host": host_of(r["urls.direct_download"]), "new_host": host_of(new["urls.direct_download"]), "old_vendor": ov_, "new_vendor": nv_, "vendor_changed": "yes" if ov_ != nv_ else "no", "commit": ""})
+                d_new = sid_added.get(sid_of(rid.strip()), ""); d_old = sid_deprecated.get(sid_of(r["id"]), "")
+                mig.append({"evidence": "catalog_redirect", "feed_file": r["id"] + "->" + rid.strip(), "provider": r["provider"], "date": d_new or d_old, "old_host": host_of(r["urls.direct_download"]), "new_host": host_of(new["urls.direct_download"]), "old_vendor": ov_, "new_vendor": nv_, "vendor_changed": "yes" if ov_ != nv_ else "no", "commit": ("new_feed_added:" + d_new + ";old_feed_deprecated:" + d_old)})
     with open(os.path.join(a.outdir, "gtfs_rt_feed_migrations.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["evidence","feed_file","provider","date","old_host","new_host","old_vendor","new_vendor","vendor_changed","commit"]); w.writeheader()
         for r in sorted(mig, key=lambda x: (x["provider"], x["date"])): w.writerow(r)
@@ -511,7 +532,11 @@ def main():
     for country in ("US", "CA"):
         sub = [r for r in rows_out if r["country"] == country]
         print(country, "agencies in census:", len(sub), "| with active vp/tu feed:", sum(1 for r in sub if r["has_active_vp_or_tu_feed"] == "yes"), "| NTD-matched:", sum(1 for r in sub if r["ntd_id"]))
-    print("US NTD bus agencies (bus file):", len(ntd), "| whitespace (no feed catalogued):", sum(1 for r in rows_out if r["primary_attribution"] == "whitespace"))
+    t14 = [r for r in rows_out if r["country"] == "US" and r["fleet_tier"] in ("1: 1-49", "2: 50-249", "3: 250-999", "4: 1000+")]
+    print("US NTD agencies with >=1 active full-size bus (tiers 1-4):", len(t14), "| with any catalogued feed:", sum(1 for r in t14 if r["primary_attribution"] != "whitespace"), "| with active vp/tu feed:", sum(1 for r in t14 if r["has_active_vp_or_tu_feed"] == "yes"))
+    fl = sum(float(r["active_fullsize_bus_ntd2025"] or 0) for r in t14); flc = sum(float(r["active_fullsize_bus_ntd2025"] or 0) for r in t14 if r["has_active_vp_or_tu_feed"] == "yes")
+    print("  buses in tiers 1-4:", int(fl), "| buses at agencies with active vp/tu feed:", int(flc), "(%.1f%%)" % (100 * flc / fl))
+    print("US NTD bus agencies (bus file):", len(ntd), "| whitespace rows (no feed catalogued, all tiers):", sum(1 for r in rows_out if r["primary_attribution"] == "whitespace"))
 
 if __name__ == "__main__":
     main()
