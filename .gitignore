@@ -1,2 +1,4 @@
 its-market-case/data/ntd/
 its-market-case/data/sec_filings/
+its-market-case/deck/*.pdf
+its-market-case/deck/slide-*.jpg
