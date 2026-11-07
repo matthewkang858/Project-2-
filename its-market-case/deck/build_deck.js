@@ -235,13 +235,13 @@ const COL_BUS = HEX.accent2, COL_SIG = HEX.dk1, COL_OTH = HEX.accent3, COL_GREY 
 
   // ------------------------------------------------------------------ 6. Investment thesis
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
-  s.addText('Enter by buy-and-build in North America: a mid-market bus ITS platform bought at 1-2.5x revenue, re-platformed to cloud with enforcement and zero-emission modules, and exited to a strategic at ~3x', { placeholder: 'title' });
+  s.addText('Enter via buy-and-build in North America: a mid-market bus ITS platform at 1-2.5x revenue, re-platformed to cloud with enforcement and zero-emission modules, exited to a strategic at ~3x', { placeholder: 'title' });
   s.addText('Investment thesis', { placeholder: 'tracker' });
   F.panelHeader(s, 'Recommendation and why North America first', 0.45, 1.4, 7.9);
   s.addText(lines([
     { text: 'Recommended route: ', options: { bold: true, color: HEX.accent2 } }, { text: 'acquire a founder- or employee-owned North American CAD/AVL or scheduling vendor (installed base, 5-20 year service tails, procurement credibility) at integrator multiples, then layer a subscription real-time, analytics and enforcement stack on top and bolt on APC, PIS or enforcement specialists at 1-2x revenue.', options: {} },
-    { text: 'Why North America: ', options: { bold: true, color: HEX.accent2 } }, { text: '(1) the refresh is dated: ~12,000 buses on 2009-16 CAD/AVL platforms and 24,100 past useful life by 2031; (2) the top is concentrated (Modaxo 33%, Hitachi 13%) but the mid-tier is open: 195 agencies with 50-999 buses hold 55% of the fleet and incumbents win only 4 of 18 competitive rebids; (3) per-vehicle spend is highest (EUR 14-16k per equipped bus-year vs EUR 7-13k in Europe) and formula funding favours refresh; (4) one procurement code, versus 20 national markets in Europe where no vendor exceeds 6%: the second platform, entered by bolt-on.', options: {} },
-  ]), { x: 0.6, y: 1.76, w: 7.65, h: 1.45, fontSize: 9, color: HEX.dk1, valign: 'top', margin: 0, isTextBox: true, paraSpaceAfter: 2 });
+    { text: 'Why North America: ', options: { bold: true, color: HEX.accent2 } }, { text: '(1) the refresh is dated: ~12,000 buses on 2009-16 CAD/AVL platforms and 24,100 past useful life by 2031; (2) the top is concentrated (Modaxo 33%, Hitachi 13%) but the mid-tier is open: 195 agencies with 50-999 buses hold 55% of the fleet and incumbents win only 4 of 18 competitive rebids; (3) per-vehicle spend is highest (EUR 14-16k vs EUR 7-13k per equipped bus-year in Europe) and formula funding favours refresh; (4) one procurement code, versus 20 national markets in Europe where no vendor exceeds 6%: the second platform, entered by bolt-on.', options: {} },
+  ]), { x: 0.6, y: 1.74, w: 7.65, h: 1.45, fontSize: 8.8, color: HEX.dk1, valign: 'top', margin: 0, isTextBox: true, paraSpaceAfter: 2 });
   F.panelHeader(s, 'Illustrative value bridge (model: Thesis sheet)', 8.6, 1.4, 4.3);
   const vb = [[hcell('Step'), hcell('USD m', { align: 'right' }), hcell('Assumption')],
     [cell('Entry EV'), cell(TH.ev0.toFixed(0), { align: 'right' }), cell('$' + TH.rev0 + 'm revenue at 2.0x; 15% margin; 2.5x debt')],
@@ -274,7 +274,7 @@ const COL_BUS = HEX.accent2, COL_SIG = HEX.dk1, COL_OTH = HEX.accent3, COL_GREY 
     [cell('Carve-out from a stressed strategic (Alstom digital, Cubic CTS)'), cell('Scale at distressed prices'), cell('Separation, leverage history, concentration'), cell('0.3-1x revenue')],
   ];
   arch.forEach((row, i) => row.forEach(c => { if (i > 0) c.options.fontSize = 8.5; }));
-  tbl(s, arch, { x: 0.45, y: 5.4, w: 7.9, colW: [2.3, 3.1, 1.6, 0.9], rowH: [0.22, 0.38, 0.26, 0.26] });
+  tbl(s, arch, { x: 0.45, y: 5.38, w: 7.9, colW: [2.3, 3.1, 1.6, 0.9], rowH: [0.22, 0.36, 0.26, 0.26] });
   F.panelHeader(s, 'What to diligence first', 8.6, 5.1, 4.3);
   s.addText(lines([
     '1. Rebid retention by agency tier: the 2016-26 award set (4 of 18 competitive rebids kept the incumbent, median tenure 16 years) extended to the target customer list.',
