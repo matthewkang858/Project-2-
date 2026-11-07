@@ -235,22 +235,22 @@ const COL_BUS = HEX.accent2, COL_SIG = HEX.dk1, COL_OTH = HEX.accent3, COL_GREY 
 
   // ------------------------------------------------------------------ 6. Investment thesis
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
-  s.addText('Enter via buy-and-build in North America at integrator multiples; returns hinge on re-rating a ~1.6x-revenue incumbent (the Clever precedent) into a 2.5x+ software asset through recurring mix and new modules', { placeholder: 'title' });
+  s.addText('Enter via buy-and-build in North America at integrator multiples; returns hinge on re-rating a ~1.6x-revenue incumbent (the Clever precedent) into a 2.5x+ software asset via recurring mix', { placeholder: 'title' });
   s.addText('Investment thesis', { placeholder: 'tracker' });
   F.panelHeader(s, 'Recommendation and why North America first', 0.45, 1.4, 7.9);
   s.addText(lines([
     { text: 'Recommended route: ', options: { bold: true, color: HEX.accent2 } }, { text: 'acquire a founder- or employee-owned North American CAD/AVL or scheduling vendor (installed base, 5-20 year service tails, procurement credibility) at integrator multiples, then layer a subscription real-time, analytics and enforcement stack on top and bolt on APC, PIS or enforcement specialists at 1-2x revenue.', options: {} },
-    { text: 'Why North America: ', options: { bold: true, color: HEX.accent2 } }, { text: '(1) the refresh is dated: ~12,000 buses on 2009-16 CAD/AVL platforms and 24,100 past useful life by 2031; (2) the top is concentrated (Modaxo 33%, Hitachi 13%) but the mid-tier is open: 195 agencies with 50-999 buses hold 55% of the fleet, 63% of US bus agencies publish no real-time feed, and incumbents win only 4 of 18 competitive rebids; (3) per-vehicle spend is highest (EUR 14-16k vs EUR 7-13k per equipped bus-year in Europe) and formula funding favours refresh; (4) one procurement code, versus 20 national markets in Europe where no vendor exceeds 6%: the second platform, entered by bolt-on.', options: {} },
+    { text: 'Why North America: ', options: { bold: true, color: HEX.accent2 } }, { text: '(1) the refresh is dated: ~12,000 buses on 2009-16 CAD/AVL platforms and 24,100 past useful life by 2031; (2) the top is concentrated (Modaxo 33%, Hitachi 13%) but the mid-tier is open: 195 agencies with 50-999 buses hold 55% of the fleet, 63% of US bus agencies publish no real-time feed, and incumbents win only 4 of 18 competitive rebids; (3) per-vehicle spend is highest (EUR 14-16k vs 7-13k per equipped bus-year in Europe) and formula funding favours refresh; (4) one procurement code, versus 20 national markets in Europe where no vendor exceeds 6%: the second platform, via bolt-ons.', options: {} },
   ]), { x: 0.6, y: 1.74, w: 7.65, h: 1.45, fontSize: 8.8, color: HEX.dk1, valign: 'top', margin: 0, isTextBox: true, paraSpaceAfter: 2 });
-  F.panelHeader(s, 'Illustrative value bridge: the exit multiple is the thesis (model: Thesis sheet)', 8.6, 1.4, 4.3);
+  F.panelHeader(s, 'Illustrative value bridge: the exit multiple is the thesis', 8.6, 1.4, 4.3);
   const vb = [[hcell('Step'), hcell('USD m', { align: 'right' }), hcell('Assumption')],
-    [cell('Entry EV + bolt-ons'), cell((TH.ev0 + TH.bolt).toFixed(0), { align: 'right' }), cell('$' + TH.rev0 + 'm revenue at 2.0x, 15% margin, 2.5x debt; $40m bolt-on revenue at 1.5x')],
-    [cell('Exit revenue, EBITDA'), cell(TH.rev1.toFixed(0) + ', ' + TH.ebitda1.toFixed(0), { align: 'right' }), cell('8% organic + bolt-ons over 5 years; 22% margin after re-platforming')],
-    [cell('A: integrator exit', { bold: true }), cell(TH.eva.toFixed(0) + ' / ' + TH.moica.toFixed(1) + 'x', { bold: true, align: 'right' }), cell(D.inputs.vb_evrev_a.toFixed(1) + 'x revenue (Clever Devices precedent): EV / gross MOIC', { bold: true })],
-    [cell('B: software re-rating', { bold: true, color: HEX.accent2 }), cell(TH.ev1.toFixed(0) + ' / ' + TH.moic.toFixed(1) + 'x', { bold: true, align: 'right', color: HEX.accent2 }), cell(D.inputs.vb_mult1 + 'x EBITDA = ' + TH.evrev.toFixed(1) + 'x revenue (IVU-like, >50% recurring): EV / MOIC, ~' + pct(Math.pow(TH.moic, 1 / 5) - 1, 0) + ' IRR', { bold: true })],
+    [cell('Entry EV + bolt-ons'), cell((TH.ev0 + TH.bolt).toFixed(0), { align: 'right' }), cell('$' + TH.rev0 + 'm at 2.0x, 15% margin, 2.5x debt; $40m bolt-ons at 1.5x')],
+    [cell('Exit revenue / EBITDA'), cell(TH.rev1.toFixed(0) + ' / ' + TH.ebitda1.toFixed(0), { align: 'right' }), cell('8% organic + bolt-ons, 5 years; 22% margin')],
+    [cell('A: integrator exit', { bold: true }), cell(TH.eva.toFixed(0) + ' / ' + TH.moica.toFixed(1) + 'x', { bold: true, align: 'right' }), cell(D.inputs.vb_evrev_a.toFixed(1) + 'x revenue (Clever precedent): EV / gross MOIC', { bold: true })],
+    [cell('B: software re-rating', { bold: true, color: HEX.accent2 }), cell(TH.ev1.toFixed(0) + ' / ' + TH.moic.toFixed(1) + 'x', { bold: true, align: 'right', color: HEX.accent2 }), cell(D.inputs.vb_mult1 + 'x EBITDA = ' + TH.evrev.toFixed(1) + 'x revenue (IVU-like): EV / MOIC, ~' + pct(Math.pow(TH.moic, 1 / 5) - 1, 0) + ' IRR', { bold: true })],
   ];
-  vb.forEach((row, i) => row.forEach(c => { if (i > 0) c.options.fontSize = 8.5; }));
-  tbl(s, vb, { x: 8.6, y: 1.72, w: 4.3, colW: [1.15, 0.75, 2.4], rowH: [0.22, 0.34, 0.34, 0.3, 0.34] });
+  vb.forEach((row, i) => row.forEach(c => { if (i > 0) c.options.fontSize = 8; }));
+  tbl(s, vb, { x: 8.6, y: 1.72, w: 4.3, colW: [1.2, 0.72, 2.38], rowH: [0.22, 0.3, 0.26, 0.3, 0.3] });
   F.panelHeader(s, 'Where to play: four wedges that sit beside the incumbent stack, sized from the model', 0.45, 3.3, 12.45);
   const cards = [
     ['Operations, real-time and cloud CAD/AVL overlay', bn(AP.ops.value) + ' bus operations pool (' + pct(AP.ops.share, 0) + ' of bus ITS); open software and services NA ' + bn(OP.open.na) + ', Europe ' + bn(OP.open.eu), '63% of US bus agencies publish no real-time feed; Swiftly overlays legacy CAD/AVL at 26+ agencies; agencies stay with vendors they are only somewhat satisfied with (Caltrans 2024)'],
