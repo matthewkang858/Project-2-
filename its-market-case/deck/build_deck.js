@@ -235,7 +235,7 @@ const COL_BUS = HEX.accent2, COL_SIG = HEX.dk1, COL_OTH = HEX.accent3, COL_GREY 
 
   // ------------------------------------------------------------------ 6. Investment thesis
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
-  s.addText('Enter via buy-and-build in North America: a mid-market bus ITS platform at 1-2.5x revenue, re-platformed to cloud with enforcement and zero-emission modules, exited to a strategic at ~3x', { placeholder: 'title' });
+  s.addText('Enter via buy-and-build in North America: a mid-market bus ITS platform at 1-2.5x revenue, moved to cloud with enforcement and zero-emission modules, exited to a strategic at ~3x', { placeholder: 'title' });
   s.addText('Investment thesis', { placeholder: 'tracker' });
   F.panelHeader(s, 'Recommendation and why North America first', 0.45, 1.4, 7.9);
   s.addText(lines([
