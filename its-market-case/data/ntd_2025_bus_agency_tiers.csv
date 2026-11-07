@@ -1,0 +1,21 @@
+tier,definition,agencies,vehicles,share_of_agencies_pct,share_of_vehicles_pct,avg_vehicles_per_agency
+1: 1-49,"A: active full-size buses (Bus, Articulated, Over-the-road, Double-decker, Trolleybus), any mode - RVI 2025",772.0,10541.0,79.0,16.2,13.7
+2: 50-249,"A: active full-size buses (Bus, Articulated, Over-the-road, Double-decker, Trolleybus), any mode - RVI 2025",149.0,15142.0,15.3,23.2,101.6
+3: 250-999,"A: active full-size buses (Bus, Articulated, Over-the-road, Double-decker, Trolleybus), any mode - RVI 2025",46.0,20411.0,4.7,31.3,443.7
+4: 1000+,"A: active full-size buses (Bus, Articulated, Over-the-road, Double-decker, Trolleybus), any mode - RVI 2025",10.0,19145.0,1.0,29.3,1914.5
+Total,"A: active full-size buses (Bus, Articulated, Over-the-road, Double-decker, Trolleybus), any mode - RVI 2025",977.0,65239.0,100.0,100.0,66.8
+1: 1-49,B: all active revenue vehicles in fixed-route bus modes MB/CB/RB/TB incl. cutaways/vans - RVI 2025,989.0,15353.0,80.9,21.0,15.5
+2: 50-249,B: all active revenue vehicles in fixed-route bus modes MB/CB/RB/TB incl. cutaways/vans - RVI 2025,177.0,17521.0,14.5,24.0,99.0
+3: 250-999,B: all active revenue vehicles in fixed-route bus modes MB/CB/RB/TB incl. cutaways/vans - RVI 2025,47.0,20971.0,3.8,28.7,446.2
+4: 1000+,B: all active revenue vehicles in fixed-route bus modes MB/CB/RB/TB incl. cutaways/vans - RVI 2025,10.0,19267.0,0.8,26.4,1926.7
+Total,B: all active revenue vehicles in fixed-route bus modes MB/CB/RB/TB incl. cutaways/vans - RVI 2025,1223.0,73112.0,100.0,100.0,59.8
+1: 1-49,C: active full-size buses operated in bus modes MB/CB/RB/TB only - RVI 2025,620.0,9669.0,75.2,15.1,15.6
+2: 50-249,C: active full-size buses operated in bus modes MB/CB/RB/TB only - RVI 2025,149.0,15300.0,18.1,23.8,102.7
+3: 250-999,C: active full-size buses operated in bus modes MB/CB/RB/TB only - RVI 2025,45.0,20113.0,5.5,31.3,447.0
+4: 1000+,C: active full-size buses operated in bus modes MB/CB/RB/TB only - RVI 2025,10.0,19145.0,1.2,29.8,1914.5
+Total,C: active full-size buses operated in bus modes MB/CB/RB/TB only - RVI 2025,824.0,64227.0,100.0,100.0,77.9
+1: 1-49,"D: total (active + inactive/contingency) full-size buses, any mode - RVI 2025",769.0,10597.0,78.1,15.3,13.8
+2: 50-249,"D: total (active + inactive/contingency) full-size buses, any mode - RVI 2025",156.0,15693.0,15.8,22.6,100.6
+3: 250-999,"D: total (active + inactive/contingency) full-size buses, any mode - RVI 2025",50.0,22913.0,5.1,33.0,458.3
+4: 1000+,"D: total (active + inactive/contingency) full-size buses, any mode - RVI 2025",10.0,20220.0,1.0,29.1,2022.0
+Total,"D: total (active + inactive/contingency) full-size buses, any mode - RVI 2025",985.0,69423.0,100.0,100.0,70.5

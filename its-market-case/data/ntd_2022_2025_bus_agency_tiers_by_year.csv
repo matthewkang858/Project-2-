@@ -1,0 +1,21 @@
+report_year,tier,definition,agencies,vehicles,share_of_agencies_pct,share_of_vehicles_pct,avg_vehicles_per_agency
+2022,1: 1-49,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2022",822.0,10495.0,80.0,16.0,12.8
+2022,2: 50-249,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2022",149.0,15059.0,14.5,22.9,101.1
+2022,3: 250-999,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2022",44.0,18849.0,4.3,28.7,428.4
+2022,4: 1000+,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2022",12.0,21239.0,1.2,32.4,1769.9
+2022,Total,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2022",1027.0,65642.0,100.0,100.0,63.9
+2023,1: 1-49,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2023",804.0,10728.0,79.9,16.3,13.3
+2023,2: 50-249,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2023",147.0,15357.0,14.6,23.4,104.5
+2023,3: 250-999,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2023",43.0,18581.0,4.3,28.3,432.1
+2023,4: 1000+,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2023",12.0,20963.0,1.2,31.9,1746.9
+2023,Total,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2023",1006.0,65629.0,100.0,100.0,65.2
+2024,1: 1-49,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2024",795.0,10553.0,79.7,16.3,13.3
+2024,2: 50-249,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2024",149.0,15627.0,14.9,24.1,104.9
+2024,3: 250-999,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2024",44.0,19579.0,4.4,30.2,445.0
+2024,4: 1000+,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2024",10.0,18994.0,1.0,29.3,1899.4
+2024,Total,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2024",998.0,64753.0,100.0,100.0,64.9
+2025,1: 1-49,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2025",772.0,10541.0,79.0,16.2,13.7
+2025,2: 50-249,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2025",149.0,15142.0,15.3,23.2,101.6
+2025,3: 250-999,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2025",46.0,20411.0,4.7,31.3,443.7
+2025,4: 1000+,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2025",10.0,19145.0,1.0,29.3,1914.5
+2025,Total,"full-size buses (Bus+Artic+OTR+DD+Trolleybus) from Vehicles Type Count table, report year 2025",977.0,65239.0,100.0,100.0,66.8

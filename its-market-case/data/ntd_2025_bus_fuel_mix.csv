@@ -1,0 +1,13 @@
+Fuel Type,active,total,agencies,share_active_pct
+Diesel Fuel,34936,37514,719,53.6
+Compressed Natural Gas,15513,16106,182,23.8
+Hybrid Diesel,8735,9333,184,13.4
+Electric Battery,2848,3053,238,4.4
+Gasoline,1193,1265,273,1.8
+Other,999,1040,3,1.5
+Electric Propulsion Power,535,535,4,0.8
+Hydrogen,202,210,18,0.3
+Liquefied Petroleum Gas (Propane),199,207,21,0.3
+Hybrid Gasoline,65,146,4,0.1
+Gasoline/Liquefied Petroleum Gas (Propane),12,12,1,0.0
+Hybrid Diesel/Electric Battery,2,2,1,0.0

@@ -1,0 +1,101 @@
+NTD ID,agency,state,comm_info_2025,total_capex_2025,comm_info_2023_2025,comm_info_2025_bus_modes,comm_info_2025_rail_modes,cum_share_pct
+20008,MTA New York City Transit,NY,322293437,5118178747,1471816625,451160,321842277,16.9
+30030,"Washington Metropolitan Area Transit Authority, dba: Washington Metro",DC,308287469,1772048062,1001878422,2797629,305489840,33.1
+90003,"San Francisco Bay Area Rapid Transit District, dba: SF BART",CA,149420235,1045935059,356517800,0,149420235,41.0
+20100,MTA Long Island Rail Road,NY,82817775,1082894938,303075449,0,82817775,45.3
+30019,Southeastern Pennsylvania Transportation Authority,PA,82114922,678724556,279697418,4386099,77728823,49.6
+30034,"Maryland Transit Administration, dba: MTA",MD,78694972,671711638,103643203,154034,77858476,53.8
+90154,"Los Angeles County Metropolitan Transportation Authority, dba: Metro",CA,66797947,2354140039,190153358,59970324,6827623,57.3
+90209,"Valley Metro Rail, Inc.",AZ,53684556,332736627,247761804,0,53684556,60.1
+10003,Massachusetts Bay Transportation Authority,MA,51817623,2009662829,106801151,1409822,49072824,62.8
+00040,"Central Puget Sound Regional Transit Authority, dba: Sound Transit",WA,44694730,1215294912,274804596,0,44694730,65.2
+40022,Metropolitan Atlanta Rapid Transit Authority,GA,37337289,417045859,91158768,11867542,25469747,67.1
+20080,New Jersey Transit Corporation,NJ,35062510,976706646,129123450,1808314,33254196,69.0
+80001,Utah Transit Authority,UT,29486427,278690347,91921242,2738906,25399641,70.5
+60056,Dallas Area Rapid Transit,TX,28857681,477140512,106242663,18844580,10013101,72.0
+00001,"King County, dba: King County Metro",WA,24441471,269176494,61460372,24441471,0,73.3
+50066,Chicago Transit Authority,IL,24095364,871673440,47493078,10515039,13580325,74.6
+50118,"Northeast Illinois Regional Commuter Railroad Corporation, dba: Metra",IL,22086102,512241566,60239255,0,22086102,75.7
+20078,"Metro-North Commuter Railroad Company, dba: MTA Metro-North Railroad",NY,21119444,1097074027,83676958,0,21119444,76.9
+90002,City and County of Honolulu,HI,20649885,76834893,43248097,561435,20088450,77.9
+00008,"Tri-County Metropolitan Transportation District of Oregon, dba: TriMet",OR,18630401,109082887,46067261,16691670,1938731,78.9
+90036,Orange County Transportation Authority,CA,18307101,144756509,46905273,4790605,13323435,79.9
+70271,"Kansas City, City of Missouri, dba: Kansas City Streetcar",MO,17120355,89221574,46923644,0,17120355,80.8
+60008,"Metropolitan Transit Authority of Harris County, Texas, dba: METRO",TX,15965065,458096158,41403593,14501514,0,81.6
+60048,"Capital Metropolitan Transportation Authority, dba: Capital Metro",TX,14263393,140436485,38415353,14056193,142020,82.4
+20098,Port Authority Trans-Hudson Corporation,NY,14060020,367384877,50441022,0,14060020,83.1
+70006,"Bi-State Development Agency of the Missouri-Illinois Metropolitan District, dba: (St. Louis) Metro",MO,13877721,148952372,38274189,4489589,8994492,83.8
+90151,"Southern California Regional Rail Authority, dba: Metrolink",CA,13613724,150082101,45407668,0,13613724,84.6
+90030,North County Transit District,CA,12552932,77644947,18444172,1626949,10925983,85.2
+90013,"Santa Clara Valley Transportation Authority, dba: Valley Transportation Authority",CA,12063702,700997579,37115142,8343573,3720129,85.8
+90299,Sonoma-Marin Area Rail Transit District,CA,11461137,68710506,14882309,0,11461137,86.4
+80006,"Denver Regional Transportation District, dba: RTD-Denver",CO,10168175,46563704,21416457,5711335,3300192,87.0
+90134,"Peninsula Corridor Joint Powers Board, dba: Caltrain",CA,9815110,311890484,39167710,0,9815110,87.5
+50027,Metro Transit,MN,9676544,560228362,21345161,9596515,80029,88.0
+50113,"Pace, the Suburban Bus Division of the Regional Transportation Authority, dba: Pace Suburban Bus",IL,8294523,87303813,20338799,8294523,0,88.4
+00035,Washington State Ferries,WA,7865205,177055659,18546419,0,0,88.9
+40034,County of Miami-Dade,FL,7215397,536322333,18285063,1733447,5481950,89.2
+20099,"Staten Island Rapid Transit Operating Authority, dba: MTA Staten Island Railway",NY,6392621,237589597,22523182,0,6392621,89.6
+40040,Jacksonville Transportation Authority,FL,6326371,68864803,22009024,5963248,332223,89.9
+50015,The Greater Cleveland Regional Transit Authority,OH,5829206,104567754,13066460,1162648,4666558,90.2
+30022,Pittsburgh Regional Transit,PA,5023206,167775094,25475592,1564194,3459012,90.5
+40232,"Central Florida Commuter Rail, dba: SunRail",FL,4988129,28070117,12136835,0,4988129,90.7
+00041,Alaska Railroad Corporation,AK,4916607,85729493,19617399,0,4916607,91.0
+10001,"Rhode Island Public Transit Authority, dba: RIPTA",RI,4679822,31904207,8081509,4622623,0,91.2
+60033,"Rock Region Metropolitan Transit Authority, dba: Rock Region METRO",AR,4467348,10867461,5727204,3377948,381937,91.5
+50104,"Northern Indiana Commuter Transportation District, dba: South Shore Line",IN,4247617,131248620,4376418,0,4247617,91.7
+90014,"Alameda-Contra Costa Transit District, dba: AC Transit",CA,3920875,53135761,11582670,3920875,0,91.9
+00018,Ben Franklin Transit,WA,3634703,12810633,4026945,3634703,0,92.1
+90015,"City and County of San Francisco, dba: San Francisco Municipal Transportation Agency",CA,3317047,284348121,10663676,364065,2952982,92.3
+90146,Foothill Transit,CA,3179713,13384376,5083998,3179713,0,92.4
+90026,San Diego Metropolitan Transit System,CA,3049423,136301969,20803157,159368,2890055,92.6
+90008,"City of Santa Monica, dba: Big Blue Bus",CA,2953663,9638629,10789138,2953663,0,92.7
+40074,"Pasco County Board of County Commissioners, dba: GoPasco",FL,2753953,5922655,2753953,2753953,0,92.9
+40008,City of Charlotte North Carolina,NC,2743647,89809488,5530850,1947841,795806,93.0
+40032,"County of Volusia, dba: VOTRAN",FL,2738633,8208447,4027372,1919633,0,93.2
+20188,MTA Bus Company,NY,2725406,77811521,19433230,2725406,0,93.3
+40018,Transit Authority of River City,KY,2644317,18851750,5570631,2644317,0,93.5
+60007,"Fort Worth Transportation Authority, dba: Trinity Metro",TX,2481471,124936004,11927355,2481471,0,93.6
+20004,"Niagara Frontier Transportation Authority, dba: NFTA - Metro Bus & Rail",NY,2421187,73871765,5195084,1286460,1134727,93.7
+50154,Metropolitan Council,MN,2188030,62969430,5039764,788525,0,93.8
+50146,Madison County Transit District,IL,2007795,6908478,2156191,2007795,0,93.9
+00025,"Salem Area Mass Transit District, dba: Salem-Keizer Transit or Cherriots",OR,1965778,3748044,4002750,1879774,0,94.0
+00002,Spokane Transit Authority,WA,1945078,53178761,4340227,1945078,0,94.1
+10183,"Woods Hole, Martha's Vineyard and Nantucket Steamship Authority, dba: The Steamship Authority",MA,1942294,47565166,4141849,0,0,94.2
+00029,"Snohomish County Public Transportation Benefit Area Corporation, dba: Community Transit",WA,1919833,12596864,5933884,1919833,0,94.4
+90023,Long Beach Transit,CA,1909863,10984324,6940128,1909863,0,94.5
+50017,Greater Dayton Regional Transit Authority,OH,1894418,15779368,8170163,1742529,0,94.6
+00019,Intercity Transit,WA,1880761,32077618,2105567,1750577,0,94.6
+40004,"Metropolitan Transit Authority, dba: WeGo Public Transit",TN,1868276,24801018,5010295,1401207,0,94.7
+40017,"Lexington Transit Authority, dba: Lextran",KY,1832187,5782920,1994842,1832187,0,94.8
+50012,"Southwest Ohio Regional Transit Authority, dba: Metro / Access",OH,1796276,31013656,6899760,1796276,0,94.9
+90079,"SunLine Transit Agency, dba: SunLine",CA,1783617,15226951,2584357,1783617,0,95.0
+20076,"Westchester County, dba: Westchester County - Bee Line",NY,1650290,7440179,1654321,1650290,0,95.1
+00007,Lane Transit District,OR,1645875,19421402,4527008,1645875,0,95.2
+50031,Suburban Mobility Authority for Regional Transportation,MI,1643494,9983908,8446301,1643494,0,95.3
+50011,Stark Area Regional Transit Authority,OH,1579852,6650980,2827930,1579852,0,95.4
+00020,"Kitsap County Public Transportation Benefit Area Authority, dba: Kitsap Transit",WA,1452233,28687680,6159877,1443905,0,95.5
+40031,"Lakeland Area Mass Transit District, dba: Citrus Connection",FL,1380844,1867784,2805605,0,0,95.5
+20075,Port Authority Transit Corporation,NJ,1380370,48158795,5245224,0,1380370,95.6
+60024,"City of Shreveport, dba: SporTran",LA,1346669,21372073,1845475,1346669,0,95.7
+30075,Delaware Transit Corporation,DE,1330496,17193278,9932568,259407,0,95.7
+40027,Pinellas Suncoast Transit Authority,FL,1291463,82449877,5590739,1291463,0,95.8
+50022,Toledo Area Regional Transit Authority,OH,1262539,26204675,5986806,1058215,0,95.9
+40029,"Broward County Board of County Commissioners, dba: Broward County Transit Division",FL,1244298,20495430,4037229,1244298,0,95.9
+10048,"Connecticut Department of Transportation - CTTRANSIT - Hartford Division, dba: CTTransit",CT,1228942,35733933,4273850,1228942,0,96.0
+50059,"Springfield Mass Transit District, dba: Sangamon Mass Transit District",IL,1226897,3284695,2253547,1226897,0,96.1
+40037,"Board of County Commissioners, Palm Beach County, dba: Palm Tran, Inc.",FL,1186888,9026867,1186888,1186888,0,96.1
+90032,"City of Phoenix, dba: Valley Metro",AZ,1158294,76928205,5920888,1158294,0,96.2
+60017,"Central Oklahoma Transportation and Parking Authority, dba: EMBARK",OK,1096476,10038403,1867807,829005,267471,96.2
+20072,"Suffolk County, dba: Suffolk County Transit",NY,1084715,7451780,4183226,1084715,0,96.3
+40094,"Alternativa de Transporte Integrado, dba: Autoridad de Transporte Integrado",PR,1041509,11309578,5767130,0,1041509,96.4
+50010,METRO Regional Transit Authority,OH,1023777,65072160,1685234,1023777,0,96.4
+40078,"Cobb County, dba: CobbLinc",GA,1021102,2972026,2019319,1021102,0,96.5
+90121,Antelope Valley Transit Authority,CA,1012442,5066984,2864498,719512,0,96.5
+10051,"Housatonic Area Regional Transit, dba: HARTransit",CT,1004689,2159870,1304003,444792,0,96.6
+10061,Montachusett Regional Transit Authority,MA,999097,3907315,2014060,133362,0,96.6
+10008,Pioneer Valley Transit Authority,MA,968918,24961847,4614607,968918,0,96.7
+50005,City of Madison,WI,942034,10806017,8771052,942034,0,96.7
+30001,Kanawha Valley Regional Transportation Authority,WV,931645,2288010,1321176,0,0,96.8
+50008,"Milwaukee County, dba: Milwaukee County Transit System",WI,922949,27089425,3866511,922949,0,96.8
+30006,Greater Richmond Transit Company,VA,889638,16606060,6546313,889638,0,96.9

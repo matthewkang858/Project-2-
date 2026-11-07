@@ -1,0 +1,81 @@
+rank,NTD ID,agency,city,state,active_HR_heavy_rail,active_LR_light_rail,active_SR_streetcar,active_CR_commuter_rail,active_YR_hybrid_rail,active_MG_monorail_automated_guideway,active_CC_cable_car,active_IP_inclined_plane,active_AR_alaska_railroad,active_TR_aerial_tramway,active_rail_vehicles_ex_locomotives,active_locomotives,total_rail_vehicles_ex_locomotives_incl_inactive,rail_modes_operated,comm_info_capex_2025_rail_modes_usd,comm_info_capex_rail_modes_avg_2023_2025_usd,rail_fleet_tier
+1,20008,MTA New York City Transit,Brooklyn,NY,6840,0,0,0,0,0,0,0,0,0,6840,0,6840,HR,321842277,490392404,4: 1000+
+2,50066,Chicago Transit Authority,Chicago,IL,1708,0,0,0,0,0,0,0,0,0,1708,0,1712,HR,13580325,8385813,4: 1000+
+3,20078,"Metro-North Commuter Railroad Company, dba: MTA Metro-North Railroad",New York,NY,0,0,0,1218,0,0,0,0,0,0,1218,60,1221,CR,21119444,27892319,4: 1000+
+4,20100,MTA Long Island Rail Road,New York,NY,0,0,0,1213,0,0,0,0,0,0,1213,41,1263,CR,82817775,101025150,4: 1000+
+5,30030,Washington Metropolitan Area Transit Authority,Washington,DC,1202,0,0,0,0,0,0,0,0,0,1202,0,1244,HR,305489840,333026931,4: 1000+
+6,20080,New Jersey Transit Corporation,Newark,NJ,0,72,0,1105,20,0,0,0,0,0,1197,201,1206,"CR,LR,YR",33254196,39252718,4: 1000+
+7,10003,Massachusetts Bay Transportation Authority,Boston,MA,460,192,0,444,0,0,0,0,0,0,1096,90,1209,"CR,HR,LR",49072824,32859022,4: 1000+
+8,50118,Northeast Illinois Regional Commuter Railroad Corporation,Chicago,IL,0,0,0,1018,0,0,0,0,0,0,1018,177,1046,CR,22086102,20079752,4: 1000+
+9,90003,San Francisco Bay Area Rapid Transit District,Oakland,CA,971,0,0,0,16,4,0,0,0,0,991,0,994,"HR,MG,YR",149420235,118839267,3: 500-999
+10,30019,Southeastern Pennsylvania Transportation Authority,Philadelphia,PA,339,0,159,396,0,0,0,0,0,0,894,15,894,"CR,HR,SR",77728823,88399200,3: 500-999
+11,10102,Connecticut Department of Transportation,Newington,CT,0,0,0,703,0,0,0,0,0,0,703,28,705,CR,0,42160,3: 500-999
+12,20098,Port Authority Trans-Hudson Corporation,New York,NY,422,0,0,0,0,0,0,0,0,0,422,0,422,HR,14060020,16813674,2: 100-499
+13,90154,Los Angeles County Metropolitan Transportation Authority,Los Angeles,CA,98,320,0,0,0,0,0,0,0,0,418,0,451,"HR,LR",6827623,11598102,2: 100-499
+14,80006,Denver Regional Transportation District,Denver,CO,0,201,0,132,0,0,0,0,0,0,333,0,333,"CR,LR",3300192,2877210,2: 100-499
+15,30034,Maryland Transit Administration,Baltimore,MD,86,53,0,177,0,0,0,0,0,0,316,48,326,"CR,HR,LR",77858476,32547708,2: 100-499
+16,90015,City and County of San Francisco,San Francisco,CA,0,208,44,0,0,0,39,0,0,0,291,0,305,"CC,LR,SR",2952982,3289083,2: 100-499
+17,00040,Central Puget Sound Regional Transit Authority,Seattle,WA,0,207,8,63,0,0,0,0,0,0,278,14,285,"CR,LR,SR",44694730,90202996,2: 100-499
+18,40022,Metropolitan Atlanta Rapid Transit Authority,Atlanta,GA,262,0,3,0,0,0,0,0,0,0,265,0,298,"HR,SR",25469747,21602743,2: 100-499
+19,90151,Southern California Regional Rail Authority,Los Angeles,CA,0,0,0,229,0,0,0,0,0,0,229,56,251,CR,13613724,15135889,2: 100-499
+20,60056,Dallas Area Rapid Transit,Dallas,TX,0,162,4,25,0,0,0,0,0,0,191,11,192,"CR,LR,SR",10013101,6127775,2: 100-499
+21,90026,San Diego Metropolitan Transit System,San Diego,CA,0,171,0,0,0,0,0,0,0,0,171,0,171,LR,2890055,3100899,2: 100-499
+22,90134,Peninsula Corridor Joint Powers Board,San Carlos,CA,0,0,0,167,0,0,0,0,0,0,167,9,167,CR,9815110,13055903,2: 100-499
+23,40034,County of Miami-Dade,Miami,FL,130,0,0,0,0,22,0,0,0,0,152,0,165,"HR,MG",5481950,3257966,2: 100-499
+24,80001,Utah Transit Authority,Salt Lake City,UT,0,113,0,37,0,0,0,0,0,0,150,16,155,"CR,LR",25399641,22777482,2: 100-499
+25,00008,Tri-County Metropolitan Transportation District of Oregon,Portland,OR,0,144,0,0,6,0,0,0,0,0,150,0,155,"LR,YR",1938731,2115450,2: 100-499
+26,90013,Santa Clara Valley Transportation Authority,San Jose,CA,40,99,0,0,0,0,0,0,0,0,139,0,140,"HR,LR",3720129,3779363,2: 100-499
+27,20099,Staten Island Rapid Transit Operating Authority,Staten Island,NY,125,0,0,0,0,0,0,0,0,0,125,0,125,HR,6392621,7507727,2: 100-499
+28,20075,Port Authority Transit Corporation,Camden,NJ,120,0,0,0,0,0,0,0,0,0,120,0,120,HR,1380370,1748408,2: 100-499
+29,50027,Metro Transit,Minneapolis,MN,0,99,0,13,0,0,0,0,0,0,112,5,136,"CR,LR",80029,489357,2: 100-499
+30,50104,Northern Indiana Commuter Transportation District,Chesterton,IN,0,0,0,102,0,0,0,0,0,0,102,0,102,CR,4247617,1458806,2: 100-499
+31,30073,Virginia Railway Express,Woodbridge,VA,0,0,0,100,0,0,0,0,0,0,100,20,100,CR,295444,602527,2: 100-499
+32,90019,Sacramento Regional Transit District,Sacramento,CA,0,89,0,0,0,0,0,0,0,0,89,0,97,LR,0,782851,1: 1-99
+33,30022,Pittsburgh Regional Transit,Pittsburgh,PA,0,80,0,0,0,0,0,2,0,0,82,0,82,"IP,LR",3459012,6553469,1: 1-99
+34,60008,"Metropolitan Transit Authority of Harris County, Texas",Houston,TX,0,79,0,0,0,0,0,0,0,0,79,0,90,LR,0,0,1: 1-99
+35,90209,"Valley Metro Rail, Inc.",Phoenix,AZ,0,72,5,0,0,0,0,0,0,0,77,0,77,"LR,SR",53684556,82587268,1: 1-99
+36,80256,Town of Mountain Village,Telluride,CO,0,0,0,0,0,0,0,0,0,71,71,0,71,TR,0,0,1: 1-99
+37,70006,Bi-State Development Agency of the Missouri-Illinois Metropolitan District,Saint Louis,MO,0,70,0,0,0,0,0,0,0,0,70,0,84,LR,8994492,6301280,1: 1-99
+38,30107,West Virginia University,Morgantown,WV,0,0,0,0,0,67,0,0,0,0,67,0,67,MG,0,99962,1: 1-99
+39,50015,The Greater Cleveland Regional Transit Authority,Cleveland,OH,39,28,0,0,0,0,0,0,0,0,67,0,71,"HR,LR",4666558,3032092,1: 1-99
+40,60032,New Orleans Regional Transit Authority,New Orleans,LA,0,0,66,0,0,0,0,0,0,0,66,0,70,SR,0,0,1: 1-99
+41,40094,Alternativa de Transporte Integrado,San Juan,PR,56,0,0,0,0,0,0,0,0,0,56,0,74,HR,1041509,1922377,1: 1-99
+42,90002,City and County of Honolulu,Honolulu,HI,48,0,0,0,0,0,0,0,0,0,48,0,80,HR,20088450,14034917,1: 1-99
+43,40077,South Florida Regional Transportation Authority,Pompano Beach,FL,0,0,0,46,0,0,0,0,0,0,46,20,50,CR,532254,778101,1: 1-99
+44,00041,Alaska Railroad Corporation,Anchorage,AK,0,0,0,0,0,0,0,0,42,0,42,58,42,AR,4916607,6539133,1: 1-99
+45,40008,City of Charlotte North Carolina,Charlotte,NC,0,33,6,0,0,0,0,0,0,0,39,0,48,"LR,SR",795806,389742,1: 1-99
+46,90182,Altamont Corridor Express,Stockton,CA,0,0,0,37,0,0,0,0,0,0,37,9,37,CR,0,9642,1: 1-99
+47,90030,North County Transit District,Oceanside,CA,0,0,0,28,8,0,0,0,0,0,36,9,40,"CR,YR",10925983,4321921,1: 1-99
+48,30057,Pennsylvania Department of Transportation,Harrisburg,PA,0,0,0,35,0,0,0,0,0,0,35,7,339,CR,0,0,1: 1-99
+49,60007,Fort Worth Transportation Authority,Fort Worth,TX,0,0,0,32,0,0,0,0,0,0,32,0,32,CR,0,0,1: 1-99
+50,20004,Niagara Frontier Transportation Authority,Buffalo,NY,0,26,0,0,0,0,0,0,0,0,26,0,27,LR,1134727,658661,1: 1-99
+51,60101,Denton County Transportation Authority,Lewisville,TX,0,0,0,0,22,0,0,0,0,0,22,0,22,YR,500000,166667,1: 1-99
+52,40232,Central Florida Commuter Rail,Tallahassee,FL,0,0,0,22,0,0,0,0,0,0,22,11,22,CR,4988129,4045612,1: 1-99
+53,60111,Rio Metro Regional Transit District,Albuquerque,NM,0,0,0,21,0,0,0,0,0,0,21,8,22,CR,0,0,1: 1-99
+54,00058,City of Portland,Portland,OR,0,0,19,0,0,0,0,0,0,2,21,0,21,"SR,TR",750882,568280,1: 1-99
+55,60048,Capital Metropolitan Transportation Authority,Austin,TX,0,0,0,0,20,0,0,0,0,0,20,0,20,YR,142020,69628,1: 1-99
+56,90299,Sonoma-Marin Area Rail Transit District,Petaluma,CA,0,0,0,18,0,0,0,0,0,0,18,0,18,CR,11461137,4960770,1: 1-99
+57,10115,Northern New England Passenger Rail Authority,Portland,ME,0,0,0,15,0,0,0,0,0,0,15,6,15,CR,0,8409,1: 1-99
+58,70271,"Kansas City, City of Missouri",Kansas City,MO,0,0,14,0,0,0,0,0,0,0,14,0,14,SR,17120355,15641215,1: 1-99
+59,50141,Detroit Transportation Corporation,Detroit,MI,0,0,0,0,0,10,0,0,0,0,10,0,12,MG,560519,1733254,1: 1-99
+60,00001,King County,Seattle,WA,0,0,10,0,0,0,0,0,0,0,10,0,10,SR,0,0,1: 1-99
+61,40159,Regional Transportation Authority,Madison,TN,0,0,0,10,0,0,0,0,0,0,10,4,19,CR,81329,27110,1: 1-99
+62,30083,Transportation District Commission of Hampton Roads,Hampton,VA,0,9,0,0,0,0,0,0,0,0,9,0,9,LR,0,0,1: 1-99
+63,40041,Hillsborough Area Regional Transit Authority,Tampa,FL,0,0,9,0,0,0,0,0,0,0,9,0,9,SR,8618,2873,1: 1-99
+64,00023,City of Seattle,Seattle,WA,0,0,0,0,0,8,0,0,0,0,8,0,8,MG,0,0,1: 1-99
+65,90033,City of Tucson,Tucson,AZ,0,0,8,0,0,0,0,0,0,0,8,0,8,SR,0,5179,1: 1-99
+66,50003,City of Kenosha,Kenosha,WI,0,0,7,0,0,0,0,0,0,0,7,0,7,SR,0,0,1: 1-99
+67,60017,Central Oklahoma Transportation and Parking Authority,Oklahoma City,OK,0,0,7,0,0,0,0,0,0,0,7,0,7,SR,267471,160502,1: 1-99
+68,60006,City of El Paso,El Paso,TX,0,0,6,0,0,0,0,0,0,0,6,0,6,SR,0,0,1: 1-99
+69,60133,McKinney Avenue Transit Authority,Dallas,TX,0,0,6,0,0,0,0,0,0,0,6,0,7,SR,0,4259,1: 1-99
+70,30112,District Department of Transportation,Washington,DC,0,0,6,0,0,0,0,0,0,0,6,0,6,SR,87731,78533,1: 1-99
+71,50571,Regional Transit Authority of Southeast Michigan,Detroit,MI,0,0,6,0,0,0,0,0,0,0,6,0,6,SR,129393,43131,1: 1-99
+72,40040,Jacksonville Transportation Authority,Jacksonville,FL,0,0,0,0,0,6,0,0,0,0,6,0,6,MG,332223,192849,1: 1-99
+73,55311,City of Cincinnati,Cincinnati,OH,0,0,5,0,0,0,0,0,0,0,5,0,5,SR,75367,121262,1: 1-99
+74,60033,Rock Region Metropolitan Transit Authority,North Little Rock,AR,0,0,5,0,0,0,0,0,0,0,5,0,5,SR,381937,136291,1: 1-99
+75,55312,City of Milwaukee,Milwaukee,WI,0,0,5,0,0,0,0,0,0,0,5,0,5,SR,0,2698,1: 1-99
+76,40003,City of Memphis,Memphis,TN,0,0,4,0,0,0,0,0,0,0,4,0,9,SR,0,0,1: 1-99
+77,60015,City of Galveston,Galveston,TX,0,0,4,0,0,0,0,0,0,0,4,0,4,SR,0,0,1: 1-99
+78,40001,Chattanooga Area Regional Transportation Authority,Chattanooga,TN,0,0,0,0,0,0,0,2,0,0,2,0,2,IP,0,0,1: 1-99
+79,30012,Cambria County Transit Authority,Johnstown,PA,0,0,0,0,0,0,0,2,0,0,2,0,2,IP,12907,4302,1: 1-99
+80,70057,Loop Trolley Transportation Development District,Saint Louis,MO,0,0,2,0,0,0,0,0,0,0,2,0,2,SR,0,0,1: 1-99

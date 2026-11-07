@@ -1,0 +1,21 @@
+rank,NTD ID,agency,city,state,active_HR_heavy_rail,active_LR_light_rail,active_SR_streetcar,active_CR_commuter_rail,active_YR_hybrid_rail,active_MG_monorail_automated_guideway,active_CC_cable_car,active_IP_inclined_plane,active_AR_alaska_railroad,active_TR_aerial_tramway,active_rail_vehicles_ex_locomotives,active_locomotives,total_rail_vehicles_ex_locomotives_incl_inactive,rail_modes_operated,cum_share_of_active_rail_vehicles_pct
+1,20008,MTA New York City Transit,Brooklyn,NY,6840,0,0,0,0,0,0,0,0,0,6840,0,6840,HR,28.9
+2,50066,Chicago Transit Authority,Chicago,IL,1708,0,0,0,0,0,0,0,0,0,1708,0,1712,HR,36.1
+3,20078,"Metro-North Commuter Railroad Company, dba: MTA Metro-North Railroad",New York,NY,0,0,0,1218,0,0,0,0,0,0,1218,60,1221,CR,41.3
+4,20100,MTA Long Island Rail Road,New York,NY,0,0,0,1213,0,0,0,0,0,0,1213,41,1263,CR,46.4
+5,30030,Washington Metropolitan Area Transit Authority,Washington,DC,1202,0,0,0,0,0,0,0,0,0,1202,0,1244,HR,51.5
+6,20080,New Jersey Transit Corporation,Newark,NJ,0,72,0,1105,20,0,0,0,0,0,1197,201,1206,"CR,LR,YR",56.5
+7,10003,Massachusetts Bay Transportation Authority,Boston,MA,460,192,0,444,0,0,0,0,0,0,1096,90,1209,"CR,HR,LR",61.2
+8,50118,Northeast Illinois Regional Commuter Railroad Corporation,Chicago,IL,0,0,0,1018,0,0,0,0,0,0,1018,177,1046,CR,65.5
+9,90003,San Francisco Bay Area Rapid Transit District,Oakland,CA,971,0,0,0,16,4,0,0,0,0,991,0,994,"HR,MG,YR",69.6
+10,30019,Southeastern Pennsylvania Transportation Authority,Philadelphia,PA,339,0,159,396,0,0,0,0,0,0,894,15,894,"CR,HR,SR",73.4
+11,10102,Connecticut Department of Transportation,Newington,CT,0,0,0,703,0,0,0,0,0,0,703,28,705,CR,76.4
+12,20098,Port Authority Trans-Hudson Corporation,New York,NY,422,0,0,0,0,0,0,0,0,0,422,0,422,HR,78.2
+13,90154,Los Angeles County Metropolitan Transportation Authority,Los Angeles,CA,98,320,0,0,0,0,0,0,0,0,418,0,451,"HR,LR",79.9
+14,80006,Denver Regional Transportation District,Denver,CO,0,201,0,132,0,0,0,0,0,0,333,0,333,"CR,LR",81.4
+15,30034,Maryland Transit Administration,Baltimore,MD,86,53,0,177,0,0,0,0,0,0,316,48,326,"CR,HR,LR",82.7
+16,90015,City and County of San Francisco,San Francisco,CA,0,208,44,0,0,0,39,0,0,0,291,0,305,"CC,LR,SR",83.9
+17,00040,Central Puget Sound Regional Transit Authority,Seattle,WA,0,207,8,63,0,0,0,0,0,0,278,14,285,"CR,LR,SR",85.1
+18,40022,Metropolitan Atlanta Rapid Transit Authority,Atlanta,GA,262,0,3,0,0,0,0,0,0,0,265,0,298,"HR,SR",86.2
+19,90151,Southern California Regional Rail Authority,Los Angeles,CA,0,0,0,229,0,0,0,0,0,0,229,56,251,CR,87.2
+20,60056,Dallas Area Rapid Transit,Dallas,TX,0,162,4,25,0,0,0,0,0,0,191,11,192,"CR,LR,SR",88.0

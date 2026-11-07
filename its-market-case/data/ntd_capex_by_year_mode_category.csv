@@ -1,0 +1,771 @@
+Report Year,mode_group,Mode,Mode Name,category,usd
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Administrative Buildings,7568360
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Communication & Information Systems,2086864
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Fare Collection Equipment,0
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Guideway,3075593
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Maintenance Buildings,315381
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other,659256
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other Vehicles,247483
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Passenger Vehicles,59045882
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Reduced Reporter Expenses,19426283
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Stations,12872904
+2022,Bus (MB/CB/RB/TB),CB,Commuter Bus,Total,105298006
+2022,Bus (MB/CB/RB/TB),MB,Bus,Administrative Buildings,176635029
+2022,Bus (MB/CB/RB/TB),MB,Bus,Communication & Information Systems,343795279
+2022,Bus (MB/CB/RB/TB),MB,Bus,Fare Collection Equipment,80350458
+2022,Bus (MB/CB/RB/TB),MB,Bus,Guideway,259247775
+2022,Bus (MB/CB/RB/TB),MB,Bus,Maintenance Buildings,844600858
+2022,Bus (MB/CB/RB/TB),MB,Bus,Other,193400835
+2022,Bus (MB/CB/RB/TB),MB,Bus,Other Vehicles,41466378
+2022,Bus (MB/CB/RB/TB),MB,Bus,Passenger Vehicles,2396934737
+2022,Bus (MB/CB/RB/TB),MB,Bus,Reduced Reporter Expenses,247144919
+2022,Bus (MB/CB/RB/TB),MB,Bus,Stations,373746583
+2022,Bus (MB/CB/RB/TB),MB,Bus,Total,4957322851
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Administrative Buildings,56720
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Communication & Information Systems,7533184
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Fare Collection Equipment,0
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Guideway,85435725
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Maintenance Buildings,58037621
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other,858392
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other Vehicles,29797
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Passenger Vehicles,41589242
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Reduced Reporter Expenses,7805715
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Stations,49814941
+2022,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Total,251161337
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Administrative Buildings,0
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Communication & Information Systems,81970
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Fare Collection Equipment,7112
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Guideway,12535303
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Maintenance Buildings,1796940
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Other,0
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Other Vehicles,260750
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Passenger Vehicles,8813478
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Reduced Reporter Expenses,0
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Stations,0
+2022,Bus (MB/CB/RB/TB),TB,Trolleybus,Total,23495553
+2022,Demand response / vanpool,DR,Demand Response,Administrative Buildings,15108856
+2022,Demand response / vanpool,DR,Demand Response,Communication & Information Systems,14304019
+2022,Demand response / vanpool,DR,Demand Response,Fare Collection Equipment,395124
+2022,Demand response / vanpool,DR,Demand Response,Guideway,0
+2022,Demand response / vanpool,DR,Demand Response,Maintenance Buildings,39015712
+2022,Demand response / vanpool,DR,Demand Response,Other,1768231
+2022,Demand response / vanpool,DR,Demand Response,Other Vehicles,2134532
+2022,Demand response / vanpool,DR,Demand Response,Passenger Vehicles,152188013
+2022,Demand response / vanpool,DR,Demand Response,Reduced Reporter Expenses,123745565
+2022,Demand response / vanpool,DR,Demand Response,Stations,0
+2022,Demand response / vanpool,DR,Demand Response,Total,348660052
+2022,Demand response / vanpool,VP,Vanpool,Administrative Buildings,0
+2022,Demand response / vanpool,VP,Vanpool,Communication & Information Systems,121077
+2022,Demand response / vanpool,VP,Vanpool,Fare Collection Equipment,0
+2022,Demand response / vanpool,VP,Vanpool,Guideway,0
+2022,Demand response / vanpool,VP,Vanpool,Maintenance Buildings,0
+2022,Demand response / vanpool,VP,Vanpool,Other,437319
+2022,Demand response / vanpool,VP,Vanpool,Other Vehicles,0
+2022,Demand response / vanpool,VP,Vanpool,Passenger Vehicles,5042023
+2022,Demand response / vanpool,VP,Vanpool,Reduced Reporter Expenses,812914
+2022,Demand response / vanpool,VP,Vanpool,Stations,0
+2022,Demand response / vanpool,VP,Vanpool,Total,6413333
+2022,Ferry,FB,Ferryboat,Administrative Buildings,8253066
+2022,Ferry,FB,Ferryboat,Communication & Information Systems,5690099
+2022,Ferry,FB,Ferryboat,Fare Collection Equipment,687628
+2022,Ferry,FB,Ferryboat,Guideway,0
+2022,Ferry,FB,Ferryboat,Maintenance Buildings,6927243
+2022,Ferry,FB,Ferryboat,Other,1673827
+2022,Ferry,FB,Ferryboat,Other Vehicles,61326
+2022,Ferry,FB,Ferryboat,Passenger Vehicles,138852903
+2022,Ferry,FB,Ferryboat,Reduced Reporter Expenses,9449066
+2022,Ferry,FB,Ferryboat,Stations,147942127
+2022,Ferry,FB,Ferryboat,Total,319537285
+2022,Rail,AR,Alaska Railroad,Administrative Buildings,320155
+2022,Rail,AR,Alaska Railroad,Communication & Information Systems,6919652
+2022,Rail,AR,Alaska Railroad,Fare Collection Equipment,0
+2022,Rail,AR,Alaska Railroad,Guideway,31468856
+2022,Rail,AR,Alaska Railroad,Maintenance Buildings,1087668
+2022,Rail,AR,Alaska Railroad,Other,0
+2022,Rail,AR,Alaska Railroad,Other Vehicles,4389320
+2022,Rail,AR,Alaska Railroad,Passenger Vehicles,3445873
+2022,Rail,AR,Alaska Railroad,Reduced Reporter Expenses,0
+2022,Rail,AR,Alaska Railroad,Stations,2450965
+2022,Rail,AR,Alaska Railroad,Total,50082489
+2022,Rail,CC,Cable Car,Administrative Buildings,0
+2022,Rail,CC,Cable Car,Communication & Information Systems,0
+2022,Rail,CC,Cable Car,Fare Collection Equipment,0
+2022,Rail,CC,Cable Car,Guideway,566977
+2022,Rail,CC,Cable Car,Maintenance Buildings,1033386
+2022,Rail,CC,Cable Car,Other,0
+2022,Rail,CC,Cable Car,Other Vehicles,60000
+2022,Rail,CC,Cable Car,Passenger Vehicles,206623
+2022,Rail,CC,Cable Car,Reduced Reporter Expenses,0
+2022,Rail,CC,Cable Car,Stations,0
+2022,Rail,CC,Cable Car,Total,1866986
+2022,Rail,CR,Commuter Rail,Administrative Buildings,10638630
+2022,Rail,CR,Commuter Rail,Communication & Information Systems,243734609
+2022,Rail,CR,Commuter Rail,Fare Collection Equipment,21052306
+2022,Rail,CR,Commuter Rail,Guideway,2830890604
+2022,Rail,CR,Commuter Rail,Maintenance Buildings,262676764
+2022,Rail,CR,Commuter Rail,Other,16822026
+2022,Rail,CR,Commuter Rail,Other Vehicles,111656608
+2022,Rail,CR,Commuter Rail,Passenger Vehicles,739542439
+2022,Rail,CR,Commuter Rail,Reduced Reporter Expenses,0
+2022,Rail,CR,Commuter Rail,Stations,947152492
+2022,Rail,CR,Commuter Rail,Total,5184166478
+2022,Rail,HR,Heavy Rail,Administrative Buildings,420258706
+2022,Rail,HR,Heavy Rail,Communication & Information Systems,965322010
+2022,Rail,HR,Heavy Rail,Fare Collection Equipment,210373105
+2022,Rail,HR,Heavy Rail,Guideway,3027616061
+2022,Rail,HR,Heavy Rail,Maintenance Buildings,522711021
+2022,Rail,HR,Heavy Rail,Other,753898519
+2022,Rail,HR,Heavy Rail,Other Vehicles,68941532
+2022,Rail,HR,Heavy Rail,Passenger Vehicles,827344575
+2022,Rail,HR,Heavy Rail,Reduced Reporter Expenses,0
+2022,Rail,HR,Heavy Rail,Stations,1906104469
+2022,Rail,HR,Heavy Rail,Total,8702569998
+2022,Rail,IP,Inclined Plane,Administrative Buildings,0
+2022,Rail,IP,Inclined Plane,Communication & Information Systems,0
+2022,Rail,IP,Inclined Plane,Fare Collection Equipment,0
+2022,Rail,IP,Inclined Plane,Guideway,7010027
+2022,Rail,IP,Inclined Plane,Maintenance Buildings,0
+2022,Rail,IP,Inclined Plane,Other,0
+2022,Rail,IP,Inclined Plane,Other Vehicles,0
+2022,Rail,IP,Inclined Plane,Passenger Vehicles,17019
+2022,Rail,IP,Inclined Plane,Reduced Reporter Expenses,0
+2022,Rail,IP,Inclined Plane,Stations,323263
+2022,Rail,IP,Inclined Plane,Total,7350309
+2022,Rail,LR,Light Rail,Administrative Buildings,21279575
+2022,Rail,LR,Light Rail,Communication & Information Systems,497360051
+2022,Rail,LR,Light Rail,Fare Collection Equipment,28511100
+2022,Rail,LR,Light Rail,Guideway,4388981281
+2022,Rail,LR,Light Rail,Maintenance Buildings,98928008
+2022,Rail,LR,Light Rail,Other,884372
+2022,Rail,LR,Light Rail,Other Vehicles,6755653
+2022,Rail,LR,Light Rail,Passenger Vehicles,506476890
+2022,Rail,LR,Light Rail,Reduced Reporter Expenses,0
+2022,Rail,LR,Light Rail,Stations,936261410
+2022,Rail,LR,Light Rail,Total,6485438340
+2022,Rail,MG,Monorail/Automated Guideway,Administrative Buildings,136816
+2022,Rail,MG,Monorail/Automated Guideway,Communication & Information Systems,174752
+2022,Rail,MG,Monorail/Automated Guideway,Fare Collection Equipment,0
+2022,Rail,MG,Monorail/Automated Guideway,Guideway,10068718
+2022,Rail,MG,Monorail/Automated Guideway,Maintenance Buildings,1250666
+2022,Rail,MG,Monorail/Automated Guideway,Other,118735
+2022,Rail,MG,Monorail/Automated Guideway,Other Vehicles,0
+2022,Rail,MG,Monorail/Automated Guideway,Passenger Vehicles,1186991
+2022,Rail,MG,Monorail/Automated Guideway,Reduced Reporter Expenses,0
+2022,Rail,MG,Monorail/Automated Guideway,Stations,35736929
+2022,Rail,MG,Monorail/Automated Guideway,Total,48673607
+2022,Rail,SR,Streetcar Rail,Administrative Buildings,22548
+2022,Rail,SR,Streetcar Rail,Communication & Information Systems,18851184
+2022,Rail,SR,Streetcar Rail,Fare Collection Equipment,1477787
+2022,Rail,SR,Streetcar Rail,Guideway,137673314
+2022,Rail,SR,Streetcar Rail,Maintenance Buildings,21261170
+2022,Rail,SR,Streetcar Rail,Other,588132
+2022,Rail,SR,Streetcar Rail,Other Vehicles,463896
+2022,Rail,SR,Streetcar Rail,Passenger Vehicles,73015503
+2022,Rail,SR,Streetcar Rail,Reduced Reporter Expenses,0
+2022,Rail,SR,Streetcar Rail,Stations,8991061
+2022,Rail,SR,Streetcar Rail,Total,262344595
+2022,Rail,TR,Aerial Tramway,Administrative Buildings,0
+2022,Rail,TR,Aerial Tramway,Communication & Information Systems,0
+2022,Rail,TR,Aerial Tramway,Fare Collection Equipment,0
+2022,Rail,TR,Aerial Tramway,Guideway,0
+2022,Rail,TR,Aerial Tramway,Maintenance Buildings,0
+2022,Rail,TR,Aerial Tramway,Other,0
+2022,Rail,TR,Aerial Tramway,Other Vehicles,0
+2022,Rail,TR,Aerial Tramway,Passenger Vehicles,0
+2022,Rail,TR,Aerial Tramway,Reduced Reporter Expenses,307055
+2022,Rail,TR,Aerial Tramway,Stations,0
+2022,Rail,TR,Aerial Tramway,Total,307055
+2022,Rail,YR,Hybrid Rail,Administrative Buildings,0
+2022,Rail,YR,Hybrid Rail,Communication & Information Systems,2679679
+2022,Rail,YR,Hybrid Rail,Fare Collection Equipment,38382
+2022,Rail,YR,Hybrid Rail,Guideway,17015593
+2022,Rail,YR,Hybrid Rail,Maintenance Buildings,1363068
+2022,Rail,YR,Hybrid Rail,Other,56432
+2022,Rail,YR,Hybrid Rail,Other Vehicles,0
+2022,Rail,YR,Hybrid Rail,Passenger Vehicles,4321518
+2022,Rail,YR,Hybrid Rail,Reduced Reporter Expenses,0
+2022,Rail,YR,Hybrid Rail,Stations,5516866
+2022,Rail,YR,Hybrid Rail,Total,30991538
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Administrative Buildings,215067
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Communication & Information Systems,1607901
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Fare Collection Equipment,278607
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Guideway,147903
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Maintenance Buildings,232675
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other,8809166
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other Vehicles,237229
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Passenger Vehicles,61585114
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Reduced Reporter Expenses,43062409
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Stations,9123408
+2023,Bus (MB/CB/RB/TB),CB,Commuter Bus,Total,125299479
+2023,Bus (MB/CB/RB/TB),MB,Bus,Administrative Buildings,328884319
+2023,Bus (MB/CB/RB/TB),MB,Bus,Communication & Information Systems,403175426
+2023,Bus (MB/CB/RB/TB),MB,Bus,Fare Collection Equipment,111534569
+2023,Bus (MB/CB/RB/TB),MB,Bus,Guideway,322102549
+2023,Bus (MB/CB/RB/TB),MB,Bus,Maintenance Buildings,1097703806
+2023,Bus (MB/CB/RB/TB),MB,Bus,Other,252730302
+2023,Bus (MB/CB/RB/TB),MB,Bus,Other Vehicles,58547568
+2023,Bus (MB/CB/RB/TB),MB,Bus,Passenger Vehicles,2258331865
+2023,Bus (MB/CB/RB/TB),MB,Bus,Reduced Reporter Expenses,320253915
+2023,Bus (MB/CB/RB/TB),MB,Bus,Stations,400393107
+2023,Bus (MB/CB/RB/TB),MB,Bus,Total,5553657426
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Administrative Buildings,0
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Communication & Information Systems,283075
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Fare Collection Equipment,9396
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Guideway,153502352
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Maintenance Buildings,2185684
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other,5921825
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other Vehicles,0
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Passenger Vehicles,101683483
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Reduced Reporter Expenses,23449785
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Stations,23742003
+2023,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Total,310777603
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Administrative Buildings,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Communication & Information Systems,51244
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Fare Collection Equipment,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Guideway,16018099
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Maintenance Buildings,2826116
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Other,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Other Vehicles,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Passenger Vehicles,4354953
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Reduced Reporter Expenses,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Stations,0
+2023,Bus (MB/CB/RB/TB),TB,Trolleybus,Total,23250412
+2023,Demand response / vanpool,DR,Demand Response,Administrative Buildings,22241751
+2023,Demand response / vanpool,DR,Demand Response,Communication & Information Systems,14368542
+2023,Demand response / vanpool,DR,Demand Response,Fare Collection Equipment,1414400
+2023,Demand response / vanpool,DR,Demand Response,Guideway,0
+2023,Demand response / vanpool,DR,Demand Response,Maintenance Buildings,30782988
+2023,Demand response / vanpool,DR,Demand Response,Other,1416246
+2023,Demand response / vanpool,DR,Demand Response,Other Vehicles,1909435
+2023,Demand response / vanpool,DR,Demand Response,Passenger Vehicles,233542142
+2023,Demand response / vanpool,DR,Demand Response,Reduced Reporter Expenses,211572049
+2023,Demand response / vanpool,DR,Demand Response,Stations,0
+2023,Demand response / vanpool,DR,Demand Response,Total,517247553
+2023,Demand response / vanpool,PB,Publico,Administrative Buildings,0
+2023,Demand response / vanpool,PB,Publico,Communication & Information Systems,0
+2023,Demand response / vanpool,PB,Publico,Fare Collection Equipment,0
+2023,Demand response / vanpool,PB,Publico,Guideway,0
+2023,Demand response / vanpool,PB,Publico,Maintenance Buildings,0
+2023,Demand response / vanpool,PB,Publico,Other,0
+2023,Demand response / vanpool,PB,Publico,Other Vehicles,0
+2023,Demand response / vanpool,PB,Publico,Passenger Vehicles,0
+2023,Demand response / vanpool,PB,Publico,Reduced Reporter Expenses,0
+2023,Demand response / vanpool,PB,Publico,Stations,0
+2023,Demand response / vanpool,PB,Publico,Total,0
+2023,Demand response / vanpool,VP,Vanpool,Administrative Buildings,0
+2023,Demand response / vanpool,VP,Vanpool,Communication & Information Systems,1249682
+2023,Demand response / vanpool,VP,Vanpool,Fare Collection Equipment,0
+2023,Demand response / vanpool,VP,Vanpool,Guideway,0
+2023,Demand response / vanpool,VP,Vanpool,Maintenance Buildings,0
+2023,Demand response / vanpool,VP,Vanpool,Other,3712560
+2023,Demand response / vanpool,VP,Vanpool,Other Vehicles,0
+2023,Demand response / vanpool,VP,Vanpool,Passenger Vehicles,8768099
+2023,Demand response / vanpool,VP,Vanpool,Reduced Reporter Expenses,1213395
+2023,Demand response / vanpool,VP,Vanpool,Stations,0
+2023,Demand response / vanpool,VP,Vanpool,Total,14943736
+2023,Ferry,FB,Ferryboat,Administrative Buildings,1306813
+2023,Ferry,FB,Ferryboat,Communication & Information Systems,7062109
+2023,Ferry,FB,Ferryboat,Fare Collection Equipment,108624
+2023,Ferry,FB,Ferryboat,Guideway,0
+2023,Ferry,FB,Ferryboat,Maintenance Buildings,27485999
+2023,Ferry,FB,Ferryboat,Other,318173
+2023,Ferry,FB,Ferryboat,Other Vehicles,386962
+2023,Ferry,FB,Ferryboat,Passenger Vehicles,127074407
+2023,Ferry,FB,Ferryboat,Reduced Reporter Expenses,9548318
+2023,Ferry,FB,Ferryboat,Stations,143483002
+2023,Ferry,FB,Ferryboat,Total,316774407
+2023,Rail,AR,Alaska Railroad,Administrative Buildings,642221
+2023,Rail,AR,Alaska Railroad,Communication & Information Systems,6254492
+2023,Rail,AR,Alaska Railroad,Fare Collection Equipment,0
+2023,Rail,AR,Alaska Railroad,Guideway,41161781
+2023,Rail,AR,Alaska Railroad,Maintenance Buildings,1938625
+2023,Rail,AR,Alaska Railroad,Other,0
+2023,Rail,AR,Alaska Railroad,Other Vehicles,7291075
+2023,Rail,AR,Alaska Railroad,Passenger Vehicles,3478968
+2023,Rail,AR,Alaska Railroad,Reduced Reporter Expenses,0
+2023,Rail,AR,Alaska Railroad,Stations,2826235
+2023,Rail,AR,Alaska Railroad,Total,63593397
+2023,Rail,CC,Cable Car,Administrative Buildings,0
+2023,Rail,CC,Cable Car,Communication & Information Systems,0
+2023,Rail,CC,Cable Car,Fare Collection Equipment,0
+2023,Rail,CC,Cable Car,Guideway,248244
+2023,Rail,CC,Cable Car,Maintenance Buildings,476781
+2023,Rail,CC,Cable Car,Other,0
+2023,Rail,CC,Cable Car,Other Vehicles,0
+2023,Rail,CC,Cable Car,Passenger Vehicles,647360
+2023,Rail,CC,Cable Car,Reduced Reporter Expenses,0
+2023,Rail,CC,Cable Car,Stations,0
+2023,Rail,CC,Cable Car,Total,1372385
+2023,Rail,CR,Commuter Rail,Administrative Buildings,11002315
+2023,Rail,CR,Commuter Rail,Communication & Information Systems,315644933
+2023,Rail,CR,Commuter Rail,Fare Collection Equipment,18546396
+2023,Rail,CR,Commuter Rail,Guideway,3447560071
+2023,Rail,CR,Commuter Rail,Maintenance Buildings,478171652
+2023,Rail,CR,Commuter Rail,Other,43743873
+2023,Rail,CR,Commuter Rail,Other Vehicles,93416523
+2023,Rail,CR,Commuter Rail,Passenger Vehicles,605505127
+2023,Rail,CR,Commuter Rail,Reduced Reporter Expenses,0
+2023,Rail,CR,Commuter Rail,Stations,894625314
+2023,Rail,CR,Commuter Rail,Total,5908216204
+2023,Rail,HR,Heavy Rail,Administrative Buildings,267345219
+2023,Rail,HR,Heavy Rail,Communication & Information Systems,1113094628
+2023,Rail,HR,Heavy Rail,Fare Collection Equipment,213828340
+2023,Rail,HR,Heavy Rail,Guideway,3770718052
+2023,Rail,HR,Heavy Rail,Maintenance Buildings,431991553
+2023,Rail,HR,Heavy Rail,Other,429849768
+2023,Rail,HR,Heavy Rail,Other Vehicles,72692876
+2023,Rail,HR,Heavy Rail,Passenger Vehicles,1154246387
+2023,Rail,HR,Heavy Rail,Reduced Reporter Expenses,0
+2023,Rail,HR,Heavy Rail,Stations,2098591614
+2023,Rail,HR,Heavy Rail,Total,9552358437
+2023,Rail,IP,Inclined Plane,Administrative Buildings,0
+2023,Rail,IP,Inclined Plane,Communication & Information Systems,0
+2023,Rail,IP,Inclined Plane,Fare Collection Equipment,0
+2023,Rail,IP,Inclined Plane,Guideway,8058174
+2023,Rail,IP,Inclined Plane,Maintenance Buildings,0
+2023,Rail,IP,Inclined Plane,Other,0
+2023,Rail,IP,Inclined Plane,Other Vehicles,0
+2023,Rail,IP,Inclined Plane,Passenger Vehicles,0
+2023,Rail,IP,Inclined Plane,Reduced Reporter Expenses,0
+2023,Rail,IP,Inclined Plane,Stations,8011752
+2023,Rail,IP,Inclined Plane,Total,16069926
+2023,Rail,LR,Light Rail,Administrative Buildings,31998934
+2023,Rail,LR,Light Rail,Communication & Information Systems,278867732
+2023,Rail,LR,Light Rail,Fare Collection Equipment,12412312
+2023,Rail,LR,Light Rail,Guideway,3100361473
+2023,Rail,LR,Light Rail,Maintenance Buildings,79473072
+2023,Rail,LR,Light Rail,Other,2044956
+2023,Rail,LR,Light Rail,Other Vehicles,64939900
+2023,Rail,LR,Light Rail,Passenger Vehicles,555053550
+2023,Rail,LR,Light Rail,Reduced Reporter Expenses,0
+2023,Rail,LR,Light Rail,Stations,490443660
+2023,Rail,LR,Light Rail,Total,4615595589
+2023,Rail,MG,Monorail/Automated Guideway,Administrative Buildings,396792
+2023,Rail,MG,Monorail/Automated Guideway,Communication & Information Systems,1725913
+2023,Rail,MG,Monorail/Automated Guideway,Fare Collection Equipment,140849
+2023,Rail,MG,Monorail/Automated Guideway,Guideway,1363879
+2023,Rail,MG,Monorail/Automated Guideway,Maintenance Buildings,369599
+2023,Rail,MG,Monorail/Automated Guideway,Other,0
+2023,Rail,MG,Monorail/Automated Guideway,Other Vehicles,104706
+2023,Rail,MG,Monorail/Automated Guideway,Passenger Vehicles,1202648
+2023,Rail,MG,Monorail/Automated Guideway,Reduced Reporter Expenses,0
+2023,Rail,MG,Monorail/Automated Guideway,Stations,25452024
+2023,Rail,MG,Monorail/Automated Guideway,Total,30756410
+2023,Rail,SR,Streetcar Rail,Administrative Buildings,559155
+2023,Rail,SR,Streetcar Rail,Communication & Information Systems,21282058
+2023,Rail,SR,Streetcar Rail,Fare Collection Equipment,1572518
+2023,Rail,SR,Streetcar Rail,Guideway,159582912
+2023,Rail,SR,Streetcar Rail,Maintenance Buildings,48896620
+2023,Rail,SR,Streetcar Rail,Other,3960298
+2023,Rail,SR,Streetcar Rail,Other Vehicles,400388
+2023,Rail,SR,Streetcar Rail,Passenger Vehicles,31257269
+2023,Rail,SR,Streetcar Rail,Reduced Reporter Expenses,0
+2023,Rail,SR,Streetcar Rail,Stations,4199866
+2023,Rail,SR,Streetcar Rail,Total,271711084
+2023,Rail,TR,Aerial Tramway,Administrative Buildings,0
+2023,Rail,TR,Aerial Tramway,Communication & Information Systems,0
+2023,Rail,TR,Aerial Tramway,Fare Collection Equipment,0
+2023,Rail,TR,Aerial Tramway,Guideway,0
+2023,Rail,TR,Aerial Tramway,Maintenance Buildings,0
+2023,Rail,TR,Aerial Tramway,Other,0
+2023,Rail,TR,Aerial Tramway,Other Vehicles,0
+2023,Rail,TR,Aerial Tramway,Passenger Vehicles,2500000
+2023,Rail,TR,Aerial Tramway,Reduced Reporter Expenses,467724
+2023,Rail,TR,Aerial Tramway,Stations,0
+2023,Rail,TR,Aerial Tramway,Total,2967724
+2023,Rail,YR,Hybrid Rail,Administrative Buildings,0
+2023,Rail,YR,Hybrid Rail,Communication & Information Systems,2424010
+2023,Rail,YR,Hybrid Rail,Fare Collection Equipment,7143
+2023,Rail,YR,Hybrid Rail,Guideway,34795220
+2023,Rail,YR,Hybrid Rail,Maintenance Buildings,3877635
+2023,Rail,YR,Hybrid Rail,Other,28795
+2023,Rail,YR,Hybrid Rail,Other Vehicles,111052
+2023,Rail,YR,Hybrid Rail,Passenger Vehicles,4259514
+2023,Rail,YR,Hybrid Rail,Reduced Reporter Expenses,0
+2023,Rail,YR,Hybrid Rail,Stations,15445591
+2023,Rail,YR,Hybrid Rail,Total,60948960
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Administrative Buildings,299736
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Communication & Information Systems,4986587
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Fare Collection Equipment,201101
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Guideway,2159018
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Maintenance Buildings,2457850
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other,250050
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other Vehicles,247681
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Passenger Vehicles,43793647
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Reduced Reporter Expenses,35229165
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Stations,9610206
+2024,Bus (MB/CB/RB/TB),CB,Commuter Bus,Total,99235041
+2024,Bus (MB/CB/RB/TB),MB,Bus,Administrative Buildings,296917749
+2024,Bus (MB/CB/RB/TB),MB,Bus,Communication & Information Systems,379866115
+2024,Bus (MB/CB/RB/TB),MB,Bus,Fare Collection Equipment,133655696
+2024,Bus (MB/CB/RB/TB),MB,Bus,Guideway,581562737
+2024,Bus (MB/CB/RB/TB),MB,Bus,Maintenance Buildings,1381860618
+2024,Bus (MB/CB/RB/TB),MB,Bus,Other,235825269
+2024,Bus (MB/CB/RB/TB),MB,Bus,Other Vehicles,94661789
+2024,Bus (MB/CB/RB/TB),MB,Bus,Passenger Vehicles,2896307517
+2024,Bus (MB/CB/RB/TB),MB,Bus,Reduced Reporter Expenses,423260562
+2024,Bus (MB/CB/RB/TB),MB,Bus,Stations,446547100
+2024,Bus (MB/CB/RB/TB),MB,Bus,Total,6870465152
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Administrative Buildings,0
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Communication & Information Systems,1369059
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Fare Collection Equipment,1220464
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Guideway,246694658
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Maintenance Buildings,11738766
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other,10876054
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other Vehicles,172591
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Passenger Vehicles,91044098
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Reduced Reporter Expenses,18901496
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Stations,51965746
+2024,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Total,433982932
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Administrative Buildings,0
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Communication & Information Systems,70611
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Fare Collection Equipment,21219
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Guideway,14417345
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Maintenance Buildings,7164501
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Other,0
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Other Vehicles,0
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Passenger Vehicles,13079927
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Reduced Reporter Expenses,0
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Stations,0
+2024,Bus (MB/CB/RB/TB),TB,Trolleybus,Total,34753603
+2024,Demand response / vanpool,DR,Demand Response,Administrative Buildings,48767535
+2024,Demand response / vanpool,DR,Demand Response,Communication & Information Systems,19641367
+2024,Demand response / vanpool,DR,Demand Response,Fare Collection Equipment,1680345
+2024,Demand response / vanpool,DR,Demand Response,Guideway,0
+2024,Demand response / vanpool,DR,Demand Response,Maintenance Buildings,17181789
+2024,Demand response / vanpool,DR,Demand Response,Other,3460998
+2024,Demand response / vanpool,DR,Demand Response,Other Vehicles,4985840
+2024,Demand response / vanpool,DR,Demand Response,Passenger Vehicles,452525837
+2024,Demand response / vanpool,DR,Demand Response,Reduced Reporter Expenses,353482332
+2024,Demand response / vanpool,DR,Demand Response,Stations,0
+2024,Demand response / vanpool,DR,Demand Response,Total,901726043
+2024,Demand response / vanpool,PB,Publico,Administrative Buildings,0
+2024,Demand response / vanpool,PB,Publico,Communication & Information Systems,0
+2024,Demand response / vanpool,PB,Publico,Fare Collection Equipment,0
+2024,Demand response / vanpool,PB,Publico,Guideway,0
+2024,Demand response / vanpool,PB,Publico,Maintenance Buildings,0
+2024,Demand response / vanpool,PB,Publico,Other,0
+2024,Demand response / vanpool,PB,Publico,Other Vehicles,0
+2024,Demand response / vanpool,PB,Publico,Passenger Vehicles,0
+2024,Demand response / vanpool,PB,Publico,Reduced Reporter Expenses,0
+2024,Demand response / vanpool,PB,Publico,Stations,0
+2024,Demand response / vanpool,PB,Publico,Total,0
+2024,Demand response / vanpool,VP,Vanpool,Administrative Buildings,0
+2024,Demand response / vanpool,VP,Vanpool,Communication & Information Systems,232657
+2024,Demand response / vanpool,VP,Vanpool,Fare Collection Equipment,0
+2024,Demand response / vanpool,VP,Vanpool,Guideway,0
+2024,Demand response / vanpool,VP,Vanpool,Maintenance Buildings,0
+2024,Demand response / vanpool,VP,Vanpool,Other,571568
+2024,Demand response / vanpool,VP,Vanpool,Other Vehicles,0
+2024,Demand response / vanpool,VP,Vanpool,Passenger Vehicles,24289365
+2024,Demand response / vanpool,VP,Vanpool,Reduced Reporter Expenses,2729547
+2024,Demand response / vanpool,VP,Vanpool,Stations,0
+2024,Demand response / vanpool,VP,Vanpool,Total,27823137
+2024,Ferry,FB,Ferryboat,Administrative Buildings,3258290
+2024,Ferry,FB,Ferryboat,Communication & Information Systems,8060602
+2024,Ferry,FB,Ferryboat,Fare Collection Equipment,586202
+2024,Ferry,FB,Ferryboat,Guideway,0
+2024,Ferry,FB,Ferryboat,Maintenance Buildings,15814367
+2024,Ferry,FB,Ferryboat,Other,23500
+2024,Ferry,FB,Ferryboat,Other Vehicles,330616
+2024,Ferry,FB,Ferryboat,Passenger Vehicles,250395331
+2024,Ferry,FB,Ferryboat,Reduced Reporter Expenses,10566162
+2024,Ferry,FB,Ferryboat,Stations,96531234
+2024,Ferry,FB,Ferryboat,Total,385566304
+2024,Rail,AR,Alaska Railroad,Administrative Buildings,701958
+2024,Rail,AR,Alaska Railroad,Communication & Information Systems,8446300
+2024,Rail,AR,Alaska Railroad,Fare Collection Equipment,0
+2024,Rail,AR,Alaska Railroad,Guideway,54258765
+2024,Rail,AR,Alaska Railroad,Maintenance Buildings,1596595
+2024,Rail,AR,Alaska Railroad,Other,0
+2024,Rail,AR,Alaska Railroad,Other Vehicles,11678573
+2024,Rail,AR,Alaska Railroad,Passenger Vehicles,5934117
+2024,Rail,AR,Alaska Railroad,Reduced Reporter Expenses,0
+2024,Rail,AR,Alaska Railroad,Stations,1404916
+2024,Rail,AR,Alaska Railroad,Total,84021224
+2024,Rail,CC,Cable Car,Administrative Buildings,0
+2024,Rail,CC,Cable Car,Communication & Information Systems,0
+2024,Rail,CC,Cable Car,Fare Collection Equipment,0
+2024,Rail,CC,Cable Car,Guideway,143451
+2024,Rail,CC,Cable Car,Maintenance Buildings,145048
+2024,Rail,CC,Cable Car,Other,0
+2024,Rail,CC,Cable Car,Other Vehicles,0
+2024,Rail,CC,Cable Car,Passenger Vehicles,0
+2024,Rail,CC,Cable Car,Reduced Reporter Expenses,0
+2024,Rail,CC,Cable Car,Stations,0
+2024,Rail,CC,Cable Car,Total,288499
+2024,Rail,CR,Commuter Rail,Administrative Buildings,7211264
+2024,Rail,CR,Commuter Rail,Communication & Information Systems,294251679
+2024,Rail,CR,Commuter Rail,Fare Collection Equipment,31914245
+2024,Rail,CR,Commuter Rail,Guideway,3031157434
+2024,Rail,CR,Commuter Rail,Maintenance Buildings,219131670
+2024,Rail,CR,Commuter Rail,Other,54029184
+2024,Rail,CR,Commuter Rail,Other Vehicles,117971829
+2024,Rail,CR,Commuter Rail,Passenger Vehicles,780427740
+2024,Rail,CR,Commuter Rail,Reduced Reporter Expenses,0
+2024,Rail,CR,Commuter Rail,Stations,1010654681
+2024,Rail,CR,Commuter Rail,Total,5546749726
+2024,Rail,HR,Heavy Rail,Administrative Buildings,228908550
+2024,Rail,HR,Heavy Rail,Communication & Information Systems,1190747043
+2024,Rail,HR,Heavy Rail,Fare Collection Equipment,217151330
+2024,Rail,HR,Heavy Rail,Guideway,4072673128
+2024,Rail,HR,Heavy Rail,Maintenance Buildings,423168761
+2024,Rail,HR,Heavy Rail,Other,230999481
+2024,Rail,HR,Heavy Rail,Other Vehicles,95216354
+2024,Rail,HR,Heavy Rail,Passenger Vehicles,1764171823
+2024,Rail,HR,Heavy Rail,Reduced Reporter Expenses,0
+2024,Rail,HR,Heavy Rail,Stations,2255466250
+2024,Rail,HR,Heavy Rail,Total,10478502720
+2024,Rail,IP,Inclined Plane,Administrative Buildings,0
+2024,Rail,IP,Inclined Plane,Communication & Information Systems,0
+2024,Rail,IP,Inclined Plane,Fare Collection Equipment,0
+2024,Rail,IP,Inclined Plane,Guideway,2962851
+2024,Rail,IP,Inclined Plane,Maintenance Buildings,0
+2024,Rail,IP,Inclined Plane,Other,0
+2024,Rail,IP,Inclined Plane,Other Vehicles,0
+2024,Rail,IP,Inclined Plane,Passenger Vehicles,0
+2024,Rail,IP,Inclined Plane,Reduced Reporter Expenses,0
+2024,Rail,IP,Inclined Plane,Stations,456922
+2024,Rail,IP,Inclined Plane,Total,3419773
+2024,Rail,LR,Light Rail,Administrative Buildings,26441460
+2024,Rail,LR,Light Rail,Communication & Information Systems,293691363
+2024,Rail,LR,Light Rail,Fare Collection Equipment,10845722
+2024,Rail,LR,Light Rail,Guideway,2190020850
+2024,Rail,LR,Light Rail,Maintenance Buildings,193215427
+2024,Rail,LR,Light Rail,Other,16946669
+2024,Rail,LR,Light Rail,Other Vehicles,15749548
+2024,Rail,LR,Light Rail,Passenger Vehicles,693089462
+2024,Rail,LR,Light Rail,Reduced Reporter Expenses,0
+2024,Rail,LR,Light Rail,Stations,589067550
+2024,Rail,LR,Light Rail,Total,4029068051
+2024,Rail,MG,Monorail/Automated Guideway,Administrative Buildings,44058
+2024,Rail,MG,Monorail/Automated Guideway,Communication & Information Systems,4901965
+2024,Rail,MG,Monorail/Automated Guideway,Fare Collection Equipment,12619
+2024,Rail,MG,Monorail/Automated Guideway,Guideway,4699763
+2024,Rail,MG,Monorail/Automated Guideway,Maintenance Buildings,675865
+2024,Rail,MG,Monorail/Automated Guideway,Other,0
+2024,Rail,MG,Monorail/Automated Guideway,Other Vehicles,30934
+2024,Rail,MG,Monorail/Automated Guideway,Passenger Vehicles,2110478
+2024,Rail,MG,Monorail/Automated Guideway,Reduced Reporter Expenses,0
+2024,Rail,MG,Monorail/Automated Guideway,Stations,26029903
+2024,Rail,MG,Monorail/Automated Guideway,Total,38505585
+2024,Rail,SR,Streetcar Rail,Administrative Buildings,3339948
+2024,Rail,SR,Streetcar Rail,Communication & Information Systems,37311463
+2024,Rail,SR,Streetcar Rail,Fare Collection Equipment,6544591
+2024,Rail,SR,Streetcar Rail,Guideway,94504900
+2024,Rail,SR,Streetcar Rail,Maintenance Buildings,75069534
+2024,Rail,SR,Streetcar Rail,Other,9377179
+2024,Rail,SR,Streetcar Rail,Other Vehicles,3872260
+2024,Rail,SR,Streetcar Rail,Passenger Vehicles,151120274
+2024,Rail,SR,Streetcar Rail,Reduced Reporter Expenses,0
+2024,Rail,SR,Streetcar Rail,Stations,6222063
+2024,Rail,SR,Streetcar Rail,Total,387362212
+2024,Rail,TR,Aerial Tramway,Administrative Buildings,0
+2024,Rail,TR,Aerial Tramway,Communication & Information Systems,0
+2024,Rail,TR,Aerial Tramway,Fare Collection Equipment,0
+2024,Rail,TR,Aerial Tramway,Guideway,0
+2024,Rail,TR,Aerial Tramway,Maintenance Buildings,0
+2024,Rail,TR,Aerial Tramway,Other,0
+2024,Rail,TR,Aerial Tramway,Other Vehicles,0
+2024,Rail,TR,Aerial Tramway,Passenger Vehicles,0
+2024,Rail,TR,Aerial Tramway,Reduced Reporter Expenses,268102
+2024,Rail,TR,Aerial Tramway,Stations,0
+2024,Rail,TR,Aerial Tramway,Total,268102
+2024,Rail,YR,Hybrid Rail,Administrative Buildings,0
+2024,Rail,YR,Hybrid Rail,Communication & Information Systems,454388
+2024,Rail,YR,Hybrid Rail,Fare Collection Equipment,0
+2024,Rail,YR,Hybrid Rail,Guideway,9071787
+2024,Rail,YR,Hybrid Rail,Maintenance Buildings,9013888
+2024,Rail,YR,Hybrid Rail,Other,142100
+2024,Rail,YR,Hybrid Rail,Other Vehicles,0
+2024,Rail,YR,Hybrid Rail,Passenger Vehicles,3463272
+2024,Rail,YR,Hybrid Rail,Reduced Reporter Expenses,0
+2024,Rail,YR,Hybrid Rail,Stations,7231003
+2024,Rail,YR,Hybrid Rail,Total,29376438
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Administrative Buildings,1168722
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Communication & Information Systems,873856
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Fare Collection Equipment,458671
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Guideway,1266732
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Maintenance Buildings,1271095
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other,613718
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Other Vehicles,1228920
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Passenger Vehicles,80369218
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Reduced Reporter Expenses,23880426
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Stations,7169583
+2025,Bus (MB/CB/RB/TB),CB,Commuter Bus,Total,118300941
+2025,Bus (MB/CB/RB/TB),MB,Bus,Administrative Buildings,466229909
+2025,Bus (MB/CB/RB/TB),MB,Bus,Communication & Information Systems,369993433
+2025,Bus (MB/CB/RB/TB),MB,Bus,Fare Collection Equipment,94000855
+2025,Bus (MB/CB/RB/TB),MB,Bus,Guideway,468460637
+2025,Bus (MB/CB/RB/TB),MB,Bus,Maintenance Buildings,1649366172
+2025,Bus (MB/CB/RB/TB),MB,Bus,Other,260192821
+2025,Bus (MB/CB/RB/TB),MB,Bus,Other Vehicles,125215892
+2025,Bus (MB/CB/RB/TB),MB,Bus,Passenger Vehicles,4110634404
+2025,Bus (MB/CB/RB/TB),MB,Bus,Reduced Reporter Expenses,416791310
+2025,Bus (MB/CB/RB/TB),MB,Bus,Stations,645800296
+2025,Bus (MB/CB/RB/TB),MB,Bus,Total,8606685729
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Administrative Buildings,2305999
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Communication & Information Systems,1520556
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Fare Collection Equipment,0
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Guideway,372839598
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Maintenance Buildings,386617
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other,8807431
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Other Vehicles,194783
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Passenger Vehicles,30913944
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Reduced Reporter Expenses,4080253
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Stations,20738446
+2025,Bus (MB/CB/RB/TB),RB,Bus Rapid Transit,Total,441787627
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Administrative Buildings,0
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Communication & Information Systems,102178
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Fare Collection Equipment,30450
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Guideway,15375089
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Maintenance Buildings,2721354
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Other,0
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Other Vehicles,0
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Passenger Vehicles,15621283
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Reduced Reporter Expenses,0
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Stations,0
+2025,Bus (MB/CB/RB/TB),TB,Trolleybus,Total,33850354
+2025,Demand response / vanpool,DR,Demand Response,Administrative Buildings,18674038
+2025,Demand response / vanpool,DR,Demand Response,Communication & Information Systems,22765421
+2025,Demand response / vanpool,DR,Demand Response,Fare Collection Equipment,3103266
+2025,Demand response / vanpool,DR,Demand Response,Guideway,0
+2025,Demand response / vanpool,DR,Demand Response,Maintenance Buildings,56257345
+2025,Demand response / vanpool,DR,Demand Response,Other,3072800
+2025,Demand response / vanpool,DR,Demand Response,Other Vehicles,3593882
+2025,Demand response / vanpool,DR,Demand Response,Passenger Vehicles,526577907
+2025,Demand response / vanpool,DR,Demand Response,Reduced Reporter Expenses,392853657
+2025,Demand response / vanpool,DR,Demand Response,Stations,0
+2025,Demand response / vanpool,DR,Demand Response,Total,1026898316
+2025,Demand response / vanpool,VP,Vanpool,Administrative Buildings,0
+2025,Demand response / vanpool,VP,Vanpool,Communication & Information Systems,76731
+2025,Demand response / vanpool,VP,Vanpool,Fare Collection Equipment,0
+2025,Demand response / vanpool,VP,Vanpool,Guideway,0
+2025,Demand response / vanpool,VP,Vanpool,Maintenance Buildings,0
+2025,Demand response / vanpool,VP,Vanpool,Other,0
+2025,Demand response / vanpool,VP,Vanpool,Other Vehicles,41565
+2025,Demand response / vanpool,VP,Vanpool,Passenger Vehicles,18464720
+2025,Demand response / vanpool,VP,Vanpool,Reduced Reporter Expenses,1632558
+2025,Demand response / vanpool,VP,Vanpool,Stations,0
+2025,Demand response / vanpool,VP,Vanpool,Total,20215574
+2025,Ferry,FB,Ferryboat,Administrative Buildings,2662765
+2025,Ferry,FB,Ferryboat,Communication & Information Systems,11021024
+2025,Ferry,FB,Ferryboat,Fare Collection Equipment,663669
+2025,Ferry,FB,Ferryboat,Guideway,0
+2025,Ferry,FB,Ferryboat,Maintenance Buildings,24318914
+2025,Ferry,FB,Ferryboat,Other,41981
+2025,Ferry,FB,Ferryboat,Other Vehicles,1610838
+2025,Ferry,FB,Ferryboat,Passenger Vehicles,255486966
+2025,Ferry,FB,Ferryboat,Reduced Reporter Expenses,5101696
+2025,Ferry,FB,Ferryboat,Stations,114388333
+2025,Ferry,FB,Ferryboat,Total,415296186
+2025,Rail,AR,Alaska Railroad,Administrative Buildings,474121
+2025,Rail,AR,Alaska Railroad,Communication & Information Systems,4916607
+2025,Rail,AR,Alaska Railroad,Fare Collection Equipment,0
+2025,Rail,AR,Alaska Railroad,Guideway,63521644
+2025,Rail,AR,Alaska Railroad,Maintenance Buildings,562436
+2025,Rail,AR,Alaska Railroad,Other,0
+2025,Rail,AR,Alaska Railroad,Other Vehicles,6718648
+2025,Rail,AR,Alaska Railroad,Passenger Vehicles,7491093
+2025,Rail,AR,Alaska Railroad,Reduced Reporter Expenses,0
+2025,Rail,AR,Alaska Railroad,Stations,2044944
+2025,Rail,AR,Alaska Railroad,Total,85729493
+2025,Rail,CC,Cable Car,Administrative Buildings,0
+2025,Rail,CC,Cable Car,Communication & Information Systems,0
+2025,Rail,CC,Cable Car,Fare Collection Equipment,0
+2025,Rail,CC,Cable Car,Guideway,234426
+2025,Rail,CC,Cable Car,Maintenance Buildings,121284
+2025,Rail,CC,Cable Car,Other,0
+2025,Rail,CC,Cable Car,Other Vehicles,0
+2025,Rail,CC,Cable Car,Passenger Vehicles,498734
+2025,Rail,CC,Cable Car,Reduced Reporter Expenses,0
+2025,Rail,CC,Cable Car,Stations,0
+2025,Rail,CC,Cable Car,Total,854444
+2025,Rail,CR,Commuter Rail,Administrative Buildings,19787314
+2025,Rail,CR,Commuter Rail,Communication & Information Systems,259389157
+2025,Rail,CR,Commuter Rail,Fare Collection Equipment,32181536
+2025,Rail,CR,Commuter Rail,Guideway,2731782722
+2025,Rail,CR,Commuter Rail,Maintenance Buildings,181206884
+2025,Rail,CR,Commuter Rail,Other,43548675
+2025,Rail,CR,Commuter Rail,Other Vehicles,295093937
+2025,Rail,CR,Commuter Rail,Passenger Vehicles,1033001563
+2025,Rail,CR,Commuter Rail,Reduced Reporter Expenses,0
+2025,Rail,CR,Commuter Rail,Stations,1106808912
+2025,Rail,CR,Commuter Rail,Total,5702800700
+2025,Rail,HR,Heavy Rail,Administrative Buildings,227252171
+2025,Rail,HR,Heavy Rail,Communication & Information Systems,1007844352
+2025,Rail,HR,Heavy Rail,Fare Collection Equipment,368957305
+2025,Rail,HR,Heavy Rail,Guideway,4769637785
+2025,Rail,HR,Heavy Rail,Maintenance Buildings,484506134
+2025,Rail,HR,Heavy Rail,Other,345495200
+2025,Rail,HR,Heavy Rail,Other Vehicles,194964043
+2025,Rail,HR,Heavy Rail,Passenger Vehicles,1808067478
+2025,Rail,HR,Heavy Rail,Reduced Reporter Expenses,0
+2025,Rail,HR,Heavy Rail,Stations,2189396538
+2025,Rail,HR,Heavy Rail,Total,11396121006
+2025,Rail,IP,Inclined Plane,Administrative Buildings,0
+2025,Rail,IP,Inclined Plane,Communication & Information Systems,12907
+2025,Rail,IP,Inclined Plane,Fare Collection Equipment,0
+2025,Rail,IP,Inclined Plane,Guideway,2645274
+2025,Rail,IP,Inclined Plane,Maintenance Buildings,0
+2025,Rail,IP,Inclined Plane,Other,0
+2025,Rail,IP,Inclined Plane,Other Vehicles,61253
+2025,Rail,IP,Inclined Plane,Passenger Vehicles,0
+2025,Rail,IP,Inclined Plane,Reduced Reporter Expenses,0
+2025,Rail,IP,Inclined Plane,Stations,742739
+2025,Rail,IP,Inclined Plane,Total,3462173
+2025,Rail,LR,Light Rail,Administrative Buildings,39773390
+2025,Rail,LR,Light Rail,Communication & Information Systems,186253024
+2025,Rail,LR,Light Rail,Fare Collection Equipment,16602247
+2025,Rail,LR,Light Rail,Guideway,2407087042
+2025,Rail,LR,Light Rail,Maintenance Buildings,268369827
+2025,Rail,LR,Light Rail,Other,9568543
+2025,Rail,LR,Light Rail,Other Vehicles,20712797
+2025,Rail,LR,Light Rail,Passenger Vehicles,800816240
+2025,Rail,LR,Light Rail,Reduced Reporter Expenses,0
+2025,Rail,LR,Light Rail,Stations,390186913
+2025,Rail,LR,Light Rail,Total,4139370023
+2025,Rail,MG,Monorail/Automated Guideway,Administrative Buildings,0
+2025,Rail,MG,Monorail/Automated Guideway,Communication & Information Systems,1352243
+2025,Rail,MG,Monorail/Automated Guideway,Fare Collection Equipment,0
+2025,Rail,MG,Monorail/Automated Guideway,Guideway,11944758
+2025,Rail,MG,Monorail/Automated Guideway,Maintenance Buildings,359159
+2025,Rail,MG,Monorail/Automated Guideway,Other,80276
+2025,Rail,MG,Monorail/Automated Guideway,Other Vehicles,0
+2025,Rail,MG,Monorail/Automated Guideway,Passenger Vehicles,4594582
+2025,Rail,MG,Monorail/Automated Guideway,Reduced Reporter Expenses,0
+2025,Rail,MG,Monorail/Automated Guideway,Stations,40953753
+2025,Rail,MG,Monorail/Automated Guideway,Total,59284771
+2025,Rail,SR,Streetcar Rail,Administrative Buildings,694123
+2025,Rail,SR,Streetcar Rail,Communication & Information Systems,34982502
+2025,Rail,SR,Streetcar Rail,Fare Collection Equipment,5018279
+2025,Rail,SR,Streetcar Rail,Guideway,89685824
+2025,Rail,SR,Streetcar Rail,Maintenance Buildings,23164607
+2025,Rail,SR,Streetcar Rail,Other,6850876
+2025,Rail,SR,Streetcar Rail,Other Vehicles,3341008
+2025,Rail,SR,Streetcar Rail,Passenger Vehicles,101882254
+2025,Rail,SR,Streetcar Rail,Reduced Reporter Expenses,0
+2025,Rail,SR,Streetcar Rail,Stations,1598841
+2025,Rail,SR,Streetcar Rail,Total,267218314
+2025,Rail,TR,Aerial Tramway,Administrative Buildings,0
+2025,Rail,TR,Aerial Tramway,Communication & Information Systems,0
+2025,Rail,TR,Aerial Tramway,Fare Collection Equipment,0
+2025,Rail,TR,Aerial Tramway,Guideway,0
+2025,Rail,TR,Aerial Tramway,Maintenance Buildings,0
+2025,Rail,TR,Aerial Tramway,Other,0
+2025,Rail,TR,Aerial Tramway,Other Vehicles,0
+2025,Rail,TR,Aerial Tramway,Passenger Vehicles,0
+2025,Rail,TR,Aerial Tramway,Reduced Reporter Expenses,1379504
+2025,Rail,TR,Aerial Tramway,Stations,0
+2025,Rail,TR,Aerial Tramway,Total,1379504
+2025,Rail,YR,Hybrid Rail,Administrative Buildings,145625
+2025,Rail,YR,Hybrid Rail,Communication & Information Systems,2556748
+2025,Rail,YR,Hybrid Rail,Fare Collection Equipment,0
+2025,Rail,YR,Hybrid Rail,Guideway,10494720
+2025,Rail,YR,Hybrid Rail,Maintenance Buildings,5044880
+2025,Rail,YR,Hybrid Rail,Other,0
+2025,Rail,YR,Hybrid Rail,Other Vehicles,0
+2025,Rail,YR,Hybrid Rail,Passenger Vehicles,9483708
+2025,Rail,YR,Hybrid Rail,Reduced Reporter Expenses,0
+2025,Rail,YR,Hybrid Rail,Stations,482540
+2025,Rail,YR,Hybrid Rail,Total,28208221

@@ -1,0 +1,6 @@
+tier_active_fullsize_bus,agencies,active_fullsize_bus,agencies_with_bus_comm_info_capex_2025,comm_info_capex_2025_bus_modes_usd,comm_info_capex_bus_modes_avg_2023_2025_usd,capex_per_active_bus_2025_usd,capex_per_active_bus_avg_2023_2025_usd
+1: 1-49,772,10541,96,23602707,21678262,2239.0,2057.0
+2: 50-249,149,15142,116,81115693,98222387,5357.0,6487.0
+3: 250-999,46,20411,42,144337385,156136349,7072.0,7650.0
+4: 1000+,10,19145,10,123006778,111374698,6425.0,5817.0
+0: no full-size bus (cutaway/van-only agencies),1667,0,6,427460,554984,,

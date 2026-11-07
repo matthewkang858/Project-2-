@@ -1,0 +1,19 @@
+rail_mode,Vehicle Type,active,total,ada,operators,mode_name
+AR,Commuter Rail Locomotive,58,58,1,1,Alaska Railroad
+AR,Commuter Rail Passenger Coach,42,42,24,1,Alaska Railroad
+CC,Cable Car,39,40,0,1,Cable Car
+CR,Commuter Rail Self-Propelled Passenger Car,3734,3802,3259,12,Commuter Rail
+CR,Commuter Rail Passenger Coach,3672,4109,3050,24,Commuter Rail
+CR,Commuter Rail Locomotive,865,978,82,23,Commuter Rail
+HR,Heavy Rail Passenger Car,12946,13122,12325,17,Heavy Rail
+IP,Inclined Plane Vehicle,6,6,5,3,Inclined Plane
+LR,Light Rail Vehicle,2518,2648,2379,22,Light Rail
+LR,Vintage Trolley,9,13,2,3,Light Rail
+MG,Automated Guideway Vehicle,109,118,109,5,Monorail/Automated Guideway
+MG,Monorail Vehicle,8,8,8,1,Monorail/Automated Guideway
+SR,Light Rail Vehicle,338,352,168,20,Streetcar
+SR,Vintage Trolley,80,90,20,8,Streetcar
+TR,Aerial Tramway,73,73,37,2,Aerial Tramway
+YR,Commuter Rail Self-Propelled Passenger Car,63,63,63,4,Hybrid Rail
+YR,Light Rail Vehicle,28,32,28,2,Hybrid Rail
+YR,Commuter Rail Passenger Coach,1,1,1,1,Hybrid Rail

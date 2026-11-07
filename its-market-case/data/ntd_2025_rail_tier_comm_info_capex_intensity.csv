@@ -1,0 +1,5 @@
+rail_fleet_tier,operators,active_rail_vehicles_ex_loco,comm_info_capex_2025_rail_modes_usd,comm_info_capex_rail_modes_avg_2023_2025_usd,capex_per_active_vehicle_2025_usd,capex_per_active_vehicle_avg_2023_2025_usd
+1: 1-99,49,1355,147139972,155984240,108590.0,115118.0
+2: 100-499,20,4231,260432292,260089068,61553.0,61472.0
+3: 500-999,3,2588,227149058,207280627,87770.0,80093.0
+4: 1000+,8,15492,849262783,1052914109,54819.0,67965.0
