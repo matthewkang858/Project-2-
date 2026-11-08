@@ -311,7 +311,7 @@ segments = [
      'toward the 11.5% a year realised in 2022-25 (research notes 06, 17 (gap), 25)',
      'HIGH base; MID range', 'A3', 'bus_na_path'),
     (9, 'Bus ITS, rest of world', '=Market!B27', (0.06, 0.09, 0.11),
-     'Base: GMI APTS Asia-Pacific forecast (10.1%) blended with slower Latin America and Middle East/Africa (~8%). '
+     'Base: GMI APTS Asia-Pacific forecast (10.1%) blended with slower Latin America (7.2%) and Middle East and Africa (5.8%); the GMI-weighted blend is 9.0%. '
      'Low: rest-of-world bus grows nearer the global market (all-mode GMI rates may overstate bus). High: slightly '
      'above the GMI Asia-Pacific rate. The range is analyst judgement (research notes 05, 07, 17 (gap))',
      'MID', 'A3', 'bus_row_path'),
@@ -433,9 +433,9 @@ T.header(4, ['Item', 'Value', 'Unit', 'Source or method', 'Confidence', 'On slid
 T.section(5, 'A. INPUTS', 'G')
 returns_inputs = [
     (6, 'Entry revenue', 60, 'USD M',
-     'Illustrative. Privately held mid-market bus ITS vendors (Avail, GIRO, Hanover, ETA, Passio) range from under '
-     'USD 10M to roughly USD 110-115M of revenue; only Hanover files accounts (GBP 92.8M, about USD 111M), the others are '
-     'aggregator estimates that vary widely (GIRO about USD 115M; research notes 08, 32)',
+     'Illustrative. Privately held North American mid-market bus ITS vendors (Avail, GIRO, ETA, Passio) range from under '
+     'USD 10M to about USD 115M of revenue (GIRO about USD 115M, Avail about USD 25M); none files accounts, so all are '
+     'aggregator estimates that vary widely (research notes 08, 32)',
      'LOW', 'A4', 'rev0', F_M),
     (7, 'Entry EV / revenue', 2.0, 'x',
      "Below IVU's software multiple, inside the INIT-to-IVU trading band (rows 40 and 42; check row 46) and above the "
@@ -637,8 +637,8 @@ rd_table(['Slide', 'Sheet and rows', 'What it shows'], [
     ('A2 Market build', 'Market rows 7-41', 'Sizing chain'),
     ('A3 Growth scenarios', 'Growth rows 7-12 and 15', 'Bridge and low/base/high table'),
     ('A4 Exit multiples and returns', 'Returns rows 6-43', 'Benchmarks, value bridge, entry sensitivity'),
-    ('A5 Incumbency', 'none', 'Cited counts from an ITS award dataset (agency board records, 2016-26) and FTA NTD RY2025 '
-     'fleet tiers (research notes 35, 31)'),
+    ('A5 Incumbency', 'none', 'Cited counts from an ITS award dataset (agency board records, 2016-26), the 2009-16 CAD/AVL refresh cohort and '
+     'FTA NTD RY2025 fleet tiers (research notes 35, 31, 16)'),
 ])
 row[0] += 1
 
