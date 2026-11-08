@@ -492,7 +492,7 @@ function bracketV(s, x, y0, y1, tick, color) {
     if (i < drv.length - 1) s.addShape('line', { x: 8.35, y: ry + 0.79, w: 4.55, h: 0, line: { color: K.mgrey, width: 0.75 } });
   });
   T(s, "Impact on each segment's 2025-31 growth", { x: 10.4, y: 6.64, w: 2.5, h: 0.18, fontSize: 7.5, italic: true, color: K.grey, align: 'right' });
-  source(s, 'Note: Base case, nominal USD at constant 2025 FX; low and high cases in appendix A3. Model: sheet Growth. Sources: European Commission ERTMS Work Plan (2026), MTA 2025-29 Capital Program, MTR, Sustainable Bus (DVV Media), FTA, H.R. 8870, Network Rail CP7, Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), analysis');
+  source(s, 'Note: Base case, nominal USD at constant 2025 FX; low and high cases in appendix A3. Model: sheet Growth. Sources: European Commission ERTMS Work Plan (2026), MTA 2025-29 Capital Program, MTR, Sustainable Bus (DVV Media), FTA, H.R. 8870, Network Rail CP7, Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), analysis');
 
   // ---------------------------------------------------------------- S5 competitive landscape grid (0 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
@@ -717,7 +717,7 @@ function bracketV(s, x, y0, y1, tick, color) {
     [gc('Market, 2031E', { bold: true, color: K.navy, fill: { color: K.lgrey } }), gc(bn1(MP.low_2031), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc(bn1(MP.values[6]), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc(bn1(MP.high_2031), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc('', { fill: { color: K.lgrey } })],
   ];
   s.addTable(sc, { x: 6.4, y: 2.48, w: 6.5, colW: [1.8, 0.62, 0.62, 0.62, 2.84], rowH: [0.34, 0.56, 0.56, 0.48, 0.86, 0.48, 0.4], border: { type: 'solid', pt: 0.75, color: 'C7D3DA' }, autoPage: false });
-  source(s, "Note: Nominal USD at constant 2025 FX; low and high use each segment's own low or high rate. Model: sheet Growth. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), MarketsandMarkets, Mordor Intelligence, FTA, analysis");
+  source(s, "Note: Nominal USD at constant 2025 FX; low and high use each segment's own low or high rate. Model: sheet Growth. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), MarketsandMarkets, Mordor Intelligence, FTA, analysis");
 
   // ---------------------------------------------------------------- A4 exit multiples and returns (17 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });

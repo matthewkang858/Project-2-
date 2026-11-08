@@ -651,8 +651,9 @@ rd_table(['Research note (on request)', 'Source', 'Used for'], [
     ('15, 21', 'UNIFE World Rail Market Study 2026 (Bain), abstract', 'World rail control, EUR 24.9B'),
     ('21', 'Analyst carve-out matrix (Eurostat train-km, UITP network km, unit costs)',
      'Passenger share 74% (EUR 18.5B of 24.9B), urban share 30% (EUR 5.6B of 18.5B)'),
-    ('21', 'SCI Verkehr CCS study (Mar 2026)',
-     'Signalling growth bracket (4.6% nominal); "Europe almost half of world signalling"; cross-check (~EUR 20B)'),
+    ('21, 90', 'SCI Verkehr CCS studies: Worldwide Market Trends 2023 and 2026 (Mar 2026)',
+     'Signalling growth bracket (4.6% nominal, 2023-28, from the 2023 study); "Europe almost half of world signalling" '
+     'and cross-check (~EUR 20B), from the 2026 study'),
     ('01', 'Umbrella ITS reports (MarketsandMarkets, Grand View Research, Precedence Research, Mordor Intelligence)',
      'Funnel top, $40-60B, context only'),
     ('03, 13', 'MarketsandMarkets rail asset management; Mordor rail telematics', 'Other rail ITS growth, 7%'),
