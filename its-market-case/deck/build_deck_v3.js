@@ -7,16 +7,25 @@
 // does no arithmetic on model values beyond rounding for display and the chart-geometry scaling
 // (bar lengths, label positions). The only typed figures in the whole build are the CITED block
 // (appendix A2 cross-checks line and A5) and the NTD agency-tier shares read from data/, each with its source.
-// Guards C01-C58 (the claims register, model/claims_register.md) stop the build if any
+// Guards C01-C59 (the claims register, model/claims_register.md) stop the build if any
 // model-backed wording on a slide stops being true.
 //
-// Writes the main deck (cover + 6 slides) and a separate appendix deck (cover + A1-A5).
+// Writes the main deck (cover + 6 slides) and a separate appendix deck (cover + A1-A6).
 // Usage:  NODE_PATH=$PWD/node_modules node build_deck_v3.js
 //         DECK_DATA=<path to a deck_data.json> overrides the model export (used for guard tests);
 //         DECK_OUT=<dir> writes the two decks somewhere other than this folder.
 // Then:   python3 fix_paragraphs.py Public_ITS_Market_Case.pptx Public_ITS_Market_Case_Appendix.pptx
 const path = require('path');
 const fs = require('fs');
+// company logos (deck/logos/<slug>.png, parent companies only; see logos/SOURCES.md): fit each inside a box, keeping its shape
+const LOGO_DIR = path.join(__dirname, 'logos');
+function pngSize(file) { const b = fs.readFileSync(file); return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) }; }
+function logoFit(s, slug, x, y, w, h) {
+  const file = path.join(LOGO_DIR, slug + '.png');
+  if (!fs.existsSync(file)) throw new Error('missing logo: ' + file);
+  const { w: pw, h: ph } = pngSize(file), r = Math.min(w / pw, h / ph);
+  s.addImage({ path: file, x: x + (w - pw * r) / 2, y: y + (h - ph * r) / 2, w: pw * r, h: ph * r });
+}
 const pptxgen = require('pptxgenjs');
 const React = require('react');
 const RDS = require('react-dom/server');
@@ -131,7 +140,7 @@ const NTD = readCsv(path.join(__dirname, '..', 'data', 'ntd_2025_bus_agency_tier
   .map(r => ({ tier: r.tier, agencies: +r.agencies, pct: +r.share_of_vehicles_pct }));
 const tierPct = t => { const r = NTD.find(x => x.tier === t); return r ? r.pct : NaN; };
 
-// ---------------------------------------------------------------- claims register and build guards (C01-C58)
+// ---------------------------------------------------------------- claims register and build guards (C01-C59)
 // One entry per claim in model/claims_register.md, with the register's Slide and Wording cells verbatim
 // (figures inside the quotes come from the formatters). `check` is the exact condition from the
 // register; claims with check === null are cited facts (research files), listed for traceability.
@@ -169,7 +178,7 @@ const CLAIMS = [
   ['C30', 'S5', '"Sold beside the incumbent on short contracts" / "AI enforcement can be funded from fines"', null],
   ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout; execution risk (Alstom profit warning)", "(INIT guidance cut)" (S5) / "Alstom and INIT cut profit guidance" (S6)', null],
   ['C32', 'S5, A5', '"legacy installs are exposed at rebid (Conduent lost LA Metro)" (S5) / "In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas)" (A5)', null],
-  ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic (private, distressed) also competes" (S5 column header) / "Cubic\'s highly levered buyout is now distressed"; "Project-heavy integrators do not support high buyout leverage" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
+  ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic also competes" (A6 group label) / "Cubic\'s highly levered buyout is now distressed"; "Project-heavy integrators do not support high buyout leverage" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
   ['C34', 'S5', '"Via and Optibus still report losses"', null],
   ['C35', 'S5, S7', '"subscriptions fit federal capital grants poorly" (S5) / "structure subscriptions to fit federal capital-grant rules" (S7)', null],
   ['C36', 'S5', '"Exit benchmark: valuations rise with recurring mix"', () => D.bm_init < D.bm_ivu],
@@ -195,6 +204,7 @@ const CLAIMS = [
   ['C56', 'A4', '"half repaid by exit"', () => D.debt_repaid === 0.5],
   ['C57', 'S3', 'Rounding integrity: the S3 segment cells must add up to the total as printed', () => Math.abs(r1(D.mainline) + r1(D.urban) + r1(D.bus) + r1(D.ro) - r1(D.market)) < 0.051],
   ['C58', 'A2 bottom-up line', '"buses and vehicles \u00D7 price per unit across 11 spending pools gives ' + bn1(D.bu_total / 1000) + ' for North American bus ITS, ' + p0(D.bu_ratio) + ' of the top-down ' + bn1(D.bu_topdown / 1000) + '"', () => D.bu_ratio > 0.75 && D.bu_ratio < 1.25],
+  ['C59', 'A6', 'Player directory: each parent, its subsidiaries and brands, and its owner, as listed on A6', null],
 ];
 const failures = [];
 function guard(id, cond, detail) { if (!cond) failures.push(id + ': ' + detail); }
@@ -208,7 +218,7 @@ CLAIMS.forEach(([id, slide, wording, check]) => {
 D.checks.forEach(c => guard('MODEL', typeof c.value === 'number' && Math.abs(c.value) <= 1e-9, c.sheet + '!' + c.cell + ' ' + c.label + ' = ' + c.value));
 // The NTD tier file must give all four tiers.
 guard('NTD', NTD.length === 4 && NTD.every(r => Number.isFinite(r.pct)), 'data/ntd_2025_bus_agency_tiers.csv must hold four definition-A tiers');
-if (CLAIMS.length !== 58 || CLAIMS.some(([id], i) => id !== 'C' + String(i + 1).padStart(2, '0'))) failures.push('REGISTER: claims must run C01-C58 in order');
+if (CLAIMS.length !== 59 || CLAIMS.some(([id], i) => id !== 'C' + String(i + 1).padStart(2, '0'))) failures.push('REGISTER: claims must run C01-C59 in order');
 if (failures.length) { console.error('GUARD FAILURES (' + DATA_PATH + ')\n' + failures.join('\n')); process.exit(1); }
 console.log('guards: ' + CLAIMS.length + ' claims registered, ' + CLAIMS.filter(c => c[3]).length + ' model or data guards checked, ' + D.checks.length + ' model checks at 0; all pass');
 
@@ -222,7 +232,7 @@ async function iconData(name, color = '#FFFFFF') {
 
 // ---------------------------------------------------------------- deck scaffolding
 // Page number box. The main deck uses the master slide number; the appendix deck prints its own
-// page codes (A1-A5) in the same place, so its pages match the A-codes the main deck cross-refers to.
+// page codes (A1-A6) in the same place, so its pages match the A-codes the main deck cross-refers to.
 const SLIDE_NO = { x: 12.35, y: 7.02, w: 0.55, h: 0.3, fontFace: BODY, fontSize: 11, bold: true, color: '000000', align: 'right' };
 const pageCode = (s, code) => s.addText(code, Object.assign({}, SLIDE_NO, { isTextBox: true, margin: [7.2, 7.2, 3.6, 3.6], valign: 'top' }));
 function newDeck(title, numbered = true) {
@@ -509,41 +519,46 @@ function bracketV(s, x, y0, y1, tick, color) {
   title(s, 'Competitive Landscape: ', 'Signalling is a closed oligopoly; North American bus ITS is consolidating around Modaxo and Hitachi, leaving a private long tail to buy');
   hbar(s, 'COMPETITIVE SUMMARY: PUBLIC ITS PLAYER GROUPS AND IMPLICATIONS FOR A NEW ENTRANT', 0, CW, K.navy);
   const cols = [
-    ['SIGNALLING MAJORS', 'Siemens, Hitachi (incl. Thales GTS), Alstom, CRSC',
+    ['SIGNALLING MAJORS', ['siemens', 'hitachi', 'alstom', 'crsc'],
       'Together hold most of world signalling, with multi-year order books',
       'Safety-certified systems, long maintenance tails, multi-year frameworks (e.g., DB)',
       'Slow, publicly funded ETCS rollout; execution risk (Alstom profit warning)',
       'Closed core: compete only in adjacencies (monitoring, cyber, connectivity)'],
-    ['BUS ITS CONSOLIDATORS', 'Modaxo (Trapeze, Vontas, ex-Conduent Routeward); Hitachi (Clever Devices)',
+    ['BUS ITS CONSOLIDATORS', ['modaxo', 'hitachi'],
       'Modaxo owns the largest North American installed base; Hitachi is number two after buying Clever',
       'Largest installed bases, each kept for a system generation; Modaxo buys and never sells',
       'Ageing CAD/AVL architectures; legacy installs are exposed at rebid (Conduent lost LA Metro)',
       'Rival bidders for targets; Hitachi may buy at exit, Modaxo sets the floor'],
-    ['LISTED PURE PLAYS', 'INIT, IVU; Cubic (private, distressed) also competes',
+    ['LISTED PURE PLAYS', ['init', 'ivu'],
       'INIT is the largest listed bus ITS pure play; IVU is smaller and majority recurring',
       'Full stack (CAD/AVL, scheduling, fare) plus long-term service contracts',
       'Hardware and project mix squeezes margins (INIT guidance cut)',
       'Exit benchmark: valuations rise with recurring mix'],
-    ['MID-MARKET PRIVATES', 'Avail, GIRO, ETA, Passio',
+    ['MID-MARKET PRIVATES', ['avail', 'giro', 'eta', 'passio'],
       'A fragmented long tail of privately held specialists',
       'Sticky agency relationships; Avail and Passio lead real-time feeds at smaller US agencies',
       'Mostly sub-scale; some still founder-led (GIRO, ETA), so succession is open',
       'Most actionable targets for a buy-and-build platform'],
-    ['SAAS / AI CHALLENGERS', 'Swiftly, Optibus, Via, Hayden AI',
+    ['SAAS / AI CHALLENGERS', ['swiftly', 'optibus', 'via', 'haydenai'],
       'LA Metro and many other US agencies already run cloud overlays on legacy CAD/AVL',
       'Sold beside the incumbent on short contracts; AI enforcement can be funded from fines',
       'Via and Optibus still report losses; subscriptions fit federal capital grants poorly',
       'Partner or overlay; scaled players are priced as SaaS'],
   ];
-  const gx = 0.35, lw = 1.5, gw = 2.18, gg = 0.04, gy = 2.44;
-  const rowsG = [['MARKET POSITION', 0.86, K.navy, 'FFFFFF', '1A1A1A'], ['KEY STRENGTHS', 0.80, K.slate, K.pale, '1A1A1A'], ['KEY WEAKNESSES', 0.80, K.purple, K.lpurple, '1A1A1A'], ['IMPLICATION FOR A NEW ENTRANT', 0.80, K.black, K.grey, 'FFFFFF']];
+  const gx = 0.35, lw = 1.5, gw = 2.18, gg = 0.04, gy = 2.44, hT = 0.34, hL = 0.72;
+  const rowsG = [['MARKET POSITION', 0.78, K.navy, 'FFFFFF', '1A1A1A'], ['KEY STRENGTHS', 0.66, K.slate, K.pale, '1A1A1A'], ['KEY WEAKNESSES', 0.66, K.purple, K.lpurple, '1A1A1A'], ['IMPLICATION FOR A NEW ENTRANT', 0.70, K.black, K.grey, 'FFFFFF']];
   cols.forEach((c, j) => {
     const x = gx + lw + gg + j * (gw + gg);
-    R(s, x, gy, gw, 0.6, K.navy);
-    T(s, c[0], { x: x + 0.06, y: gy + 0.04, w: gw - 0.12, h: 0.26, fontFace: HEAD, fontSize: 12.5, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
-    T(s, c[1], { x: x + 0.06, y: gy + 0.29, w: gw - 0.12, h: 0.29, fontSize: 8, color: '9FD7F3', align: 'center', valign: 'middle' });
+    // group title on navy, then a white strip with the parent companies' logos (2 in a row, or 4 in a 2 x 2 grid)
+    R(s, x, gy, gw, hT, K.navy);
+    T(s, c[0], { x: x + 0.06, y: gy, w: gw - 0.12, h: hT, fontFace: HEAD, fontSize: 12.5, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
+    R(s, x, gy + hT, gw, hL, 'FFFFFF', K.navy);
+    const n = c[1].length, nc = 2, nr = Math.ceil(n / nc), pad = 0.08;
+    const sw = (gw - pad * (nc + 1)) / nc, sh = n > 2 ? (hL - pad * (nr + 1)) / nr : Math.min(0.34, hL - 2 * pad);
+    const y0 = gy + hT + (n > 2 ? pad : (hL - sh) / 2);
+    c[1].forEach((slug, k) => logoFit(s, slug, x + pad + (k % nc) * (sw + pad) + 0.06, y0 + Math.floor(k / nc) * (sh + pad), sw - 0.12, sh));
   });
-  let ry = gy + 0.64;
+  let ry = gy + hT + hL + 0.04;
   rowsG.forEach(([lab, h, lc, cc, tc], ri) => {
     if (ri === 3) {
       cols.forEach((c, j) => { const x = gx + lw + gg + j * (gw + gg); s.addShape('triangle', { x: x + gw / 2 - 0.3, y: ry - 0.02, w: 0.6, h: 0.2, flipV: true, fill: { color: K.navy }, line: { color: K.navy } }); });
@@ -555,11 +570,11 @@ function bracketV(s, x, y0, y1, tick, color) {
       const x = gx + lw + gg + j * (gw + gg);
       R(s, x, ry, gw, h, cc, ri === 0 ? K.mgrey : undefined);
       // one sentence per cell, no bullets; bold in the position and implication rows
-      T(s, c[2 + ri], { x: x + 0.07, y: ry + 0.02, w: gw - 0.12, h: h - 0.04, fontSize: 10.5, bold: ri === 0 || ri === 3, color: tc, valign: 'middle' });
+      T(s, c[2 + ri], { x: x + 0.07, y: ry + 0.02, w: gw - 0.12, h: h - 0.04, fontSize: 10, bold: ri === 0 || ri === 3, color: tc, valign: 'middle' });
     });
     ry += h + 0.04;
   });
-  source(s, 'Note: Positions are qualitative, from filed vendor revenue, agency award records and trading data; multiples in appendix A4. Sources: company reports and statutory filings (Siemens, Hitachi, Alstom, CRSC, INIT, IVU, Via, Companies House), Berg Insight, deal announcements, GTFS-Realtime feed census, agency board records, trading data as of 6 Nov 2026, analysis');
+  source(s, 'Note: Positions are qualitative, from filed vendor revenue, agency award records and trading data; multiples in appendix A4. Logos show parent companies; subsidiaries and brands are in appendix A6. Sources: company reports and statutory filings, Berg Insight, deal announcements, GTFS-Realtime feed census, agency board records, trading data as of 6 Nov 2026, analysis');
 
   // ---------------------------------------------------------------- S6 risks and barriers (0 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
@@ -643,7 +658,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   R(s, 0, 2.3, CW, 2.1, K.navy);
   T(s, 'APPENDIX: SUPPORTING ANALYSIS', { x: 0.7, y: 2.5, w: 11.8, h: 0.9, fontFace: HEAD, fontSize: 44, bold: true, color: 'FFFFFF', valign: 'middle' });
   T(s, 'PUBLIC ITS MARKET CASE: ROADWAY (BUS) AND RAILWAY', { x: 0.7, y: 3.4, w: 11.8, h: 0.7, fontFace: HEAD, fontSize: 24, bold: true, color: K.lblue, valign: 'middle' });
-  T(s, 'A1 Segmentation framework  |  A2 Market build  |  A3 Growth scenarios  |  A4 Exit multiples and returns  |  A5 Incumbency and entry window', { x: 0.7, y: 4.65, w: 11.8, h: 0.4, fontSize: 12.5, color: K.navy });
+  T(s, 'A1 Segmentation framework  |  A2 Market build  |  A3 Growth scenarios\nA4 Exit multiples and returns  |  A5 Incumbency and entry window  |  A6 Player directory', { x: 0.7, y: 4.65, w: 11.8, h: 0.7, fontSize: 12.5, color: K.navy });
 
   // ---------------------------------------------------------------- A1 segmentation framework (0 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
@@ -808,6 +823,30 @@ function bracketV(s, x, y0, y1, tick, color) {
   T(s, 'Share of active full-size buses in the US, by size of the operating agency; may not sum due to rounding', { x: 6.68, y: ty0 + 4 * tPitch - 0.08, w: 6.2, h: 0.25, fontSize: 9, italic: true, color: K.grey });
   T(s, [{ text: 'Refresh wave: ', options: { bold: true, color: K.mblue } }, { text: 'CAD/AVL platforms installed in 2009-16 now serve about ' + CITED.refresh_cohort.toLocaleString('en-US') + ' buses in the US and Canada (TriMet, Denver RTD, NJ Transit, Miami-Dade, TTC, TransLink and others)' }], { x: 6.68, y: 6.1, w: 6.2, h: 0.6, fontSize: 10, color: '1A1A1A', valign: 'top' });
   source(s, 'Sources: 2016-26 ITS award dataset (agency board records), FTA NTD RY2025 Revenue Vehicle Inventory, agency CAD/AVL records, analysis');
+
+  // ---------------------------------------------------------------- A6 player directory (parents, their subsidiaries and brands, owners)
+  // Rows from research notes 08, 09, 10, 22 (gap), 26 (gap), 32 (gap), 34 (gap); register C59. Two panels: groups 1-3 left, 4-6 right.
+  const DIRECTORY = [["Signalling majors", [["Siemens", "Siemens Mobility; Hacon (HAFAS), Sqills, eos.uptrade, Padam; MERMEC units (bought 2026)", "Siemens AG (listed)"], ["Hitachi", "Hitachi Rail; ex-Thales GTS (2024), ex-Ansaldo STS; SelTrac CBTC, HMAX", "Hitachi, Ltd. (listed, Tokyo)"], ["Alstom", "Urbalis, Atlas, HealthHub, Nomad Digital; ex-Bombardier (2021); 49% of CASCO", "Listed (Euronext Paris)"], ["CRSC", "CASCO Signal (51%; JV with Alstom)", "State-owned; listed (Shanghai, Hong Kong)"]]], ["Bus ITS consolidators", [["Modaxo", "Trapeze, Vontas, Routeward (ex-Conduent), Novvan (fare), TripSpark (incl. Routematch), TransLoc, SISCOG, FARA", "Constellation Software (listed, TSX)"], ["Hitachi Rail", "Clever Devices (now Hitachi Mobility Multimodal Solutions), incl. MAIOR scheduling", "Hitachi, Ltd. (listed); bought Clever Jul 2026"]]], ["Listed pure plays (Cubic also competes)", [["INIT", "DILAX, iris-GmbH (majority); MOBILE-ITCS, MOBILE-PLAN, MOBILEvario", "Listed (XETRA); founder-controlled"], ["IVU", "IVU.suite", "Listed (Frankfurt Prime Standard)"], ["Cubic", "Cubic Transportation Systems, Umo (NextBus brand retired)", "Veritas Capital, Elliott (private, distressed)"]]], ["Mid-market privates", [["Avail", "myAvail", "Private, employee-owned (ESOP)"], ["GIRO", "HASTUS, GeoRoute", "Private, founder-led"], ["ETA Transit Systems", "-", "Private, founder-led"], ["Passio (Transit Technologies)", "Passio, ParaPlan; sister brands Ecolane, TripMaster (CTS Software), Vestige", "Private (Transit Technologies LLC)"]]], ["SaaS / AI challengers", [["Swiftly", "Hopthru, TextMarks", "VC/growth equity (Cove Hill, JMI)"], ["Optibus", "-", "VC-backed (Insight, Bessemer)"], ["Via", "Remix, Citymapper, Downtowner", "Listed (NYSE: VIA)"], ["Hayden AI", "-", "VC-backed (TPG Rise Fund)"]]], ["Also active, not on the competitive landscape", [["Luminator", "LTG Sweden (ex-Mobitec)", "Audax Private Equity (since 2014)"], ["Hanover Displays", "-", "Private, family-owned"], ["Equans", "Ineo Systrans, Icomera", "Bouygues (since 2022)"]]]];
+  s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
+  crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A6 PLAYER DIRECTORY', color: K.navy }]);
+  pageCode(s, 'A6');
+  title(s, 'Player Directory: ', 'The parent companies behind the logos on the competitive landscape, with the subsidiaries and brands they sell under');
+  hbar(s, 'PUBLIC ITS PLAYERS BY GROUP: SUBSIDIARIES, BRANDS AND OWNERSHIP', 0, CW, K.navy);
+  const dirPanel = (gs, x) => {
+    const hc = (txt) => ({ text: txt, options: { bold: true, color: 'FFFFFF', fill: { color: K.navy }, fontSize: 9, valign: 'middle' } });
+    const rows = [[hc('Company'), hc('Subsidiaries and brands'), hc('Ownership')]];
+    gs.forEach(([g, rs]) => {
+      rows.push([{ text: g.toUpperCase(), options: { colspan: 3, bold: true, color: K.navy, fill: { color: K.pale }, fontSize: 8.5, valign: 'middle' } }]);
+      rs.forEach(([co, units, owner]) => rows.push([
+        { text: co, options: { bold: true, color: K.navy, fontSize: 8.5, valign: 'middle' } },
+        { text: units, options: { fontSize: 8.5, color: '1A1A1A', valign: 'middle' } },
+        { text: owner, options: { fontSize: 8.5, color: '1A1A1A', valign: 'middle' } }]));
+    });
+    s.addTable(rows, { x, y: 2.48, w: 6.1, colW: [1.25, 3.15, 1.7], border: { type: 'solid', pt: 0.5, color: 'C7D3DA' }, margin: 0.04, autoPage: false });
+  };
+  dirPanel(DIRECTORY.slice(0, 3), 0.45);
+  dirPanel(DIRECTORY.slice(3), 6.75);
+  source(s, 'Note: Logos on the competitive landscape show these parent companies only. Sources: company reports and websites, statutory filings, deal announcements (Hitachi, Constellation Software, Siemens, Bouygues), analysis');
 
   const out2 = path.join(OUT_DIR, 'Public_ITS_Market_Case_Appendix.pptx');
   await ap.writeFile({ fileName: out2 });
