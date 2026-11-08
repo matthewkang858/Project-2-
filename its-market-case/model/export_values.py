@@ -3,7 +3,7 @@
 Run after build_model.py and the LibreOffice recalculation (recalc.py):  python3 export_values.py [workbook] [output]
 
 Keys are discovered from the workbook itself; no cell address is written in this script.
-  - Market and Returns: every row with text in the 'Deck key' column becomes a scalar key (value from the 'Value' column).
+  - Market, Bottom-up and Returns: every row with text in the 'Deck key' column becomes a scalar key (value from the 'Value' column).
   - Growth: every row with text in the 'Deck key' column becomes a row object built from the year columns and the
     CAGR / increase / share / low / base / high columns (a field is included only if its cell holds a number).
   - checks: every row on any sheet whose column-A label starts with "Check:".
@@ -20,7 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 WORKBOOK = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'Public_ITS_Market_Model.xlsx')
 OUTPUT = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, 'deck_data.json')
 
-SCALAR_SHEETS = ('Market', 'Returns')
+SCALAR_SHEETS = ('Market', 'Bottom-up', 'Returns')
 ROW_SHEET = 'Growth'
 KEY_HEADER = 'Deck key'
 VALUE_HEADER = 'Value'
@@ -51,6 +51,7 @@ REQUIRED = [
     'exit_a_mult', 'exit_b_mult', 'ev0', 'ebitda0', 'debt0', 'eq0', 'bolt_cost', 'eq_in', 'rev1', 'debt1', 'ev_a',
     'moic_a', 'ev_b', 'moic_b', 'breakeven_mult', 'eq_in_at_a', 'moic_a_at_a', 'moic_b_at_a',
     'bm_conduent', 'bm_init', 'bm_clever', 'bm_ivu', 'bm_via',
+    'bu_total', 'bu_topdown', 'bu_ratio',
 ]
 
 problems = []
@@ -112,7 +113,7 @@ def add(key, value, cell):
     out['_meta']['cells'][key] = cell
 
 
-# 2. Scalar keys (Market, Returns)
+# 2. Scalar keys (Market, Bottom-up, Returns)
 for name in SCALAR_SHEETS:
     if name not in wb_v.sheetnames:
         problems.append('sheet %s missing' % name)

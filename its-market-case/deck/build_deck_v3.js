@@ -7,7 +7,7 @@
 // does no arithmetic on model values beyond rounding for display and the chart-geometry scaling
 // (bar lengths, label positions). The only typed figures in the whole build are the CITED block
 // (appendix A2 cross-checks line and A5) and the NTD agency-tier shares read from data/, each with its source.
-// Guards C01-C57 (the claims register, model/claims_register.md) stop the build if any
+// Guards C01-C58 (the claims register, model/claims_register.md) stop the build if any
 // model-backed wording on a slide stops being true.
 //
 // Writes the main deck (cover + 6 slides) and a separate appendix deck (cover + A1-A5).
@@ -131,7 +131,7 @@ const NTD = readCsv(path.join(__dirname, '..', 'data', 'ntd_2025_bus_agency_tier
   .map(r => ({ tier: r.tier, agencies: +r.agencies, pct: +r.share_of_vehicles_pct }));
 const tierPct = t => { const r = NTD.find(x => x.tier === t); return r ? r.pct : NaN; };
 
-// ---------------------------------------------------------------- claims register and build guards (C01-C57)
+// ---------------------------------------------------------------- claims register and build guards (C01-C58)
 // One entry per claim in model/claims_register.md, with the register's Slide and Wording cells verbatim
 // (figures inside the quotes come from the formatters). `check` is the exact condition from the
 // register; claims with check === null are cited facts (research files), listed for traceability.
@@ -194,6 +194,7 @@ const CLAIMS = [
   ['C55', 'A2 cross-checks line', '"GMI\'s CBTC-only market sits below our urban signalling, which also covers light rail"', () => D.urban > CITED.gmi_cbtc],
   ['C56', 'A4', '"half repaid by exit"', () => D.debt_repaid === 0.5],
   ['C57', 'S3', 'Rounding integrity: the S3 segment cells must add up to the total as printed', () => Math.abs(r1(D.mainline) + r1(D.urban) + r1(D.bus) + r1(D.ro) - r1(D.market)) < 0.051],
+  ['C58', 'A2 bottom-up line', '"buses and vehicles \u00D7 price per unit across 11 spending pools gives ' + bn1(D.bu_total / 1000) + ' for North American bus ITS, ' + p0(D.bu_ratio) + ' of the top-down ' + bn1(D.bu_topdown / 1000) + '"', () => D.bu_ratio > 0.75 && D.bu_ratio < 1.25],
 ];
 const failures = [];
 function guard(id, cond, detail) { if (!cond) failures.push(id + ': ' + detail); }
@@ -207,7 +208,7 @@ CLAIMS.forEach(([id, slide, wording, check]) => {
 D.checks.forEach(c => guard('MODEL', typeof c.value === 'number' && Math.abs(c.value) <= 1e-9, c.sheet + '!' + c.cell + ' ' + c.label + ' = ' + c.value));
 // The NTD tier file must give all four tiers.
 guard('NTD', NTD.length === 4 && NTD.every(r => Number.isFinite(r.pct)), 'data/ntd_2025_bus_agency_tiers.csv must hold four definition-A tiers');
-if (CLAIMS.length !== 57 || CLAIMS.some(([id], i) => id !== 'C' + String(i + 1).padStart(2, '0'))) failures.push('REGISTER: claims must run C01-C57 in order');
+if (CLAIMS.length !== 58 || CLAIMS.some(([id], i) => id !== 'C' + String(i + 1).padStart(2, '0'))) failures.push('REGISTER: claims must run C01-C58 in order');
 if (failures.length) { console.error('GUARD FAILURES (' + DATA_PATH + ')\n' + failures.join('\n')); process.exit(1); }
 console.log('guards: ' + CLAIMS.length + ' claims registered, ' + CLAIMS.filter(c => c[3]).length + ' model or data guards checked, ' + D.checks.length + ' model checks at 0; all pass');
 
@@ -688,13 +689,14 @@ function bracketV(s, x, y0, y1, tick, color) {
     [seg('Other rail ITS (passenger information, CCTV, monitoring)'), tc('GMI APTS (2026): ' + bn1(D.gmi_apts) + ', all modes'), tc('Rail share less ticketing, plus analyst estimates for condition monitoring and trackside detection'), val(D.ro), conf('LOW')],
     [tc('Total', { bold: true, color: K.navy, fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } }), tc(bn1(D.market), { bold: true, align: 'center', fontSize: 11, fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } })],
   ];
-  s.addTable(td, { x: 0.45, y: 2.48, w: 12.4, colW: [2.6, 3.4, 4.0, 1.1, 1.3], rowH: [0.36, 0.48, 0.48, 0.48, 0.48, 0.44, 0.52, 0.4], border: { type: 'solid', pt: 0.75, color: 'C7D3DA' }, autoPage: false });
-  // two bottom lines in the A1 style (bullets, same indent); the table ends at y 6.12, so the box starts 0.16in below it
+  s.addTable(td, { x: 0.45, y: 2.48, w: 12.4, colW: [2.6, 3.4, 4.0, 1.1, 1.3], rowH: [0.36, 0.44, 0.44, 0.44, 0.44, 0.44, 0.5, 0.38], border: { type: 'solid', pt: 0.75, color: 'C7D3DA' }, autoPage: false });
+  // three bottom lines in the A1 style (bullets, same indent); the table ends at y 5.92, so the box starts 0.14in below it
   T(s, paras([
     [['Open pool: ', true, K.mblue], ['software and services of bus ITS (GMI: ' + p0(D.bus_hw_2025) + ' hardware) and other rail ITS (' + p0(D.ro_hw) + ' hardware, analyst) = ' + bn1(D.open) + ', of which North American bus ' + bn1(D.open_na_bus)]],
     [['Cross-checks: ', true, K.mblue], ["SCI Verkehr's independent signalling estimate is " + CITED.sci_vs_unife_words + " of UNIFE's; GMI's CBTC-only market sits below our urban signalling, which also covers light rail"]],
-  ], { paraSpaceAfter: 3 }), { x: 0.45, y: 6.28, w: 12.4, h: 0.55, fontSize: 10.5, color: '1A1A1A' });
-  source(s, "Note: Nominal USD at 2025 average FX; figures may not sum due to rounding. Model: sheet Market, where every input carries its source and confidence. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), analysis");
+    [['Bottom-up: ', true, K.mblue], ['buses and vehicles \u00D7 price per unit across 11 spending pools gives ' + bn1(D.bu_total / 1000) + ' for North American bus ITS, ' + p0(D.bu_ratio) + ' of the top-down ' + bn1(D.bu_topdown / 1000)]],
+  ], { paraSpaceAfter: 3 }), { x: 0.45, y: 6.06, w: 12.4, h: 0.82, fontSize: 10.5, color: '1A1A1A' });
+  source(s, "Note: Nominal USD at 2025 average FX; figures may not sum due to rounding. Model: sheets Market and Bottom-up, where every input carries its source and confidence. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), analysis");
 
   // ---------------------------------------------------------------- A3 growth scenarios (22 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });

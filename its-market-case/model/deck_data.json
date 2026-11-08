@@ -47,6 +47,9 @@
    "open_share": "Market!B42",
    "sig_share": "Market!B43",
    "mainline_share": "Market!B44",
+   "bu_total": "Bottom-up!F23",
+   "bu_topdown": "Bottom-up!F25",
+   "bu_ratio": "Bottom-up!F26",
    "rev0": "Returns!B6",
    "entry_mult": "Returns!B7",
    "margin0": "Returns!B8",
@@ -126,6 +129,9 @@
  "open_share": 0.146857660483521,
  "sig_share": 0.727711045726308,
  "mainline_share": 0.509397732008416,
+ "bu_total": 1035.6623872,
+ "bu_topdown": 1102.88,
+ "bu_ratio": 0.939052650515015,
  "rev0": 60,
  "entry_mult": 2,
  "margin0": 0.15,
@@ -335,6 +341,12 @@
    "sheet": "Market",
    "cell": "B49",
    "label": "Check: open pool equals software and services of bus and other rail",
+   "value": 0
+  },
+  {
+   "sheet": "Bottom-up",
+   "cell": "F36",
+   "label": "Check: bottom-up within 25% of the top-down (0 = yes)",
    "value": 0
   },
   {

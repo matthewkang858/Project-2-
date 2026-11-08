@@ -549,6 +549,151 @@ T.text('D46', '0 if INIT multiple ≤ entry EV / revenue ≤ IVU multiple, other
 T.finish()
 
 # ----------------------------------------------------------------------------
+# Sheet: Bottom-up (cross-check of North American bus ITS, 2025)
+# ----------------------------------------------------------------------------
+wsb = wb.create_sheet('Bottom-up', 1)
+B = Sheet(wsb, {'A': 50, 'B': 11, 'C': 20, 'D': 12, 'E': 10, 'F': 11, 'G': 44, 'H': 72, 'I': 11, 'J': 16, 'K': 12},
+          wrap_cols='ACGHJ')
+B.title('Bottom-up: North American bus ITS spend, 2025 (cross-check of the top-down)',
+        'Each spending pool = units × price per unit ÷ years between purchases (1 = paid every year). Value = annual '
+        'spend in USD millions unless the Unit column says otherwise. Compares with the Berg-based top-down on the '
+        'Market sheet; feeds the cross-checks line on appendix A2. Pool sizes follow research note 31 (gap), section 5.')
+B.header(4, ['Item', 'Units', 'Unit', 'Price per unit, USD', 'Years per purchase', 'Value', 'How it is worked out',
+             'Source', 'Confidence', 'On slide', 'Deck key'])
+F_N0 = '#,##0'
+F_M1 = '#,##0.0'
+
+
+def b_row(r, label, units, unit, price, years, value, how, src, conf, slide='Not shown', key=None, vfmt=F_M1,
+          bold=False):
+    B.text('A%d' % r, label, BOLD if bold else BLACK)
+    if units is not None:
+        B.num('B%d' % r, units, F_N0)
+    else:
+        B.text('B%d' % r, '')
+    B.text('C%d' % r, unit)
+    if price is not None:
+        B.num('D%d' % r, price, F_N0)
+    else:
+        B.text('D%d' % r, '')
+    if years is not None:
+        B.num('E%d' % r, years, F_INT)
+    else:
+        B.text('E%d' % r, '')
+    B.num('F%d' % r, value, vfmt, bold=bold)
+    B.text('G%d' % r, how)
+    B.text('H%d' % r, src)
+    B.text('I%d' % r, conf)
+    B.text('J%d' % r, slide)
+    B.text('K%d' % r, key or '')
+
+
+B.section(5, 'A. FLEET', 'K')
+b_row(6, 'US active full-size transit buses, 2025', None, 'buses', None, None, 65239,
+      'Standard, articulated, over-the-road, double-deck and trolleybuses',
+      'FTA National Transit Database, report year 2025, revenue vehicle inventory (research notes 04, 16)', 'HIGH',
+      vfmt=F_N0)
+b_row(7, 'Canadian transit buses', None, 'buses', None, None, 16145, 'Urban transit buses',
+      'Canadian Urban Transit Association, 2023 (research notes 05, 31 (gap))', 'HIGH', vfmt=F_N0)
+b_row(8, 'North American transit buses', None, 'buses', None, None, '=F6+F7', 'US + Canada', 'Rows 6 and 7', 'n/a',
+      vfmt=F_N0, bold=True)
+b_row(9, 'Share of buses with an onboard computer', None, 'share', None, None, 0.919,
+      'Buses with GPS tracking and wireless data, North America 2025',
+      'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (research notes 01, 37 (gap))', 'HIGH',
+      vfmt=F_PCT)
+b_row(10, 'Share of buses with passenger counters', None, 'share', None, None, 0.70,
+      'Mid-point of 60-80% of the fleet',
+      'USDOT ITS deployment survey 2023: counters at 54-85% of agencies by size (research notes 15, 31 (gap))', 'MID',
+      vfmt=F_PCT)
+
+B.section(11, 'B. SPENDING POOLS, 2025: UNITS × PRICE ÷ YEARS BETWEEN PURCHASES', 'K')
+pools = [
+    (12, 'Dispatch and tracking system (CAD/AVL) replacement', '=F8', 'buses', 30000, 16,
+     'Each bus gets a new system about every 16 years',
+     'Agency board awards 2021-26: USD 20-42k per bus, more when radio and hosting are bundled; systems are replaced '
+     'every 12-20 years, a median 16 years at a decision point (research notes 31 (gap), 35 (gap))', 'MID'),
+    (13, 'Onboard kit fitted to new buses', 5500, 'new buses a year', 33000, 1,
+     'Tracking unit, counters, cameras, router and signs on each new bus; no fareboxes',
+     'About 4,500 US and 1,000 Canadian deliveries a year; USD 25-40k of ITS content per bus '
+     '(research notes 04, 31 (gap))', 'MID'),
+    (14, 'Vendor maintenance and hosting', '=F8*F9', 'equipped buses', 2200, 1,
+     'Yearly support contract for every bus with an onboard computer',
+     'Median of agency renewals: CTA 3.3k, GCRTA 2.9k, Miami-Dade 2.6k, AC Transit 2.2k, MARTA 1.0k per bus a year; '
+     'TfL iBus2 about 2.3k (research notes 12, 31 (gap), 35 (gap))', 'MID'),
+    (15, 'Real-time and analytics software (SaaS)', 66700, 'buses at mid-size and small agencies', 700, 1,
+     'Subscription overlays sold on top of the dispatch system',
+     'USD 0.4-1.0k per bus a year (AC Transit, MARTA, NCTD awards) on tier 2-4 fleets (research note 31 (gap))',
+     'MID'),
+    (16, 'Scheduling and operations software', '=F8', 'buses', 800, 1,
+     'Licences, support and upgrades, spread per bus',
+     'USD 0.5-1.2k per bus a year, including HASTUS licence and support (research notes 31 (gap), 35 (gap))', 'MID'),
+    (17, 'Onboard video', '=F8', 'buses', 11000, 10, 'Camera systems replaced about every 10 years',
+     'CapMetro (Luminator) USD 10.9k and Golden Gate USD 11.3k per bus; replaced every 8-12 years '
+     '(research notes 31 (gap), 35 (gap))', 'MID'),
+    (18, 'Passenger counters, including support', '=F8*F10', 'equipped buses', 820, 1,
+     'USD 5-7.5k of sensors over 12 years plus about USD 300 a year of support',
+     'Marin/UTA USD 7.3k per bus turnkey; AC Transit USD 8.2k (research notes 31 (gap), 35 (gap))', 'MID'),
+    (19, 'Stop and station signs (real-time information)', '=F8', 'buses', 800, 1,
+     'Wayside displays and their upkeep, expressed per bus',
+     'USD 0.4-1.2k per bus a year; Houston pays about USD 1.24k per sign a year (research note 31 (gap))', 'MID'),
+    (21, 'Paratransit tracking and scheduling', 45000, 'on-demand vehicles', 1500, 1,
+     'Minibuses and vans that run door-to-door services',
+     'About 45,000 demand-response vehicles; USD 1.0-2.2k per vehicle a year (research notes 04, 31 (gap))', 'MID'),
+    (22, 'Onboard connectivity', '=F8', 'buses', 1000, 1, 'Routers and cellular data for every bus',
+     'USD 0.6-1.3k per bus a year (research note 31 (gap))', 'MID'),
+]
+for r, label, units, unit, price, years, how, src, conf in pools:
+    b_row(r, label, units, unit, price, years, '=B%d*D%d/E%d/1000000' % (r, r, r), how, src, conf)
+b_row(20, 'Bus-lane enforcement cameras', None, 'USD M a year', None, None, 75,
+      'City programmes that catch cars blocking bus lanes and stops',
+      "New York's camera programme costs about USD 51M a year, plus Los Angeles, Chicago, the Bay Area, Washington "
+      'DC and Philadelphia (research note 31 (gap))', 'MID')
+b_row(23, 'Bottom-up total, North American bus ITS', None, 'USD M a year', None, None, '=SUM(F12:F22)',
+      'Sum of the 11 pools', 'Rows 12-22', 'n/a', 'A2 (cross-checks line)', 'bu_total', bold=True)
+
+B.section(24, 'C. COMPARISON WITH THE TOP-DOWN', 'K')
+b_row(25, 'Top-down: North American bus and tram ITS, excluding fare collection', None, 'USD M a year', None, None,
+      '=Market!B26*1000', 'Berg Insight North America, converted to USD, less fare collection',
+      'Market sheet, row 26', 'MID', 'A2 (cross-checks line)', 'bu_topdown')
+b_row(26, 'Bottom-up ÷ top-down', None, 'share', None, None, '=F23/F25',
+      'The two methods agree within a few per cent', 'Rows 23 and 25', 'n/a', 'A2 (cross-checks line)', 'bu_ratio',
+      vfmt=F_PCT, bold=True)
+b_row(27, 'Bottom-up range in the research: low', None, 'USD M a year', None, None, 615,
+      'Every pool at the low end of its price range', 'Research note 31 (gap), section 5', 'MID')
+b_row(28, 'Bottom-up range in the research: high', None, 'USD M a year', None, None, 1563,
+      'Every pool at the high end; the top-down sits inside the range', 'Research note 31 (gap), section 5', 'MID')
+B.text('A29', 'Reading the gap', BOLD)
+B.text('G29', 'The bottom-up counts enforcement cameras, which Berg may partly leave out; the top-down counts trams, '
+              'which a bus count leaves out. Neither difference is large, so the top-down stands.')
+for col in 'BCDEFHIJK':
+    B.text('%s29' % col, '')
+
+B.section(30, 'D. GROWTH CHECK: WITH A FLAT FLEET, GROWTH COMES FROM SPEND PER BUS', 'K')
+b_row(31, 'US active full-size transit buses, 2022', None, 'buses', None, None, 65642,
+      'Same definition as row 6, three years earlier', 'FTA National Transit Database, report year 2022 '
+      '(research note 04)', 'HIGH', vfmt=F_N0)
+b_row(32, 'US fleet growth a year, 2022-25', None, 'share', None, None, '=(F6/F31)^(1/3)-1',
+      'The fleet is flat', 'Rows 6 and 31', 'n/a', vfmt=F_PCT)
+b_row(33, 'Top-down growth, North American bus ITS, base case', None, 'share', None, None, '=Growth!M8',
+      "Berg Insight's 2025-30 forecast", 'Growth sheet, row 8', 'HIGH', vfmt=F_PCT)
+b_row(34, 'Implied growth in spend per bus a year', None, 'share', None, None, '=(1+F33)/(1+F32)-1',
+      'All the growth has to come from more spend per bus',
+      'Supported by per-bus platform prices up 1.5-2x between 2003-15 and 2021-25 awards, maintenance prices rising '
+      '3-5% a year, and the 2009-16 refresh cohort reaching decisions by 2031 (research note 31 (gap))', 'MID',
+      vfmt=F_PCT)
+
+B.section(35, 'E. CHECK (should be 0)', 'K')
+B.text('A36', 'Check: bottom-up within 25% of the top-down (0 = yes)')
+for col in 'BCDE':
+    B.text('%s36' % col, '')
+B.num('F36', '=IF(ABS(F26-1)<=0.25,0,1)', F_CHK)
+B.text('G36', '0 if bottom-up ÷ top-down is between 75% and 125%, otherwise 1')
+for col in 'HIJK':
+    B.text('%s36' % col, '')
+B.finish(freeze='B5')
+
+
+# ----------------------------------------------------------------------------
 # Sheet: README (text only, no formulas). Inserted first.
 # ----------------------------------------------------------------------------
 wsd = wb.create_sheet('README', 0)
@@ -586,11 +731,13 @@ def rd_table(headers, rows):
 
 rd_section('1. How to read this model')
 rd_line('Layout', 'One sheet per quantitative slide: Market (slide 3), Growth (slide 4), Returns (slide 7). '
-                  'Slide 2 summarises all three; slides 5 and 6 carry no numbers.')
+                  'Slide 2 summarises all three; slides 5 and 6 carry no numbers. Bottom-up cross-checks North '
+                  'American bus from buses × price per unit; it feeds no headline number.')
 rd_line('Reading order', 'Each sheet reads top to bottom, from blue inputs through black formulas to its checks (every '
                          'check should equal 0). Market: A. Inputs > B. Build > C. Funnel > D. Checks. Growth: one row '
                          'per segment, with the CAGR inputs in blue in columns L-N, then the bus total and open pool, '
-                         'then checks. Returns: A. Inputs > B. Value bridge > C. Memo > D. Exit benchmarks > E. Checks.')
+                         'then checks. Returns: A. Inputs > B. Value bridge > C. Memo > D. Exit benchmarks > E. Checks. '
+                         'Bottom-up: A. Fleet > B. Spending pools > C. Comparison > D. Growth check > E. Check.')
 rd_line('Colours', 'Blue = hard-coded input; black = formula on the same sheet; green = link to another sheet.')
 rd_line('Confidence', 'HIGH = published figure used as stated; MID = published figure re-scoped, or a judgement inside '
                       'a sourced bracket; LOW = analyst estimate. Growth rows with a published base and an analyst '
@@ -616,6 +763,8 @@ chain = [
     "straight line to GMI's implied 2031 mix, which lifts the open pool's growth.",
     "Returns: buy below a software multiple with modest debt, add bolt-ons, exit at the Clever precedent (Returns row "
     "15) or at IVU's multiple (row 16); gross MOIC = exit equity ÷ equity invested.",
+    'Cross-check: Bottom-up builds North American bus ITS spend from 11 pools (buses or vehicles × price per unit '
+    '÷ years between purchases) and compares it with the top-down North American bus row on Market.',
 ]
 for i, t in enumerate(chain, 1):
     rd_line(str(i), t)
@@ -635,7 +784,7 @@ rd_table(['Slide', 'Sheet and rows', 'What it shows'], [
      "levered buyout; other sources are cited in each slide's source line"),
     ('S7 Thesis', 'Returns B14:B16, B28, B30; B7, B9, B39:B43 (in words); Market B41; B25:B26 (in words)',
      'Exit multiples, MOIC, North American bus software and services'),
-    ('A2 Market build', 'Market rows 7-41', 'Sizing chain'),
+    ('A2 Market build', 'Market rows 7-41; Bottom-up F23, F25, F26 (cross-checks line)', 'Sizing chain and the bottom-up cross-check'),
     ('A3 Growth scenarios', 'Growth rows 7-12 and 15', 'Bridge and low/base/high table'),
     ('A4 Exit multiples and returns', 'Returns rows 6-43', 'Benchmarks, value bridge, entry sensitivity'),
     ('A5 Incumbency', 'none', 'Cited counts from an ITS award dataset (agency board records, 2016-26), the 2009-16 CAD/AVL refresh cohort and '
@@ -647,6 +796,8 @@ rd_section('4. Sources')
 rd_table(['Research note (on request)', 'Source', 'Used for'], [
     ('01, 17 (gap)', 'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (Mar 2026)',
      'Bus and tram ITS, Europe and North America; bus growth rates (5.3%, 5.0%)'),
+    ('04, 16, 31 (gap), 35 (gap)', 'FTA National Transit Database (RY2022, RY2025); Canadian Urban Transit Association; agency board awards and renewals',
+     'Bottom-up fleet counts and prices per bus'),
     ('17 (gap)', 'Global Market Insights, Advanced Public Transportation Systems (Aug 2026)',
      'Rest-of-world bus mix; other rail ITS; bus hardware share and its 2031 shift'),
     ('15, 21', 'UNIFE World Rail Market Study 2026 (Bain), abstract', 'World rail control, EUR 24.9B'),

@@ -63,6 +63,7 @@ Rows with a build guard are checked by `deck/build_deck_v3.js` every time the de
 | C55 | A2 cross-checks line | "GMI's CBTC-only market sits below our urban signalling, which also covers light rail" | USD 4.91B vs $6.2B | research/21_gap; `CITED.gmi_cbtc` | `urban > CITED.gmi_cbtc` |
 | C56 | A4 | "half repaid by exit" | 50% | `debt_repaid` | `debt_repaid === 0.5` |
 | C57 | S3 | Rounding integrity: the S3 segment cells must add up to the total as printed | 14.6 + 6.2 + 4.6 + 3.2 = 28.6 | formatter | `Math.abs(sum of n1-rounded segments − round1(market)) < 0.051` |
+| C58 | A2 bottom-up line | "buses and vehicles × price per unit across 11 spending pools gives $1.0B for North American bus ITS, 94% of the top-down $1.1B" | Bottom-up USD 1,036M (11 pools: CAD/AVL replacement, kit on new buses, maintenance and hosting, SaaS, scheduling, video, passenger counters, stop signs, enforcement cameras, paratransit, connectivity) against top-down USD 1,103M; research range USD 615-1,563M | model sheet Bottom-up; research/31_gap section 5 | `bu_ratio` between 0.75 and 1.25 |
 
 ## Likely questions and answers
 
