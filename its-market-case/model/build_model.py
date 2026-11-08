@@ -436,7 +436,7 @@ returns_inputs = [
      'Illustrative. Privately held North American mid-market bus ITS vendors (Avail, GIRO, ETA, Passio) range from under '
      'USD 10M to about USD 115M of revenue (GIRO about USD 115M, Avail about USD 25M); none files accounts, so all are '
      'aggregator estimates that vary widely (research notes 08, 32)',
-     'LOW', 'A4', 'rev0', F_M),
+     'ASSUMPTION', 'A4', 'rev0', F_M),
     (7, 'Entry EV / revenue', 2.0, 'x',
      "Below IVU's software multiple, inside the INIT-to-IVU trading band (rows 40 and 42; check row 46) and above the "
      'Clever precedent (row 15); see memo rows 34-36 (research note 26)',
@@ -449,13 +449,13 @@ returns_inputs = [
      'MID', 'A4 (assumptions); S2, S5, S6, S7 (in words)', 'leverage', F_X),
     (10, 'Share of entry debt repaid by exit', 0.5, 'share',
      'Simplifying assumption: half of the entry debt is repaid from operating cash flow over the hold',
-     'LOW', 'A4 (assumptions, in words: "half")', 'debt_repaid', F_PCT),
+     'ASSUMPTION', 'A4 (assumptions, in words: "half")', 'debt_repaid', F_PCT),
     (11, 'Organic revenue growth a year', 0.08, 'share',
      'Above the North American bus market (5.0%) on module cross-sell; well below Via and INIT (24-29%) (research note 26)',
      'MID', 'A4 (assumptions)', 'growth', F_PCT),
     (12, 'Bolt-on revenue acquired over the hold', 40, 'USD M',
      'Two or three point-solution bolt-ons (passenger counting, passenger information, enforcement)',
-     'LOW', 'A4 (assumptions)', 'bolt_rev', F_M),
+     'ASSUMPTION', 'A4 (assumptions)', 'bolt_rev', F_M),
     (13, 'Bolt-on EV / revenue', 1.5, 'x',
      'Between Modaxo-Conduent (row 39) and the Clever precedent (row 15) (research note 34)',
      'MID', 'A4 (assumptions)', 'bolt_mult', F_X),
@@ -594,7 +594,8 @@ rd_line('Reading order', 'Each sheet reads top to bottom, from blue inputs throu
 rd_line('Colours', 'Blue = hard-coded input; black = formula on the same sheet; green = link to another sheet.')
 rd_line('Confidence', 'HIGH = published figure used as stated; MID = published figure re-scoped, or a judgement inside '
                       'a sourced bracket; LOW = analyst estimate. Growth rows with a published base and an analyst '
-                      'range show both (for example HIGH base; MID range).')
+                      'range show both (for example HIGH base; MID range). ASSUMPTION = an illustrative deal input on the '
+                      'Returns sheet, chosen for the value bridge rather than estimated from data.')
 rd_line('Slide link', "Column 'On slide' shows where each number appears. The decks read these cells directly (column "
                       "'Deck key' names each one), so no slide number is retyped.")
 rd_line('Scenarios', 'Low, base and high CAGRs sit side by side on Growth (columns L-N). There is no scenario selector: '

@@ -147,7 +147,7 @@ const CLAIMS = [
   ['C08', 'S4 legend and pill', '"Bus and tram ITS" / "Faster than the market; rest of world leads" (legend label and tag) / "' + p1(BP.cagr) + '" (CAGR pill)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
   ['C09', 'S2, S4 legend and pill', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "' + p1(SP.cagr) + '" (S4 CAGR pill) / "as it excludes signalling" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
   ['C10', 'S4 legend and pill', '"Other rail ITS" / "Faster than the market (condition monitoring)" (legend label and tag) / "' + p1(RP.cagr) + '" (CAGR pill)', () => RP.cagr > MP.cagr],
-  ['C11', 'S4 driver 1, S2', '"Most of the EU core network still lacks ETCS, although TEN-T makes it mandatory; tens of billions of euros of work remain" (S4) / "the ETCS mandate" (S2)', null],
+  ['C11', 'S4 driver 1, S2', '"EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work" (S4) / "the ETCS mandate" (S2)', null],
   ['C12', 'S4 driver 2', '"New York, Paris, Toronto and Hong Kong are funding metro resignalling"', null],
   ['C13', 'S4 driver 2', '"most European signalling spend goes to existing lines"', null],
   ['C14', 'S2, S4 driver 3, S7, A5', '"A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031" (S4) / "bus platform refresh" (S2) / "Dated refresh wave: CAD/AVL platforms installed 2009-16 at major agencies reach a replace-or-extend decision by 2031" (S7) / "Refresh wave: CAD/AVL platforms installed in 2009-16 now serve about ' + CITED.refresh_cohort.toLocaleString('en-US') + ' buses in the US and Canada" (A5)', null],
@@ -483,11 +483,11 @@ function bracketV(s, x, y0, y1, tick, color) {
   });
   // drivers panel
   const drv = [
-    ['FaTrainSubway', 'ERTMS / ETCS mandate (Europe)', 'Most of the EU core network still lacks ETCS, although TEN-T makes it mandatory; tens of billions of euros of work remain', 'HIGH', K.green],
-    ['FaTrain', 'Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling; most European signalling spend goes to existing lines', 'HIGH', K.green],
-    ['FaBus', 'Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', 'HIGH', K.green],
-    ['FaChargingStation', 'Zero-emission buses, AI enforcement', 'Most new European city buses are now electric; camera-based bus-lane enforcement is scaling across US cities', 'MID', K.mblue],
-    ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed; the UK cut its ETCS budget', 'MID', K.mblue],
+    ['FaTrainSubway', 'EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
+    ['FaTrain', 'Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling; most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
+    ['FaBus', 'Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', '\u25B2 HIGH', K.green],
+    ['FaChargingStation', 'Zero-emission buses, AI enforcement', 'Most new European city buses are now electric; camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
+    ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed; the UK cut its ETCS budget', '\u25BC MID', K.red],
   ];
   drv.forEach(([icn, h, st, lvl, col], i) => {
     const ry = 2.5 + i * 0.83;
@@ -498,7 +498,7 @@ function bracketV(s, x, y0, y1, tick, color) {
     T(s, lvl, { x: 12.16, y: ry + 0.12, w: 0.74, h: 0.5, fontFace: HEAD, fontSize: 15, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
     if (i < drv.length - 1) s.addShape('line', { x: 8.35, y: ry + 0.79, w: 4.55, h: 0, line: { color: K.mgrey, width: 0.75 } });
   });
-  T(s, "Impact on each segment's 2025-31 growth", { x: 10.4, y: 6.64, w: 2.5, h: 0.18, fontSize: 7.5, italic: true, color: K.grey, align: 'right' });
+  T(s, '\u25B2 raises and \u25BC lowers 2025-31 growth; HIGH or MID is the size of the effect on its segment', { x: 8.35, y: 6.64, w: 4.55, h: 0.18, fontSize: 7.5, italic: true, color: K.grey, align: 'right' });
   source(s, 'Note: Base case, nominal USD at constant 2025 FX; low and high cases in appendix A3. Model: sheet Growth. Sources: European Commission ERTMS Work Plan (2026), MTA 2025-29 Capital Program, MTR, Sustainable Bus (DVV Media), FTA, H.R. 8870, Network Rail CP7, Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), analysis');
 
   // ---------------------------------------------------------------- S5 competitive landscape grid (0 numbers)
@@ -669,7 +669,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A2 MARKET BUILD', color: K.navy }]);
   pageCode(s, 'A2');
-  title(s, 'Market Build: ', 'Each segment starts from a published estimate with stated adjustments; rest-of-world bus and other rail ITS carry low confidence');
+  title(s, 'Market Build: ', 'Each segment starts from a published estimate with stated adjustments; the two analyst-estimated segments sit outside the North American thesis');
   hbar(s, 'HOW THE 2025 MARKET IS BUILT, BILLIONS USD', 0, CW, K.navy);
   const tc = (t, o = {}) => ({ text: t, options: Object.assign({ fontFace: BODY, fontSize: 10, color: '1A1A1A', valign: 'middle', margin: 0.06 }, o) });
   const th3 = (t, o = {}) => tc(t, Object.assign({ bold: true, color: 'FFFFFF', fill: { color: K.navy }, fontSize: 10.5 }, o));
@@ -789,7 +789,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   T(s, 'median age of an incumbent system when it reaches a decision point (n=' + CITED.tenure_n + ')', { x: 2.7, y: 4.05, w: 3.4, h: 1.05, fontSize: 10.5, color: '1A1A1A', valign: 'middle' });
   // caveat
   R(s, 0.45, 5.3, 5.8, 0.9, K.lgrey);
-  T(s, [{ text: 'Directional only: ', options: { bold: true } }, { text: 'a small, hand-built sample from agency board records. In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas).' }], { x: 0.6, y: 5.3, w: 5.5, h: 0.9, fontSize: 10, color: '1A1A1A', valign: 'middle' });
+  T(s, [{ text: 'Sample: ', options: { bold: true } }, { text: CITED.dp_total + ' decisions on incumbent-held systems in the US, Canada and the UK, from agency board records. In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas).' }], { x: 0.6, y: 5.3, w: 5.5, h: 0.9, fontSize: 10, color: '1A1A1A', valign: 'middle' });
   // fleet by agency tier (bar lengths: chart geometry on the CSV shares)
   const tiers = ['4: 1000+', '3: 250-999', '2: 50-249', '1: 1-49'].map(t => NTD.find(r => r.tier === t));
   const tx = 8.3, tScale = 2.4 / 35, ty0 = 2.75, tPitch = 0.72, tH = 0.5;
