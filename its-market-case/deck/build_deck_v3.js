@@ -144,9 +144,9 @@ const CLAIMS = [
   ['C05', 'S3 lens', '"Europe is the largest region, with almost half of world signalling spend"', () => D.bus_eu > D.bus_na && D.bus_eu > D.bus_row],
   ['C06', 'S3 lens', '"hardware is still just under half of value" (bus and other rail ITS)', () => D.bus_hw_2025 >= 0.40 && D.bus_hw_2025 < 0.50 && D.ro_hw >= 0.40 && D.ro_hw < 0.50],
   ['C07', 'S3 lens, S2', '"software grows fastest as onboard systems move to cloud" (S3) / "gains share from hardware" (S2)', () => D.bus_hw_path.values[6] < D.bus_hw_path.values[0]],
-  ['C08', 'S4 legend', '"Bus and tram ITS" / "Faster than the market; rest of world leads" (legend label and tag)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
-  ['C09', 'S2, S4 legend', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "as it excludes signalling" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
-  ['C10', 'S4 legend', '"Other rail ITS" / "Faster than the market (condition monitoring)" (legend label and tag)', () => RP.cagr > MP.cagr],
+  ['C08', 'S4 legend and pill', '"Bus and tram ITS" / "Faster than the market; rest of world leads" (legend label and tag) / "' + p1(BP.cagr) + '" (CAGR pill)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
+  ['C09', 'S2, S4 legend and pill', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "' + p1(SP.cagr) + '" (S4 CAGR pill) / "as it excludes signalling" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
+  ['C10', 'S4 legend and pill', '"Other rail ITS" / "Faster than the market (condition monitoring)" (legend label and tag) / "' + p1(RP.cagr) + '" (CAGR pill)', () => RP.cagr > MP.cagr],
   ['C11', 'S4 driver 1, S2', '"Most of the EU core network still lacks ETCS, although TEN-T makes it mandatory; tens of billions of euros of work remain" (S4) / "the ETCS mandate" (S2)', null],
   ['C12', 'S4 driver 2', '"New York, Paris, Toronto and Hong Kong are funding metro resignalling"', null],
   ['C13', 'S4 driver 2', '"most European signalling spend goes to existing lines"', null],
@@ -461,7 +461,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   T(s, '2025-31E CAGR:', { x: 7.3, y: 2.45, w: 0.85, h: 0.3, fontFace: HEAD, fontSize: 11, bold: true, color: K.navy, align: 'center', valign: 'bottom' });
   pill(s, 7.33, yv(MP.values[6]) - 0.3, 0.8, 0.28, p1(MP.cagr), { line: K.black, size: 12 });
   pill(s, 7.33, yb + 0.3, 0.8, 0.28, p1(OP.cagr), { line: K.navy, size: 12 });
-  // legend, top series first; tags in words only (guards C08-C10)
+  // legend, top series first; the segment CAGRs sit in pills on the 2031E bar (guards C08-C10)
   const leg = [
     ['Bus and tram ITS', K.navy, K.sBus, 'Faster than the market; rest of world leads'],
     ['Other rail ITS', K.navy, K.sOther, 'Faster than the market (condition monitoring)'],
@@ -473,6 +473,13 @@ function bracketV(s, x, y0, y1, tick, color) {
     T(s, n, { x: 0.3, y: ly - 0.02, w: 1.6, h: 0.42, fontSize: 10.5, bold: true, color: tc, valign: 'bottom' });
     s.addShape('line', { x: 0.3, y: ly + 0.44, w: 1.6, h: 0, line: { color: lc, width: 3 } });
     T(s, tag, { x: 0.3, y: ly + 0.49, w: 1.6, h: 0.4, fontSize: 8.5, italic: true, color: K.grey });
+  });
+  // segment CAGR pills beside each segment of the 2031E bar, tied to it by a short leader (guards C08-C10)
+  const s31 = SP.values[6], r31 = RP.values[6], bar = band / 1.4, barR = px + band * 6 + band / 2 + bar / 2 + 0.03;
+  [[BP.cagr, yv(MP.values[6]), yv(s31 + r31), K.sBus, '1B8CC4'], [RP.cagr, yv(s31 + r31), yv(s31), K.sOther, K.sOther], [SP.cagr, yv(s31), yv(0), K.sMain, K.sMain]].forEach(([c, ya, yz, lc, tc]) => {
+    const m = (ya + yz) / 2;
+    s.addShape('line', { x: barR, y: m, w: 7.33 - barR, h: 0, line: { color: lc, width: 1 } });
+    pill(s, 7.33, m - 0.13, 0.8, 0.26, p1(c), { line: lc, size: 11, color: tc });
   });
   // drivers panel
   const drv = [
