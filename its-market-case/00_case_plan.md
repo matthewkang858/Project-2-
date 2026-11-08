@@ -19,6 +19,8 @@ Adjacent but out of scope (flag only): fare collection/ticketing & AFC, roadway 
 
 ## 2. Model architecture (Excel)
 
+As built (November 2026), the model is simpler than this plan: four sheets, README, Market (2025 size and funnel), Growth (2025-2031E, low / base / high side by side) and Returns (illustrative value bridge and exit benchmarks). README.md lists what was removed and where it now lives. The original plan follows.
+
 1. README: structure, color legend (blue inputs / black formulas / green links), sources.
 2. Inputs: fleet & network counts by region x mode (buses, metro/LRT vehicles, commuter/mainline cars, signalled route-km); penetration rates by domain; replacement cycles; unit economics (hardware $/vehicle, software $/vehicle/yr, services % of hardware+software); recurring vs one-off split.
 3. Top-down triangulation: third-party estimates with scope definitions and scope adjustments -> scope-matched 2025 range.
@@ -29,6 +31,8 @@ Adjacent but out of scope (flag only): fare collection/ticketing & AFC, roadway 
 8. Chart data feeding the deck.
 
 ## 3. Slide storyline (6 slides)
+
+As built, the six slides follow this order. The market build, growth scenarios, exit multiples and incumbency evidence sit in a separate appendix deck (A1-A5), and slides 5 and 6 make their points in words rather than numbers.
 
 1. Executive summary: market size & growth headline, segment mix, what drives it, who wins, where a new entrant should play, key risks.
 2. Market definition, segmentation & 2025 size: framework diagram + size by mode x component x region, with top-down vs bottom-up triangulation.

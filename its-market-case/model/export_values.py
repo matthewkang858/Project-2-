@@ -3,8 +3,8 @@
 Run after build_model.py and the LibreOffice recalculation (recalc.py):  python3 export_values.py [workbook] [output]
 
 Keys are discovered from the workbook itself; no cell address is written in this script.
-  - Market and Returns: every row with text in the 'JSON key' column becomes a scalar key (value from the 'Value' column).
-  - Growth: every row with text in the 'JSON key' column becomes a row object built from the year columns and the
+  - Market and Returns: every row with text in the 'Deck key' column becomes a scalar key (value from the 'Value' column).
+  - Growth: every row with text in the 'Deck key' column becomes a row object built from the year columns and the
     CAGR / increase / share / low / base / high columns (a field is included only if its cell holds a number).
   - checks: every row on any sheet whose column-A label starts with "Check:".
 The script exits non-zero and writes nothing if a key is duplicated or missing, a keyed cell is empty or not numeric,
@@ -22,16 +22,16 @@ OUTPUT = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, 'deck_data.jso
 
 SCALAR_SHEETS = ('Market', 'Returns')
 ROW_SHEET = 'Growth'
-KEY_HEADER = 'JSON key'
+KEY_HEADER = 'Deck key'
 VALUE_HEADER = 'Value'
 FIRST_YEAR_HEADER = '2025'
 # Growth column headers -> row-object field names
 ROW_FIELDS = {
-    'CAGR 2025-31E': 'cagr',
+    'CAGR 2025-31E (from path)': 'cagr',
     'Increase 2025-31E': 'increase',
     'Share of increase': 'share_of_increase',
     'CAGR low': 'cagr_low',
-    'CAGR base': 'cagr_base',
+    'CAGR base (input)': 'cagr_base',
     'CAGR high': 'cagr_high',
     'Low 2031E': 'low_2031',
     'High 2031E': 'high_2031',
@@ -61,7 +61,7 @@ def is_num(v):
 
 
 def header_row(ws):
-    """Return (row number, {header text: column index}) for the row that holds the 'JSON key' header."""
+    """Return (row number, {header text: column index}) for the row that holds the 'Deck key' header."""
     for r in range(1, 11):
         heads = {ws.cell(r, c).value: c for c in range(1, ws.max_column + 1) if isinstance(ws.cell(r, c).value, str)}
         if KEY_HEADER in heads:

@@ -340,13 +340,13 @@
   {
    "sheet": "Growth",
    "cell": "B22",
-   "label": "Check: 2025 market equals Market",
+   "label": "Check: 2025 total in row 12 equals the Market sheet total (Market!B34)",
    "value": 0
   },
   {
    "sheet": "Growth",
    "cell": "B23",
-   "label": "Check: 2025 open pool equals Market",
+   "label": "Check: 2025 open pool in row 18 equals the Market sheet open pool (Market!B40)",
    "value": 0
   },
   {

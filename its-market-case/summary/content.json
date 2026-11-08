@@ -39,13 +39,13 @@
     {
      "h2": "2.1 Ten conclusions",
      "bullets": [
-      "Public ITS in the brief scope is about $28.7bn in 2025 (nominal USD, ex-fare). Rail control and signalling is $20.9bn (73% of the total) and half of that is mainline and commuter systems bought by infrastructure managers. The transit-operator core (bus ITS $4.6bn, urban signalling $6.3bn, other rail ITS $3.2bn) is $14.1bn; the pool open to an asset-light entrant (software and services in bus and other rail ITS) is $4.2bn (North America $0.9bn, Europe $1.9bn).",
-      "Base-case growth is 5.3% a year to $39.2bn in 2031 (low 3.6%, high 7.0%). Two-thirds of the increase is mandated signalling modernisation; the open software-and-services pool grows fastest, 7.0% a year to $6.3bn.",
+      "Public ITS in the brief scope is about $28.6bn in 2025 (nominal USD, ex-fare). Rail control and signalling is $20.8bn (73% of the total), and mainline and commuter systems bought by infrastructure managers are half of the total. The transit-operator core (bus ITS $4.6bn, urban signalling $6.2bn, other rail ITS $3.2bn) is $14.0bn; the pool open to an asset-light entrant (software and services in bus and other rail ITS) is $4.2bn, of which North American bus software and services is $0.6bn.",
+      "Base-case growth is 5.4% a year to $39.3bn in 2031 (low 3.7%, high 7.1%). Two-thirds of the increase is mandated signalling modernisation; the open software-and-services pool grows faster than the market, 7.0% a year to $6.3bn.",
       "Bus ITS in Europe and North America is a mature replacement market: on-board computers with GPS and wireless are on 90-92% of buses and trams (Berg Insight). Growth comes from 15-21-year platform refresh cycles, mid-life upgrades, zero-emission turnover, AI enforcement and the shift of value from hardware to software.",
       "Rail signalling is modernisation-led. Only about 10% of the TEN-T network and 19% of the EU fleet carried ETCS at end-2024 against EUR 85-100bn of remaining deployment cost; the non-US resignalling pipeline for 2026-31 is EUR 36bn in the base case, 55-60% contractually committed, and slippage is the rule rather than the exception.",
       "Signalling is a four-player oligopoly (Siemens, Hitachi incl. Thales GTS, Alstom, CRSC in China), each holding 13-22% of world control-command-signalling, with 3.4-5.4 years of backlog and 25-30-year service tails. Bus ITS in North America is concentrated at the owner level (Modaxo ~33%, Hitachi/Clever ~13%, top five 71% of Berg's pool) while Europe is fragmented (no vendor above 6%).",
       "The barrier to entry is tenure, not rebid odds: incumbent-held systems reach a decision point only after a median 16 years, and most renewals are sole-sourced, but at competitive rebids incumbents won only 4 of 18 (0 of 8 in bus CAD/AVL).",
-      "Unit economics from board documents: CAD/AVL full replacement $18-29k per bus (median $24k), recurring maintenance and hosting $1.7-3.3k per bus-year, overlay SaaS $0.2-2.0k, enforcement cameras $20-30k per bus-year funded by citations. A North America bottom-up explains about 61% of the Berg-based top-down bus number.",
+      "Unit economics from board documents: CAD/AVL full replacement $18-29k per bus (median $24k), recurring maintenance and hosting $1.7-3.3k per bus-year, overlay SaaS $0.2-2.0k, enforcement cameras $20-30k per bus-year funded by citations. A North American bottom-up from these prices lands at $0.6-1.6bn (mid about $1.0bn), consistent with the Berg-based $1.1bn ex-fare.",
       "Strategic buyers set prices for integrators at 0.4-1.6x revenue (Conduent transit 0.44x; Thales GTS 1.0x revenue and 13.7x EBIT; Clever Devices $302m plus $45m of debt repaid, about 1.6x projected revenue); only growth SaaS (Via, 5.6x LTM revenue) trades higher. The one leveraged take-private in scope (Cubic, ~11x debt to EBITDA) is in distress.",
       "US federal funding is the near-term risk: IIJA advance appropriations ($4.25bn a year) lapsed on 30 September 2026 and the FY2027 scenarios run from -5% (House bill) to -20% (flat extension) and -22% (President's request) versus FY2026; formula funds that pay for refresh are the most durable line.",
       "The investable route is buy-and-build in North America around a founder-owned mid-market bus ITS vendor, re-platformed to cloud with enforcement and zero-emission modules; the crux is converting an integrator multiple (the 1.6x Clever precedent) into a software multiple (IVU 2.6x) through recurring mix."
@@ -72,12 +72,12 @@
       "rows": [
        [
         "Public ITS, brief scope, 2025",
-        "$28.7bn",
+        "$28.6bn",
         "Berg (bus), UNIFE and SCI (signalling), GMI (mix, RoW), analyst build (other rail)"
        ],
        [
         "Transit-operator core, 2025",
-        "$14.1bn",
+        "$14.0bn",
         "Bus ITS + urban signalling + other rail ITS"
        ],
        [
@@ -91,9 +91,14 @@
         "Software and services in bus and other rail ITS"
        ],
        [
+        "Of which North American bus software and services",
+        "$0.6bn",
+        "The thesis market (slide 7); grows about 5.7% a year"
+       ],
+       [
         "2031 base case / CAGR",
-        "$39.2bn / 5.3%",
-        "Low 3.6%, high 7.0%"
+        "$39.3bn / 5.4%",
+        "Low $35.7bn (3.7%), high $43.2bn (7.1%)"
        ],
        [
         "Open pool 2031 / CAGR",
@@ -101,19 +106,14 @@
         "Bus mix shifts to software per GMI"
        ],
        [
-        "Component mix 2025",
-        "46% / 26% / 28%",
-        "Hardware / software / services"
+        "Segment CAGRs 2025-31",
+        "6.3% / 5.0% / 7.0%",
+        "Bus and tram ITS / rail signalling / other rail ITS"
        ],
        [
-        "Geography 2025",
-        "Europe 50%, APAC 31%, NA 12%, RoW 7%",
-        "Rail regions aggregated to four geographies"
-       ],
-       [
-        "NA bus bottom-up vs top-down",
-        "61%",
-        "83k buses x ~$8.1k per bus-year"
+        "Gross MOIC, Clever / IVU exit",
+        "1.2x / 2.0x",
+        "Exit at 1.6x (Clever Devices) or 2.6x (IVU) revenue; illustrative 5-year bridge"
        ]
       ]
      },
@@ -232,7 +232,7 @@
      "h2": "5.1 United States: federal and state funding, mandates [06, 25_gap]",
      "bullets": [
       "IIJA authorised up to $108.15bn for FTA over FY2022-26 ($21.4bn a year against $12.8bn under the FAST Act); enacted FTA totals were $20.5bn, $21.4bn, $20.9bn, $20.9bn and about $21.0bn, each including $4.25bn of Division J advance appropriations (CIG $1.6bn, SGR $950m, Low-No $1.05bn, ASAP $350m, ferries). Authorisations expired on 30 September 2026 and were extended only to 11 December 2026 without the advance appropriations.",
-      "Reauthorisation: the House BUILD America 250 Act authorises $103.3bn for transit over FY2027-31 (APTA scores it -14% against its IIJA baseline) with Section 5307 formula funds rising to $7.745bn in FY2027 (+10%), no dedicated Low-No programme and no advance appropriations; it had no floor vote or Senate counterpart as of November 2026. The FY2027 President's request is about $16.3bn (-22%). The model's FY2027 scenarios are $20.0bn (House bill), $16.7bn (flat extension) and $16.3bn (request): -5%, -20% and -22% against FY2026.",
+      "Reauthorisation: the House BUILD America 250 Act authorises $103.3bn for transit over FY2027-31 (APTA scores it -14% against its IIJA baseline) with Section 5307 formula funds rising to $7.745bn in FY2027 (+10%), no dedicated Low-No programme and no advance appropriations; it had no floor vote or Senate counterpart as of November 2026. The FY2027 President's request is about $16.3bn (-22%). The FY2027 scenarios behind the North American bus low case are $20.0bn (House bill), $16.7bn (flat extension) and $16.3bn (request): -5%, -20% and -22% against FY2026.",
       "The operating fiscal cliff was patched by states, not solved: Illinois (NITA, about $1.5bn a year), the Bay Area (regional measure, about $1bn a year for 14 years, passed November 2026), New York (MTA $68.4bn capital plan funded by a payroll-mobility-tax expansion) moved; Pennsylvania did not (SEPTA structural deficit $192m, capital funds diverted to operations); Oregon's package is suspended by referendum and Washington repealed a tax Sound Transit counted on.",
       "Ridership recovered to 81% of 2019 in 2025 (+6%); zero-emission bus stock grew to 8,116 funded or ordered (+16%) but the federal tailwind reversed (FY2026 Low-No and Bus NOFO cut to $610m from about $2bn, prioritising low-emission); California's ICT rule (50% zero-emission purchases 2026-28, 100% from 2029) is the main hard mandate.",
       "Regulatory mandates are a steadier floor than discretionary grants: PTASP safety rules, Transit Asset Management reporting, NTD-certified APC counting, FRA PTC certification for every system change, TSA cybersecurity directives renewed annually plus a proposed rule costing $3.09bn over ten years ($1.26bn on passenger rail), and Buy America (70% domestic content, US final assembly). FTA lost about 30% of staff in 2025 and grant conditions and freezes were litigated, adding execution risk rather than removing demand.",
@@ -434,7 +434,7 @@
        [
         "Scope caveat",
         "3",
-        "Fare collection inside Berg's values is an interpretation of its definition, and the 15-25% haircut is a derived assumption (presented as such); INIT's EUR 1.2bn obligations figure is mid-2026 while EUR 994m is the end-2025 figure (the deck uses about EUR 1bn); the ITS Deployment Tracking Survey fixed-route-bus percentages rest on search excerpts because the PDFs were blocked (not used on any slide)."
+        "Fare collection inside Berg's values is an interpretation of its definition, and the 15-25% haircut is a derived assumption (presented as such); INIT's EUR 1.2bn obligations figure is mid-2026 while EUR 994m is the end-2025 figure (neither figure is used in the deck); the ITS Deployment Tracking Survey fixed-route-bus percentages rest on search excerpts because the PDFs were blocked (not used on any slide)."
        ],
        [
         "Corrected",
@@ -453,11 +453,11 @@
     {
      "h2": "10.2 Known gaps and limitations",
      "bullets": [
-      "Paid datasets not accessed: Berg's component, product and vendor-share splits (paid Excel), UNIFE's regional CCS module, SCI's full studies; the model's component and regional splits for rail are therefore analyst proxies with documented ranges.",
+      "Paid datasets not accessed: Berg's component, product and vendor-share splits (paid Excel), UNIFE's regional CCS module, SCI's full studies; the model's two rail carve-outs (74% passenger, 30% urban) are therefore analyst proxies from the 21_gap world matrix, with documented ranges, and the regional and component splits behind them stay in that research file.",
       "Blocked hosts: transit.dot.gov (NTD mirrored from data.transportation.gov), apta.com (Fact Book), mta.info board books (data.ny.gov used instead), ITS JPO portals (survey detail unconfirmed), several rating-agency pages (Cubic post-LBO financials remain undisclosed).",
       "Private-company revenue for Avail, GIRO, Passio, ETA, Swiftly and Optibus rests on aggregator estimates that proved unreliable where filings exist; the target long-list therefore carries revenue to be confirmed in diligence, with Hanover the exception.",
       "Non-US per-bus ITS contract benchmarks are scarce (Singapore, Hong Kong and Riyadh values undisclosed); several 2019-26 North American awards publish no value (Hamilton, Calgary, Metrolinx, Swiftly and Optibus wins); SEPTA's CAD/AVL procurement had no public award.",
-      "The passenger/freight and urban/mainline carve-outs of rail signalling, the 20% ex-fare haircut, the rest-of-world bus intensity tiers and the rail condition-monitoring and detection estimates are the model inputs with the widest ranges; each is a single cell on the Inputs sheet with its range noted."
+      "The passenger/freight and urban/mainline carve-outs of rail signalling, the 20% ex-fare haircut, the rest-of-world bus share and the rail condition-monitoring and detection estimates are the model inputs with the widest ranges; each is a single blue input on the Market sheet, with its source, basis and confidence noted."
      ],
      "paras": [],
      "table": null,
@@ -651,7 +651,7 @@
       "contract_benchmarks.csv: 228 award rows (year, agency, segment, product, vendor, value, term, units, value per unit, source URL).",
       "GTFS-Realtime census: classified feeds, agency-level census joined to NTD, vendor share by tier, feed migrations, top-100 review.",
       "nonus_bus_fleets_by_country.csv; rail_resignalling_pipeline.csv and its 2026-31 phasing.",
-      "Model exports: model_map.json and deck_data.json tie the deck's numbers to workbook cells."
+      "Model export: deck_data.json, written by model/export_values.py from the recalculated workbook, records the cell behind every key and is the only source of numbers for the deck."
      ],
      "paras": [],
      "table": null,
