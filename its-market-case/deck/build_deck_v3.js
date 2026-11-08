@@ -449,7 +449,8 @@ function bracketV(s, x, y0, y1, tick, color) {
   // chart geometry: plot-area position of each year band and of a value on the axis
   const px = ch.x + lay.x * ch.w, pw = lay.w * ch.w, py = ch.y + lay.y * ch.h, ph = lay.h * ch.h, band = pw / 7;
   const yv = v => py + ph * (1 - v / vmax);
-  [0, 6].forEach(i => T(s, bn1(MP.values[i]), { x: px + band * i - 0.1, y: yv(MP.values[i]) - 0.32, w: band + 0.2, h: 0.3, fontFace: HEAD, fontSize: 15, bold: true, color: K.navy, align: 'center', valign: 'bottom' }));
+  // market total above every year: 2025 and 2031E larger, the years between smaller
+  MP.values.forEach((v, i) => { const end = i === 0 || i === 6; T(s, bn1(v), { x: px + band * i - 0.1, y: yv(v) - (end ? 0.32 : 0.28), w: band + 0.2, h: end ? 0.3 : 0.26, fontFace: HEAD, fontSize: end ? 15 : 12.5, bold: true, color: K.navy, align: 'center', valign: 'bottom' }); });
   const yb = py + ph + 0.03;
   R(s, px, yb, pw, 0.28, K.black);
   Y.forEach((t, i) => T(s, t, { x: px + band * i, y: yb, w: band, h: 0.28, fontSize: 11, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' }));
@@ -483,10 +484,10 @@ function bracketV(s, x, y0, y1, tick, color) {
   });
   // drivers panel
   const drv = [
-    ['FaTrainSubway', 'EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
-    ['FaTrain', 'Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling; most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
-    ['FaBus', 'Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', '\u25B2 HIGH', K.green],
-    ['FaChargingStation', 'Zero-emission buses, AI enforcement', 'Most new European city buses are now electric; camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
+    ['FaTrainSubway', 'Tailwind: EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
+    ['FaTrain', 'Tailwind: Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling; most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
+    ['FaBus', 'Tailwind: Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', '\u25B2 HIGH', K.green],
+    ['FaChargingStation', 'Tailwind: Electric buses, AI enforcement', 'Most new European city buses are now electric; camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
     ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed; the UK cut its ETCS budget', '\u25BC MID', K.red],
   ];
   drv.forEach(([icn, h, st, lvl, col], i) => {

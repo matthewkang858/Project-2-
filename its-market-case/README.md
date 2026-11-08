@@ -6,7 +6,7 @@ Deliverables for the written case: market size and segmentation, drivers and est
 
 | File | What it is |
 |---|---|
-| `deck/Public_ITS_Market_Case.pptx` | Cover plus six content slides in house format (breadcrumb tracker, two-tone action titles, one exhibit per slide): executive summary, market size funnel and segment table, growth to 2031 with drivers, competitive grid, risks and barriers, investment thesis. The six slides carry 32 numbers, all read from `model/deck_data.json` at build time and none typed into the builder. Slides 5 (competitive landscape) and 6 (risks and barriers) carry no numbers and make their points in words. |
+| `deck/Public_ITS_Market_Case.pptx` | Cover plus six content slides in house format (breadcrumb tracker, two-tone action titles, one exhibit per slide): executive summary, market size funnel and segment table, growth to 2031 with drivers, competitive grid, risks and barriers, investment thesis. The six slides carry 37 numbers, all read from `model/deck_data.json` at build time and none typed into the builder. Slides 5 (competitive landscape) and 6 (risks and barriers) carry no numbers and make their points in words. |
 | `deck/Public_ITS_Market_Case_Appendix.pptx` | Supporting slides kept out of the six-slide limit: A1 segmentation framework, A2 market build (one published anchor and one or two adjustments per segment), A3 growth scenarios (2025-31 bridge and low / base / high CAGRs by segment), A4 exit multiples and returns (EV / revenue benchmarks and the illustrative value bridge), A5 incumbency and entry window (decision points on incumbent-held systems, US fleet by agency size). |
 | `model/Public_ITS_Market_Model.xlsx` | Live-formula model, four sheets: README (how to read it, calculation chain, slide map, sources), Market (2025 market size and funnel), Growth (2025-2031E, low / base / high side by side), Returns (illustrative buy-and-build value bridge and exit benchmarks). 47 inputs, each with its source and confidence (HIGH / MID / LOW); 160 formulas; every slide number traces to one cell, at most one sheet away from its inputs. Each sheet ends with integrity checks that must all equal 0. |
 | `model/claims_register.md` | Every quantity word and factual claim on the slides (C01-C57), the figure and source behind it, and the build guard that checks it; followed by likely questions and answers on the simplified model. |
@@ -52,7 +52,7 @@ From `model/deck_data.json`:
 
 ## What changed in the simplified model
 
-The workbook went from 12 sheets (about 122 inputs, 925 formulas, up to four hops from a slide number to its input) to 4 sheets (README, Market, Growth, Returns; 47 inputs, 160 formulas, one hop). The main deck now carries 32 numbers, none typed into the deck builder, against 209 before (90 of them typed). Headline changes:
+The workbook went from 12 sheets (about 122 inputs, 925 formulas, up to four hops from a slide number to its input) to 4 sheets (README, Market, Growth, Returns; 47 inputs, 160 formulas, one hop). The main deck now carries 37 numbers, none typed into the deck builder, against 209 before (90 of them typed). Headline changes:
 
 | Headline | Previous model | New model | Why it moved |
 |---|---|---|---|
