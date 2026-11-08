@@ -153,10 +153,10 @@ const CLAIMS = [
   ['C05', 'S3 lens', '"Europe is the largest region, with almost half of world signalling spend"', () => D.bus_eu > D.bus_na && D.bus_eu > D.bus_row],
   ['C06', 'S3 lens', '"hardware is still just under half of value" (bus and other rail ITS)', () => D.bus_hw_2025 >= 0.40 && D.bus_hw_2025 < 0.50 && D.ro_hw >= 0.40 && D.ro_hw < 0.50],
   ['C07', 'S3 lens, S2', '"software grows fastest as onboard systems move to cloud" (S3) / "gains share from hardware" (S2)', () => D.bus_hw_path.values[6] < D.bus_hw_path.values[0]],
-  ['C08', 'S4 legend and pill', '"Bus and tram ITS" / "Faster than the market; rest of world leads" (legend label and tag) / "' + p1(BP.cagr) + '" (CAGR pill)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
+  ['C08', 'S4 legend and pill', '"Bus and tram ITS" / "Faster than the market, led by rest of world" (legend label and tag) / "' + p1(BP.cagr) + '" (CAGR pill)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
   ['C09', 'S2, S4 legend and pill', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "' + p1(SP.cagr) + '" (S4 CAGR pill) / "as it excludes signalling" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
   ['C10', 'S4 legend and pill', '"Other rail ITS" / "Faster than the market (condition monitoring)" (legend label and tag) / "' + p1(RP.cagr) + '" (CAGR pill)', () => RP.cagr > MP.cagr],
-  ['C11', 'S4 driver 1, S2', '"EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work" (S4) / "the ETCS mandate" (S2)', null],
+  ['C11', 'S4 driver 1, S2', '"EU law requires one digital signalling standard (ETCS) on main rail lines, but most are not yet fitted, leaving tens of billions of euros of work" (S4) / "the ETCS mandate" (S2)', null],
   ['C12', 'S4 driver 2', '"New York, Paris, Toronto and Hong Kong are funding metro resignalling"', null],
   ['C13', 'S4 driver 2', '"most European signalling spend goes to existing lines"', null],
   ['C14', 'S2, S4 driver 3, S7, A5', '"A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031" (S4) / "bus platform refresh" (S2) / "Dated refresh wave: CAD/AVL platforms installed 2009-16 at major agencies reach a replace-or-extend decision by 2031" (S7) / "Refresh wave: CAD/AVL platforms installed in 2009-16 now serve about ' + CITED.refresh_cohort.toLocaleString('en-US') + ' buses in the US and Canada" (A5)', null],
@@ -167,25 +167,25 @@ const CLAIMS = [
   ['C19', 'S2, S3 funnel, S5, S6', '"Signalling is a closed oligopoly (Siemens, Hitachi, Alstom, CRSC)" (S2) / "Less urban signalling: safety-certified, closed oligopoly" (S3 funnel) / "Signalling is a closed oligopoly" (S5 title) / "together hold most of world signalling" (S6)', null],
   ['C20', 'S5', '"Together hold most of world signalling, with multi-year order books"', null],
   ['C21', 'S2, S5 title', '"North American bus ITS is consolidating around Modaxo and Hitachi"', null],
-  ['C22', 'S5', '"Modaxo owns the largest North American installed base; Hitachi is number two after buying Clever" / "Largest installed bases" (S5)', null],
-  ['C23', 'S5, A4', '"INIT is the largest listed bus ITS pure play; IVU is smaller and majority recurring" / "LISTED PURE PLAYS" (S5 column header) / "IVU\'s ~' + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue" (A4 title)', null],
-  ['C24', 'S2, S3 table, S5, S5 title, S7', '"a fragmented long tail of privately held vendors remains" / "Buy a privately held North American mid-market bus ITS vendor" (S2) / "Modaxo, Hitachi, INIT, IVU and a fragmented long tail" (S3) / "leaving a private long tail to buy" (S5 title) / "A fragmented long tail of privately held specialists"; "Sticky agency relationships"; "Mostly sub-scale; some still founder-led (GIRO, ETA), so succession is open"; "Most actionable targets for a buy-and-build platform" (S5) / "Acquire a privately held North American mid-market bus ITS vendor" (S7)', null],
+  ['C22', 'S5', '"Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever" / "Largest installed bases" (S5)', null],
+  ['C23', 'S5, A4', '"INIT is the largest listed bus ITS pure play, while IVU is smaller and majority recurring" / "LISTED PURE PLAYS" (S5 column header) / "IVU\'s ~' + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue" (A4 title)', null],
+  ['C24', 'S2, S3 table, S5, S5 title, S7', '"a fragmented long tail of privately held vendors remains" / "Buy a privately held North American mid-market bus ITS vendor" (S2) / "Modaxo, Hitachi, INIT, IVU and a fragmented long tail" (S3) / "leaving a private long tail to buy" (S5 title) / "A fragmented long tail of privately held specialists"; "Sticky agency relationships"; "Mostly sub-scale, with some still founder-led (GIRO, ETA), so succession is open"; "Most actionable targets for a buy-and-build platform" (S5) / "Acquire a privately held North American mid-market bus ITS vendor" (S7)', null],
   ['C25', 'S2, S5', '"cloud challengers overlay legacy systems" (S2) / "LA Metro and many other US agencies already run cloud overlays on legacy CAD/AVL" (S5)', null],
   ['C26', 'S2, S3 table, S5, S6', '"protected by safety certification and long maintenance tails" (S2) / "Signalling majors under multi-year frameworks" (S3 table) / "long maintenance tails, multi-year frameworks (e.g., DB)"; "Full stack (CAD/AVL, scheduling, fare) plus long-term service contracts" (S5) / "long frameworks protect the signalling majors" (S6)', null],
   ['C27', 'S5', '"each kept for a system generation"', null],
   ['C28', 'S5', '"Modaxo buys and never sells"', null],
   ['C29', 'S5', '"Avail and Passio lead real-time feeds at smaller US agencies"', null],
   ['C30', 'S5', '"Sold beside the incumbent on short contracts" / "AI enforcement can be funded from fines"', null],
-  ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout; execution risk (Alstom profit warning)", "(INIT guidance cut)" (S5) / "Alstom and INIT cut profit guidance" (S6)', null],
-  ['C32', 'S5, A5', '"legacy installs are exposed at rebid (Conduent lost LA Metro)" (S5) / "In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas)" (A5)', null],
+  ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout and execution risk (Alstom profit warning)", "(INIT guidance cut)" (S5) / "Alstom and INIT cut profit guidance" (S6)', null],
+  ['C32', 'S5, A5', '"legacy installs exposed at rebid (Conduent lost LA Metro)" (S5) / "In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas)" (A5)', null],
   ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic also competes" (A6 group label) / "Cubic\'s highly levered buyout is now distressed"; "Project-heavy integrators do not support high buyout leverage" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
   ['C34', 'S5', '"Via and Optibus still report losses"', null],
-  ['C35', 'S5, S7', '"subscriptions fit federal capital grants poorly" (S5) / "structure subscriptions to fit federal capital-grant rules" (S7)', null],
+  ['C35', 'S5, S7', '"subscriptions fit federal capital grants poorly" (S5) / "Structure subscriptions to fit federal capital-grant rules" (S7)', null],
   ['C36', 'S5', '"Exit benchmark: valuations rise with recurring mix"', () => D.bm_init < D.bm_ivu],
   ['C37', 'S5', '"scaled players are priced as SaaS"', () => D.bm_via > 2 * D.bm_ivu],
   ['C38', 'S2, S6 title, S6, A5', '"installed systems are rarely rebid" (S2) / "Long system lives and slow procurement favour buying an installed base" (S6 title) / "Installed systems are rarely rebid, typically only after well over a decade"; "Only a small slice of the installed base is rebid each year" (S6) / "Systems are ~' + CITED.tenure_median + ' years old at a decision point" (A5 title)', null],
   ['C39', 'S2, S6, A5', '"challengers usually win when they are" (rebid; S2) / "Challengers usually win when a competitive rebid happens" (S6) / "challengers win most competitive rebids" (A5 title) / "Competitive rebids: challengers won most" (A5 bracket)', () => CITED.dp_rebid_lost > CITED.dp_rebid_kept],
-  ['C40', 'S6, A5', '"most renewals skip a competitive rebid" (S6) / "Kept without a documented rebid" (A5 bar, ' + CITED.dp_extended + ')', () => CITED.dp_extended > CITED.dp_rebid_kept],
+  ['C40', 'S6, A5', '"Most renewals skip a competitive rebid" (S6) / "Kept without a documented rebid" (A5 bar, ' + CITED.dp_extended + ')', () => CITED.dp_extended > CITED.dp_rebid_kept],
   ['C41', 'S6', '"Multi-year award-to-go-live, bid protests" / "Long sales cycles favour vendors with reference fleets and live pilots"', null],
   ['C42', 'S6', '"Buy America documentation for hardware"', null],
   ['C43', 'S6', '"Software-led entry and cooperative purchasing (NASPO, Sourcewell) shorten the path"', null],
@@ -197,8 +197,8 @@ const CLAIMS = [
   ['C49', 'S2, S7, A4', '"the ~' + x1(D.exit_a_mult) + ' Hitachi paid for Clever barely returns capital" (S2) / "At the Clever precedent the platform barely returns its capital" (S7) / "The Clever precedent (~' + x1(D.bm_clever) + ' revenue) barely returns capital" (A4 title)', () => D.moic_a >= 1.0 && D.moic_a < 1.3],
   ['C50', 'S7', '"An IVU-like, majority-recurring mix roughly doubles the equity invested"', () => D.moic_b >= 1.85 && D.moic_b <= 2.2],
   ['C51', 'S2, S7, S7 title, A4', '"below a software multiple" (S2, S7) / "well above the ~' + x1(D.exit_a_mult) + ' paid for Clever" (S7 title) / "entry between the INIT and IVU multiples" (S7 note) / "Entry: between INIT and IVU, below IVU\'s software multiple" (A4)', () => D.bm_init <= D.entry_mult && D.entry_mult < D.bm_ivu && D.exit_b_mult >= 1.5 * D.exit_a_mult],
-  ['C52', 'S5, S7', '"Rival bidders for targets; Hitachi may buy at exit, Modaxo sets the floor" (S5) / "likely exit buyers are Hitachi, Siemens and Via, while Modaxo sets the floor price" (S7)', () => D.bm_conduent < Math.min(D.bm_init, D.bm_clever, D.bm_ivu, D.bm_via)],
-  ['C53', 'A3 title, S4 legend', '"Two-thirds of the increase to 2031 is signalling" / "2031 ranges from ~' + bn0(MP.low_2031) + ' to ~' + bn0(MP.high_2031) + ', mostly on the pace of signalling modernisation" (A3 title) / "Just below the market; its pace is the swing factor" (S4 rail signalling legend)', () => SP.share_of_increase >= 0.62 && SP.share_of_increase <= 0.70 && SP.high_2031 - SP.low_2031 > 0.5 * (MP.high_2031 - MP.low_2031)],
+  ['C52', 'S5, S7', '"Rival bidders for targets. Hitachi may buy at exit, while Modaxo sets the floor" (S5) / "Likely exit buyers are Hitachi, Siemens and Via, while Modaxo sets the floor price" (S7)', () => D.bm_conduent < Math.min(D.bm_init, D.bm_clever, D.bm_ivu, D.bm_via)],
+  ['C53', 'A3 title, S4 legend', '"Two-thirds of the increase to 2031 is signalling" / "2031 ranges from ~' + bn0(MP.low_2031) + ' to ~' + bn0(MP.high_2031) + ', mostly on the pace of signalling modernisation" (A3 title) / "Just below the market, but its pace is the swing factor" (S4 rail signalling legend)', () => SP.share_of_increase >= 0.62 && SP.share_of_increase <= 0.70 && SP.high_2031 - SP.low_2031 > 0.5 * (MP.high_2031 - MP.low_2031)],
   ['C54', 'A2 cross-checks line', '"SCI Verkehr\'s independent signalling estimate is about four-fifths of UNIFE\'s"', null],
   ['C55', 'A2 cross-checks line', '"GMI\'s CBTC-only market sits below our urban signalling, which also covers light rail"', () => D.urban > CITED.gmi_cbtc],
   ['C56', 'A4', '"half repaid by exit"', () => D.debt_repaid === 0.5],
@@ -358,13 +358,13 @@ function bracketV(s, x, y0, y1, tick, color) {
       [['The open software and services pool outgrows the market at ~' + p0(OP.cagr) + ' a year, ', true], ['as it excludes signalling and gains share from hardware']]]],
     ['FaChessKnight', 'COMPETITIVE DYNAMICS', [
       [['Signalling is a closed oligopoly ', true], ['(Siemens, Hitachi, Alstom, CRSC) protected by safety certification and long maintenance tails']],
-      [['North American bus ITS is consolidating around Modaxo and Hitachi; ', true], ['cloud challengers overlay legacy systems, and a fragmented long tail of privately held vendors remains']]]],
+      [['North American bus ITS is consolidating around Modaxo and Hitachi, ', true], ['but cloud challengers overlay legacy systems, and a fragmented long tail of privately held vendors remains']]]],
     ['FaTriangleExclamation', 'RISKS AND BARRIERS', [
       [['The barrier is tenure, not rebid odds: ', true], ['installed systems are rarely rebid, but challengers usually win when they are']],
       [['Near-term risks: ', true], ['the US federal funding reset in FY2027 and ETCS slippage in Europe']]]],
     ['FaBullseye', 'INVESTMENT THESIS', [
       [['Buy a privately held North American mid-market bus ITS vendor below a software multiple, ', true], ['move it to cloud and add AI enforcement and zero-emission modules']],
-      [['Returns hinge on a software exit multiple ', true], ['(~' + x1(D.exit_b_mult) + ' revenue, like IVU); the ~' + x1(D.exit_a_mult) + ' Hitachi paid for Clever barely returns capital']]]],
+      [['Returns hinge on a software exit multiple ', true], ['(~' + x1(D.exit_b_mult) + ' revenue, like IVU), while the ~' + x1(D.exit_a_mult) + ' Hitachi paid for Clever barely returns capital']]]],
   ];
   let y = 2.36;
   const rhs = [0.84, 0.74, 0.84, 0.74, 0.84]; // per-row heights: three-line rows and two-line rows (growth, risks)
@@ -379,13 +379,13 @@ function bracketV(s, x, y0, y1, tick, color) {
     y += rh;
   });
   s.addShape('roundRect', { x: 0.45, y: 6.4, w: 12.4, h: 0.42, rectRadius: 0.21, fill: { color: K.navy }, line: { color: K.navy } });
-  T(s, [{ text: 'Verdict: ', options: { bold: true, color: K.lblue } }, { text: 'attractive only as a software-led buy-and-build in bus ITS; not a highly levered buyout of a hardware integrator, and not in rail signalling', options: { color: 'FFFFFF' } }], { x: 0.7, y: 6.4, w: 11.9, h: 0.42, fontSize: 12, valign: 'middle', align: 'center' });
+  T(s, [{ text: 'Verdict: ', options: { bold: true, color: K.lblue } }, { text: 'attractive only as a software-led buy-and-build in bus ITS, not a highly levered buyout of a hardware integrator, and not in rail signalling', options: { color: 'FFFFFF' } }], { x: 0.7, y: 6.4, w: 11.9, h: 0.42, fontSize: 12, valign: 'middle', align: 'center' });
   source(s, 'Model: sheets Market, Growth and Returns. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), Hitachi Q1 FY2026 results, IVU trading data as of 6 Nov 2026, agency award records, analysis');
 
   // ---------------------------------------------------------------- S3 market size: funnel + who-buys table (10 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'MARKET SIZE AND SEGMENTATION', color: K.lblue }, { text: 'ADDRESSABLE MARKET', color: K.navy }]);
-  title(s, 'Market Size: ', 'A ~' + bn0(D.market) + ' market, but half is mainline signalling bought mainly by rail infrastructure managers; only ~' + bn0(D.open) + ' of software and services is open to entrants');
+  title(s, 'Market Size: ', 'A ~' + bn0(D.market) + ' market, but half is mainline signalling bought mainly by rail infrastructure managers, and only ~' + bn0(D.open) + ' of software and services is open to entrants');
   hbar(s, 'EST. ADDRESSABLE MARKET FUNNEL, 2025, BILLIONS USD', 0, 6.45, K.navy);
   hbar(s, 'WHO BUYS EACH SEGMENT, AND CAN AN ENTRANT COMPETE?', 6.51, CW - 6.51, K.navy);
   s.addShape('line', { x: 6.48, y: 2.45, w: 0, h: 4.3, line: { color: K.navy, width: 1.5 } });
@@ -404,7 +404,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   s.addShape('ellipse', { x: cx - fBot / 2, y: fy0 + nL * fh - 0.05, w: fBot, h: 0.1, fill: { color: '9ED8F2' }, line: { color: '9ED8F2' } });
   const levels = [
     ['$' + usd0(D.global_its_low) + '-' + usd0(D.global_its_high) + 'B', 'Global ITS market', 'Umbrella reports add road traffic, tolling and aviation'],
-    [bn1(D.market), 'Public ITS: bus + passenger rail', 'Case scope; hardware, software, services; ex-fare'],
+    [bn1(D.market), 'Public ITS: bus + passenger rail', 'Case scope: hardware, software and services, ex-fare'],
     [bn1(D.core), 'Transit-operator core', 'Less mainline signalling: mainly rail infrastructure managers'],
     [bn1(D.contestable), 'Contestable pool', 'Less urban signalling: safety-certified, closed oligopoly'],
     [bn1(D.open), 'Open software and services', 'Less bus and rail hardware: the asset-light entry point'],
@@ -429,7 +429,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   const sRows = [
     [hh('Segment'), hh('2025, $B'), hh('Main buyers'), hh('Supply side'), hh('Open to an entrant?')],
     segRow('Mainline and commuter signalling', D.mainline, 'Infrastructure managers (Amtrak, DB InfraGO, Network Rail, RFI)', 'Signalling majors under multi-year frameworks', 'NO'),
-    segRow('Urban signalling (metro, light rail)', D.urban, 'Metro and light rail agencies', 'Signalling majors; safety-certified systems', 'NO'),
+    segRow('Urban signalling (metro, light rail)', D.urban, 'Metro and light rail agencies', 'Signalling majors with safety-certified systems', 'NO'),
     segRow('Bus and tram ITS', D.bus, 'Transit agencies and bus operators', 'Modaxo, Hitachi, INIT, IVU and a fragmented long tail', 'SOFTWARE + SERVICES'),
     segRow('Other rail ITS (passenger info, CCTV, monitoring)', D.ro, 'Rail and metro operators', 'Rolling-stock suppliers and specialists', 'SOFTWARE + SERVICES'),
     [hc('Total', { bold: true, color: K.navy, fill: { color: K.lgrey }, fontSize: 10 }), hc(n1(D.market), { bold: true, align: 'center', fill: { color: K.navy }, color: 'FFFFFF', fontSize: 10.5 }), hc('', { fill: { color: K.lgrey } }), hc('', { fill: { color: K.lgrey } }), hc('', { fill: { color: K.lgrey } })],
@@ -440,12 +440,12 @@ function bracketV(s, x, y0, y1, tick, color) {
     [['Geography: ', true, K.mblue], ['Europe is the largest region, with almost half of world signalling spend']],
     [['Components: ', true, K.mblue], ['in bus and other rail ITS, hardware is still just under half of value, but software grows fastest as onboard systems move to cloud']],
   ], { paraSpaceAfter: 4 }), { x: 6.85, y: 5.82, w: 5.9, h: 0.86, fontSize: 10.5, color: '1A1A1A', valign: 'middle' });
-  source(s, 'Note: 2025, nominal USD at 2025 average FX, excluding fare collection; figures may not sum due to rounding; sizing chain in appendix A2. Model: sheet Market. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), umbrella ITS reports (MarketsandMarkets, Grand View Research, Precedence Research, Mordor Intelligence), analysis');
+  source(s, 'Note: 2025, nominal USD at 2025 average FX, excluding fare collection. Figures may not sum due to rounding. Sizing chain in appendix A2. Model: sheet Market. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), umbrella ITS reports (MarketsandMarkets, Grand View Research, Precedence Research, Mordor Intelligence), analysis');
 
   // ---------------------------------------------------------------- S4 growth to 2031 + drivers (6 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'MARKET GROWTH', color: K.lblue }, { text: 'GROWTH DRIVERS TO 2031', color: K.green }]);
-  title(s, 'Market Growth: ', 'Public ITS grows ~' + p0(MP.cagr) + ' a year to ~' + bn0(MP.values[6]) + ' by 2031, mostly from signalling modernisation; the open software and services pool grows faster, at ~' + p0(OP.cagr), K.green);
+  title(s, 'Market Growth: ', 'Public ITS grows ~' + p0(MP.cagr) + ' a year to ~' + bn0(MP.values[6]) + ' by 2031, mostly from signalling modernisation, while the open software and services pool grows faster, at ~' + p0(OP.cagr), K.green);
   hbar(s, 'PUBLIC ITS MARKET BY SEGMENT, GLOBAL, 2025-2031E, BILLIONS USD', 0, 8.15, K.dgreen);
   hbar(s, 'KEY GROWTH DRIVERS AND HEADWINDS', 8.21, CW - 8.21, K.dgreen);
   // bottom to top: signalling, other rail, bus
@@ -475,9 +475,9 @@ function bracketV(s, x, y0, y1, tick, color) {
   pill(s, 7.33, yb + 0.3, 0.8, 0.28, p1(OP.cagr), { line: K.navy, size: 12 });
   // legend, top series first; the segment CAGRs sit in pills on the 2031E bar (guards C08-C10)
   const leg = [
-    ['Bus and tram ITS', K.navy, K.sBus, 'Faster than the market; rest of world leads'],
+    ['Bus and tram ITS', K.navy, K.sBus, 'Faster than the market, led by rest of world'],
     ['Other rail ITS', K.navy, K.sOther, 'Faster than the market (condition monitoring)'],
-    ['Rail signalling', K.navy, K.sMain, 'Just below the market; its pace is the swing factor'],
+    ['Rail signalling', K.navy, K.sMain, 'Just below the market, but its pace is the swing factor'],
   ];
   const legY = [3.05, 3.95, 4.85];
   leg.forEach(([n, tc, lc, tag], k) => {
@@ -495,11 +495,11 @@ function bracketV(s, x, y0, y1, tick, color) {
   });
   // drivers panel
   const drv = [
-    ['FaTrainSubway', 'Tailwind: EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines; most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
-    ['FaTrain', 'Tailwind: Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling; most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
+    ['FaTrainSubway', 'Tailwind: EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines, but most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
+    ['FaTrain', 'Tailwind: Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling, and most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
     ['FaBus', 'Tailwind: Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', '\u25B2 HIGH', K.green],
-    ['FaChargingStation', 'Tailwind: Electric buses, AI enforcement', 'Most new European city buses are now electric; camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
-    ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed; the UK cut its ETCS budget', '\u25BC MID', K.red],
+    ['FaChargingStation', 'Tailwind: Electric buses, AI enforcement', 'Most new European city buses are now electric, and camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
+    ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed, and the UK cut its ETCS budget', '\u25BC MID', K.red],
   ];
   drv.forEach(([icn, h, st, lvl, col], i) => {
     const ry = 2.5 + i * 0.83;
@@ -510,40 +510,40 @@ function bracketV(s, x, y0, y1, tick, color) {
     T(s, lvl, { x: 12.16, y: ry + 0.12, w: 0.74, h: 0.5, fontFace: HEAD, fontSize: 15, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
     if (i < drv.length - 1) s.addShape('line', { x: 8.35, y: ry + 0.79, w: 4.55, h: 0, line: { color: K.mgrey, width: 0.75 } });
   });
-  T(s, '\u25B2 raises and \u25BC lowers 2025-31 growth; HIGH or MID is the size of the effect on its segment', { x: 8.35, y: 6.64, w: 4.55, h: 0.18, fontSize: 7.5, italic: true, color: K.grey, align: 'right' });
-  source(s, 'Note: Base case, nominal USD at constant 2025 FX; low and high cases in appendix A3. Model: sheet Growth. Sources: European Commission ERTMS Work Plan (2026), MTA 2025-29 Capital Program, MTR, Sustainable Bus (DVV Media), FTA, H.R. 8870, Network Rail CP7, Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), analysis');
+  T(s, '\u25B2 raises and \u25BC lowers 2025-31 growth. HIGH or MID is the size of the effect on its segment', { x: 8.35, y: 6.64, w: 4.55, h: 0.18, fontSize: 7.5, italic: true, color: K.grey, align: 'right' });
+  source(s, 'Note: Base case, nominal USD at constant 2025 FX. Low and high cases in appendix A3. Model: sheet Growth. Sources: European Commission ERTMS Work Plan (2026), MTA 2025-29 Capital Program, MTR, Sustainable Bus (DVV Media), FTA, H.R. 8870, Network Rail CP7, Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), analysis');
 
   // ---------------------------------------------------------------- S5 competitive landscape grid (0 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'COMPETITIVE LANDSCAPE', color: K.lblue }, { text: 'PLAYER GROUPS', color: K.navy }]);
-  title(s, 'Competitive Landscape: ', 'Signalling is a closed oligopoly; North American bus ITS is consolidating around Modaxo and Hitachi, leaving a private long tail to buy');
+  title(s, 'Competitive Landscape: ', 'Signalling is a closed oligopoly, while North American bus ITS is consolidating around Modaxo and Hitachi, leaving a private long tail to buy');
   hbar(s, 'COMPETITIVE SUMMARY: PUBLIC ITS PLAYER GROUPS AND IMPLICATIONS FOR A NEW ENTRANT', 0, CW, K.navy);
   const cols = [
     ['SIGNALLING MAJORS', ['siemens', 'hitachi', 'alstom', 'crsc'],
       'Together hold most of world signalling, with multi-year order books',
       'Safety-certified systems, long maintenance tails, multi-year frameworks (e.g., DB)',
-      'Slow, publicly funded ETCS rollout; execution risk (Alstom profit warning)',
+      'Slow, publicly funded ETCS rollout and execution risk (Alstom profit warning)',
       'Closed core: compete only in adjacencies (monitoring, cyber, connectivity)'],
     ['BUS ITS CONSOLIDATORS', ['modaxo', 'hitachi'],
-      'Modaxo owns the largest North American installed base; Hitachi is number two after buying Clever',
-      'Largest installed bases, each kept for a system generation; Modaxo buys and never sells',
-      'Ageing CAD/AVL architectures; legacy installs are exposed at rebid (Conduent lost LA Metro)',
-      'Rival bidders for targets; Hitachi may buy at exit, Modaxo sets the floor'],
+      'Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever',
+      'Largest installed bases, each kept for a system generation. Modaxo buys and never sells',
+      'Ageing CAD/AVL architectures, with legacy installs exposed at rebid (Conduent lost LA Metro)',
+      'Rival bidders for targets. Hitachi may buy at exit, while Modaxo sets the floor'],
     ['LISTED PURE PLAYS', ['init', 'ivu'],
-      'INIT is the largest listed bus ITS pure play; IVU is smaller and majority recurring',
+      'INIT is the largest listed bus ITS pure play, while IVU is smaller and majority recurring',
       'Full stack (CAD/AVL, scheduling, fare) plus long-term service contracts',
       'Hardware and project mix squeezes margins (INIT guidance cut)',
       'Exit benchmark: valuations rise with recurring mix'],
     ['MID-MARKET PRIVATES', ['avail', 'giro', 'eta', 'passio'],
       'A fragmented long tail of privately held specialists',
-      'Sticky agency relationships; Avail and Passio lead real-time feeds at smaller US agencies',
-      'Mostly sub-scale; some still founder-led (GIRO, ETA), so succession is open',
+      'Sticky agency relationships. Avail and Passio lead real-time feeds at smaller US agencies',
+      'Mostly sub-scale, with some still founder-led (GIRO, ETA), so succession is open',
       'Most actionable targets for a buy-and-build platform'],
     ['SAAS / AI CHALLENGERS', ['swiftly', 'optibus', 'via', 'haydenai'],
       'LA Metro and many other US agencies already run cloud overlays on legacy CAD/AVL',
-      'Sold beside the incumbent on short contracts; AI enforcement can be funded from fines',
-      'Via and Optibus still report losses; subscriptions fit federal capital grants poorly',
-      'Partner or overlay; scaled players are priced as SaaS'],
+      'Sold beside the incumbent on short contracts. AI enforcement can be funded from fines',
+      'Via and Optibus still report losses, and subscriptions fit federal capital grants poorly',
+      'Partner or overlay: scaled players are priced as SaaS'],
   ];
   const gx = 0.35, lw = 1.5, gw = 2.18, gg = 0.04, gy = 2.44, hT = 0.34, hL = 0.72;
   const rowsG = [['MARKET POSITION', 0.78, K.navy, 'FFFFFF', '1A1A1A'], ['KEY STRENGTHS', 0.66, K.slate, K.pale, '1A1A1A'], ['KEY WEAKNESSES', 0.66, K.purple, K.lpurple, '1A1A1A'], ['IMPLICATION FOR A NEW ENTRANT', 0.70, K.black, K.grey, 'FFFFFF']];
@@ -574,26 +574,26 @@ function bracketV(s, x, y0, y1, tick, color) {
     });
     ry += h + 0.04;
   });
-  source(s, 'Note: Positions are qualitative, from filed vendor revenue, agency award records and trading data; multiples in appendix A4. Logos show parent companies; subsidiaries and brands are in appendix A6. Sources: company reports and statutory filings, Berg Insight, deal announcements, GTFS-Realtime feed census, agency board records, trading data as of 6 Nov 2026, analysis');
+  source(s, 'Note: Positions are qualitative, from filed vendor revenue, agency award records and trading data. Multiples in appendix A4. Logos show parent companies, with subsidiaries and brands in appendix A6. Sources: company reports and statutory filings, Berg Insight, deal announcements, GTFS-Realtime feed census, agency board records, trading data as of 6 Nov 2026, analysis');
 
   // ---------------------------------------------------------------- S6 risks and barriers (0 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'RISKS AND BARRIERS TO ENTRY', color: K.lblue }, { text: 'IMPACT ON A NEW ENTRANT', color: K.grey }]);
-  title(s, 'Risks and Barriers: ', 'Long system lives and slow procurement favour buying an installed base; near-term risks are the US funding reset and ETCS slippage', K.grey);
+  title(s, 'Risks and Barriers: ', 'Long system lives and slow procurement favour buying an installed base, and near-term risks are the US funding reset and ETCS slippage', K.grey);
   T(s, 'BARRIERS AND RISKS', { x: 0.45, y: 1.86, w: 5.9, h: 0.34, fontFace: HEAD, fontSize: 17, bold: true, color: K.navy, align: 'center', valign: 'bottom' });
   T(s, 'LIKELY IMPACT ON A NEW ENTRANT', { x: 6.95, y: 1.86, w: 5.95, h: 0.34, fontFace: HEAD, fontSize: 17, bold: true, color: K.navy, align: 'center', valign: 'bottom' });
   R(s, 0.45, 2.24, 5.9, 0.06, K.black); R(s, 6.95, 2.24, 5.95, 0.06, K.black);
   const rk = [
-    ['FaHourglassHalf', 'Incumbency and long system lives', 'Installed systems are rarely rebid, typically only after well over a decade; most renewals skip a competitive rebid', 'HIGH', K.green,
+    ['FaHourglassHalf', 'Incumbency and long system lives', 'Installed systems are rarely rebid, typically only after well over a decade. Most renewals skip a competitive rebid', 'HIGH', K.green,
       [[['Only a small slice of the installed base is rebid each year']], [['Challengers usually win when a competitive rebid happens', true]]]],
     ['FaFileContract', 'Slow, formal public procurement', 'Multi-year award-to-go-live, bid protests and Buy America documentation for hardware', 'HIGH', K.green,
       [[['Long sales cycles favour vendors with reference fleets and live pilots']], [['Software-led entry and cooperative purchasing (NASPO, Sourcewell) shorten the path', true]]]],
     ['FaShieldHalved', 'Rail certification and signalling oligopoly', 'SIL-4 and ERA/FRA approvals and long frameworks protect the signalling majors, which together hold most of world signalling', 'HIGH', K.green,
       [[['Signalling cores are effectively closed to new entrants']], [['Adjacencies remain contestable: condition monitoring, cybersecurity, onboard connectivity', true]]]],
-    ['FaLandmark', 'US funding reset and ETCS slippage', 'With IIJA advance appropriations lapsed, FY2027 federal transit funding may fall; EU ETCS rollout is behind schedule', 'MID', K.mblue,
+    ['FaLandmark', 'US funding reset and ETCS slippage', 'With IIJA advance appropriations lapsed, FY2027 federal transit funding may fall, and EU ETCS rollout is behind schedule', 'MID', K.mblue,
       [[['Agencies in PA, WA and OR, where state rescue funding stalled, may defer purchases']], [['Formula funds for system refresh are the most durable federal line', true]]]],
-    ['FaArrowTrendDown', 'Execution and leverage in hardware-heavy models', "Cubic's highly levered buyout is now distressed; Alstom and INIT cut profit guidance", 'MID', K.mblue,
-      [[['Project-heavy integrators do not support high buyout leverage']], [['Underwrite on recurring revenue; leave hardware to OEM partners', true]]]],
+    ['FaArrowTrendDown', 'Execution and leverage in hardware-heavy models', "Cubic's highly levered buyout is now distressed. Alstom and INIT cut profit guidance", 'MID', K.mblue,
+      [[['Project-heavy integrators do not support high buyout leverage']], [['Underwrite on recurring revenue and leave hardware to OEM partners', true]]]],
   ];
   rk.forEach(([icn, h, desc, lvl, col, bl], i) => {
     const ry2 = 2.36 + i * 0.86, rh2 = 0.8;
@@ -614,7 +614,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   // ---------------------------------------------------------------- S7 investment thesis (6 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'INVESTMENT THESIS', color: K.lblue }, { text: 'NEW ENTRANT', color: K.navy }]);
-  title(s, 'Investment Thesis: ', 'Buy and build in North American bus ITS software; returns need a software exit multiple (~' + x1(D.exit_b_mult) + ' revenue), well above the ~' + x1(D.exit_a_mult) + ' paid for Clever');
+  title(s, 'Investment Thesis: ', 'Buy and build in North American bus ITS software, but returns need a software exit multiple (~' + x1(D.exit_b_mult) + ' revenue), well above the ~' + x1(D.exit_a_mult) + ' paid for Clever');
   hbar(s, 'INVESTMENT THESIS FOR A NEW ENTRANT', 0, CW, K.navy);
   s.addShape('roundRect', { x: 0.35, y: 2.48, w: 3.75, h: 4.25, rectRadius: 0.12, fill: { color: K.navy }, line: { color: K.navy } });
   s.addImage({ data: ic.FaBullseye, x: 0.6, y: 2.66, w: 0.5, h: 0.5 });
@@ -631,9 +631,9 @@ function bracketV(s, x, y0, y1, tick, color) {
   });
   const th = [
     ['FaMapLocationDot', 'WHERE TO PLAY', [[['North American bus software and services (~' + bn1(D.open_na_bus) + '), ', true], ['the most actionable slice of the open pool']], [['Wedges beside incumbents: ', true], ['real-time and cloud CAD/AVL overlays, AI enforcement and safety video, zero-emission scheduling and energy management']]]],
-    ['FaBus', 'WHY NORTH AMERICA FIRST', [[['Dated refresh wave: ', true], ['CAD/AVL platforms installed 2009-16 at major agencies reach a replace-or-extend decision by 2031']], [['Open mid-size tier and available targets: ', true], ["mid-size agencies run over half the US fleet; national procurement regimes split Europe's larger pool, limiting cross-border synergies"]]]],
-    ['FaPuzzlePiece', 'HOW TO WIN', [[['Coexist, then displace: ', true], ['sell modules on top of legacy systems and win end-of-life rebids once reference fleets exist']], [['Sell through existing channels: ', true], ['cooperative purchasing and OEM hardware partners; structure subscriptions to fit federal capital-grant rules']]]],
-    ['FaHandHoldingDollar', 'RETURNS AND EXIT', [[['At the Clever precedent the platform barely returns its capital; ', true], ['likely exit buyers are Hitachi, Siemens and Via, while Modaxo sets the floor price']], [['An IVU-like, majority-recurring mix roughly doubles the equity invested, ', true], ['so recurring revenue is the first diligence question']]]],
+    ['FaBus', 'WHY NORTH AMERICA FIRST', [[['Dated refresh wave: ', true], ['CAD/AVL platforms installed 2009-16 at major agencies reach a replace-or-extend decision by 2031']], [['Open mid-size tier and available targets: ', true], ["mid-size agencies run over half the US fleet, while national procurement regimes split Europe's larger pool, limiting cross-border synergies"]]]],
+    ['FaPuzzlePiece', 'HOW TO WIN', [[['Coexist, then displace: ', true], ['sell modules on top of legacy systems and win end-of-life rebids once reference fleets exist']], [['Sell through existing channels: ', true], ['cooperative purchasing and OEM hardware partners. Structure subscriptions to fit federal capital-grant rules']]]],
+    ['FaHandHoldingDollar', 'RETURNS AND EXIT', [[['At the Clever precedent the platform barely returns its capital. ', true], ['Likely exit buyers are Hitachi, Siemens and Via, while Modaxo sets the floor price']], [['An IVU-like, majority-recurring mix roughly doubles the equity invested, ', true], ['so recurring revenue is the first diligence question']]]],
   ];
   th.forEach(([icn, lab, bl], i) => {
     const ty = 2.48 + i * 1.07, th2 = 1.02;
@@ -643,7 +643,7 @@ function bracketV(s, x, y0, y1, tick, color) {
     T(s, paras(bl, { paraSpaceAfter: 3 }), { x: 6.7, y: ty + 0.02, w: 6.15, h: th2 - 0.04, fontSize: 10.5, color: '1A1A1A', valign: 'middle' });
     if (i < th.length - 1) s.addShape('line', { x: 4.3, y: ty + th2 + 0.025, w: 8.6, h: 0, line: { color: K.navy, width: 1.25, dashType: 'sysDot' } });
   });
-  source(s, 'Note: Illustrative value bridge only; entry between the INIT and IVU multiples; assumptions on model sheet Returns and in appendix A4. Sources: Hitachi Q1 FY2026 results, IVU Q3 2026 report, trading data as of 6 Nov 2026, FTA NTD RY2025, 2016-26 ITS award dataset, analysis');
+  source(s, 'Note: Illustrative value bridge only, with entry between the INIT and IVU multiples. Assumptions on model sheet Returns and in appendix A4. Sources: Hitachi Q1 FY2026 results, IVU Q3 2026 report, trading data as of 6 Nov 2026, FTA NTD RY2025, 2016-26 ITS award dataset, analysis');
 
   const out = path.join(OUT_DIR, 'Public_ITS_Market_Case.pptx');
   await pres.writeFile({ fileName: out });
@@ -664,7 +664,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A1 SEGMENTATION FRAMEWORK', color: K.navy }]);
   pageCode(s, 'A1');
-  title(s, 'Segmentation Framework: ', 'Public ITS is cut by mode, functional domain and component layer; fare collection and road traffic management are excluded');
+  title(s, 'Segmentation Framework: ', 'Public ITS is cut by mode, functional domain and component layer, with fare collection and road traffic management excluded');
   hbar(s, 'PUBLIC ITS SEGMENTATION: MODE x FUNCTIONAL DOMAIN x COMPONENT LAYER', 0, CW, K.navy);
   const fc = (t, o = {}) => ({ text: t, options: Object.assign({ fontFace: BODY, fontSize: 10, color: '1A1A1A', valign: 'middle', margin: 0.06 }, o) });
   const fh2 = t => fc(t, { bold: true, color: 'FFFFFF', fill: { color: K.navy }, fontSize: 11, align: 'center' });
@@ -679,14 +679,14 @@ function bracketV(s, x, y0, y1, tick, color) {
     [fc('Adjacent, excluded', { bold: true, color: 'FFFFFF', fill: { color: K.grey }, fontFace: HEAD, fontSize: 12.5 }), fc('Fare collection and ticketing, road traffic management and tolling', { fill: { color: K.lgrey } }), fc('Fare collection, rolling stock and TCMS, civil works, freight rail', { fill: { color: K.lgrey } })],
   ];
   s.addTable(fw, { x: 0.45, y: 2.48, w: 12.4, colW: [2.6, 4.9, 4.9], rowH: [0.36, 0.52, 0.52, 0.52, 0.52, 0.52, 0.48], border: { type: 'solid', pt: 0.75, color: 'C7D3DA' }, autoPage: false });
-  T(s, paras([[['Geography: ', true, K.mblue], ['bus sized for Europe and North America (Berg Insight) and scaled to the rest of the world (GMI regional mix); rail sized globally']], [['Component layer: ', true, K.mblue], ['hardware, software, services; the open pool is the software and services of bus and other rail ITS']]], { paraSpaceAfter: 3 }), { x: 0.45, y: 6.22, w: 12.4, h: 0.55, fontSize: 10.5, color: '1A1A1A' });
+  T(s, paras([[['Geography: ', true, K.mblue], ['bus is sized for Europe and North America (Berg Insight) and scaled to the rest of the world (GMI regional mix), while rail is sized globally']], [['Component layer: ', true, K.mblue], ['hardware, software and services. The open pool is the software and services of bus and other rail ITS']]], { paraSpaceAfter: 3 }), { x: 0.45, y: 6.22, w: 12.4, h: 0.55, fontSize: 10.5, color: '1A1A1A' });
   source(s, 'Sources: Berg Insight (2026), Global Market Insights (2026), UNIFE World Rail Market Study 2026, analysis');
 
   // ---------------------------------------------------------------- A2 market build (20 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A2 MARKET BUILD', color: K.navy }]);
   pageCode(s, 'A2');
-  title(s, 'Market Build: ', 'Each segment starts from a published estimate with stated adjustments; the two analyst-estimated segments sit outside the North American thesis');
+  title(s, 'Market Build: ', 'Each segment starts from a published estimate with stated adjustments, and the two analyst-estimated segments sit outside the North American thesis');
   hbar(s, 'HOW THE 2025 MARKET IS BUILT, BILLIONS USD', 0, CW, K.navy);
   const tc = (t, o = {}) => ({ text: t, options: Object.assign({ fontFace: BODY, fontSize: 10, color: '1A1A1A', valign: 'middle', margin: 0.06 }, o) });
   const th3 = (t, o = {}) => tc(t, Object.assign({ bold: true, color: 'FFFFFF', fill: { color: K.navy }, fontSize: 10.5 }, o));
@@ -699,7 +699,7 @@ function bracketV(s, x, y0, y1, tick, color) {
     [seg('Bus and tram ITS, Europe'), tc('Berg Insight (2026): ' + eur(D.berg_eu, 2) + ', fare-inclusive'), tc(less), val(D.bus_eu), conf('MID')],
     [seg('Bus and tram ITS, North America'), tc('Berg Insight (2026): ' + eur(D.berg_na, 2) + ', fare-inclusive'), tc(less), val(D.bus_na), conf('MID')],
     [seg('Bus and tram ITS, rest of world'), tc('Scaled from Europe and North America'), tc('Rest of world = ' + p0(D.row_share) + ' of the global market (GMI regional mix)'), val(D.bus_row), conf('LOW')],
-    [seg('Urban signalling (metro, light rail)'), tc('UNIFE World Rail Market Study 2026: rail control ' + eur(D.unife, 1) + ', incl. freight'), tc(p0(D.pax_share) + ' passenger; ' + p0(D.urban_share) + ' of that urban'), val(D.urban), conf('MID')],
+    [seg('Urban signalling (metro, light rail)'), tc('UNIFE World Rail Market Study 2026: rail control ' + eur(D.unife, 1) + ', incl. freight'), tc(p0(D.pax_share) + ' passenger, ' + p0(D.urban_share) + ' of that urban'), val(D.urban), conf('MID')],
     [seg('Mainline and commuter signalling'), tc('Same anchor'), tc('The rest of passenger signalling'), val(D.mainline), conf('MID')],
     [seg('Other rail ITS (passenger information, CCTV, monitoring)'), tc('GMI APTS (2026): ' + bn1(D.gmi_apts) + ', all modes'), tc('Rail share less ticketing, plus analyst estimates for condition monitoring and trackside detection'), val(D.ro), conf('LOW')],
     [tc('Total', { bold: true, color: K.navy, fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } }), tc(bn1(D.market), { bold: true, align: 'center', fontSize: 11, fill: { color: K.lgrey } }), tc('', { fill: { color: K.lgrey } })],
@@ -708,16 +708,16 @@ function bracketV(s, x, y0, y1, tick, color) {
   // three bottom lines in the A1 style (bullets, same indent); the table ends at y 5.92, so the box starts 0.14in below it
   T(s, paras([
     [['Open pool: ', true, K.mblue], ['software and services of bus ITS (GMI: ' + p0(D.bus_hw_2025) + ' hardware) and other rail ITS (' + p0(D.ro_hw) + ' hardware, analyst) = ' + bn1(D.open) + ', of which North American bus ' + bn1(D.open_na_bus)]],
-    [['Cross-checks: ', true, K.mblue], ["SCI Verkehr's independent signalling estimate is " + CITED.sci_vs_unife_words + " of UNIFE's; GMI's CBTC-only market sits below our urban signalling, which also covers light rail"]],
+    [['Cross-checks: ', true, K.mblue], ["SCI Verkehr's independent signalling estimate is " + CITED.sci_vs_unife_words + " of UNIFE's. GMI's CBTC-only market sits below our urban signalling, which also covers light rail"]],
     [['Bottom-up: ', true, K.mblue], ['buses and vehicles \u00D7 price per unit across 11 spending pools gives ' + bn1(D.bu_total / 1000) + ' for North American bus ITS, ' + p0(D.bu_ratio) + ' of the top-down ' + bn1(D.bu_topdown / 1000)]],
   ], { paraSpaceAfter: 3 }), { x: 0.45, y: 6.06, w: 12.4, h: 0.82, fontSize: 10.5, color: '1A1A1A' });
-  source(s, "Note: Nominal USD at 2025 average FX; figures may not sum due to rounding. Model: sheets Market and Bottom-up, where every input carries its source and confidence. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), analysis");
+  source(s, "Note: Nominal USD at 2025 average FX. Figures may not sum due to rounding. Model: sheets Market and Bottom-up, where every input carries its source and confidence. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2026), Global Market Insights (2026), analysis");
 
   // ---------------------------------------------------------------- A3 growth scenarios (22 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A3 GROWTH SCENARIOS', color: K.green }]);
   pageCode(s, 'A3');
-  title(s, 'Growth Scenarios: ', 'Two-thirds of the increase to 2031 is signalling; 2031 ranges from ~' + bn0(MP.low_2031) + ' to ~' + bn0(MP.high_2031) + ', mostly on the pace of signalling modernisation', K.green);
+  title(s, 'Growth Scenarios: ', 'Two-thirds of the increase to 2031 is signalling, and 2031 ranges from ~' + bn0(MP.low_2031) + ' to ~' + bn0(MP.high_2031) + ', mostly on the pace of signalling modernisation', K.green);
   hbar(s, 'GROWTH BRIDGE 2025 TO 2031E, BASE CASE, BILLIONS USD', 0, 6.2, K.dgreen);
   hbar(s, 'SCENARIOS: CAGR 2025-31E BY SEGMENT', 6.26, CW - 6.26, K.dgreen);
   const brL = ['Bus and tram ITS', 'Rail signalling', 'Other rail ITS'];
@@ -734,21 +734,21 @@ function bracketV(s, x, y0, y1, tick, color) {
   const sc = [
     [gh('Segment', { align: 'left' }), gh('Low'), gh('Base'), gh('High'), gh('Basis of the base and range', { align: 'left' })],
     // each range marker is tied to its value with non-breaking spaces ('low = ...'), so a marker never ends a line
-    scen('Bus and tram ITS, Europe', D.bus_eu_path, "Berg Insight forecast;\nlow = zero-emission bus capex crowds out ITS,\nhigh = earlier edition's pace plus enforcement"),
-    scen('Bus and tram ITS, North America', D.bus_na_path, 'Berg Insight forecast;\nlow = FY2027 federal funding reset,\nhigh = a partial return toward the 2022-25 pace'),
+    scen('Bus and tram ITS, Europe', D.bus_eu_path, "Berg Insight forecast,\nlow = zero-emission bus capex crowds out ITS,\nhigh = earlier edition's pace plus enforcement"),
+    scen('Bus and tram ITS, North America', D.bus_na_path, 'Berg Insight forecast,\nlow = FY2027 federal funding reset,\nhigh = a partial return toward the 2022-25 pace'),
     scen('Bus and tram ITS, rest of world', D.bus_row_path, 'GMI Asia-Pacific growth, blended with slower Latin America, Middle East and Africa'),
-    scen('Rail signalling (urban and mainline)', SP, "Just above SCI Verkehr's nominal forecast and in line with UNIFE's real outlook plus inflation; low = ETCS slippage and the UK cut, high = FRMCS and driverless-metro conversions"),
+    scen('Rail signalling (urban and mainline)', SP, "Just above SCI Verkehr's nominal forecast and in line with UNIFE's real outlook plus inflation, low = ETCS slippage and the UK cut, high = FRMCS and driverless-metro conversions"),
     scen('Other rail ITS', RP, 'Between rail asset-management and telematics forecasts (MarketsandMarkets, Mordor)'),
     [gc('Market, 2031E', { bold: true, color: K.navy, fill: { color: K.lgrey } }), gc(bn1(MP.low_2031), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc(bn1(MP.values[6]), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc(bn1(MP.high_2031), { bold: true, align: 'center', fill: { color: K.lgrey } }), gc('', { fill: { color: K.lgrey } })],
   ];
   s.addTable(sc, { x: 6.4, y: 2.48, w: 6.5, colW: [1.8, 0.62, 0.62, 0.62, 2.84], rowH: [0.34, 0.56, 0.56, 0.48, 0.86, 0.48, 0.4], border: { type: 'solid', pt: 0.75, color: 'C7D3DA' }, autoPage: false });
-  source(s, "Note: Nominal USD at constant 2025 FX; low and high use each segment's own low or high rate. Model: sheet Growth. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), MarketsandMarkets, Mordor Intelligence, FTA, analysis");
+  source(s, "Note: Nominal USD at constant 2025 FX. Low and high use each segment's own low or high rate. Model: sheet Growth. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, SCI Verkehr (2023, 2026), Global Market Insights (2026), MarketsandMarkets, Mordor Intelligence, FTA, analysis");
 
   // ---------------------------------------------------------------- A4 exit multiples and returns (17 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A4 EXIT MULTIPLES AND RETURNS', color: K.navy }]);
   pageCode(s, 'A4');
-  title(s, 'Exit Multiples: ', 'The Clever precedent (~' + x1(D.bm_clever) + " revenue) barely returns capital; the thesis needs IVU's ~" + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue');
+  title(s, 'Exit Multiples: ', 'The Clever precedent (~' + x1(D.bm_clever) + " revenue) barely returns capital, so the thesis needs IVU's ~" + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue');
   hbar(s, 'EV / REVENUE, TRANSACTIONS AND TRADING', 0, 6.2, K.navy);
   hbar(s, 'ILLUSTRATIVE VALUE BRIDGE, USD M', 6.26, CW - 6.26, K.navy);
   // one non-zero value per series so each bar takes its own colour: Clever grey and IVU light blue as on slide 7, the other benchmarks muted
@@ -768,15 +768,15 @@ function bracketV(s, x, y0, y1, tick, color) {
   T(s, paras([
     [['Entry: ', true, K.mblue], ["between INIT and IVU, below IVU's software multiple"]],
     [['If entry is at the Clever multiple instead: ', true, K.mblue], ['MOIC ' + x1(D.moic_a_at_a) + ' (exit A) and ' + x1(D.moic_b_at_a) + ' (exit B)']],
-    [['Assumptions: ', true, K.mblue], [p0(D.growth) + ' organic growth; $' + usd0(D.bolt_rev) + 'M of bolt-on revenue bought at ' + x1(D.bolt_mult) + '; entry debt ' + x1(D.leverage) + ' EBITDA, half repaid by exit; ' + usd0(D.hold) + '-year hold']],
+    [['Assumptions: ', true, K.mblue], [p0(D.growth) + ' organic growth, $' + usd0(D.bolt_rev) + 'M of bolt-on revenue bought at ' + x1(D.bolt_mult) + ', entry debt ' + x1(D.leverage) + ' EBITDA (half repaid by exit) and a ' + usd0(D.hold) + '-year hold']],
   ], { paraSpaceAfter: 8 }), { x: 6.4, y: 4.85, w: 6.5, h: 1.5, fontSize: 11, color: '1A1A1A', valign: 'top' });
-  source(s, 'Note: Clever = consideration plus debt repaid, on projected 2026 revenue (Hitachi Q1 FY2026 results); trading multiples as of 6 Nov 2026; Via on LTM revenue. Model: sheet Returns. Sources: Hitachi Q1 FY2026 results, Conduent 8-K (Oct 2026), IVU Q3 2026 report, stockanalysis, analysis');
+  source(s, 'Note: Clever = consideration plus debt repaid, on projected 2026 revenue (Hitachi Q1 FY2026 results). Trading multiples as of 6 Nov 2026, with Via on LTM revenue. Model: sheet Returns. Sources: Hitachi Q1 FY2026 results, Conduent 8-K (Oct 2026), IVU Q3 2026 report, stockanalysis, analysis');
 
   // ---------------------------------------------------------------- A5 incumbency and entry window (11 numbers: cited, and the NTD CSV)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A5 INCUMBENCY AND ENTRY WINDOW', color: K.navy }]);
   pageCode(s, 'A5');
-  title(s, 'Incumbency: ', 'Systems are ~' + CITED.tenure_median + ' years old at a decision point and challengers win most competitive rebids; mid-size agencies run over half the US fleet');
+  title(s, 'Incumbency: ', 'Systems are ~' + CITED.tenure_median + ' years old at a decision point, challengers win most competitive rebids, and mid-size agencies run over half the US fleet');
   hbar(s, CITED.dp_total + ' DECISION POINTS ON INCUMBENT-HELD SYSTEMS, 2016-26', 0, 6.45, K.navy);
   hbar(s, 'US FULL-SIZE BUS FLEET BY AGENCY SIZE, 2025', 6.51, CW - 6.51, K.navy);
   s.addShape('line', { x: 6.48, y: 2.45, w: 0, h: 4.3, line: { color: K.navy, width: 1.5 } });
@@ -820,13 +820,13 @@ function bracketV(s, x, y0, y1, tick, color) {
   const brX = tx + 35 * tScale + 0.40; // clear of the longest bar's label, and leaves the label box 1.68in wide
   bracketV(s, brX, ty0 + tPitch + 0.02, ty0 + 2 * tPitch + tH - 0.02, 0.1, K.navy);
   T(s, 'Mid-size (50-999 buses): over half the fleet and the core customers', { x: brX + 0.12, y: ty0 + tPitch, w: 12.9 - brX - 0.12, h: tPitch + tH, fontSize: 9.5, bold: true, color: K.navy, valign: 'middle' });
-  T(s, 'Share of active full-size buses in the US, by size of the operating agency; may not sum due to rounding', { x: 6.68, y: ty0 + 4 * tPitch - 0.08, w: 6.2, h: 0.25, fontSize: 9, italic: true, color: K.grey });
+  T(s, 'Share of active full-size buses in the US, by size of the operating agency (may not sum due to rounding)', { x: 6.68, y: ty0 + 4 * tPitch - 0.08, w: 6.2, h: 0.25, fontSize: 9, italic: true, color: K.grey });
   T(s, [{ text: 'Refresh wave: ', options: { bold: true, color: K.mblue } }, { text: 'CAD/AVL platforms installed in 2009-16 now serve about ' + CITED.refresh_cohort.toLocaleString('en-US') + ' buses in the US and Canada (TriMet, Denver RTD, NJ Transit, Miami-Dade, TTC, TransLink and others)' }], { x: 6.68, y: 6.1, w: 6.2, h: 0.6, fontSize: 10, color: '1A1A1A', valign: 'top' });
   source(s, 'Sources: 2016-26 ITS award dataset (agency board records), FTA NTD RY2025 Revenue Vehicle Inventory, agency CAD/AVL records, analysis');
 
   // ---------------------------------------------------------------- A6 player directory (parents, their subsidiaries and brands, owners)
   // Rows from research notes 08, 09, 10, 22 (gap), 26 (gap), 32 (gap), 34 (gap); register C59. Two panels: groups 1-3 left, 4-6 right.
-  const DIRECTORY = [["Signalling majors", [["Siemens", "Siemens Mobility; Hacon (HAFAS), Sqills, eos.uptrade, Padam; MERMEC units (bought 2026)", "Siemens AG (listed)"], ["Hitachi", "Hitachi Rail; ex-Thales GTS (2024), ex-Ansaldo STS; SelTrac CBTC, HMAX", "Hitachi, Ltd. (listed, Tokyo)"], ["Alstom", "Urbalis, Atlas, HealthHub, Nomad Digital; ex-Bombardier (2021); 49% of CASCO", "Listed (Euronext Paris)"], ["CRSC", "CASCO Signal (51%; JV with Alstom)", "State-owned; listed (Shanghai, Hong Kong)"]]], ["Bus ITS consolidators", [["Modaxo", "Trapeze, Vontas, Routeward (ex-Conduent), Novvan (fare), TripSpark (incl. Routematch), TransLoc, SISCOG, FARA", "Constellation Software (listed, TSX)"], ["Hitachi Rail", "Clever Devices (now Hitachi Mobility Multimodal Solutions), incl. MAIOR scheduling", "Hitachi, Ltd. (listed); bought Clever Jul 2026"]]], ["Listed pure plays (Cubic also competes)", [["INIT", "DILAX, iris-GmbH (majority); MOBILE-ITCS, MOBILE-PLAN, MOBILEvario", "Listed (XETRA); founder-controlled"], ["IVU", "IVU.suite", "Listed (Frankfurt Prime Standard)"], ["Cubic", "Cubic Transportation Systems, Umo (NextBus brand retired)", "Veritas Capital, Elliott (private, distressed)"]]], ["Mid-market privates", [["Avail", "myAvail", "Private, employee-owned (ESOP)"], ["GIRO", "HASTUS, GeoRoute", "Private, founder-led"], ["ETA Transit Systems", "-", "Private, founder-led"], ["Passio (Transit Technologies)", "Passio, ParaPlan; sister brands Ecolane, TripMaster (CTS Software), Vestige", "Private (Transit Technologies LLC)"]]], ["SaaS / AI challengers", [["Swiftly", "Hopthru, TextMarks", "VC/growth equity (Cove Hill, JMI)"], ["Optibus", "-", "VC-backed (Insight, Bessemer)"], ["Via", "Remix, Citymapper, Downtowner", "Listed (NYSE: VIA)"], ["Hayden AI", "-", "VC-backed (TPG Rise Fund)"]]], ["Also active, not on the competitive landscape", [["Luminator", "LTG Sweden (ex-Mobitec)", "Audax Private Equity (since 2014)"], ["Hanover Displays", "-", "Private, family-owned"], ["Equans", "Ineo Systrans, Icomera", "Bouygues (since 2022)"]]]];
+  const DIRECTORY = [["Signalling majors", [["Siemens", "Siemens Mobility, Hacon (HAFAS), Sqills, eos.uptrade, Padam, MERMEC units (bought 2026)", "Siemens AG (listed)"], ["Hitachi", "Hitachi Rail, ex-Thales GTS (2024), ex-Ansaldo STS, SelTrac CBTC, HMAX", "Hitachi, Ltd. (listed, Tokyo)"], ["Alstom", "Urbalis, Atlas, HealthHub, Nomad Digital,\nex-Bombardier (2021), 49% of CASCO", "Listed (Euronext Paris)"], ["CRSC", "CASCO Signal (51%, JV with Alstom)", "State-owned, listed (Shanghai, Hong Kong)"]]], ["Bus ITS consolidators", [["Modaxo", "Trapeze, Vontas, Routeward (ex-Conduent), Novvan (fare), TripSpark (incl. Routematch), TransLoc, SISCOG, FARA", "Constellation Software (listed, TSX)"], ["Hitachi Rail", "Clever Devices (now Hitachi Mobility Multimodal Solutions), incl. MAIOR scheduling", "Hitachi, Ltd. (listed), bought Clever Jul 2026"]]], ["Listed pure plays (Cubic also competes)", [["INIT", "DILAX, iris-GmbH (majority),\nMOBILE-ITCS, MOBILE-PLAN, MOBILEvario", "Listed (XETRA),\nfounder-controlled"], ["IVU", "IVU.suite", "Listed (Frankfurt Prime Standard)"], ["Cubic", "Cubic Transportation Systems, Umo (NextBus brand retired)", "Veritas Capital, Elliott (private, distressed)"]]], ["Mid-market privates", [["Avail", "myAvail", "Private, employee-owned (ESOP)"], ["GIRO", "HASTUS, GeoRoute", "Private, founder-led"], ["ETA Transit Systems", "-", "Private, founder-led"], ["Passio (Transit Technologies)", "Passio, ParaPlan. Sister brands Ecolane, TripMaster (CTS Software), Vestige", "Private (Transit Technologies LLC)"]]], ["SaaS / AI challengers", [["Swiftly", "Hopthru, TextMarks", "VC/growth equity (Cove Hill, JMI)"], ["Optibus", "-", "VC-backed (Insight, Bessemer)"], ["Via", "Remix, Citymapper, Downtowner", "Listed (NYSE: VIA)"], ["Hayden AI", "-", "VC-backed (TPG Rise Fund)"]]], ["Also active, not on the competitive landscape", [["Luminator", "LTG Sweden (ex-Mobitec)", "Audax Private Equity (since 2014)"], ["Hanover Displays", "-", "Private, family-owned"], ["Equans", "Ineo Systrans, Icomera", "Bouygues (since 2022)"]]]];
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
   crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A6 PLAYER DIRECTORY', color: K.navy }]);
   pageCode(s, 'A6');
