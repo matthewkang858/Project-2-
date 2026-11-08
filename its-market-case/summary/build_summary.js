@@ -30,7 +30,7 @@ C.sections.forEach(sec => {
   });
 });
 const doc = new Document({
-  creator: 'Matthew Kang', title: C.title,
+  creator: 'Matthew Kang', lastModifiedBy: 'Matthew Kang', title: C.title,
   styles: {
     default: { document: { run: { font: FONT, size: 20 } } },
     paragraphStyles: [

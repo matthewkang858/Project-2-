@@ -1,6 +1,6 @@
 # 37 — Gap fill: non-US / non-EU bus demand base and ITS penetration (RoW roadway block)
 
-**Prepared 2026-11-07** for the Public ITS (Roadway bus + Railway) CDD-style case. Companion data file: `/home/user/Project-2-/its-market-case/data/nonus_bus_fleets_by_country.csv` (20 country rows; transit-only vs registered fleet, year, scope, source URL, confidence, notes).
+**Prepared 2026-11-07** for the Public ITS (Roadway bus + Railway) CDD-style case. Companion data file: `data/nonus_bus_fleets_by_country.csv` (20 country rows; transit-only vs registered fleet, year, scope, source URL, confidence, notes).
 
 **Method and caveats.** The shared WebSearch budget for this turn was already exhausted when this task started (every query returned "budget used up"), so this note is built entirely from **direct fetches of primary sources through the session proxy** (curl with a browser User-Agent, PDFs converted with `pdftotext`, xlsx/CSV parsed with `python3 -I`) plus the figures already sourced in research files 01/02/04/05/07/12/16. The Berg Insight 10th-edition summary PDF **now returns HTTP 200** and was read in full (6 pages; text in the scratchpad). Hosts that were still unreachable or empty in this run: researchandmarkets.com, giiresearch.com, marketresearch.com (403), globenewswire.com (403), xxgk.mot.gov.cn 2025 bulletin (connection drop; the 2024 bulletin loaded), atuc.es, semovi.cdmx.gob.mx, mit.gov.it, stat.molit.go.kr, molit.go.kr, seoulsolution.kr, data.ibb.gov.tr, tih.hk, kmb.hk (report moved), iett.istanbul content pages (HTTP 500), ntu.org.br (JS single-page app, no document links), anav.it/dati-imprese, its.go.kr, c40.org (403). Every number below carries the URL it was read from; figures taken from earlier research files are labelled "(file NN)". Nothing is extrapolated without the label **DERIVED**. FX conventions: 1.10 USD/EUR (as in file 01) and 83 INR/USD (assumption) are used only in DERIVED lines.
 
@@ -45,7 +45,7 @@ Trade-press addendum (IoT Business News, 24 Mar 2026, https://iotbusinessnews.co
 
 ## 3. Non-US bus fleet table by country (transit-only vs registered)
 
-Full detail, URLs and notes are in `/home/user/Project-2-/its-market-case/data/nonus_bus_fleets_by_country.csv`. Transit-only = buses operated in scheduled urban/regional public service; registered = all buses & coaches (incl. coaches, school, private, minibuses where the statistic includes them).
+Full detail, URLs and notes are in `data/nonus_bus_fleets_by_country.csv`. Transit-only = buses operated in scheduled urban/regional public service; registered = all buses & coaches (incl. coaches, school, private, minibuses where the statistic includes them).
 
 | Country | Transit-only buses | Year / scope | Registered buses & coaches | Transit share | New in this run? | Confidence |
 |---|---|---|---|---|---|---|
@@ -271,4 +271,4 @@ Cross-check against Berg's EUR 1,900 per registered bus: the RoW intensities abo
 
 **US/NA intensity anchors (earlier files)**
 - NTD Capital Expenses by Capital Use (file 04/16): https://datahub.transportation.gov/d/fphd-jyyj
-- Contract benchmarks incl. iBus2 and LA Metro ATMS II (file 12): `/home/user/Project-2-/its-market-case/research/12_contract_benchmarks.md` and `/home/user/Project-2-/its-market-case/data/contract_benchmarks.csv`
+- Contract benchmarks incl. iBus2 and LA Metro ATMS II (file 12): `research/12_contract_benchmarks.md` and `data/contract_benchmarks.csv`

@@ -508,4 +508,4 @@ Transport Canada (Transportation in Canada 2024): "Canadians took roughly 1.6 bi
 - Statistics Canada, Table 23-10-0251-01 Passenger bus and urban transit statistics, monthly: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2310025101
 - Transport Canada, Transportation in Canada 2024 — Modal overviews: https://tc.canada.ca/en/corporate-services/transparency/corporate-management-reporting/transportation-canada-annual-reports/transportation-canada-2024/modal-overviews
 
-Working files (scratch, not deliverables): downloaded CSV/PDF sources and analysis scripts are in /tmp/claude-0/-home-user-Project-2-/993f4a78-282b-5e57-93b8-c5cadbfd3ba8/scratchpad/ntdfleet/ (raw/ and scripts/).
+Working files (scratch, not deliverables): downloaded CSV/PDF sources and analysis scripts were in a session scratch directory (not kept), under raw/ and scripts/.

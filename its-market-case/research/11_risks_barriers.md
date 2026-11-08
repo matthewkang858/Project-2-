@@ -82,7 +82,7 @@
 | **Budget / fiscal / political** | | | | | | | | | | |
 | 52 | PRT projected a $100M budget deficit for FY2026; state share "not increased... in more than a decade"; ~20% of Allegheny County service already cut in recent years (advocate statement) | 100 | USD M | 2025 | Pittsburgh | Operator finances | WTAE (21 Mar 2025) | https://www.wtae.com/article/pittsburgh-regional-transit-funding-crisis-service-cuts-fare-increases/64211827 | medium | |
 | 53 | PRT proposed slashing 40 routes to address a $50M shortfall; public comment to 18 June 2025 | 40 | routes | 2025 | Pittsburgh | — | WTAE (2 Apr 2025) | https://www.wtae.com/article/pittsburgh-prt-service-cuts-public-comment/64344012 | medium | $50M vs $100M figures differ between articles (phasing) |
-| 54 | Federal: IIJA advance appropriations lapsed with extension to Dec 11 2026; FTA staff -30% (791->553) by May 2025; selected grants withdrawn; FY2026 Low-No shrank to $610M; state rescue packages in IL/CA/NY, none in PA (see 06) | — | — | 2025-26 | US | Funding | Sibling file 06 | /home/user/Project-2-/its-market-case/research/06_us_funding_drivers.md | medium | Not re-verified here |
+| 54 | Federal: IIJA advance appropriations lapsed with extension to Dec 11 2026; FTA staff -30% (791->553) by May 2025; selected grants withdrawn; FY2026 Low-No shrank to $610M; state rescue packages in IL/CA/NY, none in PA (see 06) | — | — | 2025-26 | US | Funding | Sibling file 06 | research/06_us_funding_drivers.md | medium | Not re-verified here |
 | 55 | USDOT interim final rule suspended DBE goals and enforcement effective 3 Oct 2025, mid-procurement for LA Metro's ATMS II support contract (22% DBE goal set) | — | — | 2025 | US | Procurement policy | LA Metro board report 2025-0852 | https://webapi.legistar.com/v1/metro/matters/11871/texts/13954 | high | Example of political/regulatory change during a live tender |
 | 56 | LA Metro ATMS II funded from state TDA Article 4 (not federal grants); LOP budget $117M vs award $129.8M | 117 vs 129.8 | USD M | 2025 | Los Angeles | CAD/AVL | LA Metro board report 2025-0275 | (row 6) | high | Non-federal funding avoids Buy America on this contract (inference, low) |
 | **Legacy integration, standards, certification** | | | | | | | | | | |
@@ -256,4 +256,4 @@ Press / secondary
 - Urban Transport Magazine (headline only): https://www.urban-transport-magazine.com/die-konzequenzen-des-rueckzugs-von-easymile-unterbrechung-des-betriebs-autonomer-minibusse-in-monheim/
 
 Cross-reference
-- Sibling file 06 (US funding, Buy America waivers, TSA SD 2026 revisions, fiscal cliff, ridership, Proterra/CapMetro): /home/user/Project-2-/its-market-case/research/06_us_funding_drivers.md
+- Sibling file 06 (US funding, Buy America waivers, TSA SD 2026 revisions, fiscal cliff, ridership, Proterra/CapMetro): research/06_us_funding_drivers.md

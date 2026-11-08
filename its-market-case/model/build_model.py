@@ -156,17 +156,17 @@ market_inputs = [
      'ECB euro reference rate, 2025 annual average (research note 21)',
      'HIGH', 'Not shown (used in rows 25, 26, 29)', 'fx', F_BN),
     (7, 'Bus and tram ITS, Europe, 2025 (fare-inclusive)', 2.55, 'EUR B',
-     'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (Mar 2026), summary p.2 (research notes 01, 17)',
+     'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (Mar 2026), summary p.2 (research notes 01, 17 (gap))',
      'HIGH', 'A2', 'berg_eu', F_BN),
     (8, 'Bus and tram ITS, North America, 2025 (fare-inclusive)', 1.22, 'EUR B',
      'Same source as row 7',
      'HIGH', 'A2', 'berg_na', F_BN),
     (9, 'Fare-collection share removed from Berg values', 0.20, 'share',
-     'Analyst judgement inside a bracket: GMI electronic-payment share (14.7%) to GMI ticketing application share (24.2%) (research note 17, section 2)',
+     'Analyst judgement inside a bracket: GMI electronic-payment share (14.7%) to GMI ticketing application share (24.2%) (research note 17 (gap), section 2)',
      'MID', 'A2', 'haircut', F_PCT),
     (10, 'Rest-of-world share of global bus ITS', 0.261, 'share',
      'GMI APTS (Aug 2026) regional split, 2025: Asia-Pacific 17.2% + Latin America 5.0% + Middle East and Africa 3.9%. '
-     'All-mode mix applied to bus, hence LOW (research note 17, section 4)',
+     'All-mode mix applied to bus, hence LOW (research note 17 (gap), section 4)',
      'LOW', 'A2', 'row_share', F_PCT),
     (11, 'World rail control (signalling) market, 2023-25 average, treated as 2025', 24.9, 'EUR B',
      'UNIFE World Rail Market Study 2026 (Bain) abstract; includes freight, trackside and onboard (research note 21)',
@@ -179,7 +179,7 @@ market_inputs = [
      "GMI's CBTC-only market (USD 4.9B) sits below the result, as it should (research note 21)",
      'MID', 'A2', 'urban_share', F_PCT),
     (14, 'Advanced public transportation systems (APTS), all modes, 2025', 6.83, 'USD B',
-     'Global Market Insights, APTS market report (Aug 2026) (research note 17, section 4)',
+     'Global Market Insights, APTS market report (Aug 2026) (research note 17 (gap), section 4)',
      'MID', 'A2', 'gmi_apts', F_BN),
     (15, 'Railway share of APTS', 0.305, 'share',
      'GMI mode split: roadways 47.6%, railways 30.5%, airways 14.6%, waterways 7.3%',
@@ -194,7 +194,7 @@ market_inputs = [
      'Analyst estimate anchored on Frauscher (bought by Wabtec), voestalpine and others; axle counters stay in signalling (research notes 03, 22)',
      'LOW', 'A2 (in words)', 'rail_td', F_BN),
     (19, 'Bus ITS hardware share of value, 2025', 0.468, 'share',
-     'GMI APTS component split, 2025: hardware 46.8%, software 33.0%, services 20.1% (research note 17, section 4.1)',
+     'GMI APTS component split, 2025: hardware 46.8%, software 33.0%, services 20.1% (research note 17 (gap), section 4.1)',
      'MID', 'A2; S3 lens (in words)', 'bus_hw_2025', F_PCT),
     (20, 'Other rail ITS hardware share of value', 0.45, 'share',
      'Analyst assumption, just below GMI APTS (46.8%) and passenger rail signalling (~46%): condition-monitoring platforms are '
@@ -213,11 +213,11 @@ for r, label, v, unit, src, conf, slide, key, fmt in market_inputs:
 M.section(24, 'B. BUILD: SEGMENT ROWS', 'G')
 market_build = [
     (25, 'Bus and tram ITS, Europe', '=B7*B6*(1-B9)',
-     'Berg Europe × FX × (1 − fare share)', 'A2; S7 (in words)', 'bus_eu', False),
+     'Berg Europe × FX × (1 − fare share)', 'A2; S3 lens, S7 (in words)', 'bus_eu', False),
     (26, 'Bus and tram ITS, North America', '=B8*B6*(1-B9)',
-     'Berg North America × FX × (1 − fare share)', 'A2; S7 (in words)', 'bus_na', False),
+     'Berg North America × FX × (1 − fare share)', 'A2; S3 lens, S7 (in words)', 'bus_na', False),
     (27, 'Bus ITS, rest of world', '=(B25+B26)*B10/(1-B10)',
-     'Europe + North America, grossed up so the rest of the world is the row 10 share of the total', 'A2', 'bus_row', False),
+     'Europe + North America, grossed up so the rest of the world is the row 10 share of the total', 'A2; S3 lens (in words)', 'bus_row', False),
     (28, 'Bus and tram ITS, total', '=SUM(B25:B27)',
      'Sum of rows 25-27', 'S3 table', 'bus', True),
     (29, 'Passenger rail signalling', '=B11*B6*B12',
@@ -285,7 +285,7 @@ G = Sheet(wsg, gw, wrap_cols='AQS')
 YC = 'BCDEFGH'                       # year columns: 2025 ... 2031E
 YEARS = ['2025', '2026E', '2027E', '2028E', '2029E', '2030E', '2031E']
 G.title('Growth: market growth 2025-2031E, low / base / high',
-        'Feeds slide 4, slide 2 and appendix A3. USD billions, nominal at constant 2025 FX. Each segment is one row: '
+        'Feeds slide 4, slide 2, slide 3 (in words) and appendix A3. USD billions, nominal at constant 2025 FX. Each segment is one row: '
         '2025 value (green, from Market) > base path using the base CAGR (column M) > 2031E low and high (columns O-P). '
         'CAGR inputs are blue in columns L-N.')
 G.header(4, ['Segment'] + YEARS + ['CAGR 2025-31E (from path)', 'Increase 2025-31E', 'Share of increase', 'CAGR low',
@@ -307,13 +307,13 @@ segments = [
      'HIGH base; MID range', 'A3', 'bus_eu_path'),
     (8, 'Bus and tram ITS, North America', '=Market!B26', (0.025, 0.050, 0.080),
      'Base: Berg Insight 10th ed. (5.0%). Low: FY2027 federal funding reset (federal transit funding about 20% lower if '
-     'IIJA advance appropriations are not continued) and agencies facing fiscal cliffs defer refresh. High: still below '
-     'the 11.5% a year realised in 2022-25 (research notes 06, 17, 25)',
+     'IIJA advance appropriations are not continued) and agencies facing fiscal cliffs defer refresh. High: a partial return '
+     'toward the 11.5% a year realised in 2022-25 (research notes 06, 17 (gap), 25)',
      'HIGH base; MID range', 'A3', 'bus_na_path'),
     (9, 'Bus ITS, rest of world', '=Market!B27', (0.06, 0.09, 0.11),
      'Base: GMI APTS Asia-Pacific forecast (10.1%) blended with slower Latin America and Middle East/Africa (~8%). '
      'Low: rest-of-world bus grows nearer the global market (all-mode GMI rates may overstate bus). High: slightly '
-     'above the GMI Asia-Pacific rate. The range is analyst judgement (research notes 05, 07, 17)',
+     'above the GMI Asia-Pacific rate. The range is analyst judgement (research notes 05, 07, 17 (gap))',
      'MID', 'A3', 'bus_row_path'),
     (10, 'Passenger rail signalling (urban and mainline)', '=Market!B29', (0.035, 0.050, 0.065),
      "Base: just above SCI Verkehr's 4.6% nominal CCS forecast (2023-28) and in line with UNIFE's ~3.2% a year real "
@@ -382,7 +382,7 @@ for c in 'CDEFG':
     G.num('%s16' % c, '=$B16+($H16-$B16)*%s$5/$H$5' % c, F_PCT)
 G.num('H16', 0.446, F_PCT)
 G.text('Q16', '2031E input: GMI implied 2031 mix 44.6 / 35.2 / 20.1 (software grows 9.7% a year against hardware '
-              '7.7%); straight line from 2025 (research note 17)')
+              '7.7%); straight line from 2025 (research note 17 (gap))')
 G.text('R16', 'MID')
 G.text('S16', 'S2, S3 lens (in words)')
 G.text('T16', 'bus_hw_path')
@@ -426,38 +426,39 @@ G.finish(paper='A3')
 wsr = wb.create_sheet('Returns')
 T = Sheet(wsr, {'A': 64, 'B': 11, 'C': 10, 'D': 95, 'E': 12, 'F': 26, 'G': 18}, wrap_cols='ADF')
 T.title('Returns: illustrative buy-and-build value bridge',
-        'Feeds slide 7, slide 2 and appendix A4. Illustrative, not a valuation. USD millions unless stated. '
+        'Feeds slide 7, slide 2, slide 5 (in words) and appendix A4. Illustrative, not a valuation. USD millions unless stated. '
         'Gross MOIC = exit equity ÷ equity invested; modest entry debt, half repaid by exit.')
 T.header(4, ['Item', 'Value', 'Unit', 'Source or method', 'Confidence', 'On slide', 'Deck key'])
 
 T.section(5, 'A. INPUTS', 'G')
 returns_inputs = [
     (6, 'Entry revenue', 60, 'USD M',
-     'Illustrative. Founder-owned mid-market bus ITS vendors (Avail, GIRO, Hanover, ETA, Passio) are USD 20-100M '
-     'revenue businesses (research notes 08, 32)',
+     'Illustrative. Privately held mid-market bus ITS vendors (Avail, GIRO, Hanover, ETA, Passio) range from under '
+     'USD 10M to roughly USD 110-115M of revenue; only Hanover files accounts (GBP 92.8M, about USD 111M), the others are '
+     'aggregator estimates that vary widely (GIRO about USD 115M; research notes 08, 32)',
      'LOW', 'A4', 'rev0', F_M),
     (7, 'Entry EV / revenue', 2.0, 'x',
-     '"Integrator multiple": inside the INIT-to-IVU trading band (rows 40 and 42; check row 46) and above the Clever '
-     'precedent (row 15); see memo rows 34-36 (research note 26)',
+     "Below IVU's software multiple, inside the INIT-to-IVU trading band (rows 40 and 42; check row 46) and above the "
+     'Clever precedent (row 15); see memo rows 34-36 (research note 26)',
      'MID', 'S2, S7 (in words); A4', 'entry_mult', F_X),
     (8, 'Entry EBITDA margin', 0.15, 'share',
      'INIT EBITDA margin, 14.9% (FY2025 annual report; research note 08)',
      'MID', 'Not shown (used in row 20)', 'margin0', F_PCT),
     (9, 'Entry leverage: net debt at entry, multiple of entry EBITDA', 2.5, 'x EBITDA',
      "Deliberately modest; Cubic's 2021 buyout, at ~11x EBITDA of funded debt, is now distressed (research notes 10, 26)",
-     'MID', 'A4 footnote', 'leverage', F_X),
+     'MID', 'A4 (assumptions); S2, S5, S6, S7 (in words)', 'leverage', F_X),
     (10, 'Share of entry debt repaid by exit', 0.5, 'share',
      'Simplifying assumption: half of the entry debt is repaid from operating cash flow over the hold',
-     'LOW', 'A4 footnote (in words: "half")', 'debt_repaid', F_PCT),
+     'LOW', 'A4 (assumptions, in words: "half")', 'debt_repaid', F_PCT),
     (11, 'Organic revenue growth a year', 0.08, 'share',
      'Above the North American bus market (5.0%) on module cross-sell; well below Via and INIT (24-29%) (research note 26)',
-     'MID', 'A4 footnote', 'growth', F_PCT),
+     'MID', 'A4 (assumptions)', 'growth', F_PCT),
     (12, 'Bolt-on revenue acquired over the hold', 40, 'USD M',
      'Two or three point-solution bolt-ons (passenger counting, passenger information, enforcement)',
-     'LOW', 'A4 footnote', 'bolt_rev', F_M),
+     'LOW', 'A4 (assumptions)', 'bolt_rev', F_M),
     (13, 'Bolt-on EV / revenue', 1.5, 'x',
      'Between Modaxo-Conduent (row 39) and the Clever precedent (row 15) (research note 34)',
-     'MID', 'A4 footnote', 'bolt_mult', F_X),
+     'MID', 'A4 (assumptions)', 'bolt_mult', F_X),
     (14, 'Hold period', 5, 'years',
      'Standard private-equity hold',
      'MID', 'S7 MOIC header; A4', 'hold', F_INT),
@@ -494,7 +495,7 @@ returns_bridge = [
     (27, 'Exit A: enterprise value', '=B25*B15', 'USD M',
      'Exit revenue × exit A EV / revenue', 'Not shown (used in rows 28, 35)', 'ev_a', F_M, False),
     (28, 'Exit A: gross MOIC (x)', '=(B27-B26)/B24', 'x',
-     '(Exit A enterprise value − net debt at exit) ÷ total equity invested', 'S7, A4', 'moic_a', F_X1, True),
+     '(Exit A enterprise value − net debt at exit) ÷ total equity invested', 'S7, A4; S2 (in words)', 'moic_a', F_X1, True),
     (29, 'Exit B: enterprise value', '=B25*B16', 'USD M',
      'Exit revenue × exit B EV / revenue', 'Not shown (used in rows 30, 36)', 'ev_b', F_M, False),
     (30, 'Exit B: gross MOIC (x)', '=(B29-B26)/B24', 'x',
@@ -535,7 +536,8 @@ benchmarks = [
     (43, 'Via (trading, LTM revenue, 6 Nov 2026)', 5.61,
      'EV / LTM revenue; loss-making (stockanalysis; research note 26)', 'bm_via'),
 ]
-BM_SLIDE = {'bm_init': 'A4; S5 (in words)', 'bm_ivu': 'A4; S5 (in words)', 'bm_via': 'A4; S5 (in words)'}
+BM_SLIDE = {'bm_conduent': 'A4; S5, S7 (in words)', 'bm_init': 'A4; S2, S5, S7 (in words)', 'bm_clever': 'A4; S5, S7 (in words)',
+            'bm_ivu': 'A4; S2, S5, S7 (in words)', 'bm_via': 'A4; S5, S7 (in words)'}
 for r, label, v, src, key in benchmarks:
     item(T, r, label, v, 'x', src, 'HIGH', BM_SLIDE.get(key, 'A4'), key, F_X)
 
@@ -611,7 +613,7 @@ chain = [
     'contestable pool − bus and other-rail hardware = open software and services pool.',
     "Forecast: each 2025 segment row × (1 + CAGR) ^ years, in low, base and high; the bus hardware share falls in a "
     "straight line to GMI's implied 2031 mix, which lifts the open pool's growth.",
-    "Returns: buy at an integrator multiple with modest debt, add bolt-ons, exit at the Clever precedent (Returns row "
+    "Returns: buy below a software multiple with modest debt, add bolt-ons, exit at the Clever precedent (Returns row "
     "15) or at IVU's multiple (row 16); gross MOIC = exit equity ÷ equity invested.",
 ]
 for i, t in enumerate(chain, 1):
@@ -620,13 +622,17 @@ row[0] += 1
 
 rd_section('3. Slide map')
 rd_table(['Slide', 'Sheet and rows', 'What it shows'], [
-    ('S2 Executive summary', 'Market B34, B40, B43-B44 (in words); Growth rows 12 and 18; Returns B15, B16',
+    ('S2 Executive summary', 'Market B34, B40, B43-B44 (in words); Growth rows 12 and 18, rows 10 and 16 (in words); '
+     'Returns B15, B16; B7, B9, B28, B40, B42 (in words)',
      'Market, growth, open pool, exit multiples'),
     ('S3 Market size', 'Market B21:B22 (funnel top), B28, B30, B31, B33, B34 (table), B37, B38, B40, B42 (funnel), '
-     'B44 (title, in words)', 'Funnel, segment table, share of scope that is open'),
+     'B44 (title, in words), B19:B20 and B25:B27 (lens, in words); Growth row 16 (lens, in words)',
+     'Funnel, segment table, share of scope that is open'),
     ('S4 Market growth', 'Growth rows 10, 11, 12, 15, 18', 'Segment chart, total CAGR, open pool'),
-    ('S5 Competitive, S6 Risks', 'none', "Words only; sources are cited in each slide's source line"),
-    ('S7 Thesis', 'Returns B14:B16, B28, B30; Market B41',
+    ('S5 Competitive, S6 Risks', 'Returns B39:B43 (S5, in words); Returns B9 (S5, S6, in words)',
+     "Words only: S5 compares the exit benchmarks in words and S5 and S6 contrast the case's modest debt with a highly "
+     "levered buyout; other sources are cited in each slide's source line"),
+    ('S7 Thesis', 'Returns B14:B16, B28, B30; B7, B9, B39:B43 (in words); Market B41; B25:B26 (in words)',
      'Exit multiples, MOIC, North American bus software and services'),
     ('A2 Market build', 'Market rows 7-41', 'Sizing chain'),
     ('A3 Growth scenarios', 'Growth rows 7-12 and 15', 'Bridge and low/base/high table'),
@@ -638,9 +644,9 @@ row[0] += 1
 
 rd_section('4. Sources')
 rd_table(['Research note (on request)', 'Source', 'Used for'], [
-    ('01, 17', 'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (Mar 2026)',
+    ('01, 17 (gap)', 'Berg Insight, Public Transport ITS in Europe and North America, 10th ed. (Mar 2026)',
      'Bus and tram ITS, Europe and North America; bus growth rates (5.3%, 5.0%)'),
-    ('17', 'Global Market Insights, Advanced Public Transportation Systems (Aug 2026)',
+    ('17 (gap)', 'Global Market Insights, Advanced Public Transportation Systems (Aug 2026)',
      'Rest-of-world bus mix; other rail ITS; bus hardware share and its 2031 shift'),
     ('15, 21', 'UNIFE World Rail Market Study 2026 (Bain), abstract', 'World rail control, EUR 24.9B'),
     ('21', 'Analyst carve-out matrix (Eurostat train-km, UITP network km, unit costs)',

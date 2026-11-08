@@ -269,4 +269,4 @@ IPO Sept 2025 on NYSE (ticker VIA), $493m raised, ~$3.65bn valuation; FY2025 rev
 
 **Market structure:** https://media.berginsight.com/2026/03/23160541/bi-its10-ps.pdf (Berg Insight, Public Transport ITS in Europe and North America, 10th ed., Mar 2026)
 
-**Sibling files consulted (search-snippet based; flagged where used):** /home/user/Project-2-/its-market-case/research/10_deals_valuations.md ; /home/user/Project-2-/its-market-case/research/02_bus_subsegment_reports.md
+**Sibling files consulted (search-snippet based; flagged where used):** research/10_deals_valuations.md ; research/02_bus_subsegment_reports.md

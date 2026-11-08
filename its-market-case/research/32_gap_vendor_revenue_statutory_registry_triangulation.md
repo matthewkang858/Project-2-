@@ -6,7 +6,7 @@
 
 **Confidence key:** high = primary filing/registry read directly, or two independent sources agree; medium = single secondary source or primary source with a scope caveat; low = aggregator estimate or derived with stated assumptions. Every derived figure shows its formula. FX = ECB reference rates of 6 Nov 2026 (EUR 1 = USD 1.1165, GBP 0.83415, SEK 11.026, NOK 10.526, DKK 7.4752, CHF 0.9143, AUD 1.625, CAD 1.5705; https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml).
 
-**Data files written:** `/home/user/Project-2-/its-market-case/data/vendor_revenue_statutory_registry.csv` (51 vendor/entity rows with every field below), `/home/user/Project-2-/its-market-case/data/vendor_share_berg_pools_2025.csv` (42 pool-attribution rows with the assumption behind each), `/home/user/Project-2-/its-market-case/data/conduent_transit_solutions_revenue_2019_2025.csv`.
+**Data files written:** `data/vendor_revenue_statutory_registry.csv` (51 vendor/entity rows with every field below), `data/vendor_share_berg_pools_2025.csv` (42 pool-attribution rows with the assumption behind each), `data/conduent_transit_solutions_revenue_2019_2025.csv`.
 
 ---
 

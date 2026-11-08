@@ -4,7 +4,7 @@
 
 **Scope note.** All figures are United States public transit agencies that report to the NTD (includes Puerto Rico and other territories). Base year = **NTD report year 2025** (agency fiscal years ending in 2025; FTA published these tables on data.transportation.gov on 5–14 Oct 2026, i.e. this is the newest available edition). Prior years 2022–2024 are used for trend. "Bus" (Roadway) = NTD modes MB motorbus, CB commuter bus, RB bus rapid transit, TB trolleybus; demand response (DR), vanpool (VP) and publico (PB) are shown separately. "Rail" (Railway) = HR heavy rail (metro), LR light rail, SR streetcar, CR commuter rail, YR hybrid rail, MG monorail/automated guideway, plus CC cable car, IP inclined plane, AR Alaska Railroad and TR aerial tramway (the last four are immaterial and are flagged). Freight rail is not in the NTD.
 
-**Method and data provenance.** transit.dot.gov (the NTD home) and apta.com are blocked by the session network policy (HTTP 403 on first attempt and on a retry at the end of the work), and the per-turn web-search budget was already exhausted, so no web searches could be run for this topic. The same NTD products are federated on the USDOT open-data portal (data.transportation.gov / datahub.transportation.gov, Socrata), which is reachable. Fifteen tables were downloaded as full CSV exports (`https://data.transportation.gov/api/views/<id>/rows.csv?accessType=DOWNLOAD`) into a fresh folder, `/home/user/Project-2-/its-market-case/data/ntd/`, and parsed row counts were checked against the API's `count(*)` for the six load-bearing tables (all match: RVI 35,625; Vehicles 10,858; Capital Expenses 17,285; Capital Use 5,193; Capex time series 155,408; Agency Information 2,897). Download script: `/home/user/Project-2-/its-market-case/model/scripts/ntd_download.sh`. Analysis script (run with `python3 -I`, inputs treated as untrusted data): `/home/user/Project-2-/its-market-case/model/scripts/ntd_tiering.py`. Outputs: 21 CSVs in `/home/user/Project-2-/its-market-case/data/` (index in section 9). The 2023 and 2024 *Revenue Vehicle Inventory* raw files exist on Socrata only as "href" entries pointing to transit.dot.gov Excel downloads (blocked), so the 2022–2024 fleet trend uses the FTA-built "2022–2025 Vehicles (Type Count by Agency)" table instead; its 2025 full-size-bus total (65,239) exactly equals the active count computed from the 2025 Revenue Vehicle Inventory, which confirms that table counts *active* vehicles and that the two sources are consistent.
+**Method and data provenance.** transit.dot.gov (the NTD home) and apta.com are blocked by the session network policy (HTTP 403 on first attempt and on a retry at the end of the work), and the per-turn web-search budget was already exhausted, so no web searches could be run for this topic. The same NTD products are federated on the USDOT open-data portal (data.transportation.gov / datahub.transportation.gov, Socrata), which is reachable. Fifteen tables were downloaded as full CSV exports (`https://data.transportation.gov/api/views/<id>/rows.csv?accessType=DOWNLOAD`) into a fresh folder, `data/ntd/`, and parsed row counts were checked against the API's `count(*)` for the six load-bearing tables (all match: RVI 35,625; Vehicles 10,858; Capital Expenses 17,285; Capital Use 5,193; Capex time series 155,408; Agency Information 2,897). Download script: `model/scripts/ntd_download.sh`. Analysis script (run with `python3 -I`, inputs treated as untrusted data): `model/scripts/ntd_tiering.py`. Outputs: 21 CSVs in `data/` (index in section 9). The 2023 and 2024 *Revenue Vehicle Inventory* raw files exist on Socrata only as "href" entries pointing to transit.dot.gov Excel downloads (blocked), so the 2022–2024 fleet trend uses the FTA-built "2022–2025 Vehicles (Type Count by Agency)" table instead; its 2025 full-size-bus total (65,239) exactly equals the active count computed from the 2025 Revenue Vehicle Inventory, which confirms that table counts *active* vehicles and that the two sources are consistent.
 
 **Confidence legend.** high = primary source (NTD tables, counts verified against the API) or consistent across two independent NTD tables; medium = my own aggregation that involves a scope or definition choice; low = inferred.
 
@@ -262,9 +262,9 @@ Agency short names are mine; the CSV carries the legal NTD reporter names and NT
 
 ## 9. Output file index
 
-Raw downloads (untrusted data, fresh folder): `/home/user/Project-2-/its-market-case/data/ntd/` — 15 CSVs named `<table>__<socrata id>.csv` (see `ntd_download.sh` for the id list).
+Raw downloads (untrusted data, fresh folder): `data/ntd/` — 15 CSVs named `<table>__<socrata id>.csv` (see `ntd_download.sh` for the id list).
 
-Derived CSVs in `/home/user/Project-2-/its-market-case/data/`:
+Derived CSVs in `data/`:
 
 | File | Content |
 |---|---|
@@ -290,7 +290,7 @@ Derived CSVs in `/home/user/Project-2-/its-market-case/data/`:
 | `ntd_2022_2025_fleet_age_by_vehicle_type.csv` | Weighted average age by vehicle type and year |
 | `ntd_2022_2025_opex_by_modegroup.csv` | Operating expenses, services and purchased transportation by mode group |
 
-Scripts: `/home/user/Project-2-/its-market-case/model/scripts/ntd_download.sh`, `/home/user/Project-2-/its-market-case/model/scripts/ntd_tiering.py` (run: `python3 -I ntd_tiering.py <raw_dir> <out_dir>`).
+Scripts: `model/scripts/ntd_download.sh`, `model/scripts/ntd_tiering.py` (run: `python3 -I ntd_tiering.py <raw_dir> <out_dir>`).
 
 ---
 
