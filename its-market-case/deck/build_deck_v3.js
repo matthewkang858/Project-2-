@@ -454,7 +454,9 @@ function bracketV(s, x, y0, y1, tick, color) {
   s.addChart(pres.ChartType.bar, ser.map(([n, v]) => ({ name: n, labels: Y, values: v })), {
     x: ch.x, y: ch.y, w: ch.w, h: ch.h, barDir: 'col', barGrouping: 'stacked', barGapWidthPct: 40, layout: lay,
     catAxisHidden: true, valAxisHidden: true, valAxisMinVal: 0, valAxisMaxVal: vmax, valGridLine: { style: 'none' }, catGridLine: { style: 'none' },
-    showLegend: false, showValue: false,
+    showLegend: false,
+    // each segment's value inside its bar, white, whole billions ($21B)
+    showValue: true, dataLabelPosition: 'ctr', dataLabelColor: 'FFFFFF', dataLabelFontSize: 9, dataLabelFontBold: true, dataLabelFormatCode: '"$"0"B"',
     chartColors: ser.map(x => x[2]), plotArea: { fill: { color: 'FFFFFF' } },
   });
   // chart geometry: plot-area position of each year band and of a value on the axis
@@ -496,7 +498,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   // drivers panel
   const drv = [
     ['FaTrainSubway', 'Tailwind: EU train-control mandate (ETCS)', 'EU law requires one digital signalling standard (ETCS) on main rail lines, but most are not yet fitted, leaving tens of billions of euros of work', '\u25B2 HIGH', K.green],
-    ['FaTrain', 'Tailwind: Legacy metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling, and most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
+    ['FaTrain', 'Tailwind: Metro resignalling (CBTC)', 'New York, Paris, Toronto and Hong Kong are funding metro resignalling, and most European signalling spend goes to existing lines', '\u25B2 HIGH', K.green],
     ['FaBus', 'Tailwind: Bus platform refresh cycle', 'A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031', '\u25B2 HIGH', K.green],
     ['FaChargingStation', 'Tailwind: Electric buses, AI enforcement', 'Most new European city buses are now electric, and camera-based bus-lane enforcement is scaling across US cities', '\u25B2 MID', K.green],
     ['FaLandmark', 'Headwind: funding reset, ETCS slippage', 'US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed, and the UK cut its ETCS budget', '\u25BC MID', K.red],
