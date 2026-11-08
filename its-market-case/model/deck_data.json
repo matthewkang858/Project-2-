@@ -1,877 +1,299 @@
 {
- "market_rows": [
-  {
-   "label": "Roadway: bus and tram ITS, Europe",
-   "total": 2.3052,
-   "hw": 1.0788336,
-   "sw": 0.760716,
-   "svc": 0.4656504,
-   "geo": "Europe",
-   "block": "Bus"
-  },
-  {
-   "label": "Roadway: bus and tram ITS, North America",
-   "total": 1.10288,
-   "hw": 0.51614784,
-   "sw": 0.3639504,
-   "svc": 0.22278176,
-   "geo": "North America",
-   "block": "Bus"
-  },
-  {
-   "label": "Roadway: bus ITS, Asia-Pacific",
-   "total": 0.793220243572395,
-   "hw": 0.371227073991881,
-   "sw": 0.26176268037889,
-   "svc": 0.160230489201624,
-   "geo": "Asia-Pacific",
-   "block": "Bus"
-  },
-  {
-   "label": "Roadway: bus ITS, rest of world (LatAm, MEA)",
-   "total": 0.410445358592693,
-   "hw": 0.19208842782138,
-   "sw": 0.135446968335589,
-   "svc": 0.0829099624357239,
-   "geo": "Rest of world",
-   "block": "Bus"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, Europe",
-   "total": 1.718833056,
-   "hw": 0.79066320576,
-   "sw": 0.41251993344,
-   "svc": 0.5156499168,
-   "geo": "Europe",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, China",
-   "total": 2.1271572,
-   "hw": 0.978492312,
-   "sw": 0.510517728,
-   "svc": 0.63814716,
-   "geo": "Asia-Pacific",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, APAC ex-China",
-   "total": 0.691129131,
-   "hw": 0.31791940026,
-   "sw": 0.16587099144,
-   "svc": 0.2073387393,
-   "geo": "Asia-Pacific",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, North America",
-   "total": 0.959077782,
-   "hw": 0.44117577972,
-   "sw": 0.23017866768,
-   "svc": 0.2877233346,
-   "geo": "North America",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, CIS/Eurasia",
-   "total": 0.225096,
-   "hw": 0.10354416,
-   "sw": 0.05402304,
-   "svc": 0.0675288,
-   "geo": "Rest of world",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: urban (metro/LRT) signalling, Rest of world",
-   "total": 0.56724192,
-   "hw": 0.2609312832,
-   "sw": 0.1361380608,
-   "svc": 0.170172576,
-   "geo": "Rest of world",
-   "block": "Rail CCS urban"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, Europe",
-   "total": 9.023873544,
-   "hw": 4.15098183024,
-   "sw": 2.16572965056,
-   "svc": 2.7071620632,
-   "geo": "Europe",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, China",
-   "total": 2.5998588,
-   "hw": 1.195935048,
-   "sw": 0.623966112,
-   "svc": 0.77995764,
-   "geo": "Asia-Pacific",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, APAC ex-China",
-   "total": 1.692074769,
-   "hw": 0.77835439374,
-   "sw": 0.40609794456,
-   "svc": 0.5076224307,
-   "geo": "Asia-Pacific",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, North America",
-   "total": 0.723514818,
-   "hw": 0.33281681628,
-   "sw": 0.17364355632,
-   "svc": 0.2170544454,
-   "geo": "North America",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, CIS/Eurasia",
-   "total": 0.225096,
-   "hw": 0.10354416,
-   "sw": 0.05402304,
-   "svc": 0.0675288,
-   "geo": "Rest of world",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: mainline and commuter passenger signalling, Rest of world",
-   "total": 0.33314208,
-   "hw": 0.1532453568,
-   "sw": 0.0799540992,
-   "svc": 0.099942624,
-   "geo": "Rest of world",
-   "block": "Rail CCS mainline"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), Europe",
-   "total": 1.27161108,
-   "hw": 0.572224986,
-   "sw": 0.381483324,
-   "svc": 0.31790277,
-   "geo": "Europe",
-   "block": "Rail other"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), China",
-   "total": 0.572224986,
-   "hw": 0.2575012437,
-   "sw": 0.1716674958,
-   "svc": 0.1430562465,
-   "geo": "Asia-Pacific",
-   "block": "Rail other"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), APAC ex-China",
-   "total": 0.476854155,
-   "hw": 0.21458436975,
-   "sw": 0.1430562465,
-   "svc": 0.11921353875,
-   "geo": "Asia-Pacific",
-   "block": "Rail other"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), North America",
-   "total": 0.540434709,
-   "hw": 0.24319561905,
-   "sw": 0.1621304127,
-   "svc": 0.13510867725,
-   "geo": "North America",
-   "block": "Rail other"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), CIS/Eurasia",
-   "total": 0.095370831,
-   "hw": 0.04291687395,
-   "sw": 0.0286112493,
-   "svc": 0.02384270775,
-   "geo": "Rest of world",
-   "block": "Rail other"
-  },
-  {
-   "label": "Railway: other ITS (PIS, CCTV/APC, tracking, condition monitoring, detection), Rest of world",
-   "total": 0.222531939,
-   "hw": 0.10013937255,
-   "sw": 0.0667595817,
-   "svc": 0.05563298475,
-   "geo": "Rest of world",
-   "block": "Rail other"
-  }
- ],
- "total_2025": 28.6768684021651,
- "segments": {
-  "Bus": {
-   "total": 4.61174560216509,
-   "hw": 2.15829694181326,
-   "sw": 1.52187604871448,
-   "svc": 0.931572611637348,
-   "share": 0.16081761569952
-  },
-  "Rail CCS urban": {
-   "total": 6.288535089,
-   "hw": 2.89272614094,
-   "sw": 1.50924842136,
-   "svc": 1.8865605267,
-   "share": 0.219289463577732
-  },
-  "Rail CCS mainline": {
-   "total": 14.597560011,
-   "hw": 6.71487760506,
-   "sw": 3.50341440264,
-   "svc": 4.3792680033,
-   "share": 0.509036056736861
-  },
-  "Rail other": {
-   "total": 3.1790277,
-   "hw": 1.430562465,
-   "sw": 0.95370831,
-   "svc": 0.794756925,
-   "share": 0.110856863985887
+ "_meta": {
+  "source": "model/Public_ITS_Market_Model.xlsx",
+  "units": "USD B for market keys (berg_eu, berg_na and unife in EUR B; fx in USD per EUR); USD M for rev0, ebitda0, bolt_rev, bolt_cost, ev*, eq*, debt*, rev1; fractions for shares and CAGRs; x for *_mult, leverage (x EBITDA), moic_*, bm_*; years for hold",
+  "years": [
+   "2025",
+   "2026E",
+   "2027E",
+   "2028E",
+   "2029E",
+   "2030E",
+   "2031E"
+  ],
+  "cells": {
+   "fx": "Market!B6",
+   "berg_eu": "Market!B7",
+   "berg_na": "Market!B8",
+   "haircut": "Market!B9",
+   "row_share": "Market!B10",
+   "unife": "Market!B11",
+   "pax_share": "Market!B12",
+   "urban_share": "Market!B13",
+   "gmi_apts": "Market!B14",
+   "gmi_rail": "Market!B15",
+   "gmi_ticketing": "Market!B16",
+   "rail_cm": "Market!B17",
+   "rail_td": "Market!B18",
+   "bus_hw_2025": "Market!B19",
+   "ro_hw": "Market!B20",
+   "global_its_low": "Market!B21",
+   "global_its_high": "Market!B22",
+   "bus_eu": "Market!B25",
+   "bus_na": "Market!B26",
+   "bus_row": "Market!B27",
+   "bus": "Market!B28",
+   "sig": "Market!B29",
+   "urban": "Market!B30",
+   "mainline": "Market!B31",
+   "ro_gmi": "Market!B32",
+   "ro": "Market!B33",
+   "market": "Market!B34",
+   "core": "Market!B37",
+   "contestable": "Market!B38",
+   "hardware": "Market!B39",
+   "open": "Market!B40",
+   "open_na_bus": "Market!B41",
+   "open_share": "Market!B42",
+   "sig_share": "Market!B43",
+   "mainline_share": "Market!B44",
+   "rev0": "Returns!B6",
+   "entry_mult": "Returns!B7",
+   "margin0": "Returns!B8",
+   "leverage": "Returns!B9",
+   "debt_repaid": "Returns!B10",
+   "growth": "Returns!B11",
+   "bolt_rev": "Returns!B12",
+   "bolt_mult": "Returns!B13",
+   "hold": "Returns!B14",
+   "exit_a_mult": "Returns!B15",
+   "exit_b_mult": "Returns!B16",
+   "ev0": "Returns!B19",
+   "ebitda0": "Returns!B20",
+   "debt0": "Returns!B21",
+   "eq0": "Returns!B22",
+   "bolt_cost": "Returns!B23",
+   "eq_in": "Returns!B24",
+   "rev1": "Returns!B25",
+   "debt1": "Returns!B26",
+   "ev_a": "Returns!B27",
+   "moic_a": "Returns!B28",
+   "ev_b": "Returns!B29",
+   "moic_b": "Returns!B30",
+   "breakeven_mult": "Returns!B33",
+   "eq_in_at_a": "Returns!B34",
+   "moic_a_at_a": "Returns!B35",
+   "moic_b_at_a": "Returns!B36",
+   "bm_conduent": "Returns!B39",
+   "bm_init": "Returns!B40",
+   "bm_clever": "Returns!B41",
+   "bm_ivu": "Returns!B42",
+   "bm_via": "Returns!B43",
+   "bus_eu_path": "Growth!B7:P7",
+   "bus_na_path": "Growth!B8:P8",
+   "bus_row_path": "Growth!B9:P9",
+   "sig_path": "Growth!B10:P10",
+   "ro_path": "Growth!B11:P11",
+   "market_path": "Growth!B12:P12",
+   "bus_path": "Growth!B15:P15",
+   "bus_hw_path": "Growth!B16:P16",
+   "open_path": "Growth!B18:P18",
+   "open_na_bus_path": "Growth!B19:P19"
   }
  },
- "contestable_2025": 7.79077330216509,
- "ccs_2025": 20.8860951,
- "components": {
-  "Hardware": {
-   "value": 13.1964631528133,
-   "share": 0.460177972285737
-  },
-  "Software": {
-   "value": 7.48824718271448,
-   "share": 0.26112499725211
-  },
-  "Services": {
-   "value": 7.99215806663735,
-   "share": 0.278697030462153
-  }
- },
- "geos": {
-  "North America": {
-   "total": 3.325907309,
-   "bus": 1.10288,
-   "ccs": 1.6825926,
-   "other": 0.540434709,
-   "share": 0.115978748528514
-  },
-  "Europe": {
-   "total": 14.31951768,
-   "bus": 2.3052,
-   "ccs": 10.7427066,
-   "other": 1.27161108,
-   "share": 0.499340356108022
-  },
-  "Asia-Pacific": {
-   "total": 8.95251928457239,
-   "bus": 0.793220243572395,
-   "ccs": 7.1102199,
-   "other": 1.049079141,
-   "share": 0.312186085280375
-  },
-  "Rest of world": {
-   "total": 2.07892412859269,
-   "bus": 0.410445358592693,
-   "ccs": 1.350576,
-   "other": 0.31790277,
-   "share": 0.072494810083089
-  }
- },
- "years": [
-  2025,
-  2026,
-  2027,
-  2028,
-  2029,
-  2030,
-  2031
- ],
- "forecast_seg": {
-  "Bus": {
-   "cagr": 0.0626117438016078,
-   "values": [
-    4.61174560216509,
-    4.89739510635995,
-    5.20202680873234,
-    5.52699923276665,
-    5.87377495658422,
-    6.24392902914259,
-    6.63915809443787
-   ]
-  },
-  "Rail CCS": {
-   "cagr": 0.0485163354404894,
-   "values": [
-    20.8860951,
-    21.8946517965,
-    22.9539184715925,
-    24.0665284660524,
-    25.2352556056092,
-    26.4630218729363,
-    27.7529055074502
-   ]
-  },
-  "Rail other": {
-   "cagr": 0.0700000000000001,
-   "values": [
-    3.1790277,
-    3.401559639,
-    3.63966881373,
-    3.8944456306911,
-    4.16705682483948,
-    4.45875080257824,
-    4.77086335875872
-   ]
-  }
- },
- "forecast_total": {
-  "cagr": 0.0533124961739766,
+ "fx": 1.13,
+ "berg_eu": 2.55,
+ "berg_na": 1.22,
+ "haircut": 0.2,
+ "row_share": 0.261,
+ "unife": 24.9,
+ "pax_share": 0.74,
+ "urban_share": 0.3,
+ "gmi_apts": 6.83,
+ "gmi_rail": 0.305,
+ "gmi_ticketing": 0.242,
+ "rail_cm": 1,
+ "rail_td": 0.6,
+ "bus_hw_2025": 0.468,
+ "ro_hw": 0.45,
+ "global_its_low": 40,
+ "global_its_high": 60,
+ "bus_eu": 2.3052,
+ "bus_na": 1.10288,
+ "bus_row": 1.20366560216509,
+ "bus": 4.61174560216509,
+ "sig": 20.82138,
+ "urban": 6.246414,
+ "mainline": 14.574966,
+ "ro_gmi": 1.5790277,
+ "ro": 3.1790277,
+ "market": 28.6121533021651,
+ "core": 14.0371873021651,
+ "contestable": 7.79077330216509,
+ "hardware": 3.58885940681326,
+ "open": 4.20191389535182,
+ "open_na_bus": 0.58673216,
+ "open_share": 0.146857660483521,
+ "sig_share": 0.727711045726308,
+ "mainline_share": 0.509397732008416,
+ "rev0": 60,
+ "entry_mult": 2,
+ "margin0": 0.15,
+ "leverage": 2.5,
+ "debt_repaid": 0.5,
+ "growth": 0.08,
+ "bolt_rev": 40,
+ "bolt_mult": 1.5,
+ "hold": 5,
+ "exit_a_mult": 1.58,
+ "exit_b_mult": 2.6,
+ "ev0": 120,
+ "ebitda0": 9,
+ "debt0": 22.5,
+ "eq0": 97.5,
+ "bolt_cost": 60,
+ "eq_in": 157.5,
+ "rev1": 128.159684608,
+ "debt1": 11.25,
+ "ev_a": 202.49230168064,
+ "moic_a": 1.21423683606756,
+ "ev_b": 333.2151799808,
+ "moic_b": 2.04422336495746,
+ "breakeven_mult": 1.31671672348565,
+ "eq_in_at_a": 132.3,
+ "moic_a_at_a": 1.44552004293757,
+ "moic_b_at_a": 2.43359924399698,
+ "bm_conduent": 0.44,
+ "bm_init": 0.98,
+ "bm_clever": 1.58,
+ "bm_ivu": 2.6,
+ "bm_via": 5.61,
+ "bus_eu_path": {
   "values": [
-   28.6768684021651,
-   30.1936065418599,
-   31.7956140940548,
-   33.4879733295101,
-   35.2760873870329,
-   37.1657017046571,
-   39.1629269606468
+   2.3052,
+   2.4273756,
+   2.5560265068,
+   2.6914959116604,
+   2.8341451949784,
+   2.98435489031226,
+   3.1425256994988
+  ],
+  "cagr": 0.0529999999999999,
+  "increase": 0.837325699498805,
+  "cagr_low": 0.035,
+  "cagr_base": 0.053,
+  "cagr_high": 0.07,
+  "low_2031": 2.83367937828938,
+  "high_2031": 3.45948360708232
+ },
+ "bus_na_path": {
+  "values": [
+   1.10288,
+   1.158024,
+   1.2159252,
+   1.27672146,
+   1.340557533,
+   1.40758540965,
+   1.4779646801325
+  ],
+  "cagr": 0.05,
+  "increase": 0.375084680132501,
+  "cagr_low": 0.025,
+  "cagr_base": 0.05,
+  "cagr_high": 0.08,
+  "low_2031": 1.27900267707863,
+  "high_2031": 1.75013195328848
+ },
+ "bus_row_path": {
+  "values": [
+   1.20366560216509,
+   1.31199550635995,
+   1.43007510193234,
+   1.55878186110625,
+   1.69907222860582,
+   1.85198872918034,
+   2.01866771480657
+  ],
+  "cagr": 0.0900000000000001,
+  "increase": 0.815002112641481,
+  "cagr_low": 0.06,
+  "cagr_base": 0.09,
+  "cagr_high": 0.11,
+  "low_2031": 1.7074226614363,
+  "high_2031": 2.25135365822521
+ },
+ "sig_path": {
+  "values": [
+   20.82138,
+   21.862449,
+   22.95557145,
+   24.1033500225,
+   25.308517523625,
+   26.5739433998063,
+   27.9026405697966
+  ],
+  "cagr": 0.05,
+  "increase": 7.08126056979657,
+  "share_of_increase": 0.661768590124431,
+  "cagr_low": 0.035,
+  "cagr_base": 0.05,
+  "cagr_high": 0.065,
+  "low_2031": 25.5947922668432,
+  "high_2031": 30.3813562302829
+ },
+ "ro_path": {
+  "values": [
+   3.1790277,
+   3.401559639,
+   3.63966881373,
+   3.8944456306911,
+   4.16705682483948,
+   4.45875080257824,
+   4.77086335875872
+  ],
+  "cagr": 0.0700000000000001,
+  "increase": 1.59183565875872,
+  "share_of_increase": 0.148762614964304,
+  "cagr_low": 0.05,
+  "cagr_base": 0.07,
+  "cagr_high": 0.09,
+  "low_2031": 4.26020116219612,
+  "high_2031": 5.33154770803661
+ },
+ "market_path": {
+  "values": [
+   28.6121533021651,
+   30.1614037453599,
+   31.7972670724623,
+   33.5247948859578,
+   35.3493493050487,
+   37.2766232315271,
+   39.3126620229932
+  ],
+  "cagr": 0.0543795763060002,
+  "increase": 10.7005087208281,
+  "cagr_low": 0.0374546116705008,
+  "cagr_base": 0.0543795763060002,
+  "cagr_high": 0.0709727268440172,
+  "low_2031": 35.6750981458436,
+  "high_2031": 43.1738731569155
+ },
+ "bus_path": {
+  "values": [
+   4.61174560216509,
+   4.89739510635995,
+   5.20202680873234,
+   5.52699923276665,
+   5.87377495658422,
+   6.24392902914259,
+   6.63915809443787
+  ],
+  "cagr": 0.0626117438016078,
+  "increase": 2.02741249227279,
+  "share_of_increase": 0.189468794911266
+ },
+ "bus_hw_path": {
+  "values": [
+   0.468,
+   0.464333333333333,
+   0.460666666666667,
+   0.457,
+   0.453333333333333,
+   0.449666666666667,
+   0.446
   ]
  },
- "forecast_contest": {
-  "cagr": 0.0656575076736929,
-  "values": [
-   7.79077330216509,
-   8.29895474535995,
-   8.84169562246234,
-   9.42144486345775,
-   10.0408317814237,
-   10.7026798317208,
-   11.4100214531966
-  ]
- },
- "forecast_geo": {
-  "North America": {
-   "cagr": 0.0558853310174838,
-   "values": [
-    3.325907309,
-    3.51142433163,
-    3.7074365269491,
-    3.91454706540631,
-    4.13339438306192,
-    4.36465428136867,
-    4.60904215434227
-   ]
-  },
-  "Europe": {
-   "cagr": 0.0523361844859276,
-   "values": [
-    14.31951768,
-    15.0678413856,
-    15.855728058792,
-    16.6852998917618,
-    17.5587949391304,
-    18.4785735762706,
-    19.4471253261757
-   ]
-  },
-  "Asia-Pacific": {
-   "cagr": 0.0528340504445548,
-   "values": [
-    8.95251928457239,
-    9.41769845986391,
-    9.91030283799676,
-    10.4321276688559,
-    10.9850950690542,
-    11.5712634824867,
-    12.1928378742862
-   ]
-  },
-  "Rest of world": {
-   "cagr": 0.0578884380497327,
-   "values": [
-    2.07892412859269,
-    2.19664236476604,
-    2.32214667031698,
-    2.45599870348605,
-    2.59880299578631,
-    2.75121036453117,
-    2.91392160584265
-   ]
-  }
- },
- "forecast_comp": {
-  "Hardware": {
-   "cagr": 0.0518695260771849,
-   "values": [
-    13.1964631528133,
-    13.8762654583265,
-    14.5930538130004,
-    15.3489422775694,
-    16.1461711300762,
-    16.9871146761487,
-    17.8742895549878
-   ]
-  },
-  "Software": {
-   "cagr": 0.0567607295818526,
-   "values": [
-    7.48824718271448,
-    7.90928182334877,
-    8.35565812078024,
-    8.82900725943332,
-    9.33107282783407,
-    9.86371910209619,
-    10.4289399786578
-   ]
-  },
-  "Services": {
-   "cagr": 0.052427715761211,
-   "values": [
-    7.99215806663735,
-    8.40805926018471,
-    8.84690216027418,
-    9.31002379250735,
-    9.79884342912263,
-    10.3148679264123,
-    10.8596974270012
-   ]
-  }
- },
- "forecast_scen": {
-  "Low": {
-   "cagr": 0.0363846507635677,
-   "values": [
-    28.6768684021651,
-    29.711558993295,
-    30.7871961689377,
-    31.9055150442131,
-    33.0683284775463,
-    34.2775307205306,
-    35.5351012459961
-   ]
-  },
-  "Base": {
-   "cagr": 0.0533124961739766,
-   "values": [
-    28.6768684021651,
-    30.1936065418599,
-    31.7956140940548,
-    33.4879733295101,
-    35.2760873870329,
-    37.1657017046571,
-    39.1629269606468
-   ]
-  },
-  "High": {
-   "cagr": 0.0699074018321555,
-   "values": [
-    28.6768684021651,
-    30.6668266344032,
-    32.8011193076826,
-    35.0906879264256,
-    37.5473409383058,
-    40.1838254955013,
-    43.0139054116147
-   ]
-  },
-  "Contestable Low": {
-   "cagr": 0.0438758665640986,
-   "values": [
-    7.79077330216509,
-    8.13019862329499,
-    8.48541787984269,
-    8.85720450999075,
-    9.24637131040432,
-    9.6537724974914,
-    10.0803058790004
-   ]
-  },
-  "Contestable Base": {
-   "cagr": 0.0656575076736929,
-   "values": [
-    7.79077330216509,
-    8.29895474535995,
-    8.84169562246234,
-    9.42144486345775,
-    10.0408317814237,
-    10.7026798317208,
-    11.4100214531966
-   ]
-  },
-  "Contestable High": {
-   "cagr": 0.086165253312237,
-   "values": [
-    7.79077330216509,
-    8.45888341140325,
-    9.18566191079761,
-    9.97638374861794,
-    10.8368091996391,
-    11.7732295104031,
-    12.7925169266326
-   ]
-  }
- },
- "forecast_rows": [
-  {
-   "label": "Roadway: bus and tram ITS, Europe",
-   "low": 0.035,
-   "base": 0.053,
-   "high": 0.07,
-   "values": [
-    2.3052,
-    2.4273756,
-    2.5560265068,
-    2.6914959116604,
-    2.8341451949784,
-    2.98435489031226,
-    3.1425256994988
-   ]
-  },
-  {
-   "label": "Roadway: bus and tram ITS, North America",
-   "low": 0.025,
-   "base": 0.05,
-   "high": 0.08,
-   "values": [
-    1.10288,
-    1.158024,
-    1.2159252,
-    1.27672146,
-    1.340557533,
-    1.40758540965,
-    1.4779646801325
-   ]
-  },
-  {
-   "label": "Roadway: bus ITS, Asia-Pacific",
-   "low": 0.06,
-   "base": 0.09,
-   "high": 0.11,
-   "values": [
-    0.793220243572395,
-    0.86461006549391,
-    0.942424971388363,
-    1.02724321881332,
-    1.11969510850651,
-    1.2204676682721,
-    1.33030975841659
-   ]
-  },
-  {
-   "label": "Roadway: bus ITS, rest of world",
-   "low": 0.06,
-   "base": 0.09,
-   "high": 0.11,
-   "values": [
-    0.410445358592693,
-    0.447385440866035,
-    0.487650130543978,
-    0.531538642292936,
-    0.579377120099301,
-    0.631521060908238,
-    0.688357956389979
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), Europe",
-   "low": 0.035,
-   "base": 0.05,
-   "high": 0.065,
-   "values": [
-    10.7427066,
-    11.27984193,
-    11.8438340265,
-    12.436025727825,
-    13.0578270142163,
-    13.7107183649271,
-    14.3962542831734
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), China",
-   "low": 0.02,
-   "base": 0.035,
-   "high": 0.05,
-   "values": [
-    4.727016,
-    4.89246156,
-    5.0636977146,
-    5.240927134611,
-    5.42435958432238,
-    5.61421216977367,
-    5.81070959571574
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), APAC ex-China",
-   "low": 0.05,
-   "base": 0.065,
-   "high": 0.08,
-   "values": [
-    2.3832039,
-    2.5381121535,
-    2.7030894434775,
-    2.87879025730354,
-    3.06591162402827,
-    3.2651958795901,
-    3.47743361176346
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), North America",
-   "low": 0.04,
-   "base": 0.055,
-   "high": 0.07,
-   "values": [
-    1.6825926,
-    1.775135193,
-    1.872767628615,
-    1.97576984818882,
-    2.08443718983921,
-    2.19908123528037,
-    2.32003070322079
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), CIS/Eurasia",
-   "low": 0.005,
-   "base": 0.02,
-   "high": 0.035,
-   "values": [
-    0.450192,
-    0.45919584,
-    0.4683797568,
-    0.477747351936,
-    0.48730229897472,
-    0.497048344954214,
-    0.506989311853299
-   ]
-  },
-  {
-   "label": "Railway: passenger signalling (urban + mainline), Rest of world",
-   "low": 0.04,
-   "base": 0.055,
-   "high": 0.07,
-   "values": [
-    0.900384,
-    0.94990512,
-    1.0021499016,
-    1.057268146188,
-    1.11541789422834,
-    1.1767658784109,
-    1.2414880017235
-   ]
-  },
-  {
-   "label": "Railway: other ITS, Europe",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    1.27161108,
-    1.3606238556,
-    1.455867525492,
-    1.55777825227644,
-    1.66682272993579,
-    1.7835003210313,
-    1.90834534350349
-   ]
-  },
-  {
-   "label": "Railway: other ITS, China",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    0.572224986,
-    0.61228073502,
-    0.6551403864714,
-    0.701000213524398,
-    0.750070228471106,
-    0.802575144464084,
-    0.858755404576569
-   ]
-  },
-  {
-   "label": "Railway: other ITS, APAC ex-China",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    0.476854155,
-    0.51023394585,
-    0.5459503220595,
-    0.584166844603665,
-    0.625058523725922,
-    0.668812620386736,
-    0.715629503813808
-   ]
-  },
-  {
-   "label": "Railway: other ITS, North America",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    0.540434709,
-    0.57826513863,
-    0.6187436983341,
-    0.662055757217487,
-    0.708399660222711,
-    0.757987636438301,
-    0.811046770988982
-   ]
-  },
-  {
-   "label": "Railway: other ITS, CIS/Eurasia",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    0.095370831,
-    0.10204678917,
-    0.1091900644119,
-    0.116833368920733,
-    0.125011704745184,
-    0.133762524077347,
-    0.143125900762762
-   ]
-  },
-  {
-   "label": "Railway: other ITS, Rest of world",
-   "low": 0.05,
-   "base": 0.07,
-   "high": 0.09,
-   "values": [
-    0.222531939,
-    0.23810917473,
-    0.2547768169611,
-    0.272611194148377,
-    0.291693977738764,
-    0.312112556180477,
-    0.33396043511311
-   ]
-  }
- ],
- "bottom_up": {
-  "North American full-size transit bus fleet (US active + Canada)": 83022,
-  "CAD/AVL full replacement, annualised": 1588.23529411765,
-  "Mid-life refresh, annualised": 1000,
-  "Onboard video, annualised": 1100,
-  "APC, annualised x coverage": 365,
-  "Capex intensity per bus (sum of the four)": 4053.23529411765,
-  "Recurring vendor maintenance and hosting per bus": 2200,
-  "Overlay SaaS and scheduling software per bus": 800,
-  "Onboard capex plus recurring intensity per bus": 7053.23529411765,
-  "All-in intensity incl. wayside, depot and back-office adder": 8111.22058823529,
-  "Bottom-up North America bus ITS spend": 673.409755676471,
-  "Top-down North America bus ITS, core (Berg ex-fare)": 1102.88,
-  "Bottom-up as share of top-down": 0.610592045985484,
-  "Capex share of bottom-up intensity": 0.574663275092782,
-  "NTD communication and information systems capex, bus modes 2025": 370,
-  "per active full-size bus": 5671.45419151121,
-  "Top-down US share of North America bus ITS core (fleet-weighted)": 866.647253980873,
-  "NTD bus capex floor as share of US top-down": 0.426932639895223,
-  "NTD communication and information systems capex, rail modes 2025": 1497,
-  "per active rail passenger vehicle": 63255.3029662807,
-  "Top-down North America passenger rail signalling (model)": 1682.5926,
-  "NTD rail capex as share of top-down NA signalling": 0.889698433239276,
-  "Buses reaching useful-life benchmark 2026-2031": 24143,
-  "Buses already past benchmark (2025 backlog)": 12644,
-  "Implied replacement candidates per year 2026-2031": 6131.16666666667,
-  "Factory-fit onboard ITS pool per year": 94.2973433333333,
-  "Share of US fleet replaced over 2026-2031 at that pace": 0.563880500927359,
-  "Buses on 2009-2016 CAD/AVL platforms reaching 15-20 years in 2026-31": 12000,
-  "Implied CAD/AVL full-replacement awards 2026-31 from that cohort": 324,
-  "Incumbent win rate at competitive rebids of incumbent-held ITS systems (2016-26)": 0.222222222222222,
-  "Tier": "Agencies",
-  "1: 1-49": 772
- },
- "tiers": {
-  "core": {
-   "total": 14.0793083911651,
-   "hw": 6.48158554775326,
-   "sw": 3.98483278007448,
-   "svc": 3.61289006333735,
-   "share": 0.490963943263139
-  },
-  "mainline": {
-   "total": 14.597560011,
-   "hw": 6.71487760506,
-   "sw": 3.50341440264,
-   "svc": 4.3792680033,
-   "share": 0.509036056736861
-  },
-  "total": {
-   "total": 28.6768684021651,
-   "hw": 13.1964631528133,
-   "sw": 7.48824718271448,
-   "svc": 7.99215806663735,
-   "share": null
-  }
- },
- "open": {
-  "closed": {
-   "total": 20.8860951,
-   "na": 1.6825926,
-   "eu": 10.7427066,
-   "apac": 7.1102199,
-   "row": 1.350576
-  },
-  "held": {
-   "total": 3.58885940681326,
-   "na": 0.75934345905,
-   "eu": 1.651058586,
-   "apac": 0.843312687441881,
-   "row": 0.33514467432138
-  },
-  "open": {
-   "total": 4.20191389535183,
-   "na": 0.88397124995,
-   "eu": 1.925752494,
-   "apac": 0.998986697130514,
-   "row": 0.393203454271313
-  },
-  "total": {
-   "total": 28.6768684021651,
-   "na": 3.325907309,
-   "eu": 14.31951768,
-   "apac": 8.95251928457239,
-   "row": 2.07892412859269
-  }
- },
- "apps": {
-  "ops": {
-   "value": 3.36450569656635,
-   "share": 0.729551451187335
-  },
-  "info": {
-   "value": 0.681418875253944,
-   "share": 0.147757255936676
-  },
-  "safety": {
-   "value": 0.565821030344793,
-   "share": 0.122691292875989
-  }
- },
- "sens": {
-  "h0": {
-   "haircut": 0,
-   "bus_pool": 5.76468200270636
-  },
-  "h15": {
-   "haircut": 0.15,
-   "bus_pool": 4.89997970230041
-  },
-  "h20": {
-   "haircut": 0.2,
-   "bus_pool": 4.61174560216509
-  },
-  "h25": {
-   "haircut": 0.25,
-   "bus_pool": 4.32351150202977
-  }
- },
- "forecast_sam": {
-  "cagr": 0.0698904911553036,
+ "open_path": {
   "values": [
    4.20191389535183,
    4.49422911342348,
@@ -880,209 +302,64 @@
    5.50287822992775,
    5.88855521712284,
    6.30206843163588
-  ]
+  ],
+  "cagr": 0.0698904911553036,
+  "increase": 2.10015453628405
  },
- "bridge": [
+ "open_na_bus_path": {
+  "values": [
+   0.58673216,
+   0.620314856,
+   0.6557889912,
+   0.69325975278,
+   0.73283811804,
+   0.77464117044405,
+   0.818792432793405
+  ],
+  "cagr": 0.0571152089008664
+ },
+ "checks": [
   {
-   "label": "2025 market",
-   "delta": null,
-   "running": 28.6768684021651,
-   "cagr": null,
-   "note": null
+   "sheet": "Market",
+   "cell": "B47",
+   "label": "Check: segments add up to the market",
+   "value": 0
   },
   {
-   "label": "Bus and tram ITS: Europe",
-   "delta": 0.837325699498805,
-   "running": 29.5141941016639,
-   "cagr": 0.053,
-   "note": "ZEB turnover, ITxPT refresh, UK bus settlement"
+   "sheet": "Market",
+   "cell": "B48",
+   "label": "Check: core plus mainline equals the market",
+   "value": 0
   },
   {
-   "label": "Bus and tram ITS: North America",
-   "delta": 0.375084680132501,
-   "running": 29.8892787817964,
-   "cagr": 0.05,
-   "note": "24k buses past useful life, 2004-12 CAD/AVL cohort, AI enforcement"
+   "sheet": "Market",
+   "cell": "B49",
+   "label": "Check: open pool equals software and services of bus and other rail",
+   "value": 0
   },
   {
-   "label": "Bus ITS: rest of world",
-   "delta": 0.81500211264148,
-   "running": 30.7042808944379,
-   "cagr": 0.09,
-   "note": "China smart-bus retrofits, India e-bus procurement, Gulf networks"
+   "sheet": "Growth",
+   "cell": "B22",
+   "label": "Check: 2025 market equals Market",
+   "value": 0
   },
   {
-   "label": "Urban signalling (CBTC) resignalling and new lines",
-   "delta": 1.99619025963954,
-   "running": 32.7004711540774,
-   "cagr": null,
-   "note": "NYC USD 5.4bn 2025-29, London, Paris, Toronto, Copenhagen GoA4, Asian metro build-out"
+   "sheet": "Growth",
+   "cell": "B23",
+   "label": "Check: 2025 open pool equals Market",
+   "value": 0
   },
   {
-   "label": "Mainline and commuter signalling (ETCS, interlockings, PTC)",
-   "delta": 4.87062014781067,
-   "running": 37.5710913018881,
-   "cagr": null,
-   "note": "ERTMS EUR 85-100bn remaining cost, DB EUR 6.3bn frameworks, FRMCS from 2027"
+   "sheet": "Growth",
+   "cell": "J24",
+   "label": "Check: segment increases add up to the market increase",
+   "value": 0
   },
   {
-   "label": "Other rail ITS (PIS, CCTV/APC, condition monitoring, detection)",
-   "delta": 1.59183565875872,
-   "running": 39.1629269606468,
-   "cagr": 0.0700000000000001,
-   "note": "Rolling-stock renewal, predictive maintenance fleet-wide, cyber"
-  },
-  {
-   "label": "2031 market (check vs forecast total)",
-   "delta": null,
-   "running": 39.1629269606468,
-   "cagr": 0,
-   "note": "D = difference to Forecast total, should be 0"
+   "sheet": "Returns",
+   "cell": "B46",
+   "label": "Check: entry multiple sits inside the INIT-IVU trading band (0 = yes)",
+   "value": 0
   }
- ],
- "thesis": {
-  "rev0": 60,
-  "ev0": 120,
-  "eq0": 97.5,
-  "bolt": 60,
-  "rev1": 128.159684608,
-  "ebitda1": 28.19513061376,
-  "ev1": 338.34156736512,
-  "evrev": 2.64,
-  "eq1": 327.09156736512,
-  "moic": 2.07677185628648,
-  "eva": 205.0554953728,
-  "eqa": 193.8054953728,
-  "moica": 1.23051108173206,
-  "irra": 0.0423584846497518
- },
- "inputs": {
-  "fx": 1.13,
-  "scenario": 2,
-  "base_year": 2025,
-  "haircut": 0.2,
-  "berg_eu": 2.55,
-  "berg_eu_cagr": 0.053,
-  "berg_na": 1.22,
-  "berg_na_cagr": 0.05,
-  "gmi_sh_na": 0.443,
-  "gmi_sh_eu": 0.296,
-  "gmi_sh_apac": 0.172,
-  "gmi_sh_latam": 0.05,
-  "gmi_sh_mea": 0.039,
-  "row_scale": 0.3531799729364,
-  "row_bu_low": 0.9,
-  "row_bu_high": 1.6,
-  "row_apac_share": 0.659003831417625,
-  "bus_hw": 0.468,
-  "bus_sw": 0.33,
-  "bus_sw_2031": 0.352,
-  "bus_cagr_eu_l": 0.035,
-  "bus_cagr_eu_b": 0.053,
-  "bus_cagr_eu_h": 0.07,
-  "bus_cagr_na_l": 0.025,
-  "bus_cagr_na_b": 0.05,
-  "bus_cagr_na_h": 0.08,
-  "bus_cagr_row_l": 0.06,
-  "bus_cagr_row_b": 0.09,
-  "bus_cagr_row_h": 0.11,
-  "unife_cc": 24.9,
-  "unife_cc_low": 20,
-  "ccs_cagr_delta_low": -0.015,
-  "ccs_cagr_delta_high": 0.015,
-  "ccs_hw": 0.46,
-  "ccs_sw": 0.24,
-  "ccs_sh_0": 0.46,
-  "ccs_sh_1": 0.21,
-  "ccs_sh_2": 0.11,
-  "ccs_sh_3": 0.13,
-  "ccs_sh_4": 0.04,
-  "ccs_sh_5": 0.05,
-  "pax_0": 0.83,
-  "pax_1": 0.8,
-  "pax_2": 0.77,
-  "pax_3": 0.46,
-  "pax_4": 0.4,
-  "pax_5": 0.64,
-  "urb_0": 0.16,
-  "urb_1": 0.45,
-  "urb_2": 0.29,
-  "urb_3": 0.57,
-  "urb_4": 0.5,
-  "urb_5": 0.63,
-  "ccs_g_0": 0.05,
-  "ccs_g_1": 0.035,
-  "ccs_g_2": 0.065,
-  "ccs_g_3": 0.055,
-  "ccs_g_4": 0.02,
-  "ccs_g_5": 0.055,
-  "gmi_apts": 6.83,
-  "gmi_rail_share": 0.305,
-  "gmi_ticketing": 0.242,
-  "rail_pis": 1.5790277,
-  "rail_cm": 1,
-  "rail_td": 0.6,
-  "ro_hw": 0.45,
-  "ro_sw": 0.3,
-  "ro_sh_0": 0.4,
-  "ro_sh_1": 0.18,
-  "ro_sh_2": 0.15,
-  "ro_sh_3": 0.17,
-  "ro_sh_4": 0.03,
-  "ro_sh_5": 0.07,
-  "ro_cagr_l": 0.05,
-  "ro_cagr_b": 0.07,
-  "ro_cagr_h": 0.09,
-  "fare_low": 10.36,
-  "fare_high": 16.68,
-  "us_buses": 65239,
-  "us_bus_modes_all": 73112,
-  "ca_buses": 17783,
-  "us_rail_cars": 23666,
-  "ntd_ci_bus": 370,
-  "ntd_ci_rail": 1497,
-  "ntd_ci_total": 1902,
-  "ntd_fare_capex": 521,
-  "cad_full": 27000,
-  "cad_cycle": 17,
-  "midlife": 10000,
-  "midlife_cycle": 10,
-  "video_per_bus": 11000,
-  "video_cycle": 10,
-  "apc_per_bus": 7300,
-  "apc_cycle": 12,
-  "apc_cov": 0.6,
-  "rec_per_bus": 2200,
-  "saas_per_bus": 800,
-  "wayside_adder": 0.15,
-  "refresh_cohort": 12000,
-  "ulb_wave": 24143,
-  "ulb_backlog": 12644,
-  "zeb_stock": 8116,
-  "fta_2022": 20.51,
-  "fta_2023": 21.43,
-  "fta_2024": 20.86,
-  "fta_2025": 20.94,
-  "fta_2026": 20.96,
-  "fta_2027_house": 20,
-  "fta_2027_ext": 16.7,
-  "fta_2027_req": 16.3,
-  "app_ops": 0.553,
-  "app_info": 0.112,
-  "app_safety": 0.093,
-  "haircut_alt1": 0,
-  "haircut_alt2": 0.15,
-  "haircut_alt3": 0.25,
-  "vb_rev0": 60,
-  "vb_mult0": 2,
-  "vb_margin0": 0.15,
-  "vb_g": 0.08,
-  "vb_bolt": 40,
-  "vb_boltmult": 1.5,
-  "vb_hold": 5,
-  "vb_margin1": 0.22,
-  "vb_mult1": 12,
-  "vb_evrev_a": 1.6,
-  "vb_lev": 2.5
- }
+ ]
 }
