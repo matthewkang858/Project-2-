@@ -685,7 +685,7 @@ function bracketV(s, x, y0, y1, tick, color) {
   R(s, 0, 2.3, CW, 2.1, K.navy);
   T(s, 'APPENDIX: SUPPORTING ANALYSIS', { x: 0.7, y: 2.5, w: 11.8, h: 0.9, fontFace: HEAD, fontSize: 44, bold: true, color: 'FFFFFF', valign: 'middle' });
   T(s, 'PUBLIC ITS MARKET CASE: ROADWAY (BUS) AND RAILWAY', { x: 0.7, y: 3.4, w: 11.8, h: 0.7, fontFace: HEAD, fontSize: 24, bold: true, color: K.lblue, valign: 'middle' });
-  T(s, 'A1 Market scope  |  A2 Market sizing  |  A3 Growth scenarios\nA4 Exit multiples and returns  |  A5 Incumbency and entry window  |  A6 Player directory', { x: 0.7, y: 4.65, w: 11.8, h: 0.7, fontSize: 12.5, color: K.navy });
+  T(s, 'A1 Market scope  |  A2 Market sizing  |  A3 Growth scenarios  |  A4 Exit multiples and returns\nA5 Incumbency and entry window  |  A6 Player directory  |  A7 How the model works', { x: 0.7, y: 4.65, w: 11.8, h: 0.7, fontSize: 12.5, color: K.navy });
 
   // ---------------------------------------------------------------- A1 segmentation framework (0 numbers)
   s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
@@ -874,6 +874,57 @@ function bracketV(s, x, y0, y1, tick, color) {
   dirPanel(DIRECTORY.slice(0, 3), 0.45);
   dirPanel(DIRECTORY.slice(3), 6.75);
   source(s, 'Note: Logos on the competitive landscape show these parent companies only. Sources: company reports and websites, statutory filings, deal announcements (Hitachi, Constellation Software, Siemens, Bouygues), analysis');
+
+  // ---------------------------------------------------------------- A7 how the model works (flow chart: top-down build, bottom-up cross-check)
+  s = ap.addSlide({ masterName: 'CONTENT', sectionTitle: AS });
+  crumb(s, [{ text: 'APPENDIX', color: K.lblue }, { text: 'A7 HOW THE MODEL WORKS', color: K.navy }]);
+  pageCode(s, 'A7');
+  title(s, 'Model Logic: ', 'The market is built top-down from published reports, then checked bottom-up by counting buses and pricing what agencies buy');
+  hbar(s, 'HOW THE MODEL SIZES THE MARKET: TOP-DOWN FROM REPORTS, CHECKED BOTTOM-UP', 0, CW, K.navy);
+  const bnM = v => '$' + (v / 1000).toFixed(1) + 'B'; // bottom-up values are in USD M
+  const mf = {
+    lx: 0.45, lw: 1.5, x0: 2.08, bw: 1.9, gap: 0.28, hh: 0.38, bh: 1.45,
+    lanes: [
+      { y: 2.45, col: K.navy, body: K.paler, label: 'TOP-DOWN', sub: '2025 market and funnel, from published reports', steps: [
+        ['PUBLISHED REPORTS', null, 'Berg Insight for bus, UNIFE for signalling, Global Market Insights for other rail ITS'],
+        ['ADJUST', null, 'Convert euros to dollars, take out fare collection and freight, and add bus outside Europe and North America'],
+        ['FOUR SEGMENTS', bn1(D.market), 'Bus and tram ' + bn1(D.bus) + '\nMainline signalling ' + bn1(D.mainline) + '\nUrban signalling ' + bn1(D.urban) + '\nOther rail ITS ' + bn1(D.ro)],
+        ['FUNNEL', bn1(D.open), 'Take out mainline signalling (' + bn1(D.core) + ' left), then urban signalling (' + bn1(D.contestable) + ' left), then hardware'],
+        ['GROW TO 2031', bn1(MP.values[6]), 'Each segment grows at the rate its report forecasts. Market ' + p1(MP.cagr) + ' a year, open pool ' + p1(OP.cagr) + ' a year to ' + bn1(OP.values[6])],
+      ] },
+      { y: 4.78, col: K.green, body: K.lgreen, label: 'BOTTOM-UP', sub: 'North American bus, a cross-check', steps: [
+        ['COUNT VEHICLES', null, 'US and Canadian transit buses (FTA National Transit Database, CUTA), plus paratransit vans'],
+        ['PRICE PER BUS', null, 'Price per bus and years between purchases, from agency contract awards'],
+        ['ADD UP THE POOLS', null, 'Dispatch and tracking, onboard kit, upkeep and hosting, cloud software, video, cameras, connectivity'],
+        ['BOTTOM-UP TOTAL', bnM(D.bu_total), 'North American bus ITS spend a year'],
+        ['COMPARE', p0(D.bu_ratio), 'of the top-down ' + bnM(D.bu_topdown) + ', so the two methods agree and the top-down stands'],
+      ] },
+    ],
+  };
+  mf.lanes.forEach(L => {
+    R(s, mf.lx, L.y, mf.lw, mf.hh + mf.bh, L.col);
+    T(s, [{ text: L.label, options: { fontFace: HEAD, fontSize: 15, bold: true, breakLine: true } }, { text: L.sub, options: { fontSize: 10 } }], { x: mf.lx + 0.1, y: L.y, w: mf.lw - 0.18, h: mf.hh + mf.bh, color: 'FFFFFF', valign: 'middle' });
+    L.steps.forEach(([hd, big, txt], k) => {
+      const x = mf.x0 + k * (mf.bw + mf.gap);
+      R(s, x, L.y, mf.bw, mf.hh, L.col);
+      T(s, (k + 1) + '  ' + hd, { x: x + 0.08, y: L.y, w: mf.bw - 0.12, h: mf.hh, fontFace: HEAD, fontSize: 12, bold: true, color: 'FFFFFF', valign: 'middle' });
+      R(s, x, L.y + mf.hh, mf.bw, mf.bh, L.body);
+      const runs = [];
+      if (big) runs.push({ text: big, options: { fontFace: HEAD, fontSize: 18, bold: true, color: L.col === K.green ? K.green : K.mblue, breakLine: true } });
+      runs.push({ text: txt, options: { fontSize: 10.5, color: '1A1A1A' } });
+      T(s, runs, { x: x + 0.09, y: L.y + mf.hh + 0.06, w: mf.bw - 0.16, h: mf.bh - 0.12, valign: 'top' });
+      if (k < 4) s.addShape('chevron', { x: x + mf.bw + 0.04, y: L.y + mf.hh + mf.bh / 2 - 0.2, w: 0.2, h: 0.4, fill: { color: K.mgrey }, line: { color: K.mgrey } });
+    });
+  });
+  // cross-check link: the North American bus slice of the top-down segments feeds the bottom-up comparison
+  const cx3 = mf.x0 + 2 * (mf.bw + mf.gap) + mf.bw / 2, cx5 = mf.x0 + 4 * (mf.bw + mf.gap) + mf.bw / 2;
+  const yTop = mf.lanes[0].y + mf.hh + mf.bh, yBot = mf.lanes[1].y, yMid = (yTop + yBot) / 2 + 0.06;
+  const dash = { color: K.green, width: 1.75, dashType: 'dash' };
+  s.addShape('line', { x: cx3, y: yTop, w: 0, h: yMid - yTop, line: dash });
+  s.addShape('line', { x: cx3, y: yMid, w: cx5 - cx3, h: 0, line: dash });
+  s.addShape('line', { x: cx5, y: yMid, w: 0, h: yBot - yMid, line: Object.assign({ endArrowType: 'triangle' }, dash) });
+  T(s, 'North American bus slice of the top-down: ' + bnM(D.bu_topdown), { x: cx3 + 0.15, y: yMid - 0.3, w: cx5 - cx3 - 0.3, h: 0.26, fontSize: 10, bold: true, italic: true, color: K.green, align: 'center', valign: 'bottom' });
+  source(s, 'Note: Model sheets Market, Growth and Bottom-up. Growth rates come from the same reports, with low and high cases in A3. Sources: Berg Insight (2026), UNIFE World Rail Market Study 2026, Global Market Insights (2026), SCI Verkehr (2026), FTA National Transit Database (2025), Canadian Urban Transit Association, agency contract awards, analysis');
 
   const out2 = path.join(OUT_DIR, 'Public_ITS_Market_Case_Appendix.pptx');
   await ap.writeFile({ fileName: out2 });
