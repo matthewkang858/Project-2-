@@ -195,11 +195,11 @@ market_inputs = [
      'LOW', 'A2 (in words)', 'rail_td', F_BN),
     (19, 'Bus ITS hardware share of value, 2025', 0.468, 'share',
      'GMI APTS component split, 2025: hardware 46.8%, software 33.0%, services 20.1% (research note 17 (gap), section 4.1)',
-     'MID', 'A2; S3 lens (in words)', 'bus_hw_2025', F_PCT),
+     'MID', 'A2; S3 table (open column)', 'bus_hw_2025', F_PCT),
     (20, 'Other rail ITS hardware share of value', 0.45, 'share',
      'Analyst assumption, just below GMI APTS (46.8%) and passenger rail signalling (~46%): condition-monitoring platforms are '
      'mostly sold inside service contracts (row 17)',
-     'LOW', 'A2; S3 lens (in words)', 'ro_hw', F_PCT),
+     'LOW', 'A2; S3 table (open column)', 'ro_hw', F_PCT),
     (21, 'Umbrella global ITS market, low end (context; not used in any calculation)', 40, 'USD B',
      'MarketsandMarkets, Grand View Research, Precedence Research, Mordor Intelligence, 2025 estimates (research note 01)',
      'MID', 'S3 funnel top', 'global_its_low', F_BN),
@@ -213,11 +213,11 @@ for r, label, v, unit, src, conf, slide, key, fmt in market_inputs:
 M.section(24, 'B. BUILD: SEGMENT ROWS', 'G')
 market_build = [
     (25, 'Bus and tram ITS, Europe', '=B7*B6*(1-B9)',
-     'Berg Europe × FX × (1 − fare share)', 'A2; S3 lens, S7 (in words)', 'bus_eu', False),
+     'Berg Europe × FX × (1 − fare share)', 'A2; S7 (in words)', 'bus_eu', False),
     (26, 'Bus and tram ITS, North America', '=B8*B6*(1-B9)',
-     'Berg North America × FX × (1 − fare share)', 'A2; S3 lens, S7 (in words)', 'bus_na', False),
+     'Berg North America × FX × (1 − fare share)', 'A2; S7 (in words)', 'bus_na', False),
     (27, 'Bus ITS, rest of world', '=(B25+B26)*B10/(1-B10)',
-     'Europe + North America, grossed up so the rest of the world is the row 10 share of the total', 'A2; S3 lens (in words)', 'bus_row', False),
+     'Europe + North America, grossed up so the rest of the world is the row 10 share of the total', 'A2', 'bus_row', False),
     (28, 'Bus and tram ITS, total', '=SUM(B25:B27)',
      'Sum of rows 25-27', 'S3 table', 'bus', True),
     (29, 'Passenger rail signalling', '=B11*B6*B12',
@@ -388,7 +388,7 @@ G.num('H16', 0.446, F_PCT)
 G.text('Q16', '2031E input: GMI implied 2031 mix 44.6 / 35.2 / 20.1 (software grows 9.7% a year against hardware '
               '7.7%); straight line from 2025 (research note 17 (gap))')
 G.text('R16', 'MID')
-G.text('S16', 'S2, S3 lens (in words)')
+G.text('S16', 'S2 (in words)')
 G.text('T16', 'bus_hw_path')
 # Row 17: other rail hardware share, held flat
 G.text('A17', 'Other rail ITS hardware share of value')
