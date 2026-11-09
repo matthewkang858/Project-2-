@@ -202,7 +202,7 @@ const CLAIMS = [
   ['C54', 'A2 cross-checks line', '"SCI Verkehr\'s independent signalling estimate is about four-fifths of UNIFE\'s"', null],
   ['C55', 'A2 cross-checks line', '"GMI\'s CBTC-only market sits below our urban signalling, which also covers light rail"', () => D.urban > CITED.gmi_cbtc],
   ['C56', 'A4', '"half repaid by exit"', () => D.debt_repaid === 0.5],
-  ['C57', 'S3', 'Rounding integrity: the S3 segment cells must add up to the total as printed', () => Math.abs(r1(D.mainline) + r1(D.urban) + r1(D.bus) + r1(D.ro) - r1(D.market)) < 0.051],
+  ['C57', 'S3', 'Rounding integrity: the S3 segment cells must add up to the total, and the open column ($2.5 + $1.7) to the funnel\'s open pool ($4.2), as printed', () => Math.abs(r1(D.mainline) + r1(D.urban) + r1(D.bus) + r1(D.ro) - r1(D.market)) < 0.051 && Math.abs(r1(D.open_bus) + r1(D.open_ro) - r1(D.open)) < 0.051 && Math.abs(r1(D.bus) + r1(D.ro) - r1(D.contestable)) < 0.051],
   ['C58', 'A2 bottom-up line', '"buses and vehicles \u00D7 price per unit across 11 spending pools gives ' + bn1(D.bu_total / 1000) + ' for North American bus ITS, ' + p0(D.bu_ratio) + ' of the top-down ' + bn1(D.bu_topdown / 1000) + '"', () => D.bu_ratio > 0.75 && D.bu_ratio < 1.25],
   ['C59', 'A6', 'Player directory: each parent, its subsidiaries and brands, and its owner, as listed on A6', null],
 ];
@@ -422,17 +422,18 @@ function bracketV(s, x, y0, y1, tick, color) {
   // who buys each segment
   const hc = (t, o = {}) => ({ text: t, options: Object.assign({ fontFace: BODY, fontSize: 9.5, color: '1A1A1A', valign: 'middle', align: 'left', margin: [0.03, 0.05, 0.03, 0.05] }, o) });
   const hh = t => hc(t, { bold: true, color: 'FFFFFF', fill: { color: K.navy }, fontSize: 10, align: 'center' });
+  // open column: NO for signalling, else the segment's software and services in $B, so the column sums to the funnel's open pool
   const open = t => t === 'NO'
     ? hc(t, { bold: true, color: 'FFFFFF', fill: { color: K.grey }, fontSize: 9, align: 'center' })
-    : hc(t, { bold: true, color: 'FFFFFF', fill: { color: K.green }, fontSize: 9, align: 'center' });
+    : { text: [{ text: n1(t), options: { fontSize: 11.5, bold: true, breakLine: true } }, { text: 'software + services', options: { fontSize: 8, bold: true } }], options: { fontFace: BODY, color: 'FFFFFF', fill: { color: K.green }, align: 'center', valign: 'middle', margin: [0.03, 0.04, 0.03, 0.04] } };
   const segRow = (lab, v, buyers, supply, o) => [hc(lab, { bold: true, color: K.navy, fontSize: 10 }), hc(n1(v), { bold: true, align: 'center', fontSize: 10.5 }), hc(buyers), hc(supply), open(o)];
   const sRows = [
-    [hh('Segment'), hh('2025, $B'), hh('Main buyers'), hh('Supply side'), hh('Open to an entrant?')],
+    [hh('Segment'), hh('2025, $B'), hh('Main buyers'), hh('Supply side'), hh('Open to an entrant, $B')],
     segRow('Mainline and commuter signalling', D.mainline, 'Infrastructure managers (Amtrak, DB InfraGO, Network Rail, RFI)', 'Signalling majors under multi-year frameworks', 'NO'),
     segRow('Urban signalling (metro, light rail)', D.urban, 'Metro and light rail agencies', 'Signalling majors with safety-certified systems', 'NO'),
-    segRow('Bus and tram ITS', D.bus, 'Transit agencies and bus operators', 'Modaxo, Hitachi, INIT, IVU and a fragmented long tail', 'SOFTWARE + SERVICES'),
-    segRow('Other rail ITS (passenger info, CCTV, monitoring)', D.ro, 'Rail and metro operators', 'Rolling-stock suppliers and specialists', 'SOFTWARE + SERVICES'),
-    [hc('Total', { bold: true, color: K.navy, fill: { color: K.lgrey }, fontSize: 10 }), hc(n1(D.market), { bold: true, align: 'center', fill: { color: K.navy }, color: 'FFFFFF', fontSize: 10.5 }), hc('', { fill: { color: K.lgrey } }), hc('', { fill: { color: K.lgrey } }), hc('', { fill: { color: K.lgrey } })],
+    segRow('Bus and tram ITS', D.bus, 'Transit agencies and bus operators', 'Modaxo, Hitachi, INIT, IVU and a fragmented long tail', D.open_bus),
+    segRow('Other rail ITS (passenger info, CCTV, monitoring)', D.ro, 'Rail and metro operators', 'Rolling-stock suppliers and specialists', D.open_ro),
+    [hc('Total', { bold: true, color: K.navy, fill: { color: K.lgrey }, fontSize: 10 }), hc(n1(D.market), { bold: true, align: 'center', fill: { color: K.navy }, color: 'FFFFFF', fontSize: 10.5 }), hc('', { fill: { color: K.lgrey } }), hc('', { fill: { color: K.lgrey } }), hc(n1(D.open), { bold: true, align: 'center', fill: { color: K.green }, color: 'FFFFFF', fontSize: 11 })],
   ];
   s.addTable(sRows, { x: 6.68, y: 2.5, w: 6.2, colW: [1.55, 0.57, 1.6, 1.5, 0.98], rowH: [0.4, 0.66, 0.5, 0.5, 0.66, 0.36], fontFace: BODY, border: { type: 'solid', pt: 0.75, color: 'FFFFFF' }, autoPage: false });
   s.addShape('roundRect', { x: 6.68, y: 5.78, w: 6.2, h: 0.92, rectRadius: 0.1, fill: { color: K.paler }, line: { color: K.mblue, width: 1.25 } });

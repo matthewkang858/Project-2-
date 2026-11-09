@@ -47,6 +47,8 @@
    "open_share": "Market!B42",
    "sig_share": "Market!B43",
    "mainline_share": "Market!B44",
+   "open_bus": "Market!B45",
+   "open_ro": "Market!B46",
    "bu_total": "Bottom-up!F23",
    "bu_topdown": "Bottom-up!F25",
    "bu_ratio": "Bottom-up!F26",
@@ -129,6 +131,8 @@
  "open_share": 0.146857660483521,
  "sig_share": 0.727711045726308,
  "mainline_share": 0.509397732008416,
+ "open_bus": 2.45344866035183,
+ "open_ro": 1.748465235,
  "bu_total": 1035.6623872,
  "bu_topdown": 1102.88,
  "bu_ratio": 0.939052650515015,
@@ -327,19 +331,19 @@
  "checks": [
   {
    "sheet": "Market",
-   "cell": "B47",
+   "cell": "B49",
    "label": "Check: segments add up to the market",
    "value": 0
   },
   {
    "sheet": "Market",
-   "cell": "B48",
+   "cell": "B50",
    "label": "Check: core plus mainline equals the market",
    "value": 0
   },
   {
    "sheet": "Market",
-   "cell": "B49",
+   "cell": "B51",
    "label": "Check: open pool equals software and services of bus and other rail",
    "value": 0
   },

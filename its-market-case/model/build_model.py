@@ -255,18 +255,22 @@ market_funnel = [
      'Passenger signalling ÷ market', 'S2 (in words: "nearly three-quarters")', 'sig_share', F_PCT, False),
     (44, 'Mainline signalling as share of market', '=B31/B34', 'share',
      'Mainline signalling ÷ market', 'S2, S3 title (in words: "half")', 'mainline_share', F_PCT, False),
+    (45, 'Open pool: bus and tram ITS software and services', '=B28*(1-B19)', 'USD B',
+     'Bus × (1 − bus hardware share)', 'S3 table (open column)', 'open_bus', F_BN3, False),
+    (46, 'Open pool: other rail ITS software and services', '=B33*(1-B20)', 'USD B',
+     'Other rail × (1 − other rail hardware share)', 'S3 table (open column)', 'open_ro', F_BN3, False),
 ]
 for r, label, f, unit, method, slide, key, fmt, bold in market_funnel:
     item(M, r, label, f, unit, method, None, slide, key, fmt, bold)
 
-M.section(46, 'D. CHECKS (all should be 0)', 'G')
+M.section(48, 'D. CHECKS (all should be 0)', 'G')
 market_checks = [
-    (47, 'Check: segments add up to the market', '=B28+B30+B31+B33-B34',
+    (49, 'Check: segments add up to the market', '=B28+B30+B31+B33-B34',
      'Bus + urban + mainline + other rail − market'),
-    (48, 'Check: core plus mainline equals the market', '=B37+B31-B34',
+    (50, 'Check: core plus mainline equals the market', '=B37+B31-B34',
      'Core + mainline − market'),
-    (49, 'Check: open pool equals software and services of bus and other rail', '=B28*(1-B19)+B33*(1-B20)-B40',
-     'Bus × (1 − bus hardware share) + other rail × (1 − other rail hardware share) − open pool'),
+    (51, 'Check: open pool equals software and services of bus and other rail', '=B45+B46-B40',
+     'Bus software and services + other rail software and services − open pool (ties the S3 table to the funnel)'),
 ]
 for r, label, f, method in market_checks:
     M.text('A%d' % r, label)

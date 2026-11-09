@@ -51,7 +51,7 @@ REQUIRED = [
     'exit_a_mult', 'exit_b_mult', 'ev0', 'ebitda0', 'debt0', 'eq0', 'bolt_cost', 'eq_in', 'rev1', 'debt1', 'ev_a',
     'moic_a', 'ev_b', 'moic_b', 'breakeven_mult', 'eq_in_at_a', 'moic_a_at_a', 'moic_b_at_a',
     'bm_conduent', 'bm_init', 'bm_clever', 'bm_ivu', 'bm_via',
-    'bu_total', 'bu_topdown', 'bu_ratio',
+    'bu_total', 'bu_topdown', 'bu_ratio', 'open_bus', 'open_ro',
 ]
 
 problems = []
