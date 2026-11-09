@@ -162,36 +162,36 @@ const CLAIMS = [
   ['C14', 'S2, S4 driver 3, S7, A5', '"A large cohort of CAD/AVL platforms installed in 2009-16 at major US and Canadian agencies reaches a replace-or-extend decision by 2031" (S4) / "bus platform refresh" (S2) / "Dated refresh wave: CAD/AVL platforms installed 2009-16 at major agencies reach a replace-or-extend decision by 2031" (S7) / "Refresh wave: CAD/AVL platforms installed in 2009-16 now serve about ' + CITED.refresh_cohort.toLocaleString('en-US') + ' buses in the US and Canada" (A5)', null],
   ['C15', 'S4 driver 4', '"Most new European city buses are now electric"', null],
   ['C16', 'S4 driver 4', '"camera-based bus-lane enforcement is scaling across US cities"', null],
-  ['C17', 'S2, S4, S6', '"Near-term risks: the US federal funding reset in FY2027" (S2) / "US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed" (S4) / "With IIJA advance appropriations lapsed, FY2027 federal transit funding may fall" (S6)', null],
+  ['C17', 'S2, S4, S6', '"Near-term risks: the US federal funding reset in FY2027" (S2) / "US federal transit funding may fall in FY2027 after IIJA advance appropriations lapsed" (S4) / "Federal transit funding may fall in FY2027" (S6)', null],
   ['C18', 'S4 driver 5', '"the UK cut its ETCS budget"', null],
-  ['C19', 'S2, S3 funnel, S3 lens, S5, S6', '"Signalling is a closed oligopoly (Siemens, Hitachi, Alstom, CRSC)" (S2) / "Less urban signalling: safety-certified, closed oligopoly" (S3 funnel) / "Software and services are open to a new entrant because transit agencies buy them from many vendors, while signalling is locked up by certified majors on multi-year frameworks" (S3 lens) / "Signalling is a closed oligopoly" (S5 title) / "together hold most of world signalling" (S6)', null],
+  ['C19', 'S2, S3 funnel, S3 lens, S5, S6', '"Signalling is a closed oligopoly (Siemens, Hitachi, Alstom, CRSC)" (S2) / "Less urban signalling: safety-certified, closed oligopoly" (S3 funnel) / "Software and services are open to a new entrant because transit agencies buy them from many vendors, while signalling is locked up by certified majors on multi-year frameworks" (S3 lens) / "Signalling is a closed oligopoly" (S5 title) / "Signalling is a closed club" (S6)', null],
   ['C20', 'S5', '"Together hold most of world signalling, with multi-year order books"', null],
   ['C21', 'S2, S5 title', '"North American bus ITS is consolidating around Modaxo and Hitachi"', null],
   ['C22', 'S5', '"Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever" / "Largest installed bases" / ordering arrow "Larger, more entrenched" to "Smallest, newest to the market" (S5)', null],
   ['C23', 'S5, A4', '"INIT is the largest listed bus ITS pure play, while IVU is smaller" / "LISTED PURE PLAYS" (S5 column header) / "IVU\'s ~' + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue" (A4 title)', null],
   ['C24', 'S2, S3 table, S5, S5 title, S7', '"a fragmented long tail of privately held vendors remains" / "Buy a privately held North American mid-market bus ITS vendor" (S2) / "Modaxo, Hitachi, INIT, IVU and a fragmented long tail" (S3) / "leaving a private long tail opportunity" (S5 title) / "A fragmented long tail of privately held specialists"; "Sticky agency relationships"; "Mostly sub-scale, with some still founder-led (GIRO, ETA), creating succession opportunity"; "ACQUISITION TARGETS: Buy one as the platform, then bolt on others"; "Where to focus: buy a mid-market private, add SaaS / AI, and exit at a software multiple" (S5 focus callout) / "Acquire a privately held North American mid-market bus ITS vendor" (S7)', null],
   ['C25', 'S2, S5', '"cloud challengers overlay legacy systems" (S2) / "Newer firms selling cloud apps and AI cameras that agencies add on top of their existing system" (S5)', null],
-  ['C26', 'S2, S3 table, S5, S6', '"protected by safety certification and long maintenance tails" (S2) / "Signalling majors under multi-year frameworks" (S3 table) / "long maintenance tails, multi-year frameworks (e.g., DB)"; "Full stack (e.g., dispatch, location tracking, scheduling, fare) plus long-term service contracts" (S5) / "long frameworks protect the signalling majors" (S6)', null],
+  ['C26', 'S2, S3 table, S5, S6', '"protected by safety certification and long maintenance tails" (S2) / "Signalling majors under multi-year frameworks" (S3 table) / "long maintenance tails, multi-year frameworks (e.g., DB)"; "Full stack (e.g., dispatch, location tracking, scheduling, fare) plus long-term service contracts" (S5) / "Safety certification and long contracts protect the few big suppliers" (S6)', null],
   ['C27', 'S5', '"each kept for a system generation"', null],
   ['C28', 'S5', '"Modaxo buys and never sells"', null],
   ['C29', 'S5', '"Avail and Passio lead real-time feeds at smaller US agencies"', null],
   ['C30', 'S5', '"Easy to buy: short subscriptions, and the old system stays" / "Ticket fines pay for the AI cameras"', null],
-  ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout and execution risk", "Hardware and project mix squeezes margins" (S5) / "Alstom and INIT cut profit guidance" (S6)', null],
+  ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout and execution risk", "Hardware and project mix squeezes margins" (S5) / "Alstom and INIT cut profit forecasts" (S6)', null],
   ['C32', 'S5, A5', '"legacy installs exposed at rebid" (S5) / "In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas)" (A5)', null],
-  ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic also competes" (A6 group label) / "Cubic\'s highly levered buyout is now distressed"; "Project-heavy integrators do not support high buyout leverage" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
+  ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic also competes" (A6 group label) / "Cubic\'s debt-funded buyout is in distress"; "Lumpy project revenue can\'t carry much debt" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
   ['C34', 'S5', '"Via and Optibus still lose money"', null],
   ['C35', 'S5, S7', '"Federal grants favor equipment over subscriptions" (S5) / "Structure subscriptions to fit federal capital-grant rules" (S7)', null],
   ['C36', 'S5', '"EXIT BENCHMARK: Value the exit off INIT and IVU: valuations rise with recurring mix" (S5 focus callout)', () => D.bm_init < D.bm_ivu],
   ['C37', 'S5', '"scaled players are priced as SaaS"', () => D.bm_via > 2 * D.bm_ivu],
-  ['C38', 'S2, S6 title, S6, A5', '"installed systems are rarely rebid" (S2) / "Long system lives and slow procurement favour buying an installed base" (S6 title) / "Installed systems are rarely rebid, typically only after well over a decade"; "Only a small slice of the installed base is rebid each year" (S6) / "Systems are ~' + CITED.tenure_median + ' years old at a decision point" (A5 title)', null],
-  ['C39', 'S2, S6, A5', '"challengers usually win when they are" (rebid; S2) / "Challengers usually win when a competitive rebid happens" (S6) / "challengers win most competitive rebids" (A5 title) / "Competitive rebids: challengers won most" (A5 bracket)', () => CITED.dp_rebid_lost > CITED.dp_rebid_kept],
-  ['C40', 'S6, A5', '"Most renewals skip a competitive rebid" (S6) / "Kept without a documented rebid" (A5 bar, ' + CITED.dp_extended + ')', () => CITED.dp_extended > CITED.dp_rebid_kept],
-  ['C41', 'S6', '"Multi-year award-to-go-live, bid protests" / "Long sales cycles favour vendors with reference fleets and live pilots"', null],
-  ['C42', 'S6', '"Buy America documentation for hardware"', null],
-  ['C43', 'S6', '"Software-led entry and cooperative purchasing (NASPO, Sourcewell) shorten the path"', null],
-  ['C44', 'S6', '"Formula funds for system refresh are the most durable federal line"', null],
-  ['C45', 'S6', '"Agencies in PA, WA and OR, where state rescue funding stalled, may defer purchases"', null],
-  ['C46', 'S2, S4, S5, S6', '"ETCS slippage in Europe" (S2) / "Headwind: funding reset, ETCS slippage" (S4) / "Slow, publicly funded ETCS rollout" (S5) / "EU ETCS rollout is behind schedule" (S6)', null],
+  ['C38', 'S2, S6 title, S6, A5', '"installed systems are rarely rebid" (S2) / "Agencies rarely switch vendors and buy slowly, so buy an installed base" (S6 title) / "Systems last well over a decade"; "Only a few contracts open up each year" (S6) / "Systems are ~' + CITED.tenure_median + ' years old at a decision point" (A5 title)', null],
+  ['C39', 'S2, S6, A5', '"challengers usually win when they are" (rebid; S2) / "But when one does, the challenger usually wins" (S6) / "challengers win most competitive rebids" (A5 title) / "Competitive rebids: challengers won most" (A5 bracket)', () => CITED.dp_rebid_lost > CITED.dp_rebid_kept],
+  ['C40', 'S6, A5', '"most renewals skip a competitive bid" (S6) / "Kept without a documented rebid" (A5 bar, ' + CITED.dp_extended + ')', () => CITED.dp_extended > CITED.dp_rebid_kept],
+  ['C41', 'S6', '"Years from award to go-live, plus bid protests" / "Agencies favor vendors with proven customers"', null],
+  ['C42', 'S6', '"Buy America rules for hardware"', null],
+  ['C43', 'S6', '"Shared purchasing contracts speed up software sales"', null],
+  ['C44', 'S6', '"Money for system upgrades is the safest federal funding"', null],
+  ['C45', 'S6', '"Some states may delay purchases"', null],
+  ['C46', 'S2, S4, S5, S6', '"ETCS slippage in Europe" (S2) / "Headwind: funding reset, ETCS slippage" (S4) / "Slow, publicly funded ETCS rollout" (S5) / "Europe\'s ETCS rollout is behind schedule" (S6)', null],
   ['C47', 'S7, A5', '"mid-size agencies run over half the US fleet" (S7, A5 title) / "Open mid-size tier and available targets" (S7) / "Mid-size (50-999 buses): over half the fleet and the core customers" (A5)', () => tierPct('2: 50-249') + tierPct('3: 250-999') > 50],
   ['C48', 'S2 title, S7', '"best entered via buy-and-build in North America" (S2 title) / "the most actionable slice of the open pool"; "national procurement regimes split Europe\'s larger pool, limiting cross-border synergies" (S7)', () => D.bus_eu > D.bus_na],
   ['C49', 'S2, S7, A4', '"the ~' + x1(D.exit_a_mult) + ' Hitachi paid for Clever barely returns capital" (S2) / "At the Clever precedent the platform barely returns its capital" (S7) / "The Clever precedent (~' + x1(D.bm_clever) + ' revenue) barely returns capital" (A4 title)', () => D.moic_a >= 1.0 && D.moic_a < 1.3],
@@ -605,34 +605,35 @@ function bracketV(s, x, y0, y1, tick, color) {
   // ---------------------------------------------------------------- S6 risks and barriers (0 numbers)
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: SEC });
   crumb(s, [{ text: 'RISKS AND BARRIERS TO ENTRY', color: K.lblue }, { text: 'IMPACT ON A NEW ENTRANT', color: K.grey }]);
-  title(s, 'Risks and Barriers: ', 'Long system lives and slow procurement favour buying an installed base, and near-term risks are the US funding reset and ETCS slippage', K.grey);
+  title(s, 'Risks and Barriers: ', 'Agencies rarely switch vendors and buy slowly, so buy an installed base, and near-term risks are the US funding reset and ETCS delays', K.grey);
   T(s, 'BARRIERS AND RISKS', { x: 0.45, y: 1.86, w: 5.9, h: 0.34, fontFace: HEAD, fontSize: 17, bold: true, color: K.navy, align: 'center', valign: 'bottom' });
   T(s, 'LIKELY IMPACT ON A NEW ENTRANT', { x: 6.95, y: 1.86, w: 5.95, h: 0.34, fontFace: HEAD, fontSize: 17, bold: true, color: K.navy, align: 'center', valign: 'bottom' });
   R(s, 0.45, 2.24, 5.9, 0.06, K.black); R(s, 6.95, 2.24, 5.95, 0.06, K.black);
+  // plain-language rows: title, one-line description, then the impact (plain line, then the "so what" in bold)
   const rk = [
-    ['FaHourglassHalf', 'Incumbency and long system lives', 'Installed systems are rarely rebid, typically only after well over a decade. Most renewals skip a competitive rebid', 'HIGH', K.green,
-      [[['Only a small slice of the installed base is rebid each year']], [['Challengers usually win when a competitive rebid happens', true]]]],
-    ['FaFileContract', 'Slow, formal public procurement', 'Multi-year award-to-go-live, bid protests and Buy America documentation for hardware', 'HIGH', K.green,
-      [[['Long sales cycles favour vendors with reference fleets and live pilots']], [['Software-led entry and cooperative purchasing (NASPO, Sourcewell) shorten the path', true]]]],
-    ['FaShieldHalved', 'Rail certification and signalling oligopoly', 'SIL-4 and ERA/FRA approvals and long frameworks protect the signalling majors, which together hold most of world signalling', 'HIGH', K.green,
-      [[['Signalling cores are effectively closed to new entrants']], [['Adjacencies remain contestable: condition monitoring, cybersecurity, onboard connectivity', true]]]],
-    ['FaLandmark', 'US funding reset and ETCS slippage', 'With IIJA advance appropriations lapsed, FY2027 federal transit funding may fall, and EU ETCS rollout is behind schedule', 'MID', K.mblue,
-      [[['Agencies in PA, WA and OR, where state rescue funding stalled, may defer purchases']], [['Formula funds for system refresh are the most durable federal line', true]]]],
-    ['FaArrowTrendDown', 'Execution and leverage in hardware-heavy models', "Cubic's highly levered buyout is now distressed. Alstom and INIT cut profit guidance", 'MID', K.mblue,
-      [[['Project-heavy integrators do not support high buyout leverage']], [['Underwrite on recurring revenue and leave hardware to OEM partners', true]]]],
+    ['FaHourglassHalf', 'Agencies rarely switch vendors', 'Systems last well over a decade, and most renewals skip a competitive bid', 'HIGH', K.green,
+      [[['Only a few contracts open up each year']], [['But when one does, the challenger usually wins', true]]]],
+    ['FaFileContract', 'Public buying is slow', 'Years from award to go-live, plus bid protests and Buy America rules for hardware', 'HIGH', K.green,
+      [[['Agencies favor vendors with proven customers']], [['Shared purchasing contracts speed up software sales', true]]]],
+    ['FaShieldHalved', 'Signalling is a closed club', 'Safety certification and long contracts protect the few big suppliers', 'HIGH', K.green,
+      [[['Signalling itself is off-limits to new entrants']], [['Nearby niches stay open, like monitoring and cybersecurity', true]]]],
+    ['FaLandmark', 'US funding reset and ETCS delays', "Federal transit funding may fall in FY2027, and Europe's ETCS rollout is behind schedule", 'MID', K.mblue,
+      [[['Some states may delay purchases']], [['Money for system upgrades is the safest federal funding', true]]]],
+    ['FaArrowTrendDown', 'Debt-heavy hardware deals', "Cubic's debt-funded buyout is in distress, and Alstom and INIT cut profit forecasts", 'MID', K.mblue,
+      [[["Lumpy project revenue can't carry much debt"]], [['Buy recurring revenue, and leave hardware to partners', true]]]],
   ];
   rk.forEach(([icn, h, desc, lvl, col, bl], i) => {
     const ry2 = 2.36 + i * 0.86, rh2 = 0.8;
     R(s, 0.45, ry2, 0.85, rh2, K.dgrey);
     s.addImage({ data: ic[icn], x: 0.45 + 0.2, y: ry2 + (rh2 - 0.45) / 2, w: 0.45, h: 0.45 });
     R(s, 1.33, ry2, 5.02, rh2, K.lgrey);
-    T(s, [{ text: h, options: { bold: true, breakLine: true, fontSize: 12 } }, { text: desc, options: { fontSize: 10.5 } }], { x: 1.45, y: ry2 + 0.03, w: 4.82, h: rh2 - 0.06, color: '1A1A1A', valign: 'middle' });
+    T(s, [{ text: h, options: { bold: true, breakLine: true, fontSize: 13 } }, { text: desc, options: { fontSize: 11 } }], { x: 1.45, y: ry2 + 0.03, w: 4.82, h: rh2 - 0.06, color: '1A1A1A', valign: 'middle' });
     s.addShape('chevron', { x: 6.42, y: ry2 + 0.2, w: 0.22, h: 0.4, fill: { color: K.grey }, line: { color: K.grey } });
     s.addShape('chevron', { x: 6.58, y: ry2 + 0.2, w: 0.22, h: 0.4, fill: { color: K.dgrey }, line: { color: K.dgrey } });
     R(s, 6.95, ry2, 1.05, rh2, col);
     T(s, lvl, { x: 6.95, y: ry2, w: 1.05, h: rh2, fontFace: HEAD, fontSize: 16, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
     R(s, 8.03, ry2, 4.87, rh2, K.lgrey);
-    T(s, paras(bl, { paraSpaceAfter: 2 }), { x: 8.13, y: ry2 + 0.03, w: 4.7, h: rh2 - 0.06, fontSize: 10, color: '1A1A1A', valign: 'middle' });
+    T(s, paras(bl, { paraSpaceAfter: 4 }), { x: 8.13, y: ry2 + 0.03, w: 4.7, h: rh2 - 0.06, fontSize: 11, color: '1A1A1A', valign: 'middle' });
   });
   R(s, 0.45, 6.68, 5.9, 0.06, K.black); R(s, 6.95, 6.68, 5.95, 0.06, K.black);
   source(s, "Note: Evidence on incumbency and rebids in appendix A5. Sources: agency board records (LA Metro, TfL, CTA, MARTA, Miami-Dade), 2016-26 ITS award dataset, FTA notices, H.R. 8870, FY2027 President's Budget, European Commission ERTMS Work Plan (2026), company reports, analysis");
