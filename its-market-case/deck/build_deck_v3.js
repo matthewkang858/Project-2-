@@ -167,20 +167,20 @@ const CLAIMS = [
   ['C19', 'S2, S3 funnel, S3 lens, S5, S6', '"Signalling is a closed oligopoly (Siemens, Hitachi, Alstom, CRSC)" (S2) / "Less urban signalling: safety-certified, closed oligopoly" (S3 funnel) / "Software and services are open to a new entrant because transit agencies buy them from many vendors, while signalling is locked up by certified majors on multi-year frameworks" (S3 lens) / "Signalling is a closed oligopoly" (S5 title) / "together hold most of world signalling" (S6)', null],
   ['C20', 'S5', '"Together hold most of world signalling, with multi-year order books"', null],
   ['C21', 'S2, S5 title', '"North American bus ITS is consolidating around Modaxo and Hitachi"', null],
-  ['C22', 'S5', '"Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever" / "Largest installed bases" / ordering arrow "Largest, most entrenched installed base" to "Smallest installed base, newest to the market" (S5)', null],
-  ['C23', 'S5, A4', '"INIT is the largest listed bus ITS pure play, while IVU is smaller and majority recurring" / "LISTED PURE PLAYS" (S5 column header) / "IVU\'s ~' + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue" (A4 title)', null],
-  ['C24', 'S2, S3 table, S5, S5 title, S7', '"a fragmented long tail of privately held vendors remains" / "Buy a privately held North American mid-market bus ITS vendor" (S2) / "Modaxo, Hitachi, INIT, IVU and a fragmented long tail" (S3) / "leaving a private long tail opportunity" (S5 title) / "A fragmented long tail of privately held specialists"; "Sticky agency relationships"; "Mostly sub-scale, with some still founder-led (GIRO, ETA), so succession is open"; "ACQUISITION TARGETS: Buy one as the platform, then bolt on others"; "Where to focus: buy a mid-market private, add SaaS / AI, and exit at a software multiple" (S5 focus callout) / "Acquire a privately held North American mid-market bus ITS vendor" (S7)', null],
-  ['C25', 'S2, S5', '"cloud challengers overlay legacy systems" (S2) / "LA Metro and many other US agencies already run cloud overlays on legacy CAD/AVL" (S5)', null],
-  ['C26', 'S2, S3 table, S5, S6', '"protected by safety certification and long maintenance tails" (S2) / "Signalling majors under multi-year frameworks" (S3 table) / "long maintenance tails, multi-year frameworks (e.g., DB)"; "Full stack (CAD/AVL, scheduling, fare) plus long-term service contracts" (S5) / "long frameworks protect the signalling majors" (S6)', null],
+  ['C22', 'S5', '"Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever" / "Largest installed bases" / ordering arrow "Larger, more entrenched" to "Smallest, newest to the market" (S5)', null],
+  ['C23', 'S5, A4', '"INIT is the largest listed bus ITS pure play, while IVU is smaller" / "LISTED PURE PLAYS" (S5 column header) / "IVU\'s ~' + x1(D.bm_ivu) + ', a multiple earned by software-led, majority-recurring revenue" (A4 title)', null],
+  ['C24', 'S2, S3 table, S5, S5 title, S7', '"a fragmented long tail of privately held vendors remains" / "Buy a privately held North American mid-market bus ITS vendor" (S2) / "Modaxo, Hitachi, INIT, IVU and a fragmented long tail" (S3) / "leaving a private long tail opportunity" (S5 title) / "A fragmented long tail of privately held specialists"; "Sticky agency relationships"; "Mostly sub-scale, with some still founder-led (GIRO, ETA), creating succession opportunity"; "ACQUISITION TARGETS: Buy one as the platform, then bolt on others"; "Where to focus: buy a mid-market private, add SaaS / AI, and exit at a software multiple" (S5 focus callout) / "Acquire a privately held North American mid-market bus ITS vendor" (S7)', null],
+  ['C25', 'S2, S5', '"cloud challengers overlay legacy systems" (S2) / "Newer firms selling cloud apps and AI cameras that agencies add on top of their existing system" (S5)', null],
+  ['C26', 'S2, S3 table, S5, S6', '"protected by safety certification and long maintenance tails" (S2) / "Signalling majors under multi-year frameworks" (S3 table) / "long maintenance tails, multi-year frameworks (e.g., DB)"; "Full stack (e.g., dispatch, location tracking, scheduling, fare) plus long-term service contracts" (S5) / "long frameworks protect the signalling majors" (S6)', null],
   ['C27', 'S5', '"each kept for a system generation"', null],
   ['C28', 'S5', '"Modaxo buys and never sells"', null],
   ['C29', 'S5', '"Avail and Passio lead real-time feeds at smaller US agencies"', null],
-  ['C30', 'S5', '"Sold beside the incumbent on short contracts" / "AI enforcement can be funded from fines"', null],
+  ['C30', 'S5', '"Easy to buy: short subscriptions, and the old system stays" / "Ticket fines pay for the AI cameras"', null],
   ['C31', 'S5, S6', '"Slow, publicly funded ETCS rollout and execution risk", "Hardware and project mix squeezes margins" (S5) / "Alstom and INIT cut profit guidance" (S6)', null],
   ['C32', 'S5, A5', '"legacy installs exposed at rebid" (S5) / "In bus CAD/AVL, incumbents lost every competitive rebid in the sample, but every winner was an established vendor (Clever, INIT, Equans, Vontas)" (A5)', null],
   ['C33', 'S2, S5, S6, S7', '"not a highly levered buyout of a hardware integrator" (S2 verdict) / "Cubic also competes" (A6 group label) / "Cubic\'s highly levered buyout is now distressed"; "Project-heavy integrators do not support high buyout leverage" (S6) / "Avoid: signalling cores and highly levered buyouts of hardware integrators" (S7)', () => D.leverage <= 3],
-  ['C34', 'S5', '"Via and Optibus still report losses"', null],
-  ['C35', 'S5, S7', '"subscriptions fit federal capital grants poorly" (S5) / "Structure subscriptions to fit federal capital-grant rules" (S7)', null],
+  ['C34', 'S5', '"Via and Optibus still lose money"', null],
+  ['C35', 'S5, S7', '"Federal grants favor equipment over subscriptions" (S5) / "Structure subscriptions to fit federal capital-grant rules" (S7)', null],
   ['C36', 'S5', '"EXIT BENCHMARK: Value the exit off INIT and IVU: valuations rise with recurring mix" (S5 focus callout)', () => D.bm_init < D.bm_ivu],
   ['C37', 'S5', '"scaled players are priced as SaaS"', () => D.bm_via > 2 * D.bm_ivu],
   ['C38', 'S2, S6 title, S6, A5', '"installed systems are rarely rebid" (S2) / "Long system lives and slow procurement favour buying an installed base" (S6 title) / "Installed systems are rarely rebid, typically only after well over a decade"; "Only a small slice of the installed base is rebid each year" (S6) / "Systems are ~' + CITED.tenure_median + ' years old at a decision point" (A5 title)', null],
@@ -534,19 +534,19 @@ function bracketV(s, x, y0, y1, tick, color) {
     ['BUS ITS CONSOLIDATORS', ['modaxo', 'hitachi'],
       'Modaxo owns the largest North American installed base, and Hitachi is number two after buying Clever',
       'Largest installed bases, each kept for a system generation. Modaxo buys and never sells',
-      'Ageing CAD/AVL architectures, with legacy installs exposed at rebid'],
+      'Aging architecture, with legacy installs exposed at rebid'],
     ['LISTED PURE PLAYS', ['init', 'ivu'],
-      'INIT is the largest listed bus ITS pure play, while IVU is smaller and majority recurring',
-      'Full stack (CAD/AVL, scheduling, fare) plus long-term service contracts',
+      'INIT is the largest listed bus ITS pure play, while IVU is smaller',
+      'Full stack (e.g., dispatch, location tracking, scheduling, fare) plus long-term service contracts',
       'Hardware and project mix squeezes margins'],
     ['MID-MARKET PRIVATES', ['avail', 'giro', 'eta', 'passio'],
       'A fragmented long tail of privately held specialists',
       'Sticky agency relationships. Avail and Passio lead real-time feeds at smaller US agencies',
-      'Mostly sub-scale, with some still founder-led (GIRO, ETA), so succession is open'],
+      'Mostly sub-scale, with some still founder-led (GIRO, ETA), creating succession opportunity'],
     ['SAAS / AI CHALLENGERS', ['swiftly', 'optibus', 'via', 'haydenai'],
-      'LA Metro and many other US agencies already run cloud overlays on legacy CAD/AVL',
-      'Sold beside the incumbent on short contracts. AI enforcement can be funded from fines',
-      'Via and Optibus still report losses, and subscriptions fit federal capital grants poorly'],
+      'Newer firms selling cloud apps and AI cameras that agencies add on top of their existing system',
+      'Easy to buy: short subscriptions, and the old system stays. Ticket fines pay for the AI cameras',
+      'Via and Optibus still lose money. Federal grants favor equipment over subscriptions'],
   ];
   const gx = 0.35, lw = 1.5, gw = 2.18, gg = 0.04, gy = 2.42, hT = 0.34, hL = 0.62;
   const colX = j => gx + lw + gg + j * (gw + gg);
@@ -584,24 +584,22 @@ function bracketV(s, x, y0, y1, tick, color) {
   // context callout under the first two groups
   const ctxX = colX(0), ctxW = colX(1) + gw - ctxX;
   R(s, ctxX, cbY, ctxW, cbH, K.lgrey);
-  T(s, [{ text: 'Context, not targets: ', options: { bold: true, color: K.dgrey } }, { text: 'signalling is closed, so compete only in adjacencies (monitoring, cyber, connectivity). The consolidators bid against us for targets, and Hitachi may buy at exit while Modaxo sets the floor.', options: { color: '3B3B3D' } }], { x: ctxX + 0.1, y: cbY + 0.04, w: ctxW - 0.2, h: cbH - 0.08, fontSize: 10, valign: 'middle' });
+  T(s, 'Signalling is closed, so compete only in adjacencies (monitoring, cyber, connectivity). The consolidators bid against us for targets, and Hitachi may buy at exit while Modaxo sets the floor.', { x: ctxX + 0.1, y: cbY + 0.04, w: ctxW - 0.2, h: cbH - 0.08, fontSize: 10, bold: true, color: '3B3B3D', valign: 'middle' });
   // focus callout under the three groups that matter: one line, then each group's role under its column
   const focX = colX(2), focW = colX(4) + gw - focX;
   R(s, focX, cbY, focW, cbH, K.navy);
   T(s, 'Where to focus: buy a mid-market private, add SaaS / AI, and exit at a software multiple', { x: focX + 0.1, y: cbY + 0.03, w: focW - 0.2, h: 0.3, fontSize: 11, bold: true, color: 'FFFFFF', valign: 'middle' });
   [['EXIT BENCHMARK', 'Value the exit off INIT and IVU: valuations rise with recurring mix'],
    ['ACQUISITION TARGETS', 'Buy one as the platform, then bolt on others'],
-   ['PARTNERS OR RIVALS', 'Overlay, partner or buy capability. Scaled players price as SaaS']].forEach(([role, txt], k) => {
+   ['PARTNERS OR RIVALS', 'Partner with them, or buy a small one. Big ones are priced too high']].forEach(([role, txt], k) => {
     const x = colX(2 + k);
     T(s, [{ text: role, options: { bold: true, color: K.lblue, breakLine: true } }, { text: txt, options: { color: 'FFFFFF' } }], { x: x + 0.08, y: cbY + 0.31, w: gw - 0.14, h: cbH - 0.33, fontSize: 9.5, valign: 'top' });
   });
   // two-way arrow under the columns: the groups run from the largest, most entrenched installed base to the smallest and newest (guard C22)
-  const arY = cbY + cbH + 0.08, arH = 0.28, arX = colX(0), arW = colX(4) + gw - colX(0);
-  R(s, gx, arY, lw, arH, K.dgrey);
-  T(s, 'ORDERED BY SCALE', { x: gx + 0.08, y: arY, w: lw - 0.1, h: arH, fontFace: HEAD, fontSize: 11.5, bold: true, color: 'FFFFFF', valign: 'middle' });
+  const arY = cbY + cbH + 0.08, arH = 0.32, arX = gx, arW = colX(4) + gw - gx;
   s.addShape('leftRightArrow', { x: arX, y: arY, w: arW, h: arH, fill: { color: 'CDD7E3' }, line: { color: 'CDD7E3' } });
-  T(s, 'Largest, most entrenched installed base', { x: arX + 0.32, y: arY, w: 3.6, h: arH, fontSize: 10, bold: true, color: K.navy, valign: 'middle' });
-  T(s, 'Smallest installed base, newest to the market', { x: arX + arW - 3.92, y: arY, w: 3.6, h: arH, fontSize: 10, bold: true, color: K.navy, align: 'right', valign: 'middle' });
+  T(s, 'Larger, more entrenched', { x: arX + 0.36, y: arY, w: 3.6, h: arH, fontSize: 10, bold: true, color: K.navy, valign: 'middle' });
+  T(s, 'Smallest, newest to the market', { x: arX + arW - 3.96, y: arY, w: 3.6, h: arH, fontSize: 10, bold: true, color: K.navy, align: 'right', valign: 'middle' });
   source(s, 'Note: Positions are qualitative, from filed vendor revenue, agency award records and trading data. Multiples in appendix A4. Logos show parent companies, with subsidiaries and brands in appendix A6. Sources: company reports and statutory filings, Berg Insight, deal announcements, GTFS-Realtime feed census, agency board records, trading data as of 6 Nov 2026, analysis');
 
   // ---------------------------------------------------------------- S6 risks and barriers (0 numbers)
