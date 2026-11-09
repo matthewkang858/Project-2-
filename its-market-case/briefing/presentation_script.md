@@ -4,304 +4,256 @@ Matthew Kang, November 2026
 
 ## Opening: cover slide (0:40, clock at 0:40)
 
-**Land this:** Yes, but only in one slice: bus software, starting in North America.
+**Land this:** Attractive, but only in one slice: bus software, starting in North America.
 
 Good morning, and thanks for having me.
 
 **[POINT: title]** This case is about public ITS, or intelligent transportation systems. It's the tech that runs buses and passenger trains.
 
-Think sending out buses, live arrival times, cameras and train signals. The question: should a new entrant invest?
+Think dispatching buses, live arrival times, cameras and train signals. The question is whether a new entrant should invest.
 
-Our answer: yes, but only in one slice. **[PAUSE]** We'd buy a bus tech firm and build it around software, starting in North America.
+Our answer: it's attractive, but only in one slice. **[PAUSE]** That slice is bus software, starting in North America.
 
 We'd stay out of rail signalling and debt-heavy hardware deals. Here's the one-page story. **[NEXT SLIDE]**
 
 ## Slide 2: Executive summary (1:45, clock at 2:25)
 
-**Land this:** Only about $4 billion of a $29 billion market is open, so we buy and build in bus software.
+**Land this:** Only about $4 billion of a $29 billion market is open, and the most attractive way in is North American bus software.
 
-**[POINT: title]** The market is about $29 billion. Only about $4 billion of it is open to us.
+**[POINT: title]** In short, it's a market of about $29 billion, growing about 5% a year. Only about $4 billion is open to a new entrant.
 
-Three questions run through the case.
+First, size. Nearly three-quarters is rail signalling, which is off-limits to us.
 
-First, where's the money? Most of it is rail signalling, which is off-limits to us.
+The open part is software and services, in bus and other rail ITS.
 
-The open part is software and services. That's in bus, and in other rail ITS, like screens and cameras.
+Second, growth. Software and services outgrow the market, at about 7% a year.
 
-And software and services outgrow the market.
+Third, competition. Signalling is a closed oligopoly. North American bus ITS is consolidating around Modaxo and Hitachi.
 
-Second, who's in the way? Signalling is a closed club.
+But a long tail of private vendors remains. That's where we'd look.
 
-North American bus is consolidating around Modaxo and Hitachi. But a long tail of private vendors remains.
+Fourth, risks. Agencies rarely put installed systems out to bid. But when they do, challengers usually win.
 
-That's where we'd shop.
+Near term, US federal transit funding may fall, and Europe's digital signalling rollout is behind schedule.
 
-Agencies rarely put installed systems out to bid. But when they do, challengers usually win.
-
-Third, what do we do? We'd buy a private, mid-market bus ITS firm in North America.
-
-And we'd pay less than software firms sell for.
+Fifth, the thesis. The most attractive entry is a mid-market bus ITS vendor in North America. Privately held, and priced below a software multiple.
 
 Returns hinge on a software exit multiple. That's the sale price, divided by a year's revenue.
 
-IVU, a transit software firm, is valued at about 2.6 times. Hitachi paid about 1.6 times for Clever, a US bus tech firm.
+IVU, a listed transit software firm, trades at about 2.6 times. Hitachi paid about 1.6 times for Clever, a US bus tech firm. Sell at that, and we barely get our money back.
 
-Sell at that, and we barely get our money back.
+**[POINT: verdict bar]** So, the verdict. **[PAUSE]** Attractive only as a software-led buy-and-build in bus ITS.
 
-**[POINT: Verdict bar]** So, the verdict. **[PAUSE]** Attractive only as a software-led buy-and-build in bus ITS.
+Buy-and-build means buying one firm, then adding others. It's not a debt-heavy hardware buyout, and it's not rail signalling.
 
-Buy-and-build means buying one firm, then adding others.
+So first, how big is this market? **[NEXT SLIDE]**
 
-It's not a debt-heavy hardware buyout. And it's not rail signalling.
+## Slide 3: Market size (2:40, clock at 5:05)
 
-So, first: where's the money? **[NEXT SLIDE]**
+**Land this:** Of about $29 billion, only about $4 billion of software and services is open to a new entrant.
 
-## Slide 3: Market size (2:30, clock at 4:55)
+Overall, we see a market of about $29 billion. But half of it is mainline signalling, bought mainly by rail infrastructure managers.
 
-**Land this:** Of about $29 billion, only about $4 billion is open to a new entrant.
+And only about $4 billion of software and services is open to entrants.
 
-Here's where it is. Of about $29 billion, only about $4 billion is open to a newcomer.
+**[POINT: funnel, top to bottom]** Taking a look at this funnel, the top is a $40 to $60 billion global ITS market. But that includes things like road traffic, tolls and aviation.
 
-**[POINT: funnel, top to bottom]** Let's walk down the funnel. The top bar is context only.
+Tightening the scope to this case, we get to $28.6 billion. That's public ITS for bus and passenger rail, without fare collection.
 
-Broad ITS reports add road traffic, tolls and aviation. So I set that aside.
+I built this segment by segment, and cross-checked North American bus by counting buses. The two came out close.
 
-Our market is the second bar: bus and passenger rail. It covers hardware, software and services, but not fare collection.
+If we take out mainline signalling, we get to a $14 billion transit-operator core. Mainline signalling is bought mainly by the bodies that run the tracks, like Amtrak. The signalling majors supply it on multi-year contracts.
 
-I built it piece by piece, starting from published reports.
+But that $14 billion still includes urban signalling, for metros and light rail. That's the signalling majors again. It's an oligopoly of safety-certified suppliers, and a new supplier's system takes years to get approved.
 
-Then I checked North American bus by counting buses. The two answers came out close.
+Take that out, and we're left with a contestable pool of about $8 billion. Contestable just means open to competition.
 
-From there, three cuts. Each one asks a simple question.
+Last, we take out the hardware, and leave it to equipment partners. That gets us to $4.2 billion of open software and services. **[PAUSE]** That's about 15% of the market in our scope.
 
-First, who buys it? Half the market is mainline signalling, for intercity and commuter trains.
+**[POINT: the blue box, then the green column above it]** So why is that part open? Because transit agencies buy software and services from many vendors. Signalling is locked up by a few certified suppliers, on long contracts.
 
-It's bought mainly by the bodies that run the tracks, like Amtrak. They aren't the transit agencies a newcomer sells to.
+The table says the same thing, by buyer. Both signalling rows say no.
 
-Take that out, and we're down to the transit-operator core.
+Bus and tram ITS has $2.5 billion open, in software and services. Other rail ITS has $1.7 billion. Together, that's the same $4.2 billion.
 
-Second, can a newcomer compete for it? Metro and light rail signalling is a closed club of safety-certified suppliers.
+So the prize is smaller than the headline. But it's one a new entrant can actually compete for. **[NEXT SLIDE]**
 
-Take that out, and what's left is the contestable pool. That means open to competition.
-
-Third, should we own it? We'd leave bus and rail hardware to equipment partners.
-
-That keeps us on software and services.
-
-**[PAUSE]** What's left is open software and services. That's about $4 billion, or about 15% of the market we sized.
-
-**[POINT: table, then the blue box below it]** The table says the same thing, by buyer. Both signalling rows say no.
-
-The bus and tram row and the other rail row are green. They're open, but only for software and services.
-
-Why the split? Transit agencies buy software and services from many vendors.
-
-Signalling is different. It's locked up by a few certified suppliers, on long contracts.
-
-So the prize is smaller than the headline. But it's one a newcomer can actually compete for.
-
-That's the market today. Does it grow, and does our part keep up? **[NEXT SLIDE]**
-
-## Slide 4: Market growth (2:30, clock at 7:25)
+## Slide 4: Market growth (3:00, clock at 8:05)
 
 **Land this:** The market grows about 5% a year, and software and services outgrow it at about 7%.
 
-Yes on both. The market grows about 5% a year, to about $39 billion by 2031.
+Now that we know the current size of the market, understanding how it grows is just as important.
 
-And software and services outgrow the market, at about 7%. Two things to look at: the bars, then the drivers.
+We see public ITS growing about 5% a year between 2025 and 2031, to about $39 billion. Most of that comes from signalling modernisation.
 
-**[POINT: bars, dark base first, then the circled 7.0% at the bottom]** First, the bars. The dark base is rail signalling, and it brings most of the new money.
+But the open software and services pool outgrows the market, at about 7%.
 
-But it grows just below the market. So you might ask, why not chase it?
+**[POINT: the bars, then the circled 7.0% at the bottom]** Starting off on the left, here's our $28.6 billion in 2025. Each bar is rail signalling at the bottom, then other rail ITS, then bus and tram ITS.
 
-Because signalling is a closed club, and we can't sell into it.
+Most of the new money comes from rail signalling, because it's so big. But it grows just below the market.
 
-The two lighter bands are bus and tram ITS, and other rail ITS. Both grow faster than the market.
+Now pull out software and services again, the $4.2 billion. It grows to $6.3 billion by 2031. That's 7% a year, against 5.4% for the whole market.
 
-So our pool outgrows the market mostly because it leaves out slower signalling.
+**[POINT: drivers panel, top to bottom]** So what's driving this?
 
-Software also wins a little share from hardware.
+First, EU law requires digital signalling, called ETCS. But most main rail lines aren't fitted yet. That leaves tens of billions of euros of work.
 
-One honest caveat. Bus growth is led by the rest of the world.
+Second, cities are replacing old metro signalling. New York, Paris, Toronto and Hong Kong are funding the work.
 
-Those rest-of-world figures, and other rail ITS, are partly analyst estimates. So I hold those growth rates loosely.
+For example, New York is moving from fixed-block signalling to CBTC, or communications-based train control. Fixed-block splits the track into fixed sections, and lets only one train into each section.
 
-Our North American bus case doesn't depend on them.
+CBTC tracks each train's exact position, all the time, by radio. So trains can safely run closer together, and more often.
 
-Second, the drivers. **[POINT: drivers panel, top to bottom]** Three are rated high, and the top two are signalling.
+Those first two lift the total, but not our pool.
 
-EU law requires digital signalling, called ETCS. Most main rail lines aren't fitted yet.
+Third, moving from trains to buses, many bus systems come up for renewal by 2031. Big US and Canadian agencies put in dispatch and tracking systems between 2009 and 2016.
 
-And cities like New York are replacing old metro signalling. Both lift the total, not our pool.
+By 2031, those agencies reach a decision: replace or extend. That's the driver closest to home for us.
 
-The third driver is ours. Bus systems come up for renewal by 2031.
+Fourth, electric buses and bus-lane cameras. Most new European city buses are now electric.
 
-Many big US and Canadian agencies run aging dispatch and tracking systems. These send out the buses and show where each one is.
+And US cities are adding an emerging ITS use case. Cameras catch cars in the bus lane, read the plate, and send a ticket.
 
-Those agencies face a choice: replace or extend. Either way, the vendor we'd own has a shot at the work.
+Last, one headwind: US funding and ETCS delays. The extra federal transit money from the infrastructure law has run out. So federal transit funding may fall in fiscal 2027.
 
-Electric buses and bus-lane cameras help too, but less.
+And ETCS is running late, though it really varies country by country. The UK, which sets its own rail budget, cut its ETCS budget.
 
-One headwind: US funding may fall, and ETCS is running late. That slows growth, but doesn't reverse it.
+So overall, the market grows steadily, and our part outgrows it. **[NEXT SLIDE]**
 
-So the market grows steadily, and our part outgrows it.
+## Slide 5: Competitive landscape (3:00, clock at 11:05)
 
-Next question: who holds this money today, and where do we fit? **[NEXT SLIDE]**
+**Land this:** Signalling is a closed oligopoly and North American bus is consolidating, so the opportunity is the private long tail.
 
-## Slide 5: Competitive landscape (2:30, clock at 9:55)
+Now that we understand the size of the space and how it's growing, who are the main players?
 
-**Land this:** Signalling is closed and bus is consolidating, so our way in is the private long tail.
+**[POINT: the two grey columns on the left]** Starting off on the left, we have the larger, more entrenched companies.
 
-Short answer: signalling is closed, and North American bus is consolidating. That leaves a private long tail we can buy.
+First, the signalling majors: Siemens, Hitachi, Alstom and CRSC. Together they hold most of the world's signalling, with years of booked orders.
 
-**[POINT: the arrow along the bottom, left to right]** The biggest players are on the left, the smallest and newest on the right. I'll take it in two parts.
+It's a closed oligopoly, and very hard for us to enter.
 
-First, the two grey groups. We work around these.
+Next to them are the bus ITS consolidators, Modaxo and, again, Hitachi. In North America, Modaxo owns the largest installed base. Hitachi is number two, after buying Clever.
 
-The signalling majors hold most of the world's signalling. It's a closed club, so we'd only compete in nearby niches, like monitoring and cybersecurity.
+They also bid against us for targets. At exit, Hitachi could buy from us. Modaxo would bid too, but low, so it sets the floor price.
 
-In North American bus, Modaxo owns the largest installed base. That means the most systems already running.
+**[POINT: the blue box, left to right]** More towards the middle and right are smaller players. This is where it gets more attractive.
 
-Hitachi is number two, after buying Clever. The weak spot for both is aging systems.
+First, the listed pure plays. INIT is the largest, and IVU is smaller.
 
-They're exposed when contracts go back out to bid.
+They sell a full stack, like dispatch and tracking, scheduling and fares, on long-term service contracts.
 
-Both compete with us to buy the same firms. At exit, Hitachi may buy from us.
+But hardware and project work squeeze their margins.
 
-Modaxo buys and never sells. It would bid too, but low.
+Still, they're useful exit benchmarks, whether we list or sell. They show that recurring revenue lifts the price.
 
-So it sets the floor on what we can sell for.
+Next, the mid-market privates. I think this is the most interesting opportunity. These are firms like Avail, GIRO, ETA and Passio.
 
-Second, the three groups in the blue box. **[POINT: the blue box, then the role labels in the navy box]** These are where we play.
+It's a long tail, and pretty fragmented. But they have sticky agency relationships. Avail and Passio, for example, lead real-time feeds at smaller US agencies.
 
-The listed pure plays, INIT and IVU, are our exit benchmark. They show what we could sell for.
+Most are still sub-scale, well short of INIT or IVU. And some are still founder-led, like GIRO and ETA. So there could be a succession opportunity, if founders want to cash out.
 
-Recurring revenue lifts the price.
+So these are the acquisition targets. We'd buy one as the platform, then bolt on others.
 
-The mid-market privates are our acquisition targets. There are lots of them, and their agency customers tend to stay.
+Finally, the SaaS and AI challengers, like Swiftly, Optibus, Via and Hayden AI.
 
-Some are still founder-led, like GIRO and ETA. That can mean an owner thinking about succession.
+They sell cloud apps and AI cameras that agencies add on top of their existing system.
 
-We'd buy one as the platform, then bolt on others.
+It's not a full overhaul, just a few use cases. So they're easy to buy, and ticket fines pay for the cameras.
 
-The SaaS and AI challengers are partners or rivals. SaaS just means software sold as a subscription.
+But Via and Optibus still lose money. And federal grants favor equipment bought up front, not monthly subscriptions.
 
-Think Swiftly, or Hayden AI with its bus-lane cameras. Agencies add them on top of the old system.
+These are partners or rivals. We'd partner with them, or buy a smaller one to bring the capability in-house. The big ones are priced too high.
 
-We'd partner with them, or buy a small one. The big ones are priced too high.
+So where do we focus? Buy a mid-market private, add SaaS and AI, and exit at a software multiple. **[NEXT SLIDE]**
 
-So where do we focus? Buy a mid-market private, add SaaS and AI, and exit at a software multiple.
+## Slide 6: Risks and barriers (2:25, clock at 13:30)
 
-Now, what stands in a newcomer's way? **[NEXT SLIDE]**
+**Land this:** The barrier is tenure, not rebid odds, so the way in is to own an installed base.
 
-## Slide 6: Risks and barriers (2:00, clock at 11:55)
+Next, the risks and barriers. Agencies keep systems for over a decade, so the way in is to own an installed base.
 
-**Land this:** The barrier is tenure, not rebid odds, so we buy an installed base.
+There are five rows: three rated high and two rated mid.
 
-The biggest barrier isn't winning a contract. It's getting the chance to bid.
+**[POINT: top row]** One, agencies rarely switch vendors. Most of the time, an agency just renews, without a competitive bid.
 
-**[POINT: the HIGH and MID boxes]** The three HIGH rows are lasting barriers. The two MID rows are risks we can manage.
+That's why only a few contracts open up each year.
 
-**[POINT: top row]** One, agencies rarely switch vendors. Systems last well over a decade, and most renewals skip a competitive bid.
+But when one does, the challenger usually wins. So when those chances come up, we need to pounce.
 
-So only a few contracts open up each year.
+**[PAUSE]** The barrier is tenure, not rebid odds. Tenure means how long a vendor stays in place.
 
-Here's what surprised me. When one does, the challenger usually wins.
+And in bus, the winners were established vendors, not start-ups. That's why the way in is to own an installed base.
 
-And in bus, those winners were established vendors, not start-ups.
+Two, public buying is slow. It can take years from contract award to going live.
 
-**[PAUSE]** So the barrier is tenure, not rebid odds. Tenure means how long a system stays in place.
+Agencies also trust vendors that already run systems elsewhere. And shared purchasing contracts, like NASPO and Sourcewell, let agencies skip a full tender.
 
-Getting a shot is the hard part, not winning. So we'd buy an installed base.
+Another public body has already run the competition. The agency just buys off that contract.
 
-Two, public buying is slow. It can take years from signing a contract to switching the system on.
+So the shortcut is to own a vendor that already has customers, and is already on those contracts.
 
-Agencies favor vendors with proven customers. But shared purchasing contracts speed up software sales.
+Three, signalling is an oligopoly. We've discussed this quite a bit. Safety certification and long contracts protect the few big suppliers.
 
-With one, an agency can skip its own bidding process.
+Signalling itself is off-limits. But nearby niches stay open, like monitoring and cybersecurity.
 
-Three, signalling is a closed club. Safety certification and long contracts protect the few big suppliers.
+**[POINT: the two MID rows]** Now the two mid risks. First, the US funding reset and ETCS delays we saw on the growth slide.
 
-Now two risks we can manage. First, the US funding reset and ETCS delays.
+Some states may delay purchases. But money for system upgrades is the safest part of federal funding. And ETCS is signalling, outside our pool.
 
-Federal transit funding may fall. And some states may delay purchases.
+Second, debt-heavy hardware deals. Cubic's debt-funded buyout is in distress, and Alstom and INIT cut profit forecasts.
 
-But money for system upgrades is the safest federal funding. And ETCS is signalling, outside our pool.
+Lumpy project revenue can't carry much debt. The answer is to buy recurring revenue, and leave hardware to partners.
 
-Second, debt-heavy hardware deals. Cubic's debt-funded buyout is now in trouble.
+So where does all this leave us? **[NEXT SLIDE]**
 
-Lumpy project revenue can't carry much debt. So we'd buy recurring revenue, and leave hardware to partners.
+## Slide 7: Investment thesis (2:40, clock at 16:10)
 
-If the barrier is access, we buy access. **[PAUSE]** So what do we buy, and does it pay? **[NEXT SLIDE]**
+**Land this:** The most attractive entry is North American bus ITS software, but returns hinge on a software exit multiple.
 
-## Slide 7: Investment thesis (2:30, clock at 14:25)
+So, summing all of this up. The most attractive entry is North American bus ITS software. But returns hinge on a software exit multiple.
 
-**Land this:** Returns hinge on a software exit multiple, so we check recurring revenue first.
+Let me walk through why, using the rows on the right.
 
-Our thesis: buy and build in North American bus software. But returns hinge on a software exit multiple.
+**[POINT: the rows on the right, top to bottom]** First, where to play. North American bus software and services, about $600 million. It's the most practical place to start.
 
-**[POINT: "Our recommendation" box]** Here's what we'd buy. A private, mid-market bus ITS firm in North America.
+We'd sell add-ons beside the incumbents: cloud apps, AI cameras and electric-bus software.
 
-We'd pay below a software multiple.
+Second, why North America first. There's a refresh wave. Major agencies decide by 2031 on aging dispatch and tracking systems.
 
-Then we move it to the cloud. We add electric-bus software, and AI cameras that catch cars in bus lanes.
+Mid-size agencies run over half the US fleet. They're the core customers, and the vendors that serve them are the targets.
 
-And we make recurring revenue most of its sales. We'd avoid signalling itself, and debt-heavy buyouts of hardware firms.
+Europe is larger, but split. National buying rules limit scale across borders. So North America is where we start, not where we stop.
 
-That leaves three questions. Why North America, how do we win, and does it pay?
+Third, how to win. Coexist, then replace. Sell add-ons first, then use those customers to win rebids.
 
-Why North America first? It's the most practical place to start.
+And sell through existing channels: shared purchasing contracts and hardware partners. We'd shape subscriptions to qualify for federal grants.
 
-There's a refresh wave. Major agencies face a decision on aging dispatch and tracking systems.
+**[POINT: the two bars at the bottom left]** So, does it pay? Likely buyers at exit are Hitachi, Siemens and Via. What matters is the multiple they pay.
 
-Some have already extended. So it's a window, not a guarantee.
+These two bars are a five-year example. Each one shows money back on money in.
 
-Mid-size agencies are the core customers. The vendors that serve them are the targets.
+IVU trades at about 2.6 times revenue. If we sell at that, our money roughly doubles. That's the bottom bar.
 
-Europe is larger, but split. National buying rules make it hard to scale across borders.
+Hitachi paid about 1.6 times revenue for Clever. If we sell at that, we get back about 1.2 times. That's the top bar, and it's barely our money.
 
-So North America is where we start, not where we stop.
+What earns the higher price? Mostly recurring revenue, like IVU's. That's the first thing we'd check in diligence.
 
-How do we win? Coexist, then replace.
+**[PAUSE]** So our recommendation. The most attractive entry point is a privately held, mid-market bus ITS vendor in North America. Priced below a software multiple.
 
-We sell add-ons first, beside the current vendor's system. Agencies get to know us without a big switch.
+From there, we'd move it to the cloud, and add AI cameras and electric-bus software. That way, recurring revenue can become most of its sales.
 
-Then we use those customers to win rebids.
+And we'd avoid signalling itself, and debt-heavy buyouts of hardware firms. **[PAUSE, STAY ON SLIDE 7]**
 
-We also sell through shared purchasing contracts and hardware partners. And we shape subscriptions to fit federal grants.
-
-**[POINT: the two bars under "Money back on money in"]** So, does it pay? These bars show money back on money in, for one example deal.
-
-I kept everything the same except the price we sell at.
-
-Top bar. Say we sell at Clever's multiple, 1.6 times revenue.
-
-We get back 1.2 times our money. That barely returns what we put in.
-
-Bottom bar. Say we sell at IVU's 2.6 times.
-
-Our money roughly doubles.
-
-**[PAUSE]** What earns the higher price? Mostly recurring revenue, like IVU's.
-
-So that's the first thing we'd check in diligence.
-
-Let me pull it together. **[PAUSE, STAY ON SLIDE 7]**
-
-## Close and hand-off to Q&A (0:40, clock at 15:05)
+## Close and hand-off to Q&A (0:40, clock at 16:50)
 
 **Land this:** Software and services, an installed base, and a software exit multiple.
 
 Our verdict: attractive, but only as a software-led buy-and-build in bus ITS.
 
-Three things to remember. First, the money we can reach is software and services.
+Three things to remember. First, the open part of the market is software and services. North American bus is where we start.
 
-North American bus is where we start.
+Second, the barrier is tenure, not rebid odds. So the way in is owning an installed base.
 
-Second, the barrier is tenure, not rebid odds. So we buy an installed base.
-
-Third, returns hinge on a software exit multiple. Near IVU's 2.6 times, our money roughly doubles.
-
-Near Clever's 1.6 times, we barely get it back.
+Third, returns hinge on a software exit multiple. At IVU's 2.6 times, our money roughly doubles. At Clever's 1.6 times, we barely get it back.
 
 Thanks for listening. **[PAUSE]** Where would you like to start?
