@@ -788,7 +788,7 @@ rd_table(['Slide', 'Sheet and rows', 'What it shows'], [
      "levered buyout; other sources are cited in each slide's source line"),
     ('S7 Thesis', 'Returns B14:B16, B28, B30; B7, B9, B39:B43 (in words); Market B41; B25:B26 (in words)',
      'Exit multiples, MOIC, North American bus software and services'),
-    ('A2 Market build', 'Market rows 7-41; Bottom-up F23, F25, F26 (cross-checks line)', 'Sizing chain and the bottom-up cross-check'),
+    ('A2 Market sizing', 'Market rows 7-41; Bottom-up F23, F25, F26 (cross-checks line)', 'Sizing chain and the bottom-up cross-check'),
     ('A3 Growth scenarios', 'Growth rows 7-12 and 15', 'Bridge and low/base/high table'),
     ('A4 Exit multiples and returns', 'Returns rows 6-43', 'Benchmarks, value bridge, entry sensitivity'),
     ('A5 Incumbency', 'none', 'Cited counts from an ITS award dataset (agency board records, 2016-26), the 2009-16 CAD/AVL refresh cohort and '

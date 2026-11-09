@@ -149,12 +149,12 @@ const CLAIMS = [
   ['C01', 'S2', '"Nearly three-quarters is rail signalling"', () => D.sig_share >= 0.70 && D.sig_share < 0.75],
   ['C02', 'S3 title, S3 funnel, S3 table', '"half is mainline signalling bought mainly by rail infrastructure managers" (S3 title) / "Less mainline signalling: mainly rail infrastructure managers" (S3 funnel) / "Infrastructure managers (Amtrak, DB InfraGO, Network Rail, RFI)" (S3 table)', () => D.mainline_share >= 0.45 && D.mainline_share <= 0.55],
   ['C03', 'S2, S4 title, S4 strip', '"Software and services outgrow the market: ~' + p0(OP.cagr) + ' a year vs ~' + p0(MP.cagr) + ' overall" (S2, S4 callout) / "the open software and services pool grows faster" (S4 title)', () => OP.cagr > MP.cagr],
-  ['C04', 'S4 title, S2', '"mostly from signalling modernisation" (S4 title) / "Signalling drives most market growth" (S2)', () => SP.share_of_increase > 0.5],
+  ['C04', 'S4 title, S2', '"mostly from signalling modernisation" (S4 title) / "Signalling drives most growth" (S2)', () => SP.share_of_increase > 0.5],
   ['C05', 'Q&A only (was S3 lens)', '"Europe is the largest region, with almost half of world signalling spend" (briefing answer, no longer on a slide)', () => D.bus_eu > D.bus_na && D.bus_eu > D.bus_row],
   ['C06', 'A2 open pool line', '"' + p0(D.bus_hw_2025) + ' of bus per GMI" / "' + p0(D.ro_hw) + ' of other rail by our estimate" (A2: hardware is just under half of bus and other rail ITS)', () => D.bus_hw_2025 >= 0.40 && D.bus_hw_2025 < 0.50 && D.ro_hw >= 0.40 && D.ro_hw < 0.50],
   ['C07', 'S2', '"hardware is losing share to software" (S2)', () => D.bus_hw_path.values[6] < D.bus_hw_path.values[0]],
   ['C08', 'S4 legend and pill', '"Bus and tram ITS" / "Faster than the market, led by rest of world" (legend label and tag) / "' + p1(BP.cagr) + '" (CAGR pill)', () => BP.cagr > MP.cagr && D.bus_row_path.cagr > MP.cagr && D.bus_eu_path.cagr < D.bus_row_path.cagr && D.bus_na_path.cagr < D.bus_row_path.cagr],
-  ['C09', 'S2, S4 legend and pill', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "' + p1(SP.cagr) + '" (S4 CAGR pill) / "[Signalling] grows a little slower" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
+  ['C09', 'S2, S4 legend and pill', '"Rail signalling" / "Just below the market" (S4 legend label and tag) / "' + p1(SP.cagr) + '" (S4 CAGR pill) / "[Signalling] grows a little slower than the market" (S2)', () => SP.cagr < MP.cagr && MP.cagr - SP.cagr < 0.01],
   ['C10', 'S4 legend and pill', '"Other rail ITS" / "Faster than the market, helped by wear sensors" (legend label and tag) / "' + p1(RP.cagr) + '" (CAGR pill)', () => RP.cagr > MP.cagr],
   ['C11', 'S4 driver 1', '"EU law requires digital signalling (ETCS)" / "Most main rail lines are not yet fitted, leaving tens of billions of euros of work" (S4 driver 1)', null],
   ['C12', 'S4 driver 2', '"Cities are replacing old metro signalling" / "New York, Paris, Toronto and Hong Kong are funding the work" (S4 driver 2)', null],
@@ -355,7 +355,7 @@ function bracketV(s, x, y0, y1, tick, color) {
       [['Nearly three-quarters is rail signalling, and the open part is software and services in bus and other rail ITS']]]],
     ['FaArrowTrendUp', 'GROWTH TO 2031', [
       [['Software and services outgrow the market: ~' + p0(OP.cagr) + ' a year vs ~' + p0(MP.cagr) + ' overall', true]],
-      [['Signalling drives most market growth but grows a little slower, and hardware is losing share to software']]]],
+      [['Signalling drives most growth but grows a little slower than the market, and hardware is losing share to software']]]],
     ['FaChessKnight', 'COMPETITIVE DYNAMICS', [
       [['Signalling is a closed club, while North American bus ITS is consolidating around Modaxo and Hitachi', true]],
       [['A long tail of privately held vendors remains, and newer cloud firms sell add-ons to agencies\' existing systems']]]],
