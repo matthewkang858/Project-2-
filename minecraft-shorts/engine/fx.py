@@ -33,7 +33,8 @@ PUBLIC API (frames are film frames at 24 fps; the game runs 20 ticks per second:
   mining_swings(player, frame_start, frame_end, every=None) -> [frames]
       The arm while mining, as the game plays it: a swing request every tick, so the swing restarts every 4 ticks
       = 4.8 frames; the last swing is finished after the block broke (at rest at most 9 frames after frame_end,
-      exactly in the pose of frame_start). Call it after place() / look_at(). Returns the frames swings start on.
+      exactly in the pose of frame_start; end the span a few frames before the break to have the arm down
+      sooner). Call it after place() / look_at(). Returns the frames swings start on.
   arm_swings(player, frames) -> [frames]
       One swing request per frame listed (place, use, hit), by the game's rule: a request during the first half
       of a running swing is ignored, a later one restarts the swing. Absolute keys: any number of calls and any
@@ -76,7 +77,7 @@ PUBLIC API (frames are film frames at 24 fps; the game runs 20 ticks per second:
       as an animated emissive layer on a flat item.
   held_item_point(character, frame=None) -> Vector     world centre of an item held on the crossed arms.
   crossed_arms_matrix() / block_shape(block_id, props)  the transcribed layer matrix / the game's outline boxes.
-  build_proof(scene) -> dict                           the worked example below as a whole 4-shot film (self-test).
+  build_proof(scene) -> dict                           the worked example below as a whole 5-shot film (self-test).
 
 WORKED EXAMPLE (build_proof films exactly this in the real trading hall; st = films.lookdev.Stage)
 
@@ -129,11 +130,11 @@ MEASURED (trading hall, cell 1: lectern cell (-6, -31, 0), villager anchor cell_
     1.10), Steve standing at (+0.72, +2.25) facing the lectern, the librarian looking at the lens. Lights as
     lookdev.shot_hall: st.lights(s, scale=0.0, groups={"hall": 0.8}, inside="hall"); tools.palette_check then
     measures lit stone at G/R 0.92-0.94, right on its 0.92 limit.
-  - cell 1 has ONE key: the lantern on the pier at the villager's east (-4.5, -30.5, 2.3). His west cheek is nearly
-    black. A camera in the north-west corner of the aisle (-0.70, +3.88), or a head turned east of the lens (he
-    looks at a Steve standing east of the camera; an idle turn of 25 degrees), shows that cheek and fails
-    palette_check's face saturation (0.55-0.62 against 0.52). Keep the lens north or north-east of him and let
-    him look at it.
+  - cell 1 has ONE key: the lantern hanging over the pier east of him, (+1.0, +0.8, 2.34) from the anchor. His
+    west cheek is nearly black. A camera in the north-west corner of the aisle (-0.70, +3.88), or a head turned
+    east of the lens (he looks at a Steve standing east of the camera; an idle turn of 20 degrees or more: idle
+    seed 3 does it, seed 6 does not), shows that cheek and fails palette_check's face saturation (0.55-0.62
+    against 0.52). Keep the lens north or north-east of him and let him look at it.
 
 CONVENTIONS / GOTCHAS
   - Blender +X east, +Y north, +Z up, 1 block = 1 unit. Visibility, outfit and crack changes are CONSTANT keys on
@@ -161,6 +162,15 @@ CONVENTIONS / GOTCHAS
     make_job_villager(level=1) is the stone badge, the only level at which the game lets a villager lose his job.
   - Not covered: 'poof' and other particle kinds; collision with non-cube shapes; fluids and props (doors, bell)
     cannot be extracted; the glint is for flat item sprites (props.make_item), not for block models or armour.
+
+SELF-TEST
+    $BPY -m engine.fx                           the numeric checks of build_proof (no rendering, 5 s)
+    $BPY -m engine.fx stills [names] --palette  proof stills out/test/fx_<name>.png (names: fx.PROOF; about 15 s
+                                                each) measured with tools.palette_check; `palette [names]` measures
+                                                the stills on disk again without rendering
+    $BPY -m engine.fx seq A B [STEP]            frames A..B of the proof film as out/test/fx_seq_<frame>.png
+    $BPY -m tools.fx_render_check A-B           the proof film through render.py (stamps, resume, a second build)
+  A film that imports engine.fx has engine/fx.py in its engine hash: freeze this file while its finals render.
 """
 import math
 
@@ -1494,8 +1504,8 @@ def mining_swings(character, frame_start, frame_end, every=None):
     every game tick, as Minecraft.continueAttack makes while the button is held, so the arm repeats every 4 ticks
     = 4.8 frames (up in one tick, down over two, back in the fourth). The swing that is running when the block
     breaks is finished: the arm is back at rest at most 9 frames after frame_end, exactly in the pose it had at
-    frame_start. every = frames between requests instead (8 or more gives separate complete swings).
-    Returns the frames on which a swing starts. See arm_swings."""
+    frame_start. every = frames between requests instead, rounded to whole ticks of 1.2 frames (8 or more gives
+    separate complete swings). Returns the frames on which a swing starts. See arm_swings."""
     f0, f1 = float(frame_start), float(frame_end)
     n = max(0, int(math.floor((f1 - f0) / TICK + 1e-6)))
     step = 1 if every is None else max(1, int(round(float(every) / TICK)))
@@ -2229,7 +2239,8 @@ def _check(proof):
     ended = far.stop(150)
     hk = [_curve(p_["object"], "hide_render") for p_ in far.particles]
     ok("Burst.stop(frame): visible until the frame before, gone from it on",
-       ended == n_live > 0 and all(c.evaluate(149) < 0.5 and c.evaluate(150) > 0.5 and c.evaluate(170) > 0.5 for c in hk)
+       ended == n_live > 0
+       and all(c.evaluate(149) < 0.5 and c.evaluate(150) > 0.5 and c.evaluate(170) > 0.5 for c in hk)
        and far.frame_end == 149, "%d ended, frame_end %s" % (ended, far.frame_end))
     late = emit("heart", (60.0, 62.0, 0.0), 160, camera=film, seed=3)
     n_all = stop_particles(156, bursts=[far, late])
@@ -2278,7 +2289,8 @@ def _check(proof):
     r1 = [val(ob, "rotation_euler", i, 175) for ob, i in ((p2.arm_r, 0), (p2.arm_r, 1), (p2.arm_r, 2), (p2.body, 2))]
     lo = min(val(p2.arm_r, "rotation_euler", 0, 100 + f / 10.0) for f in range(0, 760))
     ok("overlapping calls (swing, swing, then mining) leave no residue: the old additive swings ended on the clamp",
-       a1 == [100.0] and [round(x_, 6) for x_ in a2] == [100.0, 106.0] and max(abs(a - r) for a, r in zip(r1, r0)) < 1e-6 and lo > -1.6,
+       a1 == [100.0] and [round(x_, 6) for x_ in a2] == [100.0, 106.0]
+       and max(abs(a - r) for a, r in zip(r1, r0)) < 1e-6 and lo > -1.6,
        "starts %s then %d mining swings, lowest arm x %.3f" % (a2, len(a3), lo))
     p2.show(1, False)
     spl = proof["bursts"].get("splash")

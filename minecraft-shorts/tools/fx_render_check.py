@@ -53,7 +53,9 @@ def main(argv):
     """Render a preview range twice (the second run must find every frame current) and write a contact sheet."""
     spec = argv[0] if argv else "296-305"
     _register()
-    args = ["fx_proof", "--frames", spec, "--res", RES, "--samples", SAMPLES, "--threads", "2"]
+    # --rerender-stale: these previews are throw-away; after an edit to engine/fx.py render.py would otherwise stop
+    # with exit code 3 (frames stamped with other engine sources), exactly as it does for a real film
+    args = ["fx_proof", "--frames", spec, "--res", RES, "--samples", SAMPLES, "--threads", "2", "--rerender-stale"]
     print("[fx_render_check] first run: %s" % " ".join(args))
     code1, text1 = _run(args)
     print("[fx_render_check] second run (the film is built again)")
