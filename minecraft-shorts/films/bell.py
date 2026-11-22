@@ -206,13 +206,13 @@ def shot_interior(st, s, at):
     pillow = (head[0] + 0.1, head[1], head[2] + 0.1)
     # (everybody ran in the previous shot, so nothing here may be keyed before f0: a pre-roll would cut that run short)
     spots = [(bo, (foot[0] - 1.25, foot[1] - 0.07, 1.0)), (ada, (foot[0] - 2.05, foot[1] - 0.92, 1.0)),
-             (kid, (foot[0] - 1.60, foot[1] - 0.60, 1.0))]
+             (kid, (foot[0] - 1.50, foot[1] - 0.80, 1.0))]         # clear of the librarian's arm and leg: the face must read
     for i, (c, pos) in enumerate(spots):
         c.place(f0, pos, yaw_to(pos, pillow))
     # the shepherd, last in, is two steps inside the door as the shot starts (left of it from here, so that the
     # doorway and the door are in the clear) and runs on to join the others on the right
     way = [(12.3, -8.3, 1.0), (13.2, -8.95, 1.0), (15.3, -9.0, 1.0), (15.9, -8.80, 1.0)]
-    stop = (16.3, -8.65, 1.0)
+    stop = (16.3, -8.65, 1.0)                                # (0.3 further south clears the wall torch behind his hat but hides him behind the librarian)
     pre = 6                                                  # frames of run before the cut
     dx, dy = way[1][0] - way[0][0], way[1][1] - way[0][1]
     d = math.hypot(dx, dy)
