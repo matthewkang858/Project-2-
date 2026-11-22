@@ -1,0 +1,7 @@
+out/frames/
+out/test/
+out/blend/
+out/preview/
+__pycache__/
+*.pyc
+assets/tex/
