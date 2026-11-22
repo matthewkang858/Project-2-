@@ -41,6 +41,7 @@ TIMING = dict(start=0.25, per_word=0.375, comma=0.125, period=0.5)
 HOLD = 0.875
 SKY = dict(preset="golden", az=62.0, el=27.0)              # the sky of the golden look-dev film: one sun for all shots
 LAVA_GLOW = 1.0                                            # emission of the forge's lava in this film (the set has 3.0)
+SMITH_BOUNCE = ((23.5, 5.9, 2.4), (1.0, 0.97, 0.93), 1000.0)  # the smith shot's bounce light: place, colour, watts
 
 
 class Plan:
@@ -134,6 +135,16 @@ def shot_smith(st, s, plan):
                     if node.type == "BSDF_PRINCIPLED":
                         node.inputs["Emission Strength"].default_value = LAVA_GLOW
     st.lights(s, scale=1.0, groups={"smithy": 2.4}, near=spot, radius=14.0)
+    # Under the porch roof the shot was a stop darker and flatter than the sunlit shots either side of it (Fast GI
+    # drops the light the sunlit yard bounces in under the roof). One pale, soft light low in the open east side
+    # stands in for that bounce, in this shot only; it is hidden everywhere else.
+    bounce = props.make_light("fill", v.collection)
+    bounce.name = "smith_bounce"
+    bounce.location = SMITH_BOUNCE[0]
+    bounce.data.color = SMITH_BOUNCE[1]
+    bounce.data.energy = SMITH_BOUNCE[2]
+    for f, hidden in ((1, True), (f0, False), (f1 + 1, True)):
+        st.key(bounce, "hide_render", f, hidden)
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -191,7 +202,9 @@ def shot_trade(st, s, plan):
         steve.hold(props.make_item("emerald", v.collection))
     fpos = A["farm_work"]
     spos = (fpos[0] + 1.0, fpos[1], 1.0)                     # on the farm's log frame, east of the farmer
-    npos = (-16.5, -9.2, 1.0)                                # on the log path between the two fields, 6 blocks behind
+    # (0.15 to the camera's right of the path's middle: there his head covers a slot of open sky between two far oak
+    # canopies, which otherwise slides out beside his forehead as a pale dash just as the focus lands on him)
+    npos = (-16.60, -9.09, 1.0)                              # on the log path between the two fields, 6 blocks behind
     # Steve is new to the film, so he may start before the cut: 6 frames earlier the arm is at 40 degrees on the
     # first frame and at 55 four frames later. Raised from hanging IN the shot, the emerald spent its first 6 frames
     # behind the caption, in the composter's side and in the farmer's folded arms.
