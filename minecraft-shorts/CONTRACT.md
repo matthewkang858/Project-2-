@@ -340,3 +340,40 @@ does on the bed in reference 3.
   `--frames all --max-seconds 240`, repeated until nothing is left; never mix previews into them (render.py keeps
   them apart). FREEZE the engine files while finals render: an engine edit stops the next chunk with exit code 3
   (see render.py); film-script edits are safe at any time and re-render only the frames they change.
+
+### After four finished films (The Bell, The Nitwit, One Word, Poppy)
+
+What a frame-by-frame check of the finished videos still found, although every film had passed two reviews on
+previews and stills. Look for these BEFORE the final render:
+
+- A face tucked against a neighbour: the child in the Bell's house shot stood between two adults and was a third
+  hidden by an arm and a trouser leg. Ray-cast or look at every face in a group at phone size (360x640).
+- Tangents: a wall torch's flame exactly on a hat, a hanging lantern on Steve's hair, and a slot of open sky between
+  two far oak canopies that slid out beside a head as the camera moved, just where the focus pull sent the eye.
+- One shot a stop darker than its neighbours (the smith under his porch roof). A view-exposure key cannot fix that:
+  view settings are in the frame stamp's GLOBAL part, so every frame goes stale. Add a film-local, shadowless
+  light keyed visible for that shot only (`SMITH_BOUNCE` in films/nitwit.py); hidden objects are not in a stamp.
+- A child in strict profile that looks at something beyond itself shows the lens a blank cheek. Cheat its look
+  targets about 21 degrees to the camera's side (`_to_lens` in films/poppy_day.py).
+- A step of less than 7 frames is a hop that stops dead (`Character.walk` is linear, there is no ease: use a low
+  speed). Two runners 0.2 block apart are one two-headed shape: stagger them by 0.7 block.
+- Daylight with the sun behind the camera is flat, with no cast shadows in the picture. Stage each daylight camera
+  so the sun is 60-120 degrees off the lens axis, or let a shadow edge cross the wall behind the subject.
+- A film with two skies is two modules (films/poppy_night.py, films/poppy_day.py), encoded separately and joined
+  with `ffmpeg -f concat -safe 0 -i list.txt -c copy -movflags +faststart` (the streams are identical in settings;
+  timestamps stay constant across the join).
+
+Known engine issues, not fixed because engine files were frozen during the finals; the films work around them:
+
+- `stamp.Fingerprinter` caches a mesh's digest together with its materials' digests. A mesh with an ANIMATED
+  material (fx crack stages, the enchant glint) then gets a fingerprint that depends on which frame the process
+  fingerprinted first, and good frames are declared stale. Work-around: `stamp_every_frame()` in films/oneword.py.
+- `Character._cut` re-keying the same frame leaves a stale key; `Character.swing_arm` is additive;
+  `Character.hold()` items become visible again at each shot start.
+- `Stage.actor()` builds villagers and Steve only: the golem and dropped items go through `add_golem` / `add_item`
+  in films/poppy_common.py. `Stage.hero` with an fx job villager needs `*villager.heads`.
+- fx `Block` tints the break particles of grass blocks. The hall cell anchor puts the villager 0.22 too far forward
+  for the book shot. Lit stone in the hall cell sits on the 0.92 G/R palette limit (0.914-0.926).
+- The smithy has no fill light group; raising its torches alone turns the cobblestone orange.
+- `tools.palette_check` has no command line (use its probe / evaluate). `render.py --still ... --sheet N` in one
+  call renders the sheet at the still's resolution: run `--sheet` on its own.
