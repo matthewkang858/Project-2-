@@ -5,3 +5,4 @@ out/preview/
 __pycache__/
 *.pyc
 assets/tex/
+assets/mc/
