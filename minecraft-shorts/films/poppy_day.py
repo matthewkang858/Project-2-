@@ -59,6 +59,16 @@ def timing():
     return clock, clock.lengths(clock.frame("one"), clock.frame("the", 1))
 
 
+def _to_lens(c, frame, point, degrees=21.0):
+    """The look_at target `point`, swung round child c until its face is `degrees` toward the lens (same distance,
+    same height). The lens looks north at a profile: a child that looks straight at the golem's face, which is
+    0.6 block beyond it, shows the lens a blank cheek (no brow, no eye); cheated 21 degrees to the camera's side
+    of what it looks at, the face reads and the eyeline still goes to the golem and his flower."""
+    p, t = c.pos_at(frame), Vector(point)
+    r, a = math.hypot(t.x - p.x, t.y - p.y), math.radians(degrees)
+    return (p.x - r * math.cos(a), p.y - r * math.sin(a), t.z)
+
+
 def _run_in(c, arrive, way, speed):
     """Let a child run along `way` so that it stops on frame `arrive`; returns the frame it starts on."""
     dist = sum((Vector(b) - Vector(a)).length for a, b in zip(way, way[1:]))
@@ -90,7 +100,7 @@ def shot_offer(st, s, clock):
     arrive = f0 + 4                                          # (inside the safe area from frame 4 of the film's day)
     kid.place(arrive - 12, start, yaw_to(start, far))
     assert kid.walk(arrive - 12, [start, far], speed=1.8) == arrive
-    kid.look_at(arrive - 12, g, ease=0)                      # eyes up at the big face all the way in
+    kid.look_at(arrive - 12, _to_lens(kid, arrive - 12, g.eye_point(arrive - 12)), ease=0)   # eyes up at the big face
     g.look_at(f0, kid, ease=0)
     g.track(f0, arrive + 4, kid, step=3, ease=3)             # his head follows the child down
     # "holds out": the arm, 22 frames up (the game snaps; this is the film's gentleness), the poppy in the fist
@@ -99,9 +109,10 @@ def shot_offer(st, s, clock):
     bloom = g.flower_point(up + 1)
     f_flower = clock.frame("flower")
     assert up <= f_flower - 6, (up, f_flower)                # up and still well before its word
-    kid.look_at(f_flower - 5, bloom, ease=7)                 # "flower": the child's eyes come down from his face to it
-    step = kid.walk(f_flower + 4, [far, KID], speed=1.2)     # ... and one small step closer, under it
-    kid.look_at(step, g.flower_point(step + 2), ease=5)
+    kid.look_at(f_flower - 5, _to_lens(kid, f_flower + 2, bloom), ease=7)   # "flower": its eyes come down to it
+    # ... and one small step closer, under it (0.15 block in 7 frames: in 3 frames it was a hop that stopped dead)
+    step = kid.walk(f_flower + 4, [far, KID], speed=0.5)
+    kid.look_at(step, _to_lens(kid, step + 5, g.flower_point(step + 2)), ease=5)
     # "children": two more, running in from the square behind (new to the film: pre-rolled, out of frame). One
     # stops beyond the flower, the other under the raised arm beside the golem: both face the poppy and so the
     # lens, clear of the first child and of the Reels icons, and stand still a quarter second before the cut
@@ -109,7 +120,9 @@ def shot_offer(st, s, clock):
     k2, k3 = st.actor("kid2", "none", child=True), st.actor("kid3", "none", child=True)
     way2 = [(8.6, -4.4, PATH_Z), (5.6, -4.9, PATH_Z), (3.45, -5.50, PATH_Z)]
     way3 = [(9.4, -3.4, PATH_Z), (6.9, -4.2, PATH_Z), (2.60, -5.30, PATH_Z)]
-    stops = ((k2, f_ch + 1, way2), (k3, f_ch + 6, way3))
+    # (the one that runs farther arrives only a frame later, so it leads by 0.7 block all the way in: arriving 5
+    # frames later it ran a head's width ahead of the other, and the two were one two-headed shape)
+    stops = ((k2, f_ch + 1, way2), (k3, f_ch + 2, way3))
     for c, f, way in stops:
         _run_in(c, f, way, speed=3.4)
         c.face(f, (bloom.x, bloom.y, 0.0), ease=5)           # they turn to it as they stop ...
