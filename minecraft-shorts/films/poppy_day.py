@@ -43,12 +43,13 @@ CLOCK = dict(start=0, word=10, comma=10, period=10, tail=24)
 
 GOLEM = Vector((2.0, -6.3, PATH_Z))        # where he stands, south of the well, facing east
 YAW = math.pi / 2.0
-KID = GOLEM + 2.15 * forward(YAW) + 0.62 * right(YAW)        # the child: in front of the fist (engine.mobs FLOWER)
-LEFT = GOLEM + 1.05 * forward(YAW) + 0.55 * right(YAW)       # where the poppy is found: under the hand that held it
+KID = GOLEM + 1.90 * forward(YAW) + 0.62 * right(YAW)        # the child: under the flower, just beyond the fist
+LEFT = GOLEM + 0.93 * forward(YAW) + 0.55 * right(YAW)       # where the poppy is found: under the hand that held it
 # the camera of shots 1 and 2: one straight, slow push from the south, low; it goes on through the cut, so the
-# empty square is the same picture, still closing in on the place where the flower was
-CAM_A, AIM_A = Vector((3.66, -13.30, 0.50)), Vector((3.66, -6.60, 0.47))
-CAM_B, AIM_B = Vector((3.66, -12.50, 0.50)), Vector((3.66, -6.60, 0.47))
+# empty square is the same picture, still closing in on the place where the flower was. (The whole group has to fit
+# x 8-82 % to the last frame, the golem's back included: he is 0.9 deep and the push must not carry him out.)
+CAM_A, AIM_A = Vector((3.30, -13.30, 0.50)), Vector((3.30, -6.60, 0.47))
+CAM_B, AIM_B = Vector((3.30, -12.80, 0.50)), Vector((3.30, -6.60, 0.47))
 HAND = (0.008, 61)                         # the same handheld drift in both shots: it does not jump at the match cut
 
 
@@ -84,34 +85,38 @@ def shot_offer(st, s, clock):
     g.place(f0, GOLEM, YAW)
     away = forward(YAW)                                      # from the golem toward the child
     # the first child toddles in from the right: new to the film, so it may start before frame 1
-    far = KID + 0.30 * away                                  # where it stops first: a small step short
+    far = KID + 0.15 * away                                  # where it stops first: a small step short
     start = far + Vector((0.90, 0.10, 0.0))
-    arrive = f0 + 7
+    arrive = f0 + 4                                          # (inside the safe area from frame 4 of the film's day)
     kid.place(arrive - 12, start, yaw_to(start, far))
     assert kid.walk(arrive - 12, [start, far], speed=1.8) == arrive
     kid.look_at(arrive - 12, g, ease=0)                      # eyes up at the big face all the way in
     g.look_at(f0, kid, ease=0)
     g.track(f0, arrive + 4, kid, step=3, ease=3)             # his head follows the child down
     # "holds out": the arm, 22 frames up (the game snaps; this is the film's gentleness), the poppy in the fist
-    up = g.offer_flower(clock.frame("holds") + 1, ease=22)
+    # (grow=10: the poppy opens while the arm lifts, not as a pop at the hanging fist)
+    up = g.offer_flower(clock.frame("holds") + 1, ease=22, grow=10)
     bloom = g.flower_point(up + 1)
     f_flower = clock.frame("flower")
     assert up <= f_flower - 6, (up, f_flower)                # up and still well before its word
     kid.look_at(f_flower - 5, bloom, ease=7)                 # "flower": the child's eyes come down from his face to it
     step = kid.walk(f_flower + 4, [far, KID], speed=1.2)     # ... and one small step closer, under it
     kid.look_at(step, g.flower_point(step + 2), ease=5)
-    # "children": two more, running in from the square behind (new to the film: pre-rolled, out of frame). They
-    # stop beyond the flower and beyond the first child, facing it and so the lens: faces turned up at the poppy
+    # "children": two more, running in from the square behind (new to the film: pre-rolled, out of frame). One
+    # stops beyond the flower, the other under the raised arm beside the golem: both face the poppy and so the
+    # lens, clear of the first child and of the Reels icons, and stand still a quarter second before the cut
     f_ch = clock.frame("children")
     k2, k3 = st.actor("kid2", "none", child=True), st.actor("kid3", "none", child=True)
-    way2 = [(8.6, -4.4, PATH_Z), (5.6, -4.9, PATH_Z), (3.72, -5.60, PATH_Z)]
-    way3 = [(9.4, -3.4, PATH_Z), (6.9, -4.2, PATH_Z), (5.15, -5.10, PATH_Z)]
-    stops = ((k2, f_ch + 5, way2), (k3, f_ch + 12, way3))
+    way2 = [(8.6, -4.4, PATH_Z), (5.6, -4.9, PATH_Z), (3.45, -5.50, PATH_Z)]
+    way3 = [(9.4, -3.4, PATH_Z), (6.9, -4.2, PATH_Z), (2.60, -5.30, PATH_Z)]
+    stops = ((k2, f_ch + 1, way2), (k3, f_ch + 6, way3))
     for c, f, way in stops:
         _run_in(c, f, way, speed=3.4)
         c.face(f, (bloom.x, bloom.y, 0.0), ease=5)           # they turn to it as they stop ...
         c.look_at(f + 1, (bloom.x, bloom.y, bloom.z + 0.45), ease=6)     # ... and look up at the flower in the big fist
-    g.look_at(f_ch + 6, (4.40, -6.30, 0.70), ease=12)        # his head lifts from the one child to all of them
+    # (the target is on the camera's side of the children: his face stays above his raised arm for the lens; turned
+    # straight ahead it went behind the arm in the last picture before the match cut)
+    g.look_at(f_ch + 2, (4.40, -7.10, 0.85), ease=12)        # his head lifts from the one child to all of them
     st.use(s, g, kid, k2, k3)
     s.lens(32, 1.6)
     s.move(CAM_A, tuple(AIM_A), CAM_B, tuple(AIM_B), ease="linear")

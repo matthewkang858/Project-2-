@@ -15,7 +15,7 @@ he is a librarian again with new trades; repeat until he offers the Mending book
     learn     I learn again.                close again: his eyes come up from the lectern, and on "learn" the five
                                             green sparkles and the librarian's outfit are there
     loop      He's looking for one word.    one locked framing over Steve's arm, jump cuts in time: break, plain,
-                                            place, green, seven times, 20 frames a cycle down to 5
+                                            place, green, four times (20, 10, 10, 8 frames); then he stops clicking
     mending   Mending.                      stillness: he holds out the enchanted book, the glint moving over it
 
     $BPY -m render oneword --sheet 12 --threads 2
@@ -29,9 +29,10 @@ the five cuts are the first frames of the sentences, and every action a word nam
 hall: "Steve mining", "cell, lectern and floor", "the book") under the hall light of films/lookdev.py shot_hall.
 
 Game truth kept here (engine/fx.py has the class names): a lectern takes 90 frames by hand and the film opens two
-thirds of the way through; breaking it gives crumbs and nothing else; the villager loses his job a moment later
+thirds of the way through; breaking it gives the burst of crumbs; the villager loses his job a moment later
 without any particle; placing has no animation but the player's arm swing; taking the job gives 5 happy_villager
 sparkles and the outfit on the same tick; a villager shows his trade item on his crossed arms.
+Game truth left out: the lectern item that a broken lectern drops (and that Steve would hold to place it again).
 """
 import math
 import sys
@@ -55,13 +56,14 @@ HAND = 90            # fx.break_frames("lectern", "hand"): frames the game needs
 BREAK_LAG = 3        # the lectern bursts this many frames after the word "lectern" appears
 # The loop of shot 5: (frames after "He's", break, plain villager, lectern placed, green + librarian) per cycle, every
 # number counted from the cycle's first frame, which is a jump in time. The first cycle is slow enough to follow,
-# the 2nd, 3rd and 4th start on "for", "one" and "word"; the last three spin on under the held "word".
-LOOP = ((0, 3, 8, 13, 16), (20, 1, 3, 5, 7), (30, 1, 3, 5, 7), (40, 1, 2, 4, 6), (48, 0, 1, 3, 4),
-        (54, 0, 1, 2, 3), (59, 0, 1, 2, 3))
+# the 2nd, 3rd and 4th start on "for", "one" and "word" and are shorter (20, 10, 10, 8 frames: every picture of a
+# cycle stays up at least two frames, so each one still reads as break / forget / place / learn). After the
+# fourth Steve stops clicking, and the shot lands on 16 quiet frames under the held "word" before "Mending".
+LOOP = ((0, 3, 8, 13, 16), (20, 1, 3, 5, 7), (30, 1, 3, 5, 7), (40, 1, 2, 4, 6))
 # fx.emit seeds for the five happy_villager sprites of each "takes the job": in a 1x1 cell about half of them start
 # inside the walls, so each seed was chosen (by projecting the simulated sprites through the shot camera) to show
 # four or five of them, around his head and not across his face
-SPARKLE_SEEDS = dict(learn=143, loop=(1, 18, 36, 35, 20, 40, 11))
+SPARKLE_SEEDS = dict(learn=143, loop=(1, 18, 36, 35))
 
 
 def timing():
@@ -184,6 +186,30 @@ def smash(lec, cracked_from, frame, shot, seed):
     return burst
 
 
+def clear_block(burst, block, frame, until, margin=0.10):
+    """End the crumbs of `burst` that are inside or against `block` when it is put back on `frame`, and those that
+    fall into it on the frames up to `until` (exclusive): they were simulated for the hole, so they would pass
+    through the block that stands there again and stick out of it. The crumbs on the floor around it stay. Returns
+    how many it ended."""
+    x0, y0, z0 = block.cell
+
+    def touches(p, f):
+        loc = list(p["object"].location)
+        for fc in shots.fcurves_of(p["object"]):
+            if fc.data_path == "location":
+                loc[fc.array_index] = fc.evaluate(f)
+        x, y, z = loc[0] - x0, loc[1] - y0, loc[2] - z0
+        return any(b[0] - margin < x < b[3] + margin and b[1] - margin < y < b[4] + margin
+                   and b[2] - margin < z < b[5] + margin for b in block.shape)
+
+    every, end, ended = burst.particles, burst.frame_end, 0
+    for f in range(int(frame), int(until)):
+        burst.particles = [p for p in every if p["first"] <= f < p["last"] and touches(p, f)]
+        ended += burst.stop(f)                               # (Burst.stop ends what is in .particles)
+    burst.particles, burst.frame_end = every, end
+    return ended
+
+
 # ----------------------------------------------------------------------------------------------------
 # 1. "He breaks my lectern."
 # ----------------------------------------------------------------------------------------------------
@@ -243,14 +269,19 @@ def shot_forget(st, s, at, cell):
 # ----------------------------------------------------------------------------------------------------
 
 def shot_place(st, s, at, cell):
-    """The picture of shot 1 again, on a slow push, the cell front empty and a plain villager behind it. Steve looks
+    """The picture of shot 1 again, on a steady push (a third of a block: on 24 mm less than that reads as a locked
+    frame, and it ends tighter on villager and lectern, toward the close-up that follows), the cell front empty and
+    a plain villager behind it. Steve looks
     him over, looks down at the empty place, and on "back" the lectern is there: the game has no placing animation,
     only the arm's use swing, which is furthest forward two frames after it starts. The villager looks down at his
     job block, and Steve up at the villager."""
     f0 = s.frame_start
     lec = cell.lec
     put = at["back"]
-    cam0, cam1 = cell.p(-0.05, 3.93, 1.60), cell.p(-0.12, 3.74, 1.59)    # from where shot 1 ended, a slow push
+    # From where shot 1 ended, a push of 0.35 toward the cell, a touch east and panning with it. (Pushing while
+    # sliding on west, as the slow push did, takes Steve's head out of the safe area once he turns it to the
+    # villager: 67 % inside on frames 146-154 against the 70 % of tools/palette_check; this way 75 % and more.)
+    cam0, cam1 = cell.p(-0.05, 3.93, 1.60), cell.p(0.02, 3.59, 1.60)
     lib = cell.librarian(s, cam0)
     steve = cell.player(s, look=lib)                         # (the librarian is placed first: Steve looks at where he is)
     steve.idle(f0, put - 4, seed=2)                          # (breathing; over before the swing reads his pose)
@@ -261,7 +292,7 @@ def shot_place(st, s, at, cell):
     steve.look_at(put + 9, lib, ease=8)                      # ... and Steve watches him (the swing is over by then)
     cell.neighbours(s)
     s.lens(24, 3.4)
-    s.move(cam0, cell.p(0.40, 0.80, 1.10), cam1, cell.p(0.36, 0.80, 1.10), ease="linear")
+    s.move(cam0, cell.p(0.40, 0.80, 1.10), cam1, cell.p(0.45, 0.80, 1.10), ease="linear")
     s.focus(lec.object)
     s.handheld(0.006, seed=11)
     st.hero(s, "librarian", *lib.heads)
@@ -295,12 +326,14 @@ def shot_learn(st, s, at, cell):
 # ----------------------------------------------------------------------------------------------------
 
 def shot_loop(st, s, at, cell):
-    """The loop, on ONE locked framing: over Steve's arm, the lectern and the librarian's face. Seven times the
+    """The loop, on ONE locked framing: over Steve's arm, the lectern and the librarian's face. Four times the
     lectern bursts, the hat is gone, the lectern is back, green sparkles and the hat again; every cycle starts with
-    a jump in time (the particles of the cycle before are stopped there) and they get shorter: 20, 10, 10, 8, 6, 5,
-    5 frames. The 2nd, 3rd and 4th start on "for", "one" and "word". The first cycle plays in one piece; from the
+    a jump in time (the particles of the cycle before are stopped there) and they get shorter: 20, 10, 10, 8
+    frames, the 2nd, 3rd and 4th starting on "for", "one" and "word". The first cycle plays in one piece; from the
     second on each is two pictures, "gone" (crumbs, no hat) and "back" (lectern, sparkles, hat), with a second jump
-    between them, and Steve's arm does not stop any more."""
+    between them, and Steve's arm does not stop. After the fourth placing it does: the arm comes to rest, he looks
+    up at the librarian, and the last sparkles drift over 16 quiet frames. He has stopped clicking, and the cut
+    says why."""
     f0, f1 = s.frame_start, s.frame_end
     lec = cell.lec
     cam = cell.p(0.05, 3.95, 1.60)
@@ -309,7 +342,10 @@ def shot_loop(st, s, at, cell):
     first = LOOP[0]
     fx.mining_swings(steve, f0 - 14, f0 + first[1] - 2)      # cycle 1: he is mining as the shot opens ...
     fx.arm_swings(steve, [f0 + first[3] - 2])                # ... one use swing puts it back ...
-    fx.mining_swings(steve, f0 + LOOP[1][0] - 3, f1 + 1)     # ... and from then on he does not stop clicking
+    last = f0 + LOOP[-1][0] + LOOP[-1][3]                    # the frame the lectern is put back for the last time
+    fx.mining_swings(steve, f0 + LOOP[1][0] - 3, last - 2)   # ... and from then on he clicks without a pause ...
+    steve.look_at(last + 8, lib, ease=7)                     # ... until that placing (the arm is at rest 9 frames
+                                                             # after the span): then he looks at what he has got
     for n, (start, brk, plain, put, green) in enumerate(LOOP):
         j = f0 + start
         fx.stop_particles(j)                                 # a jump in time: nothing of the cycle before hangs on
@@ -318,6 +354,9 @@ def shot_loop(st, s, at, cell):
         fx.place_block(lec, j + put)
         if n:                                                # the fast cycles jump again here: "gone" / "back", and
             crumbs.stop(j + put)                             # no crumbs fly across the lectern that is back
+        else:                                                # the first plays in one piece: the crumbs on the floor
+            nxt = f0 + LOOP[1][0] if len(LOOP) > 1 else f1 + 1   # go on settling, those in the lectern's place end
+            clear_block(crumbs, lec, j + put, nxt)
         lib.gain_profession(j + green, "librarian", camera=s, seed=SPARKLE_SEEDS["loop"][n])
     cell.neighbours(s)
     s.lens(35, 3.4)
@@ -340,6 +379,10 @@ def shot_mending(st, s, at, cell):
     back = 0.22
     cam0, cam1 = cell.p(0.45, 3.20, 1.95), cell.p(0.42, 3.03, 1.95)
     fx.stop_particles(f0)                                    # later in the story: no sparkles left over
+    # The lone iron-bars post two cells above the lectern ends at z 2.0, the height of his hat: from this camera
+    # (1.95) it stands on the hat like an antenna, wherever the lens goes sideways. Taken out for this shot only.
+    lec = cell.lec.cell
+    fx.extract_block(st.v, (lec[0], lec[1], lec[2] + 2)).show(f0, False)
     lib = cell.librarian(s, cam0, back=back, seed=9)
     book = fx.hold_out(lib, "enchanted_book", f0, f1 + 1, enchanted=True)
     stamp_every_frame(book)                                  # (its material carries the scrolling glint)
@@ -390,6 +433,9 @@ def plan():
         nxt = at["hes"] + LOOP[n + 1][0] if n + 1 < len(LOOP) else at["mending"]
         print("  loop %d: jump %d (%2d frames)  break %d  plain %d  placed %d  green %d"
               % (n + 1, j, nxt - j, j + brk, j + plain, j + put, j + green))
+    last = at["hes"] + LOOP[-1][0] + LOOP[-1][3]
+    print("  after the placing on frame %d Steve stops: last swing requested by frame %d, he looks up from frame %d, "
+          "cut on frame %d" % (last, last - 2, last + 8, at["mending"]))
     return 0
 
 

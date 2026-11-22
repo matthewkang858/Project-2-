@@ -90,7 +90,8 @@ def shot_watch(st, s, clock):
     # ten frames later, his eyes going past the lens and down the street
     g.look_at(f0 + 2, (23.0, -2.45, 1.80), ease=fe + 10 - f0 - 2)
     s.lens(40, 2.8)
-    s.move((19.45, -0.32, 1.55), (15.6, 0.47, 1.90), (19.15, -0.26, 1.57), (15.6, 0.47, 1.93), ease="ease_out")
+    # (linear: an eased-out push was a freeze frame for the last half second before the cut to the day)
+    s.move((19.45, -0.32, 1.55), (15.6, 0.47, 1.90), (19.15, -0.26, 1.57), (15.6, 0.47, 1.93), ease="linear")
     s.focus(g.head)
     s.handheld(0.008, seed=43)
     st.use(s, g)
