@@ -2,13 +2,14 @@
 
     "When the bell rings, / we run home. / We count who made it. / He rings it because he likes the sound."
 
-    1 bell      the village bell swinging on its bar, close (already swinging on frame 1, rung again on "rings")
+    1 bell      the village bell swinging on its bar, close: an alarm, rung on a steady beat that lands on "rings"
     2 run       villagers sprint across the square for house_a's door, the camera running backwards ahead of them
-    3 interior  inside house_a: the last one is in, the door swings shut, heads turn to the one empty (red) bed
+    3 interior  inside house_a: the last one is in, the door swings shut (in focus), heads turn to the one empty bed
     4 steve     Steve alone in the empty square, ringing the bell again and again
 
     $BPY -m render bell --sheet 12
-    $BPY -m render bell --still 1.7083,2.75,5.5834,9.75 --res 720x1280 --samples 24 --zones --captioned
+    $BPY -m render bell --still 1.7083,2.75,4.125,5.5834,9.75 --res 720x1280 --samples 24 --zones --captioned
+                                                  # (4.125 = the door of shot 3 half shut; 5.5834 = the empty bed)
     $BPY -m render bell --frames all --step 2 --res 360x640 --samples 8 --max-seconds 240      # preview, resumable
 
 The film is planned from the captions outward: CLOCK below is the whole timing, in frames. Every word starts on a
@@ -30,7 +31,7 @@ SCRIPT = "When the bell rings, we run home. We count who made it. He rings it be
 
 # the caption clock, in frames (24 fps): first word, every word, extra hold after a comma / after a sentence, and
 # how long the last picture stays once the last word has gone
-CLOCK = dict(start=3, word=11, comma=4, period=8, tail=20)
+CLOCK = dict(start=3, word=11, comma=4, period=8, tail=24)
 
 SKY = dict(preset="dusk", az=187.0, el=5.0, bloom=1.3, grade="warm")     # the look-dev dusk, unchanged
 BEDS = {"house_a_bed_2": "red"}            # the bed nobody came home to: the red one everybody knows
@@ -38,16 +39,19 @@ BEDS = {"house_a_bed_2": "red"}            # the bed nobody came home to: the re
 RUN = characters.RUN_SPEED / FPS           # blocks per frame of a sprinting villager
 
 # the people who live in house_a: name, profession, sideways offset on the square (+ = north), frames behind the
-# farmer in the run, make_villager arguments
+# farmer in the run, make_villager arguments. (The shepherd runs wide on the north side: at 0.6 / 17 frames he was
+# behind the farmer's body for the whole shot, and then came from nowhere as the last one in.)
 FAMILY = [("ada", "farmer", 0.0, 0, {}), ("kid", "farmer", 0.85, 5, dict(child=True)),
-          ("bo", "librarian", -0.8, 9, {}), ("cy", "shepherd", 0.6, 17, {})]
+          ("bo", "librarian", -0.8, 9, {}), ("cy", "shepherd", 1.5, 13, {})]
 
 
 def timing():
     """The captions and the cut frames they imply: (captions, {word index: frame}, [frame count of each shot])."""
     c = CLOCK
-    caps = captions.autotime(SCRIPT, start=c["start"] / FPS, per_word=c["word"] / FPS, comma=c["comma"] / FPS,
-                             period=c["period"] / FPS)
+    # (a quarter frame early: autotime rounds its times to 4 decimals and a frame shows the word whose t0 <= its
+    # own time, so a start such as 1.0417 s, rounded UP past frame 26, came on one frame late)
+    caps = captions.autotime(SCRIPT, start=(c["start"] - 0.25) / FPS, per_word=c["word"] / FPS,
+                             comma=c["comma"] / FPS, period=c["period"] / FPS)
     frame = {i: int(round(t0 * FPS)) + 1 for i, (_w, t0, _t1) in enumerate(caps)}
     words = [w for w, _a, _b in caps]
     cuts = [frame[words.index("we")], frame[words.index("We")], frame[words.index("He")]]
@@ -112,13 +116,15 @@ def _run_path(v, base, side, back):
 # ----------------------------------------------------------------------------------------------------
 
 def shot_bell(st, s, at):
-    """The bell, close, on the long lens of the look-dev (seen from the south-east, the west lamp its key). It was
-    rung three frames before the film starts, so frame 1 is already on its way up to the top of the first swing; it
-    swings out, and is rung again, hard, on the frame the word "rings" appears."""
+    """The bell, close, on the long lens of the look-dev (seen from the south-east, the west lamp its key). It is
+    an alarm: rung on the 22-frame beat Steve keeps in the last shot, the third hit on the frame the word "rings"
+    appears. The first hit was 8 frames before the film starts, so frame 1 is high in its swing and moving, and the
+    swing never dies away (13-17 degrees throughout)."""
     v, A = st.v, st.v.anchors
     f0 = s.frame_start
-    ring(v, f0 - 3)
-    ring(v, at["rings"])
+    beat = 2 * CLOCK["word"]
+    for k in (2, 1, 0):
+        ring(v, at["rings"] - k * beat)
     bell = A["bell"]
     s.lens(105, 1.4)
     s.move((1.06, -9.50, 0.915), up(bell, -0.13), (0.93, -9.10, 0.94), ease="ease_out")     # a slow push-in
@@ -154,23 +160,27 @@ def shot_run(st, s, at):
         st.use(s, c)
         lead = lead or c
     cast = st.cast
-    # panic is in the heads: the child looks up at the farmer as they go, the librarian throws a look back at the bell
+    # panic is in the heads: the child looks up at the farmer as they go, the librarian throws a glance across at him
+    # (26 degrees: at 52 his face went behind the farmer's shoulder and he was a red hat on a blank pink box)
     cast["kid"].look_at(f0 + 2, lead, ease=5)
     cast["kid"].look_at(at["home"] - 3, None, ease=5)
-    cast["bo"].look_at(at["run"] - 5, _aside(cast["bo"], at["run"], 52.0), ease=5)
+    cast["bo"].look_at(at["run"] - 5, _aside(cast["bo"], at["run"], 26.0), ease=5)
     cast["bo"].look_at(at["run"] + 9, None, ease=5)
     for f in (at["rings"] + 24, at["rings"] + 48):          # the bell is still being rung behind them
         ring(v, f)
     v.door_open("house_a", f1 - 1, open=True, frames=1)     # (behind the camera) open for the next shot
     a, b = lead.pos_at(f0), lead.pos_at(f1 + 1)             # the farmer when the shot starts and when it ends
     s.lens(24, 2.8)
+    # (the aim sinks a little as they close in: the child's face stays clear of the caption band to the last frame)
     s.move((a.x + 4.3, a.y - 0.62, 0.30), (a.x - 2.7, a.y + 0.82, 1.30),
-           (b.x + 2.05, b.y - 0.50, 0.36), (b.x - 2.64, b.y + 0.87, 1.45), ease="linear")
+           (b.x + 2.05, b.y - 0.50, 0.36), (b.x - 2.64, b.y + 0.87, 1.25), ease="linear")
     s.focus(lead.head)
     s.handheld(0.02, seed=5)
     st.hero(s, "lead villager", lead)
+    # the torches by the door they run for light their faces (x 3, not the look-dev's 4: with 4 the lit stone sat
+    # exactly on the palette limit, G/R 0.920, and passed or failed with the sampling noise)
     st.lights(s, scale=1.4, groups={"house_a": 2.0}, near=A["square_center"], radius=24.0,
-              extra=[((9.7, -7.5, 2.9), 4.0)])               # the torches by the door they run for light their faces
+              extra=[((9.7, -7.5, 2.9), 3.0)])
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -180,15 +190,18 @@ def shot_run(st, s, at):
 def shot_interior(st, s, at):
     """Inside house_a, over the pillow of the one bed nobody came home to (the look-dev composition: empty bed in
     front, faces above it, the door in the far wall). The shepherd, last in the run, is two steps inside and the
-    door swings shut behind him on the lamps of the square; the others look round toward it, then at each other
-    ("count"), and one after another at the empty bed ("who made it"), where the camera follows their eyes."""
+    door swings shut behind him on the lamps of the square: the shot opens FOCUSED on the open doorway, the door
+    shuts in focus once he is clear of it, and the focus comes forward to the faces as they turn from it, to each
+    other ("count") and one after another to the empty bed ("who made it"), where the camera follows their eyes."""
     v, A = st.v, st.v.anchors
     f0, f1 = s.frame_start, s.frame_end
     bed = v.beds["house_a_bed_2"]                            # the north bed: foot toward the room, pillow at the east wall
     head, foot = bed["head"], bed["foot"]
     door = A["house_a_door"]
     st.see_through(s, "house_a_east")
-    ada, bo, cy = st.actor("ada", "farmer"), st.actor("bo", "librarian"), st.actor("cy", "shepherd")
+    # (the shepherd here is a twin of the one in the run: the twin can be pre-rolled, so that on the first frame he
+    # is leaning and mid-stride, not an upright figure sliding in at sprint speed)
+    ada, bo, cy = st.actor("ada", "farmer"), st.actor("bo", "librarian"), st.actor("cy_in", "shepherd")
     kid = st.actor("kid", "farmer", child=True)
     pillow = (head[0] + 0.1, head[1], head[2] + 0.1)
     # (everybody ran in the previous shot, so nothing here may be keyed before f0: a pre-roll would cut that run short)
@@ -200,12 +213,18 @@ def shot_interior(st, s, at):
     # doorway and the door are in the clear) and runs on to join the others on the right
     way = [(12.3, -8.3, 1.0), (13.2, -8.95, 1.0), (15.3, -9.0, 1.0), (15.9, -8.80, 1.0)]
     stop = (16.3, -8.65, 1.0)
-    cy.place(f0, way[0], yaw_to(way[0], way[1]))
-    arrive = cy.walk(f0, way, run=True)
+    pre = 6                                                  # frames of run before the cut
+    dx, dy = way[1][0] - way[0][0], way[1][1] - way[0][1]
+    d = math.hypot(dx, dy)
+    start = (way[0][0] - dx / d * pre * RUN, way[0][1] - dy / d * pre * RUN, way[0][2])
+    cy.place(f0 - pre, start, yaw_to(start, way[0]))
+    arrive = cy.walk(f0 - pre, [start] + way, run=True)
     arrive = cy.walk(arrive, [stop], speed=2.4, from_current=True)       # two short steps to a stop
     cy.face(arrive, pillow, ease=6)
     st.walks["cy_in"] = way + [stop]
-    v.door_open("house_a", f0 + 2, open=False, frames=8)     # ... and the door swings shut behind him
+    # ... and the door swings shut behind him: frames f0+5 .. f0+12, shut as "count" appears. (Not earlier: for the
+    # first three frames after the cut he is in front of the opening; not later: he runs across it again from f0+17.)
+    v.door_open("house_a", f0 + 5, open=False, frames=7)
 
     # "We": heads round toward the door (their left, the right of the frame), as far as a face still reads
     bo.look_at(f0, _aside(bo, f0, 50.0), ease=0)
@@ -214,19 +233,19 @@ def shot_interior(st, s, at):
     for i, (c, pos) in enumerate(spots):
         c.shiver(f0, f1 + 1, seed=i)
     cy.shiver(arrive + 6, f1 + 1, seed=5)
-    # "count": at each other
-    n = at["count"]
-    bo.look_at(n, _aside(bo, n, -48.0, dz=-0.1), ease=6)     # toward the farmer beside him
+    # "count": the door is shut, and the heads leave it for each other (long eases: a head that swings 98 degrees
+    # in 6 frames is twice as fast as the game turns one, and a smear exactly while the word is read)
+    n = at["count"] + 2
+    bo.look_at(n, _aside(bo, n, -48.0, dz=-0.1), ease=10)    # toward the farmer beside him
     ada.look_at(n + 2, bo, ease=6)
-    kid.look_at(n + 4, _aside(kid, n, -40.0, dz=0.9), ease=5)
+    kid.look_at(n + 4, _aside(kid, n, -40.0, dz=0.9), ease=8)
     # "who": one after another, at the empty bed
     n = at["who"]
-    ada.look_at(n, pillow, ease=6)
-    bo.look_at(n + 3, pillow, ease=7)
-    kid.look_at(n + 6, pillow, ease=6)
+    ada.look_at(n + 1, pillow, ease=7)
+    bo.look_at(n + 5, pillow, ease=8)
+    kid.look_at(n + 8, pillow, ease=7)
     cy.look_at(max(arrive + 6, at["made"]), pillow, ease=6)
-    # "it": the child looks up at the librarian again; nobody looks back
-    kid.look_at(at["it"] + 2, _aside(kid, f0, 28.0, dz=1.3), ease=6)
+    # "it": nobody looks up again. (The child's look up at the librarian turned what shows of his face away.)
 
     st.use(s, ada, bo, cy, kid)
     # the look-dev frame while the door shuts; then the camera eases back and down with their eyes, onto the bed:
@@ -235,13 +254,17 @@ def shot_interior(st, s, at):
     cam1 = (head[0] + 1.32, head[1] + 0.00, 2.50)
     s.lens(26, 2.6)
     s.move(cam0, (foot[0] - 2.8, foot[1] + 0.04, 1.74), cam1, (foot[0] - 2.8, foot[1] + 0.04, 1.05))
-    s.focus(bo.head)
+    # the doorway is small in this frame and 8 blocks off: it is seen shutting only if it is what is sharp. The
+    # focus starts on it and comes forward to the librarian over frames f0+9 .. f0+17, as the door meets its frame
+    s.focus((door[0] + 0.3, door[1], door[2]))
+    s.focus(bo.head, at_s=s.start_s + 9 / float(FPS), rack_s=8 / float(FPS))
     s.handheld(0.008, seed=7)
     st.hero(s, "librarian", bo)
     st.hero(s, "farmer", ada)
     # (the room as in the look-dev; the lamps of the square stay on too: they are what the doorway shows until it shuts)
+    # (and the torch outside the door x 4, as bright as the run shot had it: the door shuts on warm light)
     st.lights(s, scale=1.2, groups={"house_a": 1.5, "bell_e": 2.5, "bell_w": 2.5}, near=door, radius=16.0,
-              inside="house_a")
+              inside="house_a", extra=[((9.7, -7.5, 2.9), 4.0)])
 
 
 # ----------------------------------------------------------------------------------------------------

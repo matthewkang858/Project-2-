@@ -9,16 +9,17 @@
 
 The timeline is planned from the captions outward: captions.autotime gives every word its time, the cuts sit where
 a sentence's first word starts (so the pause after a sentence is the last breath of its picture and no word
-straddles a cut), and every action that a word names is keyed from that word's frame (Plan.word).
+straddles a cut), and every action that a word names is keyed from that word's frame (Plan.frame).
 
     shot       words                          picture
-    villager   Everyone here has              the farmer walks past the big house's wall (reference 2)
-    smith      a job.                         the weaponsmith at his grindstone, the forge behind him
+    villager   Everyone here has              the farmer strolls past the big house's wall (reference 2)
+    smith      a job.                         the weaponsmith at his grindstone, the wheel side-on to the lens
     nitwit     I don't.                       the nitwit alone at the village edge; his head sinks on "don't"
     trade      He never trades with me.       Steve holds an emerald out to the farmer; on "me" the focus pulls to
                                               the nitwit, who has been watching from the wheat behind them
-    hall       He never locked me in a box.   the trading hall: the camera rides along the counter and ends on the
-                                              nearest caged face on "box"
+    hall       He never locked me in a box.   the trading hall: the camera rides along the counter, past the
+                                              fletcher, and stops on the toolsmith's caged face on "box"; in the
+                                              pause after it his eyes sink
     meadow     I'm the only one still free.   the nitwit walks out the exit road into the meadow, toward the sun;
                                               the camera lets him go and comes to rest
 
@@ -101,34 +102,38 @@ def shot_villager(st, s, plan):
 
 
 def shot_smith(st, s, plan):
-    """The weaponsmith at his grindstone under the forge roof: seen from the steps in front of the porch, a little
-    below his eyes, the grindstone big and soft in the foreground, the forge wall and the lava's glow behind him.
-    He is bent over the stone and works it: the folded arms jolt, the head dips with each stroke."""
+    """The weaponsmith at his grindstone under the forge roof, seen from the east end of the porch, a little below
+    his eyes. The wheel's SIDE faces the lens (stone disc, dark-oak pivot and leg), big and soft in the foreground:
+    seen on its rolling face, as from the steps, the job block was a grey slab. He stands west of the stone, bent
+    over it, the mossy cobblestone house and its window behind him, and works it: the folded arms jolt, the head
+    dips with each stroke."""
     v, A = st.v, st.v.anchors
     f0, f1 = s.frame_start, s.frame_end
     smith = st.actor("sam", "weaponsmith")
-    spot, stone = A["smithy_work"], A["smithy_station"]
-    smith.place(f0 - 12, spot, v.yaws["smithy_work"])
-    smith.look_at(f0 - 12, (stone[0], stone[1] - 0.9, stone[2] + 0.3), ease=0)   # eyes on the far rim of the stone
+    stone = A["smithy_station"]
+    spot = (17.45, 5.5, 1.0)                                 # on the porch floor, west of the stone
+    smith.place(f0 - 12, spot, yaw_to(spot, stone))
+    smith.look_at(f0 - 12, (stone[0] + 0.9, stone[1], stone[2] + 0.3), ease=0)   # eyes on the far rim of the stone
     for f in (f0 - 6, f0 + 6, f0 + 18):                      # a stroke every half second, one across the cut
         smith.swing_arm(f)
     st.use(s, smith)
-    s.lens(40, 2.8)
-    s.move((19.57, 3.50, 2.05), (18.52, 6.5, 2.30), (19.36, 3.92, 2.09))      # a slow push, half a block
+    s.lens(40, 4.0)
+    s.move((20.9, 5.9, 2.05), (17.5, 5.55, 2.15), (20.5, 5.85, 2.09))         # a slow push, less than half a block
     s.focus(smith.head)
     s.handheld(0.01, seed=41)
     st.hero(s, "smith", smith)
-    # The forge's lava is an emissive surface and lit the whole porch a saturated orange (cobblestone G/R 0.89, under
-    # the 0.92 of tools/palette_check): the look keeps block light pale so that textures stay on the game's palette,
-    # and the torches follow that rule. So the lava still glows for the camera but no longer lights diffuse surfaces
-    # (it is seen in no other shot); the pale torch on the house wall, east of the porch, is the warm key instead.
+    # The forge's lava is an emissive surface (strength 3) and lit the whole porch a saturated orange: cobblestone
+    # G/R 0.89, under the 0.92 of tools/palette_check. The look keeps block light pale so that textures stay on the
+    # game's palette. The lava itself is out of this shot's frame and is in no other, so this film turns its emission
+    # down to a third (a change to this scene's material, not to the set), and the stone stays stone: with the forge
+    # torches at 2.4 as the key on his face, lit cobblestone measures G/R 0.94-0.95.
     for ob in v.objects:
         if "lava" in ob.name:
             for mat in ob.data.materials:
                 for node in mat.node_tree.nodes:
                     if node.type == "BSDF_PRINCIPLED":
                         node.inputs["Emission Strength"].default_value = LAVA_GLOW
-    st.lights(s, scale=1.0, groups={"smithy": 1.6}, near=spot, radius=14.0)
+    st.lights(s, scale=1.0, groups={"smithy": 2.4}, near=spot, radius=14.0)
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -172,9 +177,11 @@ def shot_nitwit(st, s, plan):
 
 def shot_trade(st, s, plan):
     """Steve holds an emerald out to the farmer, who stands in his wheat beside his composter; over Steve's shoulder
-    (look-dev set-up 'trade'). The arm comes up with the emerald, the farmer looks at it and nods. The camera slides
-    to the right all the while, which brings the nitwit out from behind the farmer's head: he stands on the path
-    through the wheat and watches. On "me" the focus pulls to him and he looks down."""
+    (look-dev set-up 'trade'). The arm is on its last way up with the emerald as the shot starts; the farmer, eyes on
+    Steve, gives the little jolt of a villager who takes an offer. The camera slides half a block to the right and
+    sinks a little, fast at first and coming to rest, which brings the nitwit out from behind the farmer's head and
+    under his hat brim well before his word: he stands on the log path through the wheat and watches. During "with"
+    the focus pulls to him, so that he is sharp when "me" appears, and then he looks down."""
     v, A = st.v, st.v.anchors
     f0, f1 = s.frame_start, s.frame_end
     farmer = st.actor("ada", "farmer")
@@ -185,12 +192,15 @@ def shot_trade(st, s, plan):
     fpos = A["farm_work"]
     spos = (fpos[0] + 1.0, fpos[1], 1.0)                     # on the farm's log frame, east of the farmer
     npos = (-16.5, -9.2, 1.0)                                # on the log path between the two fields, 6 blocks behind
-    steve.place(f0, spos, yaw_to(spos, fpos))
+    # Steve is new to the film, so he may start before the cut: 6 frames earlier the arm is at 40 degrees on the
+    # first frame and at 55 four frames later. Raised from hanging IN the shot, the emerald spent its first 6 frames
+    # behind the caption, in the composter's side and in the farmer's folded arms.
+    steve.place(f0 - 6, spos, yaw_to(spos, fpos))
     farmer.place(f0, fpos, yaw_to(fpos, spos))               # (everybody is placed before anybody looks at anybody)
     nit.place(f0, npos, yaw_to(npos, spos))                  # (he was in the previous shot: nothing keyed before f0)
     steve.look_at(f0, farmer, ease=0)
-    steve.idle(f0, f1 + 1, seed=2)
-    steve.raise_arm(f0 + 1, angle=55, ease=9)                # the hand comes up and stops between them, at his chest
+    steve.idle(f0 - 6, f1 + 1, seed=2)                       # (from the same frame: an idle that starts later
+    steve.raise_arm(f0 - 5, angle=55, ease=9)                #  pulls the arm down again) ... the hand stops at his chest
     farmer.look_at(f0, steve, ease=0)
     farmer.idle(f0, f1 + 1, seed=6)
     # (the farmer keeps his eyes on Steve: a nod, or a look down at the emerald, and a camera at his eye height
@@ -198,7 +208,7 @@ def shot_trade(st, s, plan):
     farmer.swing_arm(plan.frame("trades") + 2)               # the little jolt of a villager who takes the offer
     nit.look_at(f0, steve, ease=0)
     f_me = plan.frame("me", 0)
-    nit.look_at(f_me + 7, (npos[0] + 2.2, npos[1] + 1.6, 1.3), ease=11)     # nobody holds anything out to him
+    nit.look_at(f_me + 5, (npos[0] + 2.2, npos[1] + 1.6, 1.3), ease=11)     # nobody holds anything out to him
     st.use(s, farmer, steve, nit)
     s.lens(50, 3.4)
     right = (-0.662, 0.749)                                  # the camera's right, in the ground plane
@@ -206,9 +216,9 @@ def shot_trade(st, s, plan):
     k, p = 0.50, 0.15                                        # half a block to the right and 0.2 down: the farmer's
     cam1 = (cam0[0] + k * right[0], cam0[1] + k * right[1], cam0[2] - 0.20)   # hat brim rises clear of the nitwit
     aim1 = (aim0[0] + p * right[0], aim0[1] + p * right[1], aim0[2])
-    s.move(cam0, aim0, cam1, aim1)
+    s.move(cam0, aim0, cam1, aim1, ease="ease_out")          # (he is clear of the farmer's head by "with")
     s.focus(farmer.head)
-    s.focus(nit.head, at_s=plan.start(plan.index("me", 0)) - 0.125, rack_s=0.4)
+    s.focus(nit.head, at_s=plan.start(plan.index("me", 0)) - 0.375, rack_s=0.4)   # on him one frame into "me"
     s.handheld(0.01, seed=17)
     st.hero(s, "emerald", steve.held)
     st.hero(s, "farmer", farmer)
@@ -222,9 +232,10 @@ def shot_trade(st, s, plan):
 
 def shot_hall(st, s, plan):
     """The trading hall: villagers shut in a row of 1x1 cells behind their job blocks (look-dev set-up 'hall'). The
-    camera rides east along the counter, a hand from the cell fronts at their eye height, 25 degrees off the row,
-    and arrives 2.65 blocks short of the toolsmith as "box" comes up: his face a third of the frame, clear in
-    its window. Every head follows the camera."""
+    camera rides east along the counter, a hand from the cell fronts at their eye height, 25 degrees off the row:
+    it starts beside the fletcher, who slides out of the right edge, and slows to a stop 2.65 blocks short of the
+    toolsmith as "box" comes up: his face a third of the frame, clear in its window, the row lined up behind him.
+    Every head follows the camera; in the pause after "box", with the camera at rest, the toolsmith's eyes sink."""
     v, A = st.v, st.v.anchors
     f0, f1 = s.frame_start, s.frame_end
     first = 3                                                  # the nearest of the faces: cell 3 (the toolsmith)
@@ -244,6 +255,8 @@ def shot_hall(st, s, plan):
         c.idle(f0, f1 + 1, seed=20 + i)                      # (breathing arms, weight shifts)
         c.track(f0, f1 + 1, s.camera, step=6, ease=6)        # ... and their heads follow him
         cells.append(c)
+    # (10 degrees down over 10 frames, held: brow, eyes and nose stay in view; look_at ends his track)
+    cells[first - 1].look_at(plan.frame("box") + 8, (cam1[0], cam1[1], 1.05), ease=10)
     st.use(s, *cells)
     s.focus(cells[first - 1].head)
     s.handheld(0.006, seed=19)
@@ -273,12 +286,16 @@ def shot_meadow(st, s, plan):
     nit.look_at(f_free - 8, (there.x - 6.0, there.y + 0.9, 4.2), ease=14)   # ... and up, at the open sky; held
     st.use(s, nit)
     s.lens(28, 3.2)
-    # on the plant-free verge west of the road (village.CAMERA_LANE). The offset grows as time squared by 0.8 x the
-    # shot's length x his speed: the camera starts at his pace and is standing still on the last frame.
+    # on the plant-free verge west of the road (village.CAMERA_LANE). The camera's distance behind him grows as time
+    # squared, by half his walking speed (1.6 blocks a second) x the shot's length in all: it starts at his pace
+    # and is standing still on the last frame.
     back = 0.5 * 1.6 * (s.end_s - s.start_s)
     # (aimed a quarter block lower than the look-dev still: he stands 5 % higher in the frame and the caption lies
     # across his legs and his shadow, not across the green robe)
-    s.follow(nit.root, (-2.62, -3.12, 0.78), (-2.95, -3.12 - back, 0.72), look_offset=(0.50, 0.30, 1.52),
+    # (the end offset is 0.3 to the right of the start, not to the left as in the look-dev still: drifting left
+    # brought a far oak's canopy up behind his head for the final hold, green on green. So he stays between the two
+    # oaks, against the sky, to the last frame.)
+    s.follow(nit.root, (-2.62, -3.12, 0.78), (-2.3, -3.12 - back, 0.72), look_offset=(0.50, 0.30, 1.52),
              ease="ease_in")
     s.focus(nit.head)
     s.handheld(0.012, seed=23)
@@ -287,7 +304,7 @@ def shot_meadow(st, s, plan):
 
 
 SHOTS = (
-    # name, builder, index of the caption word the shot starts on
+    # name, builder, the caption word the shot starts on (a word, or (word, n) for its n-th occurrence, from 0)
     ("villager", shot_villager, "everyone"),
     ("smith", shot_smith, "a"),
     ("nitwit", shot_nitwit, "i"),
