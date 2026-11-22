@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 assets/tex/
 assets/mc/
+# The finished films (out/<film>.mp4) are the deliverable, a few MB each: deliberately NOT ignored.
+# Everything else under out/ is reproducible from the scripts and stays out of the repository.

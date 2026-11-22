@@ -50,6 +50,10 @@ model with the real ones.
   so Minecraft north (-z) is Blender +Y. Ground surface is at Blender z = 0 in the village square.
 - 24 fps. Final frames render at 720x1280 and are upscaled to 1080x1920 in post; captions are drawn at 1080x1920.
 - Characters stand with feet at their root empty, facing **-Y** at yaw 0. Yaw is rotation about Z in radians.
+- Motion blur: shutter 0.5 frame, opening ON the frame (`motion_blur_position = 'START'`), so frame f is exposed
+  over [f, f+0.5]. Anything that jumps for frame f (a cut) must be keyed strictly inside **(f-0.5, f]**: integer-frame
+  CONSTANT keys are fine (cameras, lights, visibility), and `characters` keys its cuts at f-0.25. A cut keyed at
+  exactly f-0.5 is sampled by frame f-1 and turns the character into a ghost on the last frame before the cut.
 - All textures use Closest filtering (`pix.pixel_material` or equivalent). Animated textures (.mcmeta strips):
   use the first frame. Biome tint: plains (grass about #91BD59, foliage about #77AB2F; or sample
   `textures/colormap/*.png` properly). Seed every random generator.
@@ -89,7 +93,8 @@ Notes: vanilla plains buildings are lit with torches/wall torches; town centres 
 ### Role SET owns `engine/mcassets.py`, `engine/blocks.py`, `engine/props.py`, `engine/village.py`, `tools/`
 
 ```python
-# mcassets.py — the only place that reads assets/mc
+# mcassets.py — the only place that reads assets/mc (look, characters and captions go through texture_array /
+#               texture_meta / list_textures; captions alone falls back to the same PNG when bpy is not importable)
 texture(path) -> bpy.types.Image            # e.g. texture('block/oak_planks'), texture('entity/villager/villager'); first frame of animated strips
 material(path, tint=None, alpha=..., emission=0.0) -> Material     # cached, Closest filtering
 resolve_blockstate(block_id, props) -> list[ModelPart]             # variants AND multipart, with x/y rotations and uvlock
@@ -107,15 +112,20 @@ class World:                                # block states in BLENDER grid coord
         # real models for every block: cubes, stairs, slabs, fences, panes, doors, trapdoors, torches, lanterns, beds,
         # crops, cross plants, lectern, composter, bell frame ...; cullface between opaque full cubes; correct UVs,
         # per-face rotation and tint; cut-out alpha for plants/glass/doors. `skip` = positions built as separate props.
+        # Elements with "shade_direction_override": "up" (cross plants, crops, torches, lanterns ...) are lit like
+        # an up-facing surface from every side, as in the game (up normals + a two-sided material for the
+        # zero-thickness ones): a backlit plant is grass-green, not black.
 
 # props.py — separately animatable things, built from the same real models/textures
 make_bell(attachment="floor", facing="north") -> Object     # pivot at the hinge; rotate about local X to swing (bell body uses entity/bell/bell_body.png)
 make_door(block_id="oak_door", hinge="left") -> Object      # hinge pivot; rotate about Z to open; both halves
 make_item(item_id) -> Object                                # same as mcassets.item_object
-make_light(kind="torch"|"lantern") -> Object                # warm point light sized for that block
+make_light(kind="torch"|"lantern") -> Object                # warm point light sized for that block (near field flattened:
+                                                            #   the block a torch sits on keeps its texture); kind "fill" =
+                                                            #   the weak cool shadowless room fill of filmed interiors
 
 # village.py
-def build_village(scene, seed=1) -> Village: ...
+def build_village(scene, seed=1, bed_colors=None) -> Village: ...   # bed_colors e.g. {"house_a_bed_2": "red"}: default = vanilla (white)
 class Village:
     world: World
     collection: bpy.types.Collection
@@ -143,9 +153,13 @@ with vanilla-shaped oak trees, short grass, poppies and dandelions; every buildi
    (`library_work`), a vanilla smith (tool smith / weaponsmith / armorer) (`smithy_work`). Each anchor is where
    a villager stands facing the station; also `<name>_station`.
 4. **Trading hall**: a player-built structure in the classic survival style (stone bricks / oak, six 1x1 cells
-   side by side, each with its workstation block in front, trapdoors/slabs keeping the villager in, lanterns),
-   with an aisle a camera can dolly along. Anchors `cell_1..6`, `hall_aisle_start`, `hall_aisle_end`.
+   side by side, each with its workstation block in front, iron bars above it and between the cells keeping the
+   villager in, hanging lanterns), with an aisle a camera can dolly along. Anchors `cell_1..6`,
+   `hall_aisle_start`, `hall_aisle_end`.
 5. **Lights**: vanilla `plains_lamp_1` posts and the buildings' own torches; a few player-placed lanterns are fine.
+   Two of them are player-built lamps (cobblestone foot, two oak fence posts, a lantern) flanking the bell, two
+   blocks to its south-west and south-east: light groups `bell_w` / `bell_e`, anchors `bell_lamp_w` / `bell_lamp_e`.
+   The vanilla meeting point has no light on the bell's side; these are the key lights of both bell shots.
 6. **Way out**: path `exit_road` from the square past the last house into an open meadow that rises slightly so
    the horizon is clean. Anchors `exit_gate`, `meadow_far`, `nitwit_idle` (a lonely spot at the village edge
    with the houses behind it).
@@ -165,8 +179,8 @@ class Character:
     height: float
     def place(self, frame, pos, yaw=0.0): ...                    # hard-set position (CONSTANT key) — use at shot cuts
     def walk(self, frame, points, speed=1.6, run=False) -> int: ...   # move along polyline with leg cycle + bob; returns end frame
-    def look_at(self, frame, target, ease=6): ...                # turn head (clamped) toward a world point
-    def face(self, frame, target, ease=8): ...                   # turn whole body toward a world point
+    def look_at(self, frame, target, ease=6): ...                # turn head (clamped) toward a world point, a Character
+    def face(self, frame, target, ease=8): ...                   # (its eyes) or an Object (evaluated AT that frame); same for face
     def idle(self, frame_start, frame_end, seed=0): ...          # small head turns, weight shifts
     def nod(self, frame); def shake(self, frame); def flinch(self, frame): ...
     def swing_arm(self, frame): ...                              # player: right-arm use swing; villager: small jolt
@@ -200,17 +214,129 @@ class Shot:
     def handheld(self, amount=0.02, seed=0): ...            # subtle drift
 
 # captions.py — the real Minecraft font, read from textures/font/ascii.png (+ font/include/default.json for the layout)
-def autotime(script: str, start=0.3, per_word=0.36, comma=0.12, period=0.45) -> list[tuple[str, float, float]]: ...
+def autotime(script: str, start=0.3, per_word=0.36, comma=0.12, period=0.45, end=None) -> list[tuple[str, float, float]]: ...
+#   end=T scales the timing so the last word ends at T seconds (the defaults finish "The Bell" at 8.97 s: pass end=...)
 def draw_caption(word: str, size=(1080, 1920)) -> PIL.Image: ...   # RGBA overlay
 #   glyphs cut from the bitmap font with their real variable widths and 1-px spacing, scaled by an integer factor with
 #   nearest-neighbour; white text with the game's drop shadow (dark grey, offset one font pixel down-right), plus a thin
-#   dark outline for legibility; centred, baseline about 61% down the frame; a 6-letter word spans about 45% of the width.
+#   dark outline for legibility; centred, baseline 69% down the frame (measured on the reference in VIDEO coordinates:
+#   the phone screenshots crop the video), 17 px per font pixel at 1080 wide: a 6-letter word spans about 50% of the
+#   width. captions.CAPTION_BAND = (0.62, 0.72) is the strip of the frame a caption covers. No word spans more than
+#   68 % of the width (x 16-84 %, clear of the Reels icon column): 'Everyone' is drawn at 15 px per font pixel.
 
 # render.py (CLI, run as `$BPY -m render <film> ...`); a film module is films/<film>.py exposing
 #   build(scene) -> {"film": Film, "captions": [(word, t0, t1), ...]}
-#   --still S            render the frame at second S to out/test/<film>_<S>.png (fast: --res/--samples overridable)
-#   --frames A-B --step K   render frames to out/frames/<film>/f_####.png, skipping files that already exist (resumable)
+#   --still S            render the frame at second S to out/test/<film>_<S>.png (fast: --res/--samples overridable);
+#                        --zones also writes <name>_zones.png (Reels UI zones, caption band, safe area)
+#   --frames A-B --step K   render frames, resumable ('all', a single frame or a shot name work too). FINAL settings
+#                        (720x1280, 24 samples, step 1, motion blur) write out/frames/<film>/f_####.png; any other
+#                        --res/--samples/--step, or --no-motion-blur, is a PREVIEW and writes
+#                        out/preview/<film>/<W>x<H>_<N>spp[_stepK][_nomb]/. Every frame is stamped in meta.json with
+#                        the settings, a hash of the ENGINE sources and the frame's SCENE FINGERPRINT (engine/stamp.py:
+#                        a hash of everything Cycles is given for that frame); a frame is skipped while all three are
+#                        current. So a caption / timing / comment edit in a film script re-renders nothing, an edit to
+#                        one shot re-renders that shot only, a change of sky or set re-renders everything.
+#   --rerender-stale     An edit to an ENGINE file while frames exist STOPS --frames with exit code 3 and the list of
+#   --restamp A-B|all|SHOT   changed files (a chunked final render must not quietly restart at frame 1). Then either
+#   --restamp-changed    --restamp all (keep the frames whose fingerprint is unchanged: the edit altered no picture) or
+#                        --frames ... --rerender-stale. --restamp-changed also keeps frames whose fingerprint differs.
+#   --prune-stale        delete the PNGs of the frame directory that are not valid frames of the film any more
 #   --sheet N            contact sheet of N evenly spaced low-res frames WITH captions -> out/test/<film>_sheet.png
-#   --encode             upscale to 1080x1920, composite captions, H.264 yuv420p crf 16 +faststart -> out/<film>.mp4
-#   --save-blend         write out/blend/<film>.blend with textures packed
+#   --encode             upscale to 1080x1920 (Lanczos), composite captions after the upscale, H.264 yuv420p crf 16
+#                        +faststart -> out/<film>.mp4 (previews: out/preview/<film>_<variant>.mp4). Exits 2 while
+#                        frames are missing or stale; --allow-holds holds the previous frame instead (step previews).
+#   --save-blend         write out/blend/<film>.blend with textures packed and the FINAL render settings (no .blend1)
 ```
+
+## Integration notes (after look-dev and the fix pass on the real set; read before writing a film)
+
+`films/lookdev.py` is the worked example: four small films (`lookdev_dusk`, `lookdev_golden`, `lookdev_bed`,
+`lookdev_night`) built from the real village, cast and look. Copy its `Stage` helper into a film:
+`Stage.shot(name, seconds)`, `actor(name, profession)`, `use(shot, *characters)` (everyone else is hidden for that
+shot), `hero(shot, label, *things)` (what the shot is about: checked against the safe area), `lights(shot, scale,
+groups, near, radius, extra)` (torch levels step at the cut; `extra` boosts one torch as a key light),
+`see_through(shot, cutaway)` (wall invisible to the camera only), `remove(shot, cutaway)`, `finish()`.
+`lights(..., inside="house_a")` names the room a shot is filmed in: only there is that room's fill light on.
+`$BPY -m films.lookdev --captioned` re-renders the eleven reference stills `out/test/lookdev_<name>.png` and checks each
+one (exit code 1 if a check fails); `$BPY -m tools.contract_check --cli` checks every name in this file and every
+render.py flag; `$BPY -m tools.noise_check <film> <frame> ...` measures what would boil at final quality.
+
+### The look (engine/look.py), and why
+
+- **Colour pipeline: view transform 'Standard' + a highlight shoulder as the last compositor node.** The first
+  choice, Khronos PBR Neutral, subtracts min(r, g, b) - 6.25 min^2 from every channel: under dim light the smallest
+  channel of every colour goes to zero, which turned robes wine-red, planks orange and Steve's trousers from
+  (67, 58, 143) to (48, 2, 144). Now a pixel below the shoulder (0.76) is texture x light and nothing else.
+  Above it the drift to white is slow (`SHOULDER_DESATURATION` 0.06, Khronos has 0.15) and glowing texels are only
+  2-4.5 x their texture (`blocks.EMISSIVE`: lantern 3, torch 4.5): a lantern's glow stays the game's orange-yellow
+  with a pale core, where emission 7 through the faster drift rendered salmon pink. The third value of an EMISSIVE
+  entry lights the rest of that block a little (the chain, the iron, the stick): its own point light sits inside
+  the model and reaches none of its faces, while the game draws the block at light level 15.
+- **Pale light, near-neutral fill.** Key colours are pale (golden `#ffe9cc`, dusk `#ffcda6`), the sky FILL is
+  desaturated to 6-10 % and a touch cool (never violet: a violet fill is what makes browns magenta); the visible sky
+  keeps its colour because camera rays see another map. Grades have no lift at all and saturation <= 1.
+  `props.TORCH_COLOR` is (1.0, 0.88, 0.72); the orange of a torch comes from its glowing flame texels and their bloom.
+- **Sky:** golden hour keeps the game's blue above ~15 degrees (peach only at the horizon), dusk is indigo at the
+  zenith with orange and pink in the lowest 20 degrees. The golden-hour halo around the sun is MIXED in (preset key
+  `halo`): blue -> neutral -> cream, hue 35-45 beside the sun; warm light ADDED to that blue came out lilac. Haze is mixed over geometry only (world AOV `sky` = sky
+  coverage; the sky has its own horizon haze baked in). Stars are hard squares of varying brightness, kept under the
+  bloom threshold. Cameras have a 4-blade aperture: defocused sun and torches stay square.
+- Fast GI (direct light + one bounce + sky-tinted occlusion, reach 8 blocks), adaptive threshold 0.1, four
+  shadowless "ground bounce" lamps per preset. Rooms that are filmed inside (house_a, hall, library) carry one weak
+  cool shadowless fill light in their own light group (`Stage.lights` switches it on only for `inside=` that room). Torch / lantern lights use a smoothed falloff (`W / (d^2 + 1)`):
+  the block a torch is mounted on is lit like a surface one block away and keeps its texture.
+- **Every still is measured against the textures it was made from** (`tools/palette_check.py`, run by
+  `films.lookdev`): lit stone G >= 0.92 R, robe hue 0-30 degrees, lit oak planks saturation <= 0.68, villager skin
+  <= 0.52, Steve's trousers not crushed, his shirt still teal (its red channel is 0-2 in steve.png itself), plants
+  as bright as the ground they stand on. If a look change breaks one of these, the look change is wrong.
+  The interior passes two of them AT the limit (stone G/R 0.92, skin saturation 0.52): stone under nothing but
+  torch light is 0.88, the room's fill brings it up. Raise house_a's torches above 1.5 only together with its fill
+  (both are in the group `house_a`; never boost one torch alone with `extra` in there) and re-run the check.
+
+### Composition rule (Reels)
+
+On tall phones the 9:16 video is height-filled: about 5 % is cropped off each side, the icon column covers x 84-93 %
+for y 45-95 %, name and description cover everything below y 87 %, the top icons everything above 13 %, and the
+caption sits in y 62-72 % (`engine/post.py`: `UI_ZONES`, `CAPTION_ZONE`, `SAFE_AREA`; `--zones` draws them).
+**Faces and hero props go inside x 8-82 %, y 14-60 %; nothing essential in y 62-72 % or below 86 %.** Big foreground
+elements (the empty bed, a counter, a composter) may fill the bottom third: the caption then sits on them, as it
+does on the bed in reference 3.
+
+### Rules that each cost a wrong render
+
+- One sky per film (`look.set_time` once). Choose the sun for the shots: the village is dense, so a sun lower than
+  about 20 degrees leaves almost everything at ground level in a building's shadow. The golden look-dev film uses
+  azimuth 62, elevation 27; at dusk (elevation 5) faces need a torch as key (`Stage.lights(..., extra=...)`).
+- At dusk a subject is as bright as its practical makes it. Bell close-up: west lamp x 2.4 as the key, east lamp
+  off, everything behind the bell at 0.9, camera 20 degrees east of the bell's broad face and below its base: lit
+  face 0.95 x texture, shade side 0.4, the dusk sky over the well's rim. Steve at the bell: seen from the south-east
+  (the side of the arm that swings), east lamp x 2.6 as the key. Light a background at 1.6 and the subject is lost.
+- A character that is in two consecutive shots must not be keyed before the second shot starts (no pre-roll): the
+  `place()` cuts the first shot's walk short. `place()` everybody before any `look_at()` at them.
+- Plain villagers from behind are a brown box under a pink box: stage for noses, brows, hats and crossed arms.
+  A villager walking away can still give his profile: `look_at` a point 80 degrees or more to his side (the head
+  stops at 70) and HOLD it to the last frame of the shot: at 55 degrees, seen from behind, the face is edge-on.
+- A villager who looks DOWN at something held low hides his face under his hat from a camera above eye height.
+- Flat items (emerald) lie along the hand as in the game: edge-on from the side, readable from behind or above.
+  `raise_arm(angle=55)` puts it at the other's chest, clear of his face.
+- A bed reads as a bed lengthwise from behind its pillow or from beside its foot; the vanilla white bed is white on
+  white, so the look-dev films dye the one hero bed red (`bed_colors={"house_a_bed_2": "red"}`), as the client's
+  references do. Everything else in the houses is the unmodified template.
+- Trading hall: faces are half a block wide and two blocks apart, so from across the aisle three of them are never
+  more than a fifth of the frame wide each. Ride along the counter instead: a quarter block off the cell fronts at
+  eye height, 3 blocks short of the nearest face, looking 25 degrees off the row (38 mm f/3.4). The nearest face is
+  28-30 % of the frame, clear in its window, the row lines up behind it, the bars stand above and between the
+  faces (never across them: the pier fronts are open at face height), a lantern hangs in the upper left.
+- Meadow: flat for 30 blocks beyond `exit_gate`, then 1-block rises about 11 blocks apart with wandering, overgrown
+  edges, and five lone oaks. A camera on the exit road looking anywhere between north-west and north-east sees a
+  clean horizon. The two verge columns west of the road (`village.CAMERA_LANE`, x -3..-2, y 22..58) carry no
+  plants: a camera tracking somebody up the road rides there; a tuft one block from the lens hides him.
+- Lenses that worked: bell 105 mm f/1.4, walking villager 42 mm f/2.8 from 3.7 blocks, portrait 66 mm f/2.6,
+  over-the-shoulder trade 50 mm f/3.4, running group 24 mm f/2.8 from ground level, interior over the bed 26 mm
+  f/2.6, hall 38 mm f/3.4, walking away into the sun 28 mm f/3.2 from 0.8 above the ground, bed 35 mm f/2.2,
+  Steve at the bell 32 mm f/3.2 from 8 blocks.
+- Rendering: 10-17 s per 720x1280 frame at 24 samples on 4 idle cores (worst: the hall, with defocused iron bars in
+  front of the lens, and wide dusk shots with many torches). Render finals in chunks under the 300 s limit:
+  `--frames all --max-seconds 240`, repeated until nothing is left; never mix previews into them (render.py keeps
+  them apart). FREEZE the engine files while finals render: an engine edit stops the next chunk with exit code 3
+  (see render.py); film-script edits are safe at any time and re-render only the frames they change.

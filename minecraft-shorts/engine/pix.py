@@ -1,6 +1,7 @@
 """Shared pixel-art helpers (images + materials). STABLE API - do not change signatures.
 
-All art in this project is original and generated procedurally in code.
+These helpers only wrap pixel arrays into Blender images / materials. Everything VISIBLE in the films comes from
+the real game files through engine/mcassets.py; nothing here draws art (the first, procedural pass was rejected).
 Row 0 of every array is the TOP row of the texture.
 """
 import os
