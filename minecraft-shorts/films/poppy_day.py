@@ -109,7 +109,7 @@ def shot_offer(st, s, clock):
     bloom = g.flower_point(up + 1)
     f_flower = clock.frame("flower")
     assert up <= f_flower - 6, (up, f_flower)                # up and still well before its word
-    kid.look_at(f_flower - 5, _to_lens(kid, f_flower + 2, bloom), ease=7)   # "flower": its eyes come down to it
+    kid.look_at(f_flower - 5, _to_lens(kid, f_flower + 2, bloom), ease=7)   # "flower": its chin lifts to it
     # ... and one small step closer, under it (0.15 block in 7 frames: in 3 frames it was a hop that stopped dead)
     step = kid.walk(f_flower + 4, [far, KID], speed=0.5)
     kid.look_at(step, _to_lens(kid, step + 5, g.flower_point(step + 2)), ease=5)
