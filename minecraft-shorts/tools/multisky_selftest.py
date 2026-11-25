@@ -301,11 +301,11 @@ def part_encode():
     code, out, _ = run(["--sheet", "5", "--res", "108x192", "--samples", "2"])
     check(code == 0 and os.path.getmtime(sheet) > t and sorted(builds(out)) == ["gold", "night"],
           "--sheet 5: tiles from both skies' builds, one sheet")
-    cap = os.path.join(ROOT, "out", "test", FILM + "_3.4583_cap.png")
+    cap = os.path.join(ROOT, "out", "test", FILM + "_3.5_cap.png")
     if os.path.exists(cap):
         os.remove(cap)
-    code, out, _ = run(["--still", "3.4583", "--captioned", "--res", "108x192", "--samples", "2"])
-    ok = code == 0 and os.path.exists(cap)
+    code, out, _ = run(["--still", "3.5", "--captioned", "--res", "108x192", "--samples", "2"])
+    ok, note = code == 0 and os.path.exists(cap), out[-300:]
     if ok:
         from PIL import Image
 
@@ -313,12 +313,13 @@ def part_encode():
 
         im = Image.open(cap).convert("L")
         w, h = im.size
-        top = im.crop((0, 0, w, int(h * 0.5)))
-        band = im.crop((0, int(h * captions.CAPTION_BAND[0]), w, int(h * captions.CAPTION_BAND[1])))
-        ok = max(top.getdata()) <= 90 and max(band.getdata()) >= 250
-        note = "picture max %d of 255 at gain 1/3, caption max %d" % (max(top.getdata()), max(band.getdata()))
-    check(ok, "--still 3.4583 --captioned (inside the dip, frame 84): the picture is dark, its caption is not (%s)"
-          % (note if code == 0 and os.path.exists(cap) else out[-300:]))
+        top = im.crop((0, 0, w, int(h * 0.5))).getextrema()[1]
+        band = im.crop((0, int(h * captions.CAPTION_BAND[0]), w, int(h * captions.CAPTION_BAND[1]))).getextrema()[1]
+        plain = Image.open(cap[:-8] + ".png").convert("L")
+        full = plain.crop((0, 0, plain.size[0], plain.size[1] // 2)).getextrema()[1]
+        ok = top <= 0.67 * full + 4 and band >= 250 and "'Then'" in out
+        note = "the picture's brightest pixel %d of 255 (the plain still: %d; gain 2/3), the caption 'Then' %d" % (top, full, band)
+    check(ok, "--still 3.5 --captioned (frame 85, inside the dip): the picture is darkened, its caption is not (%s)" % note)
     blends = [os.path.join(ROOT, "out", "blend", "%s.%s.blend" % (FILM, sky)) for sky in ("gold", "night")]
     for b in blends:
         if os.path.exists(b):

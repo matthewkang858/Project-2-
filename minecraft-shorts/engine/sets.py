@@ -720,10 +720,15 @@ class Environment:
         return tuple(int(round(a[i] + (c[i] - a[i]) * t)) for i in range(3))
 
     # -- sky light
-    def bake_sky_light(self, ground, x0, y0, x1, y1):
+    def bake_sky_light(self, ground, x0, y0, x1, y1, where=None):
         """Compute the game's sky light for the box of columns and remember every cell darker than 15.
-        ground(x, y) -> terrain surface z or None. Call it when every block of the set piece is placed."""
+        ground(x, y) -> terrain surface z or None. Call it when every block of the set piece is placed; a second
+        call for the same box replaces the first (cells that are lit now are forgotten). where(x, y) -> bool:
+        columns where it is False stay as bright as open sky (somebody else's tree inside the box)."""
         w = self.w
+        for c in [c for c in self.light if x0 <= c[0] <= x1 and y0 <= c[1] <= y1]:
+            del self.light[c]
+        self._cache.clear()
         nx, ny = x1 - x0 + 1, y1 - y0 + 1
         zs = [c[2] for c in w.blocks if x0 <= c[0] <= x1 and y0 <= c[1] <= y1]
         if not zs:
@@ -763,6 +768,8 @@ class Environment:
             spread &= clear & (level < lv)
             level[spread] = lv
         dark = np.argwhere(clear & (level < 15))
+        if where is not None:
+            dark = [d for d in dark if where(int(d[0]) + x0, int(d[1]) + y0)]
         for i, j, k in dark:
             c = (int(i) + x0, int(j) + y0, int(k) + z0)
             self.light[c] = int(level[i, j, k])
@@ -849,9 +856,11 @@ def _noise(x, seed, pitch):
 
 
 def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest", spacing=6.0, bay=4.0,
-                climb=4, corridor=6, oaks=7, trail_from=45, mushrooms=6, biome=True, shade=True, side_bay=11,
-                keep_clear=(), brightness=LIGHT_GAMMA):
-    """THE WOODS: a dark oak forest edge across the far end of the meadow (see the module docstring).
+                climb=4, corridor=6, oaks=7, trail=13, mushrooms=6, biome=True, shade=True, side_bay=11,
+                keep_clear=(), brightness=LIGHT_GAMMA, approach_from=None, edge_plants=1.0, floor_plants=0.0,
+                back=4, bake=True):
+    """THE WOODS: a dark oak forest edge (see the module docstring). The wall runs east-west, is entered going
+    NORTH (+Y) and may stand anywhere there is or can be terrain; a wood facing another way is not built.
 
     gap         (x, y): the middle of the 3-block gap between two trunks, on the tree line. The trunks beside it
                 stand at y .. y + 1; a figure at <name>_gap stands just in front of them.
@@ -861,24 +870,44 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
                 bay of the forest, and the wall fills more of a frame).
     climb       the forest floor rises this many blocks more than the meadow would between the second row and the
                 back: a low camera then sees shaded ground between the trunks, not the sky behind the wood.
+    back        ... and another `back` blocks in two steep steps right behind the last trunks: from inside, the
+                view through the wood ends on a dark bank instead of a slit of sky (0: no bank).
     corridor    level blocks behind the gap where a figure walks out of sight.
+    approach_from  (x, y) where the path road_to_<name> starts. None: at the village's exit_gate, along its exit
+                road, when the gap lies north of the gate and within 8 blocks of the road's line; otherwise 14
+                blocks in front of the gap. From the last road node on the path follows the ground (ground_path):
+                level where the meadow is, one hop per 1-block step where it is not (dict['hops']).
     keep_clear  [(x, y, radius), ...]: no edge oak is planted within these circles (other set pieces' backgrounds).
-    oaks        plain oaks along the edge; trail_from = y from which a thin dirt trail leads to the gap (None: no
-                trail); mushrooms = small brown / red mushrooms on the dark floor.
+    oaks        plain oaks WANTED along the edge and at the ends; planted are those that find room 9 blocks or more
+                from the gap, clear of keep_clear, of other oaks and of low branches: dict['counts']['oaks'] says
+                how many (hello_set: 2 of 7, its three pieces keep the middle of the edge clear).
+    trail       a thin worn line of dirt_path leads to the gap over the last `trail` blocks in front of the tree
+                line and on through the corridor (0 / None: no trail); mushrooms = small brown / red mushrooms.
+    edge_plants density (1.0 = 34 % short grass, 18 % tall grass, 4 % flowers) of the thick growth along the edge.
+                It grows only on columns with NO leaves above, in practice from 3 blocks in front of the trunks
+                outward; floor_plants = the same for short grass on the shaded floor under the leaves (1.0 = 7 %,
+                default none): a cross plant that stands where the sky fill does not reach renders with near-black
+                texels under this look (reported for engine/mcassets.py), so by default nothing grows there.
     side_bay    this many columns west of the road, the 8 rows in front of the tree line carry no plants: a camera
                 that films the gap from the side at child height stands there (a tuft before the lens hides it all).
     biome       the wood's columns are dark forest biome: darker grass, greener leaves, blended over 5x5 columns.
-    shade       bake the game's sky light into the wood's blocks (see Environment): THIS is what makes it a black
-                wall; without it the look's shadowless fill light keeps the inside as bright as the meadow.
-                Call dark_forest AFTER any other piece that stands in or right beside the wood.
+    shade       give the wood the game's own sky light, baked into its blocks (see Environment): THIS is what
+                makes it a black wall; without it the look's shadowless fill light keeps the inside as bright as
+                the meadow. bake=False leaves the baking to the caller: shade_forest(b, result) when every other
+                piece that stands in or beside the wood is placed (hello_set does that).
     brightness  the game's Brightness option for that baked light: 0.5 = the default, 0.0 = "Moody" (darker trunks
-                and floor, harder steps of light on the grass), 1.0 = "Bright"."""
+                and floor, harder steps of light on the grass), 1.0 = "Bright".
+    Paths of the village that run into the wood are cut at the tree line (dict['cut_paths']); village oaks in the
+    wood or within 3 blocks of the new part of the way in are removed."""
+    _new_name(b, name)
     w, v = b.w, b.v
     rng = b.rng_for(name)
     gx, fy = float(gap[0]), int(gap[1])
     gcx = int(math.floor(gx))                                   # the gap's middle column
     seed = int(rng.integers(0, 1 << 20))
     count0 = len(w.blocks)
+    back = max(0, int(back or 0))
+    trail = max(0, int(trail or 0))
 
     def front(x):                                               # y of the tree line at x
         t = min(1.0, abs(x - gx) / float(half_width))
@@ -886,7 +915,7 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
         return fy - bay * t * t + wob
 
     x0, x1 = int(gx - half_width - 8), int(gx + half_width + 8)
-    y0, y1 = fy - int(bay) - 4, fy + depth + 3
+    y0, y1 = fy - int(bay) - 4, fy + depth + (5 if back else 3)
 
     def inside(x, y, margin=0.0):                               # the wood itself (trunks stand in here)
         return abs(x - gx) <= half_width + margin and front(x) - margin <= y <= fy + depth + margin
@@ -894,6 +923,8 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
     # 1. ground: terrain where the disc ends, the corridor level with the road, the floor climbing to the back
     b.extend_terrain(x0, y0, x1, y1, plants=False, where=lambda x, y: inside(x, y, 6.0))
     road_z = b.ground(gcx, fy - 2)
+    if road_z is None:
+        raise ValueError("dark_forest %r: no terrain in front of the gap at %s" % (name, (gcx, fy - 2)))
     for t in list(b.trees):                                     # the meadow's own oaks that stand in the wood go
         if t["kind"] == "oak" and inside(t["x"], t["y"], 1.0) and t["where"] != name:
             remove_tree(b, t)
@@ -905,12 +936,15 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
                 continue
             fr = front(x)
             flank = min(1.0, max(0.0, (half_width + 5.0 - abs(x - gx)) / 7.0))
-            back = (y - (fr + spacing)) / max(1.0, depth - spacing - 2.0)
-            up = climb * min(1.0, max(0.0, back)) * flank + 0.45 * _noise(x * 1.7 + y * 0.6, seed + 3, 5.0)
+            rise = (y - (fr + spacing)) / max(1.0, depth - spacing - 2.0)
+            up = climb * min(1.0, max(0.0, rise)) * flank + 0.45 * _noise(x * 1.7 + y * 0.6, seed + 3, 5.0)
+            behind = y - (fr + depth + 1.0)                     # >= 0: behind the last row's trunks
+            if back and behind >= 0.0:
+                up += min(back, 2 * (1 + int(behind))) * flank
             z = h + max(0, int(math.floor(up + 0.5)))
-            if abs(x - gx) <= 2.6 and fr - 4 <= y <= fy + corridor + 1:
-                z = road_z                                      # the way in: level with the road
-            elif abs(x - gx) <= 4.6 and fr - 2 <= y <= fy + corridor + 2:
+            if (abs(x - gx) <= 2.6 and fr - 4 <= y <= fy + corridor + 1) or (x == gcx + 3 and fy + 2 <= y <= fy + 4):
+                z = road_z                                      # the way in (and the spot behind the east trunk):
+            elif abs(x - gx) <= 4.6 and fr - 2 <= y <= fy + corridor + 2:   # level with the road
                 z = min(z, road_z + 1)                          # ... between low banks
             if z != h:
                 target[(x, y)] = z
@@ -995,7 +1029,9 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
             edge_oaks.append(t)
             taken.append((x, y))
 
-    # 4. what grows: thick tufts and tall grass in front of the tree line, little in the shade, a few mushrooms
+    # 4. what grows: thick tufts and tall grass along the edge where the sky is open, nothing (floor_plants) in
+    #    the shade under the leaves, a few mushrooms
+    cover = {(c[0], c[1]) for t in b.trees for c in t["leaves"]} | {(c[0], c[1]) for t in b.trees for c in t["logs"]}
     lane = (gcx - 3, gcx + 3)                                   # the road and the camera lane beside it stay bare
     for x in range(x0, x1 + 1):
         for y in range(y0, y1 + 1):
@@ -1012,7 +1048,11 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
                 continue                                        # the side camera's bay west of the road: bare grass
             d = y - front(x)                                    # < 0: in front of the wood
             ends = abs(x - gx) - half_width                     # > 0: beyond its ends
-            if -3.5 <= d < 1.0 or 0.0 <= ends <= 3.5:
+            if (x, y) in cover:
+                if r1 < 0.07 * floor_plants and d >= 1.0:
+                    w.set(x, y, h, "short_grass")
+            elif -7.0 <= d < 1.0 or 0.0 <= ends <= 3.5:
+                r1 /= max(edge_plants, 1e-6)
                 if r1 < 0.34:
                     w.set(x, y, h, "short_grass")
                 elif r1 < 0.52 and w.get(x, y, h + 1) is None:
@@ -1020,10 +1060,7 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
                     w.set(x, y, h + 1, "tall_grass", {"half": "upper"})
                 elif r1 < 0.56:
                     w.set(x, y, h, ("poppy", "dandelion", "oxeye_daisy", "cornflower")[int(r2 * 4)])
-            elif d >= 1.0 and ends < 0.0:
-                if r1 < 0.07:
-                    w.set(x, y, h, "short_grass")
-            else:
+            elif d < 1.0 or ends > 0.0:
                 b.sow(x, y, rng)
     shrooms = []
     for _ in range(mushrooms * 30):
@@ -1040,16 +1077,18 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
         shrooms.append((x, y, h))
 
     # 5. the trail: the village road thins out in the meadow; a worn line of dirt_path carries it to the gap
-    trail = []
-    if trail_from is not None:
-        for y in range(int(trail_from), fy + corridor + 1):
-            near = min(1.0, max(0.0, (y - trail_from) / max(1.0, fy - trail_from)))
+    worn = []
+    if trail:
+        t0 = fy - trail
+        for y in range(t0, fy + corridor + 1):
+            near = min(1.0, max(0.0, (y - t0) / float(max(1, trail))))
             for x, p in ((gcx, 0.55 + 0.35 * near), (gcx - 1, 0.10 + 0.15 * near), (gcx + 1, 0.12 + 0.15 * near)):
-                if rng.random() < p and w.block_id(x, y, b.ground(x, y) - 1) == "grass_block" \
-                        and w.get(x, y, b.ground(x, y)) is None:
+                g = b.ground(x, y)
+                if rng.random() < p and g is not None and w.block_id(x, y, g - 1) == "grass_block" \
+                        and w.get(x, y, g) is None:
                     b.pave(x, y)
-                    trail.append((x, y))
-        for y in range(int(trail_from), fy + corridor + 2):     # nothing grows in the way
+                    worn.append((x, y))
+        for y in range(t0, fy + corridor + 2):                  # nothing grows in the way
             for x in range(gcx - 1, gcx + 2):
                 b.clear_plants(x, y)
                 b.reserved.add((x, y))
@@ -1063,33 +1102,82 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
     approach = b.anchor(name + "_approach", (gx, fy - 3.5), yaw_to((gx, fy), (gx, fy + 30.0)), replace=True)
     cam_in = (gx + 0.3, fy + corridor - 1.0, road_z + 1.5)       # inside, at eye height, looking out along the corridor
     v.anchors[name + "_inside_cam"] = cam_in
-    start = v.anchors.get("exit_gate", (0.5, 24.5, 0.0))
-    mids = [(0.6, 31.0), (0.4, 38.0), (gx, 46.0), (gx, 52.0), (gx, fy - 3.5), (gx, fy - 0.4), (gx, fy + 2.4), hide]
-    road = b.path("road_to_" + name, [(start[0], start[1])] + [p for p in mids if p[1] > start[1] + 1.0], replace=True)
+    # the village's own paths end at the tree line (a trunk closes the corridor's far end)
+    cut_paths = []
+    mine = v.sets.get("_paths", {})
+    for pname, pts in list(v.paths.items()):
+        if pname in mine:
+            continue
+        hit = next((i for i, q in enumerate(pts) if inside(q[0], q[1], 0.0)), None)
+        if hit is not None and hit >= 2:
+            v.paths[pname] = pts[:hit]
+            cut_paths.append(pname)
+    # the way in: from the exit gate along the village road where that leads here, else from 14 blocks out
+    gate = v.anchors.get("exit_gate")
+    lead = []
+    if approach_from is not None:
+        start = (float(approach_from[0]), float(approach_from[1]))
+    elif gate is not None and abs(gx - gate[0]) <= 8.0 and fy - gate[1] >= 14.0:
+        start = (gate[0], gate[1])
+        lead = [(q[0], q[1]) for q in v.paths.get("exit_road", []) if start[1] + 1.0 < q[1] < fy - 8.0]
+    else:
+        start = (gx, fy - 14.0)
+    tail = [(gx, fy - 6.0), (gx, fy - 3.5), (gx, fy - 0.4), (gx, fy + 2.4), hide]
+    if abs(start[0] - gx) < 3.0:
+        tail = [q for q in tail if q[1] > start[1] + 1.0]
+    first_new = (lead[-1] if lead else start)
+    for t in list(b.trees):                                     # no oak over the new part of the way in
+        if t["kind"] != "oak" or t["where"] == name:
+            continue
+        ax, ay, cx, cy = first_new[0], first_new[1], gx, fy - 0.4
+        k = max(0.0, min(1.0, ((t["x"] + 0.5 - ax) * (cx - ax) + (t["y"] + 0.5 - ay) * (cy - ay))
+                         / max(1e-6, (cx - ax) ** 2 + (cy - ay) ** 2)))
+        if math.hypot(t["x"] + 0.5 - (ax + (cx - ax) * k), t["y"] + 0.5 - (ay + (cy - ay) * k)) < 3.5:
+            remove_tree(b, t)
+    road = ground_path(b, "road_to_" + name, [start] + lead + tail, replace=True)
+    hops = v.sets["_paths"]["road_to_" + name]["hops"]
     for x in range(x0, x1 + 1):
         for y in range(y0, y1 + 1):
             if inside(x, y, 1.0):
                 b.reserved.add((x, y))
-    dark_cells = 0
-    if biome or shade:
-        e = env(b)
-        if biome:
-            e.set_biome([(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)
-                         if inside(x, y, 1.0) and b.ground(x, y) is not None])
-        if shade:
-            e.gamma = float(brightness)
-            dark_cells = e.bake_sky_light(b.ground, x0 - 2, y0 - 2, x1 + 2, y1 + 2)
+    if biome:
+        env(b).set_biome([(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)
+                          if inside(x, y, 1.0) and b.ground(x, y) is not None])
     logs = sum(len(t["logs"]) for t in trees)
     leaves = sum(len(t["leaves"]) for t in trees)
     res = dict(name=name, gap=stand, gap_in=inner, deep=deep, approach=approach, inside_cam=cam_in,
                gap_cells=(gcx - 1, gcx + 1),
-               tree_line=fy, road_z=road_z, zg=zg, trees=trees, oaks=edge_oaks, mushrooms=shrooms, trail=trail,
-               path=road, bounds=(x0, y0, x1, y1), half_width=half_width, depth=depth,
+               tree_line=fy, road_z=road_z, zg=zg, trees=trees, oaks=edge_oaks, mushrooms=shrooms, trail=worn,
+               path=road, hops=hops, cut_paths=cut_paths, bounds=(x0, y0, x1, y1), half_width=half_width,
+               depth=depth, contains=inside, front=front, shade=bool(shade), brightness=float(brightness),
                top=max(max(c[2] for c in t["leaves"] + t["logs"]) for t in trees) + 1,
-               counts=dict(dark_oaks=len(trees), oaks=len(edge_oaks), logs=logs, leaves=leaves,
-                           blocks_added=len(w.blocks) - count0, dark_cells=dark_cells))
+               counts=dict(dark_oaks=len(trees), oaks=len(edge_oaks), oaks_wanted=int(oaks), logs=logs,
+                           leaves=leaves, blocks_added=len(w.blocks) - count0, dark_cells=0))
     v.sets[name] = res
+    if shade and bake:
+        shade_forest(b, res)
+        res["counts"]["blocks_added"] = len(w.blocks) - count0
     return res
+
+
+def shade_forest(b, forest):
+    """Bake the game's sky light into a wood built by dark_forest (it calls this itself unless bake=False). Call
+    it LAST, when every piece that stands in or beside the wood is placed; calling it again re-bakes. Trees that
+    do not belong to the wood (the village's oaks, a floating oak near by) are left as bright as the rest of the
+    village: nothing is darkened under them. Returns the number of cells darker than open sky."""
+    if not forest.get("shade", True):
+        return 0
+    e = env(b)
+    e.gamma = float(forest["brightness"])
+    foreign = set()
+    for t in b.trees:
+        if t["where"] != forest["name"]:
+            foreign |= {(c[0], c[1]) for c in t["leaves"]} | {(c[0], c[1]) for c in t["logs"]}
+    x0, y0, x1, y1 = forest["bounds"]
+    n = e.bake_sky_light(b.ground, x0 - 2, y0 - 2, x1 + 2, y1 + 2, where=lambda x, y: (x, y) not in foreign)
+    forest["counts"]["dark_cells"] = n
+    forest["baked"] = True
+    return n
 
 
 # ---- "The Hello" -----------------------------------------------------------------------------------------------
