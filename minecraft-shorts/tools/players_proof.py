@@ -4,6 +4,8 @@
     $BPY -m engine.players lineup_front armor    # stills by name -> out/test/players_<name>.png (540x960, 16 spp)
     names: check lineup_front lineup_back armor armor_back mixed items1 .. items6 poses hurt walk closeup action square laps
            herobrine_dusk herobrine_close scale
+           legs legs_next legs_blur legs_close (walking in armor, close) sneak_poses killing_blow
+           herobrine_first (the FIRST frame of a watch() shot) herobrine_night death_poof
 Each still is one render (well under 300 s on two threads); run a few names per call.
 """
 import math
@@ -201,7 +203,7 @@ def walk():
         dist = pl.SPRINT_JUMP_SPEED * (f - start) / 24.0
         a = (x0 - dist, 4.0, 4.0)
         p.place(start, a, math.radians(90))
-        p.sprint_jump(start, [a, (a[0] + 4.2767 * 4, 4.0, 4.0)])
+        p.sprint_jump(start, [a, (a[0] + 4.2767 * 4, 4.0, 4.0)], ramp=False)
     s = pl.make_player("sn", "zuri")                         # sneaking along the front
     s.place(1, (-3.0, -1.6, 0.0), math.radians(90))
     s.sneak(1)
@@ -282,8 +284,8 @@ def legs(name="legs", frame_offset=0, blur=False):
             pass
     stone = ch._test_material("players_test_stone", "block/stone_bricks")
     ch._test_box("players_test_step", (-4.0, 0.8, 0.0), (4.0, 2.4, 2.2), stone)
-    specs = [("steve", dict(material="diamond"), 90.0, (-1.3, 0.0, 0.0)), ("steve", dict(material="netherite"), 130.0, (0.9, 0.0, 0.0)),
-             ("alex", dict(leggings="iron", boots="golden"), 60.0, (-1.3, 1.6, 2.2)), ("kai", dict(boots="golden"), 110.0, (0.9, 1.6, 2.2))]
+    specs = [("steve", dict(material="diamond"), 90.0, (-1.5, 0.0, 0.0)), ("steve", dict(material="netherite"), 130.0, (0.5, 0.0, 0.0)),
+             ("alex", dict(leggings="iron", boots="golden"), 60.0, (-1.5, 1.6, 2.2)), ("kai", dict(boots="golden"), 110.0, (0.5, 1.6, 2.2))]
     f = 40
     for i, (skin, armor, yaw, pos) in enumerate(specs):
         p = pl.make_player("leg%d" % i, skin)
@@ -338,36 +340,42 @@ def sneak_poses():
                 p.hold("goat_horn")
                 p.toot(10, 60)
     scene.frame_set(40)
-    frame_cam(scene, 6.2, (0.0, 0.8, 1.9), height=2.9, side=0.05)
+    frame_cam(scene, 6.9, (0.0, 0.8, 1.9), height=2.9, side=0.05)
     return render(scene, "sneak_poses")
 
 
 def killing_blow():
-    """hurt + die on one frame (the killing blow) at four moments: red for the whole 20 ticks, knocked back,
-    tipping over; and a left-handed attacker in mid swing."""
+    """hurt + die on one frame (the killing blow from the lens side) 3, 9, 15 and 21 frames in: red for the whole
+    20 ticks, knocked back, tipping onto the left side; and a left-handed attacker in mid swing."""
     scene = stage()
-    tiers(scene, 2, 3.6, depth=2.2)
-    spots = [(-2.4, 0.0, 0.0), (0.0, 0.0, 0.0), (-2.4, 2.2, 2.0), (0.0, 2.2, 2.0)]
+    tiers(scene, 2, 3.8, depth=4.5)
+    spots = [(-2.2, 0.0, 0.0), (0.0, 0.0, 0.0), (-2.2, 4.5, 2.0), (0.0, 4.5, 2.0)]
     f = 40
     for i, (skin, start) in enumerate((("steve", f - 3), ("kai", f - 9), ("zuri", f - 15), ("noor", f - 21))):
         p = pl.make_player("kb%d" % i, skin)
         pl.equip(p, chestplate="iron")
         x, y, z = spots[i]
-        p.place(1, (x, y, z), math.radians(-90))                # facing west: the blow comes from there
-        p.die(start, from_point=(x - 2.0, y, z + 1.0))
+        p.place(1, (x, y, z), 0.0)
+        if i % 2:
+            p.hurt(start, from_point=(x, y - 2.0, z + 1.0))     # the two calls a director would make ...
+            p.die(start)
+        else:
+            p.die(start, from_point=(x, y - 2.0, z + 1.0))      # ... or the one
     a = pl.make_player("lefty", "alex")
     a.hold("iron_sword", hand="left")
-    a.place(1, (3.0, 0.0, 0.0), math.radians(30))
+    a.place(1, (2.3, 0.4, 0.0), math.radians(-20))
     a.attack(f - 3, hand="left")
     scene.frame_set(f)
-    frame_cam(scene, 8.4, (0.9, 1.0, 1.9), height=3.2, side=0.05)
+    frame_cam(scene, 7.0, (0.1, 2.2, 1.9), height=3.6, side=0.05)
     return render(scene, "killing_blow")
 
 
-def coplanar(player, tolerance=0.05, apart=0.004):
+def coplanar(player, tolerance=0.25, apart=0.004):
     """[(mesh a, mesh b, normal, px^2)] of same-facing faces of two of a player's meshes that lie in one plane
     (within `apart` model pixels) and overlap by more than `tolerance` square pixels, in the pose of the current
-    frame. Cycles has no draw order: such a pair renders as noise, or as whichever the BVH returns first."""
+    frame. Cycles has no draw order: such a pair renders as noise, or as whichever the BVH returns first.
+    The default tolerance passes the one tie the game's own geometry has: the arms rest 0.05 rad splayed, and a
+    sliver (0.1 px2, 0.1 px wide) of each arm's front and back lies in the torso's front and back plane."""
     from collections import defaultdict
 
     bpy.context.view_layer.update()
@@ -483,7 +491,7 @@ def laps():
         x = gate.x + (-0.9, 0.5, -0.3, 1.1)[i]
         y0 = gate.y + 18.0 - i * 3.1
         p.place(f0 - 8, (x, y0, 0.0), math.radians(0))
-        p.sprint_jump(f0 - 8 - i * 3, [(x, y0, 0.0), (x, y0 - 4.2767 * 5, 0.0)])
+        p.sprint_jump(f0 - 8 - i * 3, [(x, y0, 0.0), (x, y0 - 4.2767 * 5, 0.0)], ramp=False)   # already running laps
     st.use(s, *runners)
     s.lens(35, 4.0)
     s.move((gate.x - 2.6, gate.y + 1.5, 0.9), (gate.x, gate.y + 9.0, 1.3))
@@ -526,6 +534,108 @@ def herobrine(close=False):
     st.hero(s, "herobrine", hb)
     st.lights(s, scale=1.0)
     return village_render(scene, st, s, "herobrine_dusk")
+
+
+def death_poof():
+    """A killing blow in the village square, 4 frames after the victim vanished: the 20 white puffs of
+    LivingEntity.makePoofParticles (engine.animals.poof, called by Player.die) fill his upright hit box where the
+    knock-back left him; a second victim, 11 frames into his death, is red and tipping over."""
+    scene, st = village_stage("golden", 62.0, 27.0)
+    A = st.v.anchors
+    s = st.shot("death", 2.0)
+    f0 = s.frame_start
+    c = Vector(A["square_s"])
+    ang = math.radians(-32.0)
+    a = Vector((math.cos(ang), math.sin(ang), 0.0))             # from the group toward the camera
+    q = Vector((-a.y, a.x, 0.0))
+    cam = c + a * 8.0 + Vector((0.0, 0.0, 1.45))
+
+    def spot(lat, depth):
+        p = c + q * lat + a * depth
+        return (p.x, p.y, c.z)
+
+    def toward(p0, p1):
+        return math.atan2(p1[0] - p0[0], -(p1[1] - p0[1]))
+
+    hitter = pl.add_player(st, "hitter", "ari")
+    hitter.hold("iron_sword")
+    v1 = pl.add_player(st, "victim1", "steve")
+    pl.equip(v1, boots="golden")
+    v2 = pl.add_player(st, "victim2", "kai")
+    hitter.place(f0, spot(0.9, 1.5), toward(spot(0.9, 1.5), spot(0.0, 0.0)))
+    v1.place(f0, spot(0.0, 0.0), toward(spot(0.0, 0.0), spot(0.9, 1.5)))
+    v2.place(f0, spot(1.2, -1.5), toward(spot(1.2, -1.5), tuple(cam)))
+    hitter.attack(f0 + 1)
+    info = v1.die(f0 + 3, from_point=hitter, village=st.v)      # knocked away from the lens, 1.0 left and 1.7 deeper
+    v2.die(f0 + 20, from_point=spot(1.2, 1.0))
+    print("death_poof: victim1 gone on frame %d at %s, %r" % (info["frame"], tuple(round(x, 2) for x in info["feet"]), info["burst"]))
+    assert info["burst"] is not None and len(info["burst"].particles) >= 20
+    st.use(s, hitter, v1, v2)
+    s.lens(32, 4.0)
+    s.move(tuple(cam), (c.x, c.y, 1.0))
+    s.focus(hitter.head)
+    st.hero(s, "hitter", hitter)
+    st.lights(s, scale=1.0)
+    return village_render(scene, st, s, "death_poof", at=31.0 / 24.0)
+
+
+def herobrine_first():
+    """The FIRST frame of a shot in which Herobrine watches a child walk past, 45 degrees to his side, with the
+    film's motion blur: placed and told to watch on that frame, his head is on the child already (it used to
+    swing there over the first eight frames of every shot)."""
+    scene, st = village_stage("dusk", 187.0, 5.0, bloom=1.3, motion_blur=True)
+    A = st.v.anchors
+    s = st.shot("hb", 2.0)
+    f0 = s.frame_start
+    hb = pl.add_player(st, "herobrine", "herobrine")
+    kid = st.actor("kid", "none", child=True)
+    gate = Vector(A["exit_gate"])
+    spot = (gate.x + 0.3, gate.y + 10.0, 0.0)
+    k0, k1 = (spot[0] + 2.6, spot[1] - 2.6, 0.0), (spot[0] - 4.5, spot[1] - 2.6, 0.0)
+    hb.place(f0, spot, 0.0)
+    kid.place(f0, k0, math.radians(-90))
+    kid.walk(f0, [k0, k1], speed=2.0)
+    hb.watch(f0, s.frame_end, kid)
+    yaws = [round(math.degrees(ch._val(hb.head, "rotation_euler", 2, f)), 1) for f in (f0, f0 + 1, f0 + 2, f0 + 8, f0 + 24)]
+    print("herobrine_first: head yaw on frames +0 +1 +2 +8 +24: %s (the child is %.1f degrees to his side on +0)"
+          % (yaws, math.degrees(hb._aim(kid, f0)[0])))
+    st.use(s, hb, kid)
+    s.lens(28, 5.6)
+    s.move((spot[0] + 1.4, spot[1] - 8.2, 1.35), (spot[0] + 1.4, spot[1], 1.15))
+    s.focus(hb.head)
+    st.hero(s, "herobrine", hb)
+    st.lights(s, scale=1.0)
+    return village_render(scene, st, s, "herobrine_first", at=0.0)
+
+
+def herobrine_night():
+    """Herobrine at NIGHT, 20 blocks from a 35 mm lens: the default glow (left) beside glow=7 (right)."""
+    from engine import look, shots, village
+    from films import lookdev
+
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    scene = bpy.context.scene
+    look.setup_render(scene, res=(540, 960), samples=16, threads=2, motion_blur=False)
+    v = village.build_village(scene, seed=1)
+    sky = look.set_time(scene, "night")
+    look.setup_compositor(scene, bloom=1.0, grade="warm")
+    st = lookdev.Stage(scene, shots.Film(scene, fps=24), v, sky)
+    s = st.shot("night", 1.0)
+    f0 = s.frame_start
+    cam = (0.4, 24.0, 1.3)
+    hb = pl.add_player(st, "herobrine", "herobrine")
+    hb.place(f0, (-0.6, 44.0, 0.0), 0.0)
+    hb7 = pl.add_player(st, "herobrine7", "herobrine", glow=7.0)
+    hb7.place(f0, (1.6, 44.0, 0.0), 0.0)
+    for h in (hb, hb7):
+        h.watch(f0, s.frame_end, cam)
+    st.use(s, hb, hb7)
+    s.lens(35, 4.0)
+    s.move(cam, (0.5, 44.0, 1.5))
+    s.focus(hb.head)
+    st.lights(s, scale=1.0)
+    print("herobrine_night: %.1f blocks from the lens" % math.dist(cam, (-0.6, 44.0, 1.6)))
+    return village_render(scene, st, s, "herobrine_night", at=0.5)
 
 
 def scale():
@@ -592,9 +702,10 @@ def check():
     # sprint-jump
     j = pl.make_player("probe3", "kai")
     j.place(1, (0.0, 6.0, 0.0), math.radians(90))
-    end = j.sprint_jump(1, [(0.0, 6.0, 0.0), (17.1, 6.0, 0.0)])
+    end = j.sprint_jump(1, [(0.0, 6.0, 0.0), (17.1, 6.0, 0.0)], ramp=False)
     zs = [v for _f, v, _i in ch.read_keys(j.root, "location", 2)]
-    print("sprint_jump 17.1 blocks: %d frames, %d hops, peak %.4f" % (end - 1, round((end - 1) / 14.4), max(zs)))
+    print("sprint_jump 17.1 blocks in full stride: %d frames, %d hops, peak %.4f" % (end - 1, round((end - 1) / 14.4), max(zs)))
+    assert end - 1 == 58
     assert abs(max(zs) - 1.2522) < 1e-3 and abs(zs[-1]) < 1e-9
     # crouch
     k = pl.make_player("probe4", "ari")
@@ -612,6 +723,7 @@ def check():
     k.place(20, (0.0, 9.0, 0.0), 0.0)
     scene.frame_set(20)
     assert abs(k.torso.rotation_euler.x) < 1e-6 and not k.crouching_at(20)
+    assert abs(k.head.scale.x - 1.0) < 1e-6 and abs(ch._val(k.head, "scale", 0, 12) - pl.CROUCH_HEAD_TIE) < 1e-6
     # held items: the generic transform must equal the one characters.Character.hold uses
     m_new = pl.hand_matrix(pl._display(pl._model_chain("item/emerald"), "thirdperson_righthand"))
     m_old = ch._held_matrix("hand", pl.MODEL_SCALE)
@@ -687,8 +799,252 @@ def check():
             x = pl.make_player("b_%s_%d" % (skin, slim), skin, slim=slim)
             assert round(x.arm_r.dimensions.x / u, 2) == (3.54 if slim else 4.54), x.arm_r.dimensions.x / u
     check_api(scene)
+    check_review(scene)
     print("check ok")
     return 0
+
+
+def check_review(scene):
+    """What the independent review found, pinned down: depth ties, the first frame of a stare, the killing blow,
+    chained moves, the start and end of a lap, posed arms, and the API's rough edges."""
+    rot, loc = "rotation_euler", "location"
+    val = ch._val
+    # 1. no two meshes of a player share a plane where they overlap: standing, striding, crouching, crouching archer
+    a = pl.make_player("tie_a", "steve")
+    pl.equip(a, "diamond")
+    a.place(1, (30.0, 0.0, 0.0), math.radians(90))
+    scene.frame_set(1)
+    found = {"standing in full diamond": coplanar(a)}
+    a.walk(1, [(30.0, 0.0, 0.0), (40.0, 0.0, 0.0)])
+    wide = max(range(20, 40), key=lambda k: abs(val(a.leg_r, rot, 0, k)))
+    scene.frame_set(wide)
+    found["striding (legs %.2f rad apart)" % (2 * abs(val(a.leg_r, rot, 0, wide)))] = coplanar(a)
+    b = pl.make_player("tie_b", "kai")
+    pl.equip(b, leggings="iron", boots="golden")
+    b.hold("bow")
+    b.place(1, (30.0, 3.0, 0.0), 0.0)
+    b.sneak(1)
+    scene.frame_set(1)
+    found["crouching in leggings and boots"] = coplanar(b)
+    b.draw_bow(2, 30)
+    scene.frame_set(20)
+    found["crouching with the bow drawn"] = coplanar(b)
+    c = pl.make_player("tie_c", "herobrine")
+    pl.equip(c, boots="golden")
+    c.place(1, (30.0, 6.0, 0.0), 0.0)
+    scene.frame_set(1)
+    found["herobrine (arms dead straight) in golden boots"] = coplanar(c)
+    for label, hits in found.items():
+        print("coplanar overlaps, %s: %s" % (label, hits or "none"))
+    assert not any(found.values()), found
+    scene.frame_set(1)
+    slivers = coplanar(a, tolerance=0.01)                       # everything, however small: only arm against torso
+    print("smaller than 0.25 px2, standing:", slivers or "none")
+    assert slivers and all(x[3] < 0.25 and "arm" in x[0] and "torso" in x[1] for x in slivers), slivers
+
+    # 2. the stare: on the target from the first frame of the shot when placed on that frame
+    hb = pl.make_player("stare", "herobrine")
+    kid = ch.make_villager("stare_kid", "none", child=True)
+    kid.place(50, (36.0, 14.0, 0.0), math.radians(-90))
+    kid.walk(50, [(36.0, 14.0, 0.0), (24.0, 14.0, 0.0)], speed=2.0)
+    hb.place(50, (30.0, 20.0, 0.0), 0.0)
+    hb.watch(50, 140, kid)
+    want = math.degrees(hb._aim(kid, 50)[0])
+    got = [math.degrees(val(hb.head, rot, 2, f)) for f in (49.76, 50, 51, 52, 58)]
+    steps = [abs(math.degrees(val(hb.head, rot, 2, f + 1) - val(hb.head, rot, 2, f))) for f in range(50, 140)]
+    print("watch() after place(): head yaw on the first frame %.1f (target %.1f), then %s; largest step %.2f deg/frame"
+          % (got[1], want, [round(g, 1) for g in got[2:]], max(steps)))
+    assert abs(want) > 30 and abs(got[1] - want) < 0.5 and abs(got[0] - want) < 0.5 and max(steps) < 2.5
+    worst = max(math.degrees(hb.look_vector(f).angle(kid.eye_point(f) - hb.eye_point(f))) for f in range(50, 141, 5))
+    assert worst < 1.5, worst
+    hb.watch(140, 200, (36.0, 14.0, 1.0))                       # a new target in mid shot: he turns to it
+    assert abs(val(hb.head, rot, 2, 140) - val(hb.head, rot, 2, 139.9)) < 0.01
+    turner = pl.make_player("stare2", "herobrine")
+    turner.place(50, (30.0, 23.0, 0.0), 0.0)
+    turner.watch(50, 140, (20.0, 30.0, 1.6), body=True)          # behind him: the body is turned on the first frame too
+    d = Vector((20.0, 30.0, 1.6)) - turner.eye_point(50)
+    off = math.degrees(turner.look_vector(50).angle(d))
+    print("watch(body=True) at a target 125 degrees behind: look is %.1f degrees off it on the first frame" % off)
+    assert off < 1.0
+
+    # 3. the killing blow: red for the whole death, in either call order, and knocked back
+    for order in ("hurt, die", "die, hurt", "die(from_point)"):
+        k = pl.make_player("blow_" + order[:3] + str(len(order)), "noor")
+        k.place(1, (30.0, 30.0, 0.0), 0.0)
+        if order == "hurt, die":
+            k.hurt(20, from_point=(30.0, 28.0, 0.0))
+            info = k.die(20)
+        elif order == "die, hurt":
+            info = k.die(20)
+            k.hurt(20, from_point=(30.0, 28.0, 0.0))
+        else:
+            info = k.die(20, from_point=(30.0, 28.0, 0.0))
+        red = []
+        for f in range(18, 45):
+            scene.frame_set(f)
+            red.append((f, k.torso.color[3] < 0.5, k.torso.hide_render))
+        on = [f for f, r, _h in red if r]
+        print("%s: red on frames %d..%d, gone on %d, feet %s, colour keys %s" % (
+            order, on[0], on[-1], info["frame"], tuple(round(c, 2) for c in k.pos_at(info["frame"])),
+            ch.read_keys(k.torso, "color", 3)))
+        assert on == list(range(20, 45)) and info["frame"] == 44 and red[-1][2] and not red[-2][2]
+        assert [key[:2] for key in ch.read_keys(k.torso, "color", 3)] == [(0.0, 1.0), (20.0, 0.0)]
+        assert abs(k.pos_at(44).y - 31.99) < 0.02
+        if order != "die, hurt":
+            assert abs(info["feet"].y - 31.99) < 0.02 and info["size"] == (0.6, 1.8)
+    k.place(60, (30.0, 30.0, 0.0), 0.0)                         # standing again: his own colours
+    scene.frame_set(60)
+    assert abs(k.torso.color[3] - 1.0) < 1e-6 and abs(k.torso.scale.x - 1.0) < 1e-9
+    w = pl.make_player("blow_walk", "ari")                     # killed in mid stride: he stops, the legs hang straight
+    w.place(1, (30.0, 33.0, 0.0), math.radians(90))
+    w.walk(1, [(30.0, 33.0, 0.0), (40.0, 33.0, 0.0)])
+    w.die(30)
+    assert abs(val(w.leg_r, rot, 0, 30)) < 1e-6 and abs(val(w.leg_r, rot, 0, 29)) > 0.2
+    assert abs(val(w.root, loc, 0, 31) - val(w.root, loc, 0, 30)) < 1e-6 < abs(val(w.root, loc, 0, 30) - val(w.root, loc, 0, 29))
+    for order in (0, 1):                                        # ... and with a blow from behind he is knocked on, legs straight
+        w = pl.make_player("blow_walk%d" % order, "ari")
+        w.place(1, (30.0, 34.0 + order, 0.0), math.radians(90))
+        w.walk(1, [(30.0, 34.0 + order, 0.0), (40.0, 34.0 + order, 0.0)])
+        x30 = val(w.root, loc, 0, 30)
+        if order:
+            w.die(30)
+            w.hurt(30, from_point=(20.0, 34.0 + order, 0.0))
+        else:
+            w.hurt(30, from_point=(20.0, 34.0 + order, 0.0))
+            w.die(30)
+        assert abs(val(w.root, loc, 0, 54) - x30 - 1.99) < 0.02 and abs(val(w.leg_r, rot, 0, 31)) < 1e-6, order
+    try:
+        from engine import animals
+    except ImportError:
+        animals = None
+    if animals is not None:
+        quick.camera(scene, (30.0, 20.0, 1.6), (30.0, 36.0, 1.0), lens=35)
+        pf = pl.make_player("blow_poof", "efe")
+        pf.place(1, (30.0, 36.0, 0.0), 0.0)
+        info = pf.die(20, from_point=(30.0, 34.0, 0.0), camera=scene.camera)
+        zs = [p["pos"][0][2] for p in info["burst"].particles]
+        print("die(camera=...): %r around feet %s" % (info["burst"], tuple(round(c, 2) for c in info["feet"])))
+        assert len(info["burst"].particles) >= 20 and info["burst"].frame == 44
+
+    # 4. chained moves: no jump in the legs, no halt at the joins
+    limit = 0.6662 / 1.2 * 1.4 * 1.25                           # 1.25 x the fastest the game's leg turns per frame
+    m = pl.make_player("chain", "kai")
+    m.place(1, (0.0, 40.0, 0.0), math.radians(90))
+    e1 = m.walk(1, [(0.0, 40.0, 0.0), (6.0, 40.0, 0.0)], sprint=True, ramp=(True, False))
+    e2 = m.sprint_jump(e1, [(6.0, 40.0, 0.0), (6.0 + 4.2767 * 3, 40.0, 0.0)], ramp=(True, False))
+    e3 = m.walk(e2, [(18.83, 40.0, 0.0), (26.0, 40.0, 0.0)])
+    legs = [val(m.leg_r, rot, 0, f) for f in range(1, e3 + 30)]
+    jump = max(abs(b - a) for a, b in zip(legs, legs[1:]))
+    xs = [val(m.root, loc, 0, f) for f in range(1, e3 + 2)]
+    speed = [(b - a) * 24.0 for a, b in zip(xs, xs[1:])]
+    print("sprint -> sprint_jump -> walk (frames %d, %d, %d): largest leg change %.2f rad/frame (limit %.2f); slowest "
+          "frame between frames 6 and %d: %.2f blocks/s; arms still swing in the last walk: %.2f rad"
+          % (e1, e2, e3, jump, limit, e3 - 12, min(speed[5:e3 - 12]), max(abs(val(m.arm_l, rot, 0, f)) for f in range(e2 + 4, e3))))
+    assert jump < limit, jump
+    assert min(speed[5:e3 - 12]) > 3.5 and abs(xs[-1] - 26.0) < 1e-6
+    assert max(abs(val(m.arm_l, rot, 0, f)) for f in range(e2 + 4, e3)) > 0.5
+    n2 = pl.make_player("chain2", "alex")
+    n2.place(1, (0.0, 43.0, 0.0), math.radians(90))
+    e1 = n2.walk(1, [(0.0, 43.0, 0.0), (6.0, 43.0, 0.0)], ramp=(True, False))
+    e2 = n2.walk(e1, [(6.0, 43.0, 0.0), (14.0, 43.0, 0.0)], sprint=True)
+    legs = [val(n2.leg_r, rot, 0, f) for f in range(1, e2 + 30)]
+    xs = [val(n2.root, loc, 0, f) for f in range(1, e2 + 2)]
+    speed = [(b - a) * 24.0 for a, b in zip(xs, xs[1:])]
+    print("walk -> sprint: largest leg change %.2f rad/frame; speed over the join %s"
+          % (max(abs(b - a) for a, b in zip(legs, legs[1:])), [round(s, 2) for s in speed[e1 - 4:e1 + 5]]))
+    assert max(abs(b - a) for a, b in zip(legs, legs[1:])) < limit and min(speed[e1 - 4:e1 + 5]) > 4.0
+    n3 = pl.make_player("chain3", "zuri")                      # stop, then go on from the frame walk() returned
+    n3.place(1, (0.0, 46.0, 0.0), math.radians(90))
+    e1 = n3.walk(1, [(0.0, 46.0, 0.0), (5.0, 46.0, 0.0)])
+    e2 = n3.walk(e1, [(5.0, 46.0, 0.0), (10.0, 46.0, 0.0)])
+    legs = [val(n3.leg_r, rot, 0, f) for f in range(1, e2 + 30)]
+    assert max(abs(b - a) for a, b in zip(legs, legs[1:])) < limit
+
+    # 5. a lap from rest to rest: the first hop is shorter, the last landing slides out
+    lap = pl.make_player("lap", "sunny")
+    lap.place(1, (0.0, 50.0, 0.0), math.radians(90))
+    end = lap.sprint_jump(1, [(0.0, 50.0, 0.0), (20.0, 50.0, 0.0)])
+    xs = [val(lap.root, loc, 0, 1 + k * pl.TICK) for k in range(int(round((end - 1) / pl.TICK)) + 1)]
+    zs = [val(lap.root, loc, 2, 1 + k * pl.TICK) for k in range(len(xs))]
+    hops = [round(xs[k + 12] - xs[k], 2) for k in range(0, len(xs) - 12, 12) if max(zs[k:k + 12]) > 1.0]
+    tail = [round((b - a) * 20.0, 2) for a, b in zip(xs[len(hops) * 12:], xs[len(hops) * 12 + 1:])]
+    print("sprint_jump 20 blocks from rest: %d frames, hops of %s blocks, then the slide %s blocks/s (%.2f blocks)"
+          % (end - 1, hops, tail, xs[-1] - xs[len(hops) * 12]))
+    assert hops[0] < hops[1] - 0.8 and abs(xs[-1] - 20.0) < 1e-6 and max(zs[len(hops) * 12:]) < 1e-9
+    assert tail and all(b < a for a, b in zip(tail, tail[1:])) and tail[-1] < 0.3
+    assert abs(max(zs) - pl.JUMP_HEIGHT) < 1e-3
+    print("steady hop, blocks per tick: %s; carried over the landing %.3f" % ([round(s, 3) for s in pl.HOP_STEPS], pl.HOP_CARRY))
+
+    # 6. posed arms: the blocking arm, and the crouch on top of every pose
+    q = pl.make_player("pose", "steve")
+    q.place(1, (0.0, 55.0, 0.0), 0.0)
+    q.hold("shield", hand="left")
+    q.hold("bow")
+    q.block(10, 40)
+    stand = val(q.arm_l, rot, 0, 25)
+    q.draw_bow(50, 80)
+    bow = val(q.arm_r, rot, 0, 70)
+    q.sneak(100)
+    q.block(100, 130)
+    low = val(q.arm_l, rot, 0, 115)
+    q.draw_bow(140, 170)
+    bow_low = (val(q.arm_r, rot, 0, 160), val(q.arm_l, rot, 0, 160))
+    print("block: arm xRot %.4f standing (game -0.9425), %.4f sneaking (-0.5425); bow %.4f standing, %.4f sneaking"
+          % (stand, low, bow, bow_low[0]))
+    assert abs(stand + 0.9424779) < 1e-5 and abs(low + 0.5424779) < 1e-5
+    assert abs(bow + math.pi / 2) < 1e-5 and all(abs(v + math.pi / 2 - 0.4) < 1e-5 for v in bow_low)
+    lefty = pl.make_player("lefty", "ari")
+    lefty.place(1, (0.0, 58.0, 0.0), 0.0)
+    lefty.attack(10, hand="left")
+    lo_l = min(val(lefty.arm_l, rot, 0, 10 + k * 0.3) for k in range(30))
+    lo_r = min(val(lefty.arm_r, rot, 0, 10 + k * 0.3) for k in range(30))
+    righty = pl.make_player("righty", "ari")
+    righty.place(1, (0.0, 61.0, 0.0), 0.0)
+    righty.attack(10)
+    lo = min(val(righty.arm_r, rot, 0, 10 + k * 0.3) for k in range(30))
+    print("attack(hand='left'): left arm to %.2f rad, right arm stays at %.2f; right-handed: right arm to %.2f" % (lo_l, lo_r, lo))
+    assert lo_l < -1.0 and abs(lo_r) < 1e-6 and abs(lo_l - lo) < 0.25
+    assert abs(val(lefty.arm_l, rot, 0, 20)) < 1e-6 and abs(val(lefty.body, rot, 2, 20)) < 1e-6
+    lefty.attack(60, hand="left")
+    lefty.attack(65, hand="left")                               # in the second half of the first: a second swing
+    assert min(val(lefty.arm_l, rot, 0, 66 + k * 0.3) for k in range(20)) < -1.0 and abs(val(lefty.arm_l, rot, 0, 80)) < 1e-6
+    info = lefty.throw(30, hand="left")
+    assert min(val(lefty.arm_l, rot, 0, 30 + k * 0.3) for k in range(30)) < -1.0
+
+    # 7. the API's rough edges
+    t = pl.make_player("turtle", "efe")
+    t.hold("torch")
+    made = pl.equip(t, "turtle_scute")
+    assert [o.name for o in made] == ["turtle_helmet_head"] and t.armor_at("boots", 1) is None, made
+    for bad, call in (("a turtle chestplate", lambda: pl.equip(t, chestplate="turtle_scute")),
+                      ("a held chest", lambda: t.hold("chest")),
+                      ("a held nonsense", lambda: t.hold("no_such_thing")), ("wooden armor", lambda: pl.equip(t, "wood"))):
+        try:
+            call()
+        except ValueError as e:
+            print("%s -> ValueError: %s" % (bad, e))
+        else:
+            raise AssertionError(bad + " was accepted")
+    assert t.holding_at("right", 1) == "torch"                  # a refused item leaves the hand as it was
+
+    class FakeStage:
+        cast = {}
+
+    st = FakeStage()
+    st.cast["steve"] = ch.make_player("old_steve")              # what Stage.actor("steve", "steve") builds
+    town = pl.cast_town(st, 9, seed=1)
+    print("cast_town beside an old Steve:", [p.name for p in town])
+    assert all(isinstance(p, pl.Player) for p in town) and "player_steve" in [p.name for p in town]
+    assert pl.cast_town(st, 9, seed=1) == town
+    from engine import props
+
+    s1 = pl.make_player("like1", "steve")
+    s2 = pl.make_player("like2", "steve")
+    o1 = s1.hold("iron_sword")
+    o2 = s2.hold(props.make_item("iron_sword"), like="iron_sword")
+    flat = pl.make_player("like3", "steve").hold(props.make_item("iron_sword"))
+    assert max(abs(o1.matrix_basis[i][j] - o2.matrix_basis[i][j]) for i in range(4) for j in range(4)) < 1e-6
+    assert max(abs(o1.matrix_basis[i][j] - flat.matrix_basis[i][j]) for i in range(4) for j in range(4)) > 0.1
 
 
 def check_api(scene):
@@ -731,6 +1087,9 @@ def check_api(scene):
 
 
 STILLS = {
+    "legs": legs, "legs_blur": lambda: legs("legs_blur", blur=True), "legs_next": lambda: legs("legs_next", frame_offset=1),
+    "legs_close": legs_close, "sneak_poses": sneak_poses, "killing_blow": killing_blow, "herobrine_first": herobrine_first,
+    "herobrine_night": herobrine_night, "death_poof": death_poof,
     "check": check, "lineup_front": lambda: lineup(False), "lineup_back": lambda: lineup(True),
     "armor": lambda: armor(False), "armor_back": lambda: armor(True), "mixed": mixed,
     "items1": lambda: items(1), "items2": lambda: items(2), "items3": lambda: items(3),

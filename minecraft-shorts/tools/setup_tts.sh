@@ -24,7 +24,10 @@
 #   voices-v1.0.bin     27 MB  sha256 bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d
 #       https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/
 #   Systran/faster-whisper-small.en (revision d1d751a5...) from the Hugging Face hub, fetched by faster-whisper itself
-#   kokoro-v1.0.timed.onnx     made locally from kokoro-v1.0.onnx (same weights, one more output)
+#   kokoro-v1.0.timed.onnx     made locally from kokoro-v1.0.onnx (same weights, one more output; sha256
+#       4d7ae8ccd19c712c9353e358110c66d3a075e0a962303f0d6ad6a69258816c94 with onnx 1.23.2). tools/narrate.py does
+#       not speak a film without it (exit code 1), unless --recogniser-only is given: remake it with
+#       `$TTS tools/narrate.py --make-timed-model` if the models directory was cleared.
 set -euo pipefail
 
 SCRATCH="/tmp/claude-0/-home-user-Project-2-/be90bb9d-3fc7-572c-941a-ff79c8b6ef48/scratchpad"

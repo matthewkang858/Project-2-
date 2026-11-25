@@ -33,11 +33,29 @@ THE SPEC (a literal: tools/narrate.py reads it with `ast`, it never imports the 
   A word's `start` is the first sound of the word: the voice model's own phoneme timing, and after a silence the
   measured onset of the sound (tools/narrate.py explains and measures it). A pause is measured sound to sound.
 
+WRITING FOR THE VOICE
+  * LENGTH. am_michael speaks film sentences at 2.9-3.3 words a second and, with the pauses, gets through
+    2.5-3.0 words per second of film: ONE MINUTE HOLDS 140 TO 165 WORDS (measured: 165 words in 19 sentences
+    with three opened pauses = 61.9 s; a reviewer's script of 185 words in 22 sentences with numbers = 75 s;
+    44 test sentences = 166 words a minute). Fewer with numbers, long words or opened pauses. Every word over
+    the budget costs about 9 frames of rendering. tools/narrate.py prints the length against one minute and,
+    over 62 s, how many words to cut.
+  * NUMBERS, TIMES, ABBREVIATIONS: write them as words. The phonemiser reads '14:07' as "fourteen <pause> zero
+    seven", 'III' as "roman three" and makes a full stop of 'Mr.'. A plain number in digits ('12', '100%') is
+    said correctly, and the caption shows the digits. Capitals without a vowel ('XP', 'TNT') are spelt out; to
+    have such a word said otherwise, respell it in "say". tools/narrate.py prints a CHECK line with the phonemes
+    of every sentence that holds such a word (spoken_risks); `--phonemes` prints them for the whole script.
+  * QUOTATIONS: double or single quotes never reach the caption ('Not again!' shows Not / again).
+
 PUBLIC API
     load(film, spec=None, fps=24) -> Narration     read narration/<film>.json and CHECK it against the film's text
+                                                   (and against JSON_VERSION: a json written by an older narrator
+                                                   is stale too, its words were timed differently)
     read_spec(film) -> dict                        the NARRATION literal of films/<film>.py, read without importing
     normalise(spec) -> dict, spec_hash(spec) -> str    canonical form of a spec and the hash a json is tied to
     caption_form(token) -> str                     the caption of a script word ('rings,' -> 'rings')
+    caption_forms(words) -> [str]                  the captions of a sentence's words (knows an open single quote)
+    spoken_risks(text) -> [(word, why)]            words the voice reads by rules of its own (numbers, 'Mr.', 'III')
     words_of(text) -> [str]                        the script words of a sentence (dashes stay on their word)
     spoken_text(text, say) -> str                  the sentence as it is given to the voice (respellings applied)
     wav_path(film), json_path(film)                where a film's narration lives
@@ -47,6 +65,8 @@ PUBLIC API
     class Narration
         .frames            film length in frames = narration length (last word end + tail), frame 1 = second 0
         .duration          the same in seconds; .fps; .voice; .speed; .wav (path of the audio); .estimated ([Word])
+        .timing            'model' (normal), or 'recogniser': spoken with --recogniser-only, words several frames
+                           less exact; load() prints a warning for such a narration
         .words             [Word]: .index .text .caption .start .end (seconds) .sentence (index)
                                    .frame (frame NUMBER on which its caption appears) .frame_end (last frame
                                    in which it is still being spoken) .estimated (timing was interpolated)
@@ -77,7 +97,8 @@ modules build their part of it:
     $BPY -m render story --encode --no-audio ; $BPY -m render story_night --encode       # both silent
     ffmpeg -f concat -safe 0 -i list.txt -c copy -movflags +faststart out/story_joined.mp4
     $BPY -c "from engine import post; post.mux_audio('out/story_joined.mp4', 'narration/story.wav', 'out/story_final.mp4')"
-  (mux_audio copies the picture untouched and lays the whole narration under it from t = 0.)
+  (mux_audio copies the picture untouched and lays the whole narration under it from t = 0. Proved end to end
+   on a one-minute probe cut in two at a sentence: `$BPY -m tools.narration_minute two`, then `sync two`.)
 
 RULES (proved by `python -m engine.narration`, on every narration in narration/ and on adversarial timings)
   * A frame NUMBER f shows the time [(f-1)/fps, f/fps). A word spoken from `start` appears on the frame that
@@ -86,6 +107,14 @@ RULES (proved by `python -m engine.narration`, on every narration in narration/ 
     so no float rounding in between (json, autotime-style 4-decimal rounding, the encoder's t0 <= t test) can move
     it. One exception, always toward EARLY: a caption that would be on for a single frame ('a', 'The': words spoken
     in under two frames) starts one frame sooner so that it can be seen (min_frames=2; min_frames=1 = strict).
+    Measured in an encoded minute (tools.narration_minute, 33 words after a silence): against the clearly audible
+    voice captions are 0 to 1.7 frames early, 0.8 on average, never late; the earliest are words that begin
+    with h, which takes 40 ms to become clearly audible. Inside running speech a word's start is the voice model's phoneme
+    boundary minus 25 ms (where the cut tests found the word's sound to begin), so a caption there is 0.6 to 1.6
+    frames ahead of the boundary, and ahead of the BURST of a word that begins with p, t, k, b, d, g by the length
+    of its closure as well (about 2 frames in all on the demo: 'player', 'job'). A picture that leads its sound by
+    under 3 frames is not seen as out of sync (ITU-R BT.1359: detectable from 125 ms), a picture that trails is
+    seen from 45 ms: early is the safe side, and it is deliberate.
   * A word stays until the next word appears. If the voice then stays silent for more than `long_pause`, the word
     clears `hold` seconds after it was spoken. A word that has been spoken also clears at a cut (captions(cuts=...),
     default: every sentence's cut), so the word of the old shot is never on the first frames of the new one.
@@ -104,6 +133,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NARRATION_DIR = os.path.join(ROOT, "narration")
 
 SPEC_VERSION = 1                 # part of every hash: raise it when the meaning of a spec changes
+JSON_VERSION = 3                 # of narration/<film>.json: raised when tools/narrate.py times or levels differently
+                                 #   (3: words timed on the clip as spoken, not on the limited one; wav at -19 LUFS
+                                 #   mono). load() refuses a json of another version: its word frames would differ.
 DEFAULT_VOICE = "am_michael"     # the client has not chosen yet: change it here and every narration goes stale
 DEFAULTS = {"speed": 1.0, "lead": 0.3, "tail": 1.0, "pause": 0.35, "fps": 24}
 CUT_LEAD = 2                     # frames between a cut and the first word of the sentence that starts the shot
@@ -125,6 +157,12 @@ SAY = {
 
 _OPEN = "\"'([{“‘—–-"
 _CLOSE = ".,!?;:\"…—–-)]}”’"
+# words that really begin (and 'n' also ends) with an apostrophe: it is no quotation mark
+_ELISIONS = {"'em", "'til", "'cause", "'tis", "'twas", "'n'", "'bout", "'round", "'course", "'kay", "'sup"}
+# what the phonemiser reads by rules of its own, not as a director would say it (measured: 'III' is said "roman
+# three", '14:07' "fourteen <pause> zero seven", 'Mr.' with a sentence-final pause after it)
+_ABBREVIATIONS = {"mr.", "mrs.", "ms.", "dr.", "st.", "vs.", "etc.", "jr.", "sr.", "e.g.", "i.e.", "approx."}
+_ROMAN = {"ii", "iii", "iv", "vi", "vii", "viii", "ix", "xi", "xii", "xiii", "xiv", "xv", "xx"}
 
 
 class NarrationError(RuntimeError):
@@ -166,16 +204,65 @@ def words_of(text):
     return out
 
 
-def caption_form(token):
-    """What the caption shows for a script word: quotes, brackets, dashes and closing punctuation removed,
-    apostrophes kept ('rings,' -> 'rings', "don't." -> "don't", 'gold —' -> 'gold'). For ordinary words this is
-    engine.captions.display_word (the self-test compares them)."""
+def _bare(token):
+    """A script word without its outer punctuation, single quotes still on it."""
     w = str(token).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"').strip()
     close = _CLOSE.replace("’", "").replace("”", "") + " "
-    w = w.rstrip(close).lstrip(_OPEN.replace("'", "").replace("‘", "").replace("“", "") + " ")
-    if len(w) > 2 and w[0] == "'" and w[-1] == "'":          # 'Run.' in single quotes (but players' and 'em stay)
-        w = w[1:-1].rstrip(close)
-    return w
+    return w.rstrip(close).lstrip(_OPEN.replace("'", "").replace("‘", "").replace("“", "") + " "), close
+
+
+def _unquote(token, inside):
+    """(caption, inside a single-quoted phrase after this word) for one script word."""
+    w, close = _bare(token)
+    if w.lower() in _ELISIONS or len(w) < 2:
+        return w, inside
+    lead, trail = w[0] == "'", w[-1] == "'"
+    if lead and trail:                                       # 'Run.'
+        return w[1:-1].rstrip(close), False
+    if lead:                                                 # 'Not again!'  ->  Not ...
+        return w[1:], True
+    if trail and (inside or not w[-2].lower() == "s"):       # ... again!'  ->  again   (players' keeps its apostrophe
+        return w[:-1].rstrip(close), False                   #                          unless a quotation is open)
+    return w, inside
+
+
+def caption_form(token):
+    """What the caption shows for a script word: quotes, brackets, dashes and closing punctuation removed,
+    apostrophes kept ('rings,' -> 'rings', "don't." -> "don't", 'gold —' -> 'gold', "'Not" -> 'Not', "again!'" ->
+    'again', "players'" and "'em" as they are). For ordinary words this is engine.captions.display_word (the
+    self-test compares them). For the words of a sentence use caption_forms(), which knows whether a quotation
+    in single quotes is open."""
+    return _unquote(token, False)[0]
+
+
+def caption_forms(words):
+    """The captions of a sentence's script words (words_of(text)), one for one. As caption_form(), and a single
+    quote that closes a phrase opened by an earlier word goes too, even after an s ('Run, boys' -> Run / boys)."""
+    out, inside = [], False
+    for tok in words:
+        c, inside = _unquote(tok, inside)
+        out.append(c)
+    return out
+
+
+def spoken_risks(text):
+    """[(script word, why)] for the words of a sentence that the voice's phonemiser reads by rules of its own:
+    digits ('14:07', '100%', '3'), abbreviations ('Mr.'), Roman numerals ('III') and capitals without a vowel
+    ('XP', 'TNT'). tools/narrate.py prints the phonemes of such a sentence; write the word out, or respell it
+    with "say", when that is not what the film means."""
+    out = []
+    for tok in words_of(text):
+        bare = _bare(tok)[0].strip("'")
+        core = "".join(ch for ch in bare if ch.isalnum())
+        if any(ch.isdigit() for ch in bare):
+            out.append((bare, "a number"))
+        elif tok.strip().lower().rstrip(",;:!?\"')") in _ABBREVIATIONS:
+            out.append((bare + ".", "an abbreviation"))
+        elif bare.isupper() and bare.lower() in _ROMAN:
+            out.append((bare, "a Roman numeral"))
+        elif len(core) > 1 and core.isupper() and not any(ch in "AEIOUY" for ch in core):
+            out.append((bare, "capitals without a vowel"))
+    return out
 
 
 def letters(token):
@@ -383,6 +470,7 @@ class Narration:
         self.film = film or data.get("film", "")
         self.fps = int(fps)
         self.voice, self.speed = data.get("voice"), data.get("speed")
+        self.timing = data.get("timing", "model")       # 'model', or 'recogniser' (spoken without the timed voice model)
         self.duration = float(data["duration"])
         self.wav = wav_path(self.film) if self.film else None
         self.words = [Word(i, w["text"], w["caption"], w["start"], w["end"], w["sentence"],
@@ -507,7 +595,7 @@ class Narration:
                               "estimated": w.estimated, "source": w.source})
         if not words:
             raise ValueError("no word is spoken in frames %d..%d" % (first, last))
-        data = {"film": self.film, "duration": dur, "voice": self.voice, "speed": self.speed,
+        data = {"film": self.film, "duration": dur, "voice": self.voice, "speed": self.speed, "timing": self.timing,
                 "words": words, "sentences": sentences}
         out = Narration(data, fps=self.fps, film=self.film)
         out.wav = None
@@ -568,9 +656,10 @@ class Narration:
         n = len(self.words)
         speech = sum(s.end - s.start for s in self.sentences)
         lines = ["[narration] '%s': %.2f s = %d frames at %d fps, %d sentences, %d words, voice %s x %s, "
-                 "%.2f words/s while speaking, %d words estimated"
+                 "%.2f words/s while speaking, %d words estimated%s"
                  % (self.film, self.duration, self.frames, self.fps, len(self.sentences), n, self.voice, self.speed,
-                    n / max(speech, 1e-6), len(self.estimated))]
+                    n / max(speech, 1e-6), len(self.estimated),
+                    "" if self.timing == "model" else "; TIMED BY THE RECOGNISER ALONE (less exact)")]
         for s in self.sentences:
             lines.append("[narration]   %2d%s cut %4d  words %4d-%4d  %6.2f-%6.2f s  %s"
                          % (s.index, (" " + s.id) if s.id else "", s.cut, s.frame, s.frame_end, s.start, s.end, s.text))
@@ -594,6 +683,10 @@ def load(film, spec=None, fps=24, check=True):
         raise NarrationError("%s is not valid json (%s); %s" % (path, e, fix))
     if check:
         norm = normalise(read_spec(name) if spec is None else spec)
+        if data.get("json_version") != JSON_VERSION:
+            raise NarrationError("STALE NARRATION for '%s': %s was written by another version of the narrator (json "
+                                 "version %r, now %d: the words are timed and the audio levelled differently); %s"
+                                 % (name, os.path.relpath(path, ROOT), data.get("json_version"), JSON_VERSION, fix))
         if spec_hash(norm) != data.get("spec_hash"):
             raise NarrationError("STALE NARRATION for '%s': the film's NARRATION is not what %s was spoken from (%s); %s"
                                  % (name, os.path.relpath(path, ROOT), _diff(data.get("spec", {}), norm), fix))
@@ -606,7 +699,17 @@ def load(film, spec=None, fps=24, check=True):
         if data.get("wav_sha1") and file_sha1(wav) != data["wav_sha1"]:
             raise NarrationError("%s is not the audio that %s describes (another run wrote it); %s"
                                  % (os.path.relpath(wav, ROOT), os.path.relpath(path, ROOT), fix))
-    return Narration(data, fps=fps, film=name)
+    nar = Narration(data, fps=fps, film=name)
+    if nar.timing != "model" and name not in _WARNED:
+        _WARNED.add(name)
+        print("[narration] WARNING: '%s' was spoken with --recogniser-only (timing %r): its words are timed by the "
+              "recogniser alone, measured about 115 ms early inside speech with one pause in four on the wrong word. "
+              "Make the timed voice model (tools/narrate.py --make-timed-model) and speak it again: "
+              "$TTS tools/narrate.py %s --force" % (name, nar.timing, name))
+    return nar
+
+
+_WARNED = set()
 
 
 def encode_check(film):
@@ -724,8 +827,15 @@ def _selftest():
         ["In", "this", "town —", "everyone", "is", "musical ...", "except", "me."]
     for tok, want in (("rings,", "rings"), ("don't.", "don't"), ("\"Why?\"", "Why"), ("gold —", "gold"),
                       ("I’m", "I'm"), ("(really)", "really"), ("players'", "players'"), ("red-stoner", "red-stoner"),
-                      ("'Run.'", "Run"), ("'em", "'em"), ("64", "64"), ("Wait...", "Wait"), ("lava:", "lava")):
+                      ("'Run.'", "Run"), ("'em", "'em"), ("64", "64"), ("Wait...", "Wait"), ("lava:", "lava"),
+                      ("'Not", "Not"), ("again!'", "again"), ("‘Not", "Not"), ("again!’", "again"), ("'n'", "'n'"),
+                      ("I'M", "I'M"), ("o'clock,", "o'clock"), ("redstoner's", "redstoner's"), ("'Go!'", "Go")):
         assert caption_form(tok) == want, (tok, caption_form(tok))
+    assert caption_forms(words_of("\"Run,\" he typed. 'Not again, boys!' The players' base and 'em.")) == \
+        ["Run", "he", "typed", "Not", "again", "boys", "The", "players'", "base", "and", "'em"]
+    assert [r[0] for r in spoken_risks("At 14:07 Mr. Steve had 3 TNT, Unbreaking III and 100% XP.")] == \
+        ["14:07", "Mr.", "3", "TNT", "III", "100%", "XP"]
+    assert spoken_risks("So I wrote it on a sign: I'M STILL HERE. I said no.") == []
     if cap is not None:
         for tok in "When the bell rings, we run home. don't. I'm \"Why?\" players' Everyone".split():
             assert caption_form(tok) == cap.display_word(tok), tok
@@ -752,7 +862,41 @@ def _selftest():
         except NarrationError:
             continue
         raise AssertionError("normalise accepted %r" % (bad,))
-    print("[narration] text and spec rules: ok")
+    # a json of another version of the narrator, or one timed by the recogniser alone, is not taken silently
+    import contextlib
+    import io
+    import tempfile
+
+    global NARRATION_DIR
+    keep, here = NARRATION_DIR, tempfile.mkdtemp(prefix="narration_selftest_")
+    try:
+        NARRATION_DIR = here
+        probe = {"lines": ["One two."]}
+        data = _synthetic(3)
+        data.update(json_version=JSON_VERSION, spec_hash=spec_hash(probe), spec=normalise(probe), timing="recogniser")
+        with open(wav_path("probe"), "wb") as f:
+            f.write(b"RIFF")
+        with open(json_path("probe"), "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said):
+            nar = load("probe", probe)
+        assert nar.timing == "recogniser" and "WARNING" in said.getvalue() and "RECOGNISER" in nar.summary()
+        data["json_version"] = JSON_VERSION - 1
+        with open(json_path("probe"), "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        try:
+            load("probe", probe)
+            raise AssertionError("load accepted a json of an older narrator")
+        except NarrationError as e:
+            assert "another version" in str(e), e
+    finally:
+        NARRATION_DIR = keep
+        for name in ("probe.wav", "probe.json"):
+            if os.path.exists(os.path.join(here, name)):
+                os.remove(os.path.join(here, name))
+        os.rmdir(here)
+    print("[narration] text and spec rules, stale and recogniser-only narrations: ok")
 
     worst, total, moved = 0.0, 0, 0
     for seed in range(400):

@@ -25,7 +25,7 @@ def yaw_to(src, dst):
 
 
 def build(scene):
-    from engine import animals, look, props, shots, village
+    from engine import animals, fx, look, shots, village
     from films.lookdev import Stage
 
     look.setup_render(scene, res=(540, 960), samples=16, threads=2, motion_blur=True)
@@ -64,47 +64,47 @@ def build(scene):
     # ---- 2. feed: Steve holds wheat, a cow and her calf come; he feeds her: hearts
     s = st.shot("feed", 4.0)
     f0, f1 = s.frame_start, s.frame_end
-    wheat = props.make_item("wheat")
-    steve.hold(wheat)
     sp = (9.4, 23.6, 0.0)
     steve.place(f0, sp, yaw_to(sp, (13.5, 26.0)))
+    wheat = animals.hand_item(steve, "wheat", f0, f1 + 1)
     daisy.place(f0, (14.2, 26.3, 0.0), yaw_to((14.2, 26.3), sp))
     calf2.place(f0, (15.2, 25.4, 0.0), yaw_to((15.2, 25.4), sp))
     steve.raise_arm(f0, 40, ease=0)
     steve.look_at(f0, daisy, ease=0)
-    end = animals.follow(daisy, steve, f0, f0 + 50, look="item")
+    end = animals.follow(daisy, steve, f0, f0 + 50, look=wheat)
     animals.follow(calf2, daisy, f0 + 6, end + 12, stop=1.7)
     steve.track(f0, end, daisy)
     fed = end + 8
     steve.swing_arm(fed - 2)
     animals.love(daisy, fed, camera=s, frame_end=f1 + 1, seed=2)
     daisy.look_at(fed, steve, ease=6)
-    s.lens(30, 3.2)
-    s.move((8.25, 21.9, 1.5), (11.4, 25.0, 1.05), (8.45, 22.0, 1.5))
+    s.lens(26, 3.2)
+    s.move((7.63, 23.69, 1.72), (10.6, 24.45, 1.1), (7.8, 23.75, 1.7))
     s.focus(daisy.head)
     st.use(s, steve, daisy, calf2, *cows)
     st.hero(s, "cow", daisy)
     st.lights(s, scale=0.0)
-    info["feed"] = dict(rest=end, fed=fed, gap=(steve.pos_at(end) - daisy.pos_at(end)).length)
+    info["feed"] = dict(rest=end, fed=fed, gap=(steve.pos_at(end) - daisy.pos_at(end)).length, wheat=wheat)
 
     # ---- 3. milk: a bucket becomes a milk bucket
     s = st.shot("milk", 2.0)
     f0, f1 = s.frame_start, s.frame_end
-    steve.hold(None)
-    wheat.hide_render = True
+    fx.stop_particles(f0)                                               # the hearts of the shot before
     cp = (11.3, 24.9, 0.0)
     daisy.place(f0, cp, math.radians(-90))                              # facing west
-    sp = (10.9, 23.5, 0.0)
-    steve.place(f0, sp, yaw_to(sp, (11.6, 24.9)))
-    steve.look_at(f0, (11.5, 24.9, 0.75), ease=0)
+    sp = (11.75, 26.15, 0.0)                                            # at her flank, his right hand toward the lens
+    steve.place(f0, sp, yaw_to(sp, (11.75, 24.9)))
+    steve.look_at(f0, (11.7, 24.9, 0.75), ease=0)
     use = f0 + 20
     bucket, milk = animals.milk(steve, use, f0, f1 + 1)
+    steve.raise_arm(f0, 30, ease=0)
     daisy.idle(f0, f1 + 1, seed=4, watch=steve)
-    s.lens(34, 3.2)
-    s.move((8.7, 22.3, 1.25), (11.0, 24.3, 0.95), (8.9, 22.35, 1.25))
-    s.focus(daisy.head)
+    # a held item is a flat sprite that lies along the hand: edge-on from his side, readable from behind and above
+    s.lens(24, 3.2)
+    s.move((11.0, 26.98, 2.0), (11.55, 25.45, 0.8), (11.05, 26.98, 1.95))
+    s.focus(bucket)
     st.use(s, steve, daisy, *cows)
-    st.hero(s, "cow", daisy)
+    st.hero(s, "bucket", bucket)
     st.lights(s, scale=0.0)
     info["milk"] = dict(use=use, bucket=bucket, milk=milk)
 

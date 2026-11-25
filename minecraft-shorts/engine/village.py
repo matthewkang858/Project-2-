@@ -26,6 +26,49 @@ Use build_village(scene); everything a film needs is on the returned Village:
   door_open(), set_door(), ring_bell(), set_lantern_energy(), only_lights_near(), cutaway(), ground(), validate()
 Walking surfaces: grass 0.0, dirt_path -1/16, house floors +1.0 (vanilla houses are raised one block; the entry
 polylines climb the door step), house_f floor 0.0, farmland +15/16 above the farm's log frame.
+
+FILM SETS: build_village(scene, seed=1, bed_colors=None, edit=None). With edit=None the village is exactly the one
+of the finished films (tools/check_sets_hook.py proves it). `edit(b)` is called once with the builder when every
+block of the village is in the World and its anchors and paths exist, BEFORE the mesh, the door / bell props and the
+lights are made: whatever the hook puts into the World (or takes out of it) is meshed, lit and checked like the
+village's own. engine/sets.py holds the set pieces that are built this way. What `b` offers the hook:
+
+  b.w                      the World (blocks.World: set / get / fill / block_id / is_solid, Blender grid coordinates)
+  b.v                      the Village being built (anchors, yaws, paths, beds, buildings, sets)
+  b.seed, b.rng_for(tag)   a numpy Generator of its own for a set piece (seeded by the village seed and the tag)
+  b.ground(x, y)           terrain surface z of a column (top of its grass block; floats are floored), None = no terrain
+  b.walk_z(x, y)           height a character stands at there (grass z, dirt_path z - 1/16, a slab z + 0.5)
+  b.trees                  the village's own oaks as data: dict(kind, x, y, base, height, logs=[cells], leaves=[cells],
+                           where='village' | 'ring' | 'meadow' | 'set'); b.tree_at(x, y) finds one by its trunk
+  b.tree(x, y, rng, where) plant one more vanilla small oak (the village's own generator); returns its record
+  b.anchor(name, pos, yaw=None) / b.path(name, points)       register a standing spot / a walkable polyline (2D points
+                           get the walking height); an existing name is refused unless replace=True
+  b.extend_terrain(x0, y0, x1, y1, plants=True, rise=1/11)   grass terrain for every column of the box that has none
+                           (the set is a disc of radius 83 inside [-84, 84)): the village's own relief where its height
+                           field reaches, beyond it the edge carried on with gentle seeded noise and the meadow's rise;
+                           the same short grass / tall grass / flowers as the far meadow. Returns the new columns.
+  b.natural_height(x, y)   the height that terrain has or would get at a column (what extend_terrain uses)
+  b.set_ground(x, y, z)    re-level one column (grass top at z; whatever grew on it is removed; dirt sides are refilled)
+  b.clear_plants(x, y) / b.sow(x, y, rng, edge=None)         remove / grow the meadow's plants on one column
+  b.pave(x, y)             turn a column's surface into dirt_path
+  b.reserved, b.path_cells sets of (x, y) columns: where nothing is sown or planted / what is paved. Add yours.
+  b.show_undersides(x0, y0, x1, y1)     draw the terrain's underside there again (a set dug in under the ground)
+  b.torch(cell, block_id='torch', props=None, group='set')   a torch / lantern block WITH its point light, in a light
+                           group of its own (Village.lights[group]). Torch blocks set with b.w.set(...) get one too.
+  b.bed(name, foot_cell, facing, color='white') / b.door(name, cell, facing, hinge='left', block_id='oak_door')
+                           a bed with its anchor and Village.beds entry / a door that becomes an animated prop
+                           (Village.doors[name], door_open(name, ...)), like the houses' own
+  b.allow(what)            permit changes inside a building ('house_a', 'hall', ...), on the 'streets', or in a box
+                           (x0, y0, x1, y1); without it a block changed inside a house or on a street is a problem
+  b.changed()              the cells the hook has changed so far; b.strict = False turns problems into warnings
+After the hook: torches it removed lose their light, beds and doors it removed lose their anchors and props, and the
+build stops with a ValueError (b.strict) if a block was changed inside a building or on a street without b.allow, if
+a path is blocked or an anchor stands inside a block (Village.validate(): every anchor is taken as a standing spot
+unless it is a bed's or its name ends in _target, _center, _cam, _station or _door). The list is also in
+Village.edit_problems. If the hook re-levels ground under one of the village's own paths, register that path again
+(b.path(name, points_2d, replace=True)): its heights were taken before the hook ran.
+The look's fill light is shadowless (engine/look.py): a roofed or dug-in set piece is NOT dark by itself.
+engine/sets.py can bake the game's own sky light into the blocks (sets.env(b).bake_sky_light).
 """
 import math
 
@@ -116,9 +159,17 @@ class Village:
         self.face_count = 0
         self._height = None
         self._door_sets = {}
+        self._ext = {}            # (x, y) -> terrain height of columns a film's edit hook added beyond the height field
+        self.trees = []           # the oaks as data (see the module docstring: FILM SETS)
+        self.sets = {}            # set piece name -> whatever its function returned (engine/sets.py), for the film
+        self.edit_problems = []   # what the check after a film's edit hook found (empty = all good)
 
     def ground(self, x, y):
         """Height of the terrain surface (z) at world position (x, y)."""
+        if self._ext:             # terrain a film's edit hook added outside the height field
+            h = self._ext.get((int(math.floor(x)), int(math.floor(y))))
+            if h is not None:
+                return float(h)
         ix = int(np.clip(math.floor(x), -R, R - 1)) + R
         iy = int(np.clip(math.floor(y), -R, R - 1)) + R
         return float(self._height[ix, iy])
@@ -219,7 +270,7 @@ class Village:
                 out.append("light %s buried in %s" % (ob.name, w.block_id(*c)))
         for name, (x, y, z) in self.anchors.items():
             if name.endswith(("_station", "_station_2", "_cam", "_cam_beds", "_door", "_target", "_center")) \
-                    or "_bed_" in name \
+                    or "_bed_" in name or name in self.beds \
                     or name in ("bell", "well") or name.startswith("bell_lamp_"):
                 continue
             cx, cy = int(math.floor(x)), int(math.floor(y))
@@ -264,6 +315,21 @@ def _distance(mask):
     return d
 
 
+def _hash_noise(x, y, cell, seed):
+    """Smooth value noise 0..1 at (x, y) from a hashed lattice of pitch `cell` (defined everywhere, unlike
+    _value_noise, which fills one array): the relief of terrain a film's edit hook adds beyond the height field."""
+    gx, gy = x / cell, y / cell
+    ix, iy = int(math.floor(gx)), int(math.floor(gy))
+    fx, fy = gx - ix, gy - iy
+    fx, fy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
+
+    def lat(i, j):
+        return (pos_hash(i, j, seed, 77) & 0xFFFF) / 65535.0
+
+    return (lat(ix, iy) * (1 - fx) + lat(ix + 1, iy) * fx) * (1 - fy) + (lat(ix, iy + 1) * (1 - fx)
+                                                                         + lat(ix + 1, iy + 1) * fx) * fy
+
+
 def _jigsaws(template, name):
     out = []
     raw = template.raw
@@ -293,6 +359,16 @@ class _Builder:
         self.skip = set()
         self.torches = []             # (group, block_id, props, cell)
         self.groups = {}              # cutaway name -> set of cells
+        # the film hook (build_village(edit=...)): see the module docstring
+        self.trees = self.v.trees     # every oak tree() planted, as data
+        self.ext = self.v._ext        # terrain columns outside the height field: (x, y) -> height
+        self.set_groups = set()       # light groups made by the hook: one point light per torch / lantern
+        self.light_group = "set"      # group of torch blocks the hook places without b.torch(...)
+        self.allowed = []             # building names / 'streets' / boxes the hook may change (b.allow)
+        self.strict = True            # problems found after the hook stop the build
+        self._before = None           # World.blocks as they were when the hook was called
+        self._natural = None          # the height field as terrain() made it (set when a hook runs)
+        self._streets_before = set()
 
     # ---- terrain ---------------------------------------------------------------------------------
 
@@ -367,7 +443,9 @@ class _Builder:
 
     def surface_z(self, x, y):
         """Terrain block top at column (x, y)."""
-        return int(self.height[x + R, y + R])
+        if -R <= x < R and -R <= y < R:
+            return int(self.height[x + R, y + R])
+        return int(self.ext.get((x, y), -99))        # (only a film's edit hook builds out there)
 
     def pave(self, x, y):
         """Turn the terrain surface block of a column into dirt_path."""
@@ -640,13 +718,15 @@ class _Builder:
             self.v.anchors[group.replace("bell_", "bell_lamp_")] = props.flame_position(
                 (x, y, 2), "lantern", {"hanging": "false"})
 
-    def tree(self, x, y, rng):
-        """A vanilla small oak: 4-6 logs, two 5x5 leaf layers and two 3x3 layers with randomly missing corners."""
+    def tree(self, x, y, rng, where="set"):
+        """A vanilla small oak: 4-6 logs, two 5x5 leaf layers and two 3x3 layers with randomly missing corners.
+        Returns its record (also appended to self.trees): dict(kind, x, y, base, height, logs, leaves, where)."""
         w = self.w
         base = self.surface_z(x, y)
         if base == -99:
             return
         h = 4 + int(rng.integers(0, 3))
+        rec = dict(kind="oak", x=x, y=y, base=base, height=h, logs=[], leaves=[], where=where)
         w.set(x, y, base - 1, "dirt")
         leaf = {"persistent": "false", "distance": "1", "waterlogged": "false"}
         for i, r in ((h - 3, 2), (h - 2, 2), (h - 1, 1), (h, 1)):
@@ -656,11 +736,15 @@ class _Builder:
                         continue
                     if w.get(x + dx, y + dy, base + i) is None:
                         w.set(x + dx, y + dy, base + i, "oak_leaves", leaf)
+                        rec["leaves"].append((x + dx, y + dy, base + i))
         for i in range(h):
             w.set(x, y, base + i, "oak_log", {"axis": "y"})
+            rec["logs"].append((x, y, base + i))
         for dx in range(-2, 3):
             for dy in range(-2, 3):
                 self.reserved.add((x + dx, y + dy))
+        self.trees.append(rec)
+        return rec
 
     def hay_pile(self, x, y, rng, n=5):
         """A small heap of hay bales with random grain, like the hay piles the game scatters in plains villages."""
@@ -680,7 +764,7 @@ class _Builder:
         trees = [(5, -21), (25, -6), (-14, -17), (-13, 13), (13, 13), (24, -19), (-28, 13), (30, 6)]
         for x, y in trees:
             if (x, y) not in self.reserved:
-                self.tree(x, y, rng)
+                self.tree(x, y, rng, "village")
         placed = list(trees)
         tries = 0
         while len(placed) < 78 and tries < 6000:
@@ -694,7 +778,7 @@ class _Builder:
                 continue
             if any((x + dx, y + dy) in self.reserved for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
                 continue
-            self.tree(x, y, rng)
+            self.tree(x, y, rng, "ring")
             placed.append((x, y))
         # short grass, tall grass and flowers on open grass
         for ix in range(2 * R):
@@ -729,7 +813,7 @@ class _Builder:
                 if w.block_id(x, y, self.surface_z(x, y) + dz) in ("short_grass", "tall_grass", "poppy", "dandelion",
                                                                     "oxeye_daisy", "cornflower"):
                     w.set(x, y, self.surface_z(x, y) + dz, None)
-            self.tree(x, y, trng)
+            self.tree(x, y, trng, "meadow")
         # Second pass, from its own random stream (so everything placed above stays exactly where it was):
         # (a) the far end of the meadow, beyond the 62-block plant radius, gets its tufts too;
         # (b) tufts, tall grass and flowers crowd along every 1-block step of the terrain away from the village
@@ -1024,7 +1108,8 @@ class _Builder:
             sub = World()
             sub._states, sub._state_ids = w._states, w._state_ids
             for c in cells:
-                sub.blocks[c] = w.blocks[c]
+                if c in w.blocks:                # (a film's edit hook may have taken a block of the section out)
+                    sub.blocks[c] = w.blocks[c]
             objs = sub.build(coll, gname)
             total += sub.last_face_count
             v.cutaways[gname] = objs
@@ -1069,6 +1154,10 @@ class _Builder:
                 for bid, p, cell in items:
                     add(group, "lantern", props.flame_position(cell, bid, p))
                 continue
+            if group in self.set_groups:     # torches and lanterns of a film's edit hook: one light each, unmerged
+                for bid, p, cell in items:
+                    add(group, "lantern" if "lantern" in bid else "torch", props.flame_position(cell, bid, p))
+                continue
             if group == "library":   # torches on the back wall and far corners only keep their glowing flame
                 items = [it for it in items if not (it[2][0] <= -35 or (abs(it[2][1]) > 5 and it[2][2] < 4))]
             if group == "house_a":   # likewise the torch on the outside of the east wall
@@ -1101,10 +1190,335 @@ class _Builder:
                 x, y, z = v.anchors[anchor]
                 add(group, "fill", (x, y, z + dz), 0.16 * torch_watts / props.LIGHT_ENERGY["fill"])
 
+    # ---- the film hook: what edit(b) may use (module docstring: FILM SETS) ------------------------
+
+    def rng_for(self, tag):
+        """A numpy random Generator of its own for one set piece, seeded by the village seed and `tag`."""
+        import zlib
+
+        return np.random.default_rng([int(self.seed), zlib.crc32(str(tag).encode("utf-8"))])
+
+    def ground(self, x, y):
+        """Terrain surface z of the column under (x, y) (the top of its grass block), or None where there is none."""
+        h = self.surface_z(int(math.floor(x)), int(math.floor(y)))
+        return None if h == -99 else h
+
+    def walk_z(self, x, y):
+        """Height a character stands at on the ground at (x, y) (a dirt_path is 1/16 lower than grass), or None."""
+        cx, cy = int(math.floor(x)), int(math.floor(y))
+        h = self.surface_z(cx, cy)
+        return None if h == -99 else self.walk_surface(cx, cy, h)[0]
+
+    def tree_at(self, x, y, radius=0.0):
+        """The record (see tree()) of the oak whose trunk stands in column (x, y), or the nearest within `radius`."""
+        best = None
+        for t in self.trees:
+            d = math.hypot(t["x"] - x, t["y"] - y)
+            if d <= radius and (best is None or d < best[0]):
+                best = (d, t)
+        return best[1] if best else None
+
+    def anchor(self, name, pos, yaw=None, replace=False):
+        """Register a named standing spot / look target (a 2D position gets the walking height) and its facing yaw."""
+        if name in self.v.anchors and not replace:
+            raise KeyError("anchor %r exists already (replace=True to move it)" % name)
+        if len(pos) == 2:
+            z = self.walk_z(pos[0], pos[1])
+            if z is None:
+                raise ValueError("anchor %r: no terrain at %s" % (name, (pos,)))
+            pos = (pos[0], pos[1], z)
+        self.v.anchors[name] = tuple(float(a) for a in pos)
+        if yaw is not None:
+            self.v.yaws[name] = float(yaw)
+        return self.v.anchors[name]
+
+    def path(self, name, points, replace=False):
+        """Register a named walkable polyline (2D points get the walking height there). Returns its 3D points."""
+        if name in self.v.paths and not replace:
+            raise KeyError("path %r exists already (replace=True to change it)" % name)
+        pts = []
+        for p in points:
+            z = p[2] if len(p) > 2 else self.walk_z(p[0], p[1])
+            if z is None:
+                raise ValueError("path %r: no terrain at %s" % (name, (tuple(p),)))
+            pts.append((float(p[0]), float(p[1]), float(z)))
+        self.v.paths[name] = pts
+        return pts
+
+    PLANTS = ("short_grass", "tall_grass", "poppy", "dandelion", "oxeye_daisy", "cornflower")
+    TERRAIN = ("grass_block", "dirt", "dirt_path")
+    LIGHT_BLOCKS = ("torch", "wall_torch", "lantern")
+
+    def _set_height(self, x, y, h):
+        if -R <= x < R and -R <= y < R:
+            self.height[x + R, y + R] = int(h)
+            self.v._height[x + R, y + R] = float(h)
+        else:
+            self.ext[(x, y)] = int(h)            # (the same dict as Village._ext: Village.ground() reads it)
+        tb = self.v.terrain_bounds
+        self.v.terrain_bounds = (min(tb[0], x), min(tb[1], y), max(tb[2], x + 1), max(tb[3], y + 1))
+
+    def _refill(self, x, y):
+        """The rule of terrain() for one column after it or a neighbour changed height: dirt under the surface block
+        down to the lowest neighbour, and the underside of the lowest block is never drawn."""
+        h = self.surface_z(x, y)
+        if h == -99:
+            return
+        w = self.w
+        low = h
+        for ax, ay in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            a = self.surface_z(ax, ay)
+            if a != -99:
+                low = min(low, a)
+        bottom = h - 1
+        for z in range(low, h - 1):
+            if w.get(x, y, z) is None:
+                w.set(x, y, z, "dirt")
+            bottom = min(bottom, z)
+        w.hidden_sides.add(((x, y, bottom), "down"))
+
+    def clear_plants(self, x, y):
+        """Remove the grass tuft / tall grass / flower that grows on the terrain column (x, y), if any."""
+        h = self.surface_z(x, y)
+        if h == -99:
+            return
+        for dz in (0, 1):
+            if self.w.block_id(x, y, h + dz) in self.PLANTS:
+                self.w.set(x, y, h + dz, None)
+
+    def sow(self, x, y, rng, edge=None, density=1.0):
+        """Let the meadow's own mix grow on the column (x, y), by chance: short grass 10 % and a flower 1.5 % on open
+        ground, and the thick growth of a bank (short grass 42 %, tall grass 16 %, a flower 8 %) where the terrain
+        steps (edge=None looks at the eight neighbours). Never on a path, a reserved or an occupied column.
+        Returns the block id it planted, or None. One random number is drawn per call whatever happens."""
+        w = self.w
+        r2 = rng.random() / max(density, 1e-6)
+        h = self.surface_z(x, y)
+        if h == -99 or (x, y) in self.reserved or w.block_id(x, y, h - 1) != "grass_block" \
+                or w.get(x, y, h) is not None:
+            return None
+        if edge is None:
+            hs = [self.surface_z(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1)]
+            edge = min(hs) != max(hs) and min(hs) != -99
+        flowers = ("poppy", "dandelion", "oxeye_daisy", "cornflower")
+        what = None
+        if edge:
+            if r2 < 0.42:
+                what = "short_grass"
+            elif r2 < 0.58 and w.get(x, y, h + 1) is None:
+                what = "tall_grass"
+            elif r2 < 0.66:
+                what = flowers[int(rng.integers(0, 4))]
+        elif r2 < 0.10:
+            what = "short_grass"
+        elif r2 < 0.115:
+            what = flowers[int(rng.integers(0, 4))]
+        if what == "tall_grass":
+            w.set(x, y, h, "tall_grass", {"half": "lower"})
+            w.set(x, y, h + 1, "tall_grass", {"half": "upper"})
+        elif what:
+            w.set(x, y, h, what)
+        return what
+
+    def set_ground(self, x, y, z):
+        """Re-level the terrain column (x, y): its surface is at height z afterwards (a grass block, or a dirt_path
+        if it was one). Plants on the old surface are removed, dirt is filled in under it and beside it; a column
+        without terrain gets some. Blocks that are not terrain (a house, a tree trunk) are left alone."""
+        w = self.w
+        z = int(z)
+        old = self.surface_z(x, y)
+        if old == z:
+            return
+        top = ("grass_block", {"snowy": "false"})
+        if old != -99:
+            self.clear_plants(x, y)
+            was = w.block_id(x, y, old - 1)
+            if was == "dirt_path":
+                top = ("dirt_path", None)
+            if z < old:
+                for zz in range(z, old):
+                    if w.block_id(x, y, zz) in self.TERRAIN:
+                        w.set(x, y, zz, None)
+            elif was in self.TERRAIN:
+                w.set(x, y, old - 1, "dirt")
+                for zz in range(old, z - 1):
+                    if w.get(x, y, zz) is None:
+                        w.set(x, y, zz, "dirt")
+        if w.get(x, y, z - 1) is None or w.block_id(x, y, z - 1) in self.TERRAIN:
+            w.set(x, y, z - 1, top[0], top[1])
+        self._set_height(x, y, z)
+        for c in ((x, y), (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            self._refill(*c)
+
+    def natural_height(self, x, y, rise=1.0 / MEADOW_STEP):
+        """Height the terrain has, or would have, at column (x, y). Inside [-R, R) it is the village's own height
+        field (computed for the whole square, built only inside the disc). Beyond the square the field's edge is
+        carried on: plus `rise` blocks per block of distance (the meadow rises one block about every 11) and a
+        gentle seeded noise that fades in over 8 blocks, so the 1-block steps wander as the meadow's do."""
+        nat = self._natural if self._natural is not None else self.v._height
+        if -R <= x < R and -R <= y < R:
+            return int(nat[x + R, y + R])
+        cx, cy = min(max(x, -R), R - 1), min(max(y, -R), R - 1)
+        d = math.hypot(x - cx, y - cy)
+        n = (_hash_noise(x, y, 11.0, self.seed) - 0.5) * 1.8 + (_hash_noise(x, y, 4.5, self.seed + 1) - 0.5) * 0.8
+        return max(0, int(math.floor(float(nat[cx + R, cy + R]) + rise * d + n * min(1.0, d / 8.0) + 0.35)))
+
+    def extend_terrain(self, x0, y0, x1, y1, plants=True, rise=1.0 / MEADOW_STEP, where=None):
+        """Grass terrain for every column of the inclusive box that has none yet (the village's terrain is a disc of
+        radius 83): heights from natural_height(), the meadow's plants on top (plants=False: bare grass), dirt
+        sides filled against the old rim. where(x, y) -> bool limits the box to a shape. Returns the new columns."""
+        w = self.w
+        new = []
+        for x in range(int(x0), int(x1) + 1):
+            for y in range(int(y0), int(y1) + 1):
+                if self.surface_z(x, y) != -99 or (where is not None and not where(x, y)):
+                    continue
+                new.append((x, y, self.natural_height(x, y, rise)))
+        for x, y, h in new:
+            self._set_height(x, y, h)
+            if w.get(x, y, h - 1) is None:
+                w.set(x, y, h - 1, "grass_block", {"snowy": "false"})
+        touched = set()
+        for x, y, h in new:
+            touched.update(((x, y), (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)))
+        for c in sorted(touched):
+            self._refill(*c)
+        if plants:
+            rng = self.rng_for("extend_terrain %d %d %d %d" % (x0, y0, x1, y1))
+            for x, y, h in new:                  # as nature() does: banks outside the meadow wedge grow two thirds as thick
+                cx, cy = min(max(x, -R), R - 1), min(max(y, -R), R - 1)
+                self.sow(x, y, rng, density=1.0 if self.wedge[cx + R, cy + R] > 0.3 else 1.0 / 1.5)
+        return [(x, y) for x, y, h in new]
+
+    def show_undersides(self, x0, y0, x1, y1):
+        """Draw the underside of the terrain again inside a box of columns (terrain() never draws it: nothing could
+        see it). For a set that is dug in under the ground."""
+        self.w.hidden_sides = {(c, d) for (c, d) in self.w.hidden_sides
+                               if not (x0 <= c[0] <= x1 and y0 <= c[1] <= y1)}
+
+    def torch(self, cell, block_id="torch", props=None, group="set"):
+        """Place a torch / wall_torch / lantern block and give it its point light, in light group `group`
+        (Village.lights[group]; one light per block, never merged). A village group's name is refused."""
+        if block_id not in self.LIGHT_BLOCKS:
+            raise ValueError("no light is known for %r (use one of %s)" % (block_id, ", ".join(self.LIGHT_BLOCKS)))
+        if group not in self.set_groups and any(t[0] == group for t in self.torches):
+            raise ValueError("light group %r belongs to the village: choose another name" % group)
+        p = dict(props or {})
+        if block_id == "lantern":
+            p.setdefault("hanging", "false")
+        cell = tuple(int(c) for c in cell)
+        self.w.set(cell[0], cell[1], cell[2], block_id, p)
+        self.torches[:] = [t for t in self.torches if t[3] != cell]
+        self.torches.append((group, block_id, p, cell))
+        self.set_groups.add(group)
+
+    def bed(self, name, foot_cell, facing="north", color="white"):
+        """A bed with its foot at `foot_cell` and its pillow one block further in `facing`, with the anchor, yaw
+        and Village.beds entry the houses' own beds have (Character.lie_down(frame, anchors[name], yaws[name]))."""
+        bx, by, bz = (int(c) for c in foot_cell)
+        dx, dy = _VEC[facing]
+        self.w.set_bed(bx, by, bz, facing, color)
+        top = bz + 9.0 / 16.0
+        pos = (bx + 0.5 + dx * 0.5, by + 0.5 + dy * 0.5, top)
+        self.v.anchors[name] = pos
+        self.v.beds[name] = dict(pos=pos, head=(bx + 0.5 + dx, by + 0.5 + dy, top), foot=(bx + 0.5, by + 0.5, top),
+                                 yaw=yaw_of(facing), facing=facing)
+        self.v.yaws[name] = self.v.beds[name]["yaw"]
+        return pos
+
+    def door(self, name, cell, facing="north", hinge="left", block_id="oak_door"):
+        """A door (lower half at `cell`) that becomes an animated prop like the houses' own: Village.doors[name],
+        Village.door_open(name, frame). `facing` as in the game: the side the door was placed FROM."""
+        if name in self.entries:
+            raise KeyError("door %r exists already" % name)
+        cell = tuple(int(c) for c in cell)
+        self.w.set_door(cell[0], cell[1], cell[2], facing, hinge, block_id)
+        self.entries[name] = dict(cell=cell, out=facing, doors=[cell])
+
+    def allow(self, what):
+        """Permit the hook to change blocks inside a building ('house_a' ... 'farm', 'well', 'hall'), on the
+        'streets' (dirt paths and the two blocks of air above them), or anywhere in a box of columns (x0, y0, x1, y1)."""
+        self.allowed.append(what)
+
+    def changed(self):
+        """{cell: ((block id, props) | None, (block id, props) | None)}: every cell whose block differs now from
+        when the hook was called (before, after)."""
+        w, before = self.w, self._before or {}
+        out = {}
+        for c, sid in w.blocks.items():
+            old = before.get(c)
+            if old != sid:
+                out[c] = (None if old is None else w._states[old], w._states[sid])
+        for c, old in before.items():
+            if c not in w.blocks:
+                out[c] = (w._states[old], None)
+        return out
+
+    def _after_edit(self):
+        """Bring the builder's own lists in line with what the hook did to the World, and list what it changed
+        where it should not have (see the module docstring)."""
+        w, v = self.w, self.v
+        changed = self.changed()
+        if w.block_id(*self.bell_cell) != "bell":
+            raise ValueError("village edit hook: the bell block is gone (the set needs it)")
+        # torches: a removed one loses its light, a new one gets a light
+        kept = []
+        for group, bid, p, cell in self.torches:
+            if cell in changed:
+                st = w.get(*cell)
+                if st is None or st[0] not in self.LIGHT_BLOCKS:
+                    continue
+                bid, p = st[0], dict(st[1])
+            kept.append((group, bid, p, cell))
+        self.torches[:] = kept
+        have = {t[3] for t in self.torches}
+        for cell in sorted(changed):
+            st = w.get(*cell)
+            if st is not None and st[0] in self.LIGHT_BLOCKS and cell not in have:
+                self.torches.append((self.light_group, st[0], dict(st[1]), cell))
+                self.set_groups.add(self.light_group)
+        # doors and beds that are no longer there
+        for e in self.entries.values():
+            e["doors"] = [c for c in e.get("doors", []) if (w.block_id(*c) or "").endswith("_door")]
+        for key in list(v.beds):
+            cells = [tuple(int(math.floor(a)) for a in v.beds[key][k]) for k in ("foot", "head")]
+            if any(not (w.block_id(*c) or "").endswith("_bed") for c in cells):
+                del v.beds[key]
+                v.anchors.pop(key, None)
+                v.yaws.pop(key, None)
+        # nothing inside a house or on a street by accident
+        boxes = {name: pl.bounds for name, pl in v.buildings.items()}
+        boxes["hall"] = (HALL["x0"], HALL["y0"], -1, HALL["x0"] + 12, HALL["y0"] + 6, 3)
+        names = {a for a in self.allowed if isinstance(a, str)}
+        free = [a for a in self.allowed if not isinstance(a, str)]
+        hits = {}
+        for (x, y, z) in sorted(changed):
+            if any(b[0] <= x <= b[2] and b[1] <= y <= b[3] for b in free):
+                continue
+            for name, (x0, y0, z0, x1, y1, z1) in boxes.items():
+                if name not in names and x0 <= x <= x1 and y0 <= y <= y1 and z0 <= z <= z1:
+                    hits.setdefault(name, []).append((x, y, z))
+            if "streets" not in names and (x, y) in self._streets_before:
+                h = self.surface_z(x, y)
+                if h != -99 and h - 1 <= z <= h + 1:
+                    hits.setdefault("streets", []).append((x, y, z))
+        return ["%d block(s) changed %s, e.g. at %s (b.allow(%r) if that is meant)" % (
+            len(cells), "on the streets" if name == "streets" else "inside " + name, cells[0], name)
+            for name, cells in sorted(hits.items())]
+
+    def _report(self, problems):
+        self.v.edit_problems = list(problems)
+        if problems:
+            text = "village edit hook: " + "; ".join(problems)
+            if self.strict:
+                raise ValueError(text)
+            print("WARNING " + text)
+
     # ---- all together ----------------------------------------------------------------------------
 
-    def build(self):
-        """Run every stage and return the Village."""
+    def build(self, edit=None):
+        """Run every stage and return the Village. `edit(self)` is a film's hook (see the module docstring): it runs
+        when the World, the anchors and the paths are complete and nothing has been made from them yet."""
         self.terrain()
         self.streets()
         self.buildings()
@@ -1114,13 +1528,25 @@ class _Builder:
         self.anchors()
         self.nature()
         self.paths()
+        if edit is not None:
+            self._before = dict(self.w.blocks)
+            self._streets_before = set(self.path_cells)
+            self._natural = self.v._height.copy()
+            edit(self)
+            problems = self._after_edit()
         self.props_and_mesh()
         self.lights()
+        if edit is not None:
+            self._report(problems + self.v.validate())
         return self.v
 
 
-def build_village(scene, seed=1, bed_colors=None):
+def build_village(scene, seed=1, bed_colors=None, edit=None):
     """Build the whole village set into `scene` and return its Village handle.
+
+    edit (optional) is a film's set hook, edit(b): called with the builder when every block of the village is in
+    the World and before anything is made from it (module docstring: FILM SETS; engine/sets.py has the set pieces).
+    With edit=None the village is exactly the one of the finished films.
 
     bed_colors (optional) re-dyes single beds, e.g. {"house_a_bed_2": "red"}: the vanilla plains houses come with
     white (and yellow) beds, which is what you get by default; the red bed is the one everybody knows, and a film
@@ -1132,7 +1558,7 @@ def build_village(scene, seed=1, bed_colors=None):
         scene.cycles.transparent_max_bounces = max(scene.cycles.transparent_max_bounces, 48)
     except Exception:
         pass
-    return _Builder(scene, seed, bed_colors).build()
+    return _Builder(scene, seed, bed_colors).build(edit)
 
 
 # --------------------------------------------------------------------------------------------------

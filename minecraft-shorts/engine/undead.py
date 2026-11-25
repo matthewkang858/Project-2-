@@ -21,13 +21,22 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
       The same, registered with a films.lookdev.Stage (st.cast[name]): then st.use(shot, z), st.hero(shot, "zombie", z).
 
   Undead (a subclass of engine.characters.Character: root / hips / body / head / arm_l / arm_r / leg_l / leg_r)
-      place(frame, pos, yaw=0.0)            hard cut to a spot: upright, neutral legs, arms out (use at shot cuts)
+      place(frame, pos, yaw=0.0, keep_pose=False)
+                                            hard cut to a spot: upright, neutral legs, arms out (use at shot cuts).
+                                            A place() ENDS whatever was keyed before it: raised arms come down
+                                            (call aggro() AFTER place()), a swing, a red flash and a knock-back
+                                            stop, a death in progress is called off (see CUTS)
       show(frame, visible=True)             keyed visibility (Stage.finish calls it)
-      walk(frame, points, speed=None, run=False, from_current=False, gait="planted") -> end frame
+      walk(frame, points, speed=None, run=False, from_current=False, gait="planted", lead=None, first_step=None,
+           stride=None) -> end frame
                                             the game's speed (WALK_SPEED 2.33 blocks/s, babies BABY_SPEED 5.24:
                                             zombies have ONE speed, run= changes nothing). gait="planted": the
                                             sole on the ground does not slide; gait="vanilla": the game's exact
-                                            leg wave (its feet slide, see GAIT). The arms stay out and do not swing
+                                            leg wave (its feet slide, see GAIT). The arms stay out and do not swing.
+                                            Every zombie walks in its own step (leading foot, length of the first
+                                            step and stride come from its NAME): a horde that sets off on one
+                                            frame is not a row of clones. lead="l"|"r", first_step=0.2..1,
+                                            stride=0.8..1.2 choose them
       look_at / track / face / turn         as every Character; the head is clamped to the game's 75 degrees of
                                             yaw and 40 of pitch (Mob.getMaxHeadYRot / XRot)
       idle(frame_start, frame_end, seed=0)  the head turns to look around (RandomLookAroundGoal); the arms' slow
@@ -40,41 +49,63 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
                                             twists 0.2 rad). With target= a Character it is hurt ON `frame`: in
                                             the game damage, red flash and knock-back come on the tick the swing
                                             STARTS. swing_arm(frame) is the same without a target
-      hurt(frame, attacker=None, knockback=True, max_back=None) -> end frame      see hurt() below
+      hurt(frame, attacker=None, knockback=None, max_back=None) -> end frame      see hurt() below
       die(frame, camera=None, attacker=None, ...) -> the first frame it is gone   see die() below
       sit(frame, on=True)                   the legs of a passenger (boat, minecart): -81 degrees forward, splayed
-      hold(obj)                             an item in the right hand (the player's hand placement); hold(None)
+      hold(obj, item=None)                  an item sprite (props.make_item) in the right hand with the item's own
+                                            display transform: a sword or tool stands up out of the fist of the
+                                            outstretched arm (item/handheld), anything else lies flat on the hand
+                                            (item/generated). A BABY that holds something lets both arms hang and
+                                            the item is full size in its hand, as in the game. Before place();
+                                            hold(None) empties the hand
       size (hit box width, height), walk_speed, last_walk (dict of the last walk), baby, variant, profession
       nod / shake / flinch / shiver / lie_down / pos_at / yaw_at / eye_point: inherited, unchanged
 
-  hurt(character, frame, attacker=None, knockback=True, max_back=None, flash=True) -> end frame
+  hurt(character, frame, attacker=None, knockback=None, max_back=None, flash=True) -> end frame
       The game's hurt for ANY Character (zombie, villager, fx job villager, Steve, golem): the red tint for 10
-      ticks = 12 frames (OverlayTexture: every texel 70 % itself + 30 % pure red), the knock-back hop away from
-      `attacker` (a Character or a point; None = straight back): 0.96 block up, 1.9 blocks back, on the ground
-      again after 10 ticks, and the legs flailing as the game's walk animation does when a mob is hit.
-      max_back = blocks of room behind it (a wall, a 1x1 cell: 0.2); knockback=False: the flash alone;
-      knockback=0.5: half the strength. A golem only flashes (knock-back resistance 1).
-  die(character, frame, camera=None, attacker=None, knockback=True, max_back=None, poof=True, seed=0,
+      ticks = 12 frames (OverlayTexture: every texel 70 % itself + 30 % pure red) and the legs flailing as the
+      game's walk animation does when a mob is hit.
+      KNOCK-BACK ONLY WITH AN ATTACKER, as in the game: attacker = a Character or a point (the dispenser an arrow
+      came from) gives the hop away from it: 0.96 block up, 1.9 blocks back, on the ground again after 10 ticks.
+      attacker=None is damage that comes from nowhere (lava, fire, magma, a fall, cactus, berry bush, drowning,
+      suffocating in a wall, entity cramming, a stalagmite, magic / poison / wither, lightning: the game's
+      no_knockback list): the mob flashes and its legs kick, but it stays where it is, and one that is walking
+      walks on. knockback=True forces the hop (no attacker: straight back from the way it faces; the game would
+      pick a random direction), False forbids it, 0.5 = half the strength. A golem only flashes (resistance 1).
+      (An explosion is on that list too, but flings mobs with an impulse of its own, which is not built: as a
+      stand-in pass attacker=the centre of the blast and knockback=2 or 3.)
+      max_back = how far behind it the WALL is (a 1x1 cell: 0.2), counted from where it stood when the series
+      of blows began: pass the same number on every blow of the series and it never goes through the wall,
+      whichever side the blows come from (the series ends when it is placed or walks).
+      A blow less than 12 frames (10 ticks) after the last one that landed does nothing at all, as in the game
+      (it prints a line and returns the earlier blow's end frame); a mob that is dying takes no blow either.
+  die(character, frame, camera=None, attacker=None, knockback=None, max_back=None, poof=True, seed=0,
       village=None, glow=None) -> gone frame
-      The game's death for ANY Character: red from `frame` on, knocked back, legs straight, and one tick later
-      the body tips over to its LEFT about its feet: 90 degrees * sqrt((tick - 1) * 0.08), flat after 13.5 ticks.
-      On tick 20 (frame + 24 = the return value) it is gone and the 20 white 'poof' particles appear around its
-      UPRIGHT hit box (not along the lying body) and rise. Bloodless, nothing else. It stays gone until its
-      next place(). A mob that dies in mid-walk stops there.
+      The game's death for ANY Character: red from `frame` on, legs straight, and one tick later the body tips
+      over to its LEFT about its feet: 90 degrees * sqrt((tick - 1) * 0.08), flat after 13.5 ticks. Knocked back
+      like hurt(): only with an attacker (a zombie that dies in lava, of a fall or in a crusher tips over where it
+      is). On tick 20 (frame + 24 = the return value) it is gone and the 20 white 'poof' particles appear around
+      its UPRIGHT hit box (not along the lying body) and rise. Bloodless, nothing else. It stays gone until its
+      next place(). A mob that dies in mid-walk stops there; one killed less than 12 frames after a blow dies in
+      the flight of that blow. die() on the frame of an earlier die() replaces it (one cloud).
   poof(target, frame, camera=None, seed=0, village=None, glow=None, size=None, count=20) -> fx.Burst
       Only the cloud (entity event 60): target = a Character (its feet at `frame`) or a feet point.
   vanish(character, frame) / appear(character, frame)
       Not there / there again from `frame` on, with no effect at all (independent of show(), which Stage.finish
       uses for the shots: a character is rendered when it is shown AND there).
 
-  infect(villager, zombie_villager, frame, attacker=None, knockback=True, max_back=None) -> end frame
+  infect(villager, zombie_villager, frame, attacker=None, knockback=None, max_back=None) -> end frame
       THE INFECTION, as the client shows it (Zombie.killedEntity -> Mob.convertTo): on the tick of the killing
       blow the villager is simply replaced, where it stands and facing the way it faced, by the zombie villager.
       No body tips over, no poof, no particles at all (level event 1026 is only the sound), and the red flash of
       that last blow is never drawn: the zombie villager appears in its normal colours and takes the blow's
-      knock-back hop (it inherits the velocity). Key the earlier blows with zombie.attack(f, target=villager) (one
-      a second), then infect() on the frame of the last one together with zombie.attack(frame).
-      The zombie villager is not rendered before `frame`, whatever Stage.use says; the villager not after it.
+      knock-back hop (it inherits the velocity; pass attacker=the zombie). Key the earlier blows with
+      zombie.attack(f, target=villager) (one a second), then infect() on the frame of the last one together with
+      zombie.attack(frame). In a cell pass the same max_back to all of them. (An infect() less than 12 frames
+      after a blow cannot happen in the game; here the zombie villager then finishes that blow's flight.)
+      The zombie villager is not rendered before `frame`, whatever Stage.use says; the villager not after it,
+      until cure() (or appear()). THE SAME TWO CHARACTERS GO ROUND AS OFTEN AS THE FILM NEEDS: infect, cure,
+      infect, cure (the trading hall's whole point); each is rendered in its own turn.
   throw_potion(start, target, frame, camera=None, effect="weakness", village=None, seed=0, count=100, glow=None,
                speed=None) -> impact frame
       A splash potion thrown at `frame` from `start` (a point, or the player Character who throws it: the game
@@ -84,8 +115,8 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
       always facing the camera. On the returned frame it is gone and the splash appears (level event 2002): 8
       shards of the bottle's sprite and 100 swirl particles in the potion's colour (Weakness: dark grey 0x484D48)
       spreading along the ground (2 blocks in the median, a few as far as 7) and rising. The return value is an
-      int with attributes .bottle
-      (Object), .burst (fx.Burst), .hit (Vector), .speed (blocks per tick used), .frames (throw, impact).
+      int with attributes .bottle (Object), .burst (fx.Burst), .hit (Vector), .speed (blocks per tick used),
+      .frames (throw, impact).
   effect_swirls(character, frame_start, frame_end, effect="strength", camera=None, seed=0, glow=None,
                 size=None) -> fx.Burst
       The swirls every mob with a potion effect gives off (LivingEntity.tickEffects): one 'entity_effect'
@@ -105,10 +136,13 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
   shake(zombie_villager, frame_start, frame_end, amount=1.0)        only the conversion shake
   flee(villager, frame, threat, distance=6.0, speed=VILLAGER_PANIC_SPEED) -> end frame
       A villager runs straight away from a zombie (Character.walk(run=True) at the game's panic speed).
+  item_display(item_id) -> (rotation, translation, scale) of the item model's third-person display;
+  held_matrix(display, model_scale=1.0, baby=False) -> the matrix Undead.hold gives the sprite (ItemInHandLayer)
   knockback_track(strength=0.4, max_back=None) -> [(blocks back, blocks up) after each tick]
   zombie_sheet(baby, variant) / zombie_villager_sheet(profession, biome, level, baby) -> (key, HxWx4 uint8)
   Constants: WALK_SPEED, BABY_SPEED, VILLAGER_WALK_SPEED, VILLAGER_PANIC_SPEED, ZOMBIE_SIZE, BABY_SIZE,
-  ARMS_OUT, ARMS_RAISED, HURT_FRAMES, DEATH_FRAMES, CONVERSION_TICKS, EFFECT_COLOURS, POTION_SPEED, FACTS.
+  ARMS_OUT, ARMS_RAISED, HURT_FRAMES, DEATH_FRAMES, CONVERSION_TICKS, EFFECT_COLOURS, POTION_SPEED,
+  NO_KNOCKBACK_DAMAGE, DAMAGE_COOLDOWN_TICKS, FACTS.
 
 USING THEM IN A FILM (st = films.lookdev.Stage)
     z = undead.add_zombie(st, "zombie"); st.use(s, z); st.hero(s, "zombie", z)
@@ -119,23 +153,40 @@ USING THEM IN A FILM (st = films.lookdev.Stage)
     hit = undead.throw_potion(steve, zv, f, camera=s)    # hit = the impact frame
     steve.hold(props.make_item("golden_apple")) BEFORE his place(); undead.cure(zv, villager, hit + 20, hit + 164,
                                                                                 camera=s, player=steve, weakness_from=hit)
-    gone = z.die(f, camera=s, attacker=steve)            # tips over, poof on `gone`
+    gone = z.die(f, camera=s, attacker=steve)            # hops back, tips over, poof on `gone`
+    gone = z.die(f, camera=s)                            # lava, a fall, a crusher: tips over where it is
+    z.hurt(f)                                            # fire, cactus, magma: red and kicking, not pushed
     Key every character in frame order. A cut that jumps in time: fx.stop_particles(first frame of the new shot).
     The red flash, vanish / appear and death are kept in step with show() by wrapping the character's own show /
     place / _rekey: a character is rendered when shown AND there, and its red twin instead while it flashes.
+
+CUTS (place() is the cut, for zombies and for every character this module has touched)
+    A place() on frame f ends what was keyed before it: the knock-back and the flailing legs stop, the red flash
+    is over on f (a blow 6 frames before the cut is red for those 6 frames only), raised arms and a running
+    swing of a zombie end, a death in progress is called off (from f on the mob is upright, in its own colours,
+    stays, and its poof never appears), and the next blow starts afresh (no cool-down, a new max_back series).
+    So a film may cut on the hit or on the kill and use the same character in the next shot. After a completed
+    death place() brings it back. NOT undone by place(): an infection or a cure (use appear() / vanish()).
 
 GAIT (HumanoidModel.setupAnim, LivingEntity.updateWalkAnimation)
     The game: legs +-1.4 * s * cos(0.6662 * p), s = min(4 * blocks per tick, 1), p grows by s every tick (three
     times as fast for a baby). An adult (0.1165 block per tick) swings +-37 degrees once every 2.36 blocks
     (1.01 s) while a planted compass step of that swing covers 0.91 block, so each foot slides about 0.3 block
     per step. gait="vanilla" is exactly that, without any bob (use it when the feet are out of frame).
-    gait="planted" keeps the swing and the speed and shortens the cycle to 1.82 blocks (0.78 s): the sole on the
-    ground stays where it was put, the other leg passes it, and the hips sink by leg * (1 - cos(swing)) so both
-    soles stay on the ground (0.15 block for an adult: a film choice, the game has no bob). A baby (0.262 block
-    per tick) has legs of 4 pixels: its steps are 1.9 frames long in either gait, a blur at 24 fps, as in the
-    game (planted: +-57 degrees instead of the game's +-80). Turns (walk corners, face, turn) are made on the
-    spot, where planted feet skate: start walks facing the way they go. Character.walk is linear (no ease in or
-    out), so a zombie is at full speed on its first frame.
+    gait="planted" keeps the swing and the speed and shortens the cycle to 1.6-2.1 blocks (0.7-0.9 s): the sole on
+    the ground stays where it was put, the other leg passes it, and the hips sink by leg * (1 - cos(swing)) so
+    both soles stay on the ground (0.15 block for an adult: a film choice, the game has no bob). A baby (0.262
+    block per tick) has legs of 4 pixels: its steps are 1.9 frames long in either gait, a blur at 24 fps, as in
+    the game (planted: +-57 degrees instead of the game's +-80).
+    In the game every mob carries its own walk-animation position, so no two are in step. Here the leading foot,
+    the length of the first step (0.35-1 of a full one) and the stride (0.88-1.12 of the game's swing: 33-42
+    degrees) come from the zombie's name; in the vanilla gait the phase of the leg wave does. Two zombies whose
+    names hash alike can still be close: give one of them lead= / first_step= / stride=, or start it 5 frames
+    later. walk(lead="r", first_step=1, stride=1) is the plain cycle.
+    Turns (walk corners, face, turn) are made on the spot, where planted feet skate (a sharp corner: up to 0.05
+    block per quarter frame; walk(f, engine.mobs.rounded(points, radius=1.0)) halves that): start walks facing
+    the way they go and keep them straight in a medium shot. Character.walk is linear (no ease in or out), so a
+    zombie is at full speed on its first frame.
 
 WHAT THE GAME DOES (read from the classes; FACTS has the numbers)
   - arms: AnimationUtils.animateZombieArms replaces the walking arm swing: both arms -80 degrees (pi / 2.25),
@@ -148,6 +199,15 @@ WHAT THE GAME DOES (read from the classes; FACTS has the numbers)
   - zombies walk at 2.33 blocks/s whether strolling or chasing; babies at 5.24 (attribute x 1.5, speed is
     quadratic). A panicking villager makes 6.2 blocks/s, a walking one 2.75: no zombie catches a villager that
     has room to run. Villagers notice a zombie within 8 blocks. Zombies see 35 blocks.
+  - damage (LivingEntity.hurtServer): the 0.4 knock-back is dealt away from the position the damage comes from,
+    and not at all for the damage types tagged no_knockback (lava, fire, magma, campfire, a fall, cactus, berry
+    bush, a wall, cramming, drowning, starving, freezing, a stalagmite, magic, wither, lightning, explosions,
+    the void). For 10 ticks after a blow that landed (damageCooldownTime > 10) a blow that is not harder is
+    dropped without any event: no flash, no knock-back. A dying mob takes none (isDeadOrDying).
+  - items (ItemInHandLayer): drawn with the item model's own third-person display; a mob's arm takes no item
+    pose (HumanoidMobRenderer.getArmPose: EMPTY), but a BABY zombie with something in its main hand hangs both
+    arms and swings them the other way (animateZombieArms), and babies get the hand offset (0, 1, -4.5) / 16
+    without any scaling: the item is full size.
   - doors: only on Hard, and only some zombies: 240 ticks (12 s) of banging with the crack stages on the door.
   - zombies burn in daylight: stage them at night, underground or under a roof (no fire is built here).
 
@@ -156,8 +216,11 @@ MEASURED (`$BPY -m engine.undead check` prints and asserts these; proof stills o
     zombie villager 2.125 tall (hat rim 1.0 wide), eyes 1.74; baby zombie villager 1.0 tall, eyes 0.67; husk 2.125.
     Arms out: the arm ends 0.62 in front of the centre line, 1.27 above the ground (raised: 0.54 in front, 1.69
     high, beside the face). Stand a victim 1.2-1.3 blocks from the zombie: the hands then stop just short of it.
-    Planted walk: 1.8 blocks and 18.6 frames per cycle, the carrying sole drifts under 0.002 block per step
-    (baby: 0.008); vanilla walk: 2.36 blocks per cycle, each sole slides about 0.3 block per step.
+    Planted walk: 1.6-2.1 blocks and 17-21 frames per cycle (by name), the carrying sole drifts under 0.004
+    block per step, the first short one included (baby: 0.008); vanilla walk: 2.36 blocks per cycle, each sole
+    slides about 0.3 block per step.
+    Held items: a sword's sprite is 0.85 block across, its centre 0.38 from the hand, the blade standing up out
+    of the outstretched fist, tipped 20 degrees forward; flat items are 0.55 across.
     Knock-back: 0.4, 0.62, 0.82, 1.0, 1.16 ... blocks back after 1, 2, 3, 4, 5 ticks, highest (0.965) on tick 5,
     down on tick 10, at rest 1.99 blocks back after 16 ticks = 19 frames; the legs are still 5 frames later.
     Death: 0 / 25 / 51 / 72 / 90 degrees at 1 / 2 / 5 / 9 / 13.5 ticks; lying flat, half the body is in the ground.
@@ -169,22 +232,32 @@ MEASURED (`$BPY -m engine.undead check` prints and asserts these; proof stills o
 GOTCHAS
   - hurt / die / infect / cure change what is rendered through extra "twin" meshes (the red copy) and their own
     visibility keys: never key hide_render on these characters yourself, use show / vanish / appear.
-  - A hit interrupts a walk (the knock-back takes over the root). Key the next walk from_current=True.
+  - A hit that knocks back interrupts a walk (the knock-back takes over the root): key the next walk
+    from_current=True. A hit without knock-back (no attacker) does not: the mob walks on, red.
   - attack(), aggro() and the bob own the arm channels (absolute keys, rewritten on every call): raise_arm() maps
-    to aggro(), Character.swing_arm is attack(). Nothing else may key the arms.
+    to aggro(), Character.swing_arm is attack(). Nothing else may key the arms. place() lowers them: aggro()
+    comes after place(), also on the same frame.
+  - max_back is the wall, not a per-blow allowance: the same value on every blow of a series. Blows closer than
+    12 frames are dropped (a printed line tells you): a zombie hits every 24 frames, a player with a sword
+    every 15.
+  - A mob that is not there (dead, infected, cured away, vanish()) stops giving off effect swirls on that frame;
+    those in the air live on.
   - Particles are world objects with their own lifetimes (poof up to 82 ticks, swirls 8-40): a cut to another
     angle keeps them, a cut in time needs fx.stop_particles. A splash is about 800 objects (100 particles x 8
     sprite stages): count=40 is plenty for a background splash.
   - While a character flashes red its own meshes are hidden and the twins are rendered: a composition check on
     the head object (Stage.hero) should look at a frame outside the 12 frames of a flash. An item shown with
     fx.hold_out is not part of the character: end its window yourself when the villager is infected.
-  - Not built: burning, drowned / giant, armour and held-item poses of zombies, door breaking (use fx.break_block
-    crack stages on a door if a film needs it), the Weakness effect's own behaviour.
+  - Not built: burning, drowned / giant, zombie armour, items in the LEFT hand, door breaking (engine.breaking
+    has the door; fx.break_block the crack stages), the Weakness effect's own behaviour, the half of its old speed
+    a mob keeps when two blows land 10-11 ticks apart (it adds 0.05 block per tick to the second hop).
 
 Self-test:  $BPY -m engine.undead [check lineup lineup2 turn walk walk_vanilla attack hurt death infect cure cure2
-                                    items hall hall_bars street night_fx]
-(no argument = check: 72 numeric checks of the keyframes, no rendering, 10 s; exit code 1 if one fails. Each other
-name renders its proof stills out/test/undead_<name>*.png: one name per call stays under the 300 s limit.)
+                                    items hold cut trap horde round hall hall_bars street night_fx]
+(no argument = check: 95 numeric checks of the keyframes, no rendering, 20 s; exit code 1 if one fails. Each other
+name renders its proof stills out/test/undead_<name>*.png: one name per call stays under the 300 s limit.
+cut = a place() in the middle of a flash and of a death; trap = deaths and hurts without an attacker; horde = five
+that set off together; round = infect, cure, infect, cure with the same two characters; hold = held items.)
 """
 import math
 import sys
@@ -255,12 +328,16 @@ ANIM_LERP = 0.4
 BABY_ANIM_SCALE = 3.0                # ... and positionScale 3 for babies
 HURT_ANIM_SPEED = 1.5                # LivingEntity.handleDamageEvent: walkAnimation.setSpeed(1.5F)
 SIT_LEG = (-1.4137167, 0.31415927, 0.07853982)    # HumanoidModel.setupAnim, isPassenger: leg xRot, yRot, zRot
+HAND_OFFSET = (1.0, 2.0, -10.0)      # ItemInHandLayer.submitArmWithItem: translate(+-1, 2, -10) / 16 in the arm's frame
+HAND_OFFSET_BABY = (0.0, 1.0, -4.5)  # ... useBabyOffset (a baby that is not an armour stand)
 
 # ---- LivingEntity.handleDamageEvent / animateHurt, LivingEntityRenderer, OverlayTexture
 HURT_TICKS = 10                      # hurtDuration = hurtTime = 10
 HURT_FRAMES = int(round(HURT_TICKS * TICK))        # 12
 OVERLAY_KEEP = 178.0 / 255.0         # OverlayTexture: rows 0-7 = 0xB2FF0000; entity.fsh: mix(overlay.rgb, colour, overlay.a)
 OVERLAY_RGB = (1.0, 0.0, 0.0)
+DAMAGE_COOLDOWN_TICKS = 10           # LivingEntity.hurtServer: damageCooldownTime = 20 on a hit; while it is > 10 a blow that is
+#                                      not harder is ignored outright (no damage event: no flash, no knock-back)
 DEATH_TICKS = 20                     # LivingEntity.tickDeath: ++deathTime >= 20 -> entity event 60, remove
 DEATH_FRAMES = int(round(DEATH_TICKS * TICK))      # 24
 DEATH_FLIP = 90.0                    # LivingEntityRenderer.getFlipDegrees; angle = 90 * min(1, sqrt((t - 1) / 20 * 1.6))
@@ -269,7 +346,11 @@ SHAKE_DEGREES = math.pi * 0.4        # LivingEntityRenderer.setupRotations: body
 SHAKE_RATE = 3.25
 
 # ---- LivingEntity.knockback / travelInAir
-KNOCKBACK = 0.4                      # LivingEntity.hurtServer: knockback(0.4F, dx, dz)
+KNOCKBACK = 0.4                      # LivingEntity.hurtServer -> dealDefaultKnockback: knockback(0.4, dx, dz), NOT for damage
+#                                      types tagged no_knockback (data/minecraft/tags/damage_type/no_knockback.json)
+NO_KNOCKBACK_DAMAGE = ("lava", "in_fire", "on_fire", "hot_floor", "campfire", "fall", "cactus", "sweet_berry_bush",
+                       "in_wall", "cramming", "drown", "starve", "freeze", "stalagmite", "magic", "wither",
+                       "lightning_bolt", "explosion", "out_of_world")        # the ones a film can stage, of the tag's thirty
 REST_VY = -0.0784                    # the vertical speed of a mob standing on the ground ((0 - 0.08) * 0.98)
 GRAVITY = 0.08
 AIR_DRAG_Y = 0.98
@@ -305,6 +386,7 @@ FACTS = {
     "infection_chance": {"easy": 0.0, "normal": 0.5, "hard": 1.0},
     "arms_raised_after_ticks_with_target": 5, "arms_dropped_ticks_after_a_blow": 10,
     "door_break_ticks_hard_only": DOOR_BREAK_TICKS, "hurt_ticks": HURT_TICKS, "death_ticks": DEATH_TICKS,
+    "ticks_before_the_next_blow_can_land": DAMAGE_COOLDOWN_TICKS, "damage_without_knockback": NO_KNOCKBACK_DAMAGE,
     "conversion_ticks": CONVERSION_TICKS, "nausea_ticks_after_cure": NAUSEA_TICKS,
     "effect_particles_per_second": 20.0 / EFFECT_CHANCE, "potion_speed_blocks_per_tick": POTION_SPEED,
     "splash_range_blocks": SPLASH_RANGE,
@@ -490,7 +572,8 @@ def _state(c):
     """The bookkeeping of one character (made on first use; wraps its show / place / _rekey once)."""
     st = c.__dict__.get(_STATE)
     if st is None:
-        st = c.__dict__[_STATE] = dict(flashes=[], presence=[], base={}, twins={}, depth=0, tipped=False)
+        st = c.__dict__[_STATE] = dict(flashes=[], presence=[], base={}, twins={}, depth=0, tipped=False,
+                                       blows=[], deaths=[], chain=None)
         _save(c)
         for name in ("show", "_rekey", "hold"):
             if hasattr(c, name):
@@ -560,6 +643,8 @@ def _apply(c):
     shown AND there AND flashing."""
     st = c.__dict__[_STATE]
     if not st["flashes"] and not st["presence"]:
+        for twin in st["twins"].values():                       # (a flash that a place() called off leaves no key behind)
+            _set_hide(twin, True)
         return
     edges = {float(f) for a, b in st["flashes"] for f in (a, b)} | {float(f) for f, _on, _w in st["presence"] if f is not None}
     for ob in _managed(c):
@@ -587,6 +672,17 @@ def _apply(c):
             _set_hide(twin, [(f, hidden(f) or not _present(st, f) or not _flashing(st, f)) for f in times])
 
 
+def _stop_spawning(c, frame):
+    """A character that is not there gives off no more effect swirls: none of its effect_swirls() particles
+    appears from `frame` on (those already in the air live out their time, as in the game)."""
+    for burst in c.__dict__.get(_STATE, {}).get("swirls", ()):
+        for p in burst.particles:
+            if p["spawn"] >= frame - 1e-6 and p["last"] > p["first"]:
+                for path in ("hide_render", "hide_viewport"):
+                    fx._write(p["object"], path, 0, [p["first"] - 1], [1.0], "CONSTANT")
+                p["last"] = p["first"]
+
+
 def _presence(c, frame, on, why):
     st = _state(c)
     _restore(c)
@@ -594,6 +690,8 @@ def _presence(c, frame, on, why):
     st["presence"] = [e for e in st["presence"] if e[0] != frame] + [(frame, bool(on), why)]
     st["presence"].sort(key=lambda e: -1e18 if e[0] is None else e[0])
     _apply(c)
+    if not on and frame is not None:
+        _stop_spawning(c, frame)
 
 
 def vanish(character, frame, why="vanish"):
@@ -606,17 +704,37 @@ def appear(character, frame):
     _presence(character, frame, True, "appear")
 
 
+def _call_off(st, death, frame):
+    """A death that was keyed is called off from `frame` on: its red ends there, it does not vanish, no poof."""
+    blow, gone = death["blow"], death["gone"]
+    st["presence"] = [e for e in st["presence"] if not (e[0] == gone and e[2] == "dead")]
+    st["flashes"] = [fl for fl in st["flashes"] if fl != (blow, gone)] + ([(blow, int(frame))] if blow < frame else [])
+    if death.get("burst") is not None:
+        death["burst"].stop(int(frame))
+    st["deaths"] = [d for d in st["deaths"] if d is not death]
+
+
 def _on_place(c, frame):
-    """A place() after a death: the character is there again, upright."""
+    """A place() is a cut: whatever was keyed for the character before it ends on that frame. A red flash still
+    running is cut short, a death in progress is called off (upright, its own colours, no poof), a character that
+    had died is there again, and the next blow starts a new series (cool-down and room behind it forgotten)."""
     st = c.__dict__.get(_STATE)
     if st is None:
         return
+    fi = int(round(frame))
+    for death in [d for d in st["deaths"] if d["blow"] <= fi < d["gone"]]:
+        _call_off(st, death, fi)
+    st["deaths"] = [d for d in st["deaths"] if d["blow"] > fi]
+    st["flashes"] = sorted((a, min(b, fi)) for a, b in st["flashes"] if a != fi)
+    st["flashes"] = [(a, b) for a, b in st["flashes"] if b > a]
+    st["blows"] = [b for b in st["blows"] if b["frame"] > fi]
+    st["chain"] = None
     last = None
     for e in st["presence"]:
         if e[0] is None or e[0] <= frame + 1e-6:
             last = e
     if last is not None and not last[1] and last[2] == "dead":
-        st["presence"] = [e for e in st["presence"] if e[0] != int(frame)] + [(int(frame), True, "placed")]
+        st["presence"] = [e for e in st["presence"] if e[0] != fi] + [(fi, True, "placed")]
         st["presence"].sort(key=lambda e: -1e18 if e[0] is None else e[0])
     if st["tipped"] and ch._find(c.root, _ROT, 1) is not None:
         ch._cut(c.root, _ROT, 1, frame, 0.0)
@@ -683,10 +801,10 @@ def _twins(c):
 
 
 def _flash(c, f0, f1):
-    """Red from frame f0 to f1 (exclusive)."""
+    """Red from frame f0 to f1 (exclusive); one flash per starting frame (keying it again replaces it)."""
     st = _twins(c)
     _restore(c)
-    st["flashes"].append((int(f0), int(f1)))
+    st["flashes"] = sorted([fl for fl in st["flashes"] if fl[0] != int(f0)] + [(int(f0), int(f1))])
     _apply(c)
 
 
@@ -772,12 +890,42 @@ def _interrupt(c, frame, freeze=False):
                 ch._segment(c.root, _LOC, i, [(frame, None, "LINEAR"), (frame + 1, ch._val(c.root, _LOC, i, frame))], "LINEAR")
 
 
+def _chain_pos(chain, frame):
+    """Where the knock-back recorded in `chain` has the character at `frame` (as its keys do: linear per tick)."""
+    k = (float(frame) - chain["f0"]) / TICK
+    pts = [(0.0, 0.0)] + list(chain["track"])
+    if k <= 0.0:
+        back, up = pts[0]
+    elif k >= len(pts) - 1:
+        back, up = pts[-1]
+    else:
+        i = int(k)
+        u = k - i
+        back, up = pts[i][0] + (pts[i + 1][0] - pts[i][0]) * u, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * u
+    return chain["here"] + chain["away"] * back + Vector((0.0, 0.0, up))
+
+
 def _knock(c, frame, attacker, strength, max_back, anim_speed):
-    """Key the knock-back hop and the legs' flail from `frame` on; returns the frame it has come to rest."""
+    """Key the knock-back hop and the legs' flail from `frame` on; returns the frame it has come to rest.
+
+    max_back = how far behind it the wall is, measured from where the character stood when this series of blows
+    began (the series lasts while nothing but knock-backs has moved it): each blow gets what the earlier ones
+    left, in whatever direction it pushes (a mob in a 1x1 cell: 0.2 on every blow)."""
     f0 = float(frame)
-    track = knockback_track(strength, max_back) if strength > 0.0 else []
+    st = _state(c)
     here = c.pos_at(f0)
     away = _away(c, f0, attacker)
+    chain = st.get("chain")
+    anchor = None
+    if chain is not None and (_chain_pos(chain, f0) - here).length < 2e-3:
+        anchor = chain["anchor"]                                 # still where the last blow sent it: the same series
+    if anchor is None:
+        anchor = here.copy()
+    limit = max_back
+    if limit is not None:
+        used = (here.x - anchor.x) * away.x + (here.y - anchor.y) * away.y
+        limit = max(0.0, float(limit) - used)
+    track = knockback_track(strength, limit) if strength > 0.0 else []
     if track:
         _interrupt(c, f0)
         for i in range(3):
@@ -785,10 +933,13 @@ def _knock(c, frame, attacker, strength, max_back, anim_speed):
             for k, (back, up) in enumerate(track):
                 keys.append((f0 + (k + 1) * TICK, here[i] + away[i] * back + (up if i == 2 else 0.0), "LINEAR"))
             ch._segment(c.root, _LOC, i, keys, "LINEAR")
+        st["chain"] = dict(anchor=anchor, f0=f0, here=here.copy(), away=away.copy(), track=track)
     end = f0 + len(track) * TICK
     coef = _leg_coefficient(c)
     if coef is None or anim_speed is None:
         return int(math.ceil(end))
+    if not track and (c.pos_at(f0 + 1.0) - here).length > 1e-3:
+        return int(math.ceil(end))                               # hit while walking, not knocked back: its gait goes on
     # LivingEntity.updateWalkAnimation after handleDamageEvent set the speed to 1.5: the legs kick apart and
     # run on while the mob flies back, then settle
     scale = BABY_ANIM_SCALE if c.child else 1.0
@@ -822,9 +973,13 @@ def _knock(c, frame, attacker, strength, max_back, anim_speed):
     return int(math.ceil(max(end, t_end)))
 
 
-def _strength(knockback, c):
+def _strength(knockback, c, attacker=None):
+    """Blocks per tick of the knock-back. knockback None = the game's rule of thumb: only a blow that comes from
+    somewhere (an attacker) knocks back; True / False / a factor force it."""
     if c.kind == "golem":                                       # IronGolem: KNOCKBACK_RESISTANCE 1.0
         return 0.0
+    if knockback is None:
+        knockback = attacker is not None
     if knockback is True:
         return KNOCKBACK
     if not knockback:
@@ -832,14 +987,33 @@ def _strength(knockback, c):
     return KNOCKBACK * float(knockback)
 
 
-def hurt(character, frame, attacker=None, knockback=True, max_back=None, flash=True):
-    """The game's hurt for any Character on `frame`: red for 12 frames, the knock-back hop away from `attacker`
-    (0.96 up, 1.9 back; max_back = room behind it; knockback=False: none), flailing legs. Returns the end frame."""
+def _note(text):
+    print("[undead] " + text)
+
+
+def hurt(character, frame, attacker=None, knockback=None, max_back=None, flash=True):
+    """The game's hurt for any Character on `frame`: red for 12 frames, flailing legs, and when the blow comes
+    from an `attacker` (a Character or a point) the knock-back hop away from it (0.96 up, 1.9 back; max_back = the
+    wall behind it). No attacker (lava, fire, a fall, cactus, drowning, magic ...): no knock-back, as in the game;
+    knockback=True / False / a factor overrules. A blow less than 12 frames after the last one is ignored, as the
+    game ignores it. Returns the end frame."""
     f0 = int(round(frame))
+    st = _state(character)
+    dying = next((d for d in st["deaths"] if d["blow"] <= f0 < d["gone"]), None)
+    if dying is not None:
+        _note("hurt(%s, %d) ignored: it has been dying since frame %d" % (character.name, f0, dying["blow"]))
+        return dying["gone"]
+    recent = next((b for b in st["blows"] if b["frame"] < f0 < b["frame"] + HURT_FRAMES), None)
+    if recent is not None:
+        _note("hurt(%s, %d) ignored: it was hit on frame %d and no blow lands for the next %d frames (10 ticks)"
+              % (character.name, f0, recent["frame"], HURT_FRAMES))
+        return recent["end"]
     if flash:
         _flash(character, f0, f0 + HURT_FRAMES)
-    end = _knock(character, f0, attacker, _strength(knockback, character), max_back, HURT_ANIM_SPEED)
-    return max(end, f0 + HURT_FRAMES)
+    end = _knock(character, f0, attacker, _strength(knockback, character, attacker), max_back, HURT_ANIM_SPEED)
+    end = max(end, f0 + HURT_FRAMES)
+    st["blows"] = [b for b in st["blows"] if b["frame"] != f0] + [dict(frame=f0, end=end)]
+    return end
 
 
 def _stage_runs(first, last, spawn, life, n):
@@ -936,23 +1110,33 @@ def death_angle(ticks):
     return DEATH_FLIP * min(1.0, math.sqrt((ticks - 1.0) / 20.0 * 1.6))
 
 
-def die(character, frame, camera=None, attacker=None, knockback=True, max_back=None, poof=True, seed=0,
+def die(character, frame, camera=None, attacker=None, knockback=None, max_back=None, poof=True, seed=0,
         village=None, glow=None):
-    """The game's death for any Character, killed on `frame`: red, knocked back, legs straight, tipping over to its
-    left about its feet (flat after 13.5 ticks), gone on frame + 24 with the poof cloud where it stood. Returns that
-    frame. The character stays gone until its next place()."""
+    """The game's death for any Character, killed on `frame`: red, legs straight, tipping over to its left about its
+    feet (flat after 13.5 ticks), gone on frame + 24 with the poof cloud where it stood. Returns that frame.
+    Knocked back only when the blow comes from an `attacker` (see hurt); killed less than 12 frames after a blow
+    it dies in the flight of that blow. The character stays gone until its next place(); a place() before the
+    returned frame calls the death off."""
     c = character
     f0 = int(round(frame))
     gone = f0 + DEATH_FRAMES
     st = _twins(c)
+    dying = next((d for d in st["deaths"] if d["blow"] < f0 < d["gone"]), None)
+    if dying is not None:
+        _note("die(%s, %d) ignored: it has been dying since frame %d" % (c.name, f0, dying["blow"]))
+        return dying["gone"]
+    for death in [d for d in st["deaths"] if d["blow"] == f0]:   # keyed again for the same frame: this one replaces it
+        _call_off(st, death, f0)
+    in_flight = any(b["frame"] < f0 < b["frame"] + HURT_FRAMES for b in st["blows"])
     _restore(c)
-    st["flashes"].append((f0, gone))                             # hasRedOverlay = hurtTime > 0 || deathTime > 0
+    st["flashes"] = sorted([fl for fl in st["flashes"] if fl[0] != f0] + [(f0, gone)])   # hasRedOverlay: hurtTime > 0 || deathTime > 0
     st["presence"] = [e for e in st["presence"] if e[0] != gone] + [(gone, False, "dead")]
     st["presence"].sort(key=lambda e: -1e18 if e[0] is None else e[0])
     st["tipped"] = True
     _apply(c)
-    _interrupt(c, f0, freeze=True)                               # whatever it was doing ends here
-    _knock(c, f0, attacker, _strength(knockback, c), max_back, None)
+    if not in_flight:
+        _interrupt(c, f0, freeze=True)                           # whatever it was doing ends here
+        _knock(c, f0, attacker, _strength(knockback, c, attacker), max_back, None)
     for leg in (c.leg_l, c.leg_r):                               # a dead mob's walk animation is stopped: legs straight
         if abs(ch._val(leg, _ROT, 0, f0)) > 1e-4 or ch._find(leg, _ROT, 0) is not None:
             ch._segment(leg, _ROT, 0, [(f0, None, "LINEAR"), (f0 + TICK, 0.0)], "LINEAR")
@@ -960,9 +1144,13 @@ def die(character, frame, camera=None, attacker=None, knockback=True, max_back=N
     keys = [(f0 + TICK, None, "LINEAR")] + [(f0 + t * TICK, math.radians(death_angle(t)), "LINEAR") for t in ticks[1:]]
     ch._segment(c.root, _ROT, 1, keys, "LINEAR")
     ch._cut(c.root, _ROT, 1, gone, 0.0)                          # (hidden from this frame on: upright for its next use)
+    burst = None
     if poof:
-        globals()["poof"](c.pos_at(gone - 0.5), gone, camera=camera, seed=seed, village=village, glow=glow,
-                          size=body_box(c))
+        burst = globals()["poof"](c.pos_at(gone - 0.5), gone, camera=camera, seed=seed, village=village, glow=glow,
+                                  size=body_box(c))
+    st["deaths"].append(dict(blow=f0, gone=gone, burst=burst))
+    _stop_spawning(c, gone)
+    st["blows"] = [b for b in st["blows"] if b["frame"] != f0] + [dict(frame=f0, end=gone)]
     return gone
 
 
@@ -980,6 +1168,35 @@ def _swing_shown():
     return _SWING
 
 
+def item_display(item_id):
+    """(rotation degrees, translation in 1/16 block, scale) of display.thirdperson_righthand of an item's model:
+    the nearest model of its parent chain that defines it (item/handheld for swords and tools, else
+    item/generated); an unknown id gets item/generated's."""
+    chain = mobs._model_chain("item/" + str(item_id).replace("minecraft:", "")) or mobs._model_chain("item/generated")
+    for raw in chain:
+        d = raw.get("display", {}).get("thirdperson_righthand")
+        if d is not None:
+            return (tuple(float(c) for c in d.get("rotation", (0, 0, 0))),
+                    tuple(float(c) for c in d.get("translation", (0, 0, 0))),
+                    tuple(float(c) for c in d.get("scale", (1, 1, 1))))
+    return ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0))
+
+
+def held_matrix(display, model_scale=1.0, baby=False):
+    """Parent-space matrix (the right arm's frame) of a flat item sprite (origin at its centre, in its XZ plane,
+    front -Y, 16 px = 1 unit) as ItemInHandLayer.submitArmWithItem places it: after the arm's own transform rotate
+    X -90, rotate Y 180, translate (1, 2, -10) / 16 (a baby: (0, 1, -4.5) / 16, no scaling), then
+    ItemTransform.apply: translate, rotate X Y Z, scale."""
+    rot, trans, scale = display
+    a, b, c = HAND_OFFSET_BABY if baby else HAND_OFFSET
+    shown = (Matrix.Translation((trans[0] / 16.0, trans[1] / 16.0, trans[2] / 16.0))
+             @ Matrix.Rotation(math.radians(rot[0]), 4, "X") @ Matrix.Rotation(math.radians(rot[1]), 4, "Y")
+             @ Matrix.Rotation(math.radians(rot[2]), 4, "Z") @ Matrix.Diagonal((scale[0], scale[1], scale[2], 1.0)))
+    chain = (Matrix.Rotation(math.radians(-90.0), 4, "X") @ Matrix.Rotation(math.radians(180.0), 4, "Y")
+             @ Matrix.Translation((a / 16.0, b / 16.0, c / 16.0)) @ shown)
+    return Matrix.Diagonal((model_scale, model_scale, model_scale, 1.0)) @ ch._AXES @ chain @ ch._AXES
+
+
 class Undead(ch.Character):
     """A zombie or zombie villager: an engine.characters.Character with the game's zombie arms, gait and limits."""
 
@@ -991,7 +1208,16 @@ class Undead(ch.Character):
         self.last_walk = None
         self._aggro = []                 # (frame, on, ease)
         self._attacks = []               # frames on which a swing starts
-        self._age0 = float(zlib.crc32(name.encode("utf-8")) % 4000) / 10.0     # ticks: every zombie bobs on its own
+        self._cuts = []                  # frames of place(): a swing still running at a cut ends there
+        self._arms_down = False          # a baby that holds an item lets its arms hang (animateZombieArms)
+        crc = zlib.crc32(name.encode("utf-8"))
+        self._age0 = float(crc % 4000) / 10.0                           # ticks: every zombie bobs on its own
+        # ... and walks on its own: which foot leads, how long the first step is and where the vanilla leg wave
+        # starts come from the name too (in the game every mob has its own walk-animation position)
+        self._foot = 1 if (crc >> 12) & 1 else -1
+        self._first_step = 0.35 + 0.65 * float((crc >> 13) % 1000) / 999.0
+        self._stride = 0.88 + 0.24 * float((crc >> 5) % 1000) / 999.0
+        self._phase0 = 2.0 * math.pi * float((crc >> 3) % 1000) / 1000.0
         # AnimationUtils.animateZombieArms: the rest pose (model x, y, z rotation = rig euler x, -z, y)
         for arm, sgn in ((self.arm_r, 1.0), (self.arm_l, -1.0)):
             self._set_rest(arm, _ROT, 0, ARMS_OUT)
@@ -1020,6 +1246,8 @@ class Undead(ch.Character):
         for start in sorted(self._attacks, reverse=True):
             t = (frame - start) / TICK
             if 0.0 <= t < len(shown):
+                if any(start < cut and frame >= cut - ch.CUT_LEAD - 1e-9 for cut in self._cuts):
+                    return 0.0                                          # a place() cut it short
                 a, b = shown[int(t)]
                 return a + (b - a) * (t - int(t))
             if t >= 0.0:
@@ -1027,7 +1255,10 @@ class Undead(ch.Character):
         return 0.0
 
     def arm_base(self, frame):
-        """The arms' pitch without swing and bob at `frame`: ARMS_OUT, or ARMS_RAISED while aggro() is on."""
+        """The arms' pitch without swing and bob at `frame`: ARMS_OUT, or ARMS_RAISED while aggro() is on (0 for
+        a baby that holds an item: its arms hang)."""
+        if self._arms_down:
+            return 0.0
         value = ARMS_OUT
         for start, on, ease in sorted(self._aggro):
             target = ARMS_RAISED if on else ARMS_OUT
@@ -1049,10 +1280,11 @@ class Undead(ch.Character):
         """The right arm's model rotation (xRot, yRot, zRot) at `frame`, bob included (the left arm: x - 2 * bob x,
         -yRot, -zRot)."""
         a = self.swing_value(frame)
-        f7 = math.sin(a * math.pi)
+        flip = -1.0 if self._arms_down else 1.0                         # animateZombieArms: a baby with an item
+        f7 = flip * math.sin(a * math.pi)
         f8 = math.sin((1.0 - (1.0 - a) ** 2) * math.pi)
         bx, bz = self.arm_bob(frame)
-        return (self.arm_base(frame) + f7 * SWING_DOWN - f8 * SWING_BACK + bx, -(ARM_TOE - f7 * SWING_TOE), bz)
+        return (self.arm_base(frame) + f7 * SWING_DOWN - f8 * SWING_BACK + bx, -flip * (ARM_TOE - f7 * SWING_TOE), bz)
 
     def _bake_arms(self):
         """Rewrite the arms' keys from the aggro and attack events (the bob is an F-curve modifier on top)."""
@@ -1071,12 +1303,13 @@ class Undead(ch.Character):
             if not frames or t - frames[-1] > 0.011:
                 frames.append(t)
         pitch, toe = [], []
+        flip = -1.0 if self._arms_down else 1.0
         for t in frames:
             a = self.swing_value(t)
-            f7 = math.sin(a * math.pi)
+            f7 = flip * math.sin(a * math.pi)
             f8 = math.sin((1.0 - (1.0 - a) ** 2) * math.pi)
             pitch.append(self.arm_base(t) + f7 * SWING_DOWN - f8 * SWING_BACK)
-            toe.append(ARM_TOE - f7 * SWING_TOE)
+            toe.append(flip * (ARM_TOE - f7 * SWING_TOE))
         for arm, sgn in ((self.arm_r, 1.0), (self.arm_l, -1.0)):
             fx._write(arm, _ROT, 0, frames, pitch, "LINEAR")
             fx._write(arm, _ROT, 1, frames[:1], [0.0], "LINEAR")
@@ -1122,9 +1355,15 @@ class Undead(ch.Character):
 
     # ------------------------------------------------------------------ placement
     def place(self, frame, pos, yaw=0.0, keep_pose=False):
-        """Hard-set position and yaw from `frame` on: upright, neutral legs, arms out (use at shot cuts)."""
+        """Hard-set position and yaw from `frame` on: upright, neutral legs, arms out (use at shot cuts). Whatever
+        was keyed before ends there: raised arms come down (call aggro again after it), a swing, a red flash and a
+        death in progress stop. keep_pose=True keeps the arms and the legs as they are."""
         super().place(frame, pos, yaw, keep_pose=keep_pose)
         _on_place(self, frame)                                          # (after a death: there again, upright)
+        if not keep_pose:
+            fi = int(round(frame))
+            self._cuts = sorted(set(self._cuts) | {fi})
+            self._aggro = [e for e in self._aggro if e[0] != fi] + [(fi, False, 0)]
         self._bake_arms()
         st = self.__dict__.get(_STATE)
         if st is not None and st["depth"] == 0:
@@ -1141,14 +1380,21 @@ class Undead(ch.Character):
         return yaw, pitch
 
     # ------------------------------------------------------------------ locomotion
-    def walk(self, frame, points, speed=None, run=False, from_current=False, gait="planted"):
+    def walk(self, frame, points, speed=None, run=False, from_current=False, gait="planted", lead=None,
+             first_step=None, stride=None):
         """Travel along the polyline `points` at the game's zombie speed (2.33 blocks/s, babies 5.24); returns the end frame.
 
         gait "planted": the game's swing for the speed, the cycle shortened so that the sole on the ground does not
         slide, hips sinking with the spread of the legs. gait "vanilla": exactly the game's leg wave (the feet
-        slide, no bob). The arms stay out. run= is accepted and ignored: a zombie has one speed."""
+        slide, no bob). The arms stay out. run= is accepted and ignored: a zombie has one speed.
+        lead = "l" | "r": the foot that steps out first; first_step = 0.2..1: the length of that first step as a
+        fraction of a full one; stride = 0.8..1.2: the planted step's length against the game's swing. All three
+        default to values taken from the zombie's NAME (stride 0.88..1.12), so that zombies which set off on the
+        same frame are out of step and stay so (lead="r", first_step=1, stride=1 is the plain cycle)."""
         if gait not in ("planted", "vanilla"):
             raise ValueError("gait %r: use 'planted' or 'vanilla'" % (gait,))
+        if lead not in (None, "l", "r"):
+            raise ValueError("lead %r: use 'l', 'r' or None" % (lead,))
         speed = self.walk_speed if speed is None else float(speed)
         f0 = int(round(frame))
         f1 = ch.Character.walk(self, f0, points, speed=speed, run=False, from_current=from_current)
@@ -1174,42 +1420,58 @@ class Undead(ch.Character):
         per_tick = total / n * TICK                                     # blocks per game tick, as really keyed
         anim = min(ANIM_PER_BLOCK * per_tick, 1.0)                      # LivingEntity.updateWalkAnimation
         scale = BABY_ANIM_SCALE if self.baby else 1.0
-        sign = 1.0 if self._foot > 0 else -1.0
+        if lead is not None:
+            self._foot = 1 if lead == "r" else -1
+        sign = 1.0 if self._foot > 0 else -1.0                          # +1: the left leg carries first, the right steps out
+        first = self._first_step if first_step is None else ch._clamp(float(first_step), 0.2, 1.0)
+        longer = self._stride if stride is None else ch._clamp(float(stride), 0.8, 1.2)
         rest_z = self._rest(self.hips, _LOC, 2)
         ch._segment(self.body, _ROT, 1, [(f0, None), (f1, 0.0)])        # (no waddle: a zombie does not sway)
         if gait == "vanilla":
             rate = anim * scale / per_tick * LEG_RATE                   # leg phase in radians per block
             amp = LEG_SWING * anim
             cycle = 2.0 * math.pi / rate
+            phase = 0.0 if first_step is not None and first >= 1.0 else self._phase0
 
             def env(t):
                 """The 0.4 lerp of the walk-animation speed at the start, mirrored at the end."""
                 return max(0.0, min(1.0 - (1.0 - ANIM_LERP) ** (t / TICK), 1.0 - (1.0 - ANIM_LERP) ** ((n - t) / TICK)))
 
             def angle(t):
-                return sign * amp * env(t) * math.sin(rate * dist(t))
+                return sign * amp * env(t) * math.sin(rate * dist(t) + phase)
 
             step = min(1.0, cycle / (total / n) / 12.0)
             times = [i * step for i in range(int(math.floor(n / step)) + 1)] + [float(n)]
             mobs._sample(self.leg_r, _ROT, 0, f0, times, lambda t: -angle(t))
             mobs._sample(self.leg_l, _ROT, 0, f0, times, angle)
             ch._segment(self.hips, _LOC, 2, [(f0, None), (f1, rest_z)])
-            swing = amp
+            swing, steps = amp, 0
         else:
-            want = ch._clamp(LEG_SWING * anim, 0.3, 1.0)
-            steps = max(1, int(round(total / (2.0 * leg * math.sin(want)))))
-            half = total / steps                                        # one step: the stance sole from front to back
-            swing = math.asin(min(half / (2.0 * leg), math.sin(1.2)))
-            cycle = 2.0 * half
+            # The soles' reach s = leg * sin(leg angle) is a zigzag in the distance covered, with slope 1: the
+            # carrying sole stays where it was put while the hips pass over it. It starts and ends at 0 (legs
+            # together) and turns at +-reach; only the first turn comes early (first * reach), which is what
+            # puts two zombies out of step.
+            want = ch._clamp(LEG_SWING * anim, 0.3, 1.0) * longer
+            steps = max(1, int(round(total / (2.0 * leg * math.sin(want)) + 1.0 - first)))
+            reach = total / (2.0 * (steps - 1 + first))
+            xs, ys = [0.0], [0.0]
+            for j in range(steps):
+                top = (first * reach if j == 0 else reach) * (1.0 if j % 2 == 0 else -1.0)
+                xs.append(xs[-1] + abs(top - ys[-1]))
+                ys.append(top)
+            xs.append(total)
+            ys.append(0.0)
+            cap = math.sin(1.2)
+            swing = math.asin(min(max(abs(y) for y in ys) / leg, cap))
+            cycle = 4.0 * reach
 
             def angle(t):
                 """The stance sole stays put: leg * sin(angle) is linear in the distance covered."""
-                tri = (2.0 / math.pi) * math.asin(math.sin(math.pi * dist(t) / half))
-                return sign * math.asin(ch._clamp(tri * math.sin(swing), -1.0, 1.0))
+                return sign * math.asin(ch._clamp(float(np.interp(dist(t), xs, ys)) / leg, -cap, cap))
 
-            step = min(1.0, half / (total / n) / 6.0)
+            step = min(1.0, 2.0 * reach / (total / n) / 6.0)
             times = {i * step for i in range(int(math.floor(n / step)) + 1)} | {float(n)}
-            times |= {float(np.interp((m + 0.5) * half, acc, stamps)) - f0 for m in range(steps)}   # the turning points
+            times |= {float(np.interp(x, acc, stamps)) - f0 for x in xs[1:-1]}       # the turning points
             times = mobs._dedupe(times)
             mobs._sample(self.leg_r, _ROT, 0, f0, times, lambda t: -angle(t))
             mobs._sample(self.leg_l, _ROT, 0, f0, times, angle)
@@ -1217,7 +1479,8 @@ class Undead(ch.Character):
             if steps % 2:
                 self._foot = -self._foot
         self.last_walk = dict(gait=gait, frames=(f0, f1), blocks=total, speed=total / n * FPS, swing=swing,
-                              cycle_blocks=cycle, cycle_frames=cycle / (total / n))
+                              cycle_blocks=cycle, cycle_frames=cycle / (total / n), lead="r" if sign > 0 else "l",
+                              first_step=first, stride=longer, steps=steps)
         return f1
 
     # ------------------------------------------------------------------ idle + gestures
@@ -1262,16 +1525,32 @@ class Undead(ch.Character):
             for index, value in ((0, x), (1, sgn * z), (2, -sgn * y)):
                 ch._cut(leg, _ROT, index, frame, value if on else 0.0)
 
-    def hold(self, obj, offset=None, rotation=None):
-        """An item sprite (engine.props.make_item) in the right hand, placed as ItemInHandLayer does; hold(None)."""
+    def hold(self, obj, offset=None, rotation=None, item=None):
+        """An item sprite (engine.props.make_item) in the right hand exactly as ItemInHandLayer draws it: with the
+        display.thirdperson_righthand of the item's OWN model (item/handheld for swords and tools: turned 90
+        degrees, tilted 55, scale 0.85, so the blade stands up out of the fist; item/generated for the rest: flat
+        along the hand, scale 0.55). item = the item id when the object's name does not tell (make_item names it
+        item_<id>). The arms keep the zombie pose (HumanoidMobRenderer.getArmPose is EMPTY); only a BABY that
+        holds something lets both arms hang (AnimationUtils.animateZombieArms), and in its hand the item is as big
+        as in an adult's. Call it before place(). hold(None) empties the hand."""
         if self.held is not None and self.held is not obj:
             self.held.parent = None
             self.held = None
+        down = self.baby and obj is not None
+        if down != self._arms_down:
+            self._arms_down = down
+            for arm, sgn in ((self.arm_r, 1.0), (self.arm_l, -1.0)):
+                self._set_rest(arm, _ROT, 0, 0.0 if down else ARMS_OUT)
+                self._set_rest(arm, _ROT, 2, (-sgn if down else sgn) * ARM_TOE)
+            self._bake_arms()
         if obj is None:
             return None
+        if item is None:
+            item = str(obj.get("mc_item", obj.name.split(".")[0]))
+            item = item[5:] if item.startswith("item_") else item
         obj.parent = self.arm_r
         obj.matrix_parent_inverse = Matrix.Identity(4)
-        obj.matrix_basis = ch._held_matrix("hand", self.model_scale * (0.5 if self.baby else 1.0))
+        obj.matrix_basis = held_matrix(item_display(item), self.model_scale, self.baby)
         if offset is not None:
             obj.location = offset
         if rotation is not None:
@@ -1279,8 +1558,9 @@ class Undead(ch.Character):
         self.held = obj
         return obj
 
-    def hurt(self, frame, attacker=None, knockback=True, max_back=None, flash=True):
-        """The game's hurt on `frame` (see undead.hurt): red for 12 frames, knock-back hop, flailing legs."""
+    def hurt(self, frame, attacker=None, knockback=None, max_back=None, flash=True):
+        """The game's hurt on `frame` (see undead.hurt): red for 12 frames, flailing legs, and the knock-back hop
+        when there is an attacker."""
         return hurt(self, frame, attacker=attacker, knockback=knockback, max_back=max_back, flash=flash)
 
     def die(self, frame, camera=None, **kw):
@@ -1338,20 +1618,38 @@ def flee(villager, frame, threat, distance=6.0, speed=VILLAGER_PANIC_SPEED):
 # ----------------------------------------------------------------------------------------------------
 # infection
 # ----------------------------------------------------------------------------------------------------
-def infect(villager, zombie_villager, frame, attacker=None, knockback=True, max_back=None):
+def infect(villager, zombie_villager, frame, attacker=None, knockback=None, max_back=None):
     """The villager dies to a zombie on `frame` and is replaced on the spot by `zombie_villager` (same place, same
     yaw; no flash, no tipping body, no particles: Zombie.killedEntity -> Mob.convertTo). The zombie villager takes
-    the killing blow's knock-back hop away from `attacker` (it inherits the velocity). Returns the end frame."""
+    the killing blow's knock-back hop away from `attacker` (it inherits the velocity; max_back as in hurt, counted
+    from where the villager stood when the blows began). The same two characters can go round again: cure(), then
+    infect() once more. Returns the end frame."""
     f0 = int(round(frame))
     pos, yaw = villager.pos_at(f0), villager.yaw_at(f0)
+    vst = _state(villager)
+    chain = vst.get("chain")
+    flying = next((b for b in vst["blows"] if b["frame"] < f0 < b["frame"] + HURT_FRAMES), None)
     vanish(villager, f0, why="replaced")
     st = _state(zombie_villager)
-    st["presence"] = [e for e in st["presence"] if e[0] is not None and e[0] > f0]
+    known = bool(st["presence"])                                 # (it has a history: an earlier round, a death)
     zombie_villager.place(f0, pos, yaw)
-    _presence(zombie_villager, None, False, "unborn")
+    if not known:
+        _presence(zombie_villager, None, False, "unborn")
     _presence(zombie_villager, f0, True, "born")
+    st["chain"] = chain                                          # the wall behind the villager is behind him too
     end = f0
-    strength = _strength(knockback, zombie_villager) if (attacker is not None or knockback is not True) else 0.0
+    if flying is not None and chain is not None and (_chain_pos(chain, f0) - pos).length < 2e-3:
+        # (the game lets no blow land for 10 ticks: this cannot happen there) he finishes the villager's flight
+        _note("infect(%s, %d): the villager was hit on frame %d and is still in the air; the zombie villager comes "
+              "down where that blow sends him, the killing blow adds nothing" % (villager.name, f0, flying["frame"]))
+        times = [chain["f0"] + (k + 1) * TICK for k in range(len(chain["track"]))]
+        times = [t for t in times if t > f0 + 1e-6]
+        for i in range(3):
+            keys = [(float(f0), None, "LINEAR")] + [(t, _chain_pos(chain, t)[i], "LINEAR") for t in times]
+            if len(keys) > 1:
+                ch._segment(zombie_villager.root, _LOC, i, keys, "LINEAR")
+        return int(math.ceil(times[-1])) if times else f0
+    strength = _strength(knockback, zombie_villager, attacker)
     if strength > 0.0:
         end = _knock(zombie_villager, f0, attacker, strength, max_back, 0.0)
     return end
@@ -1409,6 +1707,8 @@ def effect_swirls(character, frame_start, frame_end, effect="strength", camera=N
         path = fx._simulate(p, v, life, -0.1 * 0.04, 0.96, None, 0.2, rng)
         _sprite_particle(burst, "undead_swirl_%d_%d" % (int(f0), tick), EFFECT_SPRITES, tint, glow, path, f, quad,
                          cams, col)
+    if isinstance(character, ch.Character):                              # (they end when it dies, is infected or cured)
+        _state(character).setdefault("swirls", []).append(burst)
     return burst
 
 
@@ -1692,12 +1992,14 @@ def cure(zombie_villager, villager, frame_start, frame_end, camera=None, player=
         globals()["shake"](zv, f0, f1, amount=float(shake))
     out["strength"] = effect_swirls(zv, f0, f1, "strength", camera=camera, seed=seed, glow=glow)
     pos, yaw = zv.pos_at(f1), zv.yaw_at(f1)
+    chain = _state(zv).get("chain")
     vanish(zv, f1, why="replaced")
     known = bool(villager.__dict__.get(_STATE, {}).get("presence"))
     villager.place(f1, pos, yaw)
     if not known:
         _presence(villager, None, False, "unborn")
     _presence(villager, f1, True, "cured")
+    _state(villager)["chain"] = chain
     out["nausea"] = effect_swirls(villager, f1, f1 + int(nausea), "nausea", camera=camera, seed=seed + 2, glow=glow) \
         if nausea > 0 else None
     return out
@@ -1798,8 +2100,8 @@ def _check():
         info = who.last_walk
         slide, low, lift = 0.0, 1e9, 0.0
         before, carrying, anchor = None, None, 0.0
-        f = 1.0 + info["cycle_frames"]
-        while f < endw - info["cycle_frames"]:
+        f = 1.0                                                         # from the first frame: the short first step too
+        while f < endw:
             _evaluate(scene, f)
             pts = [sole(who, who.leg_l), sole(who, who.leg_r)]
             if before is not None:
@@ -2022,6 +2324,223 @@ def _check():
     expect("cure: Strength ffc700, Nausea 551d4a, Weakness 484d48", cols == {"strength": ["ffc700"], "nausea": ["551d4a"], "weakness": ["484d48"]}, str(cols))
     ups = [p["pos"][-1][2] - p["pos"][0][2] for p in res["strength"].particles if "stage" not in p]
     expect("swirls rise", min(ups) > 0.0, "%.2f..%.2f blocks" % (min(ups), max(ups)))
+
+    # ---- the same two characters go round twice (the trading hall: infect, cure, infect, cure)
+    def reds(c, f):
+        scene.frame_set(int(f))
+        return len([t for t in c.__dict__[_STATE]["twins"].values() if _rendered(t)])
+
+    def own(c, f):
+        scene.frame_set(int(f))
+        return len(shown(c))
+
+    rv = fx.make_job_villager("round_v", ("librarian", "none"))
+    rv.place(1, (40.0, 0.0, 0.0), 0.0)
+    rv.show(1, True)
+    rz = make_zombie_villager("round_z", "librarian")
+    rz.show(1, True)
+    rb = make_zombie("round_biter")
+    rb.place(1, (40.0, -1.25, 0.0), math.radians(180))
+    for f in (100, 400):
+        rb.attack(f)
+        infect(rv, rz, f, attacker=rb, max_back=0.0)
+        cure(rz, rv, f + 100, f + 160, camera=cam, nausea=24)
+    rows = [(own(rv, f) > 0, own(rz, f) > 0) for f in (50, 150, 250, 300, 450, 600)]
+    late = effect_swirls(rv, 560, 700, "nausea", camera=cam, seed=8)
+    n_all = len([p_ for p_ in late.particles if "stage" not in p_ and p_["last"] > p_["first"]])
+    vanish(rv, 620)
+    kept = [p_ for p_ in late.particles if "stage" not in p_ and p_["last"] > p_["first"]]
+    expect("a mob that is gone gives off no new swirls (those in the air live on)", 0 < len(kept) < n_all
+           and max(p_["spawn"] for p_ in kept) < 620 and any(p_["first"] <= 622 < p_["last"] for p_ in late.particles)
+           and not any(p_["first"] <= 680 < p_["last"] for p_ in late.particles), "%d of %d" % (len(kept), n_all))
+    appear(rv, 640)
+    expect("infect, cure, infect, cure with the same two characters: each is there in its turn",
+           rows == [(True, False), (False, True), (False, True), (True, False), (False, True), (True, False)], str(rows))
+
+    # ---- a cut (place) in the middle of a flash, of a death, of raised arms and of a swing
+    cv = ch.make_villager("cut_v", "farmer")
+    cv.place(1, (44.0, 0.0, 0.0), 0.0)
+    cv.show(1, True)
+    hurt(cv, 40, attacker=(44.0, -1.0, 0.0))
+    cv.place(46, (60.0, 30.0, 0.0), 0.5)
+    got = (reds(cv, 45), own(cv, 45), reds(cv, 46), own(cv, 46), reds(cv, 50), own(cv, 50))
+    expect("place() 6 frames after a blow: the red flash and the hop end at the cut", got == (5, 0, 0, 5, 0, 5)
+           and (cv.pos_at(50) - Vector((60.0, 30.0, 0.0))).length < 1e-6, str(got))
+    cz = make_zombie("cut_z")
+    cz.place(1, (48.0, 0.0, 0.0), 0.0)
+    cz.show(1, True)
+    cz.die(40, camera=cam, attacker=(48.0, -1.0, 0.0), seed=3)
+    cloud = [bu for bu in fx._BURSTS if bu.kind == "poof"][-1]
+    cz.place(50, (64.0, 30.0, 0.0), 0.0)
+    got = [(own(cz, f), reds(cz, f)) for f in (45, 50, 64, 80)]
+    _evaluate(scene, 55.0)
+    tilt = math.degrees(cz.root.rotation_euler[1])
+    puffs = []
+    for f in (64, 66, 80):
+        scene.frame_set(f)
+        puffs.append(len([o for o in cloud.objects if _rendered(o)]))
+    expect("place() in the middle of a death calls it off: upright, own colours, stays, no poof",
+           got == [(0, 6), (6, 0), (6, 0), (6, 0)] and abs(tilt) < 1e-6 and puffs == [0, 0, 0], "%s tilt %.1f poof %s" % (got, tilt, puffs))
+    e1 = cz.hurt(90, attacker=(64.0, 29.0, 0.0))
+    expect("... and it can be hit again afterwards", reds(cz, 95) == 6 and e1 > 100 and cz.pos_at(130).y > 31.5, "end %d" % e1)
+    az = make_zombie("arms_z")
+    az.place(1, (58.0, 0.0, 0.0), 0.0)
+    az.aggro(20)
+    az.attack(96)
+    az.place(100, (58.0, 2.0, 0.0), 0.0)
+    vals = []
+    for f in (95.0, 99.5, 100.0, 101.0, 104.0):
+        _evaluate(scene, f)
+        vals.append(az.arm_r.rotation_euler[0] - az.arm_bob(f)[0])
+    expect("place(): raised arms come down and a running swing ends at the cut", near(vals[0], ARMS_RAISED, 1e-3) and vals[1] > ARMS_RAISED + 0.3
+           and all(near(v_, ARMS_OUT, 1e-3) for v_ in vals[2:]) and az.swing_value(99.5) > 0.2 and az.swing_value(100.0) == 0.0
+           and near(az.body.rotation_euler[2], 0.0, 1e-6), str([round(math.degrees(v_), 1) for v_ in vals]))
+    az.aggro(100)
+    az.place(140, (58.0, 4.0, 0.0), 0.0, keep_pose=True)
+    _evaluate(scene, 141.0)
+    expect("place(keep_pose=True) keeps them raised; aggro() after a place() on the same frame raises them",
+           near(az.arm_r.rotation_euler[0] - az.arm_bob(141.0)[0], ARMS_RAISED, 1e-3) and near(az.arm_base(110.0), ARMS_RAISED, 1e-9))
+
+    # ---- no attacker, no knock-back (lava, fire, a fall, cactus, drowning ...); knockback=True overrules
+    tz = make_zombie("trap_z")
+    tz.place(1, (52.0, 0.0, 0.0), 0.0)
+    tz.show(1, True)
+    tz.die(20, camera=cam, poof=False)
+    moved = max((tz.pos_at(20 + k * 0.5) - Vector((52.0, 0.0, 0.0))).length for k in range(48))
+    _evaluate(scene, 20 + 14 * TICK)
+    expect("die() without an attacker: no knock-back, it tips over where it stood", moved < 1e-9 and near(math.degrees(tz.root.rotation_euler[1]), 90.0, 0.1), "%.4f" % moved)
+    th = make_zombie("trap_h")
+    th.place(1, (54.0, 0.0, 0.0), 0.0)
+    th.show(1, True)
+    e1 = th.hurt(20)
+    moved = max((th.pos_at(20 + k * 0.5) - Vector((54.0, 0.0, 0.0))).length for k in range(48))
+    _evaluate(scene, 20 + TICK)
+    kick = abs(th.leg_l.rotation_euler[0])
+    expect("hurt() without an attacker: red for 12 frames and the legs kick, no hop", moved < 1e-9 and reds(th, 25) == 6 and reds(th, 32) == 0
+           and near(kick, LEG_SWING, 0.01) and e1 >= 32, "moved %.4f kick %.2f end %d" % (moved, kick, e1))
+    tw = make_zombie("trap_w")
+    tw.place(1, (56.0, 0.0, 0.0), math.radians(180))
+    endw = tw.walk(1, [(56.0, 0.0, 0.0), (56.0, 8.0, 0.0)])
+    tw.hurt(30)
+    swing_after = 0.0
+    for k in range(40):
+        _evaluate(scene, 34.0 + k * 0.5)
+        swing_after = max(swing_after, abs(tw.leg_l.rotation_euler[0]))
+    expect("hurt() without knock-back in mid-walk: it walks on, its gait unbroken", (tw.pos_at(endw) - Vector((56.0, 8.0, 0.0))).length < 1e-6
+           and near(swing_after, tw.last_walk["swing"], 0.03) and reds(tw, 35) == 6, "swing %.2f of %.2f" % (swing_after, tw.last_walk["swing"]))
+    tb = make_zombie("trap_b")
+    tb.place(1, (57.5, 0.0, 0.0), 0.0)
+    tb.hurt(20, knockback=True)
+    expect("hurt(knockback=True) without an attacker: straight back from the way it faces", near(tb.pos_at(60).y, 1.99, 0.02) and near(tb.pos_at(60).x, 57.5, 1e-6))
+
+    # ---- max_back is the wall: a series of blows shares it; the zombie villager inherits it
+    mv = ch.make_villager("cell_v", "none")
+    mv.place(1, (62.0, 0.0, 0.0), 0.0)
+    for i in range(3):
+        hurt(mv, 20 + 24 * i, attacker=(62.0, -1.2, 0.0), max_back=0.2)
+    ys = [mv.pos_at(20 + k * 0.5).y for k in range(200)]
+    hurt(mv, 130, attacker=(62.0, 1.4, 0.0), max_back=0.2)                # from the other side: 0.4 to the other wall
+    low = mv.pos_at(170).y
+    mzv = make_zombie_villager("cell_zv", "none")
+    infect(mv, mzv, 180, attacker=(62.0, -1.2, 0.0), max_back=0.2)
+    high = max(mzv.pos_at(180 + k * 0.5).y for k in range(80))
+    expect("max_back: three blows in a 1x1 cell stay within 0.2 of the spot, either way, the infected one too",
+           near(max(ys), 0.2, 1e-6) and min(ys) > -1e-9 and near(low, -0.2, 1e-6) and near(high, 0.2, 1e-6) and near(mv.pos_at(100).z, 0.0, 1e-9),
+           "max %.3f, other side %.3f, zombie villager %.3f" % (max(ys), low, high))
+
+    # ---- a blow inside the 10-tick cool-down does not land; a mob that is dying takes none
+    kz = make_zombie("cool_z")
+    kz.place(1, (66.0, 0.0, 0.0), 0.0)
+    kz.show(1, True)
+    e1 = kz.hurt(20, attacker=(66.0, -1.0, 0.0))
+    e2 = kz.hurt(26, attacker=(66.0, -1.0, 0.0))
+    apex = max(kz.pos_at(20 + k * 0.25).z for k in range(160))
+    expect("a second blow 6 frames after the first is ignored (one hop, one flash)", e2 == e1 and near(apex, 0.965, 0.01)
+           and near(kz.pos_at(60).y, 1.99, 0.02) and near(kz.pos_at(60).z, 0.0, 1e-9) and kz.__dict__[_STATE]["flashes"] == [(20, 32)],
+           "apex %.3f, at rest %.2f back" % (apex, kz.pos_at(60).y))
+    kz.hurt(32, attacker=(66.0, -1.0, 0.0))
+    apex = max(kz.pos_at(32 + k * 0.25).z for k in range(160))
+    expect("... 12 frames after it the next one lands", near(apex, 0.965, 0.01) and kz.pos_at(80).y > 3.5 and near(kz.pos_at(80).z, 0.0, 1e-9), "%.2f back" % kz.pos_at(80).y)
+    dd = make_zombie("twice_z")
+    dd.place(1, (70.0, 0.0, 0.0), 0.0)
+    dd.show(1, True)
+    g1 = dd.die(100, camera=cam, seed=1)
+    g2 = dd.die(100, camera=cam, seed=2)
+    g3 = dd.die(110, camera=cam)
+    e3 = dd.hurt(105, attacker=(70.0, -1.0, 0.0))
+    scene.frame_set(124)
+    puff = sum(len([o for o in bu.objects if _rendered(o)]) for bu in fx._BURSTS if bu.kind == "poof" and bu.frame == 124)
+    expect("die() keyed twice: one death, one cloud; a dying mob takes no further blow", g1 == g2 == g3 == e3 == 124 and puff == POOF_COUNT
+           and (dd.pos_at(123) - Vector((70.0, 0.0, 0.0))).length < 1e-9, "%d poof quads on frame 124" % puff)
+    fv = ch.make_villager("flight_v", "none")
+    fv.place(1, (74.0, 0.0, 0.0), 0.0)
+    hurt(fv, 20, attacker=(74.0, -1.0, 0.0))
+    fzv = make_zombie_villager("flight_zv", "none")
+    e1 = infect(fv, fzv, 26, attacker=(74.0, -1.0, 0.0))
+    expect("infected in the flight of a blow: the zombie villager finishes that flight, on the ground afterwards",
+           fzv.pos_at(26).z > 0.5 and near(fzv.pos_at(60).z, 0.0, 1e-9) and near(fzv.pos_at(60).y, 1.99, 0.02) and 36 <= e1 <= 46,
+           "%.2f up at the swap, %.2f back at rest, end %d" % (fzv.pos_at(26).z, fzv.pos_at(60).y, e1))
+    fz = make_zombie("flight_z")
+    fz.place(1, (72.0, 0.0, 0.0), 0.0)
+    fz.hurt(20, attacker=(72.0, -1.0, 0.0))
+    fz.die(26, camera=cam, poof=False)
+    expect("killed in the flight of a blow: it dies on its way and comes down", near(fz.pos_at(49).y, 1.99, 0.02) and near(fz.pos_at(49).z, 0.0, 1e-9)
+           and fz.pos_at(26).z > 0.5, "%.2f back, %.2f up when killed" % (fz.pos_at(49).y, fz.pos_at(26).z))
+
+    # ---- zombies that set off together are out of step; lead / first_step choose it
+    horde = [make_zombie("horde_%d" % i) for i in range(5)]
+    for i, hz_ in enumerate(horde):
+        hz_.place(1, (76.0 + 1.5 * i, 0.0, 0.0), 0.0)
+        hz_.walk(1, [(76.0 + 1.5 * i, 0.0, 0.0), (76.0 + 1.5 * i, -8.0, 0.0)])
+    apart = 9.0
+    for i in range(5):
+        for j in range(i + 1, 5):
+            worst = 0.0
+            for f in (5, 12, 20, 33, 47, 60):
+                scene.frame_set(f)
+                worst = max(worst, abs(horde[i].leg_l.rotation_euler[0] - horde[j].leg_l.rotation_euler[0]))
+            apart = min(apart, worst)
+    expect("five zombies that start walking on the same frame: no two in step", apart > 0.15,
+           "closest pair differs by %.2f rad; leads %s, first steps %s, strides %s"
+           % (apart, "".join(h.last_walk["lead"] for h in horde), " ".join("%.2f" % h.last_walk["first_step"] for h in horde),
+              " ".join("%.2f" % h.last_walk["stride"] for h in horde)))
+    lz = make_zombie("lead_z")
+    lz.place(1, (86.0, 0.0, 0.0), 0.0)
+    lz.walk(1, [(86.0, 0.0, 0.0), (86.0, -6.0, 0.0)], lead="l", first_step=1.0, stride=1.0)
+    _evaluate(scene, 3.0)
+    expect("walk(lead='l', first_step=1, stride=1): the left leg steps out, the right carries; the game's 37 degrees +-4",
+           lz.leg_l.rotation_euler[0] < -0.1 and lz.leg_r.rotation_euler[0] > 0.1 and lz.last_walk["lead"] == "l"
+           and near(lz.last_walk["first_step"], 1.0, 1e-9) and near(math.degrees(lz.last_walk["swing"]), 37.4, 4.0),
+           "swing %.1f deg" % math.degrees(lz.last_walk["swing"]))
+
+    # ---- held items: the item's own display transform; a baby with an item lets its arms hang
+    col = ch._collection(None)
+    expect("item_display: handheld for a sword, generated for an apple", item_display("iron_sword") == ((0.0, -90.0, 55.0), (0.0, 4.0, 0.5), (0.85, 0.85, 0.85))
+           and item_display("golden_apple") == ((0.0, 0.0, 0.0), (0.0, 3.0, 1.0), (0.55, 0.55, 0.55)), str(item_display("iron_sword")))
+    hz = make_zombie("hold_z")
+    sword = mc.item_object("iron_sword", col)
+    hz.hold(sword)
+    hz.place(1, (90.0, 0.0, 0.0), 0.0)
+    _evaluate(scene, 1.0)
+    blade = (sword.matrix_world.to_3x3() @ Vector((1.0, 0.0, 1.0))).normalized()     # the sprite's diagonal: hilt -> point
+    grip = sword.matrix_world.translation - hz.arm_r.matrix_world @ Vector((-1.0 / 16.0, 0.0, -10.0 / 16.0))
+    expect("hold(sword): scale 0.85, the blade stands up out of the fist, tipped 20 degrees forward", near(sword.matrix_world.to_scale()[0], 0.85, 1e-4)
+           and blade.z > 0.85 and -0.5 < blade.y < -0.15 and abs(blade.x) < 0.2 and grip.length < 0.45 and near(hz.arm_base(1.0), ARMS_OUT, 1e-9),
+           "blade %s, sprite centre %.2f from the hand" % (tuple(round(q, 2) for q in blade), grip.length))
+    hb = make_zombie("hold_b", baby=True)
+    sword_b = mc.item_object("iron_sword", col)
+    hb.hold(sword_b)
+    hb.place(1, (92.0, 0.0, 0.0), 0.0)
+    hb.attack(10)
+    _evaluate(scene, 1.0)
+    hang = hb.arm_r.rotation_euler[0] - hb.arm_bob(1.0)[0]
+    _evaluate(scene, 10 + 4.0 * TICK)
+    back = hb.arm_r.rotation_euler[0] - hb.arm_bob(10 + 4.0 * TICK)[0]
+    expect("a baby that holds an item lets its arms hang, swings them the other way; the item is full size", near(hang, 0.0, 1e-4)
+           and near(back, -SWING_DOWN - SWING_BACK * math.sin(0.75 * math.pi), 2e-3) and near(sword_b.matrix_world.to_scale()[0], 0.85, 1e-4),
+           "pitch %.3f, mid-swing %.3f" % (hang, back))
+    hb.hold(None)
+    expect("... and holds them out again with an empty hand", near(hb.arm_base(1.0), ARMS_OUT, 1e-9) and hb.held is None)
     print("check: %d of %d passed" % (sum(ok), len(ok)))
     return all(ok)
 
@@ -2229,6 +2748,92 @@ def _selftest(which):
         apple.scale = (0.5, 0.5, 0.5)
         quick.camera(scene, (0.0, -3.2, 1.3), (0.0, 0.0, 1.3), lens=19)
         shoot(scene, "undead_items", 1)
+
+    if want("hold"):                                                     # held items: the item's own display transform
+        scene = stage("day", wall=wall)
+        from . import props
+
+        col = ch._collection(None)
+        for i, (item, baby) in enumerate((("iron_sword", False), ("iron_shovel", False), ("golden_apple", False),
+                                          ("iron_sword", True), (None, True))):
+            z = make_zombie("holder_%d" % i, baby=baby)
+            if item is not None:
+                z.hold(props.make_item(item, col))
+            z.place(1, ((-0.55 + (i - 3) * 1.3, -1.3, 0.0) if baby else (-1.15 + i * 1.15, 0.4, 0.0)), math.radians(35))
+        scene.objects["quick_sun"].rotation_euler[2] = math.radians(-20)
+        quick.camera(scene, (0.5, -8.2, 2.3), (0.05, 0.0, 0.95), lens=24)
+        shoot(scene, "undead_hold", 1)
+
+    if want("cut"):                                                      # a place() in the middle of a flash and of a death
+        scene = stage("day", blur=True, wall=wall)
+        z = make_zombie("zombie")
+        v = ch.make_villager("farmer", "farmer")
+        dz = make_zombie("dying")
+        s = ch.make_player("steve")
+        z.place(1, (-2.6, 0.0, 0.0), math.radians(90))
+        v.place(1, (-1.35, 0.0, 0.0), math.radians(-90))
+        s.place(1, (0.3, 0.0, 0.0), math.radians(90))
+        dz.place(1, (1.5, 0.0, 0.0), math.radians(-90))
+        z.aggro(1, True, ease=0)
+        cam = quick.camera(scene, (0.0, -10.5, 1.9), (0.0, 0.0, 1.2), lens=25)
+        z.attack(20, target=v, max_back=0.6)
+        fx.arm_swings(s, [18])
+        gone = dz.die(20, camera=cam, attacker=s, max_back=0.6, seed=4)
+        v.place(26, (-1.2, 0.9, 0.0), math.radians(-40))                 # the film cuts: both stand somewhere else
+        dz.place(30, (1.3, 0.9, 0.0), math.radians(30))
+        stills = [shoot(scene, "undead_cut_%d" % (i + 1), f) for i, f in enumerate((24, 26, 30, gone + 2))]
+        sheet("undead_cut_sheet", stills)
+
+    if want("trap"):                                                     # no attacker, no knock-back
+        scene = stage("day", blur=True, wall=wall)
+        a, b, c = make_zombie("lava_death"), make_zombie("cactus_hurt"), make_zombie("sword_death")
+        s = ch.make_player("steve")
+        a.place(1, (-2.1, 0.0, 0.0), math.radians(20))
+        b.place(1, (-0.6, 0.0, 0.0), math.radians(20))
+        s.place(1, (0.6, -0.3, 0.0), math.radians(90))
+        c.place(1, (1.75, -0.3, 0.0), math.radians(-90))
+        cam = quick.camera(scene, (0.0, -10.5, 1.9), (0.0, 0.0, 1.2), lens=25)
+        a.die(20, camera=cam, seed=1)
+        b.hurt(20)
+        fx.arm_swings(s, [18])
+        c.die(20, camera=cam, attacker=s, max_back=1.0, seed=2)
+        stills = [shoot(scene, "undead_trap_%d" % (i + 1), f) for i, f in enumerate((22, 26, 34))]
+        sheet("undead_trap_sheet", stills)
+
+    if want("horde"):                                                    # five that set off together, out of step
+        scene = stage("day", blur=True, path=(-8, 8), wall=((-8, 3, 8, 3), ("stone_bricks", "oak_planks", "stone_bricks")))
+        for i in range(5):
+            z = make_zombie("horde_%d" % i)
+            start = (-6.0 - 0.45 * (i % 2), 1.9 - 0.95 * i, -0.0625)
+            z.place(1, start, math.radians(90))
+            z.walk(1, [start, (start[0] + 13.0, start[1], start[2])])
+            if i % 2:
+                z.aggro(1, True, ease=0)
+        stills = []
+        for i, f in enumerate((30, 37, 44)):
+            x = -6.0 + WALK_SPEED * (f - 1) / FPS
+            quick.camera(scene, (x + 6.0, -8.5, 2.6), (x, 0.0, 0.9), lens=24)
+            stills.append(shoot(scene, "undead_horde_%d" % (i + 1), f))
+        sheet("undead_horde_sheet", stills)
+
+    if want("round"):                                                    # infect, cure, infect, cure: the same two characters
+        scene = stage("day", wall=wall)
+        z = make_zombie("zombie")
+        v = fx.make_job_villager("trader", ("librarian", "none"), level=2)
+        zv = make_zombie_villager("trader_z", "librarian", level=2)
+        z.place(1, (-1.2, 0.0, 0.0), math.radians(90))
+        v.place(1, (0.15, 0.0, 0.0), math.radians(-90))
+        v.show(1, True)
+        zv.show(1, True)
+        cam = quick.camera(scene, (0.2, -7.6, 1.6), (0.1, 0.0, 1.25), lens=32)
+        marks = [20]
+        for f in (30, 130):
+            z.attack(f)
+            infect(v, zv, f, attacker=z, max_back=0.3)
+            res = cure(zv, v, f + 30, f + 60, camera=cam, nausea=60, seed=f)
+            marks += [f + 15, res["frame_end"] + 12]
+        stills = [shoot(scene, "undead_round_%d" % (i + 1), f) for i, f in enumerate(marks[1:])]
+        sheet("undead_round_sheet", stills)
 
     if want("hall") or want("street") or want("hall_bars") or want("night_fx"):
         _village_stills(want("hall"), want("street"), want("hall_bars"), want("night_fx"))

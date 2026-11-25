@@ -52,7 +52,8 @@ A frame is skipped while its PNG has the requested size and all three are curren
 stutter), unless --allow-holds says the gaps are deliberate (step previews). --encode alone reuses meta.json (no
 rebuild) when none of the sources it lists has changed; after a caption edit it rebuilds the film (seconds),
 finds every fingerprint unchanged and encodes the frames that are there.
-Exit codes: 0 done, 1 nothing to do, 2 encode refused, 3 stopped because engine sources changed under final frames.
+Exit codes: 0 done, 1 nothing to do, 2 encode refused, 3 stopped because engine sources changed under final frames,
+4 encode of a long film not finished yet (run the same command again).
 
 Sound. A narrated film (engine/narration.py: a NARRATION literal in the film module, spoken by tools/narrate.py into
 narration/<film>.wav + .json) needs no flag: --encode muxes narration/<film>.wav whenever that file exists (AAC
@@ -63,6 +64,15 @@ spoken from the film's current NARRATION, that the wav is the one the json descr
 shorter than its last word, and refuses (exit code 2) otherwise. The narration files count as sources of the film:
 speak the text again and the next --encode rebuilds the film, so captions and audio cannot drift apart.
 A film without narration/<film>.wav is encoded silent, exactly as before.
+
+Long films. Encoding costs 0.13 s per frame here, 0.26 s when the machine is shared (PNG read, Lanczos, caption,
+x264): a one-minute film is 190 to 380 s of it, and nothing would be left of a command killed at 300 s. So a film
+longer than 20 s (engine.post.SEGMENT_OVER frames) is encoded in parts of 10 s (engine.post.encode_parts): each
+part is kept on disk, a part whose frames and captions are unchanged is never encoded twice, no new part is
+started later than 170 s after the command began (--max-seconds lowers that), and when all parts exist they are joined
+with a stream copy and the narration is muxed under the whole film. Until then --encode ends with exit code 4:
+run the same command again (a minute takes one call on an idle machine, two or three on a busy one). Films of
+20 s or less are encoded in one pass, exactly as before.
 """
 import argparse
 import hashlib
@@ -75,6 +85,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
+ENCODE_SECONDS = 170.0           # --encode of a long film: no new part is started later than this after the
+                                 #   command began (--max-seconds overrides it)
 STILL_RES, STILL_SAMPLES, STILL_THREADS = (540, 960), 16, 2
 SHEET_RES, SHEET_SAMPLES = (270, 480), 8
 FINAL_RES, FINAL_SAMPLES, FINAL_THREADS = (720, 1280), 24, 4
@@ -104,7 +116,9 @@ def _parse_args(argv):
     ap.add_argument("--captioned", action="store_true",
                     help="with --still: also save <name>_cap.png, upscaled to 1080x1920 with its caption")
     ap.add_argument("--max-seconds", type=float, default=0.0,
-                    help="with --frames: stop starting new frames after this many seconds (resume by re-running)")
+                    help="with --frames: stop starting new frames after this many seconds (resume by re-running); "
+                         "with --encode of a film longer than 20 s: stop starting new parts this long after the "
+                         "command began (170 at most; exit code 4 until the last part is written)")
     ap.add_argument("--no-motion-blur", action="store_true", help="disable motion blur (faster look-dev stills)")
     ap.add_argument("--audio", metavar="FILE",
                     help="with --encode: mux this audio file instead of the film's narration (AAC 192k 48 kHz stereo, "
@@ -456,6 +470,7 @@ def _meta_is_fresh(name, variant=None):
 
 def main(argv=None):
     """Entry point of `python -m render`."""
+    started = time.time()
     args = _parse_args(sys.argv[1:] if argv is None else argv)
     from PIL import Image
 
@@ -669,9 +684,21 @@ def main(argv=None):
                 print("[render] encode refused:", problem)
                 return 2
         try:
-            mp4 = post.encode(name, captions=[tuple(c) for c in meta["captions"]], fps=meta["fps"],
-                              frame_start=meta["frame_start"], frame_end=meta["frame_end"], audio=audio,
-                              variant=variant, allow_holds=args.allow_holds)
+            if meta["frame_end"] - meta["frame_start"] + 1 > post.SEGMENT_OVER:
+                # a long film: in parts, resumable (see "Long films" in the module docstring)
+                mp4 = post.encode_parts(name, captions=[tuple(c) for c in meta["captions"]], fps=meta["fps"],
+                                        frame_start=meta["frame_start"], frame_end=meta["frame_end"], audio=audio,
+                                        variant=variant, allow_holds=args.allow_holds,
+                                        deadline=started + min(args.max_seconds or ENCODE_SECONDS, ENCODE_SECONDS),
+                                        first_always=not args.frames)   # (a call that rendered frames first has
+                                                                        #  no time left to owe a part)
+                if mp4 is None:
+                    print("[render] encode not finished: run the same command again (exit code 4)")
+                    return 4
+            else:
+                mp4 = post.encode(name, captions=[tuple(c) for c in meta["captions"]], fps=meta["fps"],
+                                  frame_start=meta["frame_start"], frame_end=meta["frame_end"], audio=audio,
+                                  variant=variant, allow_holds=args.allow_holds)
         except RuntimeError as e:
             print("[render] encode refused:", e)
             return 2

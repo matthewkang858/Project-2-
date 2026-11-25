@@ -23,7 +23,11 @@ PUBLIC API
         show(frame, visible=True)              keyed visibility of the whole piglin, weapon and armor included
         walk(frame, points, speed=None, run=False, from_current=False, gait="planted", swing=None, ramp=4,
              corner=0.5, dip=None) -> end frame
-                                               1.94 blocks/s, run=True 5.40 (a baby 2.80 / 7.77): see GAIT
+                                               1.94 blocks/s, run=True 5.40 (a baby 2.80 / 7.77): see GAIT. For
+                                               level ground and stairs: a drop in `points` raises ValueError
+        fall(frame, to_z, forward=None, speed=None) -> landing frame
+                                               drop to a lower floor as the game's gravity does (two blocks in
+                                               8.4 frames): into a pit, off a ledge; see FALLING
         look_at(frame, target, ease=6) / track(f0, f1, target)     head, clamped to the game's 75 / 40 degrees
         face(frame, target, ease=8) / turn(frame, yaw, ease=8)     turn the whole body on the spot
         idle(frame_start, frame_end, seed=0)   head glances, weight shifts, the game's arm bob, the ears' slow flop
@@ -41,27 +45,33 @@ PUBLIC API
                                                head, arms and body bobbing once in 11.3 frames, ears swinging)
         hurt(frame, source=None, knockback=0.4, max_back=None) -> frame it stands still again
         die(frame, source=None, knockback=0.4, max_back=None, camera=None, poof_particles=True, seed=0,
-            village=None, glow=None) -> frame it is gone                                      (see HURT AND DEATH)
+            village=None, glow=None, first=None, until=None) -> frame it is gone              (see HURT AND DEATH)
         queries: aggro_at / admiring_at / dancing_at / aiming_at / hurt_at / gone_at(frame), item_at(frame, hand),
                  item_object(key, hand), item_point(frame, hand) (world centre of the held item: focus / hero
-                 target), ear_angles(age, walk_pos, walk_speed), age(frame), last_walk, last_death
+                 target), ear_angles(age, walk_pos, walk_speed), age(frame), last_walk, last_fall, last_death
         nod / shake / flinch / raise_arm / lie_down / pos_at / yaw_at / eye_point: inherited, unchanged
     barter(piglin, ingot_item, frame, result_item="ender_pearl", toward=None, admire_ticks=119, count=1,
-           world=None, floor=None, seed=0, animate=240, face=None, ease=0) -> dict of beats        (see BARTER)
+           world=None, floor=None, seed=0, animate=240, face=None, ease=0, lob=False) -> dict of beats  (see BARTER)
     throw_item(item, frame, thrower, aim, world=None, floor=None, seed=0) -> frame it lies still
         a PLAYER throws a DroppedItem (the gold ingot) toward a point, as the game's Q key does
     pickup(item, frame, taker) -> first frame it is gone      the game's 3-tick flight of an item to who takes it
-    launch(item, frame, start, velocity, world=None, floor=0.0) -> frame it lies still     any item entity flight
+    launch(item, frame, start, velocity, world=None, floor=None) -> frame it lies still    any item entity flight
+    lob_velocity(start, target, world=None, floor=None) -> velocity for launch(): the arc that clears the blocks
+        and brings an item to REST at `target` (a cheat, not the game's throw; barter(lob=True) uses it)
     in_reach(piglin, item, frame) -> bool     does the item lie where the piglin can take it
-    poof(pos, frame, camera=None, size=(0.6, 1.95), count=20, seed=0, glow=None, village=None) -> engine.fx Burst
-        the white puffs of ANY mob's death (die() calls it): pass the mob's (width, height) as size
-    knock_track(strength=0.4, max_back=None) / item_track(start, velocity, world, floor): the game's physics as
-        lists per tick; hand_matrix / item_display: the transcribed ItemInHandLayer + ItemTransform
+    poof(pos, frame, camera=None, size=(0.6, 1.95), count=20, seed=0, glow=None, village=None, first=None,
+         until=None) -> engine.fx Burst
+        the white puffs of ANY mob's death (die() calls it): pass the mob's (width, height) as size. With a Shot
+        as camera they are seen in that shot only (see HURT AND DEATH)
+    knock_track(strength=0.4, max_back=None) / fall_track(drop, speed=0) / air_track(velocity, height, ...) /
+        item_track(start, velocity, world, floor): the game's physics as lists per tick; hand_matrix /
+        item_display: the transcribed ItemInHandLayer + ItemTransform
     Constants: WALK_SPEED 1.943, CHASE_SPEED 5.396, BABY_WALK_SPEED 2.797, BABY_RUN_SPEED 7.771 (blocks/s),
     ADMIRE_TICKS 119, SWING_TICKS 6, MELEE_COOLDOWN_TICKS 20, MELEE_REACH 1.43, HURT_FRAMES 12, DEATH_FRAMES 24,
-    PLAYER_DROP_DELAY_TICKS 40, HEALTH, ATTACK_DAMAGE, MODEL_HEIGHT 2.0, BABY_MODEL_HEIGHT 0.9375, TICK 1.2.
+    HIT_COOLDOWN_TICKS 10, SAFE_FALL 3.0, POOF_GLOW 0.25, PLAYER_DROP_DELAY_TICKS 40, HEALTH, ATTACK_DAMAGE,
+    MODEL_HEIGHT 2.0, BABY_MODEL_HEIGHT 0.9375, TICK 1.2.
 
-USING THEM IN A FILM (films.lookdev.Stage; tools/check_piglins_film.py is this as a running three-shot film)
+USING THEM IN A FILM (films.lookdev.Stage; tools/check_piglins_film.py is this as a running six-shot film)
     brute = piglins.add_piglin(st, "brute", "brute"); pig = piglins.add_piglin(st, "pig", armor=("helmet",))
     ingot = piglins.add_item(st, "gold_ingot"); pearl = piglins.add_item(st, "ender_pearl", count=3)
     st.use(s, steve, pig, brute, ingot, pearl); st.hero(s, "pig", pig)       # hero = its head
@@ -73,6 +83,7 @@ USING THEM IN A FILM (films.lookdev.Stage; tools/check_piglins_film.py is this a
     beats = piglins.barter(pig, ingot, take, pearl, toward=steve, admire_ticks=30, world=w, face=camera_pos)
     brute.aggro(f1); end = brute.walk(f1, path, run=True); hit = brute.attack(end); steve.flinch(end)
     back = victim.hurt(f2, source=steve); gone = victim.die(back + 6, source=steve, camera=s)   # s = the Shot
+    end = pig.walk(f3, [a, past_the_rim], ramp=(4, 0)); land = pig.fall(end, pit_floor_z)        # into the pit
     KEY A PIGLIN IN FRAME ORDER, shot after shot, like every Character: a later call replaces the keys after its
     frame. place() first in every shot; it ends whatever pose, flash or death was going on. The game SNAPS into
     and out of its poses (admire, weapon high, dance, crossbow): ease=0 keys them as hard cuts a quarter frame
@@ -99,6 +110,25 @@ GAIT (HumanoidModel.setupAnim, LivingEntity.updateWalkAnimation, WalkAnimationSt
     arm a pose holds (weapon high, admire, crossbow). Corners of `points` are rounded with arcs of `corner`
     blocks (stray round a right angle: 0.013); corner=0 turns on the spot. Each walk starts and ends with the feet
     together; ramp = frames of acceleration / braking (the game takes about 4).
+    walk() is for LEVEL GROUND AND STAIRS (height follows the polyline): a leg steeper than one block per block
+    raises ValueError, because it would glide down the drop with its legs walking. A drop is fall().
+
+FALLING (LivingEntity.travelInAir, knockback; Attributes.SAFE_FALL_DISTANCE)
+    fall(frame, to_z): from `frame` the piglin is in the air: -0.0784 blocks in the first tick, then vz = (vz -
+    0.08) * 0.98 per tick, keyed tick by tick: 1 block takes 5 ticks (6 frames), 2 blocks 7 ticks (8.4 frames:
+    0.08, 0.23, 0.46, 0.77, 1.15, 1.59, 2.0 down), 3 blocks 9 ticks, 4 blocks 10. Returns the landing frame.
+    INTO A PIT: the game drops a mob when its 0.6-wide box has left the block, so walk until the centre is 0.3
+    block PAST the rim, without braking, and fall from the walk's end frame:
+        end = pig.walk(f, [start, rim + 0.3 beyond], ramp=(4, 0)); land = pig.fall(end, floor_z)
+    It then carries its speed out over the pit as the game does (its last step, 0.546 of it, then 0.91 per tick):
+    0.43 block from a stroll over a 2-block drop (it lands 0.73 from the rim), 1.10 from a chase; forward= sets
+    that drift yourself (1 x 1 hole: forward=0.2, or it would end inside the far wall). A walk that brakes
+    (default ramp) or a piglin that stands (its floor is dug away) falls straight down. In the air the legs and
+    arms go on with the game's walk animation (+-19 degrees after a stroll) and settle 10 frames after landing;
+    fall() can also be called in the middle of a walk. Three piglins one after another: start their walks a
+    beat apart and give each its own landing spot (their boxes are 0.6 wide: a 2 x 2 pit holds four).
+    Two blocks do not hurt; more than SAFE_FALL 3 blocks costs health in the game (call hurt(landing)).
+    A hit while it is in the air (hurt / die with a source) pushes it sideways and does not lift it again.
 
 EARS (AbstractPiglinModel.setupAnim)
     left ear zRot = -(30 deg + cos(1.2 * q) * a), right ear = 30 deg + cos(q) * a, q = ageInTicks * 0.1 +
@@ -135,6 +165,20 @@ BARTER (PiglinAi, StopHoldingItemIfNoLongerAdmiring, BehaviorUtils.throwItem, It
     the rim 1.0-1.35 from the centre, at his feet); from 2 blocks or more they hit the wall and fall back in. And
     the player's ingot must fall INTO the hole (the piglin cannot take what lies on the rim, 2 blocks above its
     feet): standing 1.2-1.6 from the centre and aiming half a block below the rim does it.
+    FROM A 2 x 2 PIT two deep, with the game's throw: a piglin in the half of the pit NEXT to the player gets its
+    result out only while he stands within 1.2 blocks of the pit's edge (it rests 0.5-0.9 from the edge, at his
+    boots); from 1.5 blocks or more it hits the wall and falls back. A piglin in the FAR half never gets one out.
+    barter(..., lob=True) is the way round that: the result is lobbed on the flattest arc that clears the rim
+    (0.29-0.49 blocks per tick, the game's is 0.3; apex 0.2-0.9 above the floor outside) and comes to REST 0.45
+    block from the player's feet, or exactly at `toward` when that is a point; rests are within 0.04 of the aim.
+    Several results thrown to one player: give each barter another seed (0 = on the piglin's side of his feet,
+    1 / 2 = 55 degrees to either side, ...), or two sprites lie in one spot. For any other launch:
+    piglins.launch(item, frame, start, piglins.lob_velocity(start, target, world=w), world=w).
+    The result can be any item or BLOCK id. The game's table (gameplay/piglin_bartering, weights of 469): 40 each
+    'gravel', 'blackstone', 'obsidian', 'crying_obsidian', 'soul_sand', 'nether_brick', 'leather', 'fire_charge',
+    'spectral_arrow'; 20 'string', 'quartz'; 10 'ender_pearl' (count 2-4), 'iron_nugget', 'dried_ghast'; rarer
+    potions, 'iron_boots', 'book'. So a pearl is 1 result in 47 and gravel 1 in 12. One piglin can barter again
+    and again: call barter() once per ingot, each from the throw frame of the one before (+2 frames).
     Facts for the script (all read from the classes):
     - the currency is the gold INGOT only (PiglinAi.BARTERING_ITEM); one ingot = one draw from the loot table
       gameplay/piglin_bartering: ender pearls have weight 10 of 469 (2.1 %, 2-4 pearls). Runners throw stacks.
@@ -174,22 +218,37 @@ HURT AND DEATH (LivingEntity.handleDamageEvent / knockback / travelInAir / tickD
     away from it and up: 0.96 block high after 5 ticks, back on the ground after 10 ticks (12 frames) 1.8 blocks
     away, at rest after 16 ticks 1.99 away. source=None (fire, a fall) or knockback=0: flash and fling only (use
     that in a 1 x 1 hole). max_back = blocks to a wall behind it.
+    TWO HITS: the game ignores a hit that comes less than 10 ticks (12 frames) after the last one (no flash, no
+    knock-back: LivingEntity.hurtServer, damageCooldownTime), so the fastest kill in two blows is hurt(f),
+    die(f + 12). A sooner second hurt() or die() is keyed all the same and treated as the game treats a mob in
+    the air: no second lift, the new push sideways, and it comes down on the floor it left.
     die(frame, ...): red for the whole 20 ticks, knocked back like a hit, the body tips over onto its LEFT side:
     angle = 90 degrees * sqrt((t - 1) * 0.08), flat after 13.5 ticks (16.2 frames), lying half sunk in the floor
     as in the game; on frame + 24 it is gone, weapon and armor too, and poof() starts there: 20 white puffs in its
     bounding box, 0.2-1.4 blocks wide (most under 0.6), drifting up, each running once through the sprites
     generic_7 .. generic_0 and drawn for 19-83 ticks (the last is gone at most 100 frames later). Puffs are
-    camera-facing quads with self-light 0.6 (glow=): in a dark set they are the brightest thing in the picture,
-    lower glow if they burn out. camera = the Shot that films the death. Bloodless: nothing else is drawn.
+    camera-facing quads lit by the set plus self-light POOF_GLOW 0.25 (glow=): cream-white with the game's grey
+    variation under the warm lamps of a bastion (measured 232 / 222 / 208 of 255, 0.3 % of the pixels clipped;
+    engine.fx's 0.6 burns out to flat white there) and a light grey-white in flat daylight (193). Lower it in a
+    set that is darker still. camera = the Shot that films the death. Bloodless: nothing else is drawn.
+    PUFFS AND CUTS: a burst lasts up to 100 frames, longer than most shots, and Stage.finish() does not know it.
+    So with camera=<Shot>, die() and poof() show the puffs IN THAT SHOT ONLY: none before its first frame, none
+    after its last (the next shot, another place, starts clean; a snap to black is clean too).
+      - a puff that is already in the air on the first frame of a flash cut: piglins.poof(spot, shot.frame_start
+        - 8, camera=shot, size=(0.6, 1.8)) (a player's box): the eight frames before the cut are not shown.
+      - the same scene goes on in the next shot from another angle: die(..., camera=shot, until=next.frame_end
+        + 1), or until=False for no limit; first= works the same way on the other side.
+      - camera=<Film or camera object>: no limit unless first / until say so. last_death["burst"].stop(frame)
+        and engine.fx.stop_particles(frame) end a burst afterwards.
     NOT built: the experience orbs (5 for a piglin, 20 for a brute, when a player made the kill), the one-tick
     twitch of the limbs on the killing blow, sounds. A piglin's and a brute's loot tables are empty (data/
     minecraft/loot_table/entities/piglin.json): at most its own weapon or armor falls, which this module does
     not draw.
 
-Self-test:  $BPY -m engine.piglins [check lineup turn armor ears walk admire barter swing dance hurt death bastion]
-(no argument = everything, about 8 minutes: give one to three names per call to stay under the 300 s limit;
-`check` is numbers only, 3 s). Stills: out/test/piglins_*.png. tools/check_piglins_film.py renders the same
-things through films.lookdev.Stage and engine.look.setup_render (motion blur, depth of field).
+Self-test:  $BPY -m engine.piglins [check lineup turn armor ears walk admire barter swing dance hurt death fall lob
+bastion] (no argument = everything, about 12 minutes: give one or two names per call to stay under the 300 s
+limit; `check` is numbers only, 4 s). Stills: out/test/piglins_*.png. tools/check_piglins_film.py renders the
+same things through films.lookdev.Stage and engine.look.setup_render (motion blur, depth of field).
 """
 import bisect
 import math
@@ -304,6 +363,12 @@ POOF_COUNT = 20                      # makePoofParticles: 20 x ParticleTypes.POO
 POOF_SPRITES = tuple("particle/generic_%d" % i for i in range(7, -1, -1))     # particles/poof.json, in that order
 POOF_GRAVITY = -0.1                  # ExplodeParticle: gravity -0.1 (it rises 0.004 blocks per tick^2), friction 0.9
 POOF_FRICTION = 0.9
+POOF_GLOW = 0.25                     # this module's choice: self-light of a puff (the game draws a particle at the
+#                                      light level of its place; engine.fx's 0.6 burns out in a dim bastion)
+FLY_SPEED = 0.02                     # LivingEntity.getFlyingSpeed: in the air the AI's input counts 0.02 (ground: speed)
+SAFE_FALL = 3.0                      # Attributes.SAFE_FALL_DISTANCE: a fall hurts from more than 3 blocks
+HIT_COOLDOWN_TICKS = 10              # LivingEntity.hurtServer: damageCooldownTime = 20, and a hit while it is above 10
+#                                      gives no flash and no knock-back: 10 ticks (12 frames) between two hits
 
 # ---- ItemInHandLayer.submitArmWithItem: translate(+-a / 16, b / 16, c / 16) after rotate X -90, rotate Y 180
 HAND_OFFSET = (1.0, 2.0, -10.0)
@@ -329,6 +394,9 @@ MIN_STEP_FRAMES = 2.5                # no step is keyed shorter than this (a bab
 CORNER_RADIUS = 0.5                  # blocks: walk() rounds the corners of its polyline
 SHARP_TURN_FRAMES = 8.0
 EAR_BLEND = 6.0                      # frames over which ears that stood still join the game's flop again
+STAIR_SLOPE = 1.0                    # walk(): the steepest leg it takes (stairs: a block up per block); beyond: fall()
+LOB_SHORT = 0.45                     # barter(lob=True): the result comes to rest this far from the player's feet
+LOB_LOFT_TICKS = 2                   # ... on an arc two ticks longer than the flattest that clears the blocks
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -492,35 +560,66 @@ def hand_matrix(side, display, baby=False):
 # ----------------------------------------------------------------------------------------------------
 # physics the game runs for what happens around a piglin
 # ----------------------------------------------------------------------------------------------------
-def knock_track(strength=KNOCKBACK, max_back=None, max_ticks=80):
-    """[(tick, blocks back, blocks up)] of a mob that stood on the ground and was hit: LivingEntity.knockback
-    (horizontal speed `strength` away from the attacker, vertical min(0.4, -0.0784 / 2 + strength)) followed by
-    LivingEntity.travelInAir tick by tick (gravity 0.08, vertical drag 0.98, horizontal drag 0.546 on the ground and
-    0.91 in the air, taken from the state before each move). max_back = a wall that far behind it."""
-    v = float(strength)
-    vz = min(KNOCK_UP_MAX, REST_FALL / 2.0 + float(strength))
-    x = z = 0.0
-    ground = True
-    out = [(0, 0.0, 0.0)]
+def air_track(velocity, height=0.0, on_ground=True, push=(0.0, 0.0), wall=None, land_only=False, max_ticks=200):
+    """LivingEntity.travelInAir tick by tick for a mob `height` blocks above the floor it comes down on.
+
+    velocity = its (vx, vy, vz) in blocks per tick when the first tick begins; on_ground = whether it stood on
+    something in the tick before (the drag of a tick comes from the state before its move: 0.546 on the ground,
+    0.91 in the air; vertically (vz - 0.08) * 0.98). push = what its AI adds to (vx, vy) per tick while it is in the
+    air (0.02 x its forward input). wall = (ux, uy, blocks): it gets no farther than that along the unit direction.
+    land_only: stop on the tick it lands (a fall); otherwise go on until it lies still (the slide after a hop).
+    Returns [(tick, dx, dy, height, (vx, vy, vz) after the tick, on the ground after the tick)]."""
+    vx, vy, vz = (float(c) for c in velocity)
+    x = y = 0.0
+    z = max(0.0, float(height))
+    ground = bool(on_ground)
+    out = [(0, 0.0, 0.0, z, (vx, vy, vz), ground)]
     for tick in range(1, max_ticks + 1):
         drag = GROUND_DRAG if ground else AIR_DRAG
-        nx = x + v
-        if max_back is not None and nx > max_back:
-            nx, v = float(max_back), 0.0
+        if not ground:
+            vx, vy = vx + push[0], vy + push[1]
+        nx, ny = x + vx, y + vy
+        if wall is not None:
+            over = nx * wall[0] + ny * wall[1] - float(wall[2])
+            if over > 0.0:
+                nx, ny = nx - wall[0] * over, ny - wall[1] * over
+                into = vx * wall[0] + vy * wall[1]
+                vx, vy = vx - wall[0] * into, vy - wall[1] * into
         nz = z + vz
         if nz <= 0.0:
             nz, vz, ground = 0.0, 0.0, True
         else:
             ground = False
-        x, z = nx, nz
+        x, y, z = nx, ny, nz
         vz = (vz - GRAVITY) * 0.98
-        v *= drag
-        if abs(v) < 0.003:                                               # LivingEntity.aiStep zeroes what is slower
-            v = 0.0
-        out.append((tick, x, z))
-        if ground and v == 0.0:
+        vx, vy = vx * drag, vy * drag
+        if math.hypot(vx, vy) < 0.003:                                   # LivingEntity.aiStep zeroes what is slower
+            vx = vy = 0.0
+        out.append((tick, x, y, z, (vx, vy, vz), ground))
+        if ground and (land_only or (vx == 0.0 and vy == 0.0)):
             break
     return out
+
+
+def knock_track(strength=KNOCKBACK, max_back=None, max_ticks=80):
+    """[(tick, blocks back, blocks up)] of a mob that stood on the ground and was hit: LivingEntity.knockback
+    (horizontal speed `strength` away from the attacker, vertical min(0.4, -0.0784 / 2 + strength)) followed by
+    LivingEntity.travelInAir tick by tick (gravity 0.08, vertical drag 0.98, horizontal drag 0.546 on the ground and
+    0.91 in the air, taken from the state before each move). max_back = a wall that far behind it."""
+    up = min(KNOCK_UP_MAX, REST_FALL / 2.0 + float(strength))
+    wall = None if max_back is None else (1.0, 0.0, float(max_back))
+    return [(tick, x, z) for tick, x, _y, z, _v, _g in air_track((float(strength), 0.0, up), wall=wall, max_ticks=max_ticks)]
+
+
+def fall_track(drop, speed=0.0):
+    """[(tick, blocks forward, blocks fallen)] of a mob that has just walked off an edge at `speed` blocks per
+    second and comes down `drop` blocks lower (LivingEntity.travelInAir: it leaves with the -0.0784 blocks per tick
+    of a standing mob, then vz = (vz - 0.08) * 0.98; forward it keeps its last step, then 0.546 of it, 0.91 per
+    tick, plus the 0.02 x input its AI still pushes with). One block takes 5 ticks, two 7, three 9, four 10."""
+    step = max(0.0, float(speed)) / 20.0
+    push = FLY_SPEED * math.sqrt(step * (1.0 - GROUND_DRAG))             # input = attribute x modifier, speed = input^2 / 0.454
+    track = air_track((step, 0.0, REST_FALL), float(drop), True, push=(push, 0.0), land_only=True)
+    return [(tick, x, float(drop) - z) for tick, x, _y, z, _v, _g in track]
 
 
 def _solids(world):
@@ -542,12 +641,15 @@ def _solids(world):
     return fx._Solids(holder)
 
 
-def item_track(start, velocity, world=None, floor=0.0, max_ticks=400):
+def item_track(start, velocity, world=None, floor=None, max_ticks=400):
     """ItemEntity.tick() from the entity position `start` with `velocity` (blocks per tick, Blender axes) until the
     item lies still: [(tick, (x, y, z))]. Per tick: gravity 0.04, move, speed * 0.98 (horizontally * 0.6 * 0.98 on
     the ground). world = a Village or blocks.World: the item (a 0.25 block box) collides with its blocks;
-    floor = the height of a flat floor (the only ground when there is no world; None = no floor)."""
+    floor = the height of a flat floor as well (default: none with a world, so that an item can lie in a pit
+    below 0; height 0 when there is no world)."""
     solids = _solids(world)
+    if floor is None and solids is None:
+        floor = 0.0
     p = [float(c) for c in start]
     v = [float(c) for c in velocity]
     out = [(0, tuple(p))]
@@ -574,9 +676,10 @@ def item_track(start, velocity, world=None, floor=0.0, max_ticks=400):
     return out
 
 
-def launch(item, frame, start, velocity, world=None, floor=0.0):
+def launch(item, frame, start, velocity, world=None, floor=None):
     """An engine.mobs DroppedItem flies as the game's item entity does: spawned at the entity position `start` on
-    `frame` with `velocity` (blocks per TICK); returns the frame it lies still (see item_track for world / floor).
+    `frame` with `velocity` (blocks per TICK); returns the frame it lies still (see item_track for world / floor:
+    the blocks of `world`, or a flat floor at height `floor`, 0 by default when there is no world).
     It is a new entity (age 0, hidden before `frame`); call item.animate(frame, last) afterwards for bob and spin."""
     f0 = int(round(frame))
     start = ch._vec3(start)
@@ -587,6 +690,47 @@ def launch(item, frame, start, velocity, world=None, floor=0.0):
         ch._segment(item.root, _LOC, i, keys, "LINEAR")
     item.rest_pos = Vector(track[-1][1])
     return int(math.ceil(f0 + track[-1][0] * TICK - 1e-6))
+
+
+def lob_velocity(start, target, world=None, floor=None, loft=LOB_LOFT_TICKS, max_ticks=70):
+    """The velocity (blocks per tick) that lobs an item entity from `start` so that it comes to REST at `target`:
+    the flattest arc of ItemEntity.tick (gravity 0.04, drag 0.98) that clears the blocks of `world`, flown `loft`
+    ticks longer for some air over the rim. Not the game's throw (that is 0.3 blocks per tick straight at the
+    player, and from a pit it mostly hits the wall): a director's cheat for launch() and barter(lob=True).
+    floor = the height of a flat floor when there is no world (default: the target's). ValueError if no arc fits."""
+    start, target = ch._vec3(start), ch._vec3(target)
+    if floor is None and world is None:
+        floor = target.z
+    flat = Vector((target.x - start.x, target.y - start.y))
+    dist = flat.length
+    u = flat / dist if dist > 1e-6 else Vector((0.0, -1.0))
+    k = ITEM_DRAG
+
+    def aimed(n):
+        """The velocity that rests the item at the target after an arc of n ticks, or None if something is in its way."""
+        geo = (1.0 - k ** n) / (1.0 - k)
+        fallen = ITEM_GRAVITY / (1.0 - k) * (n - k * geo)                # what gravity takes off the height in n ticks
+        reach = dist
+        for _try in range(6):
+            vh = reach / geo
+            v = (u.x * vh, u.y * vh, (target.z - start.z + fallen) / geo)
+            rest = Vector(item_track(start, v, world=world, floor=floor)[-1][1])
+            miss = Vector((rest.x - target.x, rest.y - target.y))
+            if abs(rest.z - target.z) > 0.06 or miss.length > max(1.0, 0.6 * dist):
+                return None                                              # it hit a wall, or lies on another level
+            if miss.length < 0.04:
+                return v
+            reach -= miss.dot(u)                                         # (it slides on after it lands: aim short)
+            if reach < 0.02:
+                return None
+        return None
+
+    for n in range(5, int(max_ticks) + 1):
+        v = aimed(n)
+        if v is not None:
+            return aimed(n + int(loft)) or v
+    raise ValueError("no arc of an item from (%.2f, %.2f, %.2f) comes to rest at (%.2f, %.2f, %.2f): is the target "
+                     "on a floor, with air above it?" % (start.x, start.y, start.z, target.x, target.y, target.z))
 
 
 def _feet(who, frame):
@@ -641,16 +785,32 @@ def pickup(item, frame, taker):
     return gone
 
 
+def _shot_span(camera):
+    """(first frame, frame after the last) of a Shot passed as `camera`, or (None, None) for a Film / camera / None."""
+    a, b = getattr(camera, "frame_start", None), getattr(camera, "frame_end", None)
+    if a is None or b is None or not hasattr(camera, "camera"):
+        return None, None
+    return int(a), int(b) + 1
+
+
 def poof(pos, frame, camera=None, size=(PIGLIN_WIDTH, PIGLIN_HEIGHT), count=POOF_COUNT, seed=0, glow=None,
-         village=None, collection=None):
+         village=None, collection=None, first=None, until=None):
     """The white puffs of a mob that has just died (entity event 60, LivingEntity.makePoofParticles): `count` (20)
     ParticleTypes.POOF in the bounding box `size` = (width, height) standing on the feet point `pos`, from `frame`.
 
     ExplodeParticle: each puff starts with a speed of a few hundredths of a block per tick, rises (gravity -0.1)
     and slows (friction 0.9), is 0.2 to 1.4 blocks wide, is drawn for 19 to 83 ticks and runs through the sprites
     particle/generic_7 .. generic_0 (particles/poof.json) once, at 0.7 to 1.0 of white. Drawn with engine.fx:
-    camera-facing quads lit like an up-facing surface plus `glow` self-light (default fx.SPRITE_GLOW); camera = the
-    Shot (or Film, or camera object) that films it; village = a Village to collide with. Returns an fx.Burst."""
+    camera-facing quads lit like an up-facing surface plus `glow` self-light (default POOF_GLOW 0.25: cream-white
+    in a dim set; fx.SPRITE_GLOW 0.6 burns out there). camera = the Shot (or Film, or camera object) that films it;
+    village = a Village to collide with.
+    A burst lasts up to 100 frames, longer than most shots. With a SHOT as camera it is therefore seen in that shot
+    only: nothing of it shows before the shot's first frame or after its last. So a `frame` before the shot starts
+    puts puffs that are already in the air on the first frame of a flash cut (frame = shot.frame_start - 8).
+    first / until = other limits (nothing shows before `first`, nothing from `until` on); False = no limit on that
+    side (the same scene goes on in the next shot from another angle: until=next_shot.frame_end + 1 or False).
+    With a Film or a camera object there is no limit unless you give one. Returns an fx.Burst (.stop(frame) ends
+    it early, fx.stop_particles(frame) ends every burst)."""
     from . import fx                                                     # (only here: engine.fx stays optional)
 
     frame = int(frame)
@@ -660,7 +820,10 @@ def poof(pos, frame, camera=None, size=(PIGLIN_WIDTH, PIGLIN_HEIGHT), count=POOF
     cams = fx._camera_arg(camera)
     burst = fx.Burst("poof", frame)
     solids = fx._Solids(village) if village is not None else None
-    glow = fx.SPRITE_GLOW if glow is None else float(glow)
+    glow = POOF_GLOW if glow is None else float(glow)
+    shot_first, shot_after = _shot_span(camera)
+    lo = shot_first if first is None else (None if first is False else int(first))
+    hi = shot_after if until is None else (None if until is False else int(until))
     w, h = size
     top = len(POOF_SPRITES) - 1                                          # SpriteSet.get: age * (n - 1) / lifetime
     for i in range(int(count)):
@@ -675,6 +838,19 @@ def poof(pos, frame, camera=None, size=(PIGLIN_WIDTH, PIGLIN_HEIGHT), count=POOF
         # Particle.tick: `age++ >= lifetime` removes it, so it moves `lifetime` times and is drawn lifetime + 1 ticks
         path = fx._simulate(p, v, life, 0.04 * POOF_GRAVITY, POOF_FRICTION, solids, 0.2, rng)
         n = len(path) - 1
+        ages = {}
+        for age in range(n + 1):                                         # the sprite it wears at each age
+            ages.setdefault(age * top // life, []).append(age)
+        spans = []
+        for k, span in sorted(ages.items()):
+            a = int(math.ceil(frame + span[0] * TICK - 1e-6))
+            b = int(math.ceil(frame + (span[-1] + 1) * TICK - 1e-6))
+            a = a if lo is None else max(a, lo)                          # seen in its shot only (see the docstring)
+            b = b if hi is None else min(b, hi)
+            if b > a:
+                spans.append((k, a, b))
+        if not spans:                                                    # all of this puff's life is outside the limits
+            continue
         carrier = bpy.data.objects.new("fx_poof_%d_%d" % (frame, i), None)
         carrier.empty_display_size = 0.05
         col.objects.link(carrier)
@@ -686,14 +862,7 @@ def poof(pos, frame, camera=None, size=(PIGLIN_WIDTH, PIGLIN_HEIGHT), count=POOF
         carrier.scale = (quad, quad, quad)
         fx._face_camera(carrier, cams)
         level = round(grey * 20.0) / 20.0                                # (a material per 0.05 of grey)
-        ages = {}
-        for age in range(n + 1):                                         # the sprite it wears at each age
-            ages.setdefault(age * top // life, []).append(age)
-        for k, span in sorted(ages.items()):
-            first = int(math.ceil(frame + span[0] * TICK - 1e-6))
-            last = int(math.ceil(frame + (span[-1] + 1) * TICK - 1e-6))
-            if last <= first:
-                continue
+        for k, shown, hidden in spans:                                   # visible on the frames shown .. hidden - 1
             mat = fx._particle_material(POOF_SPRITES[k], colour=level ** 2.2, glow=glow)
             mname = "fx_quad_%s*%g%s" % (POOF_SPRITES[k].split("/")[-1], level, "+%g" % glow if glow else "")
             mesh = bpy.data.meshes.get(mname) or fx._quad_mesh(mname, (0.0, 1.0, 0.0, 1.0), mat)
@@ -701,13 +870,13 @@ def poof(pos, frame, camera=None, size=(PIGLIN_WIDTH, PIGLIN_HEIGHT), count=POOF
             col.objects.link(ob)
             ob.parent = carrier
             for attr in ("hide_render", "hide_viewport"):
-                fx._write(ob, attr, 0, [first - 1, first, last], [1.0, 0.0, 1.0], "CONSTANT")
+                fx._write(ob, attr, 0, [shown - 1, shown, hidden], [1.0, 0.0, 1.0], "CONSTANT")
             ob.hide_render = ob.hide_viewport = True
             ob.visible_shadow = False
             burst.objects.append(ob)
             burst.particles.append({"object": ob, "pos": path, "lifetime": n, "size": quad, "spawn": float(frame),
-                                    "first": first, "last": last, "carrier": carrier, "grey": grey, "stage": k})
-            burst.frame_end = max(burst.frame_end, last - 1)
+                                    "first": shown, "last": hidden, "carrier": carrier, "grey": grey, "stage": k})
+            burst.frame_end = max(burst.frame_end, hidden - 1)
     return burst
 
 
@@ -748,7 +917,9 @@ class Piglin(ch.Character):
         self._aggro, self._admires, self._dances, self._aims = [], [], [], []
         self._admire_head = {}             # (first, end) of an admire -> the head's (pitch, yaw) before it
         self.armor = ()
+        self._air = None                   # the hop or fall it is in: dict(frame, floor, track of air_track)
         self.last_walk = None
+        self.last_fall = None
         self.last_death = None
 
     def __repr__(self):
@@ -865,6 +1036,7 @@ class Piglin(ch.Character):
     def place(self, frame, pos, yaw=0.0, keep_pose=False):
         """Hard-set position and yaw from `frame` on: upright, alive, neutral pose, weapon lowered (use at shot cuts)."""
         super().place(frame, pos, yaw, keep_pose=keep_pose)
+        self._air = None
         if keep_pose:
             return
         f = int(round(frame))
@@ -988,7 +1160,8 @@ class Piglin(ch.Character):
         rounds each corner of `points` (0 = sharp, turned on the spot). dip = how much of the exact dip the hips
         make (planted gait; default 1 walking: the sole stays on the ground; 0.5 with run=True, where the full dip
         would be a bounce of 0.3 block four times a second: the standing sole then floats up to 0.15 at each end
-        of a step)."""
+        of a step). For LEVEL ground and stairs: a leg of `points` steeper than one block per block raises
+        ValueError (it would glide down the drop): walk past the edge, then fall()."""
         if gait not in ("planted", "vanilla"):
             raise ValueError("gait %r: use 'planted' or 'vanilla'" % (gait,))
         if speed is None:
@@ -1003,7 +1176,14 @@ class Piglin(ch.Character):
         for p in pts[1:]:
             if (p - path[-1]).length > 1e-5:
                 path.append(p)
+        for a, b in zip(path, path[1:]):
+            if abs(b.z - a.z) > STAIR_SLOPE * math.hypot(b.x - a.x, b.y - a.y) + 1e-6:
+                raise ValueError("%s.walk: the leg from (%.2f, %.2f, %.2f) to (%.2f, %.2f, %.2f) is steeper than stairs. "
+                                 "walk() is for level ground and stairs (it would glide down a drop): walk to 0.3 "
+                                 "past the edge with ramp=(4, 0), then fall(end_frame, to_z)"
+                                 % (self.name, a.x, a.y, a.z, b.x, b.y, b.z))
         teleport = (path[0] - here).length > 1e-4
+        self._air = None
         if len(path) < 2:
             if teleport:
                 for i in range(3):
@@ -1250,7 +1430,7 @@ class Piglin(ch.Character):
         self._key_ears(f0, f1, walk=lambda f: anim(f - f0), step=1.0)
         self.last_walk = dict(gait=gait, frames=(f0, f1), blocks=total, speed=cruise * FPS, swing=shown_swing,
                               steps=steps, step_frames=step_frames, stance=stances, slides=slides,
-                              anim_speed=s_cruise,
+                              anim_speed=s_cruise, ramp=(r_in, r_out),
                               corners=[(round(rad, 3), round(math.degrees(turn), 1)) for _d0, _d1, turn, rad in route.arcs],
                               sharp=[round(math.degrees(turn), 1) for _d, turn in route.sharp])
         return f1
@@ -1460,8 +1640,34 @@ class Piglin(ch.Character):
         return f1
 
     # ------------------------------------------------------------------ hurt + death
+    def _air_state(self, frame):
+        """(floor height, (vx, vy, vz), on the ground) of the hop or fall that is still going on at `frame`, or None
+        when it stands on the ground it was last put on."""
+        air = self._air
+        if air is None or frame < air["frame"] - 1e-6:
+            return None
+        k = int(math.floor((frame - air["frame"]) / TICK + 1e-6))
+        if k >= len(air["track"]) - 1:
+            return None                                                  # over: it lies still (or has landed)
+        _tick, _dx, _dy, _h, vel, ground = air["track"][k]
+        return air["floor"], vel, ground
+
+    def _key_air(self, f0, here, floor, track, scale=1.0):
+        """Key an air_track on the root from the position `here` (LINEAR from tick to tick, as the game lerps) and
+        remember it; returns the blocks moved sideways in each tick."""
+        pts = [(tick, here.x + dx * scale, here.y + dy * scale, floor + h) for tick, dx, dy, h, _v, _g in track]
+        for i in range(3):
+            keys = [(f0, here[i], "LINEAR")] + [(f0 + pt[0] * TICK, pt[1 + i], "LINEAR") for pt in pts[1:]]
+            ch._segment(self.root, _LOC, i, keys, "LINEAR")
+        self._air = dict(frame=f0, floor=floor, track=track)
+        return [math.hypot(b[1] - a[1], b[2] - a[2]) for a, b in zip(pts, pts[1:])]
+
     def _knock(self, f0, source, strength, max_back):
-        """Key the knock-back of a hit at f0 on the root; returns the blocks moved in each tick ([] = none)."""
+        """Key the knock-back of a hit at f0 on the root; returns the blocks moved in each tick ([] = none).
+
+        LivingEntity.knockback: sideways it gets half of what it had plus `strength` away from the source; only a mob
+        ON THE GROUND is lifted (min(0.4, vy / 2 + strength)). One that is still in the air from an earlier hit, or
+        falling, keeps its vertical speed and comes down on the floor it left."""
         if source is None or not strength or strength <= 0.0:
             return []
         here = self.pos_at(f0)
@@ -1471,17 +1677,20 @@ class Piglin(ch.Character):
             yaw = self.yaw_at(f0)
             away = Vector((-math.sin(yaw), math.cos(yaw), 0.0))          # nobody to be pushed from: backwards
         away.normalize()
-        track = knock_track(strength, max_back)
-        for i in range(3):
-            keys = [(f0, here[i], "LINEAR")]
-            keys += [(f0 + tick * TICK, here[i] + (away[i] * back if i < 2 else up), "LINEAR") for tick, back, up in track[1:]]
-            ch._segment(self.root, _LOC, i, keys, "LINEAR")
-        return [track[k][1] - track[k - 1][1] for k in range(1, len(track))]
+        state = self._air_state(f0)
+        floor, vel, ground = (here.z, (0.0, 0.0, REST_FALL), True) if state is None else state
+        floor = min(floor, here.z)
+        up = min(KNOCK_UP_MAX, vel[2] / 2.0 + float(strength)) if ground else vel[2]
+        wall = None if max_back is None else (away.x, away.y, float(max_back))
+        track = air_track((vel[0] / 2.0 + away.x * strength, vel[1] / 2.0 + away.y * strength, up), here.z - floor,
+                          ground, wall=wall)
+        return self._key_air(f0, here, floor, track)
 
-    def _fling(self, f0, moved):
+    def _fling(self, f0, moved, speed0=HURT_ANIM_SPEED, old0=0.0, pos0=None):
         """The limbs after a hit (LivingEntity.handleDamageEvent sets walkAnimation.speed to 1.5, then every tick
-        speed += (min(4 * blocks moved, 1) - speed) * 0.4 and position += speed); returns the frame they rest."""
-        speed, old, pos = [HURT_ANIM_SPEED], [0.0], [self._walk_pos_at(f0)]
+        speed += (min(4 * blocks moved, 1) - speed) * 0.4 and position += speed); returns the frame they rest.
+        speed0 / old0 / pos0 = another start of the walk animation (a fall goes on from the walk's)."""
+        speed, old, pos = [float(speed0)], [float(old0)], [self._walk_pos_at(f0) if pos0 is None else float(pos0)]
         while True:
             k = len(speed)
             target = min(ANIM_PER_BLOCK * moved[k - 1], 1.0) if k - 1 < len(moved) else 0.0
@@ -1519,6 +1728,59 @@ class Piglin(ch.Character):
         self._key_ears(f0, end, walk=lambda f: state((f - f0) / TICK), step=0.6)
         return end + 1.0
 
+    def fall(self, frame, to_z, forward=None, speed=None):
+        """Drop from `frame` to a floor at height `to_z`, as the game's gravity does it; returns the landing frame.
+
+        LivingEntity.travelInAir: it leaves with the -0.0784 blocks per tick of a standing mob, then every tick
+        vz = (vz - 0.08) * 0.98: one block takes 5 ticks (6 frames), two 7 ticks (8.4 frames), three 9 (10.8).
+        speed = how fast it walked off the edge, in blocks per second (default: the speed of a walk() that ends on
+        `frame` WITHOUT braking, ramp=(4, 0), or that is still under way; otherwise 0: straight down, which is
+        what a piglin does whose floor is dug away). It drifts on the way it faces: its last
+        step, then 0.546 of it, then 0.91 per tick (0.43 block from a stroll over a two-block drop, 1.10 from a
+        chase); forward = that drift in blocks if you want another (a wall in the way: forward=0.2).
+        The legs and arms go on with the game's walk animation and settle about 10 frames after the landing.
+        The game drops a mob when its 0.6-wide box has left the block: walk until its centre is 0.3 PAST the edge.
+        A fall of more than 3 blocks hurts in the game (hurt(landing)); two blocks do nothing."""
+        f0 = int(round(frame))
+        here = self.pos_at(f0)
+        drop = here.z - float(to_z)
+        if drop <= 1e-6:
+            raise ValueError("%s.fall: it stands at height %.2f on frame %d, to_z=%.2f is not below it" %
+                             (self.name, here.z, f0, float(to_z)))
+        if speed is None:                                                # the walk it is in, or that ends here unbraked
+            w, speed = self.last_walk, 0.0
+            if w is not None:
+                (a, b), (r_in, r_out) = w["frames"], w["ramp"]
+                if a + r_in <= f0 < b - r_out or (f0 == b and r_out <= 0.0):
+                    speed = w["speed"]
+        step = max(0.0, float(speed)) / 20.0                             # blocks per tick on the ground
+        push = FLY_SPEED * math.sqrt(step * (1.0 - GROUND_DRAG))
+        yaw = self.yaw_at(f0)
+        u = Vector((math.sin(yaw), -math.cos(yaw)))
+        track = air_track((u.x * step, u.y * step, REST_FALL), drop, True, push=(u.x * push, u.y * push), land_only=True)
+        ticks = track[-1][0]
+        drift = math.hypot(track[-1][1], track[-1][2])
+        scale = 1.0
+        if forward is not None:
+            if drift > 1e-6:
+                scale = float(forward) / drift
+            else:                                                        # it stood still: an even drift
+                track = [(t, u.x * forward * t / ticks, u.y * forward * t / ticks, h, v, g) for t, _x, _y, h, v, g in track]
+            drift = float(forward)
+        self._stop_walk(f0)
+        moved = self._key_air(f0, here, float(to_z), track, scale)
+        # the walk animation goes on from where the legs are (LivingEntity.calculateEntityAnimation counts the
+        # horizontal move only): speed min(4 x blocks per tick, 1), and a phase that fits the legs' angle now
+        s0 = min(ANIM_PER_BLOCK * step, 1.0)
+        leg = ch._val(self.leg_r, _ROT, 0, f0)
+        phase = self._walk_pos_at(f0) * self.anim_scale * LIMB_FREQ
+        if s0 > 0.01 and abs(math.cos(phase) * LEG_SWING * s0 - leg) > 0.03:
+            phase = math.acos(ch._clamp(leg / (LEG_SWING * s0), -1.0, 1.0))
+        still = self._fling(f0, moved, speed0=s0, old0=s0, pos0=phase / LIMB_FREQ / self.anim_scale + s0)
+        land = f0 + ticks * TICK
+        self.last_fall = dict(frames=(f0, land), ticks=ticks, drop=drop, forward=drift, speed=float(speed), still=still)
+        return int(math.ceil(land - 1e-6))
+
     def hurt(self, frame, source=None, knockback=KNOCKBACK, max_back=None):
         """The game's hurt on `frame`: red for 10 ticks (12 frames), the limbs fling, and with a `source` the knock-back hop.
 
@@ -1526,31 +1788,35 @@ class Piglin(ch.Character):
         from there and up (0.96 high, 2.0 blocks back, in the air for 10 ticks; knock_track has the numbers).
         source=None (fire, a fall) or knockback=0: no hop. max_back = blocks to a wall behind it. A walk that is
         still running is cut off. Weapon and armor do not turn red (the game draws them without the overlay).
-        Returns the frame on which it stands still again."""
+        The game ignores a hit that comes less than 10 ticks (12 frames) after the last one. Here an earlier hit
+        is keyed all the same, as the game treats a mob in the air: no second lift, it gets the new push and comes
+        down on the floor it left (so it never ends up floating). Returns the frame on which it stands still again."""
         f0 = int(round(frame))
         self.stop_admiring(f0)
         self._flash.append((f0, f0 + HURT_FRAMES))
         moved = self._knock(f0, source, knockback, max_back)
-        self._stop_walk(f0, travel=not moved)
+        self._stop_walk(f0, travel=not moved and self._air_state(f0) is None)
         end = self._fling(f0, moved)
         self._sync()
         return int(math.ceil(max(end, f0 + HURT_FRAMES, f0 + len(moved) * TICK)))
 
     def die(self, frame, source=None, knockback=KNOCKBACK, max_back=None, camera=None, poof_particles=True, seed=0,
-            village=None, glow=None):
+            village=None, glow=None, first=None, until=None):
         """The game's death from `frame`: red, the body tips over onto its left side (90 degrees after 13.5 ticks, on
         the square-root curve of LivingEntityRenderer.setupRotations), after 20 ticks (24 frames) it is gone and 20
         white poof particles rise where it lay. Bloodless, as the game is. Returns the frame it is gone.
 
         source / knockback / max_back: the knock-back of the last hit, as hurt(). The limbs hang straight (a dead
         mob's walk animation is stopped), a raised weapon stays raised. camera = the Shot (or Film / camera object)
-        that films the poof (needed unless poof_particles=False; see poof()). A later place() brings it back."""
+        that films the poof (needed unless poof_particles=False). With a Shot the puffs are seen in that shot only
+        (they would hang in the next one for up to 100 frames); first / until / glow: see poof(). The burst is
+        last_death["burst"]. A later place() brings the piglin back."""
         f0 = int(round(frame))
         gone = f0 + DEATH_FRAMES
         self.stop_admiring(f0)
         self._flash.append((f0, gone))
         moved = self._knock(f0, source, knockback, max_back)
-        self._stop_walk(f0, travel=not moved)
+        self._stop_walk(f0, travel=not moved and self._air_state(f0) is None)
         posed = self._posed_arms(f0)
         for ob, side in ((self.leg_r, None), (self.leg_l, None), (self.arm_r, "r"), (self.arm_l, "l")):
             if side not in posed and ch._find(ob, _ROT, 0) is not None:
@@ -1568,7 +1834,7 @@ class Piglin(ch.Character):
         burst = None
         if poof_particles:
             burst = poof(self.pos_at(gone), gone, camera=camera, size=(self.width, self.box_height), seed=seed,
-                         village=village, glow=glow)
+                         village=village, glow=glow, first=first, until=until)
         self.last_death = dict(frame=f0, flat=f0 + flat * TICK, gone=gone, burst=burst)
         return gone
 
@@ -1610,6 +1876,8 @@ def make_piglin(name, kind="piglin", baby=False, weapon="default", armor=(), col
             raise ValueError("baby piglins wear no armor in the game (populateDefaultEquipmentSlots: adults only)")
         pieces = (armor,) if isinstance(armor, str) else tuple(armor)
         for piece in pieces:
+            if piece not in ARMOR_TEXTURES:
+                raise ValueError("armor piece %r: use 'helmet', 'chestplate', 'leggings' or 'boots'" % (piece,))
             akey, asheet = armor_sheet(piece)
             mat = ch._sheet_material(akey, asheet)
             for part_name, part in _armor_parts(piece):
@@ -1658,8 +1926,25 @@ def in_reach(piglin, item, frame):
             and a.z < b.z + piglin.box_height and a.z + ITEM_BOX > b.z)
 
 
+def _lob_spots(start, to, beside, seed=0):
+    """Where a lobbed result may come to rest: the point `to` itself, or (beside=True: `to` is somebody's feet) the
+    spots LOB_SHORT away from it, the one on the thrower's side first; `seed` turns the order (several results
+    thrown to one player do not land on one spot)."""
+    if not beside:
+        return [to.copy()]
+    back = Vector((start.x - to.x, start.y - to.y))
+    back = back.normalized() if back.length > 1e-6 else Vector((0.0, 1.0))
+    turns = [0.0, 55.0, -55.0, 110.0, -110.0, 180.0]
+    turns = turns[int(seed) % len(turns):] + turns[:int(seed) % len(turns)]
+    spots = []
+    for deg in turns:
+        c, sn = math.cos(math.radians(deg)), math.sin(math.radians(deg))
+        spots.append(to + Vector((back.x * c - back.y * sn, back.x * sn + back.y * c, 0.0)) * LOB_SHORT)
+    return spots
+
+
 def barter(piglin, ingot_item, frame, result_item="ender_pearl", toward=None, admire_ticks=ADMIRE_TICKS, count=1,
-           world=None, floor=None, seed=0, animate=240, face=None, ease=0):
+           world=None, floor=None, seed=0, animate=240, face=None, ease=0, lob=False):
     """The whole exchange as keyed animation; returns the frames of its beats.
 
     piglin       an adult piglin (a baby admires the ingot and keeps it: nothing comes back; a brute refuses)
@@ -1673,8 +1958,13 @@ def barter(piglin, ingot_item, frame, result_item="ender_pearl", toward=None, ad
                  It is thrown with the off-hand swing from 0.3 below the piglin's eyes at 0.3 blocks per tick
                  toward one block above `toward` (the player: a Character or its feet point; None = a spot nearby,
                  as the game does when it sees no player) and then lies there as a dropped item.
+                 Any item or BLOCK id works ('gravel', 'obsidian', 'string', 'leather', 'iron_nugget', ...).
     world        a Village or blocks.World the thrown item collides with (the wall of a hole!); floor = the height
                  of a flat floor when there is no world (default: the piglin's feet)
+    lob          False = the game's throw (above). True = a director's cheat for a piglin in a pit: the result is
+                 lobbed on the flattest arc that clears the blocks of `world` and comes to rest 0.45 block from
+                 `toward`'s feet (a Character: on the piglin's side first, `seed` picks another side) or exactly
+                 at `toward` (a point). See lob_velocity; ValueError if no arc gets there.
     animate      frames of bob and spin keyed on the result after the throw; face = a camera position the result
                  shows its flat side to on the frame it lands.
     Returns dict(pickup, taken, admire=(first, end), throw, landed, item, rest): pickup = `frame`, taken = first
@@ -1716,9 +2006,23 @@ def barter(piglin, ingot_item, frame, result_item="ender_pearl", toward=None, ad
     aim = to + Vector((0.0, 0.0, THROW_TARGET_UP)) - feet
     aim = aim.normalized() if aim.length > 1e-6 else Vector((0.0, 0.0, 1.0))
     start = feet + Vector((0.0, 0.0, piglin.eye_height - THROW_BELOW_EYE))
+    velocity = tuple(aim * THROW_SPEED)
+    if lob:
+        flat = to.z if (floor is None and world is None) else floor
+        velocity = None
+        for spot in _lob_spots(start, to, isinstance(toward, ch.Character), seed):
+            try:
+                velocity = lob_velocity(start, spot, world=world, floor=flat)
+                break
+            except ValueError:
+                continue
+        if velocity is None:
+            raise ValueError("barter(lob=True): no arc from %s at (%.2f, %.2f, %.2f) comes to rest at or beside "
+                             "(%.2f, %.2f, %.2f)" % (piglin.name, start.x, start.y, start.z, to.x, to.y, to.z))
+        floor = flat
     if floor is None and world is None:
         floor = feet.z
-    landed = launch(result_item, end, start, tuple(aim * THROW_SPEED), world=world, floor=floor)
+    landed = launch(result_item, end, start, velocity, world=world, floor=floor)
     if face is not None:
         result_item.face(landed, face)
     result_item.animate(end, landed + max(0, int(animate)))
@@ -2024,28 +2328,140 @@ def _check():
     _evaluate(scene, 1400)
     assert not br._skin[0][0].hide_render and abs(br.root.rotation_euler.y) < 1e-6 and not br.weapon.hide_render
 
+    # ---- a second hit while it is still in the air: no second lift, and down on the floor it left
+    for gap in (6, 10):
+        v = make_piglin("probe_twice_%d" % gap, weapon=None)
+        v.place(1500, (0.0, 0.0, 0.0), 0.0)
+        v.hurt(1510, source=(0.0, -1.4, 0.0))
+        up = v.pos_at(1510 + gap).z
+        gone = v.die(1510 + gap, source=(0.0, -1.4, 0.0), poof_particles=False)
+        top = max(v.pos_at(1510 + gap + 0.5 * k).z for k in range(48))
+        assert up > 0.4 and top <= up + 1e-6 and abs(v.pos_at(gone - 1).z) < 1e-6, (gap, up, top, v.pos_at(gone - 1).z)
+    v = make_piglin("probe_twice", weapon=None)
+    v.place(1500, (0.0, 0.0, 0.0), 0.0)
+    v.hurt(1510, source=(0.0, -1.4, 0.0))
+    v.hurt(1518, source=(0.0, -1.4, 0.0))
+    assert max(v.pos_at(1518 + 0.5 * k).z for k in range(60)) <= v.pos_at(1518).z + 1e-6 and abs(v.pos_at(1560).z) < 1e-6
+    v.place(1600, (0.0, 0.0, 0.0), 0.0)
+    v.hurt(1610, source=(0.0, -1.4, 0.0))
+    v.hurt(1616)                                                         # burnt in the air: the hop goes on
+    assert v.pos_at(1617).z > 0.5 and abs(v.pos_at(1640).z) < 1e-6 and abs(v.pos_at(1640).y - 1.99) < 0.03
+    v.place(1700, (0.0, 0.0, 0.0), 0.0)
+    v.hurt(1710, source=(0.0, -1.4, 0.0))
+    v.hurt(1722, source=(0.0, -1.4, 0.0))                                # 10 ticks later it is on the ground: lifted again
+    assert abs(max(v.pos_at(1722 + 0.5 * k).z for k in range(30)) - apex) < 0.01
+    print("two hits within 12 frames: the second does not lift it, it lands on the floor it left")
+
+    # ---- falling
+    assert [fall_track(d)[-1][0] for d in (1.0, 2.0, 3.0, 4.0)] == [5, 7, 9, 10]
+    down = [z for _t, _x, z in fall_track(2.0)]
+    assert abs(down[1] - 0.0784) < 1e-6 and abs(down[2] - 0.23363) < 1e-4 and abs(down[6] - 1.5926) < 1e-3
+    pf = make_piglin("probe_faller")
+    pf.place(1800, (0.0, 0.0, 0.0), 0.0)
+    try:
+        pf.walk(1800, [(0.0, 0.0, 0.0), (0.0, -1.5, 0.0), (0.0, -2.2, -2.0)])
+    except ValueError as err:
+        print("walk() down a drop raises:", str(err)[:74], "...")
+    else:
+        raise AssertionError("walk() must not glide down a drop")
+    pf.walk(1800, [(0.0, 0.0, 0.0), (0.0, -1.0, 0.0), (0.0, -2.0, -1.0)])   # stairs are fine
+    pf.place(1900, (0.0, 0.0, 0.0), 0.0)
+    end = pf.walk(1900, [(0.0, 0.0, 0.0), (0.0, -2.3, 0.0)], ramp=(4, 0))
+    land = pf.fall(end, -2.0)
+    lf = pf.last_fall
+    for k in range(8):
+        _evaluate(scene, end + k * TICK)
+        assert abs(pf.root.location.z + down[k]) < 1e-5, (k, pf.root.location.z, down[k])
+    assert lf["ticks"] == 7 and land == int(math.ceil(end + 7 * TICK)) and abs(lf["forward"] - 0.43) < 0.02
+    _evaluate(scene, end - 0.02)
+    before = (pf.leg_r.rotation_euler.x, pf.arm_l.rotation_euler.x, pf.root.location.y)
+    _evaluate(scene, end + 0.02)
+    assert abs(pf.leg_r.rotation_euler.x - before[0]) < 0.02 and abs(pf.arm_l.rotation_euler.x - before[1]) < 0.02
+    assert pf.root.location.y < before[2], "it goes on forward over the edge"
+    _evaluate(scene, end + 5 * TICK)
+    assert abs(pf.leg_r.rotation_euler.x + pf.leg_l.rotation_euler.x) < 1e-6 and 0.2 < abs(pf.leg_r.rotation_euler.x) < 0.5
+    _evaluate(scene, lf["still"] + 1)
+    assert abs(pf.leg_r.rotation_euler.x) < 1e-6 and abs(pf.root.location.z + 2.0) < 1e-9
+    assert abs(pf.root.location.y + 2.3 + lf["forward"]) < 1e-6
+    pf.place(2000, (0.0, 0.0, 0.0), 0.0)
+    land0 = pf.fall(2010, -2.0)                                          # its floor is dug away: straight down
+    assert land0 == 2019 and (pf.pos_at(land0) - Vector((0.0, 0.0, -2.0))).length < 1e-9
+    pf.hurt(2040, source=(0.0, -1.0, -2.0))                              # and a hit down there hops from that floor
+    assert abs(pf.pos_at(2070).z + 2.0) < 1e-6 and abs(max(pf.pos_at(2040 + 0.5 * k).z for k in range(30)) + 2.0 - apex) < 0.01
+    print("fall: 2 blocks in %d ticks (%.1f frames), 1 / 3 / 4 blocks in 5 / 9 / 10; from a stroll it drifts %.2f; "
+          "legs +-%.0f degrees in the air, still on frame +%d" %
+          (lf["ticks"], lf["ticks"] * TICK, lf["forward"], math.degrees(0.33), round(lf["still"] - end)))
+
+    # ---- a result lobbed out of a 2 x 2 pit two deep (the game's throw falls back in)
+    from .blocks import World
+
+    pit = World()
+    pit.fill(-5, -5, -3, 6, 6, -1, "blackstone")
+    for x in (0, 1):
+        for y in (0, 1):
+            for z in (-2, -1):
+                pit.set(x, y, z, None)
+    pf.place(2100, (1.0, 1.5, -2.0), 0.0)                                # in the far half of the pit
+    thrown = barter(pf, None, 2100, "gravel", toward=(1.0, -1.2, 0.0), admire_ticks=10, world=pit)
+    pf.place(2200, (1.0, 1.5, -2.0), 0.0)
+    lobbed = barter(pf, None, 2200, "ender_pearl", toward=(1.0, -1.2, 0.0), admire_ticks=10, world=pit, lob=True, count=2)
+    assert thrown["rest"].z < -1.9 and (lobbed["rest"] - Vector((1.0, -1.2, 0.0))).length < 0.06
+    assert thrown["item"].item_id == "gravel"
+    pf.place(2300, (0.5, 0.5, -2.0), 0.0)
+    steve.place(2300, (1.0, -1.2, 0.0), math.pi)
+    rests = []
+    for seed in range(3):
+        b = barter(pf, None, 2300 + 30 * seed, "obsidian", toward=steve, admire_ticks=10, world=pit, lob=True, seed=seed)
+        rests.append(b["rest"])
+        assert abs(b["rest"].z) < 1e-6 and abs(math.hypot(b["rest"].x - 1.0, b["rest"].y + 1.2) - LOB_SHORT) < 0.06
+    assert min((a - b).length for i, a in enumerate(rests) for b in rests[i + 1:]) > 0.3
+    print("lob: from the far half of a 2 x 2 pit the game's throw rests at %s, lob=True at %s; three seeds rest %s" %
+          (tuple(round(c, 2) for c in thrown["rest"]), tuple(round(c, 2) for c in lobbed["rest"]),
+           [tuple(round(c, 2) for c in r[:2]) for r in rests]))
+
     # ---- on a Stage
     from . import shots
     from films import lookdev
 
     film = shots.Film(scene)
     st = lookdev.Stage(scene, film, None, None)
-    s1, s2 = st.shot("one", 1.0), st.shot("two", 1.0)
-    for s in (s1, s2):
+    s1, s2, s3 = st.shot("one", 1.5), st.shot("two", 1.0), st.shot("three", 1.0)
+    for s in (s1, s2, s3):
         s.move((4.0, -6.0, 1.6), (0.0, 0.0, 1.0))
     sp = add_piglin(st, "stage_brute", "brute")
     si = add_item(st, "gold_ingot", "stage_ingot")
+    sv = add_piglin(st, "stage_victim")
     assert add_piglin(st, "stage_brute") is sp
     sp.place(s2.frame_start, (0.0, 0.0, 0.0), 0.0)
     si.place(s2.frame_start, (1.0, 0.0, 0.0))
+    sv.place(s1.frame_start, (0.0, 0.0, 0.0), 0.0)
+    gone = sv.die(s1.frame_start + 4, camera=s1)                         # the puffs would last far into shot two
+    cut = sv.last_death["burst"]
+    early = poof((1.0, 0.0, 0.0), s2.frame_start - 8, camera=s2, size=(0.6, 1.8))    # in the air as shot two opens
+    on = poof((1.0, 0.0, 0.0), s2.frame_start + 4, camera=s2, until=s3.frame_start + 6)
+    free = poof((1.0, 0.0, 0.0), s2.frame_start + 4, camera=s2, until=False)
+    st.use(s1, sv)
     st.use(s2, sp, si)
     st.hero(s2, "brute", sp)
     st.finish()
+
+    def puffs(b, f):
+        _evaluate(scene, f)
+        return sum(1 for ob in b.objects if not ob.hide_render)
+
     _evaluate(scene, s1.frame_start)
     assert sp.head.hide_render and sp.weapon.hide_render and si.sprite.hide_render
     _evaluate(scene, s2.frame_start)
     assert not sp.head.hide_render and not sp.weapon.hide_render and not si.sprite.hide_render
+    assert gone == s1.frame_start + 28 and puffs(cut, gone) == POOF_COUNT and puffs(cut, s1.frame_end) > 10
+    assert all(puffs(cut, f) == 0 for f in range(s2.frame_start, s3.frame_end + 1)) and cut.frame_end == s1.frame_end
+    assert puffs(early, s2.frame_start - 1) == 0 and puffs(early, s2.frame_start) == POOF_COUNT
+    assert puffs(early, s2.frame_end) > 0 and puffs(early, s3.frame_start) == 0
+    assert puffs(on, s3.frame_start + 5) > 0 and puffs(on, s3.frame_start + 6) == 0 and puffs(free, s3.frame_end) > 0
+    assert all("+%g" % POOF_GLOW in ob.data.materials[0].name for ob in cut.objects)
     print("Stage: add_piglin / add_item register with st.cast; hidden outside their shots")
+    print("poof with camera=<Shot>: %d puffs on the shot's last frame, none on the next shot's first; started 8 frames "
+          "before a cut: none before it, %d on its first frame" % (puffs(cut, s1.frame_end), puffs(early, s2.frame_start)))
     print("check ok")
 
 
@@ -2265,6 +2681,90 @@ def _selftest(which):
         gone = p.die(10, camera=cam, seed=4)
         print("death (proof): dies on frame 10, flat on frame %.1f, gone on frame %d" % (p.last_death["flat"], gone))
         stills(scene, "piglins_death", [14, 24, gone - 1, gone + 1, gone + 12, gone + 36], height=420)
+
+    def pit_stage(res=(540, 720)):
+        """A bastion floor with a pit 2 x 2 and two deep in plain blackstone (cells x 0..1, y 0..1), dim red air,
+        warm lamps (one low in the pit), the films' shutter; returns (scene, World)."""
+        from . import props
+        from .blocks import World, new_collection
+
+        scene = quick.reset()
+        quick.setup(scene, res=res)
+        scene.render.use_motion_blur = True
+        scene.render.motion_blur_shutter = 0.5
+        scene.render.motion_blur_position = "START"
+        world = bpy.data.worlds.new("nether")
+        world.use_nodes = True
+        bg = world.node_tree.nodes["Background"]
+        bg.inputs[0].default_value = (0.30, 0.09, 0.05, 1.0)
+        bg.inputs[1].default_value = 0.35
+        scene.world = world
+        r = pix.rng(41)
+        kinds = ["polished_blackstone_bricks"] * 6 + ["cracked_polished_blackstone_bricks"] * 2 + ["gilded_blackstone"]
+        w = World()
+        for x in range(-7, 9):
+            for y in range(-6, 9):
+                near = -2 <= x <= 3 and -2 <= y <= 3                     # the pit is dug in plain blackstone
+                for z in (-3, -2, -1):
+                    w.set(x, y, z, "blackstone" if near or z < -1 else kinds[int(r.integers(0, len(kinds)))])
+        for x in (0, 1):
+            for y in (0, 1):
+                for z in (-2, -1):
+                    w.set(x, y, z, None)
+        for x in range(-7, 9):
+            for z in range(0, 4):
+                w.set(x, 8, z, "gold_block" if 0 <= x <= 2 and z < 2 else "polished_blackstone_bricks")
+        w.cull_below = -3
+        w.build(new_collection(scene, "set"))
+        lights = new_collection(scene, "lights")
+        for pos, energy in (((-3.0, -3.0, 4.0), 700.0), ((5.0, 3.0, 3.4), 420.0), ((1.0, 5.5, 3.0), 320.0), ((1.0, 1.0, 0.6), 90.0),
+                            ((1.0, 1.0, -0.9), 22.0)):
+            lamp = props.make_light("lantern", lights)
+            lamp.location = pos
+            lamp.data.energy = energy
+        return scene, w
+
+    if want("fall"):
+        scene, w = pit_stage()
+        a, b, c = make_piglin("first"), make_piglin("second", armor=("helmet",)), make_piglin("third", weapon="crossbow")
+        a.place(1, (-3.0, 0.5, 0.0), math.radians(90))
+        b.place(1, (-3.0, 1.5, 0.0), math.radians(90))
+        c.place(1, (1.5, 5.4, 0.0), 0.0)
+        end_a = a.walk(1, [(-3.0, 0.5, 0.0), (0.3, 0.5, 0.0)], ramp=(4, 0))          # 0.3 past the rim, no braking
+        land_a = a.fall(end_a, -2.0)
+        end_b = b.walk(15, [(-3.0, 1.5, 0.0), (0.3, 1.5, 0.0)], ramp=(4, 0))
+        land_b = b.fall(end_b, -2.0)
+        end_c = c.walk(24, [(1.5, 5.4, 0.0), (1.5, 1.7, 0.0)], ramp=(4, 0))
+        land_c = c.fall(end_c, -2.0)
+        for q, land in ((a, land_a), (b, land_b), (c, land_c)):
+            q.look_at(land + 6, (1.0, -1.2, 1.6), ease=8)
+            q.flop_ears(q.last_fall["still"], land_c + 60)
+        print("fall (proof): first leaves the rim on frame %d and lands on %d at %s; second %d -> %d; third %d -> %d" %
+              (end_a, land_a, tuple(round(v, 2) for v in a.pos_at(land_a)), end_b, land_b, end_c, land_c))
+        quick.camera(scene, (5.6, -4.6, 5.4), (0.7, 1.0, -0.7), lens=30)
+        stills(scene, "piglins_fall", [end_a - 3, end_a + 3, end_a + 7, end_b + 5, end_c + 5, land_c + 14], height=400)
+
+    if want("lob"):
+        scene, w = pit_stage()
+        steve = ch.make_player("steve")
+        steve.place(1, (1.0, -1.2, 0.0), math.pi)
+        steve.look_at(1, (1.0, 1.0, -1.0), ease=0)
+        near, far = make_piglin("near"), make_piglin("far", armor=("helmet",))
+        near.place(1, (0.6, 0.5, -2.0), 0.0)
+        far.place(1, (1.3, 1.5, -2.0), 0.0)
+        cam_at = (-3.4, -2.6, 3.4)
+        for q in (near, far):
+            q.look_at(1, steve, ease=0)
+        thrown = barter(near, None, 1, "gravel", toward=steve, admire_ticks=14, world=w, face=cam_at)        # the game's throw
+        lobbed = barter(far, None, 1, "ender_pearl", toward=steve, admire_ticks=20, world=w, lob=True, count=2,
+                        face=cam_at, seed=1)
+        print("lob (proof): the game's throw from the near half leaves on frame %d and rests at %s; lob=True from the far "
+              "half leaves on %d and rests at %s on frame %d" %
+              (thrown["throw"], tuple(round(v, 2) for v in thrown["rest"]), lobbed["throw"],
+               tuple(round(v, 2) for v in lobbed["rest"]), lobbed["landed"]))
+        quick.camera(scene, cam_at, (0.9, 0.0, -0.3), lens=30)
+        t = lobbed["throw"]
+        stills(scene, "piglins_lob", [t - 3, t + 5, t + 11, t + 15, lobbed["landed"] + 8], height=400)
 
     if want("bastion"):
         from . import props

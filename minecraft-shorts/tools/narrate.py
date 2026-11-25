@@ -11,14 +11,17 @@ Runs in the TTS environment, NOT under Blender (bpy and the voice model cannot s
                                               # a LISTENING copy in another voice: out/test/narrate_<film>_<voice>.wav
                                               #   (+ .json); narration/ always follows the film's own NARRATION
     $TTS tools/narrate.py --voices [names]    # pace of each voice: words per second, words that fit in 60 s
-    $TTS tools/narrate.py --selftest          # timing accuracy on 44 film-like sentences (resumable: run it again
-                                              #   until it prints the report; stops starting work after 230 s)
+    $TTS tools/narrate.py --selftest          # timing accuracy on 44 film-like sentences, on the path a film takes
+                                              #   (resumable: run it again until it prints the report; it stops
+                                              #   starting work after 230 s; about six runs on a busy machine)
     $TTS tools/narrate.py --paragraph-check   # sentence-by-sentence synthesis against whole-paragraph synthesis
     $TTS tools/narrate.py [<film>] --hear FILE     # recognise the words in any audio / video file; with a film,
                                                    #   locate its script words (independent of narration/*.json);
                                                    #   writes out/test/narrate_heard_<name>.json
     $TTS tools/narrate.py --make-timed-model  # once per machine: write kokoro-v1.0.timed.onnx (needs `pip install onnx`)
-  options: --threads N (default 2), --recogniser-only (time the words without the model's durations).
+  options: --threads N (default 2: what the committed narrations were made with), --recogniser-only (time the
+  words WITHOUT the voice model's durations: several frames less exact; without this flag a missing
+  kokoro-v1.0.timed.onnx stops the narrator with exit code 1).
 
 The spec is the `NARRATION = {...}` literal of the film module (format: engine/narration.py); it is read with ast,
 the film is never imported. Model files are looked for in $MC_TTS_MODELS (default: the session scratchpad, see
@@ -26,53 +29,84 @@ MODELS below); tools/setup_tts.sh creates the environment and downloads them.
 
 What it does, in this order
   1. Every sentence is synthesised ON ITS OWN (Kokoro 82M through kokoro-onnx; deterministic: the same sentence,
-     voice and speed give the same samples, so changing a pause changes no word). Its leading and trailing
-     silence is cut by energy to a fixed margin (20 ms before the first sound, 50 ms after the last) with short
-     fades, and the sentences are levelled to one speech level.
-  2. Loudness: one gain for the whole film to -16 LUFS integrated (ITU-R BS.1770 as measured by ffmpeg's ebur128),
-     then a look-ahead limiter keeps the true peak under -1.5 dBTP. Gain and limiter work per sentence, so they do
-     not depend on the pauses either.
+     voice and speed give the same samples, so changing a pause changes no word; with another --threads value
+     0.2 % of the 16-bit samples differ by one step and every word time stays the same). Its leading and trailing
+     silence is cut by energy to a fixed margin (20 ms before the first sound, 50 ms after the last, the release
+     of a final stop consonant included: sentence_end) with short fades, and the sentences are levelled to one
+     speech level.
+  2. Loudness: one gain for the whole film to -19 LUFS integrated for the MONO wav (ITU-R BS.1770 as measured by
+     ffmpeg's ebur128), then a look-ahead limiter keeps its true peak under -2 dBTP. The film carries it as dual
+     mono at full level (engine.post.mux_audio), which measures 3.01 LU more: the delivered mp4 is at -16 LUFS,
+     true peak under -1.5 dBTP. Gain and limiter work per sentence, so they do not depend on the pauses either.
   3. The sentences are laid out: `lead` seconds of silence, then each sentence, its first sound exactly `pause`
      seconds after the last sound of the one before, then `tail`; the file is padded to a whole number of frames.
-  4. Word timing, per sentence. Three sources, each checking the others:
+  4. Word timing, per sentence, ON THE CLIP AS THE VOICE SPOKE IT (time_clip), never on the levelled and limited
+     clip of step 2: silence is judged against the loudest frame, the voice murmurs in its pauses 41-48 dB under
+     it, and once a limiter has lowered the peaks that murmur counts as sound (the first version did this: words
+     after a pause were put up to 210 ms early, captions 4 to 6 frames). Three sources, each checking the others:
        model       the voice model's OWN phoneme durations. kokoro-v1.0.timed.onnx is the same network with its
                    duration predictor exposed as a second output (--make-timed-model; the audio is bit-identical),
                    so every phoneme has its span and nothing has to be recognised. A word starts 25 ms before
                    the gap before its first phoneme (measured: that is where its sound begins; MODEL_LEAD).
        energy      measured on the samples: the first and the last sound of the sentence, and every silence of
-                   140 ms or more inside it. The word after a pause starts where the sound comes back.
+                   140 ms or more inside it. The word after a pause starts where the sound comes back, IF it is
+                   clearly audible (28 dB under the loudest frame) within 60 ms; if not, a murmur or a breath came
+                   first and the word starts where the model says, between the two (word_onset).
        recogniser  the second opinion (faster-whisper small.en): the SCRIPT's words force-aligned to the audio by
                    the recogniser's cross-attention; where that gives a word no time, its free transcript aligned
-                   to the script by letters (it mishears: 'Crammys' -> 'cram is'). It is the fallback when the
-                   timed model is missing (--recogniser-only), and every word's recogniser start is stored beside
-                   the final one ("second"). Measured (--selftest): inside running speech the recogniser hears a
-                   word start early, while the word before is still sounding; the model does not.
+                   to the script by letters (it mishears: 'Crammys' -> 'cram is'). Every word's recogniser start
+                   is stored beside the final one ("second"); with --recogniser-only it is the timing. Measured
+                   (--selftest): inside running speech the recogniser hears a word start early, while the word
+                   before is still sounding; the model does not.
      A word no source can place is spread between its neighbours by syllables and listed as ESTIMATED.
-  5. narration/<film>.json: sentences (text, start, end), words (script text, caption, start, end, sentence,
-     source), voice, speed, sample rate, duration, loudness, and the hash of the spec (engine.narration.spec_hash).
+  5. A check on the DELIVERED samples (check_onsets): wherever the finished wav is clearly audible again after
+     100 ms of quiet, a word of the json must start there. Printed for every narration, stored as "onset_check";
+     a word more than two frames off is listed under CHECK. tools.narration_sync repeats it on the encoded mp4.
+  6. narration/<film>.json: sentences (text, start, end), words (script text, caption, start, end, sentence,
+     source), voice, speed, sample rate, duration, loudness, the words guarded against a murmur, the onset check
+     and the hash of the spec (engine.narration.spec_hash).
+  It also prints the film's length against one minute, and a CHECK line with the phonemes of every sentence that
+  holds a number, an abbreviation or capitals the phonemiser reads by rules of its own (engine.narration.spoken_risks).
 
-MEASURED (--selftest, am_michael, 44 sentences of the six films' kind, 384 words; out/test/narrate_selftest_*_report.json)
-  * no word had to be estimated; the voice paused 21 times inside a sentence, every time at punctuation, and every
-    time the word after the pause was put on the measured return of the sound
-  * the model's phoneme timing against the measured sound after those pauses: median 10 ms, 19 of 21 within 35 ms
-    (the other two 50 and 120 ms: the measured sound is what is used there)
-  * the recogniser against the final timing: after pauses the same word on the same onset 21 of 21; inside speech
+MEASURED (--selftest, am_michael, 44 sentences of the six films' kind, 384 words, spoken as four films of eleven
+sentences through the same functions a film goes through; out/test/narrate_selftest_*_report.json)
+  * no word had to be estimated; the voice paused 21 times inside a sentence, every time at punctuation. 20 times
+    the word after the pause was put on the measured return of the sound, once ('and', after a 100 ms murmur) on
+    the model's time
+  * THE DELIVERED AUDIO, no word time involved: in the four finished wavs the voice is clearly audible again after
+    a silence 65 times, and each time a word of the json starts 0 to 40 ms before that point (median 5 ms): 65 of
+    65 within one frame. (The first version, timed on the limited clips, had 4 of 16 such words 165-210 ms early
+    on a 75 s probe. The same probe now: 38 of 38 within 45 ms.)
+  * timed on the limited delivery clip instead of the spoken one (which films never do), one word of 384 would
+    move, by 30 ms: word_onset() alone holds too. At the first version's loudness (up to 14 dB of limiting) 10
+    of 569 words move, by 60 ms at most, where they moved by up to 210 ms.
+  * the model's phoneme timing against the measured sound after those pauses: median 10 ms, 19 of 20 within a
+    frame, 50 ms at most; at the start of a sentence its first phoneme is 45 ms (median) after the first sound,
+    which is why the first word starts on the sound
+  * the recogniser against the final timing: after pauses the same word on the same onset 20 of 20; inside speech
     median 40 ms apart, 52 % within one frame, 74 % within two, and EARLY on average (-45 ms)
   * the recogniser against ground truth (sentences assembled from pieces whose starts are known to the sample):
-    115 ms median error where the pieces butt (8 % within a frame), and 9 of 35 pauses of 250 ms given to the wrong
-    word. That is why the recogniser is only the second opinion.
-  * cutting the audio at a word's start where the two timings differ by over 100 ms (16 of 64 such words): at the
-    final timing the audio before the cut ends with the whole word before in 16 of 16 and both sides are intact in
-    12 of 16; at the recogniser's start in 8 and 3 of 16 ('every... | One is afraid': it starts 'is' inside 'everyone')
-  * the free transcript missed or misspelt 14 of 384 words (Crammys, redstoner, Herobrine, trapdoors, grown-ups heard
-    as two words; gym, ender, twelve not heard): nothing of it is used for the timing of a film
+    110 ms median error where the pieces butt (8 % within a frame), and 9 of 35 pauses of 250 ms given to the wrong
+    word. That is why the recogniser is only the second opinion, and why --recogniser-only must be asked for.
+  * cutting the audio at a word's start where the two timings differ by over 100 ms (16 of 65 such words): at the
+    final timing the audio before the cut ends with the whole word before in 15 of 16 and both sides are intact in
+    13 of 16; at the recogniser's start in 8 and 4 of 16
+  * the recogniser run freely over each whole film, against the final timing: median 30 ms, 59 % within one frame,
+    82 % within two; its transcript missed or misspelt 13 of 384 words (Crammys, redstoner, Herobrine, trapdoors,
+    grown-ups heard as two words; gym, ender not heard): nothing of it is used for the timing of a film
+  * loudness of the four films: -19.0 LUFS mono, true peak -2.1 dBTP; the limiter took 3.7 to 8.7 dB off the
+    highest peak and more than 3 dB off 0.2 to 4.4 % of the samples (at -16 LUFS mono it was up to 14 dB and 14-27 %)
+  * one sentence edited, a pause opened and the lead changed in a film of eleven: no word of the ten other
+    sentences moves inside its sentence (0.0000 s); the timing does not depend on the film's gain or limiter
 PACE (--voices, speed 1.0; words per second while speaking / with the default 0.35 s pauses / words that fit in 60 s
-  with lead 0.3 and tail 1.0, on 12 short sentences of 95 mostly one-syllable words):
-    am_michael 3.71 / 3.23 / 189    am_fenrir 4.33 / 3.69 / 216    am_puck  4.36 / 3.70 / 217
+  with lead 0.3 and tail 1.0, on 12 SHORT sentences of 95 mostly one-syllable words: an upper bound):
+    am_michael 3.69 / 3.21 / 188    am_fenrir 4.31 / 3.67 / 215    am_puck  4.32 / 3.68 / 215
     bm_george  3.12 / 2.77 / 162    bm_fable  2.96 / 2.64 / 155    af_heart 4.11 / 3.52 / 206
-  On the 44 test sentences (8.7 words and 12 syllables a sentence) am_michael speaks 3.20 words/s = 4.4 syllables/s,
-  2.84 words/s with pauses: 166 words in 60 s. Plan a one-minute film at 160-190 words and let the narration say.
-  The voice's own pause between two sentences of a paragraph is 0.28-0.54 s (--paragraph-check); the default is 0.35.
+  Film text is slower. am_michael on the 44 test sentences (8.7 words, 12 syllables a sentence): 3.2 words/s
+  while speaking, 2.8-3.0 with the pauses; on a one-minute script of 165 words in 19 sentences with three opened
+  pauses: 61.9 s (2.72 words/s); on a reviewer's script of 185 words in 22 sentences with numbers: 75.0 s (2.51).
+  PLAN A ONE-MINUTE FILM AT 140 TO 165 WORDS; narrate.py prints the length and, over 62 s, how many words to cut.
+  The voice's own pause between two sentences of a paragraph is 0.38-0.54 s (--paragraph-check); the default is 0.35.
 """
 import argparse
 import json
@@ -101,7 +135,19 @@ PRE, POST = 0.020, 0.050      # margin kept before the first / after the last so
 FADE_IN, FADE_OUT = 0.008, 0.030
 SILENCE_DB = -40.0            # a 10 ms frame is sound when its RMS is within this of the clip's loudest frame
 MIN_RUN, MIN_GAP = 0.025, 0.030   # shorter sounds are blips, shorter gaps belong to the sound around them
+TAIL_RUN, TAIL_REACH = 0.010, 0.150   # ... except at the END of a sentence: a sound of 10 ms or more within 150 ms
+                              #   of the last one is kept. It is the release of a final stop after a long closure
+                              #   (measured: the d of 'emerald.' 60 ms after the vowel at -27 dB, the t of 'want?'
+                              #   85 ms after at -36 dB, the t of "didn't." 65 ms after; 3 of 66 sentences)
 PAUSE_MIN = 0.140             # a silence this long inside a sentence is a pause (a stop consonant closes for less)
+CLEAR_DB = -28.0              # a frame within this of the loudest one is CLEARLY audible speech. The voice murmurs in
+                              #   its pauses at -41 .. -48 dB (measured on 47 pauses), just under SILENCE_DB, and now
+                              #   and then above it: a return of sound counts as the start of a word only when ...
+ONSET_REACH = 0.060           # ... it is clearly audible within this time (measured on the same 47 pauses: 0-15 ms
+                              #   for 46 of them, up to 55 ms for the h of a sentence that starts with 'He'; the one
+                              #   murmur took 105 ms). Otherwise the word starts where the voice model says, kept
+                              #   between the first return of the sound and the clearly audible one.
+CLEAR_BACK = 0.030            # without a model: such a word starts this long before it is clearly audible
 MODEL_LEAD = 0.025            # model timing inside speech: a word starts this much before the gap before its first
                               #   phoneme. Measured: after pauses the sound is back 10 ms (median; mean 18 ms) before
                               #   that gap starts, and audio cut exactly at it still carried the f of 'farm' and the m
@@ -111,11 +157,18 @@ MODEL_REACH = 0.20            # model timing: a word boundary this close to a pa
 SNAP_REACH = 0.25             # recogniser timing: the same, wider (its boundaries drift into the silence) ...
 PUNCT_REACH = 0.45            # ... and wider still for a boundary the script punctuates: the voice pauses at
                               #   punctuation (21 of 21 pauses inside the test sentences)
-TARGET_LUFS, MAX_TRUE_PEAK = -16.0, -1.5
+PROGRAMME_LUFS = -16.0        # what the delivered film measures: the mp4 carries the narration as dual mono
+TARGET_LUFS = PROGRAMME_LUFS - 3.01   # ... so the MONO wav is made 3.01 LU lower (two equal channels add 3.01 LU in
+                              #   BS.1770): -19 LUFS. Made at -16 and lowered at the mux, as it first was, the limiter
+                              #   had to take 3 dB more off every peak for nothing (measured on a 75 s film: up to
+                              #   14 dB, over 3 dB on 14 % of the samples; at -19: up to 9 dB, over 3 dB on 1 %).
+MAX_TRUE_PEAK = -2.0          # dBTP of the wav; the AAC encoder moves peaks by a few tenths, the mp4 stays under -1.5
 LEVEL_RANGE = 4.0             # dB a sentence may be moved to meet the common speech level
 LIMIT_WINDOW = 0.012          # the limiter looks this far ahead and behind (its gain moves over about 24 ms)
 MAX_SENTENCE = 27.0           # seconds: one recogniser window
-JSON_VERSION = 2
+JSON_VERSION = N.JSON_VERSION # (engine.narration refuses a json of another version: its words were timed otherwise)
+SELFTEST_VERSION = 3          # of the selftest's cache file
+MINUTE = 60.0                 # the films are 'about one minute': the length a narration is reported against
 MARKS = set(";:,.!?¡¿—…\"«»“”()")       # punctuation in the voice's phoneme alphabet (they carry time, no word)
 STRESS = set("ˈˌ")                       # stress marks differ between a word alone and the word in its sentence
 FRAME = 1.0 / 24.0
@@ -299,9 +352,9 @@ def frame_rms(x, sr=SR, hop=0.005, win=0.010):
     return np.sqrt((c[starts + w] - c[starts]) / w), hop
 
 
-def sound_runs(x, sr=SR, rel_db=SILENCE_DB, floor_db=-62.0):
+def sound_runs(x, sr=SR, rel_db=SILENCE_DB, floor_db=-62.0, min_run=MIN_RUN):
     """Where there is sound: [(t0, t1), ...] in seconds. A frame is sound when its RMS is within `rel_db` of the
-    loudest frame (and above `floor_db` dBFS); gaps under MIN_GAP are closed, sounds under MIN_RUN dropped."""
+    loudest frame (and above `floor_db` dBFS); gaps under MIN_GAP are closed, sounds under `min_run` dropped."""
     rms, hop = frame_rms(x, sr)
     if len(rms) == 0 or rms.max() <= 0:
         return []
@@ -323,17 +376,42 @@ def sound_runs(x, sr=SR, rel_db=SILENCE_DB, floor_db=-62.0):
             merged[-1][1] = r[1]
         else:
             merged.append(r)
-    return [(a, b) for a, b in merged if b - a >= MIN_RUN]
+    return [(a, b) for a, b in merged if b - a >= min_run - 1e-9]
+
+
+def clear_finder(x, sr=SR, clear_db=CLEAR_DB):
+    """find(t) -> the time at or after t at which the clip is CLEARLY audible (a 10 ms frame within `clear_db` of
+    the loudest one; a frame that began up to 10 ms before t counts as t), or None when it never is again."""
+    rms, hop = frame_rms(x, sr)
+    if len(rms) == 0 or rms.max() <= 0:
+        return lambda t: None
+    loud = np.flatnonzero(rms >= rms.max() * 10 ** (clear_db / 20.0)) * hop
+
+    def find(t):
+        k = int(np.searchsorted(loud, t - 0.0101))
+        return float(max(loud[k], t)) if k < len(loud) else None
+
+    return find
+
+
+def sentence_end(raw, runs, sr=SR):
+    """Where the sound of a synthesised sentence ends: the end of its last sound run, or of a short sound (TAIL_RUN
+    or longer) that begins within TAIL_REACH after it: the release of a final stop consonant, which MIN_RUN alone
+    would throw away (see TAIL_RUN above)."""
+    t1 = runs[-1][1]
+    late = [r for r in sound_runs(raw, sr, min_run=TAIL_RUN) if t1 - 1e-6 < r[0] <= t1 + TAIL_REACH]
+    return max([t1] + [r[1] for r in late])
 
 
 def trim_clip(raw, sr=SR):
-    """Cut a synthesised sentence to its sound: PRE seconds before the first sound, POST after the last, faded in
-    and out. Returns (clip, onset, offset, shift): the sound runs from `onset` to `offset` seconds inside the clip,
-    and a time t of the raw audio is t - shift in the clip."""
+    """Cut a synthesised sentence to its sound: PRE seconds before the first sound, POST after the last (the
+    release of a final consonant included, see sentence_end), faded in and out. Returns (clip, onset, offset,
+    shift): the sound runs from `onset` to `offset` seconds inside the clip, and a time t of the raw audio is
+    t - shift in the clip."""
     runs = sound_runs(raw, sr)
     if not runs:
         raise ValueError("the voice produced silence")
-    t0, t1 = runs[0][0], runs[-1][1]
+    t0, t1 = runs[0][0], sentence_end(raw, runs, sr)
     a, b = max(0, int(round((t0 - PRE) * sr))), min(len(raw), int(round((t1 + POST) * sr)))
     clip = np.array(raw[a:b], dtype=np.float64)
     n_in, n_out = min(len(clip) // 2, int(FADE_IN * sr)), min(len(clip) // 2, int(FADE_OUT * sr))
@@ -614,21 +692,49 @@ def from_recognition(script, heard, lo, hi):
     return [tuple(o) for o in out]
 
 
-def snap_to_sound(times, runs, reach=SNAP_REACH, punctuated=(), punct_reach=PUNCT_REACH, pause_min=PAUSE_MIN):
+def word_onset(lo, clear, anchor):
+    """Where a word starts whose sound returns at `lo` after a silence: (start, measured, guarded).
+    `clear` = clear_finder() of the audio, `anchor` = the voice model's start of that word or None.
+    The sound is clearly audible within ONSET_REACH: the word starts where the sound returns (measured). If it is
+    not, something quiet came first (the voice murmurs in its pauses, and such a murmur would put the caption 4 to
+    6 frames early): the word starts where the model says, but not before the sound returns nor after it is
+    clearly audible; without a model, CLEAR_BACK before it is clearly audible. guarded = the second case."""
+    hi = clear(lo) if clear is not None else None
+    if hi is None or hi - lo <= ONSET_REACH:
+        return lo, True, False
+    if anchor is None:
+        return hi - CLEAR_BACK, True, True
+    start = min(hi, max(lo, anchor))
+    return start, start in (lo, hi), True
+
+
+def snap_to_sound(times, runs, reach=SNAP_REACH, punctuated=(), punct_reach=PUNCT_REACH, pause_min=PAUSE_MIN,
+                  clear=None, anchors=None, end=None):
     """Fit word times to the measured sound of the same audio. `times` = [[start, end], ...] (seconds, in order),
-    `runs` = sound_runs() of it. The first word starts with the first sound and the last ends with the last; every
-    silence of `pause_min` or more is given to a word boundary: the nearest one the script punctuates (indices of
-    the words BEFORE such a boundary in `punctuated`) within `punct_reach`, else the nearest one within `reach`.
-    The word before the pause ends where the silence starts, the word after starts where the sound comes back.
-    Elsewhere a word ends where the next one starts. Returns (new times, indices of the words that START on a
-    measured onset, [(pause start, pause end, index of the word before it or None), ...])."""
+    `runs` = sound_runs() of it. The first word starts with the first sound and the last ends with the last (or at
+    `end`); every silence of `pause_min` or more is given to a word boundary: the nearest one the script punctuates
+    (indices of the words BEFORE such a boundary in `punctuated`) within `punct_reach`, else the nearest one within
+    `reach`. The word before the pause ends where the silence starts, the word after starts where the sound comes
+    back, as word_onset() judges it with `clear` (clear_finder() of the audio) and `anchors` (each word's start
+    by the voice model, or None). Elsewhere a word ends where the next one starts. Returns (new times, indices of
+    the words that START on a measured onset, [(pause start, pause end, index of the word before it or None), ...],
+    {index: (first return of the sound, clearly audible, start used)} of the words word_onset() guarded)."""
     t = [[float(a), float(b)] for a, b in times]
     n = len(t)
     if n == 0 or not runs:
-        return t, [], []
-    on_sound = [0]
-    t[0][0] = runs[0][0]
-    t[-1][1] = runs[-1][1]
+        return t, [], [], {}
+    on_sound, guarded = [], {}
+
+    def start_at(i, lo):
+        start, measured, guard = word_onset(lo, clear, None if anchors is None else anchors[i])
+        t[i][0] = start
+        if measured:
+            on_sound.append(i)
+        if guard:
+            guarded[i] = (round(lo, 4), round(clear(lo), 4), round(start, 4))
+
+    start_at(0, runs[0][0])
+    t[-1][1] = runs[-1][1] if end is None else float(end)
     pauses = [(a[1], b[0]) for a, b in zip(runs, runs[1:]) if b[0] - a[1] >= pause_min]
     taken, report = {}, []
     punctuated = set(punctuated)
@@ -648,12 +754,11 @@ def snap_to_sound(times, runs, reach=SNAP_REACH, punctuated=(), punct_reach=PUNC
             taken[best] = (g0, g1)
     for i, (g0, g1) in taken.items():
         t[i][1] = g0
-        t[i + 1][0] = g1
-        on_sound.append(i + 1)
+        start_at(i + 1, g1)
     for i in range(n - 1):                                           # contiguous inside a run of sound
         if i not in taken:
             t[i][1] = t[i + 1][0]
-    return t, sorted(on_sound), report
+    return t, sorted(on_sound), report, guarded
 
 
 def repair(times, words, lo, hi, min_len=0.03):
@@ -717,7 +822,8 @@ def time_by_recogniser(eng, clip, words, onset, offset, sr=SR, free=False):
             if heard_times[i][2] in ("exact", "fuzzy", "split"):
                 times[i] = [heard_times[i][0], heard_times[i][1]]
                 source[i] = "recognised"
-    snapped, on_sound, _pauses = snap_to_sound(times, runs, punctuated=punctuated_words(words))
+    snapped, on_sound, _pauses, guarded = snap_to_sound(times, runs, punctuated=punctuated_words(words),
+                                                        clear=clear_finder(clip, sr), end=offset)
     fixed, spread = repair(snapped, words, onset, offset)
     out = []
     for i in range(n):
@@ -727,16 +833,20 @@ def time_by_recogniser(eng, clip, words, onset, offset, sr=SR, free=False):
             rec = {"start": round(heard_times[i][0], 4), "end": round(heard_times[i][1], 4), "kind": heard_times[i][2]}
         out.append({"start": fixed[i][0], "end": fixed[i][1], "estimated": est,
                     "source": "estimated" if est else ("energy" if i in on_sound else source[i]),
-                    "raw_forced": round(forced[i][0], 4), "p": round(forced[i][2], 3), "recognised": rec})
+                    "raw_forced": round(forced[i][0], 4), "p": round(forced[i][2], 3), "recognised": rec,
+                    "guarded": guarded.get(i)})
     return out
 
 
 def time_sentence(eng, clip, words, onset, offset, model=None, second_opinion=True, sr=SR):
     """Start and end of every script word of one sentence clip (seconds inside the clip).
+    `clip` must be the sentence AS SPOKEN (speak_sentence()'s 'spoken'), never the levelled and limited delivery
+    clip: silence is judged against the clip's loudest frame, and a limiter that lowers the peaks lifts the voice's
+    murmur in the pauses over that threshold (time_clip() is the call a film's narration goes through).
     `model` = words_from_timings() of the clip (already in clip time) or None. With it the model's durations are
     the timing, fitted to the measured sound, and the recogniser is the second opinion; without it the recogniser
     is the timing. Returns dicts {start, end, source ('model' | 'energy' = starts on a measured onset | 'forced' |
-    'recognised' | 'estimated'), estimated, model_raw, second, second_source, pauses}."""
+    'recognised' | 'estimated'), estimated, model_raw, second, second_source, guarded, pauses}."""
     second = time_by_recogniser(eng, clip, words, onset, offset, sr) if (second_opinion or model is None) else None
     if model is None:
         for w in second:
@@ -752,7 +862,9 @@ def time_sentence(eng, clip, words, onset, offset, model=None, second_opinion=Tr
         else:
             times.append([m[0] - (MODEL_LEAD if i else 0.0), m[1]])
             prev = m[1]
-    snapped, on_sound, pauses = snap_to_sound(times, runs, reach=MODEL_REACH, punctuated=punctuated_words(words))
+    anchors = [None if i in missing else times[i][0] for i in range(n)]
+    snapped, on_sound, pauses, guarded = snap_to_sound(times, runs, reach=MODEL_REACH, punctuated=punctuated_words(words),
+                                                       clear=clear_finder(clip, sr), anchors=anchors, end=offset)
     fixed, spread = repair(snapped, words, onset, offset)
     out = []
     for i in range(n):
@@ -762,10 +874,17 @@ def time_sentence(eng, clip, words, onset, offset, model=None, second_opinion=Tr
                     "model_raw": None if model[i] is None else round(model[i][0], 4),
                     "second": None if second is None else second[i]["start"],
                     "second_source": None if second is None else second[i]["source"],
-                    "raw_forced": None if second is None else second[i]["raw_forced"]})
+                    "raw_forced": None if second is None else second[i]["raw_forced"],
+                    "guarded": guarded.get(i)})
     if out:
         out[0]["pauses"] = [(round(g0, 4), round(g1, 4), b) for g0, g1, b in pauses]
     return out
+
+
+def time_clip(eng, c, words, second_opinion=True):
+    """Word times of one synthesised sentence `c` (a speak_sentence() dict, before or after synthesise()): always
+    measured on the clip as it was spoken. narrate(), --selftest and --paragraph-check all time through here."""
+    return time_sentence(eng, c["spoken"], words, c["onset"], c["offset"], model=c["model"], second_opinion=second_opinion)
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -773,8 +892,10 @@ def time_sentence(eng, clip, words, onset, offset, model=None, second_opinion=Tr
 # ---------------------------------------------------------------------------------------------------------------
 
 def speak_sentence(eng, text, spoken, voice, speed):
-    """One sentence, spoken and cut to its sound: {'clip', 'onset', 'offset', 'model' (word times from the voice
-    model in clip time, or None), 'raw_level'}."""
+    """One sentence, spoken and cut to its sound: {'spoken' (the samples as the voice made them: what the words
+    are TIMED on), 'clip' (the same until synthesise() levels and limits it: what is DELIVERED), 'onset', 'offset'
+    (first and last sound, seconds inside either), 'model' (word times from the voice model in clip time, or
+    None), 'raw_level'}. Gain and limiter move no sample in time, so times measured on 'spoken' hold for 'clip'."""
     raw, timings = eng.speak(spoken, voice, speed)
     clip, onset, offset, shift = trim_clip(raw)
     model = None
@@ -782,12 +903,14 @@ def speak_sentence(eng, text, spoken, voice, speed):
         words = words_from_timings(timings, N.words_of(spoken), lambda w: eng.word_phonemes(w, voice))
         if len(words) == len(N.words_of(text)):
             model = [None if w is None else (w[0] - shift, w[1] - shift) for w in words]
-    return {"clip": clip, "onset": onset, "offset": offset, "model": model, "raw_level": speech_level(clip)}
+    return {"spoken": clip, "clip": clip, "onset": onset, "offset": offset, "model": model,
+            "raw_level": speech_level(clip)}
 
 
 def synthesise(eng, norm, log=print):
-    """Speak every sentence of a normalised spec: a list of speak_sentence() dicts, levelled and limited to the
-    delivery loudness (independently of the pauses), and the loudness report."""
+    """Speak every sentence of a normalised spec: a list of speak_sentence() dicts whose 'clip' is levelled and
+    limited to the delivery loudness (independently of the pauses) while 'spoken' stays as the voice made it,
+    and the loudness report."""
     clips = []
     for i, line in enumerate(norm["lines"]):
         t = time.time()
@@ -833,7 +956,8 @@ def synthesise(eng, norm, log=print):
     for c, y in zip(clips, out):
         c["clip"] = y
         c["level"] = speech_level(y)
-    report = {"target_lufs": TARGET_LUFS, "before_lufs": round(lufs0, 2), "before_true_peak_db": round(tp0, 2),
+    report = {"target_lufs": round(TARGET_LUFS, 2), "programme_target_lufs": PROGRAMME_LUFS,
+              "max_true_peak_db": MAX_TRUE_PEAK, "before_lufs": round(lufs0, 2), "before_true_peak_db": round(tp0, 2),
               "gain_db": round(gain, 2), "limiter_ceiling_db": round(ceiling, 2),
               "max_gain_reduction_db": round(-db(float(allg.min())), 2),
               "share_limited_over_1db": round(float(np.mean(allg < 10 ** (-1 / 20.0))), 4),
@@ -865,6 +989,51 @@ def layout(norm, clips):
     return out, spans, duration
 
 
+def clear_onsets(audio, sr=SR, quiet=0.100, clear_db=CLEAR_DB):
+    """Every time the voice comes back CLEARLY in a finished audio file: the start of each 10 ms frame within
+    `clear_db` of the file's loudest frame that follows at least `quiet` seconds without such a frame (the file's
+    beginning counts as quiet). No model, no recogniser and none of the narrator's word times are involved: this
+    is what the json's word starts are checked against, in the delivered wav and in the encoded mp4."""
+    rms, hop = frame_rms(audio, sr)
+    if len(rms) == 0 or rms.max() <= 0:
+        return np.zeros(0)
+    loud = np.flatnonzero(rms >= rms.max() * 10 ** (clear_db / 20.0)) * hop
+    if len(loud) == 0:
+        return loud
+    first = np.concatenate([[True], np.diff(loud) >= quiet])
+    return loud[first]
+
+
+def after_silence(words, quiet=0.100):
+    """Indices of the words (dicts or objects with start / end) that start after `quiet` seconds or more without a
+    word: the first word, the first word of every sentence, every word after a pause inside a sentence."""
+    get = (lambda w, k: w[k]) if words and isinstance(words[0], dict) else getattr
+    return [i for i, w in enumerate(words) if i == 0 or get(w, "start") - get(words[i - 1], "end") >= quiet - 1e-6]
+
+
+def check_onsets(words, audio, sr=SR, quiet=0.100):
+    """The word starts of a narration against its delivered audio: for every word that starts after a silence, how
+    long after its `start` the voice is clearly audible (clear_onsets; the nearest one from 250 ms before to 450 ms
+    after). Returns {'words', 'median_ms', 'min_ms', 'max_ms', 'within_1_frame', 'within_2_frames', 'not_found',
+    'rows': [(word index, text, start, clearly audible or None)], 'far': rows more than 2 frames off}."""
+    on = clear_onsets(audio, sr, quiet)
+    get = (lambda w, k: w[k]) if words and isinstance(words[0], dict) else getattr
+    rows = []
+    for i in after_silence(words, quiet):
+        t = get(words[i], "start")
+        near = on[(on >= t - 0.25) & (on <= t + 0.45)]
+        rows.append((i, get(words[i], "text"), round(float(t), 4),
+                     round(float(near[np.argmin(np.abs(near - t))]), 4) if len(near) else None))
+    d = np.array([r[3] - r[2] for r in rows if r[3] is not None]) * 1000.0
+    out = {"words": len(rows), "not_found": sum(r[3] is None for r in rows), "rows": rows,
+           "far": [r for r in rows if r[3] is not None and abs(r[3] - r[2]) > 2 * FRAME + 1e-6]}
+    if len(d):
+        out.update(median_ms=round(float(np.median(d)), 1), min_ms=round(float(d.min()), 1), max_ms=round(float(d.max()), 1),
+                   within_1_frame=int(np.sum(np.abs(d) <= 1000 * FRAME + 1e-6)),
+                   within_2_frames=int(np.sum(np.abs(d) <= 2000 * FRAME + 1e-6)))
+    return out
+
+
 def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
     """Build the narration of a film from its NARRATION spec. With `voice` / `speed` the result is a listening
     copy under out/test (the committed narration always follows the film's own spec). Returns the json dict."""
@@ -878,24 +1047,36 @@ def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
             spec["speed"] = speed
     norm = N.normalise(spec)
     name = N.film_name(film)
+    if eng.want_timed and not eng.timed:
+        # (refused, not warned about: timed by the recogniser alone, words inside speech start about 115 ms early
+        # and one pause in four goes to the wrong word, and nothing downstream would show it)
+        raise SystemExit("[narrate] %s is missing in %s: the words cannot be timed from the voice model.\n"
+                         "          Make it once with  $TTS tools/narrate.py --make-timed-model  (needs `pip install onnx`; "
+                         "tools/setup_tts.sh does both),\n          or pass --recogniser-only to time the words with "
+                         "the recogniser alone (several frames less exact)." % (KOKORO_TIMED, MODELS))
     log("[narrate] %s: %d sentences, voice %s, speed %s" % (name, len(norm["lines"]), norm["voice"], norm["speed"]))
+    for i, line in enumerate(norm["lines"]):
+        risky = N.spoken_risks(line["text"])
+        if risky:
+            log("[narrate]   CHECK how sentence %d is said (%s): %s\n[narrate]       %s\n[narrate]       write it in "
+                "words, or respell it with \"say\", if that is not what you mean"
+                % (i, ", ".join("%r is %s" % r for r in risky), line["spoken"], eng.phonemes(line["spoken"], norm["voice"])))
     t_start = time.time()
     clips, loud = synthesise(eng, norm, log)
     if not eng.timed:
-        log("[narrate]   WARNING: %s is missing, the words are timed by the recogniser alone (less exact after "
-            "pauses): run  tools/narrate.py --make-timed-model" % KOKORO_TIMED)
+        log("[narrate]   WARNING: --recogniser-only: the words are timed by the recogniser alone (measured: about "
+            "115 ms early inside speech, one pause in four given to the wrong word)")
     audio, spans, duration = layout(norm, clips)
-    words, sentences, estimated = [], [], []
+    words, sentences, estimated, guarded = [], [], [], []
     for i, (line, c, (s0, s1)) in enumerate(zip(norm["lines"], clips, spans)):
         script = N.words_of(line["text"])
         if eng.timed and c["model"] is None:
             log("[narrate]   sentence %d: the voice was given %d words for %d script words (a respelling in 'say' "
                 "must stay one word): timed by the recogniser" % (i, len(N.words_of(line["spoken"])), len(script)))
-        timed = time_sentence(eng, c["clip"], script, c["onset"], c["offset"], model=c["model"],
-                              second_opinion=second_opinion)
+        timed = time_clip(eng, c, script, second_opinion=second_opinion)     # on the clip AS SPOKEN, never the limited one
         first = len(words)
-        for text, tw in zip(script, timed):
-            entry = {"text": text, "caption": N.caption_form(text),
+        for text, caption, tw in zip(script, N.caption_forms(script), timed):
+            entry = {"text": text, "caption": caption,
                      "start": round(s0 + tw["start"] - c["onset"], 4), "end": round(s0 + tw["end"] - c["onset"], 4),
                      "sentence": i, "source": tw["source"], "estimated": tw["estimated"]}
             if tw.get("second") is not None:                         # the recogniser's start, for the record
@@ -903,6 +1084,9 @@ def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
                 entry["second_source"] = tw["second_source"]
             if tw["estimated"]:
                 estimated.append(len(words))
+            if tw.get("guarded"):
+                lo, hi, used = (round(s0 + v - c["onset"], 4) for v in tw["guarded"])
+                guarded.append({"word": len(words), "text": text, "sound_returns": lo, "clearly_audible": hi, "start": used})
             words.append(entry)
         sentences.append({"index": i, "id": line["id"], "text": line["text"], "spoken": line["spoken"],
                           "start": round(s0, 4), "end": round(s1, 4), "pause_after": line["pause"],
@@ -911,16 +1095,19 @@ def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
         if b["start"] < a["end"]:
             b["start"] = a["end"]
     lufs, tp = loudness(audio)
-    loud.update(integrated_lufs=round(lufs, 2), true_peak_db=round(tp, 2))
+    loud.update(integrated_lufs=round(lufs, 2), true_peak_db=round(tp, 2), programme_lufs=round(lufs + 3.01, 2))
     if tp > MAX_TRUE_PEAK or abs(lufs - TARGET_LUFS) > 0.6:
         log("[narrate]   WARNING: the file measures %.2f LUFS, true peak %.2f dBTP (wanted %.1f +- 0.6, under %.1f)"
             % (lufs, tp, TARGET_LUFS, MAX_TRUE_PEAK))
+    # the word starts against the DELIVERED samples: where the voice is clearly audible after every silence
+    check = check_onsets(words, audio)
     if audition:
         wav = os.path.join(OUT_TEST, "narrate_%s_%s%s.wav" % (name, norm["voice"], "" if not speed else "_x%s" % speed))
     else:
         wav = N.wav_path(name)
     write_wav(wav, audio)
     speech = sum(s1 - s0 for s0, s1 in spans)
+    overall = len(words) / max(spans[-1][1] - spans[0][0], 1e-6)
     data = {
         "film": name, "json_version": JSON_VERSION, "spec_hash": N.spec_hash(norm), "spec": norm,
         "voice": norm["voice"], "lang": eng.lang(norm["voice"]), "speed": norm["speed"],
@@ -928,10 +1115,11 @@ def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
         "duration": round(duration, 6), "frames": int(round(duration * norm["fps"])),
         "lead": norm["lead"], "tail": round(duration - spans[-1][1], 4),
         "speech_seconds": round(speech, 3), "words_per_second_speaking": round(len(words) / speech, 3),
-        "words_per_second_overall": round(len(words) / (spans[-1][1] - spans[0][0]), 3),
+        "words_per_second_overall": round(overall, 3),
         "timing": "model" if eng.timed else "recogniser",
         "loudness": loud, "wav": os.path.basename(wav), "wav_sha1": N.file_sha1(wav),
-        "sentences": sentences, "words": words, "estimated_words": estimated, "tools": eng.versions(),
+        "sentences": sentences, "words": words, "estimated_words": estimated, "guarded_words": guarded,
+        "onset_check": {k: v for k, v in check.items() if k != "rows"}, "tools": eng.versions(),
     }
     js = wav[:-4] + ".json"
     tmp = js + ".part"
@@ -941,11 +1129,40 @@ def narrate(film, eng, voice=None, speed=None, log=print, second_opinion=True):
     os.replace(tmp, js)
     bad = [c for c in (w["caption"] for w in words) if any(ord(ch) > 126 or ord(ch) < 32 for ch in c)]
     log("[narrate] %s: %.2f s (%d frames at %d fps), %d words, %.2f words/s while speaking, %.2f overall; "
-        "%.1f LUFS, true peak %.1f dBTP (limiter took up to %.1f dB); timing by %s, %d words estimated%s; %.0f s"
+        "wav %.1f LUFS mono = %.1f LUFS as the film's dual mono, true peak %.1f dBTP (limiter took up to %.1f dB, "
+        "over 3 dB on %.1f %% of the samples); timing by %s, %d words estimated%s; %.0f s"
         % (name, duration, data["frames"], norm["fps"], len(words), data["words_per_second_speaking"],
-           data["words_per_second_overall"], lufs, tp, loud["max_gain_reduction_db"], data["timing"], len(estimated),
+           overall, lufs, lufs + 3.01, tp, loud["max_gain_reduction_db"], 100 * loud["share_limited_over_3db"],
+           data["timing"], len(estimated),
            (": " + ", ".join("%d %r" % (k, words[k]["text"]) for k in estimated)) if estimated else "",
            time.time() - t_start))
+    # the length against one minute: what the words cost in frames to render
+    room = MINUTE - norm["lead"] - norm["tail"]
+    fit = int(room * overall)
+    if duration > MINUTE + 2.0:
+        log("[narrate]   LENGTH: %.1f s is %.1f s over one minute (%d more frames to render). At this pace (%.2f "
+            "words/s with the pauses) one minute holds about %d words: this script has %d, cut about %d words or "
+            "shorten pauses" % (duration, duration - MINUTE, int(round((duration - MINUTE) * norm["fps"])), overall,
+                                fit, len(words), len(words) - fit))
+    else:
+        log("[narrate]   length: %.1f s; at this pace (%.2f words/s with the pauses) one minute holds about %d words"
+            % (duration, overall, fit))
+    if guarded:
+        log("[narrate]   %d word(s) start where the voice model says, because the first sound after the pause was not "
+            "clearly a word within %d ms (a murmur or a breath): %s"
+            % (len(guarded), round(1000 * ONSET_REACH),
+               ", ".join("%r at %.3f s (sound from %.3f, clear at %.3f)" % (g["text"], g["start"], g["sound_returns"],
+                                                                            g["clearly_audible"]) for g in guarded)))
+    if check.get("median_ms") is not None:
+        log("[narrate]   delivered audio: %d words start after a silence; the voice is clearly audible (%d dB under the "
+            "loudest frame) %.0f ms after the json's start in the median, %.0f .. %.0f ms; %d within one frame, %d "
+            "within two%s" % (check["words"], round(CLEAR_DB), check["median_ms"], check["min_ms"], check["max_ms"],
+                              check["within_1_frame"], check["within_2_frames"],
+                              "" if not check["not_found"] else "; %d not found" % check["not_found"]))
+    if check["far"] or check["not_found"]:
+        log("[narrate]   CHECK these word starts by ear or on a spectrogram, the delivered audio disagrees by more "
+            "than two frames: " + ", ".join("%r json %.3f s, clearly audible %s" % (r[1], r[2], "%.3f s" % r[3] if r[3] is not None else "nowhere near")
+                                            for r in check["far"] + [r for r in check["rows"] if r[3] is None]))
     seconds = [w for w in words if "second" in w and not w["estimated"] and w["second_source"] != "estimated"]
     if seconds:
         d = np.array([w["second"] - w["start"] for w in seconds]) * 1000.0
@@ -1122,8 +1339,7 @@ def paragraph_check(eng, voice, log=print):
             edge_step = max(edge_step, float(step[lo:hi].max()))
     whole = speak_sentence(eng, " ".join(text), " ".join(N.spoken_text(s) for s in text), voice, 1.0)
     words = [w for s in text for w in N.words_of(s)]
-    timed = time_sentence(eng, whole["clip"], words, whole["onset"], whole["offset"], model=whole["model"],
-                          second_opinion=whole["model"] is None)
+    timed = time_clip(eng, whole, words, second_opinion=whole["model"] is None)
     para = {"level": [], "pitch": [], "rate": [], "pauses": []}
     k, prev_end = 0, None
     for s in text:
@@ -1175,16 +1391,22 @@ def _stats(errs):
 
 
 def selftest(eng, voice, part_seconds, log=print):
-    """Timing accuracy on TEST_SENTENCES, one cached record per sentence (out/test/narrate_selftest_<voice>.json),
-    so the command can be run again until everything is done. Four questions:
-      A  natural sentences. The voice model's phoneme timing against the SOUND: after every pause (and at the
-         sentence start) the first sound is measured on the samples, which no model is involved in. Then the
-         final timing (model + energy) against the recogniser's (forced alignment + energy), word by word.
+    """Timing accuracy on TEST_SENTENCES, measured ON THE PATH A FILM TAKES, cached step by step
+    (out/test/narrate_selftest_<voice>.json), so the command can be run again until everything is done.
+      F  the film path. The sentences are spoken as four films of eleven: synthesise() (levelled and limited
+         together to the delivery loudness), layout(), every word timed by time_clip(), exactly as narrate() does.
+         Then two checks no word time of the narrator enters: in the DELIVERED samples of each film, where the
+         voice is clearly audible after every silence (check_onsets) against the word that starts there; and the
+         same sentences timed on the limited delivery clip instead of the spoken one (what the narrator first did,
+         putting words on the murmur of the pauses): the difference must stay small now that word_onset() guards.
+      A  the voice model's phoneme timing against the SOUND, on those films: after every pause (and at the
+         sentence start) the first sound is measured on the samples. Then the final timing (model + energy)
+         against the recogniser's (forced alignment + energy), word by word.
       B  ground truth for the recogniser: the sentence synthesised in pieces of 2-4 words, each cut to its exact
          first and last sound and joined, alternately with NO gap and with a 250 ms gap. Every piece start is
          known to the sample; the recogniser timing must find the first word of each piece there.
-      C  the recogniser run freely over whole files (11 sentences each), its words matched to the script by
-         letters, against the final per-sentence timing.
+      C  the recogniser run freely over each whole delivered film, its words matched to the script by letters,
+         against the final timing.
       D  what the free transcript got wrong (misheard, split or merged words).
       E  who is right where the two timings differ by more than 100 ms inside speech: the sentence is cut at the
          final start of such a word and at the recogniser's, and the recogniser says what it hears on each side."""
@@ -1196,8 +1418,8 @@ def selftest(eng, voice, part_seconds, log=print):
             cache = json.load(f)
     except (OSError, ValueError):
         cache = {}
-    if cache.get("version") != JSON_VERSION:
-        cache = {"version": JSON_VERSION}
+    if cache.get("version") != SELFTEST_VERSION:
+        cache = {"version": SELFTEST_VERSION}
     t0 = time.time()
     rng_cuts = np.random.default_rng(7)
     plans = []
@@ -1217,104 +1439,142 @@ def selftest(eng, voice, part_seconds, log=print):
             json.dump(cache, f, indent=1)
         os.replace(path + ".part", path)
 
-    for idx, (s, cuts) in enumerate(zip(TEST_SENTENCES, plans)):
-        key = "s%02d" % idx
-        if key in cache and cache[key].get("text") == s:
+    def out_of_time():
+        return time.time() - t0 > part_seconds
+
+    # ---- F: the four films, through synthesise() / layout() / time_clip()
+    group = 11
+    n_films = math.ceil(len(TEST_SENTENCES) / group)
+    for g in range(n_films):
+        key = "film%d" % g
+        sents = TEST_SENTENCES[g * group:(g + 1) * group]
+        if key in cache and cache[key].get("texts") == sents:
             continue
-        if time.time() - t0 > part_seconds:
+        if out_of_time():
             break
-        words = N.words_of(s)
-        rec = {"text": s, "words": words}
-        # A: the natural sentence
-        c = speak_sentence(eng, s, N.spoken_text(s), voice, 1.0)
-        final = time_sentence(eng, c["clip"], words, c["onset"], c["offset"], model=c["model"], second_opinion=False)
-        recog = time_by_recogniser(eng, c["clip"], words, c["onset"], c["offset"], free=True)
-        rec["A"] = {
-            "final": [round(w["start"], 4) for w in final], "source": [w["source"] for w in final],
-            "model_raw": [w["model_raw"] for w in final], "estimated": [i for i, w in enumerate(final) if w["estimated"]],
-            "recogniser": [round(w["start"], 4) for w in recog], "recogniser_source": [w["source"] for w in recog],
-            "raw_forced": [w["raw_forced"] for w in recog], "kind": [w["recognised"]["kind"] for w in recog],
-            "pauses": final[0].get("pauses", []), "punctuated": punctuated_words(words),
-            "onset": round(c["onset"], 4), "offset": round(c["offset"], 4)}
-        # B: pieces with known boundaries, timed by the recogniser alone
-        edges = [0] + cuts + [len(words)]
-        firsts, truth, gaps, buf, cur = [], [], [], [], 0.0
-        for p, (a, b) in enumerate(zip(edges, edges[1:])):
-            raw, _t = eng.speak(N.spoken_text(" ".join(words[a:b])), voice, 1.0)
-            rr = sound_runs(raw)
-            x = np.array(raw[int(round(rr[0][0] * SR)):int(round(rr[-1][1] * SR))], dtype=np.float64)
-            nf = int(0.003 * SR)
-            x[:nf] *= np.linspace(0.0, 1.0, nf)
-            x[-nf:] *= np.linspace(1.0, 0.0, nf)
-            gap = 0.0 if (p == 0 or p % 2 == 1) else 0.25           # pieces 1, 3, ... butt against the one before
-            if p:
-                buf.append(np.zeros(int(round(gap * SR))))
-                cur += int(round(gap * SR)) / SR
-            truth.append(cur)
-            gaps.append(gap)
-            buf.append(x)
-            cur += len(x) / SR
-            firsts.append(a)
-        joined = np.concatenate([np.zeros(int(PRE * SR))] + buf + [np.zeros(int(POST * SR))])
-        t_b = time_by_recogniser(eng, joined, words, PRE, PRE + cur)
-        rec["B"] = {"first_words": firsts, "gap": gaps, "truth": [round(PRE + t, 4) for t in truth],
-                    "recogniser": [round(t_b[a]["start"], 4) for a in firsts],
-                    "raw_forced": [t_b[a]["raw_forced"] for a in firsts], "source": [t_b[a]["source"] for a in firsts]}
-        cache[key] = rec
+        norm = N.normalise({"voice": voice, "lines": sents})
+        clips, loud = synthesise(eng, norm, log=lambda *_: None)
+        audio, spans, _dur = layout(norm, clips)
+        film_words, per = [], []
+        for s, c, (s0, _s1) in zip(sents, clips, spans):
+            words = N.words_of(s)
+            final = time_clip(eng, c, words, second_opinion=False)
+            # the same sentence timed on the limited delivery clip: NOT the film path, the robustness check
+            limited = time_sentence(eng, c["clip"], words, c["onset"], c["offset"], model=c["model"], second_opinion=False)
+            per.append({"text": s, "words": words, "span_start": round(s0, 4),
+                        "final": [round(w["start"], 4) for w in final], "end": [round(w["end"], 4) for w in final],
+                        "source": [w["source"] for w in final], "model_raw": [w["model_raw"] for w in final],
+                        "estimated": [i for i, w in enumerate(final) if w["estimated"]],
+                        "guarded": {str(i): w["guarded"] for i, w in enumerate(final) if w.get("guarded")},
+                        "pauses": final[0].get("pauses", []), "punctuated": punctuated_words(words),
+                        "onset": round(c["onset"], 4), "offset": round(c["offset"], 4),
+                        "on_limited_clip": [round(w["start"], 4) for w in limited],
+                        "runs_spoken": len(sound_runs(c["spoken"])), "runs_limited": len(sound_runs(c["clip"]))})
+            film_words += [{"text": t, "start": s0 + w["start"] - c["onset"], "end": s0 + w["end"] - c["onset"]}
+                           for t, w in zip(words, final)]
+        check = check_onsets(film_words, audio)
+        lufs, tp = loudness(audio)
+        wav = os.path.join(OUT_TEST, "narrate_selftest_%s_film%d.wav" % (voice, g))
+        write_wav(wav, audio)
+        cache[key] = {"texts": sents, "sentences": per, "wav": os.path.basename(wav),
+                      "starts": [round(w["start"], 4) for w in film_words],
+                      "loudness": dict(loud, integrated_lufs=round(lufs, 2), true_peak_db=round(tp, 2)),
+                      "onset_check": check}
         save()
-        log("  %2d/%d %5.1f s  %s" % (idx + 1, len(TEST_SENTENCES), time.time() - t0, s))
+        log("  film %d/%d  %5.1f s  %d sentences, %.1f LUFS, limiter up to %.1f dB" % (g + 1, n_films, time.time() - t0, len(sents), lufs, loud["max_gain_reduction_db"]))
+    films = [cache.get("film%d" % g) for g in range(n_films)]
+    films = [f for f in films if f]
+    finals = [d for f in films for d in f["sentences"]]             # one record per sentence, in order
+
+    # ---- A (recogniser part) and B, per sentence
+    if len(films) == n_films:
+        for idx, (s, cuts) in enumerate(zip(TEST_SENTENCES, plans)):
+            key = "s%02d" % idx
+            if key in cache and cache[key].get("text") == s:
+                continue
+            if out_of_time():
+                break
+            words = N.words_of(s)
+            rec = {"text": s, "words": words}
+            c = speak_sentence(eng, s, N.spoken_text(s), voice, 1.0)        # the same samples as in the film (deterministic)
+            recog = time_by_recogniser(eng, c["spoken"], words, c["onset"], c["offset"], free=True)
+            rec["R"] = {"recogniser": [round(w["start"], 4) for w in recog], "recogniser_source": [w["source"] for w in recog],
+                        "raw_forced": [w["raw_forced"] for w in recog], "kind": [w["recognised"]["kind"] for w in recog]}
+            # B: pieces with known boundaries, timed by the recogniser alone
+            edges = [0] + cuts + [len(words)]
+            firsts, truth, gaps, buf, cur = [], [], [], [], 0.0
+            for p, (a, b) in enumerate(zip(edges, edges[1:])):
+                raw, _t = eng.speak(N.spoken_text(" ".join(words[a:b])), voice, 1.0)
+                rr = sound_runs(raw)
+                x = np.array(raw[int(round(rr[0][0] * SR)):int(round(rr[-1][1] * SR))], dtype=np.float64)
+                nf = int(0.003 * SR)
+                x[:nf] *= np.linspace(0.0, 1.0, nf)
+                x[-nf:] *= np.linspace(1.0, 0.0, nf)
+                gap = 0.0 if (p == 0 or p % 2 == 1) else 0.25           # pieces 1, 3, ... butt against the one before
+                if p:
+                    buf.append(np.zeros(int(round(gap * SR))))
+                    cur += int(round(gap * SR)) / SR
+                truth.append(cur)
+                gaps.append(gap)
+                buf.append(x)
+                cur += len(x) / SR
+                firsts.append(a)
+            joined = np.concatenate([np.zeros(int(PRE * SR))] + buf + [np.zeros(int(POST * SR))])
+            t_b = time_by_recogniser(eng, joined, words, PRE, PRE + cur)
+            rec["B"] = {"first_words": firsts, "gap": gaps, "truth": [round(PRE + t, 4) for t in truth],
+                        "recogniser": [round(t_b[a]["start"], 4) for a in firsts],
+                        "raw_forced": [t_b[a]["raw_forced"] for a in firsts], "source": [t_b[a]["source"] for a in firsts]}
+            cache[key] = rec
+            save()
+            log("  %2d/%d %5.1f s  %s" % (idx + 1, len(TEST_SENTENCES), time.time() - t0, s))
     done = [cache.get("s%02d" % i) for i in range(len(TEST_SENTENCES))]
     done = [d for d in done if d]
-    group = 11
-    n_files = math.ceil(len(TEST_SENTENCES) / group)
-    if len(done) == len(TEST_SENTENCES):
-        for g in range(0, len(TEST_SENTENCES), group):
-            key = "file%d" % (g // group)
+
+    # ---- C: the recogniser, freely, over each delivered film
+    if len(films) == n_films and len(done) == len(TEST_SENTENCES):
+        for g, f in enumerate(films):
+            key = "whole%d" % g
             if key in cache:
                 continue
-            if time.time() - t0 > part_seconds:
+            if out_of_time():
                 break
-            sents = TEST_SENTENCES[g:g + group]
-            norm = N.normalise({"voice": voice, "lines": sents})
-            clips, _loud = synthesise(eng, norm, log=lambda *_: None)
-            audio, spans, _dur = layout(norm, clips)
-            words = [w for s in sents for w in N.words_of(s)]
+            audio = read_audio(os.path.join(OUT_TEST, f["wav"]), SR)
+            words = [w for d in f["sentences"] for w in d["words"]]
             heard = eng.recognise(resample(audio, SR, 16000))
-            ht = from_recognition(words, heard, spans[0][0], spans[-1][1])
-            snapped, _on, _p = snap_to_sound([[a, b] for a, b, _k in ht], sound_runs(audio), punctuated=punctuated_words(words))
-            per = []
-            for s, c, (s0, _s1) in zip(sents, clips, spans):
-                timed = time_sentence(eng, c["clip"], N.words_of(s), c["onset"], c["offset"], model=c["model"], second_opinion=False)
-                per += [round(s0 + w["start"] - c["onset"], 4) for w in timed]
-            cache[key] = {"final": per, "whole_file": [round(a, 4) for a, _b in snapped],
+            runs = sound_runs(audio, rel_db=CLEAR_DB)
+            ht = from_recognition(words, heard, runs[0][0], runs[-1][1])
+            snapped, _on, _p, _g = snap_to_sound([[a, b] for a, b, _k in ht], runs, punctuated=punctuated_words(words))
+            cache[key] = {"whole_file": [round(a, 4) for a, _b in snapped],
                           "whole_file_raw": [round(a, 4) for a, _b, _k in ht], "kind": [k for _a, _b, k in ht],
                           "heard": " ".join(h[0] for h in heard), "script": " ".join(words)}
             save()
-            log("  whole file %d/%d  %5.1f s" % (g // group + 1, n_files, time.time() - t0))
-    files = [cache[k] for k in sorted(cache) if k.startswith("file")]
-    # E: who is right where the two timings disagree inside speech? Cut the sentence at each of the two starts of
-    # such a word and let the recogniser say what it hears on either side: with the cut in the right place the
-    # audio before it ends with the whole word before, and the audio after it begins with the word itself.
+            log("  whole film %d/%d  %5.1f s" % (g + 1, n_films, time.time() - t0))
+    wholes = [cache[k] for k in ("whole%d" % g for g in range(n_films)) if k in cache]
+
+    # ---- E: who is right where the two timings disagree inside speech? Cut the sentence at each of the two
+    # starts of such a word and let the recogniser say what it hears on either side: with the cut in the right
+    # place the audio before it ends with the whole word before, and the audio after it begins with the word.
     gating_done = False
-    if len(done) == len(TEST_SENTENCES) and len(files) == n_files:
-        disputed = [(idx, i) for idx, d in enumerate(done) for i in range(1, len(d["words"]))
-                    if d["A"]["source"][i] == "model" and abs(d["A"]["recogniser"][i] - d["A"]["final"][i]) > 0.10]
+    if len(films) == n_films and len(done) == len(TEST_SENTENCES) and len(wholes) == n_films:
+        disputed = [(idx, i) for idx, (d, fd) in enumerate(zip(done, finals)) for i in range(1, len(d["words"]))
+                    if fd["source"][i] == "model" and abs(d["R"]["recogniser"][i] - fd["final"][i]) > 0.10]
         pick = disputed[::max(1, len(disputed) // 16)][:16]
         gate = cache.setdefault("gating", {"disputed": len(disputed), "cuts": {}})
+        gate["disputed"] = len(disputed)
         for idx, i in pick:
             key = "%d:%d" % (idx, i)
             if key in gate["cuts"]:
                 continue
-            if time.time() - t0 > part_seconds:
+            if out_of_time():
                 break
-            d = done[idx]
+            d, fd = done[idx], finals[idx]
             c = speak_sentence(eng, d["text"], N.spoken_text(d["text"]), voice, 1.0)
             res = {"word": d["words"][i], "before": d["words"][i - 1],
-                   "difference_ms": round(1000 * (d["A"]["recogniser"][i] - d["A"]["final"][i]))}
-            for name, t in (("model", d["A"]["final"][i]), ("recogniser", d["A"]["recogniser"][i])):
+                   "difference_ms": round(1000 * (d["R"]["recogniser"][i] - fd["final"][i]))}
+            for name, t in (("model", fd["final"][i]), ("recogniser", d["R"]["recogniser"][i])):
                 k = int(round(t * SR))
                 nf = int(0.004 * SR)
-                a, b = np.array(c["clip"][:k]), np.array(c["clip"][k:])
+                a, b = np.array(c["spoken"][:k]), np.array(c["spoken"][k:])
                 a[-nf:] *= np.linspace(1.0, 0.0, nf)
                 b[:nf] *= np.linspace(0.0, 1.0, nf)
                 pad = np.zeros(int(0.2 * SR))
@@ -1326,38 +1586,47 @@ def selftest(eng, voice, part_seconds, log=print):
             gate["cuts"][key] = res
             save()
             log("  cut %d/%d  %5.1f s  %r" % (len(gate["cuts"]), len(pick), time.time() - t0, res["word"]))
-        gating_done = len(gate["cuts"]) >= len(pick)
-    if len(done) < len(TEST_SENTENCES) or len(files) < n_files or not gating_done:
-        log("[narrate] selftest: %d of %d sentences, %d of %d files, cuts %s; run the same command again to continue"
-            % (len(done), len(TEST_SENTENCES), len(files), n_files, "done" if gating_done else "not done"))
+        gating_done = all("%d:%d" % k in gate["cuts"] for k in pick)
+    if len(films) < n_films or len(done) < len(TEST_SENTENCES) or len(wholes) < n_films or not gating_done:
+        log("[narrate] selftest: %d of %d films, %d of %d sentences, %d of %d whole-film recognitions, cuts %s; "
+            "run the same command again to continue"
+            % (len(films), n_films, len(done), len(TEST_SENTENCES), len(wholes), n_films, "done" if gating_done else "not done"))
         return None
+
     # ---- report
     n_words = sum(len(d["words"]) for d in done)
-    estimated, kinds, misheard = 0, {}, []
+    estimated, kinds, misheard, guarded = 0, {}, [], []
     onset_model, onset_forced, a_all, a_mid, a_onset, first_model = [], [], [], [], [], []
     pauses_total, pauses_punct, pauses_unassigned = 0, 0, 0
-    for d in done:
-        A = d["A"]
-        estimated += len(A["estimated"])
-        for _g0, _g1, b in A["pauses"]:
+    moved, runs_changed, after_pause = [], 0, 0
+    for d, fd in zip(done, finals):
+        R = d["R"]
+        estimated += len(fd["estimated"])
+        runs_changed += fd["runs_spoken"] != fd["runs_limited"]
+        for i, g in fd["guarded"].items():
+            guarded.append("%s (sound from %.3f, clear at %.3f, starts %.3f) in %r" % (d["words"][int(i)], g[0], g[1], g[2], d["text"][:32]))
+        for _g0, _g1, b in fd["pauses"]:
             pauses_total += 1
             pauses_unassigned += b is None
-            pauses_punct += b is not None and b in A["punctuated"]
+            pauses_punct += b is not None and b in fd["punctuated"]
         for i, w in enumerate(d["words"]):
-            kinds[A["kind"][i]] = kinds.get(A["kind"][i], 0) + 1
-            if A["kind"][i] != "exact":
-                misheard.append("%s (%s)" % (N.caption_form(w), A["kind"][i]))
-            a_all.append(A["recogniser"][i] - A["final"][i])
+            kinds[R["kind"][i]] = kinds.get(R["kind"][i], 0) + 1
+            if R["kind"][i] != "exact":
+                misheard.append("%s (%s)" % (N.caption_form(w), R["kind"][i]))
+            a_all.append(R["recogniser"][i] - fd["final"][i])
+            if abs(fd["on_limited_clip"][i] - fd["final"][i]) > 0.020:
+                moved.append("%s %+d ms" % (N.caption_form(w), round(1000 * (fd["on_limited_clip"][i] - fd["final"][i]))))
             if i == 0:                                               # the sentence start: nothing precedes it, the
-                if A["model_raw"][i] is not None:                    # model's first phoneme against the first sound
-                    first_model.append(A["model_raw"][i] - A["final"][i])
-            elif A["source"][i] == "energy":                         # final[i] IS the measured onset of the sound
-                if A["model_raw"][i] is not None:
-                    onset_model.append(A["model_raw"][i] - A["final"][i])
-                onset_forced.append(A["raw_forced"][i] - A["final"][i])
-                a_onset.append(A["recogniser"][i] - A["final"][i])
+                if fd["model_raw"][i] is not None:                   # model's first phoneme against the first sound
+                    first_model.append(fd["model_raw"][i] - fd["final"][i])
+            elif fd["source"][i] == "energy":                        # final[i] IS the measured onset of the sound
+                after_pause += 1
+                if fd["model_raw"][i] is not None:
+                    onset_model.append(fd["model_raw"][i] - fd["final"][i])
+                onset_forced.append(R["raw_forced"][i] - fd["final"][i])
+                a_onset.append(R["recogniser"][i] - fd["final"][i])
             else:
-                a_mid.append(A["recogniser"][i] - A["final"][i])
+                a_mid.append(R["recogniser"][i] - fd["final"][i])
     b_butt, b_gap, b_raw_butt, b_raw_gap = [], [], [], []
     for d in done:
         B = d["B"]
@@ -1366,14 +1635,35 @@ def selftest(eng, voice, part_seconds, log=print):
             (b_gap if B["gap"][p] > 0 else b_butt).append(e)
             (b_raw_gap if B["gap"][p] > 0 else b_raw_butt).append(r)
     c_diff, c_raw, c_kinds = [], [], {}
-    for f in files:
-        c_diff += [w - p for w, p in zip(f["whole_file"], f["final"])]
-        c_raw += [w - p for w, p in zip(f["whole_file_raw"], f["final"])]
-        for k in f["kind"]:
+    for f, w in zip(films, wholes):
+        c_diff += [x - p for x, p in zip(w["whole_file"], f["starts"])]
+        c_raw += [x - p for x, p in zip(w["whole_file_raw"], f["starts"])]
+        for k in w["kind"]:
             c_kinds[k] = c_kinds.get(k, 0) + 1
+    # the delivered audio of the four films: json start -> clearly audible, for every word after a silence
+    rows = [r for f in films for r in f["onset_check"]["rows"]]
+    found = np.array([r[3] - r[2] for r in rows if r[3] is not None])
+    delivered = {"words_after_a_silence": len(rows), "not_found": sum(r[3] is None for r in rows)}
+    if len(found):
+        delivered.update(clearly_audible_after_json_start_ms={"median": round(1000 * float(np.median(found)), 1),
+                                                              "min": round(1000 * float(found.min()), 1),
+                                                              "max": round(1000 * float(found.max()), 1)},
+                         within_1_frame=int(np.sum(np.abs(found) <= FRAME + 1e-6)),
+                         within_2_frames=int(np.sum(np.abs(found) <= 2 * FRAME + 1e-6)),
+                         more_than_2_frames=["%s json %.3f, audible %.3f" % (r[1], r[2], r[3]) for r in rows
+                                             if r[3] is not None and abs(r[3] - r[2]) > 2 * FRAME + 1e-6])
     report = {
         "voice": voice, "sentences": len(done), "words": n_words, "estimated_words_in_final_timing": estimated,
-        "pauses_inside_sentences": {"found": pauses_total, "at_punctuation": pauses_punct, "given_to_no_word": pauses_unassigned},
+        "F_films": [{"sentences": len(f["texts"]), "integrated_lufs": f["loudness"]["integrated_lufs"],
+                     "true_peak_db": f["loudness"]["true_peak_db"], "limiter_max_db": f["loudness"]["max_gain_reduction_db"],
+                     "limited_over_1db": f["loudness"]["share_limited_over_1db"],
+                     "limited_over_3db": f["loudness"]["share_limited_over_3db"]} for f in films],
+        "F_delivered_audio_word_starts_vs_clearly_audible": delivered,
+        "F_words_guarded_against_a_murmur": guarded,
+        "F_if_timed_on_the_limited_clip": {"sentences_whose_sound_runs_differ": runs_changed,
+                                           "word_starts_that_would_move_over_20ms": moved},
+        "pauses_inside_sentences": {"found": pauses_total, "at_punctuation": pauses_punct, "given_to_no_word": pauses_unassigned,
+                                    "words_started_on_the_measured_sound": after_pause},
         "A_model_vs_measured_onset_after_pauses": _stats(onset_model),
         "A_model_first_phoneme_vs_first_sound_of_sentence": _stats(first_model),
         "A_raw_forced_alignment_vs_measured_onset_after_pauses": _stats(onset_forced),
@@ -1402,11 +1692,13 @@ def selftest(eng, voice, part_seconds, log=print):
     log("[narrate] selftest report -> %s" % os.path.relpath(out, ROOT))
     m = report["A_model_vs_measured_onset_after_pauses"]
     ok = (estimated == 0 and pauses_unassigned == 0 and m["n"] > 0 and m["within_2_frames"] >= 0.9
+          and delivered["not_found"] == 0 and not delivered.get("more_than_2_frames")
           and report["E_cut_at_model_start"]["both"] >= report["E_cut_at_recogniser_start"]["both"])
     log("[narrate] selftest %s" % ("passed" if ok else "FAILED its limits (no estimated word; every pause inside a "
-        "sentence given to a word, so that the word after it starts on the measured sound; the model's own timing "
-        "within two frames of that sound for 90 % of them; cutting at the model's word starts leaves at least as "
-        "many words whole as cutting at the recogniser's)"))
+        "sentence given to a word; the model's own timing within two frames of the measured sound for 90 % of the "
+        "words after a pause; in the delivered audio every word after a silence within two frames of where the "
+        "voice is clearly audible; cutting at the model's word starts leaves at least as many words whole as "
+        "cutting at the recogniser's)"))
     return report if ok else False
 
 
@@ -1423,10 +1715,12 @@ def hear(eng, path, film=None, log=print):
     if film:
         norm = N.normalise(N.read_spec(film))
         words = [w for line in norm["lines"] for w in N.words_of(line["text"])]
-        runs = sound_runs(audio)
+        # (a finished file is levelled and limited: its silences are judged at CLEAR_DB, where the voice is clearly
+        #  audible, not at SILENCE_DB, which the murmur in its pauses can reach once the peaks are lower)
+        runs = sound_runs(audio, rel_db=CLEAR_DB)
         lo, hi = (runs[0][0], runs[-1][1]) if runs else (0.0, len(audio) / SR)
         ht = from_recognition(words, heard, lo, hi)
-        snapped, on_sound, _p = snap_to_sound([[a, b] for a, b, _k in ht], runs, punctuated=punctuated_words(words))
+        snapped, on_sound, _p, _g = snap_to_sound([[a, b] for a, b, _k in ht], runs, punctuated=punctuated_words(words))
         fixed, _spread = repair(snapped, words, lo, hi)
         out["film"] = N.film_name(film)
         out["words"] = [{"text": w, "caption": N.caption_form(w), "start": round(t[0], 4), "end": round(t[1], 4),

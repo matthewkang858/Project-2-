@@ -74,7 +74,22 @@ SHOTS = {
     "shallow": dict(film="poppy_day", frame=170, border=(0.0, 0.25, 1.0, 0.60),
                     details=[(0.22, 0.42), (0.52, 0.44)],
                     what="two faces and the poppy, shallow focus, blurred foreground and background"),
+    "face": dict(film="nitwit", frame=78, border=(0.0, 0.20, 1.0, 0.55),
+                 details=[(0.44, 0.39), (0.86, 0.55)],
+                 what="the nitwit's portrait, 66 mm f/2.6: a face in focus, grass blades in front, blurred village"),
 }
+
+# Centres (fractions of the frame from the top left) of the 1:1 crops of the quality study, per shot:
+# a face, a texture with fine texels, a thin thing, a defocused background and a dark area.
+CROPS = {
+    "dusk": dict(face=(0.35, 0.45), texels=(0.62, 0.57), thin=(0.44, 0.385), defocus=(0.25, 0.27), dark=(0.06, 0.53)),
+    "hall": dict(face=(0.57, 0.46), texels=(0.84, 0.50), thin=(0.22, 0.11), defocus=(0.15, 0.45), dark=(0.14, 0.69)),
+    "sun": dict(face=(0.40, 0.37), texels=(0.30, 0.90), thin=(0.80, 0.60), defocus=(0.80, 0.28), dark=(0.30, 0.56)),
+    "night": dict(face=(0.58, 0.48), texels=(0.22, 0.74), thin=(0.20, 0.30), defocus=(0.87, 0.60), dark=(0.07, 0.56)),
+    "face": dict(face=(0.44, 0.39), texels=(0.42, 0.56), thin=(0.87, 0.55), defocus=(0.30, 0.12), dark=(0.10, 0.42)),
+    "shallow": dict(face=(0.21, 0.42), texels=(0.50, 0.66), thin=(0.50, 0.43), defocus=(0.50, 0.10), dark=(0.50, 0.93)),
+}
+CROP_NAMES = ("face", "texels", "thin", "defocus", "dark")
 
 
 def _v(res=None, samples=None, cycles=None, render=None, special=None, min_samples=None, fresh=False, note=""):
@@ -94,6 +109,9 @@ VARIANTS = {
     "r600": _v(res=(600, 1066)), "r540": _v(res=(540, 960)),
     "r600s16": _v(res=(600, 1066), samples=16), "r600s12": _v(res=(600, 1066), samples=12),
     "r540s16": _v(res=(540, 960), samples=16), "r540s12": _v(res=(540, 960), samples=12),
+    "r640s16": _v(res=(640, 1138), samples=16), "r480s16": _v(res=(480, 854), samples=16),
+    "r540s16_fw": _v(res=(540, 960), samples=16, cycles=dict(filter_width=1.0),
+                     note="narrower pixel filter (1.0 px instead of 1.3) for the 2x upscale"),
     # --- adaptive sampling
     "ad_off": _v(cycles=dict(use_adaptive_sampling=False), note="every pixel takes all 24 samples"),
     "ad_005": _v(cycles=dict(adaptive_threshold=0.05)),
@@ -152,6 +170,13 @@ GROUPS = {
     "lt_off": [("lt_off", (0,), True)], "nomb": [("nomb", (0,), True)], "bvh2": [("bvh2", (0,), True)],
     "bvh_static": [("bvh_static", (0,), True)], "spatial": [("spatial", (0,), True)],
     "threads": [("base", (0,), True)],            # run with --threads 1 / 2 / 4: CPU seconds per thread count
+    # ---- the quality study (second pass): the candidates A-E of the brief, cheapest first; the reference is the
+    # finished film's own frame on disk (bit-identical to a 'base' job: see ref_path)
+    "cand": [(v, (0,), False) for v in ("r540s16", "r600s16", "r540", "r640s16", "s16")],
+    "probe": [(v, (0,), False) for v in ("r540s12", "r480s16", "r540s16_fw")],   # cheaper still: where does it break?
+    "floor": [("base", (1,), False)],             # the reference with another noise seed: the noise floor
+    "floor_e": [("r540s16", (1,), False)],
+    "remeasure": [("r540s16", (0,), False), ("base", (0,), False)],   # timing check of the first pass (exact threads)
 }
 
 RECOMMENDED = "r540s16"       # set after the measurements: see FINDINGS
@@ -192,6 +217,17 @@ def _append(rec):
     os.makedirs(RAW, exist_ok=True)
     with open(RESULTS, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec) + "\n")
+
+
+def find_job(shot, variant, seed=0, border=False, tag="", res=None):
+    """The record of a finished job whose PNG exists, whatever thread count rendered it (Cycles gives the same
+    picture with 2 or 4 threads: checked by the self-test), or None."""
+    res = load_results() if res is None else res
+    for t in (2, 4, 1, 3):
+        rec = res.get(job_key(shot, variant, seed, border, t, tag))
+        if rec is not None and os.path.exists(os.path.join(ROOT, rec["path"])):
+            return rec
+    return None
 
 
 def project(seconds_per_frame, frames=FILM_FRAMES):
@@ -399,6 +435,8 @@ def run(shot, group, budget=200.0, threads=4):
     for variant, seeds, border in GROUPS[group]:
         for seed in seeds:
             key = job_key(shot, variant, seed, border, threads)
+            if group != "remeasure" and find_job(shot, variant, seed, border, res=done) is not None:
+                continue                                    # rendered before, with whatever thread count
             if key not in done or not os.path.exists(job_path(key)):
                 jobs.append((variant, seed, border, key))
     if not jobs:
@@ -438,6 +476,51 @@ def run(shot, group, budget=200.0, threads=4):
                  rec["trace_wall"], rec["comp_cpu"], rec["save"], rec["load"]), flush=True)
     if hold:
         restore(hold)
+    return 0
+
+
+SEQ_FRAMES = 8                # consecutive frames of the temporal study: frames F-3 .. F+4 around SHOTS[...]['frame']
+
+
+def seq_frames(shot):
+    """The 8 consecutive frame numbers of a shot's temporal sequence."""
+    f = SHOTS[shot]["frame"]
+    return list(range(f - 3, f - 3 + SEQ_FRAMES))
+
+
+def seq_tag(frame, animated=False):
+    """Job tag of one frame of a sequence ('q0021'; 'a0021' when the noise seed follows the frame number)."""
+    return "%s%04d" % ("a" if animated else "q", frame)
+
+
+def run_seq(shot, variants, budget=200.0, threads=2, animated=False):
+    """Render the missing frames of the 8-frame sequences of one shot for the given variants (noise seed 0 on
+    every frame, as render.py renders a film; animated=True: seed = frame number). Resumable."""
+    t_start = time.time()
+    done = load_results()
+    jobs = []
+    for variant in variants:
+        for f in seq_frames(shot):
+            seed = f if animated else 0
+            if find_job(shot, variant, seed, False, seq_tag(f, animated), res=done) is None:
+                jobs.append((variant, f, seed))
+    if not jobs:
+        print("[econ] %s sequences %s: nothing to do" % (shot, ",".join(variants)))
+        return 0
+    print("[econ] %s sequences: %d frames to render" % (shot, len(jobs)), flush=True)
+    ses = _session(shot)
+    _warm(ses, shot, threads)
+    n = 0
+    for variant, f, seed in jobs:
+        if time.time() - t_start > budget:
+            print("[econ] budget used: %d frames left, run the same command again" % (len(jobs) - n), flush=True)
+            break
+        rec = measure(ses, shot, variant, seed, False, threads, frame=f, tag=seq_tag(f, animated))
+        _append(rec)
+        n += 1
+        print("[econ] %-40s %dx%d %2dspp  trace %6.1f cpu-s (%5.1f wall)  load %.1f"
+              % (rec["key"], rec["res"][0], rec["res"][1], rec["samples"], rec["trace_cpu"], rec["trace_wall"],
+                 rec["load"]), flush=True)
     return 0
 
 
@@ -906,6 +989,8 @@ def main(argv):
     for a in it:
         if a in ("--budget", "--threads"):
             opt[a[2:]] = float(next(it))
+        elif a == "--animated":
+            pass
         else:
             rest.append(a)
     if cmd == "list":
@@ -917,7 +1002,10 @@ def main(argv):
         sync_study(rest[0], threads=int(opt.get("threads", 2)))
         return 0
     if cmd == "run":
-        return run(rest[0], rest[1], budget=opt.get("budget", 200.0), threads=int(opt.get("threads", 4)))
+        return run(rest[0], rest[1], budget=opt.get("budget", 200.0), threads=int(opt.get("threads", 2)))
+    if cmd == "seq":
+        return run_seq(rest[0], rest[1].split(","), budget=opt.get("budget", 200.0),
+                       threads=int(opt.get("threads", 2)), animated="--animated" in argv)
     print(__doc__)
     return 1
 

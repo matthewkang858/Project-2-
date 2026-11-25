@@ -1,6 +1,185 @@
-"""COWS and CHICKENS (adults and babies) for the farm films. New module; edits no other file.
+"""COWS and CHICKENS (adults and the 26.x babies) for the farm films: pens, feeding, milking, eggs. New module;
+edits no other file.
 
-(docstring is completed at the end of the build: see PUBLIC API below)
+Everything is transcribed from the Java Edition 26.x client classes (named next to each number below) and drawn with
+the game's own textures through engine.mcassets: entity/cow/cow_temperate[_baby].png and
+entity/chicken/chicken_temperate[_baby].png (the temperate variants, the defaults; the game also has cold and warm
+ones, not built here). Blender axes as everywhere: +X east, +Y north, +Z up, 1 block = 1 unit, animals face -Y at
+yaw 0, 24 fps (the game runs 20 ticks per second: 1 tick = 1.2 frames).
+
+PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, or a camera object: particles face it)
+
+  make_cow(name="cow", baby=False) / make_chicken(name="chicken", baby=False) -> Animal
+      Box for box from CowModel / BabyCowModel / AdultChickenModel / BabyChickenModel (horns, muzzle, udder, comb,
+      beak, wattle, wings, flat feet). Babies are the game's own baby MODELS (26.x), not shrunken adults.
+  add_cow(st, name, baby=False) / add_chicken(st, name, baby=False)
+      The same, registered with a films.lookdev.Stage (st.cast[name]); then st.use(shot, cow), st.hero(shot, "cow", cow).
+
+  Animal (a subclass of engine.characters.Character: root / hips / body / head / legs / wings)
+      place(frame, pos, yaw=0.0)            hard cut to a spot: upright, neutral, alive again (use at shot cuts)
+      show(frame, visible=True)             keyed visibility (Stage.finish calls it)
+      walk(frame, points, speed=None, run=False, from_current=False, gait="planted", swing=None, corner=None,
+           bob=None) -> end frame           along a polyline at the game's strolling speed (cow 1.76 blocks/s,
+                                            chicken 2.75; run=True: the panic speed, cow 7.05, chicken 5.40). It
+                                            gets up to speed and stops by itself (2-frame time constant; the end
+                                            frame is 10 frames after the last push), turns on the spot first if
+                                            it faces another way, and rounds corners (radius cow 1, hen 0.5).
+                                            gait="planted": soles on the ground do not slide (see GAIT);
+                                            gait="vanilla": the game's exact leg wave (the feet slide).
+      turn(frame, yaw, ease=None) / face(frame, target, ease=None) -> end frame
+                                            turn on the spot (10 frames for 45 degrees or more) with stepping legs
+      look_at(frame, target, ease=6) / track(f0, f1, target)
+                                            the head, clamped to the game's 75 degrees of yaw and 40 of pitch.
+                                            target = point / Character / Object (a held item: track(f0, f1, wheat)).
+                                            A CHICK HAS NO HEAD PART: look_at turns its whole body, track does nothing
+      idle(frame_start, frame_end, seed=0, watch=None, rate=1.0)
+                                            standing: the head turns to look somewhere for 1-2 s and comes back, at
+                                            10 degrees per tick (RandomLookAroundGoal); watch = a Character it also
+                                            looks at for 2-4 s while he is within 6 blocks (LookAtPlayerGoal)
+      hurt(frame, attacker=None, knockback=True, max_back=None) -> frame it stands again
+                                            red for 12 frames, thrown 0.96 up and 2.0 back (away from attacker: a
+                                            Character or point), legs flailing; a hen flaps and lands after 20
+                                            frames, 2.35 back. max_back = room behind it in blocks (a fence).
+                                            Then let it run: walk(end, [...], run=True)  (PanicGoal: within 5 blocks)
+      die(frame, camera=None, attacker=None, knockback=True, max_back=None, poof=True, seed=0, village=None)
+                                            -> frame + 24, the frame it is GONE: red and knocked back from `frame`,
+                                            tips over to its left (flat after 16 frames), then vanishes and 20 white
+                                            poof particles rise where it stood. Stays gone until its next place()
+      hop(frame, to=None) / fall(frame, to) -> landing frame
+                                            a jump (apex 1.25: up one block and 1 forward in 11 frames) / stepping
+                                            off an edge. A chicken flaps and sinks at 2.3 blocks/s (2 blocks: 24 frames)
+      Chicken.flap(frame_start, frame_end)  only the wings, as while airborne (hop / fall / hurt call it themselves)
+      eye_point(frame) / mouth_point(frame) middle of the head (what others look at and cameras focus on) / a point
+                                            just in front of the muzzle or beak (hold the food out to there)
+      size (hit box w, h), width, walk_speed, tempt_speed, run_speed, food (item ids), baby, species, kind,
+      last_walk (dict: frames, blocks, steps, swing, cycle_frames, stance ...), bursts (its particle bursts)
+      nod / shake / shiver / flinch (a small hop): inherited; swing_arm / raise_arm do nothing; hold / lie_down raise
+
+  wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None, gait="planted", clearance=None,
+         activity=1.0, watch=None, z=0.0) -> {name: [("stand" | "walk", first frame, last frame, target), ...]}
+      A PEN IN ONE CALL: every animal alternates standing, looking around and short straight walks inside the
+      rectangle area = (x0, y0, x1, y1), each with its own timing. place=True puts them on free spots at
+      frame_start; place=False goes on from where they stand. No body leaves the rectangle or comes closer than
+      its own width (cow 0.75, hen 0.5; clearance=) to another body or the edge, also while both move.
+  pen_area(x0, y0, x1, y1) -> area      the free rectangle inside a ring of fence blocks on those cells
+  make_pen(scene, x0, y0, x1, y1, z=0, gates=[(x, y)], fence="oak_fence", ground=None, name="pen") -> dict
+      Real fence and fence-gate blocks on the ring of cells, as their own little World (the village is not edited);
+      ["area"] is what wander() wants. ground="grass_block" lays a floor under it (not needed on the village's meadow).
+  pen_report(animals, f0, f1, area) -> (smallest gap between two bodies, smallest distance to the edge)
+
+  follow(animal, leader, frame_start, frame_end, stop=2.5, speed=None, look="eyes") -> frame it has come to rest
+      TemptGoal: the animal walks after a player holding its food whenever he is further than 2.5 blocks, at up to
+      its tempted speed (2.75 blocks/s), and keeps its head on him. look="eyes" is the game (his eyes), look=<the
+      item object> or "item" (leader.held) looks at the food instead. Also a calf after its mother:
+      follow(calf, cow, f0, f1, stop=3.0)  (FollowParentGoal: closer than 3 blocks it stays). Key the leader first.
+  hand_item(player, item, frame_start, frame_end=None) -> Object
+      'wheat' (cows), 'wheat_seeds' (chickens), 'bucket' ... in Steve's right hand for those frames only, with the
+      game's item arm pose. Unlike Character.hold it is keyed, so the next shot can show an empty hand.
+  love(animal, frame, camera, frame_end=None, seed=0) -> [Burst]
+      Fed: 7 hearts on `frame`, then one every 12 frames until frame_end (default 3 s; the game 30 s).
+  milk(player, frame, frame_start, frame_end=None) -> (bucket, milk_bucket)
+      Item 'bucket' in his hand from frame_start, his arm swings, and from `frame` it is item 'milk_bucket'.
+  lay_egg(chicken, frame, seed=0, until=None, stage=None) -> engine.mobs DroppedItem
+      Item 'egg' pops out at her feet (hops 0.38 up, lands after 11 frames, lies still 0.3-0.9 block away after
+      18; egg.rest_pos says where), then bobs and spins. Hens lay every 5-10 minutes in the game.
+  drop_loot(animal, frame, items=None, seed=0, stage=None) -> [DroppedItem]
+      On the frame of the killing blow: cow 'beef' x 2 + 'leather', chicken 'chicken' + 'feather' (babies nothing).
+  poof(target, frame, camera, seed=0, size=None, count=20) -> Burst       only the death cloud, for anything
+  knockback_track / air_track / death_angle / hurt_sheet / animal_sheet: the numbers and textures behind the above.
+  Constants: COW_WALK, COW_TEMPT, COW_PANIC, CHICKEN_WALK, CHICKEN_PANIC, CHICK_FOLLOW, COW_FOOD, CHICKEN_FOOD,
+  EGG_ITEM, BUCKET_ITEM, MILK_ITEM, TEMPT_STOP, HURT_FRAMES, DEATH_FRAMES, LOOT, FACTS.
+
+USING THEM IN A FILM (st = films.lookdev.Stage, s = st.shot(...), v = the Village)
+    pen = animals.make_pen(scene, 3, 27, 12, 36, gates=[(7, 27)])        # once; 10 x 10 cells, 8.75 x 8.75 inside
+    cows = [animals.add_cow(st, "cow%d" % i) for i in range(4)] + [animals.add_cow(st, "calf", baby=True)]
+    animals.wander(cows, s.frame_start, s.frame_end + 1, pen["area"], seed=3); st.use(s, *cows)
+    steve.place(f0, spot, yaw); wheat = animals.hand_item(steve, "wheat", f0, s.frame_end + 1)
+    end = animals.follow(daisy, steve, f0, f0 + 50, look=wheat)           # she walks up and stops 2.3 blocks away
+    steve.swing_arm(end + 6); animals.love(daisy, end + 8, camera=s, frame_end=s.frame_end + 1)
+    bucket, full = animals.milk(steve, f0 + 20, f0, s.frame_end + 1)      # in the next shot, after his place()
+    egg = animals.lay_egg(hen, f0 + 14, stage=st); st.use(s, egg)
+    up = hen.hurt(f, attacker=steve, max_back=0.9); hen.walk(up, [hen.pos_at(up), away], run=True)
+    gone = hen.die(f2, camera=s, attacker=steve); animals.drop_loot(hen, f2, stage=st)
+  Rules:
+    - Key every animal in frame order, place() before everything else in a shot. A call replaces what the animal
+      was doing from its frame on (a hurt() in mid-walk stops the walk there).
+    - wander() only knows the animals in its list. Steve, a cow that follows him or a hen that gets hit in the same
+      pen must stay out of the others' way: give wander() a sub-rectangle of the pen. A walk that began before
+      frame_end runs on (up to 65 frames): in the next shot place() them or wander(..., place=False).
+    - Particles (hearts, poof) are world objects with their own lifetimes (hearts 20 frames, poof up to 99, half of
+      it gone after 45): a cut that jumps in time needs engine.fx.stop_particles(first frame of the new shot).
+    - hand_item() / milk() after the player's place(); place() him again only at their frame_end. A held item is a
+      flat sprite along the hand: edge-on from his side, readable from behind his shoulder and from above.
+    - A walk that opens a shot in stride: place() and walk() 12+ frames before the cut (only if the animal is not
+      in the shot before: its place() would cut that shot's action short).
+    - The red flash is a second set of meshes (built on the first hurt / die); never key hide_render on an animal's
+      parts yourself: use show(). st.hero(shot, "hen", hen) is its head (a chick: its body).
+    - make_pen stands the fence on the village's ground as it is: grass tufts and flowers of the meadow stay and
+      poke through a rail here and there; a camera low behind a rail has the fence across the lower half.
+
+SIZES (blocks; hit box in brackets)
+    cow      1.5625 to the horn tips, back 1.375, 0.75 wide, nose 0.94 in front of its feet, rump 0.625 behind
+             [0.9 x 1.4]; eyes 1.25 up.     calf   1.0 to the horn tips, back 0.75, 0.5 wide, 1.06 long [0.45 x 0.7]
+    chicken  0.94 to the top of the head, back 0.69, 0.5 wide over the wings, beak 0.5 in front, tail 0.25 behind
+             [0.4 x 0.7].                    chick  0.375 tall, 0.25 wide, 0.31 long [0.3 x 0.4]
+    Steve is 1.875, a villager 1.99, a fence 1.0 as drawn (1.5 as an obstacle): a cow looks over it, a hen is
+    hidden by the rails from a low camera. In a 10 x 10 cell pen five cows and a calf have room; 8 x 9 cells hold
+    six hens and two chicks easily.
+
+GAIT (QuadrupedModel.setupAnim, ChickenModel.setupAnim, LivingEntity.updateWalkAnimation, WalkAnimationState)
+    The game: legs cos(p * 0.6662 [+ pi]) * 1.4 * s, pairs right hind + left front and left hind + right front
+    (a hen: right, left); s approaches min(4 * blocks moved per tick, 1) and p grows by s every tick (three times
+    as fast for a baby). So a strolling cow swings +-28 degrees once per 2.36 blocks (32 frames) while such a step
+    covers 0.71 block: every sole slides 0.47 block per step. gait="vanilla" is exactly that, no bob.
+    gait="planted" keeps pairs, speed and (about) the game's swing for that speed, and shortens the cycle to what
+    the legs can cover: cow 18 frames, calf 9, hen 7, chick 3 (their legs are 5 and 2 pixels long: a blur at the
+    game's speed in either gait, as in the game; speed=1.2 calms a hen in a close shot). A sole on the ground
+    strays under 0.005 block (measured, also round corners and in turns on the spot, where the legs lean
+    sideways a little to stay put); the swinging pair passes it in the middle of the step. The body sinks up to
+    0.08 block with every step of a cow so that the standing soles stay ON the ground (bob=1); a hen sinks only
+    0.03 and a chick not at all (their feet lift 0.05 / 0.03 block at the ends of a step instead: at 4 steps a
+    second a full bob would make the body tremble).
+    These, the rounded corners and the stepping turn are the module's only departures from the game.
+    Chicken legs are flat in the game (a 1-pixel shank on the back of the leg box, a 3 x 3 foot plate): seen
+    exactly from the side the shank is edge-on and vanishes; a chick's wings are 1-pixel horizontal plates.
+
+WHAT THE GAME DOES (read from the classes; FACTS has the short list)
+  - AbstractCow / Chicken goals: PanicGoal (speed x 2.0 / 1.4), BreedGoal, TemptGoal (x 1.25 with wheat / x 1.0 with
+    seeds: wheat_seeds, melon, pumpkin, beetroot, torchflower seeds, pitcher pod), FollowParentGoal (x 1.25 / 1.1),
+    WaterAvoidingRandomStrollGoal (x 1.0, up to 10 blocks, about once in 6 s), LookAtPlayerGoal (6 blocks),
+    RandomLookAroundGoal. Movement speed attribute 0.2 / 0.25; blocks per second = 20 * (attribute * modifier)^2 /
+    0.454. Babies move as fast as adults. Health: cow 10, chicken 4.
+  - TemptGoal looks at the PLAYER'S EYES, not at the item, comes no closer than 2.5 blocks, and a tempted animal
+    does nothing else. Feeding (use the food on it): hearts (entity event 18), in love for 30 s.
+  - Milking: use a bucket on an adult cow: the bucket becomes a milk bucket at once; no particles, no animation
+    on the cow. A calf cannot be milked.
+  - A hen lays an egg every 5 to 10 minutes; chicks and hens ridden by a baby zombie do not.
+  - A chicken flaps only while it is off the ground ((sin(flap) + 1) * flapSpeed: 0-115 degrees, 5.7 beats/s) and
+    then falls at 2.3 blocks/s; on the ground its wings are still. No pecking animation exists.
+  - Hurt: hurtTime 10 ticks of red overlay (every texel 70 % itself + 30 % red), knockback(0.4) away from the
+    attacker, walk animation speed set to 1.5 (the flailing legs), then PanicGoal: it runs to a random spot
+    within 5 blocks at its panic speed, again and again for about 2 s.
+  - Death: deathTime counts 20 ticks; LivingEntityRenderer tips the body about its feet, 90 degrees *
+    sqrt((t - 1) * 0.08), red all the while, legs straight; on tick 20 it is removed and 20 'poof' particles
+    (generic_7 ... generic_0, white-grey, 0.2-1.4 wide) appear in its upright hit box and rise. The loot pops out
+    on tick 0. Nothing else: no blood, no sound-dependent effect.
+
+MEASURED IN THE PROOFS (out/test/animals_*.png, check_animals_*.png)
+  - walk: cow 1 block in 24 frames, 2 in 38, 4 in 65 (always + 10 frames of rolling out); hen 1 in 19, 4 in 45.
+    A cow turns 90 degrees in 10 frames with two steps.
+  - hearts 0.3-0.6 block wide, start up to 0.9 beside the animal and 0.5-1.9 above its feet, rise 0.65.
+  - poof: 20 puffs, the last gone 24-99 frames after the death (median 45), rising to 2 blocks (a few to 3.8).
+  - cameras that worked: pen from outside, 4.3 above the ground, 24 mm, 5-9 blocks away (landscape proofs); a cow
+    two-shot in profile 50 mm from 6.6 blocks; over Steve's left shoulder at the coming cow 26 mm f/3.2; the
+    bucket from behind his right shoulder and above 24 mm; hens through a fence from 1.3 high need the lens above
+    the top rail (1.0).
+
+Self-test:  $BPY -m engine.animals [check lineup views walk flap wheat egg hurt die pen]
+    (no argument = check: 46 numeric checks, 4 s; give one or two picture names per call to stay under 300 s;
+    also views_cow / views_calf / views_chicken / views_chick, walk_calf, walk_chick, walk_cow_vanilla,
+    walk_chicken_vanilla, pen_cow, pen_chicken). Stills: out/test/animals_*.png.
+    $BPY -m tools.check_animals_film [shot:offset ...]   a four-shot farm film through films.lookdev.Stage and
+    engine.look (13 checks; stills out/test/check_animals_*.png).
 """
 import bisect
 import heapq
@@ -105,7 +284,9 @@ FACTS = {
     "speeds": "cow 1.76 / 2.75 (wheat) / 7.05 (panic) blocks/s; chicken 2.75 / 2.75 (seeds) / 5.40",
     "legs": "cos(pos * 0.6662 [+ pi]) * 1.4 * speed; pairs: right hind + left front, left hind + right front",
     "wings": "(sin(flap) + 1) * flapSpeed radians, only in the air: 0..2 rad, one beat per 4.19 frames",
-    "hurt": "red overlay 10 ticks, knock-back 0.4: 0.96 up, 1.9 back, 10 ticks in the air (a chicken 16), legs flail",
+    "hurt": "red overlay 10 ticks, knock-back 0.4: 0.96 up, 2.0 back, 10 ticks in the air (a chicken 16, 2.35 back), legs flail",
+    "love": "fed its food: 7 hearts (event 18), then one every 10 ticks for 600 ticks; TemptGoal stops 2.5 blocks from the player",
+    "items": "cow food wheat; chicken food wheat_seeds (and other seeds); bucket -> milk_bucket; egg; loot beef, leather / chicken, feather",
     "death": "tips to its left over ticks 1-13.5, gone on tick 20 with 20 poof particles around the upright hit box",
 }
 
@@ -176,7 +357,9 @@ def _chicken_spec():
             dict(name="head", parent="body", pivot=(0, 15, -4), groups=[([], [
                 C(0, 0, -2, -6, -2, 4, 6, 3),
                 C(14, 0, -2, -4, -4, 4, 2, 2),
-                C(14, 4, -1, -2, -3, 2, 2, 2)])]),
+                # (the wattle's underside lies IN the head's underside for 2 x 1 px: the game draws the wattle last
+                #  and so on top; 1/100 px of growth does the same here instead of z-fighting)
+                C(14, 4, -1, -2, -3, 2, 2, 2, grow=0.01)])]),
             # legs: one builder, 3 x 5 x 3 at texOffs(26, 0): only the foot (underside) and a 1 px shank have texels
             dict(name="leg_r", parent="hips", pivot=(-2, 19, 1), groups=[([], [C(26, 0, -1, 0, -3, 3, 5, 3)])]),
             dict(name="leg_l", parent="hips", pivot=(1, 19, 1), groups=[([], [C(26, 0, -1, 0, -3, 3, 5, 3)])]),
@@ -457,6 +640,7 @@ class Animal(ch.Character):
         frames = sorted({f for f, _v in self._shown} | {f for f, _v in self._gone} | {f for ab in self._flash for f in ab})
 
         def state(f):
+            """(the parts are rendered, the red twins are rendered) at frame f."""
             there = bool(mobs._state_at(self._shown, f, True)) and not bool(mobs._state_at(self._gone, f, False))
             red = any(a <= f < b for a, b in self._flash)
             return there and not red, there and red
@@ -608,7 +792,7 @@ class Animal(ch.Character):
         if swing is None:
             swing = ch._clamp(LEG_SWING * min(ANIM_PER_BLOCK * peak * TICK, 1.0), lo, hi)       # the game's, bounded
         step = 2.0 * L * math.sin(ch._clamp(float(swing), 0.05, 1.3))
-        steps = max(1, int(round(total / step)))
+        steps = max(1, int(math.ceil(total / step - 0.15)))             # rather one step more than a lunge
         turning = dist[-1] < 1e-3
         if turning:
             if total < 0.3 * step:
@@ -623,9 +807,11 @@ class Animal(ch.Character):
         self._foot = (first + steps) % 2
 
         def pose(t):
+            """(x, y, yaw) of the root at time t."""
             return float(np.interp(t, fts, xs)), float(np.interp(t, fts, ys)), float(np.interp(t, fts, yw))
 
         def hip(leg, t):
+            """World (x, y) of a leg's hip at time t."""
             px, py, yaw = pose(t)
             hx, hy = self._hip[leg]
             c, sn = math.cos(yaw), math.sin(yaw)
@@ -647,6 +833,7 @@ class Animal(ch.Character):
             return c * dx + sn * dy, -(-sn * dx + c * dy)
 
         def sole(leg, t):
+            """((to its left, forward) of the leg's sole from its hip at time t, is it standing on it)."""
             j = min(max(bisect.bisect_right(marks, t) - 1, 0), last)
             if leg in groups[(first + j) % 2]:
                 return planted(leg, j, t), True
@@ -922,8 +1109,8 @@ class Animal(ch.Character):
 
     def hurt(self, frame, attacker=None, knockback=True, max_back=None, flash=True):
         """The game's hurt on `frame`: red for 10 ticks (12 frames), the knock-back hop away from `attacker` (a
-        Character or a point; None = straight back): 0.96 block up and 1.9 back, on the ground again after 10
-        ticks (a chicken floats down with beating wings: 16 ticks), and the legs flailing as the game's walk
+        Character or a point; None = straight back): 0.96 block up, 2.0 back, on the ground again after 10 ticks
+        (a chicken floats down with beating wings: 16 ticks, 2.35 back), and the legs flailing as the game's walk
         animation does when a mob is hit. knockback=False: only the flash; a number scales the blow. max_back =
         blocks of room behind it (a fence). A walk that is running stops here. Returns the frame it stands again."""
         f0 = int(round(frame))
@@ -962,8 +1149,8 @@ class Animal(ch.Character):
         _run(self.root, _ROT, 1, [float(f0)] + [f0 + t * TICK for t in ticks],
              [0.0] + [math.radians(death_angle(t)) for t in ticks])
         if poof:
-            self.bursts.append(globals()["poof"](self.pos_at(gone), gone, camera=camera, seed=seed, village=village,
-                                                 glow=glow, size=self.size))
+            self.bursts.append(_cloud(self.pos_at(gone), gone, camera=camera, seed=seed, village=village, glow=glow,
+                                      size=self.size))
         return gone
 
 
@@ -1157,6 +1344,9 @@ def poof(target, frame, camera=None, seed=0, village=None, glow=None, size=None,
     return burst
 
 
+_cloud = poof                           # (Animal.die has a parameter called poof)
+
+
 def love(animal, frame, camera=None, frame_end=None, seed=0, glow=None, village=None):
     """The hearts of an animal that was just fed its food (Animal.setInLove): 7 heart particles ON `frame` (entity
     event 18), then one more every 10 ticks while it is in love: until frame_end (default: 3 s; the game: 600
@@ -1169,6 +1359,7 @@ def love(animal, frame, camera=None, frame_end=None, seed=0, glow=None, village=
     out = []
 
     def hearts(f, count, salt):
+        """`count` heart particles around the animal on frame f."""
         at = animal.pos_at(f) - Vector((0.0, 0.0, 1.0 - LOVE_LIFT))     # fx.emit lifts by 1.0, an animal's hearts by 0.5
         out.append(fx.emit("heart", at, f, camera=camera, count=count, seed=seed * 131 + salt, glow=glow,
                            size=animal.size, village=village))
@@ -1188,8 +1379,8 @@ def love(animal, frame, camera=None, frame_end=None, seed=0, glow=None, village=
 # ----------------------------------------------------------------------------------------------------
 def lay_egg(chicken, frame, seed=0, until=None, stage=None, name=None):
     """A hen lays an egg on `frame` (Chicken.aiStep: every 6000-11999 ticks; item 'egg'): an item entity appears
-    at her feet with the game's toss (hops 0.38, lands within 0.5 block after 9 ticks), then bobs and spins until
-    `until` (default: 20 s). stage = a films.lookdev.Stage to register it with (then st.use(shot, egg)).
+    at her feet with the game's toss (hops 0.38, lands after 9 ticks, lies still 0.3-0.9 block away, at most 1.3,
+    after 15), then bobs and spins until `until` (default: 20 s). stage = a films.lookdev.Stage to register it with (then st.use(shot, egg)).
     Returns the engine.mobs DroppedItem (.sprite is the focus / hero target, .rest_pos where it lies)."""
     f0 = int(round(frame))
     egg = mobs.make_dropped_item(EGG_ITEM, seed=seed, name=name or ("%s_egg_%d" % (chicken.name, f0)))
@@ -1200,35 +1391,68 @@ def lay_egg(chicken, frame, seed=0, until=None, stage=None, name=None):
     return egg
 
 
-def milk(player, frame, frame_start, frame_end=None, collection=None):
-    """The milking beat: the player holds an empty 'bucket' from frame_start, uses it on the cow on `frame` (his
-    arm swings, furthest forward on `frame`) and from that frame on it is a 'milk_bucket' (AbstractCow.mobInteract;
-    no particles), until frame_end. The two items sit in his right hand exactly where Character.hold puts an item
-    but are not player.held: their visibility is their own (give the frames of the shot), and for those frames
-    the arm is carried in the game's item pose. Call it AFTER the player's place() and look_at() for that shot
-    and place() him again only after frame_end. Returns (bucket, milk_bucket)."""
+LOOT = {"cow": (("beef", 2), ("leather", 1)), "chicken": (("chicken", 1), ("feather", 1)), "calf": (), "chick": ()}
+
+
+def drop_loot(animal, frame, items=None, seed=0, until=None, stage=None):
+    """What a killed animal leaves, as item entities tossed up from where it stands ON the frame of the killing
+    blow (LivingEntity.die drops the loot at once, while the body still tips over). items = [(item id, count), ...];
+    default: the loot tables' typical roll: cow ('beef', 2) and ('leather', 1) (the game: 1-3 beef, 0-2 leather),
+    chicken ('chicken', 1) and ('feather', 1) (1 raw chicken, 0-2 feathers), babies nothing. An animal that burns
+    drops 'cooked_beef' / 'cooked_chicken'. They bob and spin until `until` (default 20 s). stage = a Stage to
+    register them with. Returns the list of engine.mobs DroppedItems."""
+    f0 = int(round(frame))
+    out = []
+    for i, (item_id, count) in enumerate(LOOT[animal.kind] if items is None else items):
+        it = mobs.make_dropped_item(item_id, count=count, seed=seed * 17 + i, name="%s_%s_%d" % (animal.name, item_id, f0))
+        it.drop(f0, animal.pos_at(f0), seed=seed * 17 + i)
+        it.animate(f0, f0 + 480 if until is None else until)
+        if stage is not None:
+            stage.cast[it.name] = it
+        out.append(it)
+    return out
+
+
+def hand_item(player, item, frame_start, frame_end=None, collection=None):
+    """An item in the player's right hand for the frames [frame_start, frame_end): 'wheat', 'wheat_seeds', 'bucket'
+    ... (an item id) or an object from engine.props.make_item. It sits exactly where Character.hold puts an item
+    and the arm is carried in the game's item pose for those frames, but it is NOT player.held: its visibility is
+    its own, so one Steve can hold wheat in one shot and nothing in the next (Character.hold cannot be keyed).
+    Call it AFTER the player's place() for that shot, and place() him again only at or after frame_end.
+    Returns the item object: a focus / hero target, and follow(..., look=<it>)."""
     from . import fx, props
 
-    if player.arm_r is None:
-        raise ValueError("milk() needs the player (a Character with arms)")
-    f, f0 = int(round(frame)), int(round(frame_start))
+    if getattr(player, "arm_r", None) is None:
+        raise ValueError("hand_item() needs the player (a Character with arms)")
+    f0 = int(round(frame_start))
     col = collection if collection is not None else fx._collection()
-    out = []
-    for item_id, a, b in ((BUCKET_ITEM, f0, f), (MILK_ITEM, f, frame_end)):
-        ob = props.make_item(item_id, col)
-        ob.parent = player.arm_r
-        ob.matrix_parent_inverse = Matrix.Identity(4)
-        ob.matrix_basis = ch._held_matrix("hand", player.model_scale)
-        keys = [(min(a, 1) - 1, 1.0), (a, 0.0)] + ([(int(b), 1.0)] if b is not None else [])
-        for path in ("hide_render", "hide_viewport"):
-            fx._write(ob, path, 0, [k[0] for k in keys], [k[1] for k in keys], "CONSTANT")
-        ob.hide_render = ob.hide_viewport = True
-        out.append(ob)
-    ch._cut(player.arm_r, _ROT, 0, f0, ch.ITEM_ARM_PITCH)              # ArmPose.ITEM: the hand with an item, 18 degrees forward
-    player.swing_arm(f - 2)
+    ob = props.make_item(item, col) if isinstance(item, str) else item
+    ob.parent = player.arm_r
+    ob.matrix_parent_inverse = Matrix.Identity(4)
+    ob.matrix_basis = ch._held_matrix("hand", player.model_scale)
+    keys = [(min(f0, 1) - 1, 1.0), (f0, 0.0)] + ([(int(round(frame_end)), 1.0)] if frame_end is not None else [])
+    for path in ("hide_render", "hide_viewport"):
+        fx._write(ob, path, 0, [k[0] for k in keys], [k[1] for k in keys], "CONSTANT")
+    ob.hide_render = ob.hide_viewport = True
+    ch._cut(player.arm_r, _ROT, 0, f0, ch.ITEM_ARM_PITCH)               # ArmPose.ITEM: 18 degrees forward
     if frame_end is not None:
-        ch._cut(player.arm_r, _ROT, 0, int(frame_end), player._rest(player.arm_r, _ROT, 0))
-    return tuple(out)
+        rest = player._rest(player.arm_r, _ROT, 0)
+        if abs(ch._val(player.arm_r, _ROT, 0, int(round(frame_end))) - ch.ITEM_ARM_PITCH) < 1e-6:
+            ch._cut(player.arm_r, _ROT, 0, int(round(frame_end)), rest)
+    return ob
+
+
+def milk(player, frame, frame_start, frame_end=None, collection=None):
+    """The milking beat: the player holds an empty 'bucket' from frame_start, uses it on the cow on `frame` (his
+    arm swings, furthest forward on `frame`) and from that frame on it is a 'milk_bucket' (AbstractCow.mobInteract:
+    adult cows only, no particles), until frame_end. Two hand_item()s and Character.swing_arm: call it AFTER the
+    player's place() and look_at() for that shot. Returns (bucket, milk_bucket)."""
+    f = int(round(frame))
+    bucket = hand_item(player, BUCKET_ITEM, frame_start, f, collection)
+    full = hand_item(player, MILK_ITEM, f, frame_end, collection)
+    ch._cut(player.arm_r, _ROT, 0, int(round(frame_start)), ch.ITEM_ARM_PITCH)
+    player.swing_arm(f - 2)
+    return bucket, full
 
 
 def follow(animal, leader, frame_start, frame_end, stop=TEMPT_STOP, speed=None, look="eyes", gait="planted",
@@ -1348,10 +1572,12 @@ def wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None
     events = {a.name: [] for a in animals}
 
     def pose(a, f):
+        """(x, y, yaw) of an animal on frame f as keyed so far (after its last key: where it stopped)."""
         rec = samples[a.name]
         return rec.get(int(f)) or rec[ends[a.name]]
 
     def record(a, fa, fb):
+        """Remember where the keys put an animal on the frames fa..fb."""
         rec = samples.setdefault(a.name, {})
         for f in range(int(fa), int(fb) + 1):
             p = a.pos_at(f)
@@ -1619,11 +1845,10 @@ def _check():
     # ---- wings
     hen.place(1000, (0.0, 50.0, 1.0), 0.0)
     land = hen.fall(1000, (0.0, 50.0, 0.0))
-    big, sink = 0.0, []
+    big = 0.0
     for f in np.arange(1000.0, land, 0.2):
         big = max(big, ch._val(hen.wing_r, _ROT, 1, f))
-        expect_sym = abs(ch._val(hen.wing_r, _ROT, 1, f) + ch._val(hen.wing_l, _ROT, 1, f))
-        assert expect_sym < 1e-9
+        assert abs(ch._val(hen.wing_r, _ROT, 1, f) + ch._val(hen.wing_l, _ROT, 1, f)) < 1e-9, "the wings mirror each other"
     v_term = (hen.pos_at(land - 3).z - hen.pos_at(land - 2).z) * FPS
     _evaluate(scene, land + 8)
     expect("hen falls 1 block in %d frames at %.2f blocks/s, wings to %.0f deg, folded after landing" % (
@@ -1725,6 +1950,12 @@ def _check():
     expect("egg: hidden before frame 1610, lies %.2f from the hen at frame 1640" % (
         (egg.root.matrix_world.translation.xy - Vector((0.0, 70.0))).length),
         before and not egg.sprite.hide_render and (egg.root.matrix_world.translation.xy - Vector((0.0, 70.0))).length < 0.6)
+    loot = drop_loot(hen, 1650, seed=1)
+    _evaluate(scene, 1700)
+    expect("loot of a chicken: %s, lying %s from her" % ([(it.item_id, len(it.copies)) for it in loot],
+           [round((it.root.matrix_world.translation.xy - hen.pos_at(1650).xy).length, 2) for it in loot]),
+           [it.item_id for it in loot] == ["chicken", "feather"] and all(not it.sprite.hide_render for it in loot)
+           and not drop_loot(chick, 1650))
     bursts = love(cow, 1700, camera=cam, frame_end=1760, seed=1)
     expect("love: %d bursts, %d + %s hearts" % (len(bursts), len(bursts[0].objects), [len(b.objects) for b in bursts[1:]]),
            len(bursts[0].objects) == LOVE_HEARTS and all(len(b.objects) == 1 for b in bursts[1:]) and len(bursts) == 5)

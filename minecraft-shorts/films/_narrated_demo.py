@@ -6,7 +6,9 @@
 The voice is the clock. The text below is spoken once by a separate command; from then on every caption, every
 cut and the film's length come from the measured voice, never from a guess:
 
-    $TTS tools/narrate.py _narrated_demo                 # -> narration/_narrated_demo.wav + .json (commit both)
+    $TTS tools/narrate.py _narrated_demo --phonemes      # how the voice will say it (check Minecraft words first)
+    $TTS tools/narrate.py _narrated_demo                 # -> narration/_narrated_demo.wav + .json (commit both);
+                                                         #    prints the length against one minute
     $BPY -m render _narrated_demo --sheet 8              # look at it: out/test/_narrated_demo_sheet.png
     $BPY -m render _narrated_demo --frames all --res 360x640 --samples 8 --threads 2 --max-seconds 240
                                                          # preview frames; repeat until none are left
@@ -15,7 +17,11 @@ cut and the film's length come from the measured voice, never from a guess:
                                                          #    narration muxed in (render.py finds narration/<film>.wav)
     $BPY -m tools.narration_sync _narrated_demo out/preview/_narrated_demo_360x640_8spp.mp4
                                                          # proof: every caption against the voice in the encoded file
-  (a final film: the same without --res / --samples -> out/frames/<film>/ and out/<film>.mp4)
+  (a final film: the same without --res / --samples -> out/frames/<film>/ and out/<film>.mp4. A one-minute film is
+   encoded in 10 s parts: `--encode` may end with exit code 4, "run the same command again"; it continues.)
+
+Writing the text (engine/narration.py, WRITING FOR THE VOICE): one minute holds 140 to 165 words with this voice;
+numbers, times and abbreviations are written as words; one entry of "lines" is one sentence.
 
 Edit a sentence, a pause or the voice and `narration.load` stops the build until tools/narrate.py has spoken the
 new text: a film can never be rendered against audio it does not match. The shots are the look-dev shots of
@@ -39,6 +45,25 @@ NARRATION = {
 }
 
 SKY = dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm")       # the look-dev golden hour
+
+
+def shot_job(st, s):
+    """The farmer on her way past the big house (films.lookdev.shot_villager, made for one second and held here
+    for three). Two changes for the longer hold: she strolls at 0.78 blocks a second, and the camera rides at
+    1.25 instead of 0.80, level with her face. As it was, the low camera followed her behind the tall grass
+    after a second and a half and the tufts covered the lower third of the frame."""
+    f0 = s.frame_start
+    farmer = st.actor("ada", "farmer")
+    a, b = (3.05, 22.95, 0.0), (6.6, 22.95, 0.0)
+    farmer.place(f0 - 26, a, L.yaw_to(a, b))
+    farmer.walk(f0 - 26, [a, b], speed=0.78)
+    st.use(s, farmer)
+    s.lens(42, 2.8)
+    s.follow(farmer.root, (2.3, 3.0, 1.25), (2.0, 3.15, 1.25), look_offset=(-0.08, 0.0, 1.22))
+    s.focus(farmer.head)
+    s.handheld(0.012, seed=11)
+    st.hero(s, "farmer", farmer)
+    st.lights(s, scale=1.0, near=st.v.anchors["exit_gate"], radius=10.0)
 
 
 def shot_leave(st, s):
@@ -76,7 +101,7 @@ def build(scene):
     # 2. the cuts: every shot starts with a sentence. Sentence.cut is the first frame of such a shot: two frames
     #    before the sentence's first word, never inside the word before. shot_frames turns cuts into shot lengths;
     #    the last shot runs to nar.frames (last word + tail).
-    builders = (("villager", L.shot_villager), ("trade", L.shot_trade), ("nitwit", L.shot_nitwit), ("leave", shot_leave))
+    builders = (("villager", shot_job), ("trade", L.shot_trade), ("nitwit", L.shot_nitwit), ("leave", shot_leave))
     lengths = nar.shot_frames([nar.sentence(1), nar.sentence("But nobody"), nar.sentence("leave")])
     for (name, fn), n in zip(builders, lengths):
         fn(st, st.shot(name, nar.seconds(n)))

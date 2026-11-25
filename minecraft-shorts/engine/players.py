@@ -18,79 +18,113 @@ PUBLIC API
     cast_town(st, count=6, seed=0, skins=None, items=True, names=None) -> [Player]
         `count` different players for "a village of players": one skin each (all nine before any repeats), an
         everyday item in some hands, each with its own idle seed in p.idle_seed (call p.idle(f0, f1) per shot).
+        Always Players: where the cast already holds somebody else under a skin's name (st.actor("steve",
+        "steve") is the old engine.characters Steve), the new one is called "player_<skin>".
     equip(player, material=None, helmet=..., chestplate=..., leggings=..., boots=..., enchanted=False, frame=None,
           glint_strength=1.5) -> [Object]
         Armor as HumanoidArmorLayer draws it. equip(p, "diamond") = the full set; equip(p, boots="golden") = one
         piece; a keyword set to None takes that piece off. materials: leather chainmail iron golden diamond
-        netherite (also copper; turtle_scute as helmet). enchanted=True adds the armor glint (see GLINT below).
+        netherite, also copper, and turtle_scute, which is a helmet only (equip(p, "turtle_scute") puts on just
+        that; any other turtle piece is a ValueError). enchanted=True adds the armor glint (see GLINT below).
         frame=None: worn for the whole film; frame=f: from that frame on (CONSTANT keys). Also Player.equip(...).
     SKINS, ARMOR_MATERIALS, WALK_SPEED 4.317, SPRINT_SPEED 5.612, SNEAK_SPEED 1.295, SPRINT_JUMP_SPEED (7.13,
-    simulated), JUMP_HEIGHT 1.252, JUMP_TICKS 12, HEROBRINE_GLOW, HURT_TICKS 10, DEATH_TICKS 20.
+    simulated; HOP_STEPS = the 12 per-tick distances of a steady hop), JUMP_HEIGHT 1.252, JUMP_TICKS 12,
+    HEROBRINE_GLOW, HURT_TICKS 10, DEATH_TICKS 20.
 
 Player (a subclass of engine.characters.Character: root / hips / body / head / arm_l / arm_r / leg_l / leg_r, plus
         .torso, the body box; `body` itself is an empty carrier so that a crouch tilts the torso only)
     place(frame, pos, yaw=0.0)             hard cut to a spot: neutral standing pose, upright, not crouching
     show(frame, visible=True)              keyed visibility of rig, armor and held items (Stage.finish calls it)
-    hold(item, hand="right", frame=None, enchanted=False, potion_color=None) -> Object | None
+    hold(item, hand="right", frame=None, enchanted=False, potion_color=None, like=None) -> Object | None
         item = an item id ("diamond_sword", "iron_pickaxe", "netherite_axe", "stone_shovel", "golden_hoe", "bow",
         "shield", "torch", "redstone_torch", "bucket", "milk_bucket", "cooked_chicken", "steak", "golden_apple",
         "splash_potion", "ender_pearl", "gold_ingot", "emerald", "music_disc_13", "goat_horn", "totem",
-        and block items held as blocks: "note_block", "tnt", "redstone_lamp", "anvil", "dirt" ...), an Object made
-        by props.make_item, or None (empty hand). Placed by ItemInHandLayer + the model's own
-        display.thirdperson_righthand / _lefthand transform; the hand's arm is carried 18 degrees forward (ArmPose
-        ITEM). frame=None: for the whole film; frame=f: from that frame on. Returns the item object (focus target).
+        "compass", "clock", and block items held as blocks: "note_block", "tnt", "redstone_lamp", "anvil",
+        "dirt" ...), an Object made by props.make_item, or None (empty hand). Placed by ItemInHandLayer + the
+        model's own display.thirdperson_righthand / _lefthand transform; the hand's arm is carried 18 degrees
+        forward (ArmPose ITEM). frame=None: for the whole film; frame=f: from that frame on. Returns the item
+        object (focus target). An OBJECT is held like a flat item (lying on the hand) unless like="iron_sword"
+        names the item whose transform it takes. Things the game draws with an entity model (chest, banner,
+        skull) and unknown ids raise ValueError and leave the hand as it was.
     item(hand="right") / item_point(hand, frame)      the object in a hand / its world centre at a frame
     walk(frame, points, speed=None, run=False, from_current=False, sprint=None, ramp=True) -> end frame
         The game's gait along a polyline (legs cos(0.6662 p) * 1.4 * s, arms * 1.0, no body bob): speed None =
         WALK_SPEED (SPRINT_SPEED with run / sprint=True, SNEAK_SPEED while sneaking). ramp=True = the game's
         acceleration and slide to a halt (ground friction 0.546 per tick); ramp=(False, True) starts in full
         stride (walking into frame), (True, False) leaves at full speed. Slow walks are fine: speed=1.6.
-    sprint_jump(frame, points, from_current=False) -> end frame
-        Bunny-hopping along the polyline: 12-tick hops 1.252 high (jump velocity 0.42, gravity 0.08, drag 0.98),
-        4.28 blocks each at SPRINT_JUMP_SPEED; a whole number of hops, so the speed is adjusted by a few percent.
+    sprint_jump(frame, points, from_current=False, ramp=True) -> end frame
+        Bunny-hopping along the polyline: 12-tick hops 1.252 high (jump velocity 0.42, gravity 0.08, drag 0.98)
+        with the game's surge at every take-off (12 blocks/s on that tick, 6 to 7 in the air; 4.28 blocks a hop,
+        7.13 blocks/s on average). ramp as for walk: in = the first hops from rest (2.9, 4.0, 4.2 blocks), out =
+        the slide after the last landing (0.6 block); ramp=False = already hopping and gone at speed. A whole
+        number of hops, so the distances are scaled by a few percent to fit the path.
+    CHAINING: a move asked for on the frame the last one RETURNED goes on from it: the leg cycle continues
+        without a jump, and if the last one ended at speed (ramp out False) the new one starts exactly where its
+        travel ended (ticks are 1.2 frames) at the speed it had, so nothing halts at the join:
+            e = p.walk(f, [a, b], sprint=True, ramp=(True, False)); e = p.sprint_jump(e, [b, c], ramp=(True, False))
+            e = p.walk(e, [c, d])               # lands, slows to a walk, slides to a halt at d
+        A place() in between is a cut: the next move starts fresh.
     jump(frame) -> landing frame           one jump on the spot (14.4 frames)
     sneak(frame, on=True)                  the crouch pose from `frame` on (a snap, as in the game); walk() then
                                            defaults to SNEAK_SPEED (the game's feet slide while sneaking: so here)
-    attack(frame) / swing(frame)           one arm swing (6 ticks; engine.fx.arm_swings: absolute keys)
-    mine(frame_start, frame_end)           the mining swing held for a span (restarts every 4 ticks; fx.mining_swings)
+    attack(frame, hand="right") / swing    one arm swing (6 ticks; right: engine.fx.arm_swings, left: the same
+                                           rule mirrored as HumanoidModel.setupAttackAnimation does; absolute keys)
+    mine(frame_start, frame_end)           the mining swing held for a span (restarts every 4 ticks; fx.mining_swings;
+                                           right arm)
     eat(frame_start, frame_end=None, hand="right") / drink(...) -> end frame
         Item to the mouth with the 4-tick bob, 32 ticks (38 frames) by default. NOT in the game's third person
         (ArmPose has no eating pose: other players just hold the food): a film gesture built from the first-person
         timing of FirstPersonHandsAndItemsRenderer.applyEatTransform. The bob starts after 20 % of the time.
     block(frame_start, frame_end, hand="left")        shield raised (ArmPose BLOCK + models/item/shield_blocking)
+        While SNEAKING every posed arm (block, bow, horn) is 0.4 rad lower, as in the game, which adds the crouch
+        after the arm pose: a sneaking horn-blower holds the horn at his chin. eat() / drink() still reach the mouth.
     draw_bow(frame_start, frame_end, hand="right") -> dict(frame, origin, direction)
         ArmPose BOW_AND_ARROW, bow_pulling_0 / _1 (13 ticks) / _2 (18 ticks); released ON frame_end: the dict is
         where and which way the arrow leaves (eye height - 0.1, along the look).
     throw(frame, hand="right", kind="ender_pearl") -> dict(frame, origin, direction, speed, hand)
-        The arm swing of a throw; the projectile is another module's: it leaves ON `frame` from `origin` (eye
-        height - 0.1, where the game spawns it) along `direction` at `speed` blocks per tick (pearl 1.5; splash
-        potion 0.5, pitched 20 degrees up); dict["hand"] = where the hand is at that frame.
+        The swing of the throwing arm; the projectile is another module's: it leaves ON `frame` from `origin`
+        (eye height - 0.1, where the game spawns it) along `direction` at `speed` blocks per tick (pearl 1.5;
+        splash potion 0.5, pitched 20 degrees up); dict["hand"] = where the hand is at that frame.
     toot(frame_start, frame_end, hand="right")        goat horn held to the mouth (ArmPose TOOT_HORN + the
                                                       tooting_goat_horn model); a horn call lasts 7 s (168 frames)
     sleep(frame, bed_pos, yaw)             = Character.lie_down (flat on the back on a bed, as the game draws it)
     hurt(frame, from_point=None, knockback=0.4) -> end frame
         Red flash for 10 ticks (12 frames; the entity overlay: 30 % red over the SKIN, not over armor or items)
         and, with from_point, the game's knock-back away from it (0.4 blocks per tick, a hop 0.96 high, lands
-        1.9 blocks back after 10 ticks). from_point=None: flash only.
-    die(frame, poof=True) -> dict(frame, point)
-        Red, tips over onto his left side to 90 degrees (sqrt curve, flat after 13.5 ticks), gone after 20 ticks
-        (24 frames): dict = the frame he vanishes on and the middle of the body, for the 20 white 'poof' particles
-        (engine.fx has no 'poof' kind: see NOT DONE). A later place() stands him up in his own colours again
+        1.9 blocks back after 10 ticks). from_point=None: flash only. Flashes add up: a blow during a flash or
+        on the dying never switches the red off early.
+    die(frame, from_point=None, knockback=0.4, poof=True, camera=None, seed=0, village=None) -> dict
+        Red for the whole death, tips over onto his left side to 90 degrees (sqrt curve, flat after 13.5 ticks),
+        gone after 20 ticks (24 frames). from_point = where the killing blow comes from: its knock-back, as
+        hurt() (hurt(f, from_point) and die(f) in either order do the same). A walk under way stops and the limbs
+        hang straight (the game zeroes a dead entity's walk animation). Returns dict(frame = the frame he
+        vanishes on, feet = where the entity is then (after the knock-back), size = (0.6, 1.8) the hit box, point
+        = the middle of the lying body (a look / focus target), burst). The 20 white 'poof' particles fill the
+        UPRIGHT hit box at `feet`, not the lying body. For a player made with add_player / cast_town die() draws
+        them itself with engine.animals.poof, facing the cameras of the Stage's film (burst = its engine.fx
+        Burst; they drift up and thin out for up to 4 s: engine.fx.stop_particles(frame) before a cut that jumps
+        in time). poof=False: none. A bare make_player() has no film: pass camera=<Shot | Film | camera object>,
+        or call animals.poof(info["feet"], info["frame"], camera=shot, size=info["size"]) yourself. village =
+        the Village (the puffs then stop at its blocks). A later place() stands him up in his own colours again
         (it calls revive(frame)); show(frame, True) brings him back.
     idle(frame_start, frame_end, seed=None) Character.idle (head glances, weight shifts, the slow arm sway);
                                            seed None = the player's own idle_seed. A no-op while .still is True.
     still                                  True = no idle sway and no arm swing while walking, arms dead straight
                                            (make_player("herobrine") sets it). stand_still(frame) cuts to that pose.
-    watch(frame_start, frame_end, target, step=2, body=False)
-        The head stays on a (moving) target for the whole span, re-aimed every `step` frames, eased; body=True
-        also turns the whole figure on the spot when the target leaves the head's 70 degrees. Herobrine's stare.
+    watch(frame_start, frame_end, target, step=2, body=False, ease=8, snap=None)
+        The head stays on a (moving) target for the whole span, re-aimed every `step` frames; body=True also
+        turns the whole figure on the spot when the target leaves the head's 70 degrees. Herobrine's stare.
+        snap=None: when the player was place()d on frame_start (the first frame of his shot) the head is ON the
+        target from that frame; otherwise it turns to it over `ease` frames (a new target in mid shot).
+        snap=True / False forces either.
     crouching_at(frame), holding_at(hand, frame), armor_at(slot, frame), eye_point(frame) (crouch-aware),
     look_vector(frame) (unit vector along the head's look), revive(frame) (end the red overlay)
     look_at / track / face / turn / nod / shake / flinch / raise_arm / lie_down / pos_at / yaw_at: inherited.
 
 USING THEM IN A FILM (st = films.lookdev.Stage)
     hb = players.add_player(st, "herobrine", "herobrine")          # still, eyes glowing
-    hb.place(f0, spot, yaw); hb.watch(f0, s.frame_end, kid)         # he only turns his head
+    hb.place(f0, spot, yaw); hb.watch(f0, s.frame_end, kid)         # his head is on the child from the first frame
+                                                                    # of the shot, and nothing else of him moves
     hero = players.add_player(st, "player", "steve"); players.equip(hero, "diamond"); hero.hold("diamond_sword")
     town = players.cast_town(st, 7, seed=3)                         # 7 different players, some carrying things
     for p in town: p.place(f0, ...); p.idle(f0, s.frame_end + 1)
@@ -103,13 +137,19 @@ WHAT THE GAME DOES (read from the classes)
              4x12x4 (40,16) pivot (-5,2,0), right leg (0,16) pivot (-1.9,12,0); PlayerModel.createMesh: left arm
              (32,48), left leg (16,48), jacket (16,32), sleeves (40,32)/(48,48), pants (0,32)/(0,48), all +0.25;
              slim: arms 3 wide, same pivots. AvatarRenderer.scale 0.9375. (Here: sleeves +0.27 and pants +0.23,
-             so that no two overlay faces are coplanar: Cycles has no draw order to settle a depth tie.)
+             so that no two overlay faces are coplanar: Cycles has no draw order to settle a depth tie. For the
+             same reason the head is 0.02 px narrower than the torso while crouching, when it sinks 1 px into
+             it. tools/players_proof.coplanar() audits a posed player; what it still finds is the game's own:
+             the resting arms are splayed 0.05 rad and a sliver of 0.1 px2 of each arm's front and back lies in
+             the torso's front and back plane.)
   armor      HumanoidModel.createArmorMeshSet(inner 0.5, outer 1.0), 64x32 sheets: helmet = head +1.0, chestplate =
              body +1.0 and 4-wide arms +1.0, leggings = body +0.5 and legs +0.4 (textures/entity/equipment/
-             humanoid_leggings), boots = legs +0.9; everything else from equipment/humanoid. (Here: arms +1.03 and
-             helmet +1.06 for the same no-coplanar reason; the two legs are cropped at the centre line, where the
-             game lets them overlap.) Armor is drawn without the hurt overlay; leather = leather.png tinted
-             #A06540 + leather_overlay.png.
+             humanoid_leggings), boots = legs +0.9; everything else from equipment/humanoid. The leg boxes are
+             the game's whole boxes: leggings reach 0.5 px and boots 1.0 px past the centre line into the other
+             leg. (Here: arms +1.03, helmet +1.06, and the LEFT leg's leggings and boots 0.03 larger than the
+             right leg's, for the same no-coplanar reason: where the two legs' boxes overlap the left one shows,
+             as in the game, which draws the left leg last.) Armor is drawn without the hurt overlay; leather =
+             leather.png tinted #A06540 + leather_overlay.png.
   walk       HumanoidModel.setupAnim: right leg cos(0.6662 p) 1.4 s, left leg opposite, arms cos(...) 2 s 0.5,
              opposite to their legs; LivingEntity.calculateEntityAnimation: target s = min(4 * blocks per tick, 1),
              s += (target - s) 0.4 each tick, p += s. A full cycle is 9.43 units of p: 2.36 blocks at any speed up
@@ -119,20 +159,28 @@ WHAT THE GAME DOES (read from the classes)
              game). No body bob in third person. A hand that holds an item swings half as far.
              Speeds: movement speed 0.1 x 0.98 input over (1 - 0.546) = 0.2159 blocks/tick = 4.317/s; sprint x 1.3.
   jump       LivingEntity.jumpFromGround: vy = 0.42 (+0.2 forward when sprinting), then vy = (vy - 0.08) 0.98:
-             peak 1.2522 after 6 ticks, back on the ground on tick 12.
+             peak 1.2522 after 6 ticks, back on the ground on tick 12. Sprint-jumping, per tick: the take-off
+             tick v += 0.2 + 0.1274 on the ground (then x 0.546), eleven air ticks v += 0.02548 (Player
+             .getFlyingSpeed 0.026 x 0.98 input; then x 0.91): 0.612 blocks on the take-off tick, 0.36 falling to
+             0.31 in the air, 4.276 blocks a hop in the steady state.
   crouch     body.xRot 0.5, arms.xRot +0.4, legs z +4, head y +4.2, body and arms y +3.2 (pixels), and
              AvatarRenderer.getRenderOffset y -2/16: the whole model, feet included, sinks 2 px into the ground.
-  arm poses  ITEM x*0.5 - pi/10; BLOCK x*0.5 - 0.9425 + clamp(head pitch, -1.396, 0.436), yaw -+30 degrees +
-             clamp(head yaw, +-30); BOW both arms -pi/2 + head pitch, yaw -0.1 / +0.5 + head yaw; TOOT_HORN
-             clamp(head pitch, +-1.2) - 1.4835, yaw head -+ 0.5236. Idle: AnimationUtils.bobArms (+-0.05 rad).
+  arm poses  (x = the arm's walk swing) ITEM x*0.5 - pi/10; BLOCK (poseBlockingArm) x*0.5 - 0.9425 + clamp(head
+             pitch, -1.396, 0.436), yaw -+30 degrees + clamp(head yaw, +-30): -0.9425 standing still; BOW both
+             arms -pi/2 + head pitch, yaw -0.1 / +0.5 + head yaw; TOOT_HORN clamp(head pitch, +-1.2) - 1.4835,
+             yaw head -+ 0.5236. setupAnim then runs the attack swing and only then the crouch (+0.4 on both
+             arms, whatever their pose). Attack with the LEFT arm: body.yRot negated, the left arm takes
+             -(g 1.2 + h), yRot + 2 body.yRot, zRot -0.4 sin (not mirrored). Idle: AnimationUtils.bobArms.
   held item  ItemInHandLayer: arm, rotate X -90, Y 180, translate (+-1, 2, -10)/16, then ItemTransform.apply:
              translate, rotate X Y Z, scale (left hand: x translation and Y, Z rotations negated). handheld tools
              rotation (0,-90,55) scale 0.85; flat items scale 0.55; blocks rotation (75,45,0) scale 0.375.
              Shield: ShieldModel plate 12x22x1 + handle 2x6x6, entity/shield/shield_base_nopattern.png.
   hurt/death OverlayTexture: hurt = (255,0,0) at 1 - 178/255 = 30 % over the entity texture for hurtTime 10 ticks
              and while dying; LivingEntityRenderer.setupRotations: roll = sqrt((deathTime - 1) / 20 * 1.6) * 90
-             degrees; LivingEntity.makePoofParticles: 20 'poof' on removal at tick 20; knockback(0.4): horizontal
-             speed 0.4, vy = min(0.4, vy / 2 + 0.4).
+             degrees; LivingEntity.makePoofParticles: 20 'poof' on removal at tick 20, at getRandomX(1) /
+             getRandomY() / getRandomZ(1): +-0.6 around the feet position and 0 to 1.8 up; knockback(0.4):
+             horizontal speed 0.4, vy = min(0.4, vy / 2 + 0.4). LivingEntityRenderer.extractRenderState: walk
+             animation position and speed are 0 unless the entity isAlive.
 
 GLINT (optional, enchanted=True)
     Armor: engine.fx.glint on each armor box with misc/enchanted_glint_armor.png and the armor texturing of
@@ -145,11 +193,13 @@ GLINT (optional, enchanted=True)
     (films/oneword.py stamp_every_frame) before a chunked final render.
 
 NOT DONE / NOT THE GAME
-  - 'poof' particles of a death: engine.fx has no such kind; die() returns the frame and the point for them.
+  - 'poof' particles of a death are engine.animals.poof's (die() calls it); a player made with a bare
+    make_player() and no camera= gets none, die() then only returns where and when (feet, size, frame).
   - Eating and drinking have no third-person arm animation in Java Edition; eat() / drink() are this module's.
   - Projectiles (arrow, pearl, potion), food crumbs and potion splashes are not drawn here: draw_bow() / throw()
     return frame, origin and direction for whoever draws them.
-  - attack() and mine() swing the RIGHT arm (engine.fx); block / toot / eat / hold work for either hand.
+  - mine() swings the RIGHT arm (engine.fx); attack / throw / block / toot / eat / hold work for either hand.
+    Swings of one arm follow the game's rule (a request during the first half of a swing is ignored).
   - Not built: capes, elytra, armor trims, dyed leather other than the default brown, shield banners, crossbow /
     trident / spyglass / brush poses, swimming and crawling, riding.
   - Corners of a walk are turned on the spot over about 5 frames (the game snaps the body yaw even faster).
@@ -163,8 +213,10 @@ GOTCHAS
     (measured) and render.py re-renders exactly the frames a new or moved hurt() touches.
   - walk() is the game's gait: +-69 degree legs at 4.3 blocks/s. For a calm stroll pass speed=1.4..1.8
     (+-25 degrees). A walk of 20 blocks takes 120 frames: 111 at speed plus the game's start and slide to a halt.
-  - cast_town() names its players after their skins ("steve", "alex", ...): pass names=[...] if the film already
-    has a st.actor("steve", "steve"), which is the old engine.characters Steve and not a Player.
+  - cast_town() names its players after their skins ("steve", "alex", ...). st.actor("steve", "steve") is the
+    old engine.characters Steve and not a Player: beside him the town's Steve is called "player_steve".
+  - A walk turns a corner of its polyline on the spot over about 5 frames (28 degrees a frame at a right angle):
+    with motion blur that is a smear. Round the corners of a path that is filmed close (three or four points).
   - Flat items (food, ingots, buckets, the horn) lie FLAT on the hand in third person, as in the game: from eye
     height they are seen edge-on; tools and swords point forward out of the fist; blocks sit above the fist.
   - Herobrine's eyes: 2 x 1 texels each, 0.117 block wide per eye. From 18 blocks they are 2-3 px at 720 wide on
@@ -205,12 +257,12 @@ DEATH_TICKS = 20                        # LivingEntity.DEATH_DURATION
 HURT_MIX = 1.0 - 178.0 / 255.0          # OverlayTexture: 0xB2FF0000, colour = mix(red, texture, alpha)
 EAT_TICKS = 32                          # Consumable.DEFAULT_CONSUME_SECONDS 1.6
 CROUCH = dict(torso_x=0.5, arm_x=0.4, leg_back=4.0, head_down=4.2, body_down=3.2, offset=2.0 / 16.0)
-TORSO_TIE = 1.004                       # make_player: the torso is 0.008 px deeper than the arms (their fronts tie)
 CROUCH_HEAD_TIE = 0.995                 # sneak(): the head is 0.02 px narrower than the torso it sinks into
 POTION_COLOR = (0x38, 0x5D, 0xC6)       # items/splash_potion.json: default tint -13083194
 ITEM_ALIASES = {"steak": "cooked_beef", "totem": "totem_of_undying", "pearl": "ender_pearl", "milk": "milk_bucket",
                 "music_disc": "music_disc_13", "disc": "music_disc_13", "horn": "goat_horn", "potion": "splash_potion",
-                "chicken": "cooked_chicken", "apple": "golden_apple"}
+                "chicken": "cooked_chicken", "apple": "golden_apple", "compass": "compass_16", "clock": "clock_00",
+                "eye_of_ender": "ender_eye"}
 
 
 def _jump_arc():
@@ -701,7 +753,9 @@ class Player(Character):
         self._gait = None                 # the last move's limb cycle: dict(f0, ps, ss, end, carry); None after a cut
         self._phase = 0.0                 # walk-cycle position p where the last move left it
         self._red = []                    # [(start, end or None)]: spans of the red hurt / death overlay
+        self._left_swing = None           # the running left-arm swing: dict(f0, end, requests, rest)
         self.size = (0.6, 1.8)            # the hit box (EntityType.PLAYER): what engine.animals.poof fills
+        self.film = None                  # the Stage's Film (set by add_player): whose cameras the death poof faces
         for ob in (self.torso,):
             for i in range(3):
                 self._pose.append((ob, _ROT, i, 0.0))
@@ -862,6 +916,7 @@ class Player(Character):
             if abs(base - self._rest(arm, _ROT, 0)) > 1e-9:
                 _cut(arm, _ROT, 0, frame, base)
         self._gait = None
+        self._left_swing = None
 
     def stand_still(self, frame):
         """Cut to the dead-still pose on `frame`: everything at rest, arms hanging perfectly straight."""
@@ -878,26 +933,27 @@ class Player(Character):
         item whose third-person transform it should take."""
         side = _side(hand)
         old = self._arm_base(side, frame if frame is not None else 0)
+        ob = new = None
+        if item is not None:                                    # build first: a refused item changes nothing
+            new = _Held(item if isinstance(item, str) else "object", side, frame)
+            new.enchanted, new.potion_color = enchanted, potion_color
+            if isinstance(item, str):
+                new.item_id = ITEM_ALIASES.get(item, item).replace("minecraft:", "")
+                ob = self._variant(new, "")
+            else:
+                ob = item
+                new.chain = _model_chain("item/" + (ITEM_ALIASES.get(like, like).replace("minecraft:", "") if like
+                                                    else "generated"))
+                new.variants[""] = self._attach(ob, "arm_" + side, self._item_matrix(new.chain, side), on=frame)
+                if enchanted:
+                    self._glint(ob)
         for h in self._hands[side]:
             if h.end is None and (frame is None or h.active(frame) or (h.start is not None and h.start >= frame)):
                 h.end = frame if frame is not None else -10 ** 9
                 for att in h.variants.values():
                     att.set(frame, False)
-        ob = None
-        if item is not None:
-            h = _Held(item if isinstance(item, str) else "object", side, frame)
-            h.enchanted, h.potion_color = enchanted, potion_color
-            if isinstance(item, str):
-                h.item_id = ITEM_ALIASES.get(item, item).replace("minecraft:", "")
-                ob = self._variant(h, "")
-            else:
-                ob = item
-                h.chain = _model_chain("item/" + (ITEM_ALIASES.get(like, like).replace("minecraft:", "") if like
-                                                  else "generated"))
-                h.variants[""] = self._attach(ob, "arm_" + side, self._item_matrix(h.chain, side), on=frame)
-                if enchanted:
-                    self._glint(ob)
-            self._hands[side].append(h)
+        if new is not None:
+            self._hands[side].append(new)
         self._rebase(side, frame, old)
         self._refresh()
         return ob
@@ -1233,6 +1289,12 @@ class Player(Character):
 
         reqs = sorted(float(f) for f in frames)
         f0 = reqs[0]
+        run = self._left_swing
+        if run is not None and run["f0"] - 1e-6 <= f0 < run["end"] - 1e-6:    # still swinging: the same run goes on
+            reqs = sorted(set(run["requests"]) | set(reqs))
+            f0 = run["f0"]
+        else:
+            run = None
         _starts, shown, _end = fx._swing_run([int(round((f - f0) / TICK)) for f in reqs])
         while len(shown) > 1 and shown[-1][0] in (0.0, 1.0) and shown[-1][1] in (0.0, 1.0):
             shown.pop()
@@ -1242,7 +1304,7 @@ class Player(Character):
                  (self.arm_l, 0, lambda b, x, y, z: x - b),     # leftArm.xRot += body.yRot, then -= g * 1.2 + h
                  (self.arm_l, 2, lambda b, x, y, z: y),         # leftArm.yRot += body.yRot * 2
                  (self.arm_l, 1, lambda b, x, y, z: z))         # leftArm.zRot += sin(t * pi) * -0.4
-        rest = [_val(ob, _ROT, index, f0) for ob, index, _fn in chans]
+        rest = run["rest"] if run is not None else [_val(ob, _ROT, index, f0) for ob, index, _fn in chans]
         times, poses = [], []
         for k, (a, b) in enumerate(shown):
             for j in range(fx._SWING_KEYS):
@@ -1257,6 +1319,7 @@ class Player(Character):
                 keys.append((f, _clamp(r + fn(*pose), -fx._SWING_LIMIT, fx._SWING_LIMIT)))
             keys.append((f_end, r))
             _segment(ob, _ROT, index, keys, "LINEAR")
+        self._left_swing = dict(f0=f0, end=f_end, requests=reqs, rest=rest)
         return f_end
 
     def mine(self, frame_start, frame_end):
@@ -1401,8 +1464,11 @@ class Player(Character):
             fc.keyframe_points.clear()
             if marks:
                 _put(fc, min(marks[0], 1) - 1, off, "CONSTANT")
+                state = False
                 for f in marks:
-                    _put(fc, f, on if self._red_at(f) else off, "CONSTANT")
+                    if self._red_at(f) != state:
+                        state = not state
+                        _put(fc, f, on if state else off, "CONSTANT")
             else:
                 getattr(ob, path)[index] = off
             fc.update()
@@ -1437,6 +1503,9 @@ class Player(Character):
         for i in range(3):
             ks = [(f, here[i] + d[i] * x + (y if i == 2 else 0.0), "LINEAR") for f, x, y in keys]
             _segment(self.root, _LOC, i, ks, "LINEAR")
+        if self._gait is not None:                              # a walk under way ends here: its travel is replaced
+            self._gait["end"] = min(self._gait["end"], float(f0))
+            self._gait["carry"] = 0.0
         return max(end, int(math.ceil(keys[-1][0])))
 
     def _halt(self, f0):
@@ -1462,8 +1531,9 @@ class Player(Character):
 
     def die(self, frame, from_point=None, knockback=0.4, poof=True, camera=None, seed=0, village=None):
         """Die on `frame`: red, tipping onto the left side, gone 20 ticks later. from_point = where the killing blow
-        comes from (its knock-back, as hurt()). camera = the Shot / Film / camera object: the 20 white poof
-        particles are then drawn by engine.animals.poof. Returns dict(frame, feet, size, point, poof, burst)."""
+        comes from (its knock-back, as hurt()). The 20 white poof particles are drawn by engine.animals.poof,
+        facing `camera` (a Shot / Film / camera object; default: the film of the Stage the player was added to).
+        Returns dict(frame, feet, size, point, poof, burst)."""
         f0 = int(round(frame))
         gone = f0 + int(round(DEATH_TICKS * TICK))
         self._halt(f0)
@@ -1483,6 +1553,7 @@ class Player(Character):
         left = Vector((math.cos(yaw), math.sin(yaw), 0.0))      # the character's left: where the body comes to lie
         info = dict(frame=gone, feet=feet, size=self.size, point=feet + left * 0.9 + Vector((0.0, 0.0, 0.3)),
                     poof=poof, burst=None)
+        camera = self.film if camera is None else camera
         if poof and camera is not None:                         # LivingEntity.makePoofParticles, around the hit box
             from . import animals
 
@@ -1552,11 +1623,6 @@ def make_player(name="player", skin="steve", slim=None, glow=None, collection=No
     spec = _player_spec(slim)
     col = ch._collection(collection)
     parts = ch._build_rig(name, spec, sheet, _skin_material(key, sheet, mask, glow), col)
-    # The torso is exactly as deep as the arms, and the arms rest 0.05 rad splayed: a sliver of each arm's front
-    # and back lies IN the torso's front and back plane (a depth tie). The torso is drawn 0.4 % deeper (0.008 px)
-    # and wins it. (The jacket overlay moves with it to 2.259 px; the sleeves stay at 2.27.)
-    for v in parts["torso"].data.vertices:
-        v.co.y *= TORSO_TIE
     p = Player(name, parts, spec, skin, slim, col)
     if skin == "herobrine":
         p.still = True
@@ -1570,6 +1636,7 @@ def add_player(st, name, skin="steve", **kw):
     p = st.cast.get(name)
     if p is None:
         p = st.cast[name] = make_player(name, skin, **kw)
+        p.film = getattr(st, "film", None)
     return p
 
 

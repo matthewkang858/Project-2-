@@ -13,7 +13,15 @@ puts the audio under it WITHOUT re-encoding the picture (the video stream is cop
 48 kHz, stereo (a mono narration becomes dual mono), starting at t = 0 and padded or cut to the exact length of the
 picture, +faststart. A narrated film gets its audio automatically (render.py --encode finds narration/<film>.wav,
 see engine/narration.py); mux_audio(video, wav) alone puts a narration under an already joined film.
+
+Long films: encode_parts() writes a film in parts of SEGMENT_FRAMES frames, each by encode() itself, and joins them
+with a stream copy. A part that is already on disk for the same frames, captions and settings is not encoded again,
+and a `deadline` stops the work between two parts, so a one-minute film (0.13 to 0.26 s per frame here: 190 to
+380 s for 1440 frames) survives a command time limit: run the same command again and it continues. render.py
+--encode uses it for every film longer than SEGMENT_OVER frames; shorter films are written in one pass exactly
+as before.
 """
+import hashlib
 import json
 import os
 import re
@@ -29,11 +37,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "out")
 FINAL_SIZE = (1080, 1920)
 AUDIO_RATE, AUDIO_BITRATE = 48000, "192k"
-# A mono narration is delivered as dual mono (the same signal left and right). Each channel carries it 3.01 dB
-# down, so that the STEREO programme measures what the mono file measures (BS.1770 adds the two channels' power:
-# narration/<film>.wav at -16 LUFS -> the mp4 at -16 LUFS, its true peak 3 dB further under the ceiling).
-# Set 0.0 to copy the mono samples at full level into both channels (the mp4 then measures 3 LU louder).
-DUAL_MONO_GAIN_DB = -3.01
+# A mono narration is delivered as dual mono: the same samples, at full level, left and right. BS.1770 adds the two
+# channels' power, so the STEREO programme measures 3.01 LU above the mono file: tools/narrate.py therefore makes
+# narration/<film>.wav at -19 LUFS (true peak under -2 dBTP) and the mp4 measures -16 LUFS with its true peak under
+# -1.5 dBTP. (The wav was first made at -16 LUFS and lowered 3.01 dB here: the same programme, but the limiter in
+# narrate.py had to take 3 dB more off every peak to get there.)
+DUAL_MONO_GAIN_DB = 0.0
+# Encoding costs 0.13 s per 1080x1920 frame on this machine when it is idle and 0.26 s when four agents share it
+# (measured: 275 frames of a finished film in 72 s), most of it single-threaded Python (PNG read, Lanczos, caption).
+SEGMENT_FRAMES = 240          # encode_parts(): frames per part (10 s at 24 fps: 31 to 62 s of work)
+SEGMENT_OVER = 480            # render.py --encode: a film longer than this many frames (20 s) is encoded in parts
 
 # Where a Reels viewer actually sees the picture, as fractions of the 9:16 video (x0, y0, x1, y1), measured on the
 # reference screenshots (1179x2556 phone, video height-filled down to y = 2333, so the sides are cropped):
@@ -183,21 +196,11 @@ def contact_sheet(tiles, labels, words, path, columns=None, gap=6):
     return path
 
 
-def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
-           crf=16, audio=None, preset="medium", variant=None, allow_holds=False):
-    """Upscale every frame to 1080x1920 (Lanczos), composite its caption AFTER the upscale and pipe to ffmpeg
-    (H.264 yuv420p, +faststart). Returns the mp4 path. audio=FILE adds sound with mux_audio() (the picture is
-    encoded exactly as without it; AAC 192k 48 kHz stereo from t = 0, as long as the picture).
-
-    Only frames that are valid for the film's current signature count (see valid_frames). A frame that is missing
-    from the range is an ERROR: a crashed render chunk must not turn into a stutter in the delivered film. Pass
-    allow_holds=True for a deliberate --step preview: missing frames then hold the previous rendered frame, so the
-    timing stays right. Frames of mixed pixel sizes are always an error.
-    captions / fps / range default to the film's meta.json.
-    """
+def usable_frames(film, variant=None, frame_start=None, frame_end=None, allow_holds=False):
+    """The frames an encode of [frame_start, frame_end] (default: the film's range in meta.json) may use:
+    (valid frame numbers on disk, frame_start, frame_end). Raises RuntimeError when there are none, when frames of
+    the range are missing or stale and allow_holds is False, or when the frames have mixed pixel sizes."""
     meta = read_meta(film, variant) or {}
-    captions = meta.get("captions", []) if captions is None else captions
-    fps = int(fps or meta.get("fps", 24))
     stamped = meta.get("current") is not None or meta.get("signature")
     have = valid_frames(film, variant) if stamped else existing_frames(film, variant)
     if not have:
@@ -223,6 +226,30 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
     if len(sizes) > 1:
         raise RuntimeError("%s: frames of mixed sizes %s - re-render so that every frame has one size"
                            % (frames_dir(film, variant), {k: len(v) for k, v in sizes.items()}))
+    return have, frame_start, frame_end
+
+
+def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
+           crf=16, audio=None, preset="medium", variant=None, allow_holds=False, time_origin=None):
+    """Upscale every frame to 1080x1920 (Lanczos), composite its caption AFTER the upscale and pipe to ffmpeg
+    (H.264 yuv420p, +faststart). Returns the mp4 path. audio=FILE adds sound with mux_audio() (the picture is
+    encoded exactly as without it; AAC 192k 48 kHz stereo from t = 0, as long as the picture).
+    time_origin = the frame number at which the captions' clock reads 0 (default frame_start; encode_parts() passes
+    the film's first frame for every part).
+
+    Only frames that are valid for the film's current signature count (see valid_frames). A frame that is missing
+    from the range is an ERROR: a crashed render chunk must not turn into a stutter in the delivered film. Pass
+    allow_holds=True for a deliberate --step preview: missing frames then hold the previous rendered frame, so the
+    timing stays right. Frames of mixed pixel sizes are always an error.
+    captions / fps / range default to the film's meta.json.
+    """
+    meta = read_meta(film, variant) or {}
+    captions = meta.get("captions", []) if captions is None else captions
+    fps = int(fps or meta.get("fps", 24))
+    have, frame_start, frame_end = usable_frames(film, variant, frame_start, frame_end, allow_holds)
+    have_set = set(have)
+    wanted = range(frame_start, frame_end + 1)
+    origin = frame_start if time_origin is None else int(time_origin)
     if out_path is None:
         out_path = os.path.join(OUT, film + ".mp4") if not variant else \
             os.path.join(OUT, "preview", "%s_%s.mp4" % (film, variant))
@@ -261,7 +288,7 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
                 with Image.open(frame_path(film, use, variant)) as im:
                     base = upscale(im, size)
                 src_frame = use
-            word = cap.caption_at(captions, (f - frame_start) / float(fps))
+            word = cap.caption_at(captions, (f - origin) / float(fps))
             out = cap.composite(base.copy(), word) if word else base
             proc.stdin.write(out.tobytes())
     finally:
@@ -282,6 +309,117 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
                                                         info["duration"])
     print(f"[encode] {out_path}: {n} frames ({n / fps:.2f} s) at {fps} fps, {size[0]}x{size[1]}, "
           f"{missing} held{sound}, {time.time() - t0:.1f}s")
+    return out_path
+
+
+def _part_key(film, variant, a, b, origin, fps, size, crf, preset, captions, have):
+    """What a part of a film depends on: its frame files (name, size, modification time; with holds also the frame
+    held into it), the captions visible in it and the encoder settings. Same key = same bytes, not encoded again."""
+    have_in = [f for f in have if a <= f <= b]
+    earlier = [f for f in have if f < a]
+    used = ([earlier[-1]] if earlier and (not have_in or have_in[0] > a) else []) + have_in
+    stats = []
+    for f in used:
+        st = os.stat(frame_path(film, f, variant))
+        stats.append([f, st.st_size, st.st_mtime_ns])
+    t0, t1 = (a - origin) / float(fps), (b + 1 - origin) / float(fps)
+    caps = [[str(c[0]), float(c[1]), float(c[2])] for c in captions if c[1] < t1 and c[2] > t0]
+    blob = json.dumps([a, b, origin, fps, list(size), crf, preset, caps, stats], sort_keys=True)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
+
+
+def encode_parts(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
+                 crf=16, audio=None, preset="medium", variant=None, allow_holds=False, segment=SEGMENT_FRAMES,
+                 deadline=None, first_always=True):
+    """encode() for a long film, in parts that survive an interrupted command. The range is cut into parts of
+    `segment` frames; each is written by encode() (same settings, captions on the film's clock) to
+    <out>.part_<a>-<b>.mp4 and recorded in <out>.parts.json with a key of everything it depends on; a part whose
+    key is unchanged is not encoded again. When all parts exist they are joined with a stream copy (+faststart),
+    the frame count is checked, `audio` is put under the whole film with mux_audio() and the parts are deleted.
+    `deadline` (a time.time() value): no new part is started after it, except the first of this call (so that
+    every call makes progress; first_always=False drops the exception, for a call that has already spent its time
+    on something else). Returns the mp4 path, or None when parts are still missing (call again with the same
+    arguments)."""
+    meta = read_meta(film, variant) or {}
+    captions = meta.get("captions", []) if captions is None else captions
+    fps = int(fps or meta.get("fps", 24))
+    have, frame_start, frame_end = usable_frames(film, variant, frame_start, frame_end, allow_holds)
+    if audio and not os.path.exists(audio):
+        raise RuntimeError("audio file %s does not exist" % audio)
+    if out_path is None:
+        out_path = os.path.join(OUT, film + ".mp4") if not variant else \
+            os.path.join(OUT, "preview", "%s_%s.mp4" % (film, variant))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        raise RuntimeError("ffmpeg not found on PATH")
+    stem = out_path[:-4]
+    book_path = stem + ".parts.json"
+    try:
+        with open(book_path, encoding="utf-8") as f:
+            book = json.load(f)
+    except (OSError, ValueError):
+        book = {}
+    ranges = [(a, min(frame_end, a + int(segment) - 1)) for a in range(frame_start, frame_end + 1, int(segment))]
+    names = {"%s.part_%04d-%04d.mp4" % (os.path.basename(stem), a, b) for a, b in ranges}
+    for name in list(book):                                   # parts of another cut of the film: gone
+        if name not in names:
+            old = os.path.join(os.path.dirname(out_path), name)
+            if os.path.exists(old):
+                os.remove(old)
+            del book[name]
+    t0, made, todo, parts = time.time(), 0, 0, []
+    for a, b in ranges:
+        part = "%s.part_%04d-%04d.mp4" % (stem, a, b)
+        name = os.path.basename(part)
+        key = _part_key(film, variant, a, b, frame_start, fps, size, crf, preset, captions, have)
+        parts.append(part)
+        if book.get(name) == key and os.path.exists(part):
+            continue
+        if deadline is not None and (made or not first_always) and time.time() > deadline:
+            todo += 1
+            continue
+        book.pop(name, None)
+        encode(film, captions=captions, fps=fps, frame_start=a, frame_end=b, out_path=part, size=size, crf=crf,
+               preset=preset, variant=variant, allow_holds=allow_holds, time_origin=frame_start)
+        book[name] = key
+        with open(book_path + ".tmp", "w", encoding="utf-8") as f:
+            json.dump(book, f, indent=1)
+        os.replace(book_path + ".tmp", book_path)
+        made += 1
+    if todo:
+        print("[encode] %s: %d of %d parts written (%d in this call, %.0f s); %d left: run the same command again"
+              % (out_path, len(ranges) - todo, len(ranges), made, time.time() - t0, todo))
+        return None
+    n = frame_end - frame_start + 1
+    listing = stem + ".parts.txt"
+    with open(listing, "w", encoding="utf-8") as f:
+        for part in parts:
+            f.write("file '%s'\n" % os.path.abspath(part).replace("'", "'\\''"))
+    video_path = out_path if not audio else stem + ".video_only.mp4"
+    code = subprocess.call([ffmpeg, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", listing,
+                            "-c", "copy", "-an", "-movflags", "+faststart", video_path])
+    if code != 0:
+        raise RuntimeError("ffmpeg (joining the parts) failed with exit code %d" % code)
+    joined = probe(video_path)
+    if joined["frames"] != n or abs(joined["duration"] - n / float(fps)) > 0.5 / fps:
+        raise RuntimeError("the joined film has %s frames in %.3f s, expected %d in %.3f s"
+                           % (joined["frames"], joined["duration"], n, n / float(fps)))
+    sound = ""
+    if audio:
+        try:
+            info = mux_audio(video_path, audio, out_path)
+        finally:
+            if os.path.exists(video_path):
+                os.remove(video_path)
+        sound = ", sound %s (%s %d Hz %d ch, %.3f s)" % (os.path.relpath(audio, ROOT) if os.path.isabs(audio) else audio,
+                                                        info["codec"], info["sample_rate"], info["channels"],
+                                                        info["duration"])
+    for path in parts + [listing, book_path]:
+        if os.path.exists(path):
+            os.remove(path)
+    print("[encode] %s: %d frames (%.2f s) at %d fps in %d parts (%d encoded in this call)%s, %.1fs"
+          % (out_path, n, n / float(fps), fps, len(ranges), made, sound, time.time() - t0))
     return out_path
 
 
@@ -327,9 +465,12 @@ def mux_audio(video, audio, out_path=None, gain_db=None):
     if src["channels"] == 1:
         k = 10.0 ** ((DUAL_MONO_GAIN_DB if gain_db is None else gain_db) / 20.0)
         layout = "pan=stereo|c0=%.6f*c0|c1=%.6f*c0" % (k, k)
-        # no perceptual noise substitution: it fills quiet bands with noise that is DIFFERENT left and right
-        # (measured: the channels then differ by up to -40 dB; without it they are equal to -82 dB)
-        codec += ["-aac_pns", "0"]
+        # Dual mono must come out of the decoder as two IDENTICAL channels. The encoder is told to code mid / side
+        # (the side channel of two equal channels is exactly zero) and to use neither intensity stereo nor
+        # perceptual noise substitution, which fills quiet bands with noise that differs left and right.
+        # Measured on a 62 s narration, max |L - R| after decoding: defaults -40 dB, without PNS -53 dB,
+        # M/S forced with intensity stereo left on -20 dB, all three as here 0 (bit-identical).
+        codec += ["-aac_pns", "0", "-aac_is", "0", "-aac_ms", "1"]
     else:
         layout = "aformat=channel_layouts=stereo" + ("" if not gain_db else ",volume=%.3fdB" % gain_db)
     chain = "[1:a:0]aresample=%d,%s,apad=whole_len=%d,atrim=end_sample=%d[a]" % (AUDIO_RATE, layout, samples, samples)
@@ -410,3 +551,29 @@ if __name__ == "__main__":
     silent = encode(film, out_path=os.path.join(OUT, "test", "post_test_again.mp4"), allow_holds=True, audio=tone)
     assert video_md5(silent) == video_md5(mp4) and probe_audio(silent)["channels"] == 2
     print("sound:", info, "- picture stream identical with and without it")
+    # a long film in parts: three parts of 12 frames, the command "interrupted" after every part (a deadline in the
+    # past allows one part per call). The result must be the same film as the one-pass encode: frame count, length,
+    # every decoded picture with its caption (not the same bits: each part starts its own GOP), sound from t = 0
+    parted = os.path.join(OUT, "test", "post_test_parts.mp4")
+    calls = 0
+    while encode_parts(film, out_path=parted, allow_holds=True, audio=tone, segment=12, deadline=0.0) is None:
+        calls += 1
+        assert calls < 5 and os.path.exists(parted[:-4] + ".parts.json")
+    assert calls == 2, calls                                      # two unfinished calls, the third joins
+    one, many = probe(mp4), probe(parted)
+    assert many["frames"] == one["frames"] == 36 and abs(many["duration"] - one["duration"]) < 1e-3, (one, many)
+
+    def decoded(path):
+        raw = subprocess.check_output([shutil.which("ffmpeg"), "-v", "error", "-i", path, "-map", "0:v:0", "-vf",
+                                       "scale=270:480", "-f", "rawvideo", "-pix_fmt", "gray", "-"])
+        return np.frombuffer(raw, dtype=np.uint8).reshape(-1, 480, 270).astype(np.float32)
+
+    a, b = decoded(mp4), decoded(parted)
+    worst = float(np.abs(a - b).mean(axis=(1, 2)).max())
+    assert a.shape == b.shape and worst < 1.5, (a.shape, b.shape, worst)
+    sound = probe_audio(parted)
+    assert sound["channels"] == 2 and abs(sound["duration"] - 1.5) < 0.002 and abs(sound["start_time"]) < 1e-6, sound
+    left = [n for n in os.listdir(os.path.join(OUT, "test")) if n.startswith("post_test_parts.") and n != "post_test_parts.mp4"]
+    assert not left, left
+    print("parts: 3 parts over 3 calls -> %d frames, %.3f s, largest mean picture difference to the one-pass film "
+          "%.2f of 255, sound %s" % (many["frames"], many["duration"], worst, sound))
