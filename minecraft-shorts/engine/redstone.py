@@ -1,4 +1,176 @@
-"""REDSTONE PARTS THAT WORK ON CAMERA (docstring completed at the end of this file's development; see __doc__ below)."""
+"""REDSTONE PARTS THAT WORK ON CAMERA: lever, piston and sticky piston, redstone dust, repeater, redstone lamp,
+redstone torch (placed and held), redstone block, and the game's timings to play a small circuit in order.
+
+New module; edits no other file. Shapes are the game's own block models and blockstates (engine.mcassets), textures
+through engine.blocks' materials; numbers are transcribed from the 26.x client classes (named next to each constant
+and listed below). Blender axes as everywhere: +X east, +Y north, +Z up, 1 block = 1 unit, 24 fps, 1 game tick =
+1.2 frames. "frame" = a film frame; a few calls take a film TIME t (a float: ticks fall between frames).
+
+WHAT IS AN OBJECT AND WHAT IS STATIC
+  Every part this module makes is its own object (parts change during a film, and dust needs its tint, which the
+  World's mesh does not give it). What never changes goes into the village through the hook: the stone a lever or
+  wall torch hangs on, the block under a lamp, a wall, a floor (bench()). A cell a part occupies (or a block a
+  piston moves into) must be EMPTY in the set's World: the kit refuses a taken cell (RedstoneError, naming it).
+  A redstone block / lamp that never changes may also be plain b.w.set(...) in the hook (an unlit lamp; a lit
+  lamp in the World glows but gives no light: use kit.lamp).
+
+PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a part with .name, .show(frame, visible),
+            .objects; register parts with the Stage like characters: st.cast[p.name] = p; st.use(shot, p))
+  IN THE HOOK (build_village(edit=...))
+    bench(b, x0, y0, x1, y1, block="smooth_stone", level=None) -> dict(z, cells)   a level stone floor for parts
+        (the grass top replaced, plants cleared, columns reserved); parts then stand in cells at z = dict["z"].
+    carve(b, cells) -> {cell: state}          take cells out of the World (they become parts / moving blocks)
+    door_cells(cells, side) -> [cells]        every cell a piston_door needs empty (door, head, piston cells)
+  THE KIT
+    kit(where, collection=None, sky_light=None) -> Kit      one per set (the Village or a blocks.World); the same kit
+        comes back for the same set. sky_light = a sky-light level 0..15 baked into every part's colours the way
+        engine.sets bakes a dark set (lightmap()); per part too (sky_light=...). Lit lamps / torches never dim.
+    k.block(block_id, cell, props=None, frame=None, sky_light=None) -> movable block (an engine.breaking Breakable:
+        .breakable .object .cell_at(t)); what pistons push and pull. frame = placed ON that frame.
+    k.lever(cell, face="floor"|"wall"|"ceiling", facing, powered=False) -> Lever
+    k.piston(cell, facing, sticky=False, extended=False) -> Piston      facing: north east south west up down
+    k.wire(cells, power=0 | {cell: level}, dots=(), source=None) -> Wire     dust lying IN these cells
+    k.repeater(cell, toward, delay=1, powered=False) -> Repeater       toward = where the signal goes
+    k.lamp(cell, lit=False, watts=None) -> Lamp                         .light = its point light
+    k.torch(cell, wall=None, lit=True, frame=None, watts=None) -> Torch  wall = the side a wall torch leans out to
+    k.piston_door(cells, side, block="stone", closed=True) -> PistonDoor       ONE CALL for the door of "Two Apples"
+    k.piston_row(cells, facing, carry="oak_planks", extended=True, sticky=True) -> PistonRow     ONE CALL for the
+        twelve pistons of "Leg Day": each with `carry` on its arm (2 out extended, 1 out retracted)
+    k.extend_all(pistons, frame) / k.retract_all(pistons, frame) -> end time       any set of pistons on one tick
+    k.ride(thing, on, frame_start=None, frame_end=None)   thing (a block, Breakable, Object or Character) moves with
+        the movable block `on` (see NOT THE GAME); k.show(frame, visible) every part of the kit
+  LEVER
+    .flip(frame, ease=0) / .set(frame, powered, ease=0) -> frame    the game swaps two models (no in-between frame):
+        drawn from `frame` on (keyed at frame - 0.25: frame - 1's exposure is untouched). ease=2: a 2-frame swing
+        ending ON frame (a film choice, off by default).
+    .state_at(frame)   .hand_point(frame=None, along=0.8) -> the point on the handle a hand must reach (1.0 = tip)
+    .stand(distance=0.58, side=None, lateral=0.22, along=0.5) -> ((x, y, z), yaw)     where a player stands so his
+        right hand, at the far end of an engine.players attack() swing (SWING_REACH, measured), is at the handle
+    flip_by(player, lever, frame, sync="game"|"hand", look=True, ease=0) -> frame the lever changes on
+        the player's swing (players attack) starts ON frame (the click); sync="game": the lever changes the frame
+        after (LEVER_SHOW_TICKS); sync="hand": on the frame his hand is nearest the handle (reads in a close-up).
+  PISTON
+    .extend(t, push="auto", ride=()) -> t + 2.4   the head and the blocks in front travel 1 block in 2 ticks, linear;
+        push="auto" = the kit's movable blocks in a line from the cell in front (or a list of them / of cells);
+        13 or more -> RedstoneError, nothing moves; a block of the set's mesh in the way -> RedstoneError.
+    .retract(t, pull="auto") -> t + 2.4           a sticky piston pulls the block in front of its head (None: not)
+    .cancel(t)        take back the move starting at t (and its blocks' moves)
+    .travel(t) (0 in .. 1 out)  .extended_at(t)  .look_at_frame(f) ('R' block / 'S' short head / 'L' long head)
+    .head_point(t)    arm_inside(piston, frame) -> bool (the check that no head pokes out or leaves a gap)
+  PISTON DOOR / ROW
+    door.open(frame) / door.close(frame) -> end time; door.is_open(t); door.pistons, door.blocks
+    row.retract(frame) / row.extend(frame) -> end time; row.pistons, row.blocks
+  WIRE (redstone dust)
+    .power(frame, source=None, level=15, ripple=0) -> frame   lit from `source` (default its source cell; a cell
+        BESIDE the line = a lever / torch there): level - 1 per block of dust. ripple=N: block by block away from
+        the source over N frames (a film choice; the game lights the line in one tick).
+    .unpower(frame)   the whole line dark on one frame (the game: within one tick)
+    .set_levels(frame, {cell: level}) .level_at(cell, frame) .levels(frame, source, level) .distances(source)
+    .states  {cell: {'north': 'side'|'up'|'none', ...}} as the game connects it; dust_shape(state) names it
+    wire_color(power) -> (r, g, b)   WIRE_COLORS: the game's table (power 0 (76, 0, 0) .. 15 (255, 50, 0))
+  REPEATER / LAMP / TORCH
+    repeater.set(frame, powered)   .delay_ticks (= 2 x delay)
+    lamp.set(frame, lit)   lamp.lit_at(frame)   lamp.light (keyed on exactly while lit; scale .light.data.energy)
+    torch.set(frame, lit)  torch.remove(frame)  torch.plant(frame, player=None, hand="right", consume=False) ->
+        frame it appears on: with a player his swing starts ON frame and the torch is there the frame after; it is
+        not there before (a torch that is planted is made with k.torch(cell) and plant()ed)
+    hold_torch(player, hand="right", frame=None, glow=True, watts=30) -> item    engine.players hold("redstone_torch")
+        with its head glowing and a small light that is on exactly while the item is (a driver on its visibility)
+  PLAYING A CIRCUIT ("powered from frame f")
+    signal(frame, *steps) -> time   each step's input is powered when the step before it puts out its signal:
+        a step = a part or a tuple of parts powered together. part.power(t) -> the time its output changes:
+        wire 0, lever 0, lamp on 0, piston 0 (+ 2 ticks of travel), repeater 2 x delay ticks, torch (an inverter:
+        powered = goes OUT) 2 ticks.
+    unsignal(frame, *steps) -> time  the same switched off (lamp off 4 ticks late, repeaters keep their delay)
+    at(frame, ticks) -> film time    frame_of(t) -> the first whole frame that draws a change at time t
+    Example (beat 7 of "Leg Day"):  torch = k.torch(c0); wire = k.wire(cells, source=c0)
+        t = torch.plant(f, player=efe); redstone.signal(t, wire, repeater, (lamp, piston))
+  PROOF
+    proof_set(b) / build_proof(scene) -> dict      the proof film in the real village (AREAS lists where)
+    PROOFS = sheet_a sheet_b dust bench lever column row door   (stills, see SELF-TEST)
+
+WHAT THE GAME DOES (read from the classes; the constants at the top carry the class names)
+  piston   checkIfExtend sends the block event in the same tick power arrives (start delay 0). The move is a
+           PistonMovingBlockEntity: progress += 0.5 per tick, drawn at lerp(progressO, progress, partial tick):
+           1 block in 2 ticks (2.4 frames), linear, for the head and every pushed / pulled block alike. Pushing:
+           the base becomes the extended model (piston_base) at once and the head (piston_head) slides out of it;
+           retracting: the block entity draws the base AND the head. PistonHeadRenderer draws the head SHORT
+           (piston_head_short: a 12 px arm) while it is 0.5 block or less out, the long one (16 px arm, 4 px into
+           the base) beyond: the arm always ends inside the base. Push limit 12 (PistonStructureResolver
+           .MAX_PUSH_DEPTH: 13 and it does not move at all). A sticky piston pulls the one block in front of its
+           head. A normal piston leaves it.
+  sticky   sticky_piston / piston_head_sticky: the face is block/piston_top_sticky (the slime-green one).
+  lever    LeverBlock.pull sets the new state in the tick of the click; its blockstate swaps model lever <->
+           lever_on (the handle element at -45 / +45 degrees about the base's X axis): no in-between. The client
+           shows the server's change (the click itself only cycles a copy on the client): ~1 tick later.
+  dust     redstone_wire multipart: dot + side0 / side_alt0 (line0) + side_alt1 / side1 (line1) + up pieces,
+           chosen by getConnectionState: connections from getConnectingSide (dust, a repeater along its axis, any
+           signal source; climbing 'up' a block side when the block above the dust is not a conductor; down past
+           an edge), an unconnected dust is a cross unless right-clicked (dot), connections on one axis only run
+           across the whole block. Tint: RedstoneWireBlock COLORS (f = power/15; r = 0.6 f + 0.4 (0.3 at 0),
+           g = clamp(0.7 f^2 - 0.5), b = clamp(0.6 f^2 - 0.7); floor(x 255) in single precision), applied by
+           BlockTintSources$10. Power falls one per block. Not a light source.
+  repeater RepeaterBlock.getDelay = DELAY x 2 ticks, both ways; FACING is its INPUT side (toward is the other).
+  lamp     RedstoneLampBlock: lit in the same tick, unlit 4 ticks after it loses power; light level 15.
+  torch    RedstoneTorchBlock: light 7; TOGGLE_DELAY 2 ticks (inverter); the lit model adds a 3x3x3 px halo of
+           single-texel faces around the head.
+  falling  FallingBlock.getDelayAfterPlace = 2: an anvil whose plank is pulled away starts to fall 2 ticks after
+           (for engine/fixtures.py; this module leaves it hanging).
+
+MEASURED (`$BPY -m engine.redstone`: 27 numeric checks + 3 in the village; stills out/test/redstone_*.png)
+  Piston: for moves starting at any phase of a frame, every frame's head (short / long) stays inside the base over
+  the whole exposure and the moved block touches the head plate at every sampled moment (no gap, no overlap).
+  extend(10.0): frames 8-9 the block model, 10 the short head, 11+ the long one; the head is 0.10 out at the
+  middle of frame 10's exposure and 0.52 at frame 11's.
+  Lever: the module's handle rotation lands within 1e-7 px of the game's other model for all 12 placements.
+  A player at lever.stand(): the swing passes 0.42 block from the middle of a wall lever's raised handle in the
+  block above the floor (0.14 beside it, 0.39 below: the swing tops out 1.33 above his feet; redstone_lever_strip).
+  Lamp light at golden hour on a figure 2.7 blocks away: +10 % on the lit side of the torso, +8 % on the floor near
+  it (redstone_bench_f44 / f45): a daytime lamp is subtle, as in the game. For "the lamp lights his face" (beat 7)
+  raise lamp(watts=...) for that shot or keep the face in shade.
+  Render times (2 threads, 16 samples, loaded machine): a 960x540 sheet 12-20 s, a 360x640 strip tile 3-10 s.
+  Fingerprints (`$BPY -m tools.check_redstone_stamp`): order-independent, identical in a second process, and
+  changing on exactly the frames a lever / dust level / lamp / piston move changes (motion blur sampled).
+
+NOT THE GAME, AND WHERE THE PICTURE DIFFERS FROM IT
+  - Lit dust glows a little (DUST_GLOW 0.6 x power/15, emission of the tinted texture): vanilla dust is not
+    emissive; shader packs make lit redstone glow. Lit torch heads glow (TORCH_GLOW 1.4 on texels brighter than
+    0.65), the lit repeater's red line a little (REPEATER_GLOW). The halo of the lit torch is two-sided here (the
+    game culls its near faces; the silhouette is the same 3x3x3 px box).
+  - Dust is drawn with its pieces DUST_LAYER_PX (0.05 px) apart (the game draws them coplanar and translucent;
+    a ray tracer skips a coplanar quad behind a cut-out texel, which made arms vanish) and without the never-seen
+    undersides. The overlay texture (redstone_dust_overlay) is fully transparent in this version and is left out.
+  - Light: LAMP_WATTS 122 = 1.11 x the village torch, REDSTONE_TORCH_WATTS 37 = 0.34 x: the game's brightness
+    ratios at two blocks (lightmap.fsh, light 15 / 14 / 7). The point lights fall off as the village's (W/(d^2+1)),
+    not as the game's flat light curve. Redstone torch light is tinted (1.0, 0.62, 0.5): the game has one block-
+    light colour. The lamp's own faces do not block its light (shadow linking).
+  - kit.ride() carries blocks and characters with a moved block: the game drops an anvil whose support moves,
+    and carries entities only on an upward push. flip_by(sync="hand") and plant() timing follow the arm, not the
+    server tick. Pushed blocks keep their Breakable's .cell / .center at the original cell: use cell_at(t).
+  - Not built: particles (the lever's and the dust's red specks, the torch's smoke), sounds, comparators,
+    observers, slime / honey blocks, quasi-connectivity, locked repeaters, torch burnout, block placement
+    animation (a planted torch is there on its frame), falling anvils (engine/fixtures.py).
+  - The proof's door scene is lit by the look's shadowless fill inside a closed stone box: underground it reads
+    brighter than the game (engine.sets' sky-light bake would darken the walls but also every torch-lit face).
+
+GOTCHAS
+  - Make parts AFTER build_village, cells left empty in the hook; make the parts a wire touches (levers, torches,
+    repeaters, other dust) BEFORE the wire (its shapes are fixed when it is made).
+  - Visibility of every part is keyed by the module (and Stage.finish through .show): never key hide_render on a
+    part's objects yourself. Stage.lights does not touch this module's lights (they are not village lights).
+  - Calls may come in any order; a piston refuses overlapping moves (RedstoneError): cancel(t) first to re-time.
+  - Visibility changes land on whole frames (frame_of); moves are keyed at their exact (fractional) times.
+  - A film that imports engine.redstone has this file in its engine hash: freeze it while finals render.
+
+SELF-TEST
+    $BPY -m engine.redstone                    numeric checks + the proof film in the village (about 20 s)
+    $BPY -m engine.redstone quick              numeric checks only
+    $BPY -m engine.redstone stills NAME ...    proof stills out/test/redstone_<name>.png: sheet_a sheet_b dust
+                                               (stills) and bench lever column row door (strips of tiles
+                                               redstone_<name>_f<frame>.png + redstone_<name>_strip.png); two or
+                                               three names per call stay under the 300 s limit
+    $BPY -m tools.check_redstone_stamp         frame fingerprints (two processes; about a minute)
+"""
 import math
 
 import bpy

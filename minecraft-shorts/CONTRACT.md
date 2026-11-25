@@ -304,7 +304,8 @@ does on the bed in reference 3.
 
 ### Rules that each cost a wrong render
 
-- One sky per film (`look.set_time` once). Choose the sun for the shots: the village is dense, so a sun lower than
+- One sky per BUILD: a film with several skies declares them in SKIES and tags its shots (see "Several skies in one
+  film" below; this replaced "one sky per film"). Choose the sun for the shots: the village is dense, so a sun lower than
   about 20 degrees leaves almost everything at ground level in a building's shadow. The golden look-dev film uses
   azimuth 62, elevation 27; at dusk (elevation 5) faces need a torch as key (`Stage.lights(..., extra=...)`).
 - At dusk a subject is as bright as its practical makes it. Bell close-up: west lamp x 2.4 as the key, east lamp
@@ -359,9 +360,8 @@ previews and stills. Look for these BEFORE the final render:
   speed). Two runners 0.2 block apart are one two-headed shape: stagger them by 0.7 block.
 - Daylight with the sun behind the camera is flat, with no cast shadows in the picture. Stage each daylight camera
   so the sun is 60-120 degrees off the lens axis, or let a shadow edge cross the wall behind the subject.
-- A film with two skies is two modules (films/poppy_night.py, films/poppy_day.py), encoded separately and joined
-  with `ffmpeg -f concat -safe 0 -i list.txt -c copy -movflags +faststart` (the streams are identical in settings;
-  timestamps stay constant across the join).
+- (History) Poppy, made before several skies per film existed, is two modules (films/poppy_night.py,
+  films/poppy_day.py) encoded separately and joined with `ffmpeg -f concat`. New films use one module with SKIES.
 
 Known engine issues, not fixed because engine files were frozen during the finals; the films work around them:
 
@@ -377,3 +377,71 @@ Known engine issues, not fixed because engine files were frozen during the final
 - The smithy has no fill light group; raising its torches alone turns the cobblestone orange.
 - `tools.palette_check` has no command line (use its probe / evaluate). `render.py --still ... --sheet N` in one
   call renders the sheet at the still's resolution: run `--sheet` on its own.
+
+## The one-minute narrated films (from November 25)
+
+The client asked for one-minute films "with a real story" and a narrator. Scripts: SCRIPTS.md; shot lists:
+SHOTLISTS.md; per story `stories/<slug>.json` (narration, beats with the picture for each sentence, locations, risks,
+fallbacks). Every module below was built from the game's own classes and files, checked by an independent reviewer and
+fixed; its module docstring is the reference, and its self-test is `$BPY -m engine.<module>` (narration: `$TTS
+tools/narrate.py --selftest`).
+
+| Module | What it gives a film |
+| --- | --- |
+| `engine/narration.py`, `tools/narrate.py`, `tools/narration_sync.py` | NARRATION literal in the film, spoken by Kokoro into `narration/<film>.wav` + `.json` (commit both); word frames, cuts from sentences, captions from the voice; `--encode` muxes the voice automatically. Template: `films/_narrated_demo.py`. |
+| `engine/players.py` | The real player model, ten skins (Steve ... Zuri, and "herobrine" with glowing white eyes), armor of every material with glint, held items, walk / sprint / sprint-jump / sneak / attack / mine / hurt / die / watch. `players.add_player(st, name, skin)`. Use it instead of `st.actor(name, "steve")`. |
+| `engine/undead.py` | Zombie, husk, zombie villager (all professions, babies), aggro arms, attack, infect, cure with splash potion and golden apple; `undead.hurt / die` (flash, knock-back only with an attacker) for ANY character. |
+| `engine/piglins.py` | Piglin, brute, baby; admire, barter with lobbed results, axe swing, dance, fall, hurt, death poof. |
+| `engine/animals.py` | Cow, calf, chicken, chick; wander in pens, follow, eat, milk, lay eggs, hurt, death; `pen_set` through the village hook. |
+| `engine/sets.py` + `village.build_village(..., edit=hook)` | Film-specific blocks go INTO the village world before it is meshed and lit (torches become lights, paths and anchors follow). `hello_set`: dark oak forest wall, floating oak, bare oaks, sand pyramid, with anchors, paths and cameras. Docstring says how to add a set piece. |
+| `engine/breaking.py` | The game's destroy-stage cracks on doors and single blocks, breakable / placeable blocks, mining with the game's timing (compressible), the zombie banging on a door (cracks climb and reset, optional shudder), `door_torches`. |
+
+**Final quality is set by each new film, in build()** (study: `tools/render_economics.py findings`, independently
+checked): `scene.render.resolution_x, scene.render.resolution_y = 540, 960` and `scene.cycles.samples = 16`, upscaled
+to 1080x1920 by the encoder. In blind pairs nobody could tell it from 720x1280 at 24 at phone size; it halves the render
+time (about 3 h for 1,440 frames on four idle cores). Do NOT change `render.FINAL_RES / FINAL_SAMPLES` (that would make
+every frame of the finished films stale), never pass `--res / --samples` for finals (that selects a preview directory),
+and leave the noise seed alone (an animated seed boils dark defocused areas).
+
+**Long films.** A film over 20 s is encoded in resumable 10 s parts: `--encode` returns exit 4 until it is done; run it
+again. Render finals in chunks with `--frames all --max-seconds N` and resume on exit 3 with `--restamp all` when an
+engine edit changed no picture.
+
+### Several skies in one film, and dips to black (render.py, films/lookdev.py Stage, engine/post.py)
+
+This REPLACES the rule "One sky per film (`look.set_time` once)" (Rules that each cost a wrong render, first bullet: keep its advice about sun elevation) and the bullet "A film with two skies is two modules (films/poppy_night.py, films/poppy_day.py) ..." (After four finished films). A film that alternates between skies is ONE module, one frame directory, one narration and one mp4. Template: `films/_multisky_demo.py`.
+
+```python
+SKIES = {"gold":  dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm"),      # module level, the name SKIES
+         "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool")}      # az: degrees ccw from east
+def build(scene, sky=None):                                  # render.py calls it once per sky that has work
+    st = Stage(scene, film, v, skies=SKIES, sky=sky)         # builds the ACTIVE sky (None: the first) and its compositor
+    s = st.shot("door_night", seconds, sky="night")          # every shot names its sky (default: the one in force before it)
+    torches = dict(near=bed, radius=16.0, inside="house_a")
+    st.lights(s, scale=1.7, **torches)
+    st.sky_change(frame, "gold")                             # a sky change INSIDE a shot: same camera path, actors mid-motion
+    st.lights(s, scale=1.0, at=frame, **torches)             # torch levels that step with it (repeat every argument)
+    st.dip(frame, out=3, hold=0, back=3)                     # encoder: black ON `frame`, 3 frames out, 3 back; st.fade(f0, f1, g0, g1)
+    return {"film": film, "captions": caps, "narration": nar, "stage": st}
+```
+
+- **One sky per build.** The timeline, every actor, key, torch level, caption and render setting must be the same in every build. Nothing but `Stage(..., sky=sky)` may depend on `sky`; render.py raises SkyError when two builds of unchanged sources disagree. Never key `st.sky[...]` per shot. Write SKIES as an assignment or a named import (a star import is followed). `SKIES = {}` is a one-sky film.
+- **One process per sky.** render.py runs each sky in a fresh Blender process of its own (internal `--sky NAME`), and only the skies that have work. A Session owns only the frames tagged with its sky: `Session.fingerprint / render_frame` and `Stamps.status / fp / mark` raise SkyError for any other frame, and every stamp records its sky.
+- **Names are labels, fingerprints the proof.** Renaming a SKIES key re-renders nothing. A PNG rendered under another sky than its shot now has is stale ("rendered under another sky ...") and is never kept by --restamp-changed.
+- **Tools.** `render.Session(name)` builds the FIRST sky. `render.session_for(name, frame)` builds the sky of that frame, and `render.sky_table(name)` gives the table without a build. tools/noise_check.py reaches only the first sky until it uses session_for.
+- **Flags.** All flags work unchanged; `--save-blend` writes `out/blend/<film>.<sky>.blend`.
+- **What it prints.** Per sky: `[render] sky 'night': N frames requested, D already done, T to render ...` (or `none to render`). The LAST line is the film's: `[render] frames: N requested, D already done, [K rendered in this run, ]0 to render at ... (2 skies: ...)` or `... L left ... re-run the same command to resume`. The words ` 0 to render` appear only there, and only when every sky's frames are valid as judged in their own sky's build.
+- **Edits and exit codes.** After an edit, the first sky's process learns the film's real table (a new shot, a longer film, a renamed sky and a new frame directory all work). Editing the film while a chunk renders is safe: the command keeps its frames, prints "a source file of the film changed while this command ran" and exits 0. Exit codes keep their meanings; exit 3 is decided over every sky's frames before any sky renders.
+- **Costs** (village, 1,440-frame two-sky film):
+  - 0.6 s plus a 1.5-2.7 s build per sky that has work;
+  - 3 s outside the frames per chunk, 5 s in the chunk where the sky switches;
+  - about 35 ms of bookkeeping per rendered frame;
+  - no build when nothing is left (0.5 s);
+  - after any source edit, both skies are built and all 1,440 frames judged in about 32 s.
+  - An edit to one shot re-renders that shot; an edit to one SKIES value re-renders that sky's frames; captions, dips and sky names re-render nothing.
+- **Fades.** A film may return `"fades": [(t0, t1, g0, g1), ...]`: picture-gain ramps in film seconds, active for t0 <= t < t1, gain 1 outside, overlapping ramps multiply. `post.encode / encode_parts / contact_sheet / finish_frame` apply them to the picture after the upscale and BEFORE the caption (the caption stays at full strength). They live in meta.json, never in a frame stamp: changing one re-encodes and never re-renders. A film without fades has the meta.json and mp4 it always had.
+- **Checks:**
+  - `$BPY -m tools.multisky_selftest [chunks|engine|stale|lock|encode|edits|detect|midrun]` (60 checks; run the parts separately);
+  - `$BPY -m tools.multisky_check change | verify | inprocess | cuts MP4`;
+  - `$BPY -m tools.multisky_judge <film> [--sky S] [--save|--compare F]`.
+- **Known effect.** A frame's pixels depend slightly on which shots its process rendered before (Cycles persistent data with per-shot torch sets: mean 0.06-0.11 of 255). A chunk boundary inside a torch-lit shot changes the noise pattern there. This is true for every film.
