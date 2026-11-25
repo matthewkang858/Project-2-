@@ -364,15 +364,15 @@ def killing_blow():
     return render(scene, "killing_blow")
 
 
-def coplanar(player, tolerance=0.5):
-    """[(mesh a, mesh b, plane, px^2)] of same-facing coplanar faces of two of a player's meshes that overlap by
-    more than `tolerance` square model pixels, in the pose of the current frame. Cycles has no draw order: such a
-    pair renders as noise, or as whichever the BVH returns first. Planes are told apart to 0.004 px."""
+def coplanar(player, tolerance=0.05, apart=0.004):
+    """[(mesh a, mesh b, normal, px^2)] of same-facing faces of two of a player's meshes that lie in one plane
+    (within `apart` model pixels) and overlap by more than `tolerance` square pixels, in the pose of the current
+    frame. Cycles has no draw order: such a pair renders as noise, or as whichever the BVH returns first."""
     from collections import defaultdict
 
     bpy.context.view_layer.update()
     u = player.unit
-    buckets = defaultdict(list)
+    faces = []
     for ob in bpy.context.scene.objects:
         if ob.type != "MESH" or not ob.name.startswith(player.name + "_") or ob.hide_render:
             continue
@@ -381,37 +381,37 @@ def coplanar(player, tolerance=0.5):
         for poly in ob.data.polygons:
             n = (rot @ poly.normal).normalized()
             pts = [mw @ ob.data.vertices[i].co for i in poly.vertices]
-            key = (round(n.x, 3), round(n.y, 3), round(n.z, 3), round(n.dot(pts[0]) / u * 250.0))
-            buckets[key].append((ob.name, pts))
+            faces.append((ob.name, n, n.dot(pts[0]) / u, pts))
+    faces.sort(key=lambda f: (round(f[1].x, 2), round(f[1].y, 2), round(f[1].z, 2)))
     hits = defaultdict(float)
-    for key, faces in buckets.items():
-        n = Vector(key[:3])
-        for i in range(len(faces)):
-            for j in range(i + 1, len(faces)):
-                if faces[i][0] == faces[j][0]:
-                    continue
-                poly, clip = list(faces[j][1]), faces[i][1]     # clip one quad by the other's edges
-                centre = sum(clip, Vector()) / len(clip)
-                for k in range(len(clip)):
-                    e0, e1 = clip[k], clip[(k + 1) % len(clip)]
-                    inward = n.cross(e1 - e0)
-                    if inward.dot(centre - e0) < 0:
-                        inward = -inward
-                    kept = []
-                    for m in range(len(poly)):
-                        p0, p1 = poly[m], poly[(m + 1) % len(poly)]
-                        d0, d1 = inward.dot(p0 - e0), inward.dot(p1 - e0)
-                        if d0 >= 0:
-                            kept.append(p0)
-                        if (d0 >= 0) != (d1 >= 0):
-                            kept.append(p0 + (p1 - p0) * (d0 / (d0 - d1)))
-                    poly = kept
-                    if len(poly) < 3:
-                        break
-                if len(poly) >= 3:
-                    area = sum((poly[m] - poly[0]).cross(poly[m + 1] - poly[0]).length / 2.0 for m in range(1, len(poly) - 1))
-                    hits[(tuple(sorted((faces[i][0], faces[j][0]))), key[:3])] += area / u / u
-    return [(a, b, plane, round(area, 2)) for ((a, b), plane), area in sorted(hits.items()) if area > tolerance]
+    for i, (name_a, na, da, clip) in enumerate(faces):
+        for name_b, nb, db, quad in faces[i + 1:]:
+            if abs(nb.x - na.x) > 0.02:                         # sorted by normal: no more candidates
+                break
+            if name_a == name_b or na.dot(nb) < 0.999999 or abs(da - db) > apart:
+                continue
+            poly = list(quad)                                   # clip one quad by the other's edges
+            centre = sum(clip, Vector()) / len(clip)
+            for k in range(len(clip)):
+                e0, e1 = clip[k], clip[(k + 1) % len(clip)]
+                inward = na.cross(e1 - e0)
+                if inward.dot(centre - e0) < 0:
+                    inward = -inward
+                kept = []
+                for m in range(len(poly)):
+                    p0, p1 = poly[m], poly[(m + 1) % len(poly)]
+                    d0, d1 = inward.dot(p0 - e0), inward.dot(p1 - e0)
+                    if d0 >= 0:
+                        kept.append(p0)
+                    if (d0 >= 0) != (d1 >= 0):
+                        kept.append(p0 + (p1 - p0) * (d0 / (d0 - d1)))
+                poly = kept
+                if len(poly) < 3:
+                    break
+            if len(poly) >= 3:
+                area = sum((poly[m] - poly[0]).cross(poly[m + 1] - poly[0]).length / 2.0 for m in range(1, len(poly) - 1))
+                hits[(tuple(sorted((name_a, name_b))), (round(na.x, 2), round(na.y, 2), round(na.z, 2)))] += area / u / u
+    return [(a, b, n, round(area, 2)) for ((a, b), n), area in sorted(hits.items()) if area > tolerance]
 
 
 # ---------------------------------------------------------------------------------------------------- village stills
