@@ -30,9 +30,37 @@ HIS FACE: never readable before dg22 (dg15: out of focus, small or turned away; 
   dg21: cropped at the chin, three-quarter from behind). In dg22 the white eyes must be unmistakable.
 LIGHT: C.lights(s, "gold", near="door", radius=16).
 """
+import math
+
+from engine import breaking
 from films import hello_common as HC
 
 TWO_SHOT_SEED = 7          # the handheld of dg04 and dg22: the same seed, so the two frames match
+
+# beat 15: ONE locked frame for the three jump cuts (CAMS "house_fronts" moved: lower and half a block further
+# back, so the eaves of house_a sit in the top UI strip instead of across the top right)
+FRONTS = dict(pos=(8.75, -15.0, 1.6), target=(9.7, 4.0, 1.4), lens=55.0, fstop=2.8)
+FRONTS_SEED = 15
+# beat 5: over his LEFT shoulder (the empty hand: the sword arm is on the other side), looking down at the child
+NOD_CAM = dict(pos=(9.75, -4.3, 1.1), target=(9.2, -6.5, 0.3), lens=32.0, fstop=2.4,
+               pos1=(9.73, -4.4, 1.09), target1=(9.2, -6.5, 0.3))
+NOD_RUN = [(8.7, -6.95), (8.4, -8.4), (7.3, -10.9)]     # beat 5: the child runs off along the plaza, away from
+#                                                         the lens, west of the step
+# beat 20: low, close behind his right hip (north-west of him), looking past him at the door
+WALK_CAM = dict(pos=(7.4, -4.7, 0.35), target=(9.6, -7.15, 0.45), lens=32.0, fstop=2.4,
+                pos1=(7.48, -4.78, 0.36), target1=(9.6, -7.15, 0.45))
+# beat 21: behind his right shoulder line, cropped at his chin, down on the child
+CROUCH_CAM = dict(pos=(7.65, -4.95, 1.15), target=(9.0, -6.2, 0.55), lens=40.0, fstop=2.4,
+                  pos1=(7.73, -5.02, 1.14), target1=(9.0, -6.2, 0.55))
+
+
+def _head_point(c, frame, yaw_deg, pitch_deg=0.0, dist=3.0):
+    """A look target that turns c's head `yaw_deg` from its body (+ = to its left) and `pitch_deg` up, at `frame`
+    (the body standing still): for head turns that must read the same in every shot of one locked frame."""
+    eye = c.eye_point(frame)
+    yaw = c.yaw_at(frame) + math.radians(yaw_deg)
+    return (eye.x + math.sin(yaw) * dist, eye.y - math.cos(yaw) * dist,
+            eye.z + math.tan(math.radians(pitch_deg)) * dist)
 
 
 def _two_shot(s, C):
@@ -79,9 +107,15 @@ def dg04_hello(st, s, C, nar):
     kid = C.actor("child", "dg")
     C.put(steve, f0, "watch_door", yaw=HC.WATCH_YAW)
     C.put(kid, f0, "hello_child", toward="watch_door")
+    down = C.at(s, "twice") - 12                      # first crouch inside "crouched", the second ON "twice"
+    steve.idle(f0, down - 1)                          # the game's idle arm bob and weight shift until the crouch
+    steve.look_at(f0, C.P("watch_face"), ease=0)      # on the cut he still looks at the door ...
+    steve.watch(f0, f1, kid, snap=False, ease=8)      # ... and his head comes down to the child by "morning"
+    up = C.crouch_twice(steve, down)
+    steve.idle(up + 1, f1 + 1)                        # alive again once he is up for good ...
+    steve.track(up + 1, f1, kid, step=2, ease=1)      # ... but his head stays on the child (idle glances it away)
     kid.look_at(f0, steve, ease=0)
-    steve.watch(f0, f1, kid)
-    C.crouch_twice(steve, C.at(s, "crouched"))
+    kid.track(f0, f1, steve, step=2, ease=1)          # its head follows his eyes down and up
     st.use(s, steve, kid)
     _two_shot(s, C)
     s.focus(steve.head)
@@ -116,29 +150,37 @@ def dg05_nod(st, s, C, nar):
     steve = C.actor("steve_iron", "dg")
     kid = C.actor("child", "dg")
     C.put(steve, f0, "watch_door", yaw=HC.WATCH_YAW)
-    C.put(kid, f0, "hello_child", toward="watch_door")
-    kid.look_at(f0, steve, ease=0)
+    here = C.put(kid, f0, "hello_child", toward="watch_door")
+    steve.idle(f0, f1 + 1)                            # his arm at the edge of the frame: the idle arm bob
+    steve.watch(f0, f1, kid)
+    kid.look_at(f0, steve, ease=0)                    # straight up at his face (and so up at the lens)
     end = C.hello_nod(kid, C.at(s, "hello"))
-    here = C.P("hello_child")
-    kid.walk(end + 4, [here, (8.0, -6.6, here[2]), C.P("run_off")], run=True)
-    steve.idle(f0, f1 + 1)
+    kid.look_at(end - 2, None, ease=4)                # head level again, then away along the plaza
+    kid.walk(end + 1, [here] + [C.stand(p) for p in NOD_RUN], run=True)
     st.use(s, steve, kid)
-    C.cam(s, "two_shot", pos=(8.05, -5.15, 1.05), target=(9.1, -6.3, 0.75), lens=32.0, fstop=2.4, focus=kid.head)
+    C.cam(s, "two_shot", focus=kid.head, handheld=0.006, **NOD_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
 
 
-def _fronts(st, s, C, place):
-    """Beat 15, one of its three jump cuts: the locked frame along the house fronts, the child on the step, him at
-    `place`."""
-    f0, f1 = s.frame_start, s.frame_end
+AWAY, LOOK = (12.0, -8.0), (-70.0, 3.0)      # beat 15: the child's head (yaw from its body, pitch): to the lens
+#                                             side and a little down (its face), and turned to its right as far as a
+#                                             head goes (screen left, where he stands: its nose in profile)
+
+
+def _fronts(st, s, C, place, turns):
+    """Beat 15, one of its three jump cuts: the locked frame along the house fronts, the child on the step facing
+    the lens, him at `place` in profile. turns = [(frame, AWAY or LOOK, ease)]: the child's head, from f0 (the
+    first entry is its pose on the cut)."""
+    f0 = s.frame_start
     kid = C.actor("child", "dg")
     p = HC.PLACES[place]
-    him = C.watcher(s, "dg", place=place, yaw=HC.yaw_to(p, (p[0] + 1.0, p[1])))      # in profile: facing the fronts
-    C.put(kid, f0, "step_child", toward=(5.0, -6.0))
-    kid.look_at(f0, him, ease=0)
+    C.watcher(s, "dg", place=place, yaw=HC.yaw_to(p, (p[0] + 1.0, p[1] + 0.3)))   # facing the fronts: profile
+    C.put(kid, f0, "step_child", toward=FRONTS["pos"])
+    for frame, (yaw, pitch), ease in turns:
+        kid.look_at(frame, _head_point(kid, frame, yaw, pitch), ease=ease)
     st.use(s, kid)
-    C.cam(s, "house_fronts", focus=kid.head, seed=15, handheld=0.003)
+    C.cam(s, "house_fronts", focus=kid.head, seed=FRONTS_SEED, handheld=0.002, **FRONTS)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
 
@@ -183,20 +225,23 @@ def dg15_a(st, s, C, nar):
       but "watch_door" is his place in beats 19-22).
     STUB: the child on the step, him at watch_far, the locked frame.
     """
-    _fronts(st, s, C, "watch_far")
+    f0 = s.frame_start
+    _fronts(st, s, C, "watch_far", [(f0, AWAY, 0), (C.at(s, "time") + 2, LOOK, 6), (C.at(s, "look") + 4, AWAY, 6)])
 
 
 def dg15_b(st, s, C, nar):
     """BEAT 15, second jump  "he is one house"   frames 947-967 (21 f, 0.88 s), sky gold.
     Words: he 949, is 951, one 954, house 961. (See dg15_a for the beat.) Him at "watch_mid" (the next house)."""
-    _fronts(st, s, C, "watch_mid")
+    f0 = s.frame_start
+    _fronts(st, s, C, "watch_mid", [(f0, AWAY, 0), (f0 + 1, LOOK, 5), (C.at(s, "house"), AWAY, 6)])
 
 
 def dg15_c(st, s, C, nar):
     """BEAT 15, third jump  "closer."   frames 968-997 (30 f, 1.25 s), sky gold.
     Words: closer 968. The pause after it is 0.8 s (to 997): he is at our corner; hold. (See dg15_a for the beat.)
     Him at "watch_door" (the corner of the child's own house: his place in beats 19-22)."""
-    _fronts(st, s, C, "watch_door")
+    f0 = s.frame_start
+    _fronts(st, s, C, "watch_door", [(f0, AWAY, 0), (f0 + 1, LOOK, 5)])
 
 
 def dg20_walkup(st, s, C, nar):
@@ -239,18 +284,26 @@ def dg20_walkup(st, s, C, nar):
     him = C.watcher(s, "dg", place="watch_door")
     kid = C.actor("child", "dg2")
     flesh = C.item("rotten_flesh", "dg")
-    flesh.place(f0, C.P("step"))
+    step = C.P("step")
+    flesh.place(f0, step)
     flesh.animate(f0, f1 + 1)
-    C.v.door_open("house_a", C.at(s, "morning") - 4, open=True, frames=6)
-    door_in = C.P("door_in")
-    kid.place(f0, door_in, HC.yaw_to(door_in, C.P("step")))
+    breaking.crack(C.door, f0, -1, half="both")      # morning: whatever the night's knocking left is gone
+    opens = C.at(s, "morning") - 2
+    C.v.door_open("house_a", opens, open=True, frames=6)
     here = C.P("hello_child")
-    route = [door_in, (9.75, -7.45, 1.0), (9.25, -7.35, 0.5), (8.75, -7.0, here[2]), here]
-    end = kid.walk(C.at(s, "morning"), route, speed=1.9)
-    kid.look_at(end, him, ease=6)
-    C.hello_nod(kid, max(end + 8, C.at(s, "hello")))
+    start = (11.45, -7.42, 1.0)                       # inside, behind the shut door
+    kid.place(f0, start, HC.yaw_to(start, (9.6, -7.3)))
+    # out of the door (beside the flesh, not through it), onto the step's high half (z 1.0), down to its low half
+    # (z 0.5), off its north edge to the ground and up to his feet: walking, not running
+    route = [start, (10.0, -7.33, 1.0), (9.58, -7.24, 1.0), (9.47, -7.22, 0.5), (9.32, -7.1, 0.5),
+             (9.28, -6.96, here[2]), here]
+    end = kid.walk(opens + 1, route, speed=2.1)
+    kid.look_at(end, him, ease=8)                     # the head tipped all the way back
+    C.hello_nod(kid, max(end + 10, C.at(s, "hello")))
     st.use(s, kid, flesh)
-    C.cam(s, "two_shot", pos=(3.9, -6.3, 0.5), target=(9.1, -6.1, 0.1), lens=50.0, fstop=2.4, focus=kid.head)
+    C.cam(s, "two_shot", focus=step, handheld=0.006, **WALK_CAM)
+    s.focus(kid.head, at_s=(opens + 6 - 1) / 24.0, rack_s=0.4)   # from the spinning flesh to the child coming out
+    st.hero(s, "flesh", flesh.sprite)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
 
@@ -288,11 +341,13 @@ def dg21_crouch(st, s, C, nar):
     him = C.watcher(s, "dg", place="watch_door")
     kid = C.actor("child", "dg2")
     C.put(kid, f0, "hello_child", toward="watch_door")
+    C.crouch_slow(him, C.at(s, "crouched") + 2, frames=28)    # sinks while "crouched, once" is spoken; down on
+    #                                                           "stayed"; then nothing moves through the silence
+    him.watch(f0, f1, kid)                            # his head on the child (the only part of him that turns)
     kid.look_at(f0, him, ease=0)
-    him.look_at(f0, kid, ease=0)
-    C.crouch_slow(him, C.at(s, "once"), frames=24)
+    kid.track(f0, f1, him, step=3, ease=1)            # its head follows his face down
     st.use(s, kid)
-    C.cam(s, "two_shot", pos=(7.7, -5.0, 1.5), target=(9.0, -6.2, 0.85), lens=40.0, fstop=2.4, focus=kid.head)
+    C.cam(s, "two_shot", focus=kid.head, handheld=0.004, **CROUCH_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
 

@@ -15,6 +15,20 @@ LIGHT: C.lights(s, "gold", near=<place>, radius=16) (daylight: the torches at th
 """
 from films import hello_common as HC
 
+# ---- beat 1 (sq01): Steve on guard south of the bell, the child BEHIND his left leg looking up at him; a low
+# long lens from the south-south-east, looking north-north-west (azimuth 115: the sun at 215 is 100 degrees off
+# the axis and keys both faces from frame left). The child stands a block further from the lens than he does, so
+# its look up at him comes back toward the lens (its face, not the back of its head). The bell lamp post west of
+# the bell is at the left edge (at azimuth 135 its lantern sat on his hair; at 145-150 its post stood behind the
+# child's head).
+SQ01_STEVE = (-1.2, -6.3)                   # = PLACES["guard"]
+SQ01_STEVE_YAW = HC.yaw_to((-1.2, -6.3), (-2.4, -12.0))    # facing down the south street, his sword side away
+SQ01_CHILD = (-0.9, -5.06)                  # 1.0 block behind him (from the lens), 0.8 to his left
+SQ01_STREET = (-1.2, -12.3, 1.35)           # where he looks: down the street, 25 degrees off the lens
+SQ01_SCAN = (0.05, -12.17, 1.4)             # ... and a little further round toward the lens (15 degrees off it)
+SQ01_CAM = dict(pos=(2.18, -13.55, 0.8), target=(-1.07, -5.58, 0.6), lens=70.0, fstop=1.6,
+                pos1=(1.93, -13.01, 0.8), target1=(-1.07, -5.58, 0.6))
+
 
 def sq01_guard(st, s, C, nar):
     """BEAT 1  "In this town, the player used to protect us."   frames 1-71 (71 f, 2.96 s), sky gold.
@@ -53,17 +67,27 @@ def sq01_guard(st, s, C, nar):
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve_iron", "sq")
     kid = C.actor("child", "sq")
-    ada, bo = C.actor("farmer", "sq"), C.actor("librarian", "sq")
-    C.put(steve, f0, "guard", yaw=0.0)
-    C.put(kid, f0, "guard_child", toward="guard")
-    C.put(ada, f0, (-4.3, -2.7), toward=(-6.0, -1.0))
-    C.put(bo, f0, (-6.0, -1.0), toward=(-4.3, -2.7))
-    kid.look_at(f0, steve, ease=0)
-    steve.idle(f0, f1 + 1)
-    ada.idle(f0, f1 + 1, seed=3)
-    bo.idle(f0, f1 + 1, seed=5)
-    st.use(s, steve, kid, ada, bo)
-    C.cam(s, "guard", focus=steve.head)
+    cam = SQ01_CAM
+    C.put(steve, f0, SQ01_STEVE, yaw=SQ01_STEVE_YAW)
+    C.put(kid, f0, SQ01_CHILD, toward=SQ01_STEVE)
+    steve.idle(f0, f1 + 1, seed=11)
+    kid.idle(f0, f1 + 1, seed=4)
+    # the heads are keyed over the idles (a look_at segment drops the idle's head keys it covers), and both turns
+    # began before the film did, so they are at speed on frame 1:
+    # the child looked where he looks (down the street), and is tipping its head right back to him (frames -5..14)
+    up = C.to_lens(kid, f0 + 14, tuple(steve.eye_point(f0 + 14)), cam["pos"], degrees=10.0)
+    kid.look_at(f0 - 6, SQ01_STREET, ease=0)
+    kid.look_at(f0 - 6, up, ease=20)
+    kid.look_at(f0 + 14, up, ease=f1 + 1 - (f0 + 14))
+    # Steve scans the street, slowly, his face coming round toward the lens while the narrator names him
+    # ("player" 32: 15 degrees off the lens), and holds
+    steve.look_at(f0 - 12, SQ01_STREET, ease=0)
+    steve.look_at(f0 - 12, SQ01_SCAN, ease=44)
+    steve.look_at(f0 + 32, SQ01_SCAN, ease=f1 + 1 - (f0 + 32))
+    st.use(s, steve, kid)
+    C.cam(s, "guard", focus=steve.head, handheld=0.006, **cam)
+    # "protect" (49): the focus pulls from his face to the child looking up at him
+    s.focus(kid.head, at_s=s.film.seconds(C.at(s, "protect") - 5), rack_s=0.4)
     st.hero(s, "steve", steve)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="guard", radius=16.0)

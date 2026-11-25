@@ -37,15 +37,53 @@ LIGHT: house_a's torches and its room fill are one group ("house_a"): raise them
   "night_room"); lit cobblestone and villager skin are at the palette limit in there (CONTRACT.md). Film-local
   lights: C.fill("in_<name>", ...) (the name must start with "in").
 """
+import math
+
+from mathutils import Vector
+
+from engine import characters
 from films import hello_common as HC
 
-PANE_FILL = dict(pos=(11.4, -11.0, 2.85), watts=120.0, color=(1.0, 0.88, 0.72))     # in17: on the child's face
+PANE_FILL = dict(pos=(11.05, -10.85, 2.95), watts=120.0, color=(1.0, 0.88, 0.72))    # in17: on the child's face
+# beat 17: the child stands on the HIGH back half of the chair under the pane (oak stairs facing east: x 11.5..12,
+# top z 2.0), toward the north side of the chair, so the camera from the south-west sees it centred in the pane. On the
+# seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16, 0.16 above the sill: only the eyes showed.
+KID_WINDOW = (11.75, -10.25, 2.0)
+
+# THE BED CAMERA of beats 3 and 16 (one constant, both shots): inside the room, high at the west end of the bed
+# wing, a little toward Steve's side, looking east down the two beds to their pillows: the red bed and Steve at the
+# right and nearer, the child's white bed at the left, the wall torch between the pillows, and the east gable's
+# glass pane above it, through which the camera sees SKY (night: stars; from "ended": day). A slow linear dolly in
+# (BED_PUSH blocks a frame, the same speed in both shots, so in16 is the first 49 frames of in03's path).
+BED_CAM = dict(pos=(15.5, -11.95, 3.75), target=(19.6, -10.65, 2.15), lens=21.0, fstop=2.8)
+BED_PUSH = 0.0035
+BED_SEED = 31
+CHILD_TURN = math.radians(35.0)     # the child's head turned toward Steve's pillow (about the body's long axis)
+
+# beat 17 (the story's fallback, from outside): low behind his right shoulder, under the starry sky, a slow push
+# that rises toward the pane so the child's face comes up over the sill
+WINDOW_CAM = dict(pos=(5.0, -12.4, 1.75), target=(10.0, -10.6, 2.6), lens=28.0, fstop=2.0,
+                  pos1=(5.55, -12.2, 1.85), target1=(10.0, -10.55, 2.6))
 
 
 def _beds(C):
     """(Steve's red bed, the child's bed): anchor points and the yaw a sleeper needs (Character.lie_down)."""
     A, Y = C.A, C.v.yaws
     return (A[HC.RED_BED], Y[HC.RED_BED]), (A[HC.CHILD_BED], Y[HC.CHILD_BED])
+
+
+def _bed_cam(C, s, focus):
+    """BED_CAM on shot s with its linear push (the same speed in every shot that uses it)."""
+    p0, t0 = Vector(BED_CAM["pos"]), Vector(BED_CAM["target"])
+    d = (t0 - p0).normalized() * (BED_PUSH * (s.frame_end + 1 - s.frame_start))
+    return C.cam(s, "bed", focus=focus, handheld=0.003, seed=BED_SEED, ease="linear", lens=BED_CAM["lens"],
+                 fstop=BED_CAM["fstop"], pos=tuple(p0), target=tuple(t0), pos1=tuple(p0 + d), target1=tuple(t0 + d))
+
+
+def _turn_head(c, f0, f1, angle):
+    """A lying character's head turned about the body's long axis to `angle` (radians) from f0 to f1 (f1 <= f0:
+    already turned on f0). Character.look_at aims with the STANDING yaw, which means nothing for a sleeper."""
+    characters._ease(c.head, "rotation_euler", 2, f0, f1, angle)
 
 
 def in03_bed(st, s, C, nar):
@@ -96,14 +134,16 @@ def in03_bed(st, s, C, nar):
     STUB: both asleep, CAMS "bed", the night torches; from the change the gold levels and C.morning.
     """
     f0, f1 = s.frame_start, s.frame_end
-    steve = C.actor("steve_bed", "in")
+    steve = C.actor("steve_iron", "in")
+    steve.hold(None)                                      # asleep with an empty hand (no sword in bed)
     kid = C.actor("child", "in")
     (red, red_yaw), (mine, my_yaw) = _beds(C)
     steve.sleep(f0, red, red_yaw)
     kid.lie_down(f0, mine, my_yaw)
-    st.see_through(s, "house_a_south")
+    a = C.at(s, "slept")
+    _turn_head(kid, a - 2, a + 10, CHILD_TURN)            # on "slept" the child turns its head to him
     st.use(s, steve, kid)
-    C.cam(s, "bed", focus=kid.head, handheld=0.003)
+    _bed_cam(C, s, focus=steve.head)
     st.hero(s, "steve", steve)
     st.hero(s, "child", kid)
     room = dict(near=C.A["house_a_center"], radius=14.0)
@@ -140,9 +180,9 @@ def in16_empty(st, s, C, nar):
     kid = C.actor("child", "in")
     _red, (mine, my_yaw) = _beds(C)
     kid.lie_down(f0, mine, my_yaw)
-    st.see_through(s, "house_a_south")
+    _turn_head(kid, f0, f0, CHILD_TURN)                  # already turned to the empty pillow
     st.use(s, kid)
-    C.cam(s, "bed", focus=kid.head, handheld=0.003)
+    _bed_cam(C, s, focus=kid.head)
     st.hero(s, "child", kid)
     C.lights(s, "night_room", near=C.A["house_a_center"], radius=14.0)
 
@@ -183,12 +223,12 @@ def in17_window(st, s, C, nar):
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "in")
     him = C.watcher(s, "in", place="watch_window", yaw=HC.yaw_to(HC.PLACES["watch_window"], HC.PLACES["window"]))
-    C.put(kid, f0, "window_chair", toward=HC.PLACES["window"])
+    C.put(kid, f0, KID_WINDOW, toward=(KID_WINDOW[0] - 1.0, KID_WINDOW[1]))
     kid.look_at(f0, him, ease=0)                          # out through the pane at him (and so nearly at the lens)
     st.use(s, kid)
     # the child's face is turned away from the room's torch (11, -8, 3): a small warm film-local light inside the
     # pane, in front of its face, stands in for the torch light the game would show on it (shadowless, invisible)
     C.fill("in_pane", PANE_FILL["pos"], PANE_FILL["watts"], [s], color=PANE_FILL["color"])
-    C.cam(s, "window_out", focus=kid.head, handheld=0.004)
+    C.cam(s, "window_out", focus=kid.head, handheld=0.004, **WINDOW_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "night_room", near=C.A["house_a_center"], radius=14.0)

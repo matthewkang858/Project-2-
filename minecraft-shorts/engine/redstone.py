@@ -12,10 +12,11 @@ WHAT IS AN OBJECT AND WHAT IS STATIC
   wall torch hangs on, the block under a lamp, a wall, a floor (bench()). A cell a part occupies (or a block a
   piston moves into) must be EMPTY in the set's World: the kit refuses a taken cell (RedstoneError, naming it).
   A redstone block / lamp that never changes may also be plain b.w.set(...) in the hook (an unlit lamp; a lit
-  lamp in the World glows but gives no light: use kit.lamp).
+  lamp in the World glows but gives no light: use kit.lamp). Dust is never World blocks (mcassets gives it no tint).
 
-PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a part with .name, .show(frame, visible),
-            .objects; register parts with the Stage like characters: st.cast[p.name] = p; st.use(shot, p))
+PUBLIC API (k = redstone.kit(v) after build_village; EVERY builder returns a part with .name (unique in the kit),
+            .show(frame, visible) and .objects; register parts with the Stage like characters: st.cast[p.name] = p;
+            st.use(shot, p); for Stage.hero pass the objects: st.hero(shot, "door", *p.objects))
   IN THE HOOK (build_village(edit=...))
     bench(b, x0, y0, x1, y1, block="smooth_stone", level=None) -> dict(z, cells)   a level stone floor for parts
         (the grass top replaced, plants cleared, columns reserved); parts then stand in cells at z = dict["z"].
@@ -23,15 +24,19 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
     door_cells(cells, side) -> [cells]        every cell a piston_door needs empty (door, head, piston cells)
   THE KIT
     kit(where, collection=None, sky_light=None) -> Kit      one per set (the Village or a blocks.World); the same kit
-        comes back for the same set. sky_light = a sky-light level 0..15 baked into every part's colours the way
-        engine.sets bakes a dark set (lightmap()); per part too (sky_light=...). Lit lamps / torches never dim.
+        comes back for the same set. sky_light (kit-wide, or per part: sky_light=...) = the set's sky-light level
+        baked into the part's colours EXACTLY as engine.sets draws a World cell at that level: sets.lightmap of
+        Environment._step (levels in pairs below 11, NOTHING DARKER THAN sets.LIGHT_FLOOR = 3: 0.137; levels 0-3
+        are alike, never black), with the set's Brightness gamma. sky_light="auto" reads the level engine.sets
+        baked around the part's cell (sets.env(b).bake_sky_light in the hook): a door block then gets the very
+        tint of the baked wall beside it. None: no dimming. Lit lamps, lit torches and lit dust never dim.
     k.block(block_id, cell, props=None, frame=None, sky_light=None) -> movable block (an engine.breaking Breakable:
-        .breakable .object .cell_at(t)); what pistons push and pull. frame = placed ON that frame.
+        .breakable .object .objects .cell_at(t)); what pistons push and pull. frame = placed ON that frame.
     k.lever(cell, face="floor"|"wall"|"ceiling", facing, powered=False) -> Lever
     k.piston(cell, facing, sticky=False, extended=False) -> Piston      facing: north east south west up down
     k.wire(cells, power=0 | {cell: level}, dots=(), source=None) -> Wire     dust lying IN these cells
     k.repeater(cell, toward, delay=1, powered=False) -> Repeater       toward = where the signal goes
-    k.lamp(cell, lit=False, watts=None) -> Lamp                         .light = its point light
+    k.lamp(cell, lit=False, watts=None) -> Lamp      .light = its point light (LAMP_WATTS; LAMP_KEY_WATTS as a key)
     k.torch(cell, wall=None, lit=True, frame=None, watts=None) -> Torch  wall = the side a wall torch leans out to
     k.piston_door(cells, side, block="stone", closed=True) -> PistonDoor       ONE CALL for the door of "Two Apples"
     k.piston_row(cells, facing, carry="oak_planks", extended=True, sticky=True) -> PistonRow     ONE CALL for the
@@ -46,9 +51,17 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
     .state_at(frame)   .hand_point(frame=None, along=0.8) -> the point on the handle a hand must reach (1.0 = tip)
     .stand(distance=0.58, side=None, lateral=0.22, along=0.5) -> ((x, y, z), yaw)     where a player stands so his
         right hand, at the far end of an engine.players attack() swing (SWING_REACH, measured), is at the handle
-    flip_by(player, lever, frame, sync="game"|"hand", look=True, ease=0) -> frame the lever changes on
-        the player's swing (players attack) starts ON frame (the click); sync="game": the lever changes the frame
-        after (LEVER_SHOW_TICKS); sync="hand": on the frame his hand is nearest the handle (reads in a close-up).
+    flip_by(player, lever, frame, sync="game"|"hand", look=True, ease=0, look_from=None, reach=False) -> frame
+        the lever changes on. The swing (players attack) starts ON frame (the click); sync="game": the lever
+        changes the frame after (LEVER_SHOW_TICKS); sync="hand": on the frame his hand is nearest the handle.
+        look=True turns his head to the handle from 6 frames before the click, but never from before his last
+        place() (no pre-roll into the previous shot; look_from= sets the start). reach=True (film choice): his arm
+        is lifted / turned during that swing (delta_rotation_euler x / z of his right arm, at most REACH_LIMIT 40
+        degrees each, solved on the evaluated rig) so the fist touches the middle of the handle (MEASURED: the plain
+        swing misses a wall lever in the block above the floor by 0.42 block; with reach=True 37 degrees, the fist
+        centre 0.13 from the handle: the 0.25-wide fist touches it). lever.reach_info = what was measured.
+        Without reach: a lever whose handle middle is about 1.3 above his feet meets the swing (a FLOOR lever on
+        top of a 1-block pier), a wall lever in the block above the floor does not.
   PISTON
     .extend(t, push="auto", ride=()) -> t + 2.4   the head and the blocks in front travel 1 block in 2 ticks, linear;
         push="auto" = the kit's movable blocks in a line from the cell in front (or a list of them / of cells);
@@ -60,8 +73,11 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
     .travel(t) (0 in .. 1 out)  .extended_at(t)  .look_at_frame(f) ('R' block / 'S' short head / 'L' long head)
     .head_point(t)    arm_inside(piston, frame) -> bool (the check that no head pokes out or leaves a gap)
   PISTON DOOR / ROW
-    door.open(frame) / door.close(frame) -> end time; door.is_open(t); door.pistons, door.blocks
-    row.retract(frame) / row.extend(frame) -> end time; row.pistons, row.blocks
+    door.open(frame) / door.close(frame) -> end time; door.is_open(t); door.pistons, door.blocks, door.objects
+    door.power(t) CLOSES it, door.unpower(t) OPENS it (powered pistons extend, as in the game) -> t
+    row.retract(frame) / row.extend(frame) -> end time; row.power(t) / row.unpower(t) -> t (circuit steps);
+    row.extended_at(t); row.pistons, row.blocks, row.objects.   Leg Day beats 18-19 in one line:
+        t = lever.flip(f); redstone.unsignal(t, wire, row)   (the line dark and all twelve retracting on f)
   WIRE (redstone dust)
     .power(frame, source=None, level=15, ripple=0) -> frame   lit from `source` (default its source cell; a cell
         BESIDE the line = a lever / torch there): level - 1 per block of dust. ripple=N: block by block away from
@@ -70,6 +86,7 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
     .set_levels(frame, {cell: level}) .level_at(cell, frame) .levels(frame, source, level) .distances(source)
     .states  {cell: {'north': 'side'|'up'|'none', ...}} as the game connects it; dust_shape(state) names it
     wire_color(power) -> (r, g, b)   WIRE_COLORS: the game's table (power 0 (76, 0, 0) .. 15 (255, 50, 0))
+    dust_tint(power), dust_albedo(power)   what the module draws dust with (see NOT THE GAME)
   REPEATER / LAMP / TORCH
     repeater.set(frame, powered)   .delay_ticks (= 2 x delay)
     lamp.set(frame, lit)   lamp.lit_at(frame)   lamp.light (keyed on exactly while lit; scale .light.data.energy)
@@ -77,24 +94,31 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
         frame it appears on: with a player his swing starts ON frame and the torch is there the frame after; it is
         not there before (a torch that is planted is made with k.torch(cell) and plant()ed)
     hold_torch(player, hand="right", frame=None, glow=True, watts=30) -> item    engine.players hold("redstone_torch")
-        with its head glowing and a small light that is on exactly while the item is (a driver on its visibility)
+        with its head glowing and a small light that is on exactly while the item is (a driver on its visibility);
+        watts=HELD_TORCH_KEY_WATTS (120) when the held torch is the key on his face (beat 24)
   PLAYING A CIRCUIT ("powered from frame f")
     signal(frame, *steps) -> time   each step's input is powered when the step before it puts out its signal:
-        a step = a part or a tuple of parts powered together. part.power(t) -> the time its output changes:
-        wire 0, lever 0, lamp on 0, piston 0 (+ 2 ticks of travel), repeater 2 x delay ticks, torch (an inverter:
-        powered = goes OUT) 2 ticks.
+        a step = a part (wire, lever, lamp, piston, repeater, torch, ROW, DOOR) or a tuple of parts powered
+        together. part.power(t) -> the time its output changes: wire 0, lever 0, lamp on 0, piston / row / door 0
+        (+ 2 ticks of travel), repeater 2 x delay ticks, torch (an inverter: powered = goes OUT) 2 ticks.
     unsignal(frame, *steps) -> time  the same switched off (lamp off 4 ticks late, repeaters keep their delay)
     at(frame, ticks) -> film time    frame_of(t) -> the first whole frame that draws a change at time t
     Example (beat 7 of "Leg Day"):  torch = k.torch(c0); wire = k.wire(cells, source=c0)
         t = torch.plant(f, player=efe); redstone.signal(t, wire, repeater, (lamp, piston))
-  PROOF
-    proof_set(b) / build_proof(scene) -> dict      the proof film in the real village (AREAS lists where)
-    PROOFS = sheet_a sheet_b dust bench lever column row door   (stills, see SELF-TEST)
+  PROOF AND MEASUREMENT
+    proof_set(b, dark=False) / build_proof(scene, sky=None, dark_door=False) -> dict   the proof film in the real
+        village (AREAS lists where); SKIES = golden (the look-dev sun) / dusk / night
+    PROOFS = sheet_a sheet_b close dust bench lever column row door door_dark lights   (see SELF-TEST)
+    palette_check(skies) -> failures    power-15 dust colour measured in the finished look (see MEASURED)
+    light_study('floor' | 'lamp' | 'held')   the light measurements below, printed
 
 WHAT THE GAME DOES (read from the classes; the constants at the top carry the class names)
   piston   checkIfExtend sends the block event in the same tick power arrives (start delay 0). The move is a
            PistonMovingBlockEntity: progress += 0.5 per tick, drawn at lerp(progressO, progress, partial tick):
-           1 block in 2 ticks (2.4 frames), linear, for the head and every pushed / pulled block alike. Pushing:
+           1 block in 2 ticks (2.4 frames), linear, for the head and every pushed / pulled block alike. The client
+           makes its own moving block entity when the block event packet arrives (Minecraft.runTick: runAllTasks
+           before tick()) and ticks it in that same tick (Level.tickBlockEntities adds pending tickers first), so
+           the head moves in the tick the lamp beside it lights: the module starts both on the same tick. Pushing:
            the base becomes the extended model (piston_base) at once and the head (piston_head) slides out of it;
            retracting: the block entity draws the base AND the head. PistonHeadRenderer draws the head SHORT
            (piston_head_short: a 12 px arm) while it is 0.5 block or less out, the long one (16 px arm, 4 px into
@@ -114,46 +138,66 @@ WHAT THE GAME DOES (read from the classes; the constants at the top carry the cl
            BlockTintSources$10. Power falls one per block. Not a light source.
   repeater RepeaterBlock.getDelay = DELAY x 2 ticks, both ways; FACING is its INPUT side (toward is the other).
   lamp     RedstoneLampBlock: lit in the same tick, unlit 4 ticks after it loses power; light level 15.
-  torch    RedstoneTorchBlock: light 7; TOGGLE_DELAY 2 ticks (inverter); the lit model adds a 3x3x3 px halo of
-           single-texel faces around the head.
+  torch    RedstoneTorchBlock: light 7; TOGGLE_DELAY 2 ticks (inverter). The lit model (template_redstone_torch)
+           puts a 3x3x3 px halo of single red texels around the 2x2 px head whose faces all point INWARD; blocks are
+           drawn with back-face culling (RenderPipelines: the terrain pipelines keep the default cull), so from any
+           side the near halo face is not drawn: the pink-white core shows inside a red frame. The module culls
+           the same faces (Backfacing -> Transparent on the lit torch and repeater torches).
   falling  FallingBlock.getDelayAfterPlace = 2: an anvil whose plank is pulled away starts to fall 2 ticks after
            (for engine/fixtures.py; this module leaves it hanging).
 
-MEASURED (`$BPY -m engine.redstone`: 27 numeric checks + 3 in the village; stills out/test/redstone_*.png)
+MEASURED (`$BPY -m engine.redstone`: 34 numeric checks + 6 in the village; stills out/test/redstone_*.png)
   Piston: for moves starting at any phase of a frame, every frame's head (short / long) stays inside the base over
   the whole exposure and the moved block touches the head plate at every sampled moment (no gap, no overlap).
   extend(10.0): frames 8-9 the block model, 10 the short head, 11+ the long one; the head is 0.10 out at the
   middle of frame 10's exposure and 0.52 at frame 11's.
   Lever: the module's handle rotation lands within 1e-7 px of the game's other model for all 12 placements.
-  A player at lever.stand(): the swing passes 0.42 block from the middle of a wall lever's raised handle in the
-  block above the floor (0.14 beside it, 0.39 below: the swing tops out 1.33 above his feet; redstone_lever_strip).
-  Lamp light at golden hour on a figure 2.7 blocks away: +10 % on the lit side of the torso, +8 % on the floor near
-  it (redstone_bench_f44 / f45): a daytime lamp is subtle, as in the game. For "the lamp lights his face" (beat 7)
-  raise lamp(watts=...) for that shot or keep the face in shade.
-  Render times (2 threads, 16 samples, loaded machine): a 960x540 sheet 12-20 s, a 360x640 strip tile 3-10 s.
+  Dust colour (palette_check, the dust pixels found by rendering with and without the dust, edges dropped, the
+  brighter half): power 15 in the finished golden look (222, 77, 44) hue 11.1 degrees, saturation 0.80; at dusk
+  (179, 60, 32) hue 11.4, saturation 0.82 (the game in daylight: (255, 50, 0) x texel, hue 11.8). Before the
+  look's grade saturation step: (222, 65, 12) saturation 0.95. The first version drew (245, 126, 115) salmon.
+  Saturation above about 0.81 is out of reach for ANY bright pixel in the look: its grade (look.GRADES warm /
+  cool, saturation 0.97 in linear HSV) lifts every colour's smallest channel to 3 % of its largest.
+  Light (light_study 'floor', night, the floor 1 / 2 / 3 blocks in front of each source, its light alone): lamp
+  x1.11 / 1.10 / 1.17 of a village torch (the game: 1.11 / 1.11 / 1.12), redstone torch x0.33 / 0.30 / 0.29 (the
+  game 0.38 / 0.34 / 0.29). Our point lights fall off as W / (d^2 + 1): from 1 to 3 blocks the torch-lit floor
+  drops x10, the game's light (lightmap 13 -> 11) x1.25. ('lamp') golden hour, the narrator 2.7 blocks from a lit
+  lamp, turned to it: his face x1.46 with LAMP_WATTS (reads), x2.93 with LAMP_KEY_WATTS (548 W); ('held') dusk,
+  facing the lens, held redstone torch: face x1.19 at 30 W, x1.78 at HELD_TORCH_KEY_WATTS (120), x2.95 at 300 W.
+  Door (redstone_door_strip): seen from above the aisle the opened doorway is a black square beside his hat
+  (the stone face there 39 -> 27 of 255 when it opens). door_dark (engine.sets' sky light baked, parts "auto"):
+  the door blocks get exactly the wall's tint (0.137, checked in the self-test), and so does everything else in
+  the sealed box: closed and open measure alike (4 of 255) - see NOT THE GAME for what that means for film two.
+  Render times (2 threads, 16 samples, loaded machine): a 960x540 sheet 11-13 s, a 360x640 strip tile 3-10 s.
   Fingerprints (`$BPY -m tools.check_redstone_stamp`): order-independent, identical in a second process, and
   changing on exactly the frames a lever / dust level / lamp / piston move changes (motion blur sampled).
 
 NOT THE GAME, AND WHERE THE PICTURE DIFFERS FROM IT
-  - Lit dust glows a little (DUST_GLOW 0.6 x power/15, emission of the tinted texture): vanilla dust is not
-    emissive; shader packs make lit redstone glow. Lit torch heads glow (TORCH_GLOW 1.4 on texels brighter than
-    0.65), the lit repeater's red line a little (REPEATER_GLOW). The halo of the lit torch is two-sided here (the
-    game culls its near faces; the silhouette is the same 3x3x3 px box).
-  - Dust is drawn with its pieces DUST_LAYER_PX (0.05 px) apart (the game draws them coplanar and translucent;
-    a ray tracer skips a coplanar quad behind a cut-out texel, which made arms vanish) and without the never-seen
-    undersides. The overlay texture (redstone_dust_overlay) is fully transparent in this version and is left out.
-  - Light: LAMP_WATTS 122 = 1.11 x the village torch, REDSTONE_TORCH_WATTS 37 = 0.34 x: the game's brightness
-    ratios at two blocks (lightmap.fsh, light 15 / 14 / 7). The point lights fall off as the village's (W/(d^2+1)),
-    not as the game's flat light curve. Redstone torch light is tinted (1.0, 0.62, 0.5): the game has one block-
-    light colour. The lamp's own faces do not block its light (shadow linking).
+  - Lit dust glows a little (DUST_GLOW 0.4 x power/15) and is drawn with a damped diffuse colour (dust_albedo:
+    power 15 x DUST_ALBEDO 0.35, nothing under the knee): the look's sunlit floor is 1.24 x its texture, so the
+    game's full red would sit over the highlight shoulder. dust_tint() raises the green of power 13-15 (15: (255,
+    76, 0) instead of (255, 50, 0)) so that after the look's grade the DISPLAYED hue is the game's; power 0-12
+    (no green in the game) is the game's colour. Dust is one opaque cut-out face per piece, lit like an up-facing
+    surface, with its pieces DUST_LAYER_PX (0.05 px) apart (coplanar quads lose to a ray tracer) and without the
+    never-seen faces against the block it lies on; the overlay texture is empty in this version and left out.
+  - Lit torch heads glow (TORCH_GLOW: the pale core 0.8, the red 0.5, the stick 0.12) and their bright red
+    texels' diffuse is x TORCH_RED_ALBEDO 0.55 (as the dust: no salmon in sun); the lit repeater's red line glows
+    (REPEATER_GLOW). The held torch has the same material, no halo (it is the item sprite) and a light.
+  - Light: LAMP_WATTS 137 / REDSTONE_TORCH_WATTS 50 match the game's brightness ratios to a torch (MEASURED), not
+    its flat falloff. Redstone torch light is tinted (1.0, 0.62, 0.5): the game has one block-light colour. The
+    lamp's own faces do not block its light (shadow linking). In the game a held torch lights nothing (shader
+    packs add hand-held light): hold_torch's light is that film choice.
+  - Underground (film two): engine.sets bakes sky light only, so a sealed hall is drawn at 0.137 everywhere,
+    torch-lit walls too (the game takes the brighter of sky and block light). Parts follow that bake exactly, so
+    the door is no black slab, but the black doorway does not read against a wall that dark: light the back wall
+    with the film's own torches (as the proof's day strip does, torches x3) or do not bake that wall.
   - kit.ride() carries blocks and characters with a moved block: the game drops an anvil whose support moves,
-    and carries entities only on an upward push. flip_by(sync="hand") and plant() timing follow the arm, not the
-    server tick. Pushed blocks keep their Breakable's .cell / .center at the original cell: use cell_at(t).
+    and carries entities only on an upward push. flip_by(sync="hand"), reach=True and plant() timing follow the
+    arm, not the server tick. Pushed blocks keep their Breakable's .cell / .center at the original cell: use
+    cell_at(t).
   - Not built: particles (the lever's and the dust's red specks, the torch's smoke), sounds, comparators,
     observers, slime / honey blocks, quasi-connectivity, locked repeaters, torch burnout, block placement
     animation (a planted torch is there on its frame), falling anvils (engine/fixtures.py).
-  - The proof's door scene is lit by the look's shadowless fill inside a closed stone box: underground it reads
-    brighter than the game (engine.sets' sky-light bake would darken the walls but also every torch-lit face).
 
 GOTCHAS
   - Make parts AFTER build_village, cells left empty in the hook; make the parts a wire touches (levers, torches,
@@ -162,15 +206,19 @@ GOTCHAS
     part's objects yourself. Stage.lights does not touch this module's lights (they are not village lights).
   - Calls may come in any order; a piston refuses overlapping moves (RedstoneError): cancel(t) first to re-time.
   - Visibility changes land on whole frames (frame_of); moves are keyed at their exact (fractional) times.
+  - Names: a second default-named row / door / part gets _2, _3 ... (Stage keys st.cast by name).
+  - flip_by(reach=True) keys delta_rotation_euler on the player's right arm: do not key it yourself there.
   - A film that imports engine.redstone has this file in its engine hash: freeze it while finals render.
 
 SELF-TEST
-    $BPY -m engine.redstone                    numeric checks + the proof film in the village (about 20 s)
+    $BPY -m engine.redstone                    numeric checks + the proof film in the village (about 40 s)
     $BPY -m engine.redstone quick              numeric checks only
-    $BPY -m engine.redstone stills NAME ...    proof stills out/test/redstone_<name>.png: sheet_a sheet_b dust
-                                               (stills) and bench lever column row door (strips of tiles
-                                               redstone_<name>_f<frame>.png + redstone_<name>_strip.png); two or
+    $BPY -m engine.redstone stills NAME ...    proof stills out/test/redstone_<name>.png: sheet_a sheet_b close
+                                               dust lights (stills) and bench lever column row door door_dark
+                                               (strips of tiles redstone_<name>_f<frame>.png + _strip.png); two or
                                                three names per call stay under the 300 s limit
+    $BPY -m engine.redstone palette [golden dusk night]   the dust colour check (renders; about 60 s for two)
+    $BPY -m engine.redstone study floor | lamp | held      the light measurements (renders, 40-90 s each)
     $BPY -m tools.check_redstone_stamp         frame fingerprints (two processes; about a minute)
 """
 import math
@@ -240,12 +288,18 @@ TORCH_GLOW = (0.8, 0.5, 0.12)        # lit redstone torch texels: (the pale core
                                      # pale = HSV value > 0.65 and saturation < 0.6, red = value > 0.65, saturation >= 0.6
 TORCH_RED_ALBEDO = 0.55              # diffuse colour of the bright red torch / repeater texels x this (as DUST_ALBEDO)
 REPEATER_GLOW = (0.0, 0.8, 0.0)      # lit repeater top (repeater_on): its bright red texels glow, nothing else
-LAMP_WATTS = 122.0                   # = 1.11 x the village torch (props: 110 W): the game's brightness ratio of light
-                                     # 15 to 14 at two blocks (lightmap.fsh through sets.lightmap: 0.799 / 0.719)
-REDSTONE_TORCH_WATTS = 37.0          # = 0.34 x the torch: level 7 against 14 at two blocks (0.243 / 0.719)
+LAMP_WATTS = 137.0                   # MEASURED (light_study 'floor', night): the floor 1 / 2 / 3 blocks in front of a lit
+                                     # lamp gets 1.11 / 1.10 / 1.17 x what a village torch's gets, the game's ratio of
+                                     # light 15 to 14 there 1.11-1.12 (lightmap.fsh); the computed 122 W gave 0.93-0.99
+REDSTONE_TORCH_WATTS = 50.0          # MEASURED the same way: 0.33 / 0.30 / 0.29 x the torch at 1 / 2 / 3 blocks, the
+                                     # game's light 7 against 14: 0.38 / 0.34 / 0.29 (the computed 37 W gave 0.25 x)
 REDSTONE_TORCH_COLOR = (1.0, 0.62, 0.5)   # the game has one block-light colour; a shader pack tints it by the source
 LAMP_RADIUS = 0.45                   # soft-shadow radius of the lamp's light (it is a glowing cube, not a flame)
 HELD_TORCH_WATTS = 30.0              # the redstone torch in a hand (a little less: it is half a block from a face)
+HELD_TORCH_KEY_WATTS = 120.0         # MEASURED (light_study 'held', dusk): a held torch as the KEY on a face facing the
+                                     # lens (beat 24): the face x1.78 (30 W: x1.19, 300 W: x2.95)
+LAMP_KEY_WATTS = 4.0 * LAMP_WATTS    # MEASURED (light_study 'lamp', golden hour, the face 2.7 blocks off turned to the
+                                     # lamp): LAMP_WATTS x1.46 (reads), x4 = 548 W x2.93, x8 x4.03
 
 HORIZONTAL = ("north", "east", "south", "west")
 DIRS6 = ("north", "east", "south", "west", "up", "down")
@@ -545,14 +599,15 @@ def dust_tint(level):
 
 
 def dust_albedo(level):
-    """The factor on the diffuse colour of dust at a power level (1 up to DUST_ALBEDO_KNEE, DUST_ALBEDO at 15; the
-    linear red it leaves rises with the level): see DUST_ALBEDO."""
+    """The factor on the diffuse colour of dust at a power level: the linear red of the game's colour is kept up to
+    DUST_ALBEDO_KNEE and compressed linearly above it, down to DUST_ALBEDO x at power 15 (so the diffuse red it
+    leaves still rises with the power; see DUST_ALBEDO)."""
     r = _srgb_to_linear(wire_color(level)[0] / 255.0)
     r15 = _srgb_to_linear(wire_color(15)[0] / 255.0)
+    top = max(DUST_ALBEDO * r15, DUST_ALBEDO_KNEE)
     if r <= DUST_ALBEDO_KNEE or r15 <= DUST_ALBEDO_KNEE:
         return 1.0
-    u = (r - DUST_ALBEDO_KNEE) / (r15 - DUST_ALBEDO_KNEE)
-    return 1.0 - (1.0 - DUST_ALBEDO) * u
+    return (DUST_ALBEDO_KNEE + (r - DUST_ALBEDO_KNEE) * (top - DUST_ALBEDO_KNEE) / (r15 - DUST_ALBEDO_KNEE)) / r
 
 
 def _srgb_to_linear(c):
@@ -668,14 +723,14 @@ class Kit:
         if env is None or cell is None:
             return 15
         c = _cell(cell)
-        best = None
-        for d in (None,) + DIRS6:
-            n = c if d is None else _add(c, d)
-            if d is not None and self.world is not None and self.world.is_full_cube(*n):
-                continue
-            lv = env.light.get(n, 15)
-            best = lv if best is None else max(best, lv)
-        return 15 if best is None else best
+        if c not in env.light:                      # lit (15) or never baked: as the World draws it there
+            return 15
+        best = env.light[c]
+        for d in DIRS6:                             # a cell that was solid at the bake has no entry: not counted
+            n = _add(c, d)
+            if n in env.light and not (self.world is not None and self.world.is_full_cube(*n)):
+                best = max(best, env.light[n])
+        return best
 
     # ---- what is where ----------------------------------------------------------------------------------
     def world_block(self, cell):
@@ -1256,8 +1311,10 @@ def flip_by(player, lever, frame, sync="game", look=True, ease=0, look_from=None
         d = (Vector(player.item_point("right", f)) - hp).length
         if best is None or d < best[0]:
             best = (d, f)
+    lever.reach_info = dict(natural=best[0], frame=best[1], reached=None, angle=0.0)
     if reach:
-        _reach(player, hp, frame, best[1])
+        ang = _reach(player, hp, frame, best[1])
+        lever.reach_info.update(angle=ang, reached=(Vector(player.item_point("right", best[1])) - hp).length)
     if sync == "hand":
         f_flip = best[1]
     else:
@@ -1279,44 +1336,44 @@ def _last_cut_any(player, frame):
 
 
 def _reach(player, target, frame, f_near):
-    """Lift the right arm about its parent's X axis (through the shoulder) during the swing that starts on `frame`
-    so the hand reaches `target` on f_near: delta_rotation_euler.x keyed 0 -> angle -> 0 (smooth)."""
+    """Lift / turn the right arm (delta_rotation_euler x and z, outside the swing's own keys: at most REACH_LIMIT
+    each) during the swing that starts on `frame`, so the hand reaches `target` on f_near: keyed 0 -> angle -> 0
+    (smooth), solved numerically on the evaluated rig. Returns the combined angle (radians)."""
     arm = player.arm_r
-    scene = bpy.context.scene
-    cur, sub = scene.frame_current, scene.frame_subframe
-    scene.frame_set(int(f_near))
-    pivot = arm.matrix_world.translation.copy()
-    axis = (arm.parent.matrix_world.to_3x3() @ Vector((1.0, 0.0, 0.0))).normalized() if arm.parent else \
-        Vector((1.0, 0.0, 0.0))
-    scene.frame_set(cur, subframe=sub)
-    hand = Vector(player.item_point("right", f_near))
-    u, v = hand - pivot, Vector(target) - pivot
-    u -= axis * u.dot(axis)
-    v -= axis * v.dot(axis)
-    if u.length < 1e-6 or v.length < 1e-6:
-        return 0.0
-    ang = math.atan2(axis.dot(u.cross(v)), u.dot(v))
-    ang = max(-REACH_LIMIT, min(REACH_LIMIT, ang))
     end = frame + 6 * TICK + 1.0
-    fc0 = _fcurve(arm, "delta_rotation_euler", 0)
-    keep = [(kp.co.x, kp.co.y) for kp in fc0.keyframe_points if not (frame - 0.01 <= kp.co.x <= end + 0.01)]
+    keeps = []
+    for i in (0, 2):
+        fc0 = _fcurve(arm, "delta_rotation_euler", i)
+        keeps.append([(kp.co.x, kp.co.y) for kp in fc0.keyframe_points
+                      if not (frame - 0.01 <= kp.co.x <= end + 0.01)])
 
-    def put(a):
-        ks = sorted(keep + [(float(frame), 0.0), (float(f_near), a), (end, 0.0)])
-        fc = _keys(arm, "delta_rotation_euler", [k[0] for k in ks], [k[1] for k in ks], "BEZIER", index=0)
-        for kp in fc.keyframe_points:
-            kp.handle_left_type = kp.handle_right_type = "AUTO_CLAMPED"
-        fc.update()
+    def put(ax, az):
+        for keep, i, a in ((keeps[0], 0, ax), (keeps[1], 2, az)):
+            ks = sorted(keep + [(float(frame), 0.0), (float(f_near), a), (end, 0.0)])
+            fc = _keys(arm, "delta_rotation_euler", [k[0] for k in ks], [k[1] for k in ks], "BEZIER", index=i)
+            for kp in fc.keyframe_points:
+                kp.handle_left_type = kp.handle_right_type = "AUTO_CLAMPED"
+            fc.update()
 
-    put(ang)                                       # delta rotations sit outside the arm's own: check the direction
-    d_pos = (Vector(player.item_point("right", f_near)) - Vector(target)).length
-    put(-ang)
-    d_neg = (Vector(player.item_point("right", f_near)) - Vector(target)).length
-    if d_pos <= d_neg:
-        put(ang)
-    else:
-        ang = -ang
-    return ang
+    def miss(ax, az):
+        put(ax, az)
+        return (Vector(player.item_point("right", f_near)) - Vector(target)).length
+
+    best = (miss(0.0, 0.0), 0.0, 0.0)
+    step = math.radians(16.0)
+    while step > math.radians(0.5):
+        moved = False
+        for dx, dz in ((step, 0.0), (-step, 0.0), (0.0, step), (0.0, -step)):
+            ax = max(-REACH_LIMIT, min(REACH_LIMIT, best[1] + dx))
+            az = max(-REACH_LIMIT, min(REACH_LIMIT, best[2] + dz))
+            d = miss(ax, az)
+            if d < best[0] - 1e-5:
+                best, moved = (d, ax, az), True
+                break
+        if not moved:
+            step *= 0.5
+    put(best[1], best[2])
+    return math.hypot(best[1], best[2])
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -2256,7 +2313,9 @@ AREAS = {
     "lights": (36, 13, 44, 19),      # night: a village torch, a redstone lamp and a redstone torch side by side
 }
 DOOR = dict(cells=[(7, 47, 0), (7, 47, 1)], side="east", cell=(7, 46), villager=(7.5, 46.45, 0.0), lever=(8, 45, 1),
+            cam=(8.3, 44.0, 3.0), target=(7.45, 47.4, 0.9), focus=(7.5, 47.0, 1.0),
             roof=[(x, y, 2) for x in range(5, 10) for y in range(43, 46)] + [(7, 46, 2)])
+HELD = dict(player=(18.5, 20.5, 0.0), cam=(18.4, 15.9, 1.4), target=(18.45, 20.5, 1.05))
 LIGHTS = dict(torch=(37, 18, 0), lamp=(40, 18, 0), rtorch=(43, 18, 0), wall_y=19)
 COLUMN = dict(piston=(32, 14, 0), lever=(33, 14, 0), blocks=12)
 ROW = dict(cells=[(x, 43, 3) for x in (14, 15, 16, 17)], facing="north", lever=(13, 42, 4),
@@ -2269,7 +2328,7 @@ SKIES = {"golden": SKY,                                                  # the l
          "dusk": dict(preset="dusk", az=187.0, el=5.0, bloom=1.3, grade="warm"),       # films/lookdev 'lookdev_dusk'
          "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool")}    # films/_multisky_demo
 CLOSE = dict(dust=[(x, 23, 0) for x in (22, 23, 24, 25)], repeater=(25, 24, 0), torch=(24, 24, 0),
-             cam=(24.75, 25.75, 0.95), target=(24.55, 24.0, 0.42), focus=(24.5, 24.45, 0.55))
+             cam=(25.1, 25.9, 1.05), target=(25.0, 23.9, 0.35), focus=(24.6, 24.45, 0.55))
 
 
 def proof_set(b, dark=False):
@@ -2323,15 +2382,15 @@ def proof_set(b, dark=False):
     hollow += door_cells(DOOR["cells"], DOOR["side"]) + [DOOR["lever"]]
     for c in hollow:
         w.set(c[0], c[1], c[2], None)
-    b.torch((6, 45, 1), "wall_torch", {"facing": "south"}, group="rs_door")
+    b.torch((7, 43, 1), "wall_torch", {"facing": "north"}, group="rs_door")      # behind the camera, into the cell
     b.torch((5, 44, 1), "wall_torch", {"facing": "east"}, group="rs_door")
     b.allow(AREAS["door"])
     if dark:                                     # the game's sky light baked in (engine.sets): the box is sealed
         from . import sets
 
         sets.env(b).bake_sky_light(b.ground, x0, y0, x1, y1)
-    for c in DOOR["roof"]:                       # the roof over the aisle and the cell: objects the camera does
-        w.set(c[0], c[1], c[2], None)            # not see (build_proof), after the bake that counted them
+    for c in DOOR["roof"]:                       # the roof over the aisle and the cell is off for the camera (dark:
+        w.set(c[0], c[1], c[2], None)            # after the bake that counted it, and rebuilt camera-invisible)
     b.v.sets["redstone_proof"] = dict(areas=AREAS)
     return b.v.sets["redstone_proof"]
 
@@ -2400,7 +2459,7 @@ def build_proof(scene, sky=None, dark_door=False):
     P["close_dust"] = k.wire(CLOSE["dust"], power=15)
     P["close_repeater"] = k.repeater(CLOSE["repeater"], "west", delay=2, powered=True)
     s = st.shot("close", 0.5)
-    cam(s, CLOSE["cam"], CLOSE["target"], 40, 5.6, focus=CLOSE["focus"])
+    cam(s, CLOSE["cam"], CLOSE["target"], 30, 5.6, focus=CLOSE["focus"])
     out["frames"]["close"] = s.frame_start + 2
 
     # ---- dust: shapes, and the 16 power levels along a U from a lever
@@ -2442,6 +2501,15 @@ def build_proof(scene, sky=None, dark_door=False):
     st.hero(s, "narrator", efe)
     out["frames"]["bench"] = [f0 + 3, f0 + 5, f0 + 7, f0 + 8, f0 + 9, f0 + 13]
 
+    # ---- held: the narrator facing the lens with the redstone torch in his hand (beat 24's key light)
+    s = st.shot("held", 0.5)
+    f0 = s.frame_start
+    efe.place(f0, HELD["player"], 0.0)
+    efe.look_at(f0, None, ease=0)
+    st.use(s, efe)
+    cam(s, HELD["cam"], HELD["target"], 50, 2.8, focus=efe.head)
+    out["frames"]["held"] = f0 + 2
+
     # ---- the lever, flipped by a player's hand
     s = st.shot("lever", 0.75)
     f0 = s.frame_start
@@ -2450,7 +2518,7 @@ def build_proof(scene, sky=None, dark_door=False):
     pos, yaw = lev.stand()
     steve.place(f0, pos, yaw)
     steve.look_at(f0, lev.hand_point(f0, 0.5), ease=0)
-    ff = flip_by(steve, lev, f0 + 4, sync="hand", look=False)
+    ff = flip_by(steve, lev, f0 + 4, sync="hand", look=False, reach=True)
     out["lever_flip"] = ff
     out["lever_reach"] = min(((Vector(steve.item_point("right", f / 2.0)) - lev.hand_point(f0, 0.5)).length, f / 2.0)
                              for f in range(2 * f0 + 8, 2 * f0 + 28))
@@ -2484,14 +2552,15 @@ def build_proof(scene, sky=None, dark_door=False):
     cam(s, (20.6, 50.4, 6.2), (15.4, 43.6, 3.5), 24, 8.0)
     out["frames"]["row"] = [f0 + 5, f0 + 7, f0 + 10]
 
-    # ---- the door of "Two Apples": the librarian in his cell, the back wall opening behind him (the camera above
-    #      the aisle; the roof over the aisle and the cell is there for light and shadow, invisible to the camera)
+    # ---- the door of "Two Apples": the librarian in his cell, the back wall opening behind him, seen from above
+    #      the aisle (the roof over the aisle and the cell is off; dark_door: it is there for light and shadow but
+    #      invisible to the camera, the box sealed and its sky light baked as engine.sets does)
     s = st.shot("door", 2.0)
     f0 = s.frame_start
     dl = "auto" if dark_door else None
-    roof = [k.block("stone", c, sky_light=dl) for c in DOOR["roof"]]
-    for r in roof:
-        r.object.visible_camera = False
+    if dark_door:
+        for c in DOOR["roof"]:
+            k.block("stone", c, sky_light=dl).object.visible_camera = False
     door = P["door"] = k.piston_door(DOOR["cells"], DOOR["side"], block="stone", closed=True, sky_light=dl)
     lev = P["door_lever"] = k.lever(DOOR["lever"], "wall", "south", sky_light=dl)
     dad = st.actor("dad", "librarian")
@@ -2499,11 +2568,11 @@ def build_proof(scene, sky=None, dark_door=False):
     door.open(lev.flip(f0 + 8))
     door.close(lev.flip(f0 + 30))
     st.use(s, dad)
-    cam(s, (7.05, 44.35, 4.3), (7.55, 47.2, 1.0), 26, 4.0, focus=(7.5, 47.0, 1.2))
-    st.lights(s, scale=1.0, groups={"rs_door": 1.4}, near=(7.5, 45.0, 1.0), radius=4.0)
+    cam(s, DOOR["cam"], DOOR["target"], 24, 4.0, focus=DOOR["focus"])
+    st.lights(s, scale=1.0, groups={"rs_door": 3.0}, near=(7.5, 45.0, 1.0), radius=4.0)
     out["frames"]["door"] = [f0 + 7, f0 + 9, f0 + 12, f0 + 29, f0 + 31, f0 + 34]
     out["frames"]["door_dark"] = [f0 + 7, f0 + 12, f0 + 34]
-    out["door_parts"] = dict(door=door, lever=lev, roof=roof)
+    out["door_parts"] = dict(door=door, lever=lev)
 
     # ---- lights (night): a village torch, a redstone lamp and a redstone torch on the floor, side by side
     s = st.shot("lights", 0.5)
@@ -2675,7 +2744,7 @@ def light_study(which="floor", res=(640, 360)):
                                                       level - d, 14 - d))
         os.remove(path("off"))
     else:
-        f = out["frames"]["bench"][-1] if which == "lamp" else out["frames"]["bench"][0]
+        f = out["frames"]["bench"][-1] if which == "lamp" else out["frames"]["held"]
         film.goto(f)
         efe = out["stage"].cast["efe"]
         eye = Vector(efe.eye_point(f))
@@ -2977,6 +3046,65 @@ def _check():
        lamp.light.light_linking.blocker_collection is not None
        and all(co.light_linking.link_state == "EXCLUDE"
                for co in lamp.light.light_linking.blocker_collection.collection_objects))
+    # ---- API: names, circuit steps on rows / doors, objects
+    k4 = kit(_blocks.World())
+    k4.world.fill(0, 0, -1, 30, 30, -1, "stone")
+    r1 = k4.piston_row([(x, 2, 0) for x in range(0, 3)], "north")
+    r2 = k4.piston_row([(x, 6, 0) for x in range(0, 3)], "north")
+    d1 = k4.piston_door([(10, 2, 0), (10, 2, 1)], "east")
+    d2 = k4.piston_door([(10, 8, 0), (10, 8, 1)], "east")
+    ok("two rows / doors with the default name get different names (Stage keys st.cast by name)",
+       r1.name != r2.name and d1.name != d2.name and len({p.name for p in r1.pistons + r2.pistons}) == 6,
+       "%s %s %s %s" % (r1.name, r2.name, d1.name, d2.name))
+    wr4 = k4.wire([(x, 0, 0) for x in range(0, 3)], power=15)
+    try:
+        t_end = unsignal(30.0, wr4, r1)
+        sig_ok = (abs(t_end - 30.0) < 1e-9 and not r1.extended_at(31.0) and wr4.level_at((0, 0, 0), 30) == 0
+                  and abs(signal(50.0, r1) - 50.0) < 1e-9 and r1.extended_at(51.0))
+    except AttributeError as e:
+        sig_ok = False
+        print("   ", e)
+    d1.unpower(40.0)
+    ok("rows and doors are circuit steps: unsignal(t, wire, row) retracts the row on t; signal(t, row) extends it; "
+       "door.unpower(t) opens it (powered pistons extend: power closes)", sig_ok and d1.is_open(41.0))
+    ok("every builder has .objects (row, door, block)", len(r1.objects) == 3 * 4 + 3 and len(d1.objects) == 2 * 4 + 2
+       and k4.block("stone", (20, 20, 0)).objects[0].name.startswith("block_stone"))
+
+    # ---- sky light: the same factor engine.sets draws a World cell with (floored at LIGHT_FLOOR)
+    from . import sets
+
+    k5 = kit(_blocks.World(), sky_light=0)
+    f0_ = k5._dim(0)
+    ok("kit(sky_light=0): parts get sets.lightmap(LIGHT_FLOOR = 3) = %.3f, not black (levels 0..3 alike; 9 and 10 "
+       "alike as sets pairs them)" % f0_, abs(f0_ - sets.lightmap(3)) < 1e-9 and k5._dim(1) == f0_
+       and k5._dim(3) == f0_ and abs(k5._dim(10) - sets.lightmap(9)) < 1e-9 and k5._dim(15) is None)
+    w6 = _blocks.World()
+    w6.fill(0, 0, -1, 6, 6, 3, "stone")
+    for c in [(x, 3, z) for x in range(1, 4) for z in (0, 1)] + [(2, 4, 0), (2, 4, 1)]:
+        w6.set(c[0], c[1], c[2], None)                 # an aisle (y 3) and a door cell behind it (2, 4)
+    env6 = w6.sets_environment = sets.Environment(w6)           # (what sets.env(b) does in a hook)
+    for c in [(x, 3, z) for x in range(1, 4) for z in (0, 1)] + [(2, 4, 0), (2, 4, 1)]:
+        env6.light[c] = 0
+        env6.columns.add((c[0], c[1]))
+    env6.columns |= {(x, y) for x in range(0, 7) for y in range(0, 7)}
+    wall = w6._state_at((1, 4, 0))                    # the wall beside the door: its face into the aisle
+    wall_tint = [q[2][1] for q in wall.quads if q[3] == "south"]
+    k6 = kit(w6)
+    blk = k6.block("stone", (2, 4, 0), sky_light="auto")
+    tints = {m.name.split("#")[-1][:6] for m in blk.object.data.materials}
+    want = "%02x%02x%02x" % tuple(wall_tint[0]) if wall_tint and wall_tint[0] else None
+    ok("a door block at sky_light='auto' next to a wall engine.sets baked dark gets the identical tint (%s)" % want,
+       want is not None and tints == {want}, "%s vs %s" % (tints, want))
+
+    # ---- dust colour film choices
+    ok("dust_tint: the game's red, green raised only where the game has green (power 13-15), so the DISPLAYED hue "
+       "is the game's after the look's grade (15: %s)" % (dust_tint(15),),
+       all(dust_tint(l)[0] == wire_color(l)[0] and dust_tint(l)[2] == 0 for l in range(16))
+       and all(dust_tint(l) == wire_color(l) for l in range(13)) and dust_tint(15)[1] > wire_color(15)[1])
+    ok("dust_albedo: 1 up to the knee, DUST_ALBEDO at 15, and the diffuse red it leaves never falls with power",
+       dust_albedo(0) == 1.0 and abs(dust_albedo(15) - DUST_ALBEDO) < 1e-9 and all(
+           dust_albedo(l) * _srgb_to_linear(wire_color(l)[0] / 255.0) <= dust_albedo(l + 1)
+           * _srgb_to_linear(wire_color(l + 1)[0] / 255.0) + 1e-9 for l in range(15)))
     print("[redstone] %d failed%s" % (len(failed), ": " + "; ".join(failed) if failed else ""))
     return len(failed)
 
@@ -2997,8 +3125,35 @@ def _check_village():
     ok("the proof set goes through the village hook with no problem and validates", not v.edit_problems
        and not v.validate(), "%s %s" % (v.edit_problems, v.validate()))
     reach, f = out["lever_reach"]
-    ok("a player at lever.stand() brings his swinging right hand within 0.45 block of the handle's middle "
-       "(%.2f at frame %g; the swing tops out 1.33 above his feet)" % (reach, f), reach < 0.45)
+    info = out["parts"]["lever_pier"].reach_info
+    ok("a player at lever.stand(): the plain swing passes %.2f block from the handle's middle (the swing tops out "
+       "1.33 above his feet); flip_by(reach=True) lifts the arm %.0f degrees and the fist (0.25 wide) touches it (%.2f "
+       "from its centre; over the "
+       "whole swing at half frames %.2f at frame %g)" % (info["natural"], math.degrees(info["angle"]),
+                                                          info["reached"], reach, f),
+       info["natural"] < 0.45 and info["reached"] is not None and info["reached"] < 0.15 and reach < 0.15)
+    st = out["stage"]
+    sh = {x.name: x for x in out["film"].shots}
+    steve = st.cast["steve"]
+    f_lever = sh["lever"].frame_start
+    before = {(fc.data_path, fc.array_index, kp.co.x) for fc in _root_fcurves(steve.head) for kp in fc.keyframe_points}
+    lev2 = out["kit"].lever((5, 23, 0), "floor", "north")
+    flip_by(steve, lev2, f_lever + 2, look=True)          # a click 2 frames after he is placed
+    new_keys = sorted(k[2] for fc in _root_fcurves(steve.head) for kp in fc.keyframe_points
+                      for k in [(fc.data_path, fc.array_index, kp.co.x)] if k not in before)
+    ok("flip_by 2 frames after the player's place(): his head turn starts on the place() frame, not 6 frames "
+       "before (no pre-roll into the shot before)", new_keys and min(new_keys) >= f_lever - 1e-6,
+       "new head keys %s, placed on %d" % ([round(x, 2) for x in new_keys[:4]], f_lever))
+    lt = out["parts"]["lights_rtorch"]
+    mats = [m for ob in lt.looks.looks[True] for m in ob.data.materials]
+    ok("lit torch: its torch faces are drawn with back-face culling (Backfacing -> Transparent) and the glow",
+       any(m.node_tree and any(n.type == "NEW_GEOMETRY" for n in m.node_tree.nodes) for m in mats)
+       and all(m.get("mc_redstone_style") for m in mats if m.get("mc_texture") == "block/redstone_torch"),
+       str([m.name for m in mats]))
+    dm = [m for ob in out["parts"]["dust_cross"].objects for m in ob.data.materials]
+    ok("dust: one opaque cut-out face per piece (a Principled material, not the two-sided 'up_thin' one that let the "
+       "floor show through)", dm and all(any(n.type == "BSDF_PRINCIPLED" for n in m.node_tree.nodes) for m in dm),
+       str([m.name for m in dm]))
     efe = out["stage"].cast["efe"]
     item = efe.item("right")
     L = bpy.data.objects.get(item.get("redstone_glow_light", "")) if item is not None else None
