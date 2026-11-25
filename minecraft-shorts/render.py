@@ -6,7 +6,9 @@
     $BPY -m render <film> --sheet 12                  # out/test/<film>_sheet.png    (contact sheet WITH captions)
     $BPY -m render <film> --frames all --max-seconds 240      # FINAL frames: out/frames/<film>/f_####.png
                                                               #   (720x1280, 24 samples, 4 threads), resumable
-    $BPY -m render <film> --encode [--audio a.wav]    # out/<film>.mp4  1080x1920 H.264 yuv420p crf 16 +faststart
+    $BPY -m render <film> --encode                    # out/<film>.mp4  1080x1920 H.264 yuv420p crf 16 +faststart
+                                                      #   + the film's narration when narration/<film>.wav exists
+                                                      #   (--audio FILE: another sound file; --no-audio: silent)
     $BPY -m render <film> --frames all --step 4 --res 360x640 --samples 8 --encode --allow-holds
                                                       # PREVIEW: out/preview/<film>/360x640_8spp_step4/ and
                                                       #   out/preview/<film>_360x640_8spp_step4.mp4
@@ -51,6 +53,16 @@ stutter), unless --allow-holds says the gaps are deliberate (step previews). --e
 rebuild) when none of the sources it lists has changed; after a caption edit it rebuilds the film (seconds),
 finds every fingerprint unchanged and encodes the frames that are there.
 Exit codes: 0 done, 1 nothing to do, 2 encode refused, 3 stopped because engine sources changed under final frames.
+
+Sound. A narrated film (engine/narration.py: a NARRATION literal in the film module, spoken by tools/narrate.py into
+narration/<film>.wav + .json) needs no flag: --encode muxes narration/<film>.wav whenever that file exists (AAC
+192 kb/s, 48 kHz, dual mono, from t = 0, exactly as long as the picture; the picture itself is encoded as without
+sound and its stream is copied). Automatic, because a flag can be forgotten or point at an old file, and the
+narration is what the film's captions and cuts were timed from: before muxing, --encode checks that the json was
+spoken from the film's current NARRATION, that the wav is the one the json describes and that the film is not
+shorter than its last word, and refuses (exit code 2) otherwise. The narration files count as sources of the film:
+speak the text again and the next --encode rebuilds the film, so captions and audio cannot drift apart.
+A film without narration/<film>.wav is encoded silent, exactly as before.
 """
 import argparse
 import hashlib
@@ -94,7 +106,11 @@ def _parse_args(argv):
     ap.add_argument("--max-seconds", type=float, default=0.0,
                     help="with --frames: stop starting new frames after this many seconds (resume by re-running)")
     ap.add_argument("--no-motion-blur", action="store_true", help="disable motion blur (faster look-dev stills)")
-    ap.add_argument("--audio", metavar="FILE", help="with --encode: mux this audio file (AAC 192k, cut to the video)")
+    ap.add_argument("--audio", metavar="FILE",
+                    help="with --encode: mux this audio file instead of the film's narration (AAC 192k 48 kHz stereo, "
+                         "padded or cut to the video)")
+    ap.add_argument("--no-audio", action="store_true",
+                    help="with --encode: a silent mp4 even when narration/<film>.wav exists")
     ap.add_argument("--allow-holds", action="store_true",
                     help="with --encode: hold the previous frame over missing frames instead of failing")
     ap.add_argument("--zones", action="store_true",
@@ -127,7 +143,19 @@ def variant_of(res, samples, step, motion_blur=True):
 
 # project files that cannot change a rendered pixel: captions are composited at encode time, post / stamp / render
 # only do bookkeeping (what they set on the scene is measured by the fingerprint), tools only inspect
-NON_PIXEL = ("engine/captions.py", "engine/post.py", "engine/stamp.py", "render.py")
+# (engine/narration.py only reads times: what a film does with them is measured by the fingerprint)
+NON_PIXEL = ("engine/captions.py", "engine/post.py", "engine/stamp.py", "engine/narration.py", "render.py")
+
+
+def narration_files(name):
+    """Project-relative paths of a film's narration files that exist (narration/<film>.json, .wav): they are
+    sources of the film (its captions, cuts and length come from them)."""
+    out = []
+    for ext in (".json", ".wav"):
+        rel = "narration/%s%s" % (name, ext)
+        if os.path.exists(os.path.join(ROOT, rel)):
+            out.append(rel)
+    return out
 
 
 def project_sources():
@@ -214,7 +242,10 @@ class Session:
     def meta(self):
         """Everything post needs to encode without Blender, plus what the frames depend on."""
         f = self.film
-        sources = project_sources()
+        # (a module that builds one part of a narrated film returns the whole film's Narration as "narration")
+        nar = self.result.get("narration")
+        spoken = set(narration_files(self.name)) | set(narration_files(getattr(nar, "film", None) or self.name))
+        sources = sorted(set(project_sources()) | spoken)
         return {
             "film": self.name, "fps": f.fps, "frame_start": f.frame_start, "frame_end": f.frame_end,
             "captions": [list(c) for c in self.captions],
@@ -418,6 +449,8 @@ def _meta_is_fresh(name, variant=None):
     meta = post.read_meta(name, variant)
     if not meta or not meta.get("sources") or not meta.get("source_hash"):
         return False
+    if any(rel not in meta["sources"] for rel in narration_files(name)):
+        return False                              # a narration was spoken after this meta was written
     return source_hash(meta["sources"]) == meta["source_hash"]
 
 
@@ -620,14 +653,31 @@ def main(argv=None):
     # ---- encode
     if args.encode:
         meta = post.read_meta(name, variant)
+        audio = None if args.no_audio else args.audio
+        if audio is None and not args.no_audio:
+            # the film's own narration, if it has one: checked against the film's text before it is used
+            from engine import narration
+
+            audio, problem = narration.encode_check(name)
+            if audio is not None and problem is None:
+                nar = narration.load(name, fps=meta["fps"])
+                n = meta["frame_end"] - meta["frame_start"] + 1
+                if nar.words and nar.words[-1].end > n / float(meta["fps"]) + 1e-6:
+                    problem = ("the film is %d frames (%.2f s) long but its narration's last word ends at %.2f s: "
+                               "build the film to nar.frames (%d)" % (n, n / float(meta["fps"]), nar.words[-1].end, nar.frames))
+            if problem:
+                print("[render] encode refused:", problem)
+                return 2
         try:
             mp4 = post.encode(name, captions=[tuple(c) for c in meta["captions"]], fps=meta["fps"],
-                              frame_start=meta["frame_start"], frame_end=meta["frame_end"], audio=args.audio,
+                              frame_start=meta["frame_start"], frame_end=meta["frame_end"], audio=audio,
                               variant=variant, allow_holds=args.allow_holds)
         except RuntimeError as e:
             print("[render] encode refused:", e)
             return 2
         print("[render] video:", post.probe(mp4))
+        if audio:
+            print("[render] audio:", post.probe_audio(mp4))
     return 0
 
 

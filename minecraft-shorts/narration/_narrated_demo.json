@@ -1,0 +1,410 @@
+{
+ "film": "_narrated_demo",
+ "json_version": 2,
+ "spec_hash": "5b0297b29caecc6b",
+ "spec": {
+  "version": 1,
+  "voice": "am_michael",
+  "speed": 1.0,
+  "lead": 0.3,
+  "tail": 1.2,
+  "pause": 0.35,
+  "fps": 24,
+  "lines": [
+   {
+    "id": null,
+    "text": "In this village, everyone has a job.",
+    "spoken": "In this village, everyone has a job.",
+    "pause": 0.35,
+    "speed": 1.0
+   },
+   {
+    "id": null,
+    "text": "The player trades with all of them.",
+    "spoken": "The player trades with all of them.",
+    "pause": 0.35,
+    "speed": 1.0
+   },
+   {
+    "id": null,
+    "text": "But nobody trades with a nitwit.",
+    "spoken": "But nobody trades with a nitwit.",
+    "pause": 0.8,
+    "speed": 1.0
+   },
+   {
+    "id": "leave",
+    "text": "So today, I'm leaving.",
+    "spoken": "So today, I'm leaving.",
+    "pause": 0.0,
+    "speed": 1.0
+   }
+  ]
+ },
+ "voice": "am_michael",
+ "lang": "en-us",
+ "speed": 1.0,
+ "sample_rate": 24000,
+ "channels": 1,
+ "fps": 24,
+ "duration": 10.458333,
+ "frames": 251,
+ "lead": 0.3,
+ "tail": 1.2383,
+ "speech_seconds": 7.42,
+ "words_per_second_speaking": 3.235,
+ "words_per_second_overall": 2.691,
+ "timing": "model",
+ "loudness": {
+  "target_lufs": -16.0,
+  "before_lufs": -22.7,
+  "before_true_peak_db": -3.4,
+  "gain_db": 8.3,
+  "limiter_ceiling_db": -2.0,
+  "max_gain_reduction_db": 6.82,
+  "share_limited_over_1db": 0.1555,
+  "share_limited_over_3db": 0.0709,
+  "sentence_level_gain_db": [
+   -0.15,
+   0.34,
+   0.15,
+   -0.71
+  ],
+  "sentence_level_db": [
+   -15.04,
+   -14.76,
+   -15.26,
+   -15.0
+  ],
+  "integrated_lufs": -16.0,
+  "true_peak_db": -1.8
+ },
+ "wav": "_narrated_demo.wav",
+ "wav_sha1": "92887b39917fd26f21a2f23be203c4291fe190ae",
+ "sentences": [
+  {
+   "index": 0,
+   "id": null,
+   "text": "In this village, everyone has a job.",
+   "spoken": "In this village, everyone has a job.",
+   "start": 0.3,
+   "end": 2.66,
+   "pause_after": 0.35,
+   "speed": 1.0,
+   "first_word": 0,
+   "last_word": 6
+  },
+  {
+   "index": 1,
+   "id": null,
+   "text": "The player trades with all of them.",
+   "spoken": "The player trades with all of them.",
+   "start": 3.01,
+   "end": 4.84,
+   "pause_after": 0.35,
+   "speed": 1.0,
+   "first_word": 7,
+   "last_word": 13
+  },
+  {
+   "index": 2,
+   "id": null,
+   "text": "But nobody trades with a nitwit.",
+   "spoken": "But nobody trades with a nitwit.",
+   "start": 5.19,
+   "end": 6.97,
+   "pause_after": 0.8,
+   "speed": 1.0,
+   "first_word": 14,
+   "last_word": 19
+  },
+  {
+   "index": 3,
+   "id": "leave",
+   "text": "So today, I'm leaving.",
+   "spoken": "So today, I'm leaving.",
+   "start": 7.77,
+   "end": 9.22,
+   "pause_after": 0.0,
+   "speed": 1.0,
+   "first_word": 20,
+   "last_word": 23
+  }
+ ],
+ "words": [
+  {
+   "text": "In",
+   "caption": "In",
+   "start": 0.3,
+   "end": 0.415,
+   "sentence": 0,
+   "source": "energy",
+   "estimated": false,
+   "second": 0.3,
+   "second_source": "energy"
+  },
+  {
+   "text": "this",
+   "caption": "this",
+   "start": 0.415,
+   "end": 0.64,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.42,
+   "second_source": "forced"
+  },
+  {
+   "text": "village,",
+   "caption": "village",
+   "start": 0.64,
+   "end": 1.105,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.6,
+   "second_source": "forced"
+  },
+  {
+   "text": "everyone",
+   "caption": "everyone",
+   "start": 1.385,
+   "end": 1.84,
+   "sentence": 0,
+   "source": "energy",
+   "estimated": false,
+   "second": 1.385,
+   "second_source": "energy"
+  },
+  {
+   "text": "has",
+   "caption": "has",
+   "start": 1.84,
+   "end": 2.04,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 1.66,
+   "second_source": "forced"
+  },
+  {
+   "text": "a",
+   "caption": "a",
+   "start": 2.04,
+   "end": 2.115,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 2.0,
+   "second_source": "forced"
+  },
+  {
+   "text": "job.",
+   "caption": "job",
+   "start": 2.115,
+   "end": 2.66,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 2.16,
+   "second_source": "forced"
+  },
+  {
+   "text": "The",
+   "caption": "The",
+   "start": 3.01,
+   "end": 3.08,
+   "sentence": 1,
+   "source": "energy",
+   "estimated": false,
+   "second": 3.01,
+   "second_source": "energy"
+  },
+  {
+   "text": "player",
+   "caption": "player",
+   "start": 3.08,
+   "end": 3.455,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 3.11,
+   "second_source": "forced"
+  },
+  {
+   "text": "trades",
+   "caption": "trades",
+   "start": 3.455,
+   "end": 3.98,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 3.37,
+   "second_source": "forced"
+  },
+  {
+   "text": "with",
+   "caption": "with",
+   "start": 3.98,
+   "end": 4.13,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 3.85,
+   "second_source": "forced"
+  },
+  {
+   "text": "all",
+   "caption": "all",
+   "start": 4.13,
+   "end": 4.455,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 4.09,
+   "second_source": "forced"
+  },
+  {
+   "text": "of",
+   "caption": "of",
+   "start": 4.455,
+   "end": 4.58,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 4.37,
+   "second_source": "forced"
+  },
+  {
+   "text": "them.",
+   "caption": "them",
+   "start": 4.58,
+   "end": 4.84,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 4.55,
+   "second_source": "forced"
+  },
+  {
+   "text": "But",
+   "caption": "But",
+   "start": 5.19,
+   "end": 5.31,
+   "sentence": 2,
+   "source": "energy",
+   "estimated": false,
+   "second": 5.19,
+   "second_source": "energy"
+  },
+  {
+   "text": "nobody",
+   "caption": "nobody",
+   "start": 5.31,
+   "end": 5.81,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 5.29,
+   "second_source": "forced"
+  },
+  {
+   "text": "trades",
+   "caption": "trades",
+   "start": 5.81,
+   "end": 6.335,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 5.69,
+   "second_source": "forced"
+  },
+  {
+   "text": "with",
+   "caption": "with",
+   "start": 6.335,
+   "end": 6.46,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 6.19,
+   "second_source": "forced"
+  },
+  {
+   "text": "a",
+   "caption": "a",
+   "start": 6.46,
+   "end": 6.535,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 6.45,
+   "second_source": "forced"
+  },
+  {
+   "text": "nitwit.",
+   "caption": "nitwit",
+   "start": 6.535,
+   "end": 6.97,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 6.57,
+   "second_source": "forced"
+  },
+  {
+   "text": "So",
+   "caption": "So",
+   "start": 7.77,
+   "end": 8.0,
+   "sentence": 3,
+   "source": "energy",
+   "estimated": false,
+   "second": 7.77,
+   "second_source": "energy"
+  },
+  {
+   "text": "today,",
+   "caption": "today",
+   "start": 8.0,
+   "end": 8.55,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 7.97,
+   "second_source": "forced"
+  },
+  {
+   "text": "I'm",
+   "caption": "I'm",
+   "start": 8.55,
+   "end": 8.75,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 8.61,
+   "second_source": "forced"
+  },
+  {
+   "text": "leaving.",
+   "caption": "leaving",
+   "start": 8.75,
+   "end": 9.22,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 8.79,
+   "second_source": "forced"
+  }
+ ],
+ "estimated_words": [],
+ "tools": {
+  "model": "kokoro-v1.0.timed.onnx",
+  "voices": "voices-v1.0.bin",
+  "recogniser": "faster-whisper small.en",
+  "kokoro-onnx": "0.6.1",
+  "faster-whisper": "1.2.1",
+  "onnxruntime": "1.32.0",
+  "ctranslate2": "4.9.1"
+ }
+}

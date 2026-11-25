@@ -7,6 +7,12 @@ Next to the frames sits meta.json, which render.py writes after building a film:
 list, the render settings, a hash of the sources that built the film, for every rendered frame its stamp (settings,
 engine-source hash, scene fingerprint: see render.py and engine/stamp.py) and, under 'current', what each frame
 should carry now. A frame counts only while its stamp is the current one.
+
+Sound: encode(audio=...) first writes the silent film exactly as a film without sound is written, then mux_audio()
+puts the audio under it WITHOUT re-encoding the picture (the video stream is copied bit for bit): AAC 192 kb/s,
+48 kHz, stereo (a mono narration becomes dual mono), starting at t = 0 and padded or cut to the exact length of the
+picture, +faststart. A narrated film gets its audio automatically (render.py --encode finds narration/<film>.wav,
+see engine/narration.py); mux_audio(video, wav) alone puts a narration under an already joined film.
 """
 import json
 import os
@@ -22,6 +28,12 @@ from . import captions as cap
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "out")
 FINAL_SIZE = (1080, 1920)
+AUDIO_RATE, AUDIO_BITRATE = 48000, "192k"
+# A mono narration is delivered as dual mono (the same signal left and right). Each channel carries it 3.01 dB
+# down, so that the STEREO programme measures what the mono file measures (BS.1770 adds the two channels' power:
+# narration/<film>.wav at -16 LUFS -> the mp4 at -16 LUFS, its true peak 3 dB further under the ceiling).
+# Set 0.0 to copy the mono samples at full level into both channels (the mp4 then measures 3 LU louder).
+DUAL_MONO_GAIN_DB = -3.01
 
 # Where a Reels viewer actually sees the picture, as fractions of the 9:16 video (x0, y0, x1, y1), measured on the
 # reference screenshots (1179x2556 phone, video height-filled down to y = 2333, so the sides are cropped):
@@ -174,7 +186,8 @@ def contact_sheet(tiles, labels, words, path, columns=None, gap=6):
 def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
            crf=16, audio=None, preset="medium", variant=None, allow_holds=False):
     """Upscale every frame to 1080x1920 (Lanczos), composite its caption AFTER the upscale and pipe to ffmpeg
-    (H.264 yuv420p, +faststart). Returns the mp4 path.
+    (H.264 yuv420p, +faststart). Returns the mp4 path. audio=FILE adds sound with mux_audio() (the picture is
+    encoded exactly as without it; AAC 192k 48 kHz stereo from t = 0, as long as the picture).
 
     Only frames that are valid for the film's current signature count (see valid_frames). A frame that is missing
     from the range is an ERROR: a crashed render chunk must not turn into a stutter in the delivered film. Pass
@@ -218,19 +231,19 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
     if ffmpeg is None:
         raise RuntimeError("ffmpeg not found on PATH")
 
+    if audio and not os.path.exists(audio):
+        raise RuntimeError("audio file %s does not exist" % audio)
+    # the picture is always encoded on its own, by the same command whether or not sound follows: with audio it
+    # goes to a temporary file first and mux_audio() copies its video stream, untouched, beside the sound
+    video_path = out_path if not audio else out_path[:-4] + ".video_only.mp4"
     cmd = [ffmpeg, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
            "-s", "%dx%d" % tuple(size), "-r", str(fps), "-i", "-"]
-    if audio:
-        cmd += ["-i", audio]
     cmd += ["-vf", "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p",
             "-c:v", "libx264", "-preset", preset, "-crf", str(crf), "-pix_fmt", "yuv420p",
             "-profile:v", "high", "-r", str(fps),
             "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv"]
-    if audio:
-        cmd += ["-c:a", "aac", "-b:a", "192k", "-shortest"]
-    else:
-        cmd += ["-an"]
-    cmd += ["-movflags", "+faststart", out_path]
+    cmd += ["-an"]
+    cmd += ["-movflags", "+faststart", video_path]
 
     first = have[0]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
@@ -257,9 +270,85 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
     if code != 0:
         raise RuntimeError("ffmpeg failed with exit code %d" % code)
     n = frame_end - frame_start + 1
+    sound = ""
+    if audio:
+        try:
+            info = mux_audio(video_path, audio, out_path)
+        finally:
+            if os.path.exists(video_path):
+                os.remove(video_path)
+        sound = ", sound %s (%s %d Hz %d ch, %.3f s)" % (os.path.relpath(audio, ROOT) if os.path.isabs(audio) else audio,
+                                                        info["codec"], info["sample_rate"], info["channels"],
+                                                        info["duration"])
     print(f"[encode] {out_path}: {n} frames ({n / fps:.2f} s) at {fps} fps, {size[0]}x{size[1]}, "
-          f"{missing} held, {time.time() - t0:.1f}s")
+          f"{missing} held{sound}, {time.time() - t0:.1f}s")
     return out_path
+
+
+def video_md5(path):
+    """md5 of a file's video stream as stored (packets copied, nothing decoded): equal before and after mux_audio."""
+    out = subprocess.check_output([shutil.which("ffmpeg"), "-v", "error", "-i", path, "-map", "0:v:0", "-c", "copy",
+                                   "-f", "md5", "-"])
+    return out.decode().strip().split("=")[-1]
+
+
+def probe_audio(path):
+    """ffprobe summary of the first audio stream: {'codec', 'sample_rate', 'channels', 'duration', 'start_time',
+    'bit_rate'}, or None when the file has no sound."""
+    out = subprocess.check_output([
+        shutil.which("ffprobe"), "-v", "error", "-select_streams", "a:0", "-show_entries",
+        "stream=codec_name,sample_rate,channels,duration,start_time,bit_rate", "-of", "json", path])
+    streams = json.loads(out).get("streams", [])
+    if not streams:
+        return None
+    a = streams[0]
+    return {"codec": a.get("codec_name"), "sample_rate": int(a.get("sample_rate", 0)), "channels": int(a.get("channels", 0)),
+            "duration": float(a.get("duration", 0.0) or 0.0), "start_time": float(a.get("start_time", 0.0) or 0.0),
+            "bit_rate": int(a.get("bit_rate", 0) or 0)}
+
+
+def mux_audio(video, audio, out_path=None, gain_db=None):
+    """Put `audio` under the finished film `video` (an mp4): the video stream is COPIED (not one bit of the picture
+    changes: video_md5 is the same before and after), the audio becomes AAC 192 kb/s 48 kHz stereo, starts at t = 0
+    and is padded with silence or cut to exactly the length of the picture; the mp4 is written +faststart.
+    A mono file (a narration) becomes dual mono with DUAL_MONO_GAIN_DB on each channel (gain_db overrides it); a
+    stereo file is used as it is. out_path None replaces `video` itself. Returns probe_audio() of the result."""
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        raise RuntimeError("ffmpeg not found on PATH")
+    v = probe(video)
+    if not v["frames"] or not v["fps"]:
+        raise RuntimeError("%s has no video frames" % video)
+    src = probe_audio(audio)
+    if src is None:
+        raise RuntimeError("%s has no audio stream" % audio)
+    samples = int(round(v["frames"] / v["fps"] * AUDIO_RATE))        # 24 fps: exactly 2000 samples per frame
+    codec = ["-c:a", "aac", "-b:a", AUDIO_BITRATE]
+    if src["channels"] == 1:
+        k = 10.0 ** ((DUAL_MONO_GAIN_DB if gain_db is None else gain_db) / 20.0)
+        layout = "pan=stereo|c0=%.6f*c0|c1=%.6f*c0" % (k, k)
+        # no perceptual noise substitution: it fills quiet bands with noise that is DIFFERENT left and right
+        # (measured: the channels then differ by up to -40 dB; without it they are equal to -82 dB)
+        codec += ["-aac_pns", "0"]
+    else:
+        layout = "aformat=channel_layouts=stereo" + ("" if not gain_db else ",volume=%.3fdB" % gain_db)
+    chain = "[1:a:0]aresample=%d,%s,apad=whole_len=%d,atrim=end_sample=%d[a]" % (AUDIO_RATE, layout, samples, samples)
+    final = out_path or video
+    tmp = final[:-4] + ".mux_part.mp4"
+    before = video_md5(video)
+    cmd = [ffmpeg, "-y", "-loglevel", "error", "-i", video, "-i", audio, "-filter_complex", chain,
+           "-map", "0:v:0", "-map", "[a]", "-c:v", "copy"] + codec + [
+           "-ar", str(AUDIO_RATE), "-ac", "2", "-movflags", "+faststart", tmp]
+    code = subprocess.call(cmd)
+    if code != 0:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise RuntimeError("ffmpeg (audio mux) failed with exit code %d" % code)
+    if video_md5(tmp) != before:
+        os.remove(tmp)
+        raise RuntimeError("the video stream changed while muxing audio into %s" % video)
+    os.replace(tmp, final)
+    return probe_audio(final)
 
 
 def probe(path):
@@ -308,3 +397,16 @@ if __name__ == "__main__":
         print("refused as it should:", str(e)[:90], "...")
     mp4 = encode(film, out_path=os.path.join(OUT, "test", "post_test.mp4"), allow_holds=True)
     print(probe(mp4))
+    # sound: a one-second mono tone under the 1.5 s film. The picture must not change by one bit, the audio must be
+    # AAC 48 kHz stereo from t = 0 and as long as the picture (the missing half second is silence)
+    tone = os.path.join(OUT, "test", "post_test_tone.wav")
+    subprocess.check_call([shutil.which("ffmpeg"), "-y", "-loglevel", "error", "-f", "lavfi", "-i",
+                           "sine=frequency=440:duration=1.0:sample_rate=24000", "-ac", "1", tone])
+    with_sound = os.path.join(OUT, "test", "post_test_sound.mp4")
+    info = mux_audio(mp4, tone, with_sound)
+    assert video_md5(with_sound) == video_md5(mp4), "mux_audio changed the picture"
+    assert (info["codec"], info["sample_rate"], info["channels"]) == ("aac", 48000, 2), info
+    assert abs(info["duration"] - 1.5) < 0.002 and abs(info["start_time"]) < 1e-6, info
+    silent = encode(film, out_path=os.path.join(OUT, "test", "post_test_again.mp4"), allow_holds=True, audio=tone)
+    assert video_md5(silent) == video_md5(mp4) and probe_audio(silent)["channels"] == 2
+    print("sound:", info, "- picture stream identical with and without it")
