@@ -502,7 +502,7 @@ def run_seq(shot, variants, budget=200.0, threads=2, animated=False):
     for variant in variants:
         for f in seq_frames(shot):
             seed = f if animated else 0
-            if find_job(shot, variant, seed, False, seq_tag(f, animated), res=done) is None:
+            if variant_path(shot, variant, f, animated=animated) is None:
                 jobs.append((variant, f, seed))
     if not jobs:
         print("[econ] %s sequences %s: nothing to do" % (shot, ",".join(variants)))
@@ -919,6 +919,704 @@ def report(verbose=True):
     return out
 
 
+# ----------------------------------------------------------------------------------------------------------------
+# second pass: quality (what is indistinguishable on a phone once the film is upscaled, captioned and encoded)
+# ----------------------------------------------------------------------------------------------------------------
+
+CANDIDATES = (("REF", "base"), ("A", "s16"), ("B", "r640s16"), ("C", "r600s16"), ("D", "r540"), ("E", "r540s16"))
+PROBES = (("F", "r540s12"), ("G", "r480s16"), ("H", "r540s16_fw"))
+LETTER = dict((v, k) for k, v in CANDIDATES + PROBES)
+PHONE_SIZE = (540, 960)                  # "phone size" of the brief: the delivered frame at half size
+CROP = 224                               # side of the 1:1 crops of the delivered 1080x1920 frame
+UPSCALES = ("lanczos", "bicubic", "lanczos_usm", "nn_lanczos", "mix", "nearest")
+SEQ_SHOTS = ("night", "hall")            # the temporal study: a nearly locked camera (a 0.3-block drift in 2 s,
+                                         #   handheld 0.01) and a dolly along the counter
+# still regions of the temporal study (fractions from the top left): dark and defocused parts of each shot
+SEQ_BOXES = {
+    "night": dict(sky=(0.30, 0.02, 0.95, 0.20), dark_post=(0.00, 0.50, 0.12, 0.60), far_houses=(0.80, 0.52, 1.00, 0.61),
+                  shadow_ground=(0.30, 0.86, 0.95, 0.99)),
+    "hall": dict(bars_defocused=(0.10, 0.02, 0.70, 0.18), wall=(0.72, 0.36, 0.98, 0.60), dark_counter=(0.02, 0.73, 0.40, 0.84),
+                 chest_blur=(0.05, 0.86, 0.95, 0.99)),
+}
+ACCEPTED_FLAT = 0.9                      # temporal sigma in flat areas that the finished films were accepted with
+ACCEPTED_P99 = 4.4                       #   (levels of 255) and the worst accepted 99th percentile (a grassy foreground)
+
+
+def ref_path(shot, frame=None):
+    """The reference picture of a shot's frame: the finished film's own final frame on disk (720x1280, 24 samples,
+    seed 0; a 'base' job is bit-identical to it, which the self-test checks), else the 'base' job."""
+    S = SHOTS[shot]
+    frame = S["frame"] if frame is None else frame
+    p = os.path.join(ROOT, "out", "frames", S["film"], "f_%04d.png" % frame)
+    if os.path.exists(p):
+        return p
+    rec = find_job(shot, "base", 0, False, "" if frame == S["frame"] else seq_tag(frame))
+    return os.path.join(ROOT, rec["path"]) if rec else None
+
+
+def variant_path(shot, variant, frame=None, seed=0, animated=False):
+    """PNG of one variant of one frame of a shot (None when it was not rendered). variant 'base' with seed 0 is
+    the reference; animated=True: the job whose noise seed is the frame number."""
+    S = SHOTS[shot]
+    frame = S["frame"] if frame is None else frame
+    if variant == "base" and seed == 0 and not animated:
+        return ref_path(shot, frame)
+    rec = None
+    if frame == S["frame"] and not animated:
+        rec = find_job(shot, variant, seed, False)
+    if rec is None:
+        rec = find_job(shot, variant, frame if animated else seed, False, seq_tag(frame, animated))
+    return os.path.join(ROOT, rec["path"]) if rec else None
+
+
+def deliver(src, how="lanczos", size=DELIVERY):
+    """A rendered frame as delivered, 1080x1920 RGB. 'lanczos' is engine.post.upscale itself (what the encoder does
+    today); the other filters are the alternatives that were tested: 'bicubic', 'nearest', 'nn_lanczos' (nearest x4,
+    then Lanczos down: square texels with softened steps), 'mix' (half nearest, half Lanczos), 'lanczos_usm'
+    (Lanczos, then an unsharp mask of radius 1.5 px, 60 %)."""
+    from PIL import Image, ImageFilter
+
+    from engine import post
+
+    im = Image.open(src) if isinstance(src, str) else src
+    im = im.convert("RGB")
+    size = tuple(size)
+    if im.size == size:
+        return im
+    if how == "lanczos":
+        return post.upscale(im, size)
+    if how == "bicubic":
+        return im.resize(size, Image.BICUBIC)
+    if how == "nearest":
+        return im.resize(size, Image.NEAREST)
+    if how == "nn_lanczos":
+        return im.resize((im.size[0] * 4, im.size[1] * 4), Image.NEAREST).resize(size, Image.LANCZOS)
+    if how == "mix":
+        return Image.blend(im.resize(size, Image.NEAREST), im.resize(size, Image.LANCZOS), 0.5)
+    if how == "lanczos_usm":
+        return im.resize(size, Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.5, percent=60, threshold=0))
+    raise ValueError(how)
+
+
+def to_phone(img):
+    """A delivered frame at phone size (540x960, Lanczos)."""
+    from PIL import Image
+
+    return img.resize(PHONE_SIZE, Image.LANCZOS)
+
+
+def luma(arr):
+    """BT.709 luma of an HxWx3 array of 8-bit levels (float32)."""
+    import numpy as np
+
+    a = np.asarray(arr, dtype=np.float32)
+    return a[..., 0] * 0.2126 + a[..., 1] * 0.7152 + a[..., 2] * 0.0722
+
+
+def psnr(a, b):
+    """Peak signal-to-noise ratio in dB of two pictures in 8-bit levels (99 = identical)."""
+    import numpy as np
+
+    mse = float(((np.asarray(a, dtype=np.float64) - np.asarray(b, dtype=np.float64)) ** 2).mean())
+    return 99.0 if mse < 1e-10 else 10.0 * math.log10(255.0 ** 2 / mse)
+
+
+def _box(x, k):
+    """Mean over every k x k window of a 2-D array (valid part), by cumulative sums."""
+    import numpy as np
+
+    c = np.cumsum(np.cumsum(np.pad(np.asarray(x, dtype=np.float64), ((1, 0), (1, 0))), axis=0), axis=1)
+    return (c[k:, k:] - c[:-k, k:] - c[k:, :-k] + c[:-k, :-k]) / float(k * k)
+
+
+def ssim(a, b, k=8):
+    """Mean structural similarity of two luma pictures in 8-bit levels (Wang et al. 2004, uniform 8x8 windows)."""
+    import numpy as np
+
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    c1, c2 = (0.01 * 255) ** 2, (0.03 * 255) ** 2
+    ma, mb = _box(a, k), _box(b, k)
+    va, vb, cov = _box(a * a, k) - ma * ma, _box(b * b, k) - mb * mb, _box(a * b, k) - ma * mb
+    s = ((2 * ma * mb + c1) * (2 * cov + c2)) / ((ma * ma + mb * mb + c1) * (va + vb + c2))
+    return float(s.mean())
+
+
+def acutance(lum):
+    """Mean gradient magnitude of a luma picture (levels per pixel): falls when a picture gets softer."""
+    import numpy as np
+
+    gy, gx = np.gradient(np.asarray(lum, dtype=np.float32))
+    return float(np.hypot(gx, gy).mean())
+
+
+def _crop_box(centre, size=CROP, frame=DELIVERY):
+    """(x0, y0, x1, y1) pixels of a size x size window around a centre given in fractions, kept inside the frame."""
+    w, h = frame
+    x = int(min(max(centre[0] * w - size / 2, 0), w - size))
+    y = int(min(max(centre[1] * h - size / 2, 0), h - size))
+    return x, y, x + size, y + size
+
+
+def compare(ref_img, img):
+    """Numbers of one delivered frame against the reference frame (both 1080x1920 PIL): SSIM / PSNR on luma of the
+    whole frame and at phone size, largest phone-size tile difference; no crops (see quality())."""
+    import numpy as np
+
+    a, b = luma(np.asarray(ref_img)), luma(np.asarray(img))
+    pa, pb = luma(np.asarray(to_phone(ref_img))), luma(np.asarray(to_phone(img)))
+    d = np.abs(pa - pb)
+    return dict(ssim=ssim(a, b), psnr=psnr(a, b), phone_ssim=ssim(pa, pb), phone_psnr=psnr(pa, pb),
+                phone_mean=float(d.mean()), phone_p99=float(np.percentile(d, 99)), sharp=acutance(b) / max(acutance(a), 1e-6))
+
+
+def quality(shot, how="lanczos", variants=None):
+    """{letter: numbers} for every rendered candidate of a shot against the reference, as delivered with the
+    upscale `how`: SSIM / PSNR on luma (whole frame, phone size, each of the five crops), relative acutance, the
+    cost of the job. 'REF2' = the reference setting with another noise seed (the noise floor: what two renders of
+    the current final differ by)."""
+    import numpy as np
+
+    rp = ref_path(shot)
+    if rp is None:
+        return {}
+    ref = deliver(rp)
+    ref_l = luma(np.asarray(ref))
+    out = {}
+    todo = [(k, v, 0) for k, v in CANDIDATES[1:] + PROBES] + [("REF2", "base", 1), ("E2", "r540s16", 1)]
+    for letter, v, seed in todo:
+        if variants is not None and letter not in variants:
+            continue
+        p = variant_path(shot, v, seed=seed)
+        if p is None:
+            continue
+        img = deliver(p, how)
+        row = compare(ref, img)
+        lum = luma(np.asarray(img))
+        row["crops"] = {}
+        for name in CROP_NAMES:
+            x0, y0, x1, y1 = _crop_box(CROPS[shot][name])
+            ca, cb = ref_l[y0:y1, x0:x1], lum[y0:y1, x0:x1]
+            row["crops"][name] = dict(ssim=ssim(ca, cb), psnr=psnr(ca, cb), sharp=acutance(cb) / max(acutance(ca), 1e-6))
+        rec = find_job(shot, v, seed, False)
+        if rec is not None:
+            row.update(variant=v, res=rec["res"], samples=rec["samples"], trace_cpu=rec["trace_cpu"],
+                       cpu=rec["sync_cpu"] + rec["trace_cpu"] + rec["comp_cpu"] + rec["save"], idle=idle_seconds(rec),
+                       load=rec["load"], threads=rec["threads"])
+        out[letter] = row
+    return out
+
+
+def _text(text, scale=2):
+    from engine import captions as cap
+
+    return cap.label(text, scale=scale)
+
+
+def _tile_with_caption(tile, lines, width=None, bar=22):
+    """A picture with text lines in a dark strip UNDER it (nothing is drawn over the pixels that are judged)."""
+    from PIL import Image
+
+    w = width or tile.size[0]
+    out = Image.new("RGB", (w, tile.size[1] + bar * len(lines)), (18, 18, 22))
+    out.paste(tile, (0, 0))
+    for i, t in enumerate(lines):
+        lab = _text(t)
+        out.paste(lab, (2, tile.size[1] + 3 + i * bar), lab)
+    return out
+
+
+def _grid(rows, gap=6, bg=(18, 18, 22)):
+    """Paste a list of rows (lists of PIL images) into one sheet."""
+    from PIL import Image
+
+    hs = [max(t.size[1] for t in r) for r in rows]
+    ws = [sum(t.size[0] for t in r) + gap * (len(r) - 1) for r in rows]
+    sheet = Image.new("RGB", (max(ws), sum(hs) + gap * (len(rows) - 1)), bg)
+    y = 0
+    for r, h in zip(rows, hs):
+        x = 0
+        for t in r:
+            sheet.paste(t, (x, y))
+            x += t.size[0] + gap
+        y += h + gap
+    return sheet
+
+
+def _side_label(lines, height, width=176):
+    from PIL import Image
+
+    out = Image.new("RGB", (width, height), (18, 18, 22))
+    for i, t in enumerate(lines):
+        lab = _text(t)
+        out.paste(lab, (4, 6 + i * 22), lab)
+    return out
+
+
+def sheet_crops(shot, letters=("REF", "A", "B", "C", "D", "E"), how="lanczos", name="crops", q=None):
+    """out/test/econ_<name>_<shot>.png: one row per candidate, the five 1:1 crops of the delivered 1080x1920 frame
+    (face, fine texels, thin thing, defocused background, dark area), SSIM and PSNR of each crop under it."""
+    q = quality(shot, how) if q is None else q
+    lookup = dict(CANDIDATES + PROBES)
+    rows = []
+    for letter in letters:
+        v = lookup[letter]
+        p = variant_path(shot, v)
+        if p is None:
+            continue
+        img = deliver(p, how)
+        row = q.get(letter, {})
+        rec = find_job(shot, v, 0, False)
+        res = VARIANTS[v]["res"] or FINAL_RES
+        side = ["%s  %s" % (letter, shot), "%dx%d" % tuple(res), "%d samples" % (VARIANTS[v]["samples"] or FINAL_SAMPLES)]
+        if rec is not None:
+            side.append("%.0f cpu-s" % (rec["sync_cpu"] + rec["trace_cpu"] + rec["comp_cpu"] + rec["save"]))
+        if row:
+            side += ["frame:", "ssim %.4f" % row["ssim"], "%.1f dB" % row["psnr"], "phone:", "ssim %.4f" % row["phone_ssim"],
+                     "%.1f dB" % row["phone_psnr"]]
+        tiles = [_side_label(side, CROP + 22)]
+        for cn in CROP_NAMES:
+            tile = img.crop(_crop_box(CROPS[shot][cn]))
+            c = row.get("crops", {}).get(cn)
+            tiles.append(_tile_with_caption(tile, ["%s %s" % (cn, ("%.3f %.1fdB" % (c["ssim"], c["psnr"])) if c else "reference")]))
+        rows.append(tiles)
+    if not rows:
+        return None
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, shot))
+    _grid(rows).save(path)
+    return path
+
+
+def sheet_zoom(shot, crop, letters=("REF", "C", "E"), zoom=3, size=120, how="lanczos", name="zoom", tag=""):
+    """out/test/econ_<name>_<shot>_<crop>.png: a size x size window of the delivered frame, enlarged `zoom` times
+    with nearest neighbour (to judge texel edges and stair-steps), one tile per candidate."""
+    from PIL import Image
+
+    lookup = dict(CANDIDATES + PROBES)
+    tiles = []
+    for letter in letters:
+        how_l = how
+        if ":" in letter:                                  # 'E:nearest' = candidate E with another upscale
+            letter, how_l = letter.split(":")
+        p = variant_path(shot, lookup[letter])
+        if p is None:
+            continue
+        centre = CROPS[shot][crop] if isinstance(crop, str) else crop
+        t = deliver(p, how_l).crop(_crop_box(centre, size)).resize((size * zoom, size * zoom), Image.NEAREST)
+        tiles.append(_tile_with_caption(t, ["%s %s" % (letter, how_l if how_l != "lanczos" else "")]))
+    if not tiles:
+        return None
+    path = os.path.join(TEST, "econ_%s_%s_%s.png" % (name, shot, crop if isinstance(crop, str) else tag or "at"))
+    per_row = 3 if len(tiles) > 4 else len(tiles)
+    _grid([tiles[i:i + per_row] for i in range(0, len(tiles), per_row)]).save(path)
+    return path
+
+
+def sheet_phone(shot, letters=("REF", "C", "E"), name="phone"):
+    """out/test/econ_<name>_<shot>.png: the whole delivered frames at phone size (540x960) side by side."""
+    lookup = dict(CANDIDATES + PROBES)
+    tiles = []
+    for letter in letters:
+        p = variant_path(shot, lookup[letter])
+        if p is None:
+            continue
+        v = lookup[letter]
+        res = VARIANTS[v]["res"] or FINAL_RES
+        tiles.append(_tile_with_caption(to_phone(deliver(p)), ["%s %dx%d %dspp" % (letter, res[0], res[1],
+                                                                                 VARIANTS[v]["samples"] or FINAL_SAMPLES)]))
+    if not tiles:
+        return None
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, shot))
+    _grid([tiles]).save(path)
+    return path
+
+
+def sheet_upscale(shot, letter="E", name="upscale"):
+    """out/test/econ_<name>_<shot>.png: the reference above one candidate delivered with each upscale filter: the
+    face, texel, thin and defocus crops at 1:1 and the middle of the thin crop enlarged 3 times; numbers against the
+    reference under each tile."""
+    import numpy as np
+    from PIL import Image
+
+    lookup = dict(CANDIDATES + PROBES)
+    p = variant_path(shot, lookup[letter])
+    rp = ref_path(shot)
+    if p is None or rp is None:
+        return None, {}
+    ref = deliver(rp)
+    ref_l = luma(np.asarray(ref))
+    rows, stats = [], {}
+    for how in ("ref",) + UPSCALES:
+        img = ref if how == "ref" else deliver(p, how)
+        lum = luma(np.asarray(img))
+        st = None if how == "ref" else compare(ref, img)
+        if st:
+            stats[how] = st
+        side = ["REF 720 lanczos"] if how == "ref" else ["%s %s" % (letter, how), "ssim %.4f" % st["ssim"], "%.1f dB" % st["psnr"],
+                                                         "phone %.4f" % st["phone_ssim"], "sharp x%.2f" % st["sharp"]]
+        tiles = [_side_label(side, CROP + 22, 200)]
+        for cn in ("face", "texels", "thin", "defocus"):
+            x0, y0, x1, y1 = _crop_box(CROPS[shot][cn])
+            cap_ = cn if how == "ref" else "%s %.3f x%.2f" % (cn, ssim(ref_l[y0:y1, x0:x1], lum[y0:y1, x0:x1]),
+                                                             acutance(lum[y0:y1, x0:x1]) / max(acutance(ref_l[y0:y1, x0:x1]), 1e-6))
+            tiles.append(_tile_with_caption(img.crop((x0, y0, x1, y1)), [cap_]))
+        z = img.crop(_crop_box(CROPS[shot]["thin"], 74)).resize((222, 222), Image.NEAREST)
+        tiles.append(_tile_with_caption(z, ["thin x3"]))
+        rows.append(tiles)
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, shot))
+    _grid(rows).save(path)
+    return path, stats
+
+
+BLIND_KEY = os.path.join(RAW, "blind_key.json")
+
+
+def sheet_blind(shot, letter, name="blind"):
+    """out/test/econ_blind_<shot>_<letter>.png: the reference and one candidate at phone size, unlabelled, in an
+    order drawn from os.urandom and stored only in econ_raw/blind_key.json (the judge looks first, reads the key
+    afterwards). An existing sheet keeps its order."""
+    lookup = dict(CANDIDATES + PROBES)
+    p, rp = variant_path(shot, lookup[letter]), ref_path(shot)
+    if p is None or rp is None:
+        return None
+    key = {}
+    if os.path.exists(BLIND_KEY):
+        with open(BLIND_KEY, encoding="utf-8") as f:
+            key = json.load(f)
+    k = "%s_%s" % (shot, letter)
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, k))
+    if k not in key or not os.path.exists(path):
+        key[k] = "left" if os.urandom(1)[0] & 1 else "right"          # where the REFERENCE is
+        with open(BLIND_KEY, "w", encoding="utf-8") as f:
+            json.dump(key, f, indent=1, sort_keys=True)
+    a, b = to_phone(deliver(rp)), to_phone(deliver(p))
+    pair = [a, b] if key[k] == "left" else [b, a]
+    _grid([pair], gap=0).save(path)
+    return path
+
+
+# ---- temporal: 8 consecutive frames, encoded exactly as engine/post.py encodes a film -----------------------------
+
+def seq_paths(shot, variant, animated=False):
+    """The 8 PNGs of a variant's sequence, or None while one is missing."""
+    out = [variant_path(shot, variant, f, animated=animated) for f in seq_frames(shot)]
+    return None if any(p is None for p in out) else out
+
+
+def seq_name(shot, variant, animated=False, frozen=False):
+    return "%s_%s%s%s" % (shot, variant, "_animseed" if animated else "", "_frozen" if frozen else "")
+
+
+def seq_encode(shot, variant, animated=False, frozen=False, word="Hello", paths=None):
+    """Encode a variant's 8 frames with engine.post.encode itself (Lanczos to 1080x1920, the caption composited
+    after the upscale, H.264 yuv420p crf 16) -> out/test/econ_seq_<shot>_<variant>.mp4. post.OUT is pointed at
+    out/test/econ_raw/enc for the call, so the frames are read from there and nothing of a real film is touched.
+    frozen=True: frame F eight times (what copying frames with an identical fingerprint gives)."""
+    import shutil
+
+    from engine import post
+
+    paths = paths or seq_paths(shot, variant, animated)
+    if paths is None:
+        return None
+    if frozen:
+        paths = [paths[3]] * len(paths)
+    name = "_econ_" + seq_name(shot, variant, animated, frozen)
+    mp4 = os.path.join(TEST, "econ_seq_%s.mp4" % seq_name(shot, variant, animated, frozen))
+    newest = max(os.path.getmtime(p) for p in paths)
+    if os.path.exists(mp4) and os.path.getmtime(mp4) > newest:
+        return mp4
+    old_out = post.OUT
+    post.OUT = os.path.join(RAW, "enc")
+    try:
+        d = post.frames_dir(name)
+        os.makedirs(d, exist_ok=True)
+        for i, p in enumerate(paths):
+            shutil.copyfile(p, post.frame_path(name, i + 1))
+        n = len(paths)
+        post.write_meta(name, {"fps": 24, "frame_start": 1, "frame_end": n, "captions": [[word, 0.0, n / 24.0]],
+                               "signature": "econ", "frames": {str(i + 1): "econ" for i in range(n)}})
+        post.encode(name, out_path=mp4)
+        for i in range(n):
+            os.remove(post.frame_path(name, i + 1))
+        os.remove(os.path.join(d, "meta.json"))
+    finally:
+        post.OUT = old_out
+    return mp4
+
+
+def insta(mp4):
+    """An Instagram-like second encode of a clip (ASSUMED, not Instagram's own pipeline: 720x1280, bicubic, x264
+    crf 27): what survives of a difference after the platform has had the film."""
+    import shutil
+    import subprocess
+
+    out = os.path.join(RAW, "insta_" + os.path.basename(mp4))
+    if os.path.exists(out) and os.path.getmtime(out) > os.path.getmtime(mp4):
+        return out
+    subprocess.check_call([shutil.which("ffmpeg"), "-y", "-loglevel", "error", "-i", mp4, "-vf",
+                           "scale=720:1280:flags=bicubic", "-c:v", "libx264", "-preset", "medium", "-crf", "27",
+                           "-pix_fmt", "yuv420p", "-an", out])
+    return out
+
+
+def decode(mp4):
+    """Every frame of a clip as uint8 RGB: N x H x W x 3."""
+    import shutil
+    import subprocess
+
+    import numpy as np
+
+    info = json.loads(subprocess.check_output([shutil.which("ffprobe"), "-v", "error", "-select_streams", "v:0",
+                                               "-show_entries", "stream=width,height", "-of", "json", mp4]))["streams"][0]
+    raw = subprocess.check_output([shutil.which("ffmpeg"), "-v", "error", "-i", mp4, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"])
+    return np.frombuffer(raw, dtype=np.uint8).reshape(-1, info["height"], info["width"], 3)
+
+
+def temporal_maps(frames):
+    """Per-pixel temporal measures of N consecutive frames (N x H x W x 3, 8-bit): 'sigma' = standard deviation
+    over the frames (largest channel); 'noise' = the part of it that is not smooth motion, from second differences
+    f[i-1] - 2 f[i] + f[i+1] (sqrt(mean d^2 / 6): white frame-to-frame noise of sigma s gives s, a steady drift
+    gives 0); 'pair' = mean over the consecutive pairs of the largest channel difference (tools/noise_check)."""
+    import numpy as np
+
+    f = frames.astype(np.float32)
+    sigma = f.std(axis=0, ddof=1).max(axis=2)
+    d2 = f[:-2] - 2.0 * f[1:-1] + f[2:]
+    noise = np.sqrt((d2 ** 2).mean(axis=0) / 6.0).max(axis=2)
+    pairs = np.abs(f[1:] - f[:-1]).max(axis=3)                           # (N-1) x H x W
+    return dict(sigma=sigma, noise=noise, pair=pairs.mean(axis=0), pairs=pairs)
+
+
+def flat_mask(frames, grad=4.0):
+    """Pixels of a clip that are 'still regions' for the noise measure: the temporal mean picture is flat there
+    (luma gradient under `grad` levels per pixel, so a slow camera drift changes nothing), and they are outside
+    the caption band."""
+    import numpy as np
+
+    from engine import captions as cap
+
+    lum = luma(frames.astype(np.float32).mean(axis=0))
+    gy, gx = np.gradient(lum)
+    m = np.hypot(gx, gy) < grad
+    h = m.shape[0]
+    m[int(cap.CAPTION_BAND[0] * h) - 8:int(cap.CAPTION_BAND[1] * h) + 8] = False
+    return m
+
+
+def _stats(maps, mask):
+    import numpy as np
+
+    if not mask.any():
+        return {}
+    pr = maps["pairs"][:, mask]
+    return dict(sigma=float(maps["sigma"][mask].mean()), sigma_p99=float(np.percentile(maps["sigma"][mask], 99)),
+                noise=float(maps["noise"][mask].mean()), noise_p99=float(np.percentile(maps["noise"][mask], 99)),
+                pair_mean=float(pr.mean()), pair_p99=float(np.percentile(pr, 99)), over6=float((pr > 6).mean()),
+                share=float(mask.mean()))
+
+
+def temporal(shot, variants, animated=(), frozen=(), platform=False):
+    """The temporal study of one shot on ENCODED frames: {name: {'flat': stats, 'all': stats, '<box>': stats,
+    'vs_ref': {ssim, psnr, phone_ssim}}} for the reference clip and each variant's clip. The still-region mask is
+    taken from the reference clip and used for every variant. platform=True measures after insta()."""
+    import numpy as np
+    from PIL import Image
+
+    todo = [(v, False, False) for v in variants] + [(v, True, False) for v in animated] + [(v, False, True) for v in frozen]
+    clips = {}
+    for v, an, fr in todo:
+        mp4 = seq_encode(shot, v, an, fr)
+        if mp4 is None:
+            continue
+        clips[seq_name(shot, v, an, fr)[len(shot) + 1:]] = decode(insta(mp4) if platform else mp4)
+    if "base" not in clips:
+        return {}, {}, None
+    ref = clips["base"]
+    mask = flat_mask(ref)
+    h, w = mask.shape
+    band = np.ones_like(mask)
+    from engine import captions as cap
+
+    band[int(cap.CAPTION_BAND[0] * h) - 8:int(cap.CAPTION_BAND[1] * h) + 8] = False
+    out, maps_all = {}, {}
+    for name, fr in clips.items():
+        maps = temporal_maps(fr)
+        maps_all[name] = (maps, fr)
+        row = dict(flat=_stats(maps, mask), all=_stats(maps, band))
+        for bn, b in SEQ_BOXES.get(shot, {}).items():
+            bm = np.zeros_like(mask)
+            bm[int(b[1] * h):int(b[3] * h), int(b[0] * w):int(b[2] * w)] = True
+            row[bn] = _stats(maps, bm)
+        if name != "base":
+            ss, ps, phs = [], [], []
+            for i in range(len(fr)):
+                a, b = luma(ref[i]), luma(fr[i])
+                ss.append(ssim(a, b))
+                ps.append(psnr(a, b))
+                pa = luma(np.asarray(Image.fromarray(ref[i]).resize((w // 2, h // 2), Image.LANCZOS)))
+                pb = luma(np.asarray(Image.fromarray(fr[i]).resize((w // 2, h // 2), Image.LANCZOS)))
+                phs.append(ssim(pa, pb))
+            row["vs_ref"] = dict(ssim=float(np.mean(ss)), psnr=float(np.mean(ps)), phone_ssim=float(np.mean(phs)))
+        out[name] = row
+    return out, maps_all, mask
+
+
+def sheet_seq(shot, variants, animated=(), frozen=(), name="seq", gain=40.0, platform=False):
+    """out/test/econ_<name>_<shot>.png: per variant (columns) the 4th encoded frame, and under it the per-pixel
+    frame-to-frame noise of the encoded clip x `gain` (white = 255 / gain levels), with the numbers of the still
+    regions; returns (path, stats)."""
+    import numpy as np
+    from PIL import Image
+
+    stats, maps_all, mask = temporal(shot, variants, animated, frozen, platform)
+    if not stats:
+        return None, stats
+    cols = []
+    size = (360, 640)
+    for nm, (maps, fr) in maps_all.items():
+        st = stats[nm]["flat"]
+        pic = Image.fromarray(fr[3]).resize(size, Image.LANCZOS)
+        heat = Image.fromarray(np.clip(maps["noise"] * gain, 0, 255).astype(np.uint8)).convert("RGB").resize(size, Image.BILINEAR)
+        lab = LETTER.get(nm, nm) if nm != "base" else "REF"
+        a = _tile_with_caption(pic, ["%s %s" % (lab, nm)])
+        b = _tile_with_caption(heat, ["flat noise %.2f p99 %.1f" % (st["noise"], st["noise_p99"]),
+                                      "pair %.2f p99 %.1f" % (st["pair_mean"], st["pair_p99"])])
+        cols.append((a, b))
+    sheet = _grid([[c[0] for c in cols], [c[1] for c in cols]])
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, shot))
+    sheet.save(path)
+    return path, stats
+
+
+# ---- frames that need not be rendered ---------------------------------------------------------------------------
+
+FINISHED = ("bell", "nitwit", "oneword", "poppy_night", "poppy_day")
+
+
+def identical_frames(films=FINISHED):
+    """{film: {'frames', 'same_as_previous', 'same_as_any_earlier', 'camera_same', 'objects_same', 'lights_same'}}
+    from the scene fingerprints stored in out/frames/<film>/meta.json (no Blender, no rendering)."""
+    out = {}
+    for film in films:
+        p = os.path.join(ROOT, "out", "frames", film, "meta.json")
+        if not os.path.exists(p):
+            continue
+        with open(p, encoding="utf-8") as f:
+            m = json.load(f)
+        fr = m.get("frames", {})
+        rng = [f for f in range(m["frame_start"], m["frame_end"] + 1) if str(f) in fr]
+        seen, again, prev = set(), 0, 0
+        parts = dict(c=0, o=0, l=0)
+        for i, f in enumerate(rng):
+            fp = fr[str(f)]["fp"]
+            again += fp in seen
+            seen.add(fp)
+            if i and rng[i - 1] == f - 1:
+                prev += fp == fr[str(f - 1)]["fp"]
+                for k in parts:
+                    parts[k] += fr[str(f)]["parts"][k] == fr[str(f - 1)]["parts"][k]
+        out[film] = dict(frames=len(rng), same_as_previous=prev, same_as_any_earlier=again, camera_same=parts["c"],
+                         objects_same=parts["o"], lights_same=parts["l"])
+    return out
+
+
+def same_pixels(a, b):
+    """True when two PNGs hold exactly the same pixels."""
+    import numpy as np
+    from PIL import Image
+
+    with Image.open(a) as ia, Image.open(b) as ib:
+        if ia.size != ib.size:
+            return False
+        return bool((np.asarray(ia.convert("RGB")) == np.asarray(ib.convert("RGB"))).all())
+
+
+def quality_report(verbose=True, sheets=True):
+    """The second pass as tables: cost and likeness of every candidate on every shot, the upscale filters, the
+    temporal study on encoded frames and the frames that need no render; writes out/test/econ_raw/quality.json and
+    (sheets=True) the sheets out/test/econ_{crops,phone,upscale,seq,blind}_*.png. Returns the summary dict."""
+    say = print if verbose else (lambda *a, **k: None)
+    out = dict(quality={}, upscale={}, temporal={}, temporal_platform={}, sheets=[], identical=identical_frames())
+    for shot in SHOTS:
+        q = quality(shot)
+        if not q:
+            continue
+        out["quality"][shot] = q
+        say("\nQUALITY %s (%s): against the film's final frame, as delivered (1080x1920, Lanczos)" % (shot, SHOTS[shot]["what"]))
+        say("       setting          cpu-s  load | frame ssim  psnr | phone ssim  psnr  p99 | " +
+            "  ".join("%-12s" % c for c in CROP_NAMES) + "  (crop ssim / psnr)")
+        for letter, row in q.items():
+            say("  %-4s %-16s %5s  %4s | %.4f   %5.1f | %.4f     %5.1f %4.1f | %s" % (
+                letter, ("%dx%d@%d" % (row["res"][0], row["res"][1], row["samples"])) if "res" in row else "",
+                ("%.0f" % row["cpu"]) if "cpu" in row else "-", ("%.1f" % row["load"]) if "load" in row else "-",
+                row["ssim"], row["psnr"], row["phone_ssim"], row["phone_psnr"], row["phone_p99"],
+                "  ".join("%.3f %5.1f " % (row["crops"][c]["ssim"], row["crops"][c]["psnr"]) for c in CROP_NAMES)))
+        if sheets:
+            for p in (sheet_crops(shot, q=q), sheet_phone(shot), sheet_phone(shot, ("A", "B", "D"), name="phone_abd")):
+                if p:
+                    out["sheets"].append(p)
+            for letter in ("E", "C", "D"):
+                p = sheet_blind(shot, letter)
+                if p:
+                    out["sheets"].append(p)
+        for letter in ("E", "C"):
+            if letter in q:
+                if sheets:
+                    p, st = sheet_upscale(shot, letter, name="upscale" if letter == "E" else "upscale_c")
+                    if p:
+                        out["sheets"].append(p)
+                else:
+                    st = {}
+                out["upscale"].setdefault(shot, {})[letter] = st
+                if st:
+                    say("  upscale filters for %s:  " % letter + "   ".join(
+                        "%s ssim %.4f phone %.4f sharp x%.2f" % (h, s["ssim"], s["phone_ssim"], s["sharp"]) for h, s in st.items()))
+    for shot in SEQ_SHOTS:
+        have = [v for _l, v in CANDIDATES + PROBES if seq_paths(shot, v) is not None]
+        if "base" not in have or len(have) < 2:
+            continue
+        anim = [v for _l, v in CANDIDATES + PROBES if seq_paths(shot, v, animated=True) is not None]
+        frozen = [v for v in ("base", RECOMMENDED) if v in have]
+        for platform in (False, True):
+            if sheets:
+                path, stats = sheet_seq(shot, have, anim, frozen, name="seq_insta" if platform else "seq", platform=platform)
+                if path:
+                    out["sheets"].append(path)
+            else:
+                stats = temporal(shot, have, anim, frozen, platform)[0]
+            out["temporal_platform" if platform else "temporal"][shot] = stats
+            say("\nTEMPORAL %s frames %d-%d, %s: 8-bit levels in still (flat) regions; noise = frame-to-frame part that "
+                "is not smooth motion; pair = consecutive-frame difference (noise_check)" % (
+                    shot, seq_frames(shot)[0], seq_frames(shot)[-1],
+                    "after an Instagram-like second encode (720x1280, crf 27)" if platform else "encoded as post.py does (crf 16)"))
+            boxes = list(SEQ_BOXES.get(shot, {}))
+            say("  clip                  flat: sigma  p99 | noise  p99 | pair  p99  >6 lv |  all: noise p99 | " +
+                " | ".join("%s noise p99" % b for b in boxes) + " | vs REF ssim psnr phone-ssim")
+            for nm, row in stats.items():
+                f, a = row["flat"], row["all"]
+                vr = row.get("vs_ref")
+                say("  %-20s  %5.2f %5.2f | %5.2f %5.2f | %4.2f %5.2f %4.1f%% | %5.2f %5.2f | %s | %s" % (
+                    nm, f["sigma"], f["sigma_p99"], f["noise"], f["noise_p99"], f["pair_mean"], f["pair_p99"],
+                    100 * f["over6"], a["noise"], a["noise_p99"],
+                    " | ".join("%5.2f %5.2f" % (row[b]["noise"], row[b]["noise_p99"]) for b in boxes),
+                    ("%.4f %.1f %.4f" % (vr["ssim"], vr["psnr"], vr["phone_ssim"])) if vr else "reference"))
+    say("\nIDENTICAL FRAMES (scene fingerprints in out/frames/<film>/meta.json):")
+    for film, r in out["identical"].items():
+        say("  %-12s %3d frames: %d identical to the frame before, %d identical to any earlier frame "
+            "(camera unchanged in %d, objects in %d, lights in %d)" % (film, r["frames"], r["same_as_previous"],
+                                                                      r["same_as_any_earlier"], r["camera_same"],
+                                                                      r["objects_same"], r["lights_same"]))
+    os.makedirs(RAW, exist_ok=True)
+    with open(os.path.join(RAW, "quality.json"), "w", encoding="utf-8") as f:
+        json.dump(out, f, indent=1)
+    if sheets:
+        say("\nsheets:")
+        for p in out["sheets"]:
+            say("  " + p)
+    return out
+
+
 def listing():
     """Print the shots, variants, groups and the number of finished jobs of every group."""
     res = load_results()
@@ -989,7 +1687,7 @@ def main(argv):
     for a in it:
         if a in ("--budget", "--threads"):
             opt[a[2:]] = float(next(it))
-        elif a == "--animated":
+        elif a in ("--animated", "--no-sheets"):
             pass
         else:
             rest.append(a)
@@ -1003,6 +1701,9 @@ def main(argv):
         return 0
     if cmd == "run":
         return run(rest[0], rest[1], budget=opt.get("budget", 200.0), threads=int(opt.get("threads", 2)))
+    if cmd == "quality":
+        quality_report(sheets="--no-sheets" not in argv)
+        return 0
     if cmd == "seq":
         return run_seq(rest[0], rest[1].split(","), budget=opt.get("budget", 200.0),
                        threads=int(opt.get("threads", 2)), animated="--animated" in argv)
