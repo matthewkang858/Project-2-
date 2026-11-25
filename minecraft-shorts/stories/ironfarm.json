@@ -1,0 +1,415 @@
+{
+ "slug": "ironfarm",
+ "premise": "In this village everyone is afraid of the Minecraft MC for making farms out of the iron golems. Villagers get trapped at the top blah blah blah (This one is told from the perspective of a baby villager)",
+ "title": "Twenty Minutes",
+ "logline": "A baby villager, the only one in the village who is not afraid of the player, climbs the dirt staircase he forgot to take down and slips through a one-block gap into his iron farm to be with its mom. Its twenty-minute childhood runs out inside, it no longer fits through the gap, and it becomes the fourth frightened villager making his iron.",
+ "narration": "In this village, everyone is afraid of the player. I'm not. He only takes grownups. My mom lives at the top of his glass tower now. I would wave, but our arms don't do that. He gave her a bed, and a zombie in a box. The zombie can't reach her. It doesn't have to. When we get scared, an iron golem comes to save us. It comes every time. The water pushes it into the lava. He takes the iron and leaves the poppies. He never took down his dirt staircase. At the top there's a gap, one block high. Grownups don't fit, but I do. Mom never looks at me, only at the zombie. Childhood here lasts twenty minutes. I spent mine with her. I was still inside when it ended. Now I don't fit. He counted us twice, then brought one more bed. I'm still not afraid of the player. I'm afraid of the zombie. Apparently that counts.",
+ "word_count": 161,
+ "why_this_version": "The base is the editor's script, Twenty Minutes, and its narration is unchanged: all 161 words and 24 sentences. I was given only that version, so nothing is grafted from other drafts. Nothing was cut: every line carries a step of the story (rule, want, machine, way in, clock, trap, pay-off), and the film still lands at about a minute. What changed is what a Minecraft player or the renderer would have rejected. The zombie's cell is no longer glass, because in Java villagers cannot see a zombie through glass and the farm as drawn would not work; it is now a cobblestone box with an open window at head height. Mom stands a full empty block from the zombie's arms. The pod is two blocks high under a glass roof so no golem can spawn inside it. The villager the player pushes away in beat 3 is Mom instead of a fisherman who never reappeared, which fixes the head count and introduces the straw hat before the line that names her. The bed in beat 21 lands mid-frame instead of under the caption. Two near-repeat framings (beats 5 and 13) were made distinct. The dirt step in beat 22 breaks in real time. The hook and the last line were tested against alternatives and kept.",
+ "beats": [
+  {
+   "line": "In this village, everyone is afraid of the player.",
+   "picture": "Hook. Camera at baby height on the path by the well, long lens. Steve walks across the square straight at the lens. Behind him an armorer and a shepherd turn and hurry to a house, and the door shuts behind the second. In the lower middle of the frame, above the caption band, a baby villager stands still, three-quarter from behind so its nose shows, and tilts its big head up as he comes. The glass tower is a soft bright shape above the roofs.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve (the player)",
+    "baby villager (narrator)",
+    "armorer villager",
+    "shepherd villager"
+   ],
+   "props_and_effects": [
+    "house door closing",
+    "iron farm tower out of focus in the background"
+   ]
+  },
+  {
+   "line": "I'm not.",
+   "picture": "Two seconds; the pause after the line is opened to fill the shot. Tight on the baby's face from the front, three-quarter, in the upper half of the frame, head tilted up. Steve's legs stride through the foreground and his shadow crosses its face. It does not step back. Its head turns to follow him.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Steve (legs only)"
+   ],
+   "props_and_effects": [
+    "Steve's shadow passing over the baby"
+   ]
+  },
+  {
+   "line": "He only takes grownups.",
+   "picture": "Side-on at baby height. Steve walks into the back of Mom, a farmer in a straw hat, and pushes her step by step along the path toward the tower, the way players move villagers. Her head is turned to give hat brim and nose in profile. The baby runs three steps after them, 0.7 block clear of his legs, and stops. He passes it without turning his head.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve (the player)",
+    "Mom (farmer villager, straw hat)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "villager pushed along by the player (slow continuous shuffle)",
+    "baby run and stop"
+   ]
+  },
+  {
+   "line": "My mom lives at the top of his glass tower now.",
+   "picture": "Over the baby's shoulder, slow tilt up from the well and the bell to the iron farm tower above the roofs: stone pillar, low glass pod with lantern light, an orange glow under the platform rim, a brown zigzag of dirt blocks up its flank. At the front glass the straw hat, in profile, looking sideways at something inside the pod, not down. Rack focus from the baby to her.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Mom (farmer villager, straw hat)",
+    "cleric villager and librarian villager as shapes in the pod"
+   ],
+   "props_and_effects": [
+    "iron farm tower exterior",
+    "lantern in the pod",
+    "lava glow under the platform rim",
+    "dirt staircase visible on the tower's flank (plant)",
+    "rack focus"
+   ]
+  },
+  {
+   "line": "I would wave, but our arms don't do that.",
+   "picture": "Full figure of the baby at the foot of the tower, front three-quarter, camera at its own height, the folded arms at the centre of the frame and the stone base behind it. Its head is tilted far up. It rocks forward, makes one small hop and lands. The arms never unfold. Hold a beat on the stillness.",
+   "location": "Foot of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "baby hop",
+    "stone base of the tower"
+   ]
+  },
+  {
+   "line": "He gave her a bed, and a zombie in a box.",
+   "picture": "Inside the pod, under its low glass roof. Slow pan from Mom's red bed, seen lengthwise from its foot with two white beds beyond it, past Mom standing beside it, to the side wall: a one-block cobblestone cell under a stone slab, closed at foot level and open at head height. A zombie's head and outstretched arms fill the window, lit by a wall torch.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "Mom (farmer villager)",
+    "zombie"
+   ],
+   "props_and_effects": [
+    "red bed (Mom's)",
+    "two white beds",
+    "cobblestone zombie cell with stone slab roof and an open window at head height (no glass)",
+    "wall torch at the cell",
+    "lantern on the floor"
+   ]
+  },
+  {
+   "line": "The zombie can't reach her.",
+   "picture": "Tight profile two-shot on a long lens. On the left the zombie's arms reach out of the window and stop in the air. One whole empty block further right, Mom's face, straw hat and nose, looking straight at it. Nothing between them but air.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "Mom (farmer villager)",
+    "zombie"
+   ],
+   "props_and_effects": [
+    "zombie arm sway (arms raised, aggressive pose)",
+    "window sill of the cell at the frame edge"
+   ]
+  },
+  {
+   "line": "It doesn't have to.",
+   "picture": "From beside the zombie cell, looking across the pod. Mom, a cleric and a librarian are backed against the far glass, three heads turned toward the lens side, where the zombie's arm is a soft green shape at the frame edge. They tremble and turn on the spot. Behind them, through the glass, the empty stone platform. This camera position returns for the last two lines.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "Mom (farmer villager)",
+    "cleric villager",
+    "librarian villager",
+    "zombie (foreground, out of focus)"
+   ],
+   "props_and_effects": [
+    "villager panic tremble and quick turns",
+    "golem platform visible through the glass, empty"
+   ]
+  },
+  {
+   "line": "When we get scared, an iron golem comes to save us.",
+   "picture": "Low angle on the stone platform beside the pod, still shallow water at foot level. An iron golem appears out of nothing in one frame, huge against the gold sky. It turns its head toward the pod, where the three villagers are small shapes behind the glass.",
+   "location": "Golem platform beside the pod, golden hour",
+   "cast": [
+    "iron golem",
+    "Mom, cleric and librarian as background shapes"
+   ],
+   "props_and_effects": [
+    "golem pop-in (appears in a single frame)",
+    "still water sheet on the platform"
+   ]
+  },
+  {
+   "line": "It comes every time.",
+   "picture": "Same framing, jump cut. The platform is empty. A new golem appears on the same block in the same pose and takes one step toward the pod.",
+   "location": "Golem platform beside the pod, golden hour",
+   "cast": [
+    "iron golem"
+   ],
+   "props_and_effects": [
+    "golem pop-in, repeated",
+    "jump cut on an identical framing"
+   ]
+  },
+  {
+   "line": "The water pushes it into the lava.",
+   "picture": "From the side and a little below, so the water is a still blue sheet and the lava only an orange glow in a slot at the platform's edge. The golem, still facing the pod, slides sideways and drops out of sight into the slot. A white puff rises and the glow flickers.",
+   "location": "Golem platform beside the pod, golden hour",
+   "cast": [
+    "iron golem"
+   ],
+   "props_and_effects": [
+    "golem sideways slide and drop",
+    "white death puff",
+    "lava glow flicker (light only, no visible flowing lava)",
+    "still water sheet"
+   ]
+  },
+  {
+   "line": "He takes the iron and leaves the poppies.",
+   "picture": "Close and shallow at the foot of the tower, the hopper in the middle of the frame. Three iron ingots and a poppy land on the hopper and vanish into it. Steve turns from the chest with an iron ingot in his hand and walks out of frame. Poppies lie spinning on the grass all around the chest. The baby stands among them, its face above the caption band.",
+   "location": "Foot of the iron farm tower, golden hour",
+   "cast": [
+    "Steve (the player)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "hopper and chest",
+    "iron ingots as dropped items",
+    "iron ingot held in Steve's hand",
+    "poppies as spinning dropped items",
+    "items vanishing into the hopper"
+   ]
+  },
+  {
+   "line": "He never took down his dirt staircase.",
+   "picture": "Locked tall frame of the back of the tower. A rough one-block-wide staircase of full dirt blocks zigzags up the clean stone and glass, stray dirt at its foot. The baby, tiny at the bottom, looks up it, then hops up the first two steps.",
+   "location": "Foot of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "dirt block staircase",
+    "stray dirt blocks at the foot",
+    "baby hop up one block, twice"
+   ]
+  },
+  {
+   "line": "At the top there's a gap, one block high.",
+   "picture": "Top of the dirt staircase at the pod's back wall. The two-block doorway is plugged with one cobblestone at head height, and the lower block is open. The baby hops up the last step and stands beside the opening, exactly as tall as it. Through the glass: beds and a straw hat.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Mom (farmer villager) as a shape through the glass"
+   ],
+   "props_and_effects": [
+    "cobblestone plug at head height",
+    "one-block gap at floor level",
+    "top of the dirt staircase",
+    "baby hop up one block"
+   ]
+  },
+  {
+   "line": "Grownups don't fit, but I do.",
+   "picture": "Inside at floor level, the opening in the middle of the frame with daylight through it. The cleric walks into the cobblestone plug and stops, half a block to the side of the opening, twice its height. The baby runs in underneath, past his robe, without ducking.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "cleric villager"
+   ],
+   "props_and_effects": [
+    "one-block gap seen from inside, daylight through it",
+    "cobblestone plug"
+   ]
+  },
+  {
+   "line": "Mom never looks at me, only at the zombie.",
+   "picture": "Two-shot at the red bed. The baby stands on the lens side of Mom, pressed against her, big head tilted up at her and cheated toward the lens, its face clear of her sleeve. Her head stays turned away, on the zombie, whose arms reach from the window, soft in the background.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Mom (farmer villager)",
+    "zombie (background)"
+   ],
+   "props_and_effects": [
+    "red bed",
+    "zombie cell window",
+    "lantern light"
+   ]
+  },
+  {
+   "line": "Childhood here lasts twenty minutes.",
+   "picture": "Locked-off side view against the front glass, the village and the well small and golden far below. Mom in profile. The baby stands 0.9 block from her along the glass, and the top of its head is level with her folded arms. Nothing moves but the zombie's arms at the frame edge. This exact framing returns two lines later.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Mom (farmer villager)",
+    "zombie (frame edge)"
+   ],
+   "props_and_effects": [
+    "locked camera, reused for the growing-up shot",
+    "village seen far below through the front glass"
+   ]
+  },
+  {
+   "line": "I spent mine with her.",
+   "picture": "Closer. The baby bounces twice on Mom's red bed, as baby villagers do, then stands beside her and turns its head to look where she looks. Warm lantern light on both.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Mom (farmer villager)"
+   ],
+   "props_and_effects": [
+    "baby bouncing on the red bed",
+    "lantern as key light"
+   ]
+  },
+  {
+   "line": "I was still inside when it ended.",
+   "picture": "The locked framing again. The baby stands at Mom's folded arms. On the last word it snaps in a single frame to a full-size villager in a plain brown robe, head level with hers, as in the game, with no puff. Mom does not turn. Hold one second.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "grown narrator (unemployed adult villager, plain brown robe)",
+    "Mom (farmer villager)"
+   ],
+   "props_and_effects": [
+    "single-frame swap from baby to adult on the same spot",
+    "identical framing to the twenty minutes shot"
+   ]
+  },
+  {
+   "line": "Now I don't fit.",
+   "picture": "Inside, low side view at the back wall, from far enough back that the opening sits in the middle of the frame and his head stays under the top icons. The grown narrator walks into the cobblestone plug and stops. Daylight comes through the opening at his knees. His head tilts down to it, nose in profile.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "grown narrator (unemployed adult villager)"
+   ],
+   "props_and_effects": [
+    "one-block gap at knee height",
+    "cobblestone plug",
+    "daylight through the gap onto the floor"
+   ]
+  },
+  {
+   "line": "He counted us twice, then brought one more bed.",
+   "picture": "High over Steve's shoulder, the glass roof hidden to the camera, wide lens tilted down. Four villagers in a row face him, their faces in the upper third: librarian, cleric, the narrator, Mom. The librarian and the cleric turn their heads away, Mom's is on the zombie, and only the narrator looks straight up at him. His head moves along the row, and back again. His arm swings and a second red bed appears beside Mom's in the middle of the frame, above the caption band.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "Steve (the player)",
+    "grown narrator",
+    "Mom (farmer villager)",
+    "cleric villager",
+    "librarian villager"
+   ],
+   "props_and_effects": [
+    "Steve's head panning along the row and back",
+    "arm swing",
+    "second red bed placed beside Mom's (pops in, no particles)",
+    "glass roof hidden to the camera"
+   ]
+  },
+  {
+   "line": "I'm still not afraid of the player.",
+   "picture": "Past the narrator's three-quarter face, through the back glass. Steve stands one step down the dirt staircase, head and shoulders above the floor line. He swings at the top dirt step until it cracks and bursts into crumbs, then walks down out of sight. The narrator watches, perfectly still, eyes level.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "grown narrator",
+    "Steve (the player)"
+   ],
+   "props_and_effects": [
+    "dirt block breaking with crack stages and crumbs, at its real length by hand",
+    "top of the dirt staircase seen through glass",
+    "mining arm swings"
+   ]
+  },
+  {
+   "line": "I'm afraid of the zombie.",
+   "picture": "The camera from beside the zombie cell again. The narrator's head snaps round to the lens side. The zombie's arms reach from the window at the foreground edge. He trembles on the spot next to Mom: same height, same pose, both staring at it. The two red beds sit side by side below them.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "grown narrator",
+    "Mom (farmer villager)",
+    "cleric villager",
+    "librarian villager",
+    "zombie (foreground edge)"
+   ],
+   "props_and_effects": [
+    "villager panic tremble, the narrator's matched to Mom's",
+    "two red beds side by side",
+    "zombie arm sway"
+   ]
+  },
+  {
+   "line": "Apparently that counts.",
+   "picture": "Same shot, held. Behind the four villagers, through the glass, an iron golem appears out of nothing on the platform, its head above theirs, turns its head to the pod, takes one step and begins to slide toward the orange glow. Rack focus to it on the last word. Hold two seconds, then cut to black before it reaches the edge.",
+   "location": "Pod at the top of the iron farm tower, golden hour",
+   "cast": [
+    "grown narrator",
+    "Mom (farmer villager)",
+    "cleric villager",
+    "librarian villager",
+    "zombie (foreground edge)",
+    "iron golem (through the glass)"
+   ],
+   "props_and_effects": [
+    "golem pop-in seen through the pod glass",
+    "golem slide toward the lava glow",
+    "rack focus",
+    "cut to black"
+   ]
+  }
+ ],
+ "locations": [
+  "Village square by the well, golden hour (lines 1 to 4)",
+  "Foot of the iron farm tower, golden hour: the front base, and at the back the hopper, chest and dirt staircase (lines 5, 12, 13)",
+  "Pod at the top of the iron farm tower, golden hour with a lantern inside: interior and the back wall with the gap (lines 6 to 8 and 14 to 24)",
+  "Golem platform beside the pod, golden hour (lines 9 to 11). One sky for the whole film: golden hour, sun about 27 degrees up, one module and no join; a Minecraft day is twenty minutes, so the sun is truly back in the same place when the narrator grows up"
+ ],
+ "new_assets_needed": [
+  "Iron farm tower set beside the well: a stone pillar about ten blocks tall with a glass pod on top. The pod is about five by five inside and TWO blocks high, with a stone floor and a glass roof, so no golem can spawn inside it (a golem needs 2.7 blocks and cannot spawn on glass). One lantern standing on the floor. Layout: front glass toward the square, zombie cell on one side wall, golem platform outside the opposite wall at floor level, doorway and dirt staircase at the back.",
+  "Glass block walls and roof that read as Minecraft glass and can be hidden from the camera pane by pane (the Stage see_through mechanism), roof included for the high shot in beat 21.",
+  "Zombie cell, NOT glass: a one-block cobblestone cell attached to the pod with a stone slab roof (no sunlight, and no room to jump), a solid block at foot level on the side facing the beds and open air at head height, plus a wall torch so the zombie reads. Reason: in Java Edition villagers cannot see a zombie through glass.",
+  "Zombie in the arms-forward pose with a slow arm sway and the raised aggressive pose. engine/undead.py appears to provide make_zombie with both already; check before building anything.",
+  "Beds in the pod: Mom's red bed, two white beds, a free two-block space beside the red one, and a second red bed that appears during the film.",
+  "Golem platform: stone, a thin still water sheet, and a slot at the outer edge lit orange from below (lava as a glow and a light only).",
+  "Collection point at the foot of the tower: hopper and chest block models, hopper top visible to the camera.",
+  "Dirt block staircase (full dirt blocks, one up and one along) zigzagging up the back of the tower, stray dirt blocks at its foot, the top step breakable on camera with the real crack stages.",
+  "Back-wall doorway: one cobblestone plug at head height with a one-block gap beneath it.",
+  "Iron ingot as a dropped item and as a held item; poppy as a dropped item (reuse the one from the Poppy film if it fits).",
+  "Grown narrator: an unemployed adult villager in the plain brown robe. The cast builder appears to accept the profession 'none' (alias 'unemployed'); confirm it renders clearly different from the green nitwit.",
+  "Golem effects: appearing in a single frame, sliding sideways and dropping out of sight, the white death puff, the lava glow flicker; one golem model reused for every spawn.",
+  "Baby to adult swap in a single frame on the same spot (two characters, visibility cut).",
+  "Villager motions: a baby hop up one block, a baby bouncing on a bed, a villager pushed along by the player walking into its back, and a panic tremble with quick turns (Character.shiver may cover the tremble).",
+  "Block effects on the new set: a bed placed with no particles, the dirt step broken with cracks and crumbs, dropped items vanishing into a hopper.",
+  "Narration track: 24 sentences with per-sentence pauses, opened after the short lines (see risks).",
+  "Steve needs no armor: plain Steve as in the four finished films."
+ ],
+ "risks": [
+  "GROWING UP (I was still inside when it ended): a one-frame swap can look like a glitch or a jump cut. Fallback: keep the camera locked on exactly the framing of the twenty minutes shot with Mom as the height ruler, hold twelve frames before and a full second after, and time the snap to the word ended. If it still does not read, add a small white puff and accept that it is not vanilla.",
+  "THE GAP (lines 14, 15, 20): the plot hangs on the viewer seeing that the opening is one block high. Fallback: put the cleric beside the gap in line 14 as well, so adult, baby and opening are measured in one frame; cobblestone against glass for contrast; daylight through the gap in every interior shot of it.",
+  "ZOMBIE CELL WITH A WINDOW (lines 6, 7, 8, 16, 23): the foot-level block hides the zombie's legs, and a dark cell can swallow a green zombie. Fallback: raise the wall torch as its key light, or replace the solid foot block with an oak fence (line of sight passes over a fence and a zombie cannot jump it). Never go back to glass on the side facing the beds.",
+  "LAST LINE (Apparently that counts): a golem behind four villagers and a glass wall may be soft on a phone. Fallback: rack focus to it on the word counts and let its shadow fall across the pod floor, or cut on that word to the low-angle platform framing of line 9 with the grown narrator now among the shapes behind the glass.",
+  "CAPTION SIZE: Apparently is ten letters and by my count will be drawn at about three quarters of the standard caption size, still about 65 percent of the frame width. I do not expect a problem. Fallback wording with the same meaning and rhythm: I guess that counts.",
+  "MOM AT THE TOP OF THE TOWER (line 4): from the square she is one villager at ten or more blocks up and may be a few pixels of straw hat. Fallback: end the tilt on a longer lens from further back so the pod fills the upper third, or cut inside the line to a long-lens view of the straw hat at the glass. Beat 3 now introduces the hat large, which helps.",
+  "GLASS: pane edges crossing faces, and stacked panes turning milky from the square. Fallback: hide the pane nearest the lens in every interior shot, keep glass only behind the subjects, and check each face at phone size.",
+  "HE COUNTED US TWICE, THEN BROUGHT ONE MORE BED: two actions in one shot of about four seconds, with the count shown as the back of Steve's head turning. Fallback: cut on the comma (a front view of Steve's head panning along the row and back, then the bed appearing beside the red one), or drop the count to a single slow sweep.",
+  "MOM NEVER LOOKS AT ME: this is only true if her head is on the zombie in every pod shot from her first appearance at the glass. One frame of her looking down breaks the line. Fallback: check continuity shot by shot; if a shot forces her to face the lens, frame her from behind the straw hat. Beat 3, before she is in the pod, is the one place she may look elsewhere.",
+  "FEAR WITHOUT FACES (It doesn't have to; I'm afraid of the zombie): panic has to read from trembling and from all heads pointing one way. Fallback: let the shadow of the zombie's arms fall across the villagers, and in the last scene match the narrator's tremble frame for frame with Mom's.",
+  "LENGTH: 24 shots with ten short lines. Open the pause after I'm not, He only takes grownups, It doesn't have to, It comes every time and Now I don't fit so each shot runs two seconds, and add one second after ended and a two-second tail. I estimate 62 to 64 seconds. Fallback if it must be exactly sixty: close the pauses after the long lines to a quarter second; do not cut a line.",
+  "VOICE: the word lives in My mom lives at the top must be spoken as the verb. Fallback: check it with the narration tool's phoneme listing before speaking the track and add a say entry if the voice gets it wrong.",
+  "DIRT STAIRCASE: there is no dirt stairs block, so the picture must be full dirt blocks stepped one up and one along, visibly rougher than the tower. Fallback wording if staircase reads oddly aloud: He never took down his dirt steps.",
+  "IRON AND POPPIES: ingots and a poppy are tiny in a medium shot. Fallback: shoot it as a macro on the hopper with Steve only as a hand and boots, and three poppies large on the grass in the foreground.",
+  "WATER AND LAVA (The water pushes it into the lava): moving water and close lava cannot be done well. Fallback: no visible flow at all, just a still blue sheet, the golem's sideways slide, orange light from below and the puff after it drops out of frame.",
+  "THE WAVE LINE: a rock and a hop may not read as trying to wave. Fallback: hold on the folded arms in a tighter shot for the second half of the line, with nothing moving but the head tilting further up.",
+  "ONE SKY: with no change of light, the passing of the childhood rests on the narration and the snap. Fallback: a second module at dusk from the growing-up shot on, as in Poppy, at the cost of a join and a second look pass."
+ ],
+ "problems_fixed_by_checker": [
+  "FORMAT (passed, nothing changed): I counted 161 words in 24 sentences; the longest sentence is 11 words. No numerals, dashes, semicolons, quotation marks or parentheses. The narration is returned word for word as the editor wrote it. Every fix below is to the pictures, the set or the continuity.",
+  "ZOMBIE IN A GLASS CELL (beats 6, 7, 8, 16, 23 and the asset list): wrong mechanic. In Java Edition a villager only panics at a zombie it has line of sight to, and glass blocks line of sight (the same rule that stops an enderman getting angry through glass). A zombie sealed behind glass makes no golems, and technical players will say so. Fixed: the cell is cobblestone under a stone slab, closed at foot level and open at head height toward the beds. A zombie cannot jump out of a two-high cell over a one-block sill, and the villagers see it through open air. The line 'a zombie in a box' needs no change. It also removes glass from in front of the zombie and Mom in the tight two-shot.",
+  "MOM ONE BLOCK FROM THE ZOMBIE'S ARMS (beat 7): a villager standing in the block next to the cell is inside a zombie's melee reach, so 'The zombie can't reach her' would be false as staged. Fixed: one whole empty block of air between the arm tips and her face; a long lens keeps the two-shot tight.",
+  "GOLEMS WOULD SPAWN INSIDE THE POD (asset list): a five by five pod with a stone floor and no stated height lets the golem appear among the beds. Fixed: the pod interior is two blocks high with a glass roof (a golem needs 2.7 blocks and cannot spawn on glass), and the lantern stands on the floor. This is also how real farm pods look, and it makes the interior shots tighter.",
+  "THE FISHERMAN (beat 3): he is pushed toward the tower and never seen again, while the pod holds exactly three villagers and 'He counted us twice' depends on that count. Fixed: the villager he pushes away is Mom, the farmer in the straw hat. The viewer now meets her large in frame one line before 'My mom lives at the top of his glass tower now' and recognises the straw hat at the glass and in every pod shot.",
+  "THE NEW BED LOW IN THE FRAME (beat 21): by the contract's Reels composition rule, anything essential must sit in y 14 to 60 percent; 'low in the frame' puts the bed, which is the point of the line, under the caption or the description. Fixed: a high over-the-shoulder with the glass roof hidden to the camera and a wide lens tilted down, so faces sit in the upper third and the bed appears mid-frame. I also dropped the 'placing puff': a placed block makes no particles in the game.",
+  "NEAR-REPEAT PICTURES: beats 2 and 5 were both front close-ups of the baby with its head tilted up, and beats 4 and 13 both tilted up the tower. Fixed: beat 5 is a full figure with the folded arms at frame centre (the line is about the arms). Beat 13 is a locked tall frame in which the baby hops up the first two steps, so the film also shows it starting to climb.",
+  "DIRT BROKEN IN ONE SWING (beat 22): dirt takes three quarters of a second by hand. Fixed: the crack stages run their real length. I restaged it the way players remove a staircase: he stands one step down, breaks the top step and walks down out of sight. The gap now opens onto nothing.",
+  "FACES HIDDEN BY NEIGHBOURS (beats 15, 16, 17, 19): the contract's notes after four films warn about a child tucked against an adult and about two figures closer than 0.7 block. Fixed in the pictures: the cleric stands half a block to the side of the one-block-wide opening so the baby is visible running in; the baby is on the lens side of Mom in the two-shot; and it stands 0.9 block from her in the locked height-comparison framing.",
+  "HOOK AND LAST LINE (checked, kept): the first sentence is the user's own opening and is carried by its picture; 'I'm not.' lands at second three. The last line stays as written. It is the mechanical punchline (fear makes a golem, set up by 'When we get scared'), it echoes 'He counted us twice', and it empties the boast of line two. I tested ending on 'I'm still not afraid of the player' instead and rejected it, because it breaks the chain fear, counts, golem that the last picture shows. 'Apparently' has ten letters and will be drawn at about three quarters of the standard caption size, still about 65 percent of the frame width, so it is not a legibility problem.",
+  "RUN TIME (noted, not changed): 24 sentences is the top of the allowed range and ten of them are five words or fewer. With every shot at two seconds or more, a one-second hold on the growing-up shot and a two-second hold at the end, I estimate 62 to 64 seconds (not measured against the voice track). That is still around a minute. No line is cut, because each one carries a step of the story; the pauses to open are listed under risks."
+ ]
+}

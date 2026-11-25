@@ -1,0 +1,414 @@
+{
+ "slug": "piglin",
+ "premise": "In this bastion I'm the only one who doesn't like gold. (This is told from the perspective of a piglin) this one is about speedrunners and how they trap piglins in holes to trade with them but one piglin just keeps attacking the player and doesn't care about gold. He keeps seeing the player in different worlds and messing up his speed run",
+ "title": "Six Seconds",
+ "logline": "A piglin brute who guards his bastion and sees no point in gold ends the same gold-booted speedrunner's run in world after world, starts waiting for him at the gate, and is left behind when the runner moves to an older version of the world from before brutes were added, staring at an ingot for six seconds and feeling nothing.",
+ "narration": "In this bastion, I'm the only one who doesn't like gold. My brothers will stare at one ingot for six seconds. Somebody has to guard the place. One day, a player ran in. He wore golden boots, so my brothers thought he was family. He dug a hole, and they fell in. He threw gold, and they threw back ender pearls. Mostly gravel. I hit him with my axe. He turned into smoke, and the whole world ended. New world, different bastion, same boots. Every world has a bastion, and every bastion has me. He hid on a pillar and threw gold at me. I looked at it for zero seconds. I can wait, and he can't. I ended a full stack of worlds. I started waiting at the gate. One day, he didn't come. He found an older version of the world, from before they added me. In that bastion, everyone likes gold. So today I'm staring at an ingot. Six seconds. Nothing.",
+ "word_count": 164,
+ "why_this_version": "The base is the editor's script 'Six Seconds', kept whole in structure, order and voice: I was given only that version, not the earlier drafts, so I cannot say what it grafted from them beyond what it carries. I changed one narration line and restaged six pictures. The line: 'He found an older world' became 'He found an older version of the world, from before they added me', because the true speedrun fact is a version rollback to before piglin brutes, and that wording keeps the world motif while using the word players use. The pictures: beats 17 to 19 were re-ordered into portrait, gate frame, exact match cut, so the brute visibly vanishes from an identical frame (the boot shot's third use, an empty floor that contradicted the set geometry, was cut); beat 7 no longer breaks the six-second rule; beat 10 implies the second axe blow a brute really needs; beats 8, 13, 14 and 15 were put inside the Reels safe area; the home set got one fixed layout and a stated pit continuity; the closing stare was made exactly six real seconds. Nothing else was cut: the hook is the user's sentence, the user's premise (the one piglin who ignores gold, the trading hole, the same runner in world after world, the wrecked runs) is still the whole story, and the ending 'Six seconds. Nothing.' stays because it is the strongest thing in the script.",
+ "beats": [
+  {
+   "line": "In this bastion, I'm the only one who doesn't like gold.",
+   "picture": "Low long-lens portrait from the guard landing, slow push in. The piglin brute stands dead still at frame left on blackstone, looking just past the lens, a golden axe in his hand that nobody ever mentions. Far behind and below him, soft and glowing under a lantern, three piglins stand with their backs to him, facing a wall of gold blocks. Lava glow from below. The courtyard floor is whole: no pit yet.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute (narrator)",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "golden axe (held)",
+    "wall of gold blocks",
+    "lantern as key light on the brute",
+    "lava glow from below",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "My brothers will stare at one ingot for six seconds.",
+   "picture": "The ingot row frame (returns in the last scene): side-on close shot at snout height in front of the gold wall. A piglin holds a gold ingot up in his left hand in front of his snout, head tilted down to it, frozen, his golden sword still in his right hand. A second piglin beside him does exactly the same. The brute's dark shoulder is soft at the edge of the foreground, turned away from them.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "two piglins",
+    "piglin brute (shoulder only)"
+   ],
+   "props_and_effects": [
+    "two gold ingots held in the admire pose (left hand)",
+    "golden swords in the right hands",
+    "gold-block wall and its one-block blackstone step",
+    "lantern light",
+    "ingot row camera preset re-used in sentence twenty-one"
+   ]
+  },
+  {
+   "line": "Somebody has to guard the place.",
+   "picture": "The gate frame (returns three times): static wide from low at the near end of the courtyard, composed for the tall frame. Far and high, the gateway with the glow of the entrance corridor beyond it. On the guard landing beside it the brute stands alone in profile, axe in hand, facing the open gateway. Nearer and lower, every piglin faces the gold wall, backs to the door. No pit. Hold long enough for the frame to be learned.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "golden axe",
+    "blackstone gateway, guard stair and landing",
+    "gold-block wall",
+    "static gate frame camera preset re-used in sentences eighteen, nineteen and twenty-three"
+   ]
+  },
+  {
+   "line": "One day, a player ran in.",
+   "picture": "Ground-level wide lens just inside the gateway: the player (Steve skin, no armor except golden boots, iron pickaxe in hand) sprints through the gateway straight at the camera and past it. Small on the landing above and behind him, the brute turns his whole body to follow.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "the player (Steve skin, golden boots)",
+    "piglin brute (background)"
+   ],
+   "props_and_effects": [
+    "golden boots (worn)",
+    "iron pickaxe (held)",
+    "sprint cycle",
+    "golden axe",
+    "body turn on the brute"
+   ]
+  },
+  {
+   "line": "He wore golden boots, so my brothers thought he was family.",
+   "picture": "The boot shot (returns on the bridge): camera on the blackstone floor, long lens, looking across the courtyard at the gold wall. The legs sprint in from the gateway side and skid to a stop with the golden boots bright in the middle of the frame, above the caption band. Behind them three piglins turn from the gold, tip their heads down at the boots, hold, then turn back to the gold. Rack focus from the boots to the piglins and back so the look at the boots is sharp.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "the player (legs and boots)",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "golden boots keyed by a warm-white lantern",
+    "piglins holding golden swords and a crossbow",
+    "skid stop",
+    "rack focus",
+    "floor-level boot shot camera preset re-used in sentence eleven"
+   ]
+  },
+  {
+   "line": "He dug a hole, and they fell in.",
+   "picture": "High three-quarter angle on the courtyard: the player breaks the last block of a pit two blocks deep and two wide, with cracks and crumbs. The pit is in plain blackstone, never gilded blackstone or gold. A gold ingot is already spinning at the bottom. Three piglins walk to it, step off the rim one after another, 0.7 block and a beat apart, and drop in.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "the player",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "iron pickaxe swing",
+    "block breaking with cracks and blackstone crumbs",
+    "gold ingot (dropped, spinning) as the lure",
+    "piglins stepping off the rim and dropping, staggered",
+    "pit camera preset re-used in sentence twenty"
+   ]
+  },
+  {
+   "line": "He threw gold, and they threw back ender pearls.",
+   "picture": "From behind and above the player's shoulder at the rim, third person, looking down into the pit: all three piglins already stand frozen, each with an ingot held up in front of his snout. The player tosses one more ingot down. A piglin who has been staring since the last shot lowers his hand, and an ender pearl pops up out of the pit and lands spinning beside the golden boots. The pearl is never the answer to the ingot thrown in this shot.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "the player (shoulder, arm, boots)",
+    "three piglins in the pit"
+   ],
+   "props_and_effects": [
+    "gold ingot tossed down (item arc)",
+    "three ingots in the admire pose",
+    "ender pearl popping up and landing as a spinning item",
+    "golden boots"
+   ]
+  },
+  {
+   "line": "Mostly gravel.",
+   "picture": "Close on the golden boots at the rim of the pit: gravel pops out of the hole piece after piece and piles up around his feet, bobbing and spinning, with one lonely ender pearl among it. Boots and pile sit between 14 and 60 percent of the frame height. Hold a full beat after the words.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "the player (boots only)"
+   ],
+   "props_and_effects": [
+    "six to eight gravel items popping up (block items, small cubes)",
+    "one ender pearl item",
+    "lantern light on the pile",
+    "hold after the line"
+   ]
+  },
+  {
+   "line": "I hit him with my axe.",
+   "picture": "Side-on medium at the rim: the brute strides into frame behind the player and swings the golden axe once. The player flashes red and is knocked back off his feet. Cut on the knock-back. The only full swing in the film.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "the player"
+   ],
+   "props_and_effects": [
+    "golden axe swing",
+    "red hurt flash",
+    "knock-back",
+    "gravel pile at the rim"
+   ]
+  },
+  {
+   "line": "He turned into smoke, and the whole world ended.",
+   "picture": "Same angle, a little wider. The brute's axe is just coming down to rest from a second blow we did not see. A white puff where the player was. Gravel, the iron pickaxe, the golden boots and one ender pearl scatter and spin on the blackstone. In the pit the piglins are still looking at their ingots. On the word ended the picture snaps to black and the caption word stays on the black for half a second.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "three piglins in the pit",
+    "the player (vanishing)"
+   ],
+   "props_and_effects": [
+    "axe lowering (tail of a second blow)",
+    "white smoke puff",
+    "dropped items: gravel, iron pickaxe, golden boots, ender pearl",
+    "snap to black (the picture for a reset)",
+    "caption held on black"
+   ]
+  },
+  {
+   "line": "New world, different bastion, same boots.",
+   "picture": "Out of black, the boot shot again on a different set: a long blackstone bridge between basalt pillars over an orange lava glow, empty for one beat. Then the same legs sprint in and skid to a stop, golden boots mid-frame, exactly as before.",
+   "location": "Second bastion bridge, another world (Nether)",
+   "cast": [
+    "the player (legs and boots)"
+   ],
+   "props_and_effects": [
+    "cut up from black",
+    "blackstone bridge, basalt pillars, gilded blackstone",
+    "lava glow far below",
+    "golden boots",
+    "skid stop",
+    "boot shot framing matched to sentence five"
+   ]
+  },
+  {
+   "line": "Every world has a bastion, and every bastion has me.",
+   "picture": "Over the player's shoulder, third person: his back and shoulder fill the near edge of the frame. Down the bridge the brute stands square in the middle of it, blocking it, axe at his side, perfectly still, already facing him, under his own lantern.",
+   "location": "Second bastion bridge, another world (Nether)",
+   "cast": [
+    "piglin brute",
+    "the player (back, foreground)"
+   ],
+   "props_and_effects": [
+    "golden axe",
+    "bridge with lava glow below",
+    "lantern on a chain as the brute's key light"
+   ]
+  },
+  {
+   "line": "He hid on a pillar and threw gold at me.",
+   "picture": "Tall static composition made for the vertical frame, all of it between 14 and 60 percent of the height: the player crouches on top of a three-block netherrack pillar at the top of that zone. Directly below, the brute stands at its foot looking straight up. The player tosses a gold ingot and it drops the whole height of the pillar, past the brute's snout.",
+   "location": "Second bastion bridge, another world (Nether)",
+   "cast": [
+    "the player (crouched on the pillar)",
+    "piglin brute"
+   ],
+   "props_and_effects": [
+    "three-block netherrack pillar",
+    "crouch pose",
+    "gold ingot tossed down (long fall)",
+    "brute head pitched up",
+    "golden axe"
+   ]
+  },
+  {
+   "line": "I looked at it for zero seconds.",
+   "picture": "Side-on medium on the brute in clean profile, head tilted up at the pillar top, feet no lower than 60 percent of the frame height. The ingot falls past his snout and lands spinning at his feet. A second lands beside it. His head never dips.",
+   "location": "Second bastion bridge, another world (Nether)",
+   "cast": [
+    "piglin brute"
+   ],
+   "props_and_effects": [
+    "two gold ingots landing and spinning",
+    "golden axe",
+    "foot of the netherrack pillar at frame edge"
+   ]
+  },
+  {
+   "line": "I can wait, and he can't.",
+   "picture": "High angle from just behind the player on the pillar top, third person: his back and head are the big foreground shape in the lower part of the frame, sneak-bobbing up and down and snapping left and right. Above his shoulder, far below on the bridge, the brute's upturned face, perfectly still, three ingots turning ignored at his feet. Slow push down toward the brute.",
+   "location": "Second bastion bridge, another world (Nether)",
+   "cast": [
+    "the player (back, sneak-bobbing)",
+    "piglin brute"
+   ],
+   "props_and_effects": [
+    "sneak-bob (crouch spam) animation",
+    "head snaps left and right",
+    "three gold ingots spinning on the bridge",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "I ended a full stack of worlds.",
+   "picture": "Three flash cuts of about a second each with a snap to black between them. The brute is locked in the same spot of the frame every time, a white puff beside him and a pair of golden boots spinning as a dropped item at his feet. Only the bastion behind him changes: the bridge, then a treasure corner with a chest and a pile of gold blocks, then the home gateway (floor whole, no pit).",
+   "location": "Second bastion bridge, then third bastion treasure corner, then home bastion (three flash cuts)",
+   "cast": [
+    "piglin brute"
+   ],
+   "props_and_effects": [
+    "white smoke puff in each cut",
+    "golden boots as a dropped item in each cut",
+    "different extra drops in each cut: gravel, ender pearl, iron pickaxe",
+    "snap to black between cuts",
+    "chest and gold-block pile (treasure corner)"
+   ]
+  },
+  {
+   "line": "I started waiting at the gate.",
+   "picture": "Frontal portrait from the entrance corridor outside, slow push in: the brute steps into the middle of the gateway and plants himself there, facing out past the lens, axe lowered at his side, not raised. He stands frame left, as in the first shot of the film. Soft behind him, through the gateway, his brothers face their gold.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "three piglins (soft background)"
+   ],
+   "props_and_effects": [
+    "golden axe held low",
+    "one slow step into position (at least seven frames)",
+    "gateway as a frame around him",
+    "corridor lava glow as his key light",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "One day, he didn't come.",
+   "picture": "The gate frame from sentence three, same camera: the guard landing is empty. The brute stands small in the gateway with his back to us, a still silhouette with ears and axe against the glow of the empty corridor. His brothers face the gold. No pit. Hold a full second after the words. Nothing moves but the flicker of the lava glow.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute (silhouette in the gateway)",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "gate frame camera preset",
+    "empty guard landing",
+    "lava glow flicker",
+    "hold after the line"
+   ]
+  },
+  {
+   "line": "He found an older version of the world, from before they added me.",
+   "picture": "Hard match cut on the identical camera, not one block of the set changed: on the cut the brute is simply gone from the gateway. The player in golden boots sprints in through the gateway, straight through the spot where he stood, without slowing, and runs out of the bottom of the frame. The camera holds on the empty gateway and the empty landing.",
+   "location": "Older version of the world: the home bastion set with no brute (Nether)",
+   "cast": [
+    "the player (Steve skin, golden boots)",
+    "three piglins (facing the gold)"
+   ],
+   "props_and_effects": [
+    "match cut with the gate frame camera preset",
+    "golden boots",
+    "iron pickaxe",
+    "sprint cycle",
+    "empty gateway and landing held at the end"
+   ]
+  },
+  {
+   "line": "In that bastion, everyone likes gold.",
+   "picture": "High shot over the pit, the camera of sentence six: four piglins each hold an ingot up and stare at it. The player stands on the rim, unhurried, ender pearls and gravel popping up around his golden boots. The side of the frame where the brute walked in for sentence nine stays empty.",
+   "location": "Older version of the world: the home bastion set with no brute (Nether)",
+   "cast": [
+    "the player",
+    "four piglins in the pit"
+   ],
+   "props_and_effects": [
+    "four gold ingots in the admire pose",
+    "ender pearls and gravel popping out of the pit",
+    "golden boots",
+    "deliberately empty space behind the player"
+   ]
+  },
+  {
+   "line": "So today I'm staring at an ingot.",
+   "picture": "Back in the brute's bastion, floor whole, no pit: the ingot row frame from sentence two, side-on at snout height. Two brothers each hold an ingot up to his snout. Beside them, 0.7 block clear of the nearest, now stands the brute, head tilted down at a single ingot turning on the blackstone step in front of his chest, because he cannot pick it up. The golden axe is still in his hand. The six-second stare starts on the first frame of this shot.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "two piglins"
+   ],
+   "props_and_effects": [
+    "two gold ingots held in the admire pose",
+    "one gold ingot as a spinning dropped item on the one-block blackstone step",
+    "golden axe",
+    "ingot row camera preset"
+   ]
+  },
+  {
+   "line": "Six seconds.",
+   "picture": "Tight low close-up from below eye height, shallow focus, slow push in: the ingot turning sharp in the middle of the frame, the brute's unmoving face just above it, lantern light on his snout. Nothing else in the picture. Hold in silence after the words until exactly six seconds (144 frames) have passed since the first frame of the previous shot, about three seconds of hold.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute"
+   ],
+   "props_and_effects": [
+    "gold ingot spinning (sharp)",
+    "lantern key on the face",
+    "slow push in",
+    "silent hold timed to a real six seconds"
+   ]
+  },
+  {
+   "line": "Nothing.",
+   "picture": "The gate frame one last time: at the gold wall, his body still to the gold, the brute lifts his head from the ingot and turns it to the empty gateway, ending in clean profile with his snout against the glow. The ingot still turns at his feet, his brothers stay heads-down over theirs, the gateway where he waited is empty. Hold two seconds, then a plain cut to black, not the snap that meant a reset: this world does not end.",
+   "location": "Home bastion (Nether)",
+   "cast": [
+    "piglin brute",
+    "three piglins"
+   ],
+   "props_and_effects": [
+    "head lift and turn to profile toward the gateway",
+    "gold ingot spinning on the step",
+    "gate frame camera preset",
+    "hold, then plain cut to black"
+   ]
+  }
+ ],
+ "locations": [
+  "Home bastion (Nether, no day or night: dark red haze, lava glow from below, lanterns as key lights). One fixed layout for every shot: gateway in the far wall with the entrance corridor and its glow beyond, guard stair rising along a side wall to a landing beside the gateway, wall of gold blocks on the near side wall with a one-block blackstone step in front of it, open courtyard floor between. The two-deep pit exists ONLY in sentences six to ten. Sentences 1 to 10, the last flash cut of 16, 17, 18 and 21 to 23.",
+  "Second bastion bridge, another world (Nether, no day or night): a long blackstone bridge between basalt pillars over an orange lava glow far below, with a three-block netherrack pillar and one lantern on a chain. Sentences 11 to 15 and the first flash cut of 16.",
+  "Third bastion treasure corner, another world (Nether, no day or night): a small corner of blackstone wall with a pile of gold blocks and a chest. The second flash cut of 16 only.",
+  "Older version of the world (Nether, no day or night): the home bastion set re-used block for block with the same cameras and the brute removed from every shot. Floor whole in sentence 19, the pit dug in sentence 20. Sentences 19 and 20."
+ ],
+ "new_assets_needed": [
+  "Piglin (adult) from the game's model and texture, four instances: walk, turn, head tilt down and up, step off an edge and drop, and the Java admire pose (ingot held up in the LEFT hand in front of the snout, head tilted to it, golden sword or crossbow kept in the right hand)",
+  "Piglin brute from the game's model and texture (dark tunic, gold armband): walk and stride, one axe swing, axe lowering, head pitched up, head bowed, head lift and turn to profile, whole-body turn",
+  "Golden boots as an armor layer on Steve, plus golden boots as a dropped item",
+  "Steve additions: sprint cycle with skid stop, crouch pose and sneak-bob, item toss arm, red hurt flash with knock-back, vanish in a white puff",
+  "Held and dropped items: golden axe, gold ingot, ender pearl, gravel (block item), iron pickaxe, golden sword and crossbow for the piglins' hands",
+  "Blocks: blackstone, polished blackstone bricks and cracked polished blackstone bricks, gilded blackstone, basalt and polished basalt, block of gold, netherrack, chest, lantern and chain, a distant lava surface used only as a glow",
+  "Set piece: home bastion in the fixed layout (gateway and entrance corridor in the far wall, guard stair and landing beside it, gold-block wall on the near side wall with a one-block step in front, courtyard), in TWO states: floor whole, and with a two-deep two-by-two pit in plain blackstone whose last block can be broken on camera",
+  "Set piece: second bastion bridge with basalt pillars over a lava glow, and a three-block netherrack pillar",
+  "Set piece: third bastion treasure corner (blackstone wall, pile of gold blocks, chest), one flash cut only",
+  "Nether look preset: no sky and no sun, dark red haze and fog, lava glow from below as fill, lanterns as warm-white key lights so gold reads as gold and the brute separates from the wall",
+  "Effect: thrown item arcs (ingot down into the pit and down the pillar, ender pearl and gravel popping up out of the pit) landing as spinning items",
+  "Effect: blackstone break with cracks and blackstone-coloured crumbs",
+  "Effect: red hurt flash, knock-back, and white death puff with a burst of dropped items",
+  "Edit devices: snap to black for a reset, half-second black with the caption word held, plain cut to black at the end, and re-usable camera presets (gate frame four times: sentences 3, 18, 19, 23; boot shot framing twice: 5 and 11; ingot row frame twice: 2 and 21; pit camera twice: 6 and 20)",
+  "Timing device: sentences twenty-one and twenty-two together run exactly 144 frames from first frame to the cut into the last shot"
+ ],
+ "risks": [
+  "'He found an older version of the world, from before they added me' (the turn): a viewer who does not follow speedruns may still not know why he left. The picture has to carry it: the match cut from sentence eighteen must be pixel-exact so the brute pops out of an otherwise identical frame and the runner sprints through his spot. Fallback line if test viewers still miss it: 'He went back to a version from before they added me.' (11 words).",
+  "'Six seconds' pays off a line spoken fifty seconds earlier. It is reinforced by 'zero seconds' in the middle, by the re-used ingot row frame and by the stare lasting a real six seconds. Fallback if test viewers miss it: change the two closing lines to 'I count to six. Nothing.' and keep the timing.",
+  "'I started waiting at the gate' may read as an ambush, which weakens the loss. The portrait must show the axe lowered and a slow, settled stance. Fallback line of the same length: 'I started looking forward to him.'",
+  "Brute against piglins at phone size in a dark red set: he must read as a different kind at a glance. Fallback: give him his own lantern as key, give every ordinary piglin a golden sword or crossbow, keep him 0.7 block or more from any brother in every shot, and check every face at 360 by 640.",
+  "'Mostly gravel': small grey cubes on dark blackstone can vanish. Fallback: let the pile land on a gilded blackstone rim under a lantern, use at least six pieces, and frame so the pile fills a third of the picture above the caption band.",
+  "Golden boots in orange lava light can turn the colour of everything else, and the boot shot carries two beats. Fallback: light the boots with a warm-white lantern, keep the blackstone behind them at half brightness, and hold the first boot shot half a second longer.",
+  "The kill: one swing, then smoke. Players know a brute needs two hits. The axe coming down at the start of sentence ten stands for the second. Fallback if it reads as a one-hit kill in the preview: put a second red flash on the first two frames of sentence ten before the puff.",
+  "The pillar shots: a face pitched straight up is the underside of a snout from most angles, and the tall tableau makes both figures small. Fallback: keep the brute in strict side profile for sentences thirteen and fourteen and shorten the pillar to two blocks in frame by cropping its base behind him.",
+  "'I ended a full stack of worlds': three cuts must read as many worlds. Fallback: four cuts of twenty frames each, or if the treasure corner is not built, alternate the bridge and the home gateway from mirrored camera sides with different drops in each.",
+  "The snap to black on 'the whole world ended' can look like the video ended or glitched. Fallback: keep the black to half a second with the caption word on screen and start the next sentence over the black.",
+  "The last shot: the head turn toward the far gateway can end as the back of a dark head. Fallback: a reverse angle from the gateway, floor level, the empty blackstone in the foreground under the caption word and the brute's face lifting toward the lens behind it.",
+  "Pit continuity: any home shot outside sentences six to ten that shows the pit breaks the story (those are worlds the runner never reached). Check stills of sentences 1 to 5, 16, 17, 18, 19 and 21 to 23 for a whole floor before the final render.",
+  "Running time: 164 words is about 50 seconds of speech and the ending needs about 8 seconds of air, so the film lands at 60 to 64 seconds. Fallback if it must be shorter: drop 'will' from sentence two and trim the holds on sentences three and eighteen, never the holds on 'Mostly gravel', 'Six seconds' and 'Nothing'."
+ ],
+ "problems_fixed_by_checker": [
+  "Count and format: I counted the editor's narration word by word and by script: 161 words, 23 sentences, longest 11 words, no numerals, dashes, quotation marks, semicolons or parentheses. Nothing to fix. After my one line change the film is 164 words, 23 sentences, longest 13 words, about 49.7 seconds of speech.",
+  "The turn line was the one real Minecraft-truth problem. 'He found an older world, from before they added me' is not how it works: runners do not find an older world, they roll the game back to the VERSION before piglin brutes were added (1.16.1, brutes arrived in 1.16.2), and heard cold 'older world' sounds like an old save. Changed to 'He found an older version of the world, from before they added me.' (13 words). It keeps the film's world motif (world ended, new world, every world, a stack of worlds), uses the word every player uses, gives 'that bastion' in the next line a clear owner, and turns the re-used home set from a risk (same world?) into the point (same bastion, minus him).",
+  "Beat 18 could not be shot as written: in beat 17 the brute stands in the gateway facing out, but the boot-shot camera looks across the courtyard at the gold wall, so his legs cannot be 'soft in the background' of it. The boot shot also sat between the two gate frames, so the brute would not visibly pop out on the cut to the older version. Restaged: beat 17 is now a frontal portrait from the entrance corridor (he steps into the gateway, axe lowered), beat 18 is the gate frame with him waiting small in the gateway, beat 19 is a true match cut on the identical camera where he is simply gone and the runner sprints through his spot. This also removes the empty-floor shot the editor already listed as a risk.",
+  "Pit continuity on the home set was not stated and would have cost a wrong render. The runner digs the pit on camera in beat 6, and every later home shot is a world he never reached, or reaches fresh. The pit must exist only in beats 6 to 10 and 20, and must be absent in beats 1 to 5, the third flash cut of 16, 17, 18, 19 and 21 to 23. Written into the location, the beats and the asset list.",
+  "Beat 7 broke the film's own rule: an ender pearl popped out the instant an ingot was thrown, in a film whose second line says piglins stare for six seconds. Restaged so all three piglins are already frozen with ingots from the lure, and the pearl comes from one who has been staring since the previous shot.",
+  "Beats 9 and 10 showed a one-hit kill. A brute's golden axe does not kill a full-health player in one blow on Normal (it takes two). Kept the single swing (no long fights) and cut on the knock-back, but beat 10 now opens with the axe coming down to rest from a second blow we did not see, so the cut stands for the second hit. Narration unchanged.",
+  "Safe-area problems in three pictures. Beat 13 had the ingot drop 'the whole height of the picture', which runs through the caption band (62 to 72 percent) and the Reels text below it: now the whole pillar tableau sits between 14 and 60 percent of the height. Beats 8 and 14 got the same note for the gravel pile and the ingots at the brute's feet. Beat 15 now says where each figure sits: the player's back as the big foreground element low in the frame, the brute's upturned face above it.",
+  "Home set layout was never fixed, so 'backs to the door', 'facing the gateway' and the three re-used cameras contradicted each other depending on where the gold wall stood. Defined one layout (gateway in the far wall, guard landing beside it, gold wall on the near side wall) and staged the brute in profile on the landing, so he is never a dark box seen square from behind in the gate frame.",
+  "Admire pose detail: in Java a piglin holds the ingot up in its LEFT hand and keeps its golden sword or crossbow in the right. Written into beat 2 and the asset list so the rig is built the way players know it.",
+  "Final shot readability: a head turn toward the far gateway turns the face away from the lens. Beat 23 now keeps his body to the gold and ends the turn in clean profile, snout against the gateway glow, with a reverse-angle fallback in the risks.",
+  "Improvement, not a fault: the last stare is now literally six seconds. From the first frame of 'So today I'm staring at an ingot' to the cut on 'Nothing' is exactly 144 frames, the real bartering time, which gives players something to count and comment on at no extra render cost beyond the hold the editor already asked for.",
+  "Checked and left alone: the hook is the user's own opening and works with the picture of a brute ignoring a wall of gold. The last line 'Six seconds. Nothing.' is strong enough to post: it pays off line two, reverses the first line (the one who does not like gold is trying to), and leaves the missing-him to the picture of the empty gate rather than saying it. I tested 'I miss the boots' as a closer and rejected it: it states the feeling the picture already carries. Gravel, golden boots, the hole, the pillar, a full stack and six seconds are all true in Java Edition. No picture repeats one from the four finished films."
+ ]
+}

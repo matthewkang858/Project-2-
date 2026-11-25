@@ -1,0 +1,420 @@
+{
+ "slug": "underground",
+ "premise": "In this town the player has an underground base. My dad got taken down there. It's a villager trading hall where they turn villagers into zombies then cure for better trades. (This one is told from the perspective of a baby villager)",
+ "title": "Two Apples",
+ "logline": "A baby villager goes down into the player's underground trading hall to find his dad and calmly tells us how the hall's one zombie turns dad green so the player can cure him into a one-emerald librarian, until the last line shows that the zombie the player keeps is the child himself.",
+ "narration": "In this town, the player has an underground base. My dad got taken down there. The player walked into him until he was downstairs. That evening, I jumped on dad's bed. Nobody told me to stop. So I went down to find him. It's a trading hall, and dad has the last tiny room. The player keeps one zombie down here. He pulls a lever, and dad's wall opens. The zombie runs in and hugs him. On Hard, we always turn. Dad goes green under his hat. The player throws a potion and feeds him a golden apple. He only ever brings one. I always hope he'll bring two. Dad shakes for five minutes. Then he's dad again, and Mending costs one emerald. Dad thinks the player saved him. He never looks behind him. Babies grow up in twenty minutes. I'm still small. The night I came down, the zombie found me first. The player only needs one zombie. He kept the smaller one.",
+ "word_count": 164,
+ "why_this_version": "The base is the editor's 'Two Apples', kept almost whole: its arc, its twist and 162 of its 163 words. I was not given the earlier drafts, so I cannot say what the editor grafted from them; the only trace is Draft 2's ending, which stays in the risks as the fallback if the client wants the narrator to remain a villager. What I changed in the words: 'That night' became 'That evening' (bed jumping stops at sunset, and the film has one dusk sky), and the second to last line names the player so the final 'He' is clear on one hearing. What I changed in the pictures: the cure swirls are yellow, not red; the grey puff, the tipping over and the particle burst around the two transformations are cut, because the game swaps the mob instantly and a player would say so; the growing-up puff is cut for a wipe behind the well; the counter ride repeated from The Nitwit and One Word is replaced by a look down into the cells; the zombie's hands, the push, the sword kill and the slot height are corrected to the real models and numbers; the last shot has a stated camera. Nothing else needed cutting.",
+ "beats": [
+  {
+   "line": "In this town, the player has an underground base.",
+   "picture": "Dusk on the square, lamp posts lit. From a child's eye height beside the well: a two-wide stone stair cut into the grass, torchlight glowing up out of it. Steve crosses in profile and walks down into it without slowing until his head sinks below the grass. Slow push in on the glowing hole.",
+   "location": "Village square, stair mouth beside the well (dusk)",
+   "cast": [
+    "Steve (the player)"
+   ],
+   "props_and_effects": [
+    "stair mouth cut into the grass with wall torches",
+    "torch glow and bloom from below",
+    "lit lamp posts",
+    "well in soft foreground"
+   ]
+  },
+  {
+   "line": "My dad got taken down there.",
+   "picture": "Close on the baby villager alone at the lip of the stairs, three-quarter front with his look cheated toward the lens, staring down. The warm glow from below is his key light. The square behind him is empty and out of focus. Remember this framing: the last shot of the film repeats it.",
+   "location": "Village square, stair mouth beside the well (dusk)",
+   "cast": [
+    "Baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "torch glow from the stairwell as key light",
+    "shallow depth of field"
+   ]
+  },
+  {
+   "line": "The player walked into him until he was downstairs.",
+   "picture": "The event itself, side-on and low. Dad, a librarian in the book hat, arms crossed, is shoved along the path by Steve, who just keeps walking into his back. Dad slides ahead of him in small smooth nudges, as pushed mobs do, reaches the stair mouth and bumps down the first step, his head turned back toward the lens the whole way. The baby's big head is soft in the bottom corner of the foreground, watching.",
+   "location": "Village square, stair mouth beside the well (dusk)",
+   "cast": [
+    "Steve (the player)",
+    "Dad (librarian)",
+    "Baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "smooth push slide (no walk cycle on dad)",
+    "dad's head held turned back to the last frame"
+   ]
+  },
+  {
+   "line": "That evening, I jumped on dad's bed.",
+   "picture": "Inside the house, one wall torch, indigo dusk in the window. The baby villager bounces up and down on the red bed, seen lengthwise from beside its foot. The pillow end is empty. Low camera, the bed fills the bottom third.",
+   "location": "Dad's house, bedroom (dusk in the window, torch-lit)",
+   "cast": [
+    "Baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "red hero bed (the existing house bed)",
+    "bounce animation",
+    "wall torch",
+    "window with dusk sky"
+   ]
+  },
+  {
+   "line": "Nobody told me to stop.",
+   "picture": "Same room, wider and locked off, the closed door on the lens side so his face is three-quarter to us. He has stopped. He stands on the bed, very small, facing the door. Nothing moves. Hold.",
+   "location": "Dad's house, bedroom (dusk in the window, torch-lit)",
+   "cast": [
+    "Baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "closed oak door",
+    "locked-off camera",
+    "stillness"
+   ]
+  },
+  {
+   "line": "So I went down to find him.",
+   "picture": "Inside the stairwell: one long straight flight, stone turning to deepslate, wall torches. The baby villager runs down away from the camera, big head bobbing, tiny in the frame, seen from high behind, his head cheated toward a wall torch so the nose reads. This is the last time we see him as a villager until the flashback in beat twenty-two.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "stairwell with wall torches",
+    "stone to deepslate transition",
+    "baby run cycle"
+   ]
+  },
+  {
+   "line": "It's a trading hall, and dad has the last tiny room.",
+   "picture": "A new angle on the hall, not the counter ride of the earlier films: the ceiling is off for the camera and we look steeply down along the row. Each cell is a one-block pocket with a hat in it: the farmer's straw hat, the fletcher's feathered cap, the cleric's bare head, each behind his job block. The camera slides to the last pocket: the red book hat. Dad alone tips his head back and looks up at us. Behind his cell sits one more square of stone, sealed with a lid. A lever is on the front pier of his cell. No narrator in frame from here on.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Farmer",
+    "Fletcher",
+    "Cleric",
+    "Dad (librarian)"
+   ],
+   "props_and_effects": [
+    "ceiling removed for the camera",
+    "one-block cells with piers and iron bars",
+    "composter, fletching table, brewing stand, lectern",
+    "hanging lantern",
+    "lever on the pier of dad's cell",
+    "sealed stone box behind dad's cell",
+    "dad's head pitched up to its stop"
+   ]
+  },
+  {
+   "line": "The player keeps one zombie down here.",
+   "picture": "The back corner of the hall, camera on the floor, focus on Steve's boots as his legs walk past. Behind them, soft, the sealed stone box: its only opening is a slot of iron bars at floor level, one block high, black inside. In the black something green shifts, and two tiny hands rest between the bars at the height of Steve's knees. Steve does not look down.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player, legs only)",
+    "Baby zombie villager (a soft green shape and two hands, face never readable)"
+   ],
+   "props_and_effects": [
+    "sealed stone box with a floor-level iron bar slot",
+    "one torch well away from the slot so the inside stays black",
+    "focus held on the boots, the slot defocused"
+   ]
+  },
+  {
+   "line": "He pulls a lever, and dad's wall opens.",
+   "picture": "At the front of dad's cell. Close on Steve's hand flipping the lever on the stone pier. Focus pulls past dad's shoulder to the back of the cell: the two stone blocks behind him jerk aside on sticky pistons and a black doorway stands open. Dad keeps facing front.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player, hand and arm)",
+    "Dad (librarian)"
+   ],
+   "props_and_effects": [
+    "lever switching",
+    "two sticky pistons pulling two wall blocks sideways into the end wall",
+    "rack focus",
+    "black doorway behind dad"
+   ]
+  },
+  {
+   "line": "The zombie runs in and hugs him.",
+   "picture": "From the aisle, low and a little to one side, the lectern filling the bottom third. Dad is hit from behind: he flashes red and hops forward against the lectern, the short hop of a mob struck in a one-block cell. The attacker is not in the picture at all: beside his robe there is only the black doorway. Dad's eyes stay front.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad (librarian)"
+   ],
+   "props_and_effects": [
+    "red hurt flash",
+    "short knock-back hop toward the lectern",
+    "lectern as foreground",
+    "attacker not rendered in this shot"
+   ]
+  },
+  {
+   "line": "On Hard, we always turn.",
+   "picture": "Tight three-quarter portrait of dad: big nose, brow, book hat. A second blow: the red flash again, a small jolt. His colours come back. He is still looking straight ahead. He does not fall and there is no smoke.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad (librarian)"
+   ],
+   "props_and_effects": [
+    "second red hurt flash",
+    "portrait lens, shallow focus"
+   ]
+  },
+  {
+   "line": "Dad goes green under his hat.",
+   "picture": "Frontal, symmetrical, locked off on the whole cell. One more jolt, and on that frame dad is simply replaced where he stands, exactly as in the game: a zombie villager in the very same book hat and robe, green face, arms out over the lectern, finishing the little hop. No particles. The black doorway is still open behind him. Hold on the hat.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad (librarian)",
+    "Dad as zombie villager (librarian)"
+   ],
+   "props_and_effects": [
+    "instant villager to zombie villager swap on the blow, no effect",
+    "arms-forward zombie pose",
+    "locked-off camera"
+   ]
+  },
+  {
+   "line": "The player throws a potion and feeds him a golden apple.",
+   "picture": "Side-on along the counter. One casual arm swing from Steve: a splash potion crosses the counter and breaks on zombie dad in a burst of dark grey swirls. Steve's other hand comes up into frame holding a golden apple toward the green face. Zombie dad does not react.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player)",
+    "Dad as zombie villager (librarian)"
+   ],
+   "props_and_effects": [
+    "splash potion of weakness, thrown",
+    "dark grey splash burst and bottle shards",
+    "golden apple in Steve's raised hand"
+   ]
+  },
+  {
+   "line": "He only ever brings one.",
+   "picture": "Close on the single golden apple in Steve's hand, torchlit, the brightest thing in the frame. The green face is soft behind it.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player, hand)",
+    "Dad as zombie villager (librarian)"
+   ],
+   "props_and_effects": [
+    "golden apple close-up",
+    "long lens, shallow focus"
+   ]
+  },
+  {
+   "line": "I always hope he'll bring two.",
+   "picture": "The apple is gone from Steve's hand, which drops out of frame. The first yellow swirls rise off zombie dad. The camera drifts past his shoulder toward the black doorway behind him. Nothing comes out of it. On the last word the pistons push the wall shut over the dark.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad as zombie villager (librarian)",
+    "Steve (the player, hand)"
+   ],
+   "props_and_effects": [
+    "slow drift toward the dark doorway",
+    "sticky pistons closing the wall",
+    "yellow Strength swirls starting",
+    "nothing visible in the doorway"
+   ]
+  },
+  {
+   "line": "Dad shakes for five minutes.",
+   "picture": "Wide down the aisle. Zombie dad shakes in his cell on the left, yellow swirls streaming up off him. In the middle of the aisle Steve jumps on the spot, again and again, looking at nothing. Farmer, fletcher and cleric stare straight ahead out of their cells.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad as zombie villager (librarian)",
+    "Steve (the player)",
+    "Farmer",
+    "Fletcher",
+    "Cleric"
+   ],
+   "props_and_effects": [
+    "zombie villager cure shake, enlarged about three times so it reads in a wide",
+    "yellow swirl particles",
+    "Steve jump loop"
+   ]
+  },
+  {
+   "line": "Then he's dad again, and Mending costs one emerald.",
+   "picture": "Over Steve's shoulder at the counter. Between one frame and the next the shaking stops and the librarian stands there again: pink skin, same hat, no burst, only dark purple swirls drifting off him. Steve holds up a single emerald. Dad's arm comes up at once, holding out an enchanted book with its glint.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad as zombie villager (librarian)",
+    "Dad (librarian)",
+    "Steve (the player)"
+   ],
+   "props_and_effects": [
+    "instant zombie villager to villager swap, no effect",
+    "dark purple Nausea swirls",
+    "one emerald held so it reads from behind",
+    "enchanted book with glint"
+   ]
+  },
+  {
+   "line": "Dad thinks the player saved him.",
+   "picture": "Portrait of dad. His head follows Steve walking away up the aisle with the book until it reaches its stop, and stays turned that way. The book's glint goes soft in the distance.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad (librarian)",
+    "Steve (the player, walking away, out of focus)"
+   ],
+   "props_and_effects": [
+    "head follow to the seventy-degree stop and hold",
+    "enchanted book in Steve's hand",
+    "last purple swirls"
+   ]
+  },
+  {
+   "line": "He never looks behind him.",
+   "picture": "Same cell from the side and lower, through the end wall, so the wall behind him is in the picture. Dad still gazes up the aisle. The camera slides slowly off his face onto the stone directly behind his back, the seam of the piston wall, and holds there.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Dad (librarian)"
+   ],
+   "props_and_effects": [
+    "see-through end wall for the camera",
+    "slow lateral slide and focus pull to the wall",
+    "visible seam in the back wall"
+   ]
+  },
+  {
+   "line": "Babies grow up in twenty minutes.",
+   "picture": "The square at the same dusk. Two baby villagers chase each other round the well, staggered. The one in front runs behind the well as a baby and comes out the other side full size, and slows to a walk. The other keeps running, alone, past the glowing stair mouth.",
+   "location": "Village square, stair mouth beside the well (dusk)",
+   "cast": [
+    "Second baby villager",
+    "Third baby villager",
+    "Adult villager (the one who grew up)"
+   ],
+   "props_and_effects": [
+    "baby swapped for an adult while hidden behind the well",
+    "lamp posts",
+    "stair mouth glow in the background"
+   ]
+  },
+  {
+   "line": "I'm still small.",
+   "picture": "The back corner again, camera on the floor. The slot of iron bars at floor level, black inside, no hands this time. Steve's legs walk past: the whole slot ends at his waist. Slow push in on the bars.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player, legs only)"
+   ],
+   "props_and_effects": [
+    "floor-level iron bar slot",
+    "slow push in",
+    "black interior"
+   ]
+  },
+  {
+   "line": "The night I came down, the zombie found me first.",
+   "picture": "Flashback at the foot of the stairs. The baby villager, still an ordinary villager, stops where the steps meet the hall, three-quarter front. In the dark aisle behind him a full-size zombie steps out, arms raised, rim-lit by one torch. He turns his big head toward it. Cut before it reaches him.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Baby villager (narrator)",
+    "Zombie (adult)"
+   ],
+   "props_and_effects": [
+    "torch rim light on the zombie",
+    "zombie arms raised, walking",
+    "cut before contact"
+   ]
+  },
+  {
+   "line": "The player only needs one zombie.",
+   "picture": "Same spot. Steve with an iron sword: one swing, the last blow. The big zombie flashes red, is knocked back, tips over sideways and is gone in a white puff a second later. A piece of rotten flesh spins on the floor. Steve lowers the sword and looks down at something small at his feet, below the frame.",
+   "location": "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern)",
+   "cast": [
+    "Steve (the player)",
+    "Zombie (adult)"
+   ],
+   "props_and_effects": [
+    "iron sword, single swing",
+    "the game's death: red, knock-back, tip over, white poof",
+    "rotten flesh as a spinning dropped item",
+    "Steve's head tilting down"
+   ]
+  },
+  {
+   "line": "He kept the smaller one.",
+   "picture": "Inside the box for the first time, seen through its see-through side wall from his own eye height: the camera of beat nineteen moved to the other side of the wall. A baby zombie villager, framed where the baby villager stood in beat two: the same big head, now green, the same brown robe, small arms out, lit only by the strip of torchlight from the floor-level bars. Hold a full second. The wall in front of him pulls aside and warm light falls across his face. He runs, and a short pan with his first step brings dad's back and book hat into frame beyond the doorway. Cut to black.",
+   "location": "Inside the zombie box behind dad's cell (no sky, part of the hall set)",
+   "cast": [
+    "Baby zombie villager (narrator)",
+    "Dad (librarian, from behind)"
+   ],
+   "props_and_effects": [
+    "see-through box wall for the camera",
+    "sticky pistons opening the wall",
+    "light falling across him as it opens",
+    "baby zombie run start",
+    "short pan",
+    "cut to black"
+   ]
+  }
+ ],
+ "locations": [
+  "Village square, stair mouth beside the well (dusk; beats 1 to 3 and 20)",
+  "Dad's house, bedroom (dusk in the window, torch-lit; beats 4 and 5)",
+  "Underground trading hall under the square: stairwell, aisle, dad's end cell, back corner (no sky, torches and one lantern; beats 6 to 19 and 21 to 23)",
+  "Inside the zombie box behind dad's cell (no sky, one strip of torchlight through floor-level bars; beat 24 only, part of the hall set)"
+ ],
+ "new_assets_needed": [
+  "Set: stair mouth cut into the grass of the village square beside the well (two blocks wide, stone steps, wall torches, glow from below)",
+  "Set: underground stairwell, one long straight flight, stone turning to deepslate, wall torches",
+  "Set: underground trading hall in stone and deepslate: the existing one-block cells with piers, iron bars and job blocks rebuilt underground, an aisle, torches, one hanging lantern, and a ceiling that can be removed for the camera (beat 7)",
+  "Set: dad's end cell with a back wall of two stone blocks that slide sideways into the end wall on sticky pistons (two-high doorway), a lever on the front pier, and an end wall that can be see-through for the camera (beats 19 and 24)",
+  "Set: the zombie box behind dad's cell: sealed stone with a lid, a one-block-high slot of iron bars at floor level facing the back corner of the aisle, one side wall see-through for the last shot",
+  "Blocks: lever (both states), sticky piston (retracted and extended, with the moving block), deepslate and deepslate bricks",
+  "Mob: zombie (adult): arms raised walk, hurt, the game's death (tip over sideways, white poof)",
+  "Mob: zombie villager, adult, plains, librarian overlay (same book hat and robe as dad): arms-forward pose, cure shake",
+  "Mob: baby zombie villager, plains, no profession (this version's own baby model: one block tall, big green head, brown robe, tiny arms): idle in the dark, run start",
+  "Note on the three mobs and the effects below: they are not in the brief's exists lists, but the project already has engine/undead.py with zombie, zombie villager, baby zombie villager, hurt flash, infection swap, thrown splash potion, effect swirls, cure and death, with proof stills in out/test. They may only need staging, not building",
+  "Item: splash potion of weakness (held and thrown along an arc)",
+  "Item: golden apple (held, close-up quality)",
+  "Item: iron sword (held, one swing)",
+  "Item: rotten flesh (dropped, spinning)",
+  "Item: enchanted book with glint and emerald (reuse from One Word)",
+  "Effect: red hurt flash with the short knock-back hop",
+  "Effect: instant character swaps with no particles: villager to zombie villager on a blow, zombie villager to villager at the end of the cure",
+  "Effect: dark grey splash burst with bottle shards; yellow Strength swirls during the cure; dark purple Nausea swirls after it",
+  "Effect: baby villager swapped for an adult villager while hidden behind the well",
+  "Animation: Steve walking into a villager and pushing him in a smooth slide, down the first stair step",
+  "Animation: Steve jumping on the spot (loop)",
+  "Animation: baby villager bouncing on a bed",
+  "Cast extras from existing models: two more baby villagers and one plain adult villager for the square; farmer, fletcher and cleric for the cells"
+ ],
+ "risks": [
+  "The reveal (beats 22 to 24, 'He kept the smaller one'): if the small green figure in the dark box does not read as the narrator, the ending is lost. Fallback in picture: match beat 2's framing exactly, let the opening wall light him fully, hold the full second before he moves. If the pan cannot show dad's back as well, drop it: the light across his face and the run are enough, because beat 19 already showed what is on the other side of that wall. Fallback in words: 'He kept me.' (the count drops to 162).",
+  "Premise drift: the client asked for a baby villager's point of view and this narrator ends as a baby zombie villager. I think it serves the premise (dad, the hall, zombify and cure are all the story), but it is the client's call. If it is not wanted, the editor's alternative replaces the last six lines from 'He never looks behind him' with: 'I stood at his cell, and he looked over my head. The room next to dad's is empty. I grow up in twenty minutes. He's already holding my golden apple.' That is 159 words on the same sets, without the box interior, the adult zombie, the sword and the rotten flesh. It has not had this check as a whole and the two apple lines would need another look.",
+  "'On Hard, we always turn' heard aloud at speed: 'On Hard' is two short syllables and only the capital in the caption says difficulty. Fallback: 'On Hard difficulty, we always turn.' (165 words, the limit, so not together with any other added word).",
+  "'Dad shakes for five minutes': the game takes three to five, so five is true but the top of the range. If a comment about that is not wanted: 'Dad shakes for a few minutes.' (one more word).",
+  "'He only ever brings one' and 'I always hope' suggest the cure is repeated. Since Java 1.20.2 a second cure of the same villager adds no discount. The film must show dad cured once and no montage of repeats; the three other cells are what makes 'always' true.",
+  "Beat 7 (looking down into the cells with the ceiling off) is new for the pipeline: wall tops, bars from above and the dark beyond the set may look like a model, and faces are hidden under hats except dad's. Fallback: the proven ride along the counter, but from a child's eye height, about 0.7 block above the floor, looking up at the faces over their job blocks.",
+  "Beat 8 ('The player keeps one zombie down here'): a soft green shape behind low bars has to say zombie without showing a face or a size. If it reads as nothing, bring the green head one step closer to the torch strip while keeping it out of focus. If it gives the twist away, show the slot black and empty of everything but the two hands. Do not use a full-size zombie arm: it would be a lie on second viewing.",
+  "Beats 10 to 12: the attacker must not be seen, so it is simply not rendered in these shots, and the black doorway must stay black at phone size. The instant swap in beat 12 is how the game does it, but a viewer who does not play may take it for a glitch. Fallback: make the swap on the cut from beat 11 to beat 12.",
+  "Beat 15 ('I always hope he'll bring two') is an inner thought carried by the empty hand and the wall closing over the dark. If it plays flat, hold on the apple leaving Steve's hand in beat 14 and let this line run over his empty open palm.",
+  "Beat 16: the game's cure shake is a fine tremble that vanishes in a wide shot. It is enlarged here. If it still does not read, move in to a medium shot of dad with Steve jumping soft in the background.",
+  "Beat 17 packs the end of the cure and the trade into one shot. Fallback: two shots under one sentence, the swap on 'dad again' and the emerald and book on 'one emerald'. The word Mending only reads in the caption; the picture says book for one emerald, which is enough.",
+  "Beat 20: if the wipe behind the well is missed at phone size, do the swap in the open on a single frame with no effect, which is what the game does.",
+  "Beats 22 and 23 are a dark mob on a dark set: the adult zombie needs a torch rim light or it disappears into the deepslate. One swing and one death, never a fight. If the loose zombie raises the question of why it is out, stage it stepping out of the open piston doorway at the end of the aisle.",
+  "Fourteen shots in a row in one stone corridor (beats 6 to 19), on the slowest set to render. The angles are deliberately different each time (stairwell from above, look down, floor level, hand close-up, low medium, portrait, frontal, side-on, macro, drift, wide, over the shoulder, portrait with follow, side cutaway): keep that variety, keep the bedroom warm and the square wide, and let beat 20 break the corridor."
+ ],
+ "problems_fixed_by_checker": [
+  "Count and format: I counted the editor's narration word by word and by script: 163 words, 24 sentences, longest 11 words, no numerals, dashes, quotation marks, semicolons or parentheses. It passed. My version is 164 words (49.7 seconds of speech at 3.3 words a second), still 24 sentences, longest 11.",
+  "Line 4, 'That night, I jumped on dad's bed': baby villagers jump on beds in their play hours, which end at sunset, and at night they are asleep in them. Changed to 'That evening, I jumped on dad's bed.' Same word count, and it now matches the picture (the film has one dusk sky, which the editor had listed as a risk for this very line).",
+  "Line 23, 'He only needs one zombie': heard cold, the last 'he' was dad (line 19) and the last subject was the zombie (line 22). Changed to 'The player only needs one zombie.' so the final 'He kept the smaller one' has an owner. Plus one word.",
+  "Pictures, cure colour: the editor (and the producer note) had red swirls during the cure. In current Java the Strength effect is yellow (0xFFC700, changed from dark red in 1.19.4), which the project's own engine/undead.py also uses. Beats 15 and 16 now say yellow swirls. Weakness stays dark grey, Nausea after the cure stays dark purple.",
+  "Pictures, invented puffs: beat 11 had dad tip over into a grey smoke puff and beat 17 had a burst of particles. In the game a villager who turns is simply replaced on the killing blow (no falling over, no particles), and a finished cure is an instant swap with only the Nausea swirls afterwards. Beats 11, 12 and 17 are rewritten that way: the swap happens in frame, as players know it, and costs less than a puff.",
+  "Beat 20, a baby popping into an adult in a puff: growing up has no effect in the game. The well wipe (runs behind the well small, comes out full size) is now the main picture, not the fallback.",
+  "Beat 3, dad pushed 'a block at a time': pushed mobs slide smoothly in small nudges. Reworded.",
+  "Beat 8, 'two short green arms at ankle height': on this version's baby zombie villager model (I looked at the texture and the engine's proof stills) the arms are five pixels long and two thick, brown sleeves with only the hand green, at Steve's knee height. They cannot carry the word zombie on their own. The picture now relies on a soft green shape (his head) shifting in the dark behind the bars, with the tiny hands as a detail, focus kept on Steve's boots so neither face nor size reads.",
+  "Beat 21, 'the top of the slot is below his belt': a one-block slot ends at Steve's waist (his legs are 0.7 block). Reworded so nobody builds to a wrong measure.",
+  "Beat 7 was by the editor's own words 'the series' hall move' (the ride along the counter past the cells, already used in The Nitwit and One Word). Replaced by a steep look down into the row with the ceiling off: one-block pockets with a hat in each, dad looking up, and the sealed box behind his cell in plain view, which also plants the geography of the ending. The old ride is kept as fallback.",
+  "Beat 23, one swing of an iron sword killing a full-health zombie: a zombie has twenty health and an iron sword does six. The picture is now explicitly the last blow, with the game's real death (red, knocked back, tips over sideways, white poof a second later, rotten flesh).",
+  "Beat 24 asked for his face, the wall opening in front of him and dad's back beyond in one picture without saying where the camera is, and risked reading as first person. Camera now specified: outside the see-through side wall, the same camera family as beat 19 moved to the other side of the wall, three-quarter on him for the one-second hold, then a short pan with his first step.",
+  "Checked and kept: Mending for one emerald after a single cure is real (the cure is worth 25 emeralds off a book trade, and Mending starts between 10 and 38). 'Dad shakes for five minutes' is the top of the game's three to five and stays. On Hard a villager always turns. Baby zombie villagers never grow up, can be cured, and do turn villagers. Cured villagers get purple Nausea swirls. A villager holds out his trade item when the player holds an emerald.",
+  "Checked and kept: hook and last line. The opening sentence is the user's own and is only a fair hook by itself, but line 2 arrives at second three and the picture (Steve sinking into a glowing hole in the square) holds the scroll. 'He kept the smaller one.' is deadpan, lands on a picture and turns 'The player keeps one zombie down here' and 'hugs him' into something else on a second viewing. I did not find a better one.",
+  "Not something I could check: the task asks which draft was the base and what was grafted from the others. I was given only the editor's script, so I can only report on that."
+ ]
+}

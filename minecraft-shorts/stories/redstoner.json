@@ -1,0 +1,439 @@
+{
+ "slug": "redstoner",
+ "premise": "In this town everyone wants to get ripped. there's a chicken farm. Cow farm for protein shakes, but I'm a redstoner. Then one day one of his traps saves the village (this one is in a village of all players)",
+ "title": "Leg Day",
+ "logline": "In a town of gym-mad players who carry twelve anvils up a wall every day, the one thin-armed redstoner quietly puts a sticky piston under each anvil. When a pillager patrol shrugs off their fists, one lever drops the whole rack on the road, and the town, still calling redstone cheating, proudly hauls the weights back up without knowing their workout is how his trap reloads.",
+ "narration": "In this town, everyone wants to get ripped. Steve mines stone with his fists. It drops nothing, and he counts that as one rep. There's a chicken farm, and a cow farm for protein shakes. Milk doesn't even fill you up. I haven't told them. But I'm a redstoner. My arms are three pixels wide, and theirs are four. Steve asked how much my piston lifts, and I said twelve blocks. He said that's cheating. Every day they carry twelve anvils up the wall. They call it leg day. Under each anvil, I put a sticky piston. Nobody asked why. Then the pillagers came. Everyone ran out to punch them. Pillagers have crossbows, so everyone hid behind the cows. I flipped one lever. Twelve pistons pulled back, and twelve anvils fell on the road. That left a banner and a bottle. Steve still says redstone is cheating. But they carried all twelve back up before dark. They call it leg day. I call it reloading.",
+ "word_count": 165,
+ "why_this_version": "Base: the editor's Leg Day, kept whole in structure, order and voice. Twenty-three of its twenty-four sentences are unchanged, including the user's opening and the closing pair, which already do what the brief asks (the town's workout turns out to be the trap's reload). One sentence changed: Only the banner was left became That left a banner and a bottle, because a patrol captain in current Java also drops an ominous bottle and the old line echoed Poppy's ending. Everything else I changed is in the pictures, where a player would have caught the film out: the arm comparison restaged frontally (a slim arm is only narrower from the front), dropped items moved out of pick-up reach, the milk gag turned into the real empty-tap-full loop, a power source for the bench circuit, an honest order for placing the last sticky piston, dust that goes dark in one tick, planks that pull in one block instead of vanishing, cobblestone under the shelf so the anvils land as blocks, and a shelf high enough to finish a captain with a banner on its head. Kept from the editor's notes: Draft 3's sprint-jump laps as the hook fallback, the dusk repeat of the leg day shot. Considered and rejected: a bro drinking the ominous bottle like a protein shake (funny, but it would give Bad Omen and start a raid, a thread this film cannot close, and there are no words to spare); plain pistons with the anvils standing on the bare arms (also true, but a plank shelf reads faster and sticky piston is the word players love); making the narrator Alex for the famous slim arms (the user wrote his, and the project's assets already hold the slim Efe skin). Running time by the beat sheet is about 63 seconds.",
+ "beats": [
+  {
+   "line": "In this town, everyone wants to get ripped.",
+   "picture": "HOOK, about 2.8 s. Ground-level wide lens at the foot of the well, sun from the side. Steve, Zuri and Ari stand in a staggered row facing the lens, an anvil in each one's hand, and do squats in unison: the player sneak pose, down, up, down, exactly like players spamming crouch. Kai sprint-jumps a lap around the well behind them. Far back at the edge of the square, soft, the narrator stands perfectly still with a glowing redstone torch, the only one not moving. Steve's face upper middle of frame, anvils above the caption band.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve",
+    "Zuri",
+    "Ari",
+    "Kai",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "three anvils as held items",
+    "redstone torch held and glowing",
+    "player sneak pose cycled as squats",
+    "sprint-jump cycle"
+   ]
+  },
+  {
+   "line": "Steve mines stone with his fists.",
+   "picture": "About 2.2 s. Close shot, long lens, looking along a row of stone blocks that stands on the grass at the edge of the square. Steve stands beside the nearest block in profile, nothing in his hand, and punches it: arm swinging, the crack overlay creeping across the block, crumbs flying. Start with the cracks already half way.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "stone block with breaking cracks and crumbs",
+    "repeated punch-mining arm swing",
+    "row of stone blocks soft behind"
+   ]
+  },
+  {
+   "line": "It drops nothing, and he counts that as one rep.",
+   "picture": "About 3.3 s. The same take carries on and drifts back. The block bursts into crumbs and nothing drops: bare grass, hold on the empty spot for half a second. Steve steps one block sideways and starts punching the next. The pull-back shows about eight stone blocks waiting in a line, his whole set, and an iron pickaxe turning slowly as a dropped item three blocks behind his back, in his plane of focus, never touched. Three blocks keeps it out of pick-up reach, or he would collect it.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "block break with crumbs and no item drop",
+    "row of about eight stone blocks",
+    "iron pickaxe as a turning dropped item, three blocks from Steve",
+    "repeated punch-mining arm swing"
+   ]
+  },
+  {
+   "line": "There's a chicken farm, and a cow farm for protein shakes.",
+   "picture": "About 3.6 s. One slow low sideways track along the fences. First the chicken pen: Kai stands among four chickens and lifts a cooked chicken to his face while the live chickens turn their heads up to watch him. The move carries on to the cow pen: Zuri stands beside a cow and tips a milk bucket up to her face. Both players in profile cheated toward the lens.",
+   "location": "Chicken and cow pens at the village edge, golden hour",
+   "cast": [
+    "Kai",
+    "Zuri",
+    "four chickens",
+    "two cows"
+   ],
+   "props_and_effects": [
+    "cooked chicken held",
+    "milk bucket held",
+    "eat and drink arm pose",
+    "oak fences and fence gates",
+    "chicken head turns"
+   ]
+  },
+  {
+   "line": "Milk doesn't even fill you up.",
+   "picture": "About 2.4 s. Portrait of Zuri and one cow, both cheated toward the lens. She lowers the bucket from her face and it is empty. She taps the cow with it once, one arm swing, and the bucket is full of milk again and goes straight back up to her face. One bucket, one cow, no end. The cow turns its head and looks into the lens. Nothing lies on the ground.",
+   "location": "Chicken and cow pens at the village edge, golden hour",
+   "cast": [
+    "Zuri",
+    "one cow"
+   ],
+   "props_and_effects": [
+    "held bucket swapping between milk bucket and empty bucket",
+    "drink arm pose",
+    "one arm swing at the cow",
+    "cow head turn to the lens"
+   ]
+  },
+  {
+   "line": "I haven't told them.",
+   "picture": "About 2.0 s. Over the narrator's shoulder at the fence, his thin arm and the glow of the redstone torch in the foreground. In the middle distance Zuri milks the cow and drinks again, the same loop. The narrator watches for a beat, then turns his head away toward the village and walks out of frame. The cow keeps looking at the lens.",
+   "location": "Chicken and cow pens at the village edge, golden hour",
+   "cast": [
+    "Narrator (Efe, slim-arm model)",
+    "Zuri",
+    "one cow"
+   ],
+   "props_and_effects": [
+    "redstone torch held and glowing",
+    "milk bucket and empty bucket held",
+    "drink arm pose",
+    "oak fence"
+   ]
+  },
+  {
+   "line": "But I'm a redstoner.",
+   "picture": "About 2.0 s. A corner of the square with a small open-air redstone bench. Close and warm: the narrator plants his redstone torch at the head of a short line of redstone dust. The dust lights up red, runs through a repeater, a redstone lamp switches on and lights his face, and a piston beside the lamp pushes out once. The planted torch is the power source, so the circuit is honest.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "redstone torch placed as a block and glowing",
+    "redstone dust lighting up",
+    "repeater switching on",
+    "redstone lamp switching on",
+    "piston extending",
+    "block placing"
+   ]
+  },
+  {
+   "line": "My arms are three pixels wide, and theirs are four.",
+   "picture": "About 3.3 s. Frontal two-shot against the plain glow of the lit redstone lamp, both players facing the lens. The narrator stands still with his arms hanging, the redstone torch in his far hand. Steve steps in shoulder to shoulder, so the narrator's near arm and Steve's near arm hang side by side in the middle of the frame, same height, each at least an eighth of the frame wide: three pixels next to four. Steve's head tilts down to the thin arm, the narrator's head turns to Steve's arm. Never side-on: from the side both arms are four pixels deep and look the same.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Narrator (Efe, slim-arm model)",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "redstone torch held and glowing",
+    "redstone lamp lit behind as a plain backdrop",
+    "slim and wide arms hanging side by side, seen from the front"
+   ]
+  },
+  {
+   "line": "Steve asked how much my piston lifts, and I said twelve blocks.",
+   "picture": "About 3.9 s. Tall composition made for the phone frame, low wide lens: one piston facing upward under a column of twelve iron blocks that stands higher than the houses. Steve stands at its foot looking down at the piston. The narrator flips a lever beside it, the whole column rises one block, and Steve tips his head back to follow it up as the camera tilts with it.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "upward piston extending",
+    "column of twelve iron blocks moving up one block",
+    "lever switching"
+   ]
+  },
+  {
+   "line": "He said that's cheating.",
+   "picture": "About 2.0 s. Steve turns his back on the column and walks away toward the well, his head held in profile toward the lens to the last frame. The narrator stays at the lever, small, his head turning to watch him go. The column of twelve stays up against the sky behind them.",
+   "location": "Village square by the well, golden hour",
+   "cast": [
+    "Steve",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "column of twelve iron blocks on the extended piston",
+    "lever"
+   ]
+  },
+  {
+   "line": "Every day they carry twelve anvils up the wall.",
+   "picture": "About 3.0 s. Low angle from the road: a tall stone wall beside the road into the village with a long stair up its end. Steve, Kai, Zuri and Ari climb the stairs in a staggered line, each holding an anvil. Along the top, eight anvils already stand on a shelf of oak planks that hangs out over the road, receding against the gold sky.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Steve",
+    "Kai",
+    "Zuri",
+    "Ari"
+   ],
+   "props_and_effects": [
+    "four anvils as held items",
+    "eight anvils as blocks on the plank shelf",
+    "tall stone wall with a long stair",
+    "walking up stairs"
+   ]
+  },
+  {
+   "line": "They call it leg day.",
+   "picture": "About 2.0 s. Ground-level close shot on the stairs: Steve's legs pump up the steps past the lens with an anvil in his hand, Kai's legs right behind him. This exact set-up comes back at dusk for the second They call it leg day.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Steve",
+    "Kai"
+   ],
+   "props_and_effects": [
+    "two anvils as held items",
+    "stone stairs",
+    "walking up stairs, no step shorter than seven frames"
+   ]
+  },
+  {
+   "line": "Under each anvil, I put a sticky piston.",
+   "picture": "About 3.0 s. Camera just outside the top of the wall, looking back along the row: sticky pistons in the top course, each with its arm out over the drop, one oak plank on the end of each arm and an anvil standing on each plank, eleven in all. In the last gap the narrator sets the twelfth sticky piston, slime-green face showing for an instant. The dust behind it is already lit, so its arm shoots out at once, bare, and he sets one oak plank on the end. Behind the pistons a lit line of redstone dust runs to one lever, bright at the lever and duller toward the far end.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "twelve sticky pistons, eleven already extended",
+    "sticky piston placed and extending at once, slime-green face visible",
+    "oak plank blocks on the piston arms, one placed in shot",
+    "eleven anvils as blocks",
+    "lit redstone dust line fading with distance from the lever",
+    "lever",
+    "block placing"
+   ]
+  },
+  {
+   "line": "Nobody asked why.",
+   "picture": "About 2.0 s. Ground-level on the wall top beside the lever, the glowing dust line leading away from the lens. Steve's feet step right over the lit dust, past the lever and the piston backs. He sets his anvil down on the last bare plank and walks on, never once looking down. Soft in the background the narrator stands and watches him go.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Steve",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "anvil held, then placed as the twelfth block",
+    "sticky pistons extended with planks",
+    "lit redstone dust line in the foreground",
+    "lever"
+   ]
+  },
+  {
+   "line": "Then the pillagers came.",
+   "picture": "About 2.0 s. Ground-level long lens from the road, looking out to the meadow and a lone oak on a clean horizon: five pillagers walk up the road toward the lens in single file, crossbows held, the captain in front with the ominous banner standing over its head.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "five pillagers, one of them the patrol captain"
+   ],
+   "props_and_effects": [
+    "five crossbows held",
+    "ominous banner on the captain's head",
+    "pillager walk cycle"
+   ]
+  },
+  {
+   "line": "Everyone ran out to punch them.",
+   "picture": "About 2.2 s. Low tracking shot from the verge: Steve sprints down the road at the lens with a bare fist raised, Kai and Zuri staggered behind him, the wall running along one side. On the last beat three arrows thud into the ground in front of them and all three stop dead.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Steve",
+    "Kai",
+    "Zuri"
+   ],
+   "props_and_effects": [
+    "sprint cycle with a raised fist",
+    "three arrows sticking into the ground",
+    "runners staggered by at least 0.7 block"
+   ]
+  },
+  {
+   "line": "Pillagers have crossbows, so everyone hid behind the cows.",
+   "picture": "About 3.0 s. Low shot through the cow pen fence: Steve, Kai, Zuri and Ari packed behind three cows in the sneak pose, only their heads showing over the cows' backs and all turned toward the road. One arrow is stuck in the fence post and a second thuds in beside it. The nearest cow looks at the lens, unbothered.",
+   "location": "Chicken and cow pens at the village edge, golden hour",
+   "cast": [
+    "Steve",
+    "Kai",
+    "Zuri",
+    "Ari",
+    "three cows"
+   ],
+   "props_and_effects": [
+    "player sneak pose",
+    "two arrows stuck in a fence post, one arriving in shot",
+    "oak fence"
+   ]
+  },
+  {
+   "line": "I flipped one lever.",
+   "picture": "About 2.0 s. Close on the lever on the wall top: the narrator's thin arm reaches in and flips it. The whole glowing line of redstone dust goes dark in the same instant, as it does in the game. Soft and far below, on the open road just short of the shelf, the captain's banner moves toward it.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Narrator (Efe, slim-arm model)",
+    "patrol captain far below, out of focus"
+   ],
+   "props_and_effects": [
+    "lever switching off",
+    "redstone dust line going dark all at once",
+    "ominous banner on the captain's head"
+   ]
+  },
+  {
+   "line": "Twelve pistons pulled back, and twelve anvils fell on the road.",
+   "picture": "About 3.8 s, the money shot. Locked low wide angle from the road, looking along the foot of the wall and up, the five pillagers marching in a clean file on the cobblestone strip directly under the shelf. All twelve sticky pistons snap back at once and pull their planks one block in against the wall. Twelve anvils hang on air for two frames, then drop in a receding line. The captain tips its head up. On impact each pillager flashes red and tips over, and the road fills with white puffs of smoke.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "five pillagers, one of them the patrol captain"
+   ],
+   "props_and_effects": [
+    "twelve sticky pistons retracting with their planks",
+    "twelve anvils as falling blocks",
+    "red hurt flash and tip-over on five pillagers",
+    "white smoke puffs",
+    "ominous banner on the captain's head",
+    "cobblestone paving under the shelf"
+   ]
+  },
+  {
+   "line": "That left a banner and a bottle.",
+   "picture": "About 2.5 s. The smoke thins over a silent road: twelve anvils stand in a line on the cobblestones, most of them chipped, and between two of them the ominous banner and one ominous bottle turn slowly side by side as dropped items. No crossbows, no other drops. Slow push in until the pair fills the middle of the frame.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [],
+   "props_and_effects": [
+    "twelve anvils as blocks, most in the chipped variant",
+    "ominous banner as a turning dropped item",
+    "ominous bottle as a turning dropped item",
+    "thinning smoke"
+   ]
+  },
+  {
+   "line": "Steve still says redstone is cheating.",
+   "picture": "About 2.2 s. Tall frame from the road: Steve walks out and stops among the anvils in the foreground, two blocks short of the banner and bottle so he does not collect them. High above him on the wall top, small against the sky, the narrator stands by the lever with his redstone torch. Steve looks up at him and holds it for a beat, then turns his head away, to the anvils and then to the stairs.",
+   "location": "Anvil wall on the road into the village, golden hour",
+   "cast": [
+    "Steve",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "anvils as blocks on the cobblestones",
+    "banner and bottle as dropped items at the frame edge, out of his reach",
+    "redstone torch held and glowing",
+    "lever"
+   ]
+  },
+  {
+   "line": "But they carried all twelve back up before dark.",
+   "picture": "About 3.0 s. The low angle of the first wall shot, now at dusk, orange into purple, lanterns glowing along the wall: the four climb the stairs in a staggered line, an anvil in every hand. On top the narrator waits by the lever, the dust line lit again, the sticky pistons pushed out with their planks and eight anvils already back in place. Never show the anvils being picked up off the road.",
+   "location": "Anvil wall on the road into the village, dusk",
+   "cast": [
+    "Steve",
+    "Kai",
+    "Zuri",
+    "Ari",
+    "Narrator (Efe, slim-arm model)"
+   ],
+   "props_and_effects": [
+    "four anvils as held items",
+    "eight anvils as blocks on the planks",
+    "sticky pistons extended with planks",
+    "lit redstone dust line",
+    "lanterns as light",
+    "dusk sky"
+   ]
+  },
+  {
+   "line": "They call it leg day.",
+   "picture": "About 2.0 s. Exactly the set-up of the first They call it leg day, same lens, height and step count, now in lantern light: the same legs pump up the same steps past the lens, Steve's first and Kai's right behind, an anvil in each hand.",
+   "location": "Anvil wall on the road into the village, dusk",
+   "cast": [
+    "Steve",
+    "Kai"
+   ],
+   "props_and_effects": [
+    "two anvils as held items",
+    "stone stairs",
+    "lantern light"
+   ]
+  },
+  {
+   "line": "I call it reloading.",
+   "picture": "About 3.0 s. Wall top at last light, looking along the row: Steve sets the twelfth anvil on the last plank and walks off without a glance. The narrator stays beside the lever, the redstone torch lighting his face, his free arm lifting to the lever and stopping there, looking out over the armed row of twelve anvils and the empty road below. Hold one second after the last word, then cut to black.",
+   "location": "Anvil wall on the road into the village, dusk",
+   "cast": [
+    "Narrator (Efe, slim-arm model)",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "twelve anvils as blocks on planks, the last one placed in shot",
+    "sticky pistons extended",
+    "lit redstone dust line",
+    "lever",
+    "redstone torch held and glowing as the key light on his face",
+    "lanterns as light"
+   ]
+  }
+ ],
+ "locations": [
+  "Village square by the well, golden hour (beats 1 to 3 and 7 to 10): the row of stone blocks at its edge, an open-air redstone bench in one corner, the twelve-block piston column",
+  "Chicken and cow pens at the village edge, golden hour (beats 4 to 6 and 17)",
+  "Anvil wall on the road into the village, golden hour (beats 11 to 16 and 18 to 21): the cobblestone strip at its foot, the stairs, the wall top, the meadow beyond",
+  "Anvil wall on the road into the village, dusk (beats 22 to 24): the same set under a second sky, rendered as a second module and joined; fallback is to stay in the golden sky"
+ ],
+ "new_assets_needed": [
+  "Player skins on the classic wide model: Kai, Zuri, Ari (Steve exists)",
+  "Slim player model (three-pixel arms) with the slim Efe skin for the narrator; no armor on anyone",
+  "Player poses and cycles: sneak pose (squats and hiding), sprint and sprint-jump, repeated punch-mining swing, eat and drink (item to the face), one tap swing at a cow, walking up stairs with a held block, arm lifted to a lever",
+  "Pillager model and texture, five of them, with a walk cycle and a held crossbow; one as patrol captain with the ominous banner on its head; red hurt flash and tip-over before the death puff",
+  "Ominous banner built from the banner pattern layers, in two forms: worn on the captain, small turning dropped item",
+  "Ominous bottle as a turning dropped item (item texture is in the asset pack)",
+  "Cows (three or four) and chickens (four), with head turns",
+  "Anvil in four forms: held item, placed block, falling block, chipped variant",
+  "Held or dropped items: milk bucket and empty bucket (one held item that swaps), cooked chicken, redstone torch (emissive, held and placed), iron pickaxe (dropped), crossbow, arrow (stuck in the ground and in a fence post)",
+  "Redstone blocks: redstone dust (unlit, and lit with brightness falling off along the line), repeater, redstone lamp (off and on), piston and sticky piston (retracted, extended with arm, slime-green face), lever (both states)",
+  "Plain blocks: iron block (twelve), stone, oak planks, oak fence and fence gate, cobblestone or stone bricks with matching stairs, lanterns",
+  "Set piece: chicken pen and cow pen at the village edge",
+  "Set piece: open-air redstone bench in a corner of the square (dust line, repeater, lamp, piston, a spot for the placed redstone torch) and a row of about eight stone blocks on the grass",
+  "Set piece: upward piston under a column of twelve iron blocks, with a lever, able to rise one block",
+  "Set piece: the anvil wall beside the exit road, at least 14 blocks long, with a stair up one end. Twelve sticky pistons in the top course facing out over the road, each arm carrying one oak plank two blocks out from the wall face; a block behind each piston with redstone dust on top so the dust really powers the pistons; one lever at the end; lanterns. Shelf 18 blocks above the paving for a true kill on all five (an ordinary pillager needs a fall of 13, the captain 17 because the banner on its head takes a quarter off anvil damage); 15 is acceptable; never lower than 8",
+  "Set dressing: a strip of cobblestone paving at the foot of the wall under the shelf in place of dirt path, so falling anvils land as blocks",
+  "Effect: redstone dust lighting up, and a whole line going dark in one frame",
+  "Effect: piston extend and retract, also twelve at once pulling their planks in one block",
+  "Effect: twelve anvils as falling blocks landing as blocks, white death puffs for five pillagers, arrow thud",
+  "Second sky module at dusk for the last three shots (same set, joined in the edit)"
+ ],
+ "risks": [
+  "My arms are three pixels wide, and theirs are four: a one-pixel difference can vanish at phone size, and it does not exist at all from the side. Shoot frontally, the two adjacent arms hanging at the same height against the plain lamp glow, each at least an eighth of the frame wide, and check the still at 360 by 640. Fallback: crop tighter to just the two arms and half of each torso and let the heads go; the line carries it.",
+  "Under each anvil, I put a sticky piston: the viewer must understand that each anvil stands on a plank held out by a piston arm, or the drop makes no sense. The green face going in, the arm shooting out and the plank going on must all be in the one shot. Fallback: cut the plank placing and show the twelfth piston already carrying its plank; he only places the green-faced piston behind it in a first take from the wall top.",
+  "Twelve pistons pulled back, and twelve anvils fell on the road: twelve falling blocks, five mobs and smoke in under four seconds can turn to mush. Keep the camera locked, the pillagers in a clean file, the two-frame hang before the drop. Fallback: two cuts inside the sentence, the planks snapping in seen from the wall top, then the impact from the road with only six anvils in frame on a longer lens.",
+  "That left a banner and a bottle: the ominous bottle is a small dropped item and must be recognised. End the push-in with banner and bottle together filling the middle third of the frame. Fallback if it still does not read: change the line to They left a banner on the road (same word count) and leave the bottle in the picture for the players who look for it.",
+  "It drops nothing: an absence is hard to show. The half-second hold on bare grass and the untouched pickaxe in the pull-back carry it. Fallback: let Steve look down at the empty spot for a beat before he steps to the next block.",
+  "Milk doesn't even fill you up: the empty and full bucket are two small held sprites. Stage the bucket toward the lens in the portrait and make the swap on the tap. Fallback: put Kai behind her in the frame eating a cooked chicken, the one who is actually being fed.",
+  "The sneak pose for players (squats in the hook, hiding behind the cows) is new. Fallback for the hook: Draft 3's sprint-jump laps around the well with one anvil carrier walking at the lens. Fallback for the cows: the four stand upright behind the cows, filmed from low so the cows cover them to the neck.",
+  "Everyone ran out to punch them into hid behind the cows is a jump of place. The three arrows that stop the runners and the arrows in the fence post link the two shots. Fallback: carry the arrow sound over the cut and start the cow shot on the arrow in the post.",
+  "Steve still says redstone is cheating is an attitude, not an action. It reads through the look up at the narrator and the head turning away, the same turn as He said that's cheating. Fallback: have Steve walk out of the frame with his back to the wall exactly as he walked away from the piston.",
+  "The second They call it leg day must be recognised as the same shot as the first. Keep lens, height and step count identical and change only the light. Fallback if the dusk module is dropped: keep the golden sky (before dark is still true), keep the lanterns and add one more climber so the repeat still feels like later.",
+  "Walking up stairs with a held anvil is a new move, and a step shorter than seven frames hops. Use a slow climb and the close leg shot. Fallback: a ground-level side view in which the climbers cross the frame behind the stair's edge, seen from the waist up.",
+  "A wall 18 blocks high throws a long shadow at golden hour and is hard to hold in one frame with the road. Build it so its road face looks at the sun and shoot the wall shots tall and low. Fallback: lower it to 15, or to 9 if the framing demands it; nobody counts blocks in a three-second shot.",
+  "At dusk the narrator's face is only as bright as his practical. The redstone torch is a weak light in the game: key his face with a boosted lantern beside the lever and let the torch be the red accent.",
+  "165 words is the ceiling and the sheet runs about 63 seconds. If the recorded voice is slower than 3.3 words a second, trim in this order: drop even from the milk line, then But from the carried line. Do not cut Nobody asked why or either leg day line.",
+  "Long caption words (Pillagers, crossbows, redstoner, reloading, cheating) need the reduced letter size the pipeline already uses for Everyone. Check that reloading with its full stop fits inside the caption width and hold it a full second."
+ ],
+ "problems_fixed_by_checker": [
+  "Count and format: I counted the editor's narration word by word (script, whitespace split): 163 words, 24 sentences, longest sentence 12 words, no numerals, dashes, semicolons, quotation marks or parentheses. All inside the rules. After my one line change the final is 165 words, 24 sentences, longest 12. 165 is the ceiling, so a trim order is given in the risks.",
+  "Minecraft truth, narration: Only the banner was left is false in current Java. Since 1.21 a patrol captain that dies outside a raid also drops one ominous bottle, and neither drop needs a player kill (the banner sits in the head slot with a guaranteed drop). The project's own asset pack already contains ominous_bottle.png, so the films are on a version where this is true. The line also repeated the device of Poppy's ending (the flower was all we found). Changed to: That left a banner and a bottle. Seven words, no pronoun that could be heard as the anvils, and it keeps the dry counting voice of the twelve, twelve, twelve lines. Beat 20 now shows both drops.",
+  "Minecraft truth, picture (beat 8): the three-pixel arm cannot be seen from the side. A slim arm is three pixels wide but still four pixels deep, exactly like a wide arm, so the editor's side-on close-up of two arms held straight out would have shown two identical arms. Restaged frontally: both players face the lens shoulder to shoulder with the adjacent arms hanging, so the three and four pixel faces sit side by side. The editor's fallback became the primary; side-on is forbidden in the beat text.",
+  "Minecraft truth, picture (beats 2, 3, 5): dropped items lying at a player's feet get picked up, and four empty buckets would merge into one stack. The pickaxe now turns three blocks behind Steve's back, out of pick-up reach, and is revealed in the pull-back of beat 3. The pile of empty buckets is replaced by the real loop: the bucket comes down empty, she taps the cow with it, it is full again, it goes back up. One bucket, one cow, no end. It says doesn't fill you up better and needs one asset less.",
+  "Minecraft truth, picture (beat 7): the bench circuit had no power source (a held redstone torch powers nothing). The narrator now plants his redstone torch at the head of the dust line, which is the action that lights it.",
+  "Minecraft truth, picture (beat 13): a sticky piston set into a gap cannot push out a plank that is not there, and its slime face would point away from a camera on the wall top. Now the camera is just outside the wall edge looking back along the row, the piston goes in with the green face showing, its arm shoots out at once because the dust behind it is already lit, and he sets one oak plank on the end. Sticky is the right piston: a plain one would leave the plank hanging and nothing would fall.",
+  "Minecraft truth, picture (beats 18, 19): redstone dust does not go dark as a travelling ripple, the whole line drops in the same tick, and while lit it fades from bright at the lever to dull at the far end (signal strength). Written that way. The planks do not vanish into the wall either: they snap back one block against it and the anvils are left on air for two frames, which is also what the game does. From the lever the banner cannot be seen under the shelf, so it is now seen on the open road just short of the shelf.",
+  "Minecraft truth, set: the vanilla village road is dirt path, and a falling anvil that lands on a path block (less than full height) pops into an item instead of standing as a block. Beat 20 needs twelve standing anvils, so the strip under the shelf is cobblestone paving. The narration still says road.",
+  "Minecraft truth, set: the editor's thirteen-block fall kills an ordinary pillager (24 health, two damage per block after the first), but the captain wears its banner in the head slot and anything worn there takes a quarter off falling-anvil damage, so the captain needs a fall of seventeen. Set note changed to a shelf 18 blocks above the paving, 15 acceptable, never below 8. At that height most anvils chip on landing, which the editor already dressed in.",
+  "Picture truth (beat 21): Steve walking out among the drops would collect the banner and bottle. He now stops two blocks short of them.",
+  "Variety (beats 13 and 14): the editor shot both from the same spot on the wall top. Beat 14 is now ground-level at the glowing dust by the lever, Steve's feet stepping over the lit line, so Nobody asked why is a picture of him literally walking over the answer.",
+  "Continuity: anvil counts made explicit so they add up to twelve in every shot (eight on the shelf and four in hands in beat 11, eleven up in beat 13, Steve brings the twelfth in beat 14, the same again at dusk).",
+  "Checked and left alone: stone mined by hand drops nothing; milk restores no hunger; slim arms are three pixels and wide arms four (both efe.png variants exist in the project's assets); the piston push limit is twelve blocks; patrols spawn by day with a captain in front; pillagers carry crossbows; the hook and the last two lines. The first sentence is the user's opening and reads in 2.4 seconds over crouch-spam squats with anvils. They call it leg day. I call it reloading is a true reversal of the first line and needed no rewrite. Cold read: no lost thread; the only pronoun at risk was in the banner line, now gone. The user's premise (gym town, chicken farm, cow farm for protein shakes, a redstoner, a trap that saves the town, a pay-off about how the town treats redstone) is intact.",
+  "Not fixable in the script, noted for production: an anvil mined with a bare fist drops nothing, so never show the bros picking the anvils up off the road. The film cuts from the road to the climb, which is how the editor already has it."
+ ]
+}

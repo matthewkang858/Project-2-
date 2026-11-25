@@ -1,0 +1,379 @@
+{
+ "slug": "herobrine",
+ "premise": "In this town the player used to protect us. But one day he went into the woods wearing his best armor and now he just stands around and watches us. (Player got replaced by herobrine) (This one is told from the perspective of a baby villager)",
+ "title": "The Hello",
+ "logline": "A baby villager who only wants back the crouch-crouch hello the player gave him every morning watches the thing that came out of the woods stand one house closer each day, walks up to it after a night in which it let a zombie knock until sunrise, and gets his hello from a face that does not have the player's eyes.",
+ "narration": "In this town, the player used to protect us. He fought every zombie that knocked on our door. When he slept, the night just ended. Every morning he crouched at me, twice. That meant hello. One day he put on his best armor and walked into the woods. He came back at sunrise without it. He didn't crouch. Now he just stands around and watches us. The grownups say players stand still sometimes. I watch him back. He used to take the trunk and leave the tree floating. Now he only takes the leaves. Nobody built the sand pyramid in the meadow. Every time I look, he is one house closer. He doesn't sleep anymore. The nights last all night. Last night a zombie knocked on our door until sunrise. He stood beside it and watched. So this morning I walked up to him and waited for my hello. He crouched, once, and he stayed down. The player had blue eyes.",
+ "word_count": 161,
+ "why_this_version": "The base is the editor's script The Hello. I was shown no other drafts, so nothing was grafted at this stage. The narration is kept word for word (161 words, 22 sentences): it passed the count, the format rules, the Minecraft check and the cold read, and its three pay-offs (the night that no longer ends, the zombie nobody fights, the hello that comes back wrong) all land. Every change is in the pictures, where the script would have cost wrong renders. Cut: the one-swing zombie kill and its death puff (untrue), the lintel behind his head (impossible once he faces the door), the head sinking level with the child's face (a sneaking player is still taller than a baby villager), the child on its bed at a window (the beds are not at a window), the window behind the pillows (there is none) and the standalone empty-bed shot (a repeat of an earlier picture). Added: a hello staged on the plaza so the last shot can truly reuse its camera, the empty red bed seen from the camera of beat 3, the child on the chair at the one window that faces the plaza, real wall torches as the night key, and notes on the five sky segments and the west-facing door. The plan runs about 64 seconds for about 49 seconds of speech.",
+ "beats": [
+  {
+   "line": "In this town, the player used to protect us.",
+   "picture": "Golden hour. Steve in iron chestplate, leggings and boots, no helmet, iron sword in hand, stands guard by the well looking out along the path. The baby villager stands at his leg, about half his height, big head tipped back to look up at him. Low camera at child height from the front three-quarter, long lens, both faces in the upper half of the frame, two adult villagers soft in the background. Slow push in. About 3 seconds.",
+   "location": "Village square (well and bell), golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Steve",
+    "farmer (background)",
+    "librarian (background)"
+   ],
+   "props_and_effects": [
+    "iron chestplate, leggings and boots on Steve",
+    "iron sword held",
+    "shallow depth of field",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "He fought every zombie that knocked on our door.",
+   "picture": "Night. Low from the plaza, a tight vertical frame on the child's oak door with about one block of wall either side, the two wall torches beside the door as the key light. A zombie on the step hits the door with both arms out. Steve steps in from the right and swings once: the zombie flashes red and is knocked back out of frame to the left. Steve ends planted in front of the door, sword up. No kill is shown. This exact framing returns in beat 18. About 3 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), night",
+   "cast": [
+    "Steve",
+    "zombie"
+   ],
+   "props_and_effects": [
+    "iron armor",
+    "iron sword",
+    "one sword swing",
+    "red hurt flash and one knockback",
+    "oak door",
+    "two wall torches as key light"
+   ]
+  },
+  {
+   "line": "When he slept, the night just ended.",
+   "picture": "Inside the house, locked off from beside the foot of the nearer bed, looking across both beds to the side wall, whose two-pane window sits just behind the far bed. Steve lies in the red bed in the foreground, the baby villager in the far bed with its head turned toward him and the lens. The window is moonlit blue with stars. On the word ended the window and the light in the room snap to golden morning inside the same frame. Neither of them has moved. About 3 seconds.",
+   "location": "Inside the child's house (two beds, chair and table under the west window), night snapping to golden hour in the same frame",
+   "cast": [
+    "Steve",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "red hero bed in the foreground and the white bed beyond",
+    "Steve and the child in the lying pose",
+    "one camera rendered under the night sky and the golden sky",
+    "hard cut between them on a word boundary",
+    "wall torch scaled down so the window carries the change"
+   ]
+  },
+  {
+   "line": "Every morning he crouched at me, twice.",
+   "picture": "Golden morning on the plaza at the foot of the doorstep. Steve has stepped outside and stands two blocks from the door, facing it, no helmet. The child has come down the step and stands at his feet. Close two-shot from child height, camera with its back to the door looking out: the child low in the foreground, three-quarter from behind with its nose showing, Steve's face filling the upper part of the frame, pitched down at the child, the white and dark blue eye pixels clearly readable, a roofline across the plaza as a fixed line behind his head. He drops into the sneak pose and stands again, twice, quickly. The last shot of the film uses this camera exactly. About 3 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour",
+   "cast": [
+    "Steve",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "player sneak pose",
+    "two quick crouches, six frames down and six up",
+    "fixed roofline behind his head so the drop reads",
+    "film-local neutral fill on his face, the same one as in beat 22"
+   ]
+  },
+  {
+   "line": "That meant hello.",
+   "picture": "Reverse angle from beside Steve's hip, his arm and iron leg at the edge of the frame. The baby villager looks straight up at him and nods twice in answer, the only hello a villager can do, then turns and runs off along the plaza with its big head bobbing. About 2 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "Steve (hip and arm only)"
+   ],
+   "props_and_effects": [
+    "baby villager nod twice (existing nod)",
+    "baby villager run"
+   ]
+  },
+  {
+   "line": "One day he put on his best armor and walked into the woods.",
+   "picture": "Golden hour at the exit gate, low wide lens, camera still. Steve in full enchanted diamond armor, the glint sliding over it, diamond sword in hand, walks away from the camera down the meadow road toward the black wall of dark oak trunks at its far end, getting small and bright against it. In the foreground the baby villager stands on the last path block in three-quarter profile, watching him go. About 4 seconds. The next shot repeats this framing.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour",
+   "cast": [
+    "Steve",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "full diamond armor with enchantment glint",
+    "diamond sword",
+    "dark oak forest wall at the end of the road"
+   ]
+  },
+  {
+   "line": "He came back at sunrise without it.",
+   "picture": "A six-frame dip to black, then the identical framing. The road is empty except for one figure in Steve's plain teal shirt, no armor, empty hands, standing dead still at the far end where the trees begin, facing the village. He is out of focus and too small for a face to be read, but large enough that bare arms and a bare head show. The child, on the same path block, lifts its head. No camera move. About 3 seconds.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour playing as sunrise",
+   "cast": [
+    "the watcher (far, face unreadable)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "dip to black to mark the night that passed",
+    "same camera as beat 6",
+    "focus held on the child"
+   ]
+  },
+  {
+   "line": "He didn't crouch.",
+   "picture": "The same road from the side, at child height. The shot opens on the child's last two running steps. It stops three blocks short of him, tips its head back and nods twice. His teal shoulder and the back of his head sit out of focus at the edge of the foreground. Nothing comes back. Hold on the child with its head still tipped up. About 2.5 seconds.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "the watcher (shoulder and back of head only)"
+   ],
+   "props_and_effects": [
+    "baby villager run and stop",
+    "nod twice, unanswered",
+    "strong defocus on the foreground figure"
+   ]
+  },
+  {
+   "line": "Now he just stands around and watches us.",
+   "picture": "Village square, long lens, locked off. A farmer carries wheat past the well and a librarian crosses in the foreground, both sharp, and two baby villagers run past playing, staggered so they do not merge. Far behind them at the mouth of the path he stands facing this way, small and soft, the only thing in the picture that does not move. Nobody looks at him. About 3 seconds.",
+   "location": "Village square (well and bell), golden hour",
+   "cast": [
+    "the watcher (far background, face unreadable)",
+    "farmer",
+    "librarian",
+    "two baby villagers"
+   ],
+   "props_and_effects": [
+    "wheat held by the farmer",
+    "focus held on the villagers, never on him"
+   ]
+  },
+  {
+   "line": "The grownups say players stand still sometimes.",
+   "picture": "By the well, camera at child height looking up. A farmer and a toolsmith face each other, heads nodding, arms crossed, noses in profile. The baby villager stands between and in front of them, clear of their arms, looks from one to the other, then turns its head past them toward the path, where he is a small still shape in the gap between the two adults. About 2.5 seconds.",
+   "location": "Village square (well and bell), golden hour",
+   "cast": [
+    "farmer",
+    "toolsmith",
+    "baby villager (narrator)",
+    "the watcher (small in the background gap)"
+   ],
+   "props_and_effects": [
+    "villager head nods",
+    "child head turn held to the last frame"
+   ]
+  },
+  {
+   "line": "I watch him back.",
+   "picture": "Portrait lens past his hip and still hand at the foreground edge of the frame. The baby villager stands alone in the middle of the path, three-quarter to the lens, head tipped all the way up, staring. Two children run past behind it. Slow push in on the big head. About 2 seconds.",
+   "location": "Village square (well and bell), golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "the watcher (hip and hand only)",
+    "two baby villagers (background)"
+   ],
+   "props_and_effects": [
+    "slow push in",
+    "defocused foreground hip and hand"
+   ]
+  },
+  {
+   "line": "He used to take the trunk and leave the tree floating.",
+   "picture": "Meadow, low wide shot against a clean horizon. A lone oak with its lower trunk gone: the leafy canopy and its last two logs hang in mid-air three blocks above the grass. The baby villager stands in the gap underneath, looking straight up at it. About 3.5 seconds.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour",
+   "cast": [
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "floating oak: canopy plus two top logs, three blocks of air below",
+    "clean sky visible through the gap"
+   ]
+  },
+  {
+   "line": "Now he only takes the leaves.",
+   "picture": "Three lone oaks stripped to bare logs against the sky, not one leaf block left. He stands among them with his back to the camera, facing the village roofs in the distance. The baby villager is small at the edge of the frame, nose in profile, looking at him. About 2.2 seconds.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour",
+   "cast": [
+    "the watcher (from behind)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "three leafless oaks, logs only"
+   ]
+  },
+  {
+   "line": "Nobody built the sand pyramid in the meadow.",
+   "picture": "A neat three-layer pyramid of sand blocks sits on the grass, taller than the child, with the bare trunks behind it. The baby villager walks half way around it and stops, nose in profile. Slow sideways track. About 2.7 seconds.",
+   "location": "Meadow road beyond the exit gate (lone oaks, sand pyramid, dark forest wall at the far end), golden hour",
+   "cast": [
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "sand pyramid, five by five base, three layers",
+    "slow sideways track"
+   ]
+  },
+  {
+   "line": "Every time I look, he is one house closer.",
+   "picture": "Late gold at the child's door. The baby villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands small and soft beyond the next house. The child looks away and back, jump cut in the same frame: he is at the next house, same pose. Once more: he is at the corner of the child's own house. About 3 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour",
+   "cast": [
+    "baby villager (narrator)",
+    "the watcher (background, out of focus)"
+   ],
+   "props_and_effects": [
+    "two jump cuts in a locked frame, each covered by the child's head turn",
+    "focus stays on the child"
+   ]
+  },
+  {
+   "line": "He doesn't sleep anymore.",
+   "picture": "Night inside the house, the exact camera of beat 3. The red bed in the foreground is empty. Beyond it the baby villager lies in its own bed with its head turned toward the empty one. The window behind stays moonlit blue. Locked off, nothing moves. About 2.2 seconds.",
+   "location": "Inside the child's house (two beds, chair and table under the west window), night",
+   "cast": [
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "red hero bed, empty",
+    "same camera as beat 3, night only",
+    "moonlit window that does not change"
+   ]
+  },
+  {
+   "line": "The nights last all night.",
+   "picture": "The same room, the other end. The baby villager stands on the chair beside the table under the west window, the one window that faces the plaza, its big nose in profile close to the pane. Through the glass, small on the moonlit plaza, he stands facing the house. Very slow push toward the window. About 2.5 seconds.",
+   "location": "Inside the child's house (two beds, chair and table under the west window), night",
+   "cast": [
+    "baby villager (narrator)",
+    "the watcher (through the window, a dark shape eight blocks out)"
+   ],
+   "props_and_effects": [
+    "child standing on the oak stairs chair",
+    "single glass pane",
+    "moonlit plaza outside",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "Last night a zombie knocked on our door until sunrise.",
+   "picture": "The exact framing of beat 2. A zombie stands on the step hitting the oak door, the door shudders with each blow, and the break cracks climb and reset without ever finishing. The right side of the frame, where Steve stepped in, stays empty for the whole line. About 3.2 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), night",
+   "cast": [
+    "zombie"
+   ],
+   "props_and_effects": [
+    "zombie arm swings on the door",
+    "door shudder",
+    "crack overlay on the door that never completes",
+    "two wall torches as key light"
+   ]
+  },
+  {
+   "line": "He stood beside it and watched.",
+   "picture": "The camera drifts about a block and a half to the left, off the zombie. He was standing just outside the frame the whole time, two blocks along the wall from the zombie, seen from behind, facing the door. The zombie keeps hitting the door and never turns toward him. Torch light on the wall in front of them, their two backs to us. About 2.5 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), night",
+   "cast": [
+    "the watcher (from behind)",
+    "zombie"
+   ],
+   "props_and_effects": [
+    "slow drift left to reveal him",
+    "zombie arm swings continue",
+    "zombie never targets him"
+   ]
+  },
+  {
+   "line": "So this morning I walked up to him and waited for my hello.",
+   "picture": "Golden morning at the same door. One piece of rotten flesh spins on the step where the zombie stood. He has not moved from his spot. The door opens and the baby villager comes out, down the step, walking not running, up to him. Side-on long lens along the house wall: the child stops at his feet, tips its head all the way back and nods twice. He is cropped at the shoulders by the top of the frame. About 4.2 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour playing as morning",
+   "cast": [
+    "baby villager (narrator)",
+    "the watcher (cropped at the shoulders)"
+   ],
+   "props_and_effects": [
+    "rotten flesh dropped item, spinning",
+    "door opening",
+    "nod twice"
+   ]
+  },
+  {
+   "line": "He crouched, once, and he stayed down.",
+   "picture": "The same place, camera a little behind his shoulder line, the frame cropped at his chin. He sinks slowly into the sneak pose: the torso leans forward and his head comes down into the picture from above, seen three-quarter from behind, pitched down at the child. He is still taller than the child, so he ends leaning over it. He holds there. Neither of them moves. One second of silence. About 3.5 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour",
+   "cast": [
+    "the watcher (three-quarter from behind)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "player sneak pose",
+    "one slow crouch over a full second, held",
+    "no music"
+   ]
+  },
+  {
+   "line": "The player had blue eyes.",
+   "picture": "The camera of beat 4, exactly, the same roofline behind his head. His face, turned down to the child and the lens, fills the upper part of the frame: where the blue was, both pixels of each eye are blank white, faintly glowing. He stays down. Hold two seconds on the two of them, the child's big head below the white eyes, then cut to black. About 4 seconds.",
+   "location": "Front of the child's house on the plaza (door, step, two wall torches, west window), golden hour",
+   "cast": [
+    "the watcher (face, first time seen)",
+    "baby villager (narrator)"
+   ],
+   "props_and_effects": [
+    "white-eyed Steve skin",
+    "eyes slightly emissive in this shot only",
+    "same camera and same fill light as beat 4",
+    "two-second hold, then cut to black"
+   ]
+  }
+ ],
+ "locations": [
+  "Village square with the well and bell and the mouth of the path: golden hour (beats 1 and 9 to 11)",
+  "Front of the child's house on the plaza (house_a: oak door with one step, two wall torches beside it, one window in the same wall): night (beats 2, 18, 19) and golden hour playing as morning (beats 4, 5, 15, 20 to 22)",
+  "Inside the child's house (two beds with a side window behind them, chair and table under the window that faces the plaza): night (beats 3, 16, 17) with one snap to golden morning at the end of beat 3",
+  "Meadow road beyond the exit gate, with the lone oaks, the sand pyramid and a dark oak forest wall at the far end: golden hour (beats 6 to 8 and 12 to 14)"
+ ],
+ "new_assets_needed": [
+  "The watcher: Steve's model with a white-eyed skin (steve.png with the two #523d89 iris pixels painted white, so each eye is two white pixels), non-emissive everywhere except the last shot",
+  "Zombie: model and texture, arms-out pose, an arm swing for knocking, a red hurt flash and one knockback hop (no death animation needed)",
+  "Iron armor on Steve (chestplate, leggings, boots, no helmet) and a held iron sword",
+  "Full diamond armor on Steve (helmet, chestplate, leggings, boots) with the enchantment glint on armor, and a held diamond sword",
+  "Player sneak pose for the Steve rig (two quick crouches in beat 4, one slow held crouch in beat 21)",
+  "Steve lying in the red bed (lie_down exists in the rig but no finished film has used it for the player: test one still first)",
+  "Dark forest wall at the far end of the meadow road: dark oak logs and dark oak leaves, two or three trees deep, dense enough to read as a black gap",
+  "Floating oak: one lone oak with its lower trunk removed, the canopy and two top logs left hanging over three blocks of air",
+  "Three leafless oaks: lone oaks reduced to logs only",
+  "Sand pyramid: three layers of sand blocks on a five by five base",
+  "Rotten flesh dropped item",
+  "Oak door shudder and the break-crack overlay applied to the door model, climbing and resetting",
+  "Film-local shadowless fill light for the doorstep shots, identical in beats 4 and 22 (the door of house_a faces west)",
+  "Two sky modules (night and golden hour) and an edit list of five segments (gold: beat 1, night: beat 2 and the first half of beat 3, gold: the end of beat 3 to beat 15, night: beats 16 to 19, gold: beats 20 to 22), every join on a word boundary, captions timed per segment, plus the six-frame dip to black before beat 7"
+ ],
+ "risks": [
+  "The player had blue eyes: the iris texel is #523d89, the same indigo as his trousers, and can read purple or dark under warm light. Fallback: light beats 4 and 22 with the same near-neutral film-local fill, keep the face at least a third of the frame wide, and give the white eyes a slight glow in beat 22 only. Do not swap the line. It still works if the iris only reads as dark, because the picture carries the white.",
+  "Doorstep light (beats 4, 15, 20 to 22): the door of house_a faces west, so with the look-dev golden sun (azimuth 62) the frontage and his face are in the house's own shadow. Fallback: choose the gold module's sun 60 to 120 degrees off the doorstep lens axis, or add one shadowless film-local fill keyed visible for those shots only, with the same strength in beats 4 and 22.",
+  "Every morning he crouched at me, twice, and He crouched, once, and he stayed down: the sneak pose is a drop of a third of a block plus a lean and can vanish at phone size. Fallback: a fixed roofline behind his head in beats 4 and 22, six frames down and six up for each quick crouch, and in beat 21 crop at his chin so the head enters the picture as he sinks.",
+  "His face before the reveal: two white eye pixels can show as bright dots even at distance and spoil the ending. Fallback: before beat 22 he is only seen from behind, cropped at the shoulders, or beyond focus with a face under about ten pixels. If dots still show in beats 7, 9, 10, 15 or 17, use the normal Steve skin for those shots.",
+  "When he slept, the night just ended: a hard cut from night to gold inside one frame can read as a glitch, and the join sits inside a sentence. Fallback: keep the beds and the two-pane window large and locked so only the light changes, put the join exactly at the start of the word ended, and try a four-frame dissolve with the window going first. If the side window is too small from that camera, use the existing bed camera between the pillows looking down the room to the west window.",
+  "He came back at sunrise without it: the golden sky plays both evening and morning, and at distance diamond armor and the teal shirt are both in the cyan family. Fallback: the six-frame dip to black, the figure kept large enough that bare arms and a bare head show, and beat 8's teal shoulder in the foreground. If it still feels like the same afternoon, add a two-second night insert of the empty road from the same camera with no narration.",
+  "He fought every zombie that knocked on our door: with no kill shown the fight must read from one swing. Fallback: the red hurt flash, a knockback hop that carries the zombie fully out of frame, and Steve ending square in front of the door. Watch the two wall torches, which sit at head height either side of the door, for tangents with the zombie's and Steve's heads.",
+  "Last night a zombie knocked on our door until sunrise: knocking has to read with the sound off, and a pedant knows a Hard-mode zombie breaks the door. Fallback: exaggerated arm swings, wood crumbs on each hit, and cracks that climb and visibly reset so it is clear this door holds. Keep the empty right side wide enough that Steve's absence is felt against beat 2.",
+  "He stood beside it and watched: the reveal needs him just outside the frame of beat 18, which means a tight vertical frame and him two blocks along the wall. Fallback: if the drift is too slow for the line, cut to a wider shot on the same axis with both of them from behind. The shot can be mirrored if the wall to the left of the door is too short.",
+  "The nights last all night: the plaza is seen through a single glass pane past the child's big head. Fallback: shoot from outside instead, over his dark shoulder toward the house, with the child's face in the torch-lit window pane.",
+  "Every time I look, he is one house closer: jump cuts in a locked frame can look like a render error. Fallback: cover each jump with the child's head turning away and back, or cut to a one-second close-up of the child between the positions.",
+  "He used to take the trunk and leave the tree floating: the canopy must read as hanging in the air, not as a tree behind a rise. Fallback: three clear blocks of sky under the two remaining logs, the camera low on the road looking north for a clean horizon, the child in the gap for scale.",
+  "The grownups say players stand still sometimes: the line is a thought with no action. Fallback: keep him visible in the gap between the two adults and hold the child's head turn toward him to the last frame. The child stands in front of the adults, not tucked between them.",
+  "The child from behind is a brown box under a pink box. Fallback: in beats 4, 11, 13, 14, 17 and 22 stage the child for its nose in profile or three-quarter, cheated about twenty degrees toward the camera.",
+  "Length and joins: 161 words is about 49 seconds of speech and the shot plan runs about 64 seconds, in five sky segments. If the narrator runs slow, cut I watch him back first (157 words), then drop He doesn't sleep anymore and play The nights last all night over the shot from beat 3's camera (153 words). Never trim the second of silence before the last line or the two-second hold after it."
+ ],
+ "problems_fixed_by_checker": [
+  "Format (no change needed): counted word by word and by script. 161 words, 22 sentences, longest sentence 13 words, no numerals, dashes, semicolons, quotation marks or parentheses. The first sentence is the user's opening words. The Herobrine name is never spoken.",
+  "Narration truth, line by line (no change needed): sleeping skips the night, the double crouch as hello, the floating tree, leafless trees and the sand pyramid of the legend, and rotten flesh left after sunrise are all right. Two lines a pedant could contest were kept on purpose. (a) A zombie knocking until sunrise: in current Java a door-breaking zombie on Hard gets through in about twelve seconds, but the zombie at the door all night with cracks that climb and reset is what every player remembers, so the picture uses exactly that and the door never breaks. (b) Blue eyes: I read the iris texel in the project's steve.png, it is #523d89, the same indigo as the trousers everyone calls blue jeans.",
+  "Beat 2 showed a zombie dying to one iron sword swing. A zombie has twenty health and no sword kills it in one hit, so players would comment on it. Changed to one swing, a red hurt flash and the zombie knocked back out of frame to the left, with Steve planted in front of the door. This also drops the death puff from the asset list, and the zombie leaving frame left now rhymes with the watcher being found on the left in beat 19.",
+  "Continuity break between beat 4 and beats 19 to 22. Beat 4 put the door lintel behind Steve's head, so he stood with his back to the door. In beats 19 to 22 the watcher faces the door, so the lintel cannot be behind his head and the exact repeat of the framing, which the ending depends on, was impossible. Restaged beat 4 on the plaza at the foot of the step with Steve facing the door, camera with its back to the door looking out. Beat 22 now truly reuses that camera.",
+  "Beat 21 said his head sinks until it is level with the child's face. Sneaking lowers a player from 1.8 to 1.5 blocks and a baby villager is about one block tall, so that cannot happen. Rewritten: he leans over the child with his head pitched down, and the frame is cropped at his chin so the head enters the picture as he sinks.",
+  "Beats 2, 3, 17 and 18 did not match the real set. I read the house_a template (plains_medium_house_1): the wall behind the pillows has no window, only a torch. The beds stand two blocks from the side windows, which face away from the plaza. The door has two wall torches beside it, not a lantern above it. The only window facing the plaza is one pane in the west wall with a chair and table under it. Beat 3 is now shot from beside the foot of the nearer bed, across both beds, to the two-pane side window. Beat 17 puts the child on the chair at the west window. Beats 2 and 18 are keyed by the two wall torches.",
+  "Beat 19 had him one block from the zombie, shoulder to shoulder, yet outside the frame of beat 18. That only works if he is two blocks along the wall in a tight vertical frame. Fixed the distance and the drift of about a block and a half.",
+  "Beat 16 was a standalone empty red bed from behind its pillow, the picture already used by the look-dev bed film and by the series references. Replaced with the exact camera of beat 3 at night: the red bed empty in the foreground, the child awake in the other bed looking at it, the window still blue. It costs no new camera and pays off the snap to morning in beat 3.",
+  "Small picture errors. Beat 1 called the child a third of his height, a baby villager is about half. Beat 5 had Steve's head turn while the camera sits at his hip with the head out of frame, cut. Beat 8 packed a run, a stop, two dips and a slow head drop into 2.5 seconds, it now opens on the last two steps.",
+  "Asset list. The baby villager head dip is the existing Character.nod (two quick nods, 14 frames) and lie_down already exists in the rig, so neither is a new asset. Added what the editor missed: the red hurt flash, film-local fill lights for the doorstep, and an explicit five-segment edit list.",
+  "Two skies. The contract allows one sky per module and joins modules by concat. The film is five segments (gold, night, gold, night, gold) from two modules. Every join, including the snap inside beat 3, must fall on a word boundary so no caption word straddles two encodes. Stated in assets and risks.",
+  "Doorstep light. The door of house_a faces west, so with the look-dev golden sun (azimuth 62) the frontage is in the house's own shadow, and the two shots that compare the eyes (beats 4 and 22) would both be dark. Added a risk with the fix: one film-local shadowless fill, identical in both shots.",
+  "Cold read (no change needed): no line loses the thread. The it in He came back at sunrise without it resolves to the armor. He covers both the player and the thing that came back, which is the design, and the last line is what separates them. The user's premise is intact, including his own phrases best armor, into the woods and just stands around and watches us.",
+  "Hook and last line (kept). The hook is the user's mandated sentence and used to does the work in two seconds. The player had blue eyes is five flat words that contradict the picture and turn the player in the first line into someone who is gone. I rejected the editor's fallback line The player's eyes were never all white because it explains the picture instead of contradicting it.",
+  "Considered and left alone: netherite as the best armor (diamond stays, a dark figure walking toward a black forest wall would vanish, and his best is relative to him) and trunk instead of the game word log (the line is instantly understood and the picture leaves two logs in the canopy so the leaves would not decay)."
+ ]
+}

@@ -1,0 +1,466 @@
+{
+ "slug": "crammys",
+ "premise": "In this town everyone is musical except me. The biggest Crammy party is today and I'm the only one who never has anything to perform (this one is in a village of all players)",
+ "title": "The Crammys",
+ "logline": "The one player in a musical town with nothing to perform at the Crammys walks out past the last torch and gets himself shot so a skeleton will kill a creeper for a music disc. It is the broken disc eleven, the sound of someone running away, and it sounds so much like him being chased home every night that he wins Best Vocals.",
+ "narration": "In this town, everyone is musical except me. Zuri keeps her note block on wool, so she plays guitar. Kai keeps his on gold, so he plays bells. Sunny keeps his on a pumpkin, and we don't talk about it. Tonight was the Crammys, our biggest party of the year. Everyone performs, and I never have anything. I just get chased home every night. But a creeper drops a music disc if a skeleton kills it. So I walked out past the last torch. I found a creeper. I found a skeleton. I stood in the middle. The skeleton shot me. Then it shot me again. Then it shot the creeper. A disc dropped. I ran to the stage with arrows still in me. Nobody asked. I put my disc in the jukebox. It was disc eleven, the broken one. It's just someone running away and breathing hard. Nobody moved. Kai said it sounded just like me coming home. I won Best Vocals.",
+ "word_count": 163,
+ "why_this_version": "The base is the editor's script, which is the only draft I was given, so nothing was grafted from earlier drafts. Its story, order and 24 lines are kept, and nothing was cut from the narration. Two words changed: 'shoots' became 'kills' (the real rule for the disc drop) and Efe became Sunny (a name a narrator voice cannot get wrong). The rest of the work is in the pictures: three small mechanic errors fixed (notes over a goat horn, a disc lying flat, a one-arrow creeper kill), every held flat item turned to face the lens as CONTRACT.md requires, beat 15 unloaded, the three near-identical stage wides and the doubled note-block framing varied, the stage step-up removed, and the night meadow staged against the sky. I considered cutting 'Nobody asked.' and merging the creeper and skeleton lines to save about four seconds, and kept both because the deadpan run of short lines is the film's rhythm; they stay as the timing fallback.",
+ "beats": [
+  {
+   "line": "In this town, everyone is musical except me.",
+   "picture": "Golden hour, sun from the side. Low camera, long lens, slow push in. Steve (the narrator) sharp in the foreground, three-quarter front, both hands empty. Behind him, soft, on the wool bandstand: Zuri, Kai and Sunny each tap a note block and a coloured note pops above each block. Noor raises a goat horn to her face (no note: a horn makes none). Nothing rises anywhere near Steve. He turns his head back to look at them, then to the front.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Steve",
+    "Zuri",
+    "Kai",
+    "Sunny",
+    "Noor"
+   ],
+   "props_and_effects": [
+    "wool bandstand",
+    "three note blocks (on white wool, gold block, pumpkin)",
+    "goat horn raised to the face",
+    "note particles above the three note blocks only",
+    "arm swing on a note block",
+    "slow push in"
+   ]
+  },
+  {
+   "line": "Zuri keeps her note block on wool, so she plays guitar.",
+   "picture": "Close on a note block sitting on a white wool block, both large in frame. Zuri's arm taps it and a note pops with each tap, changing colour as the pitch goes up. Tilt up from the wool to Zuri's face, looking screen right. Steve crosses behind her, out of focus, watching.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Zuri",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "note block on white wool",
+    "note particles changing colour with pitch",
+    "arm swing",
+    "tilt up"
+   ]
+  },
+  {
+   "line": "Kai keeps his on gold, so he plays bells.",
+   "picture": "The mirror of the last shot, from the other side: past Steve's soft shoulder in the foreground, a note block on a gold block with the low sun rimming the gold. Kai taps it, notes pop. Focus pulls from the gold block up to Kai's face, looking screen left, and holds on it so he is known later. He does not look at Steve.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Kai",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "note block on gold block",
+    "note particles",
+    "arm swing",
+    "focus pull",
+    "sun rim on the gold"
+   ]
+  },
+  {
+   "line": "Sunny keeps his on a pumpkin, and we don't talk about it.",
+   "picture": "Static wide of the stage. Sunny, alone at the far end, taps a note block that sits on a pumpkin: one single note rises. Zuri and Kai stop tapping, turn their heads to him together, hold a beat, then turn away again. Below the stage Steve looks at the ground.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Sunny",
+    "Zuri",
+    "Kai",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "note block on pumpkin (plain, not carved)",
+    "single note particle",
+    "two synchronised head turns"
+   ]
+  },
+  {
+   "line": "Tonight was the Crammys, our biggest party of the year.",
+   "picture": "Start close on the trophy: a totem of undying turning slowly as a dropped item above a gold block on a fence-post pedestal at the front of the stage. The camera rises and pulls back to the whole bandstand: coloured wool, the row of note blocks, a jukebox centre stage, lanterns on fence posts. Alex places the last lantern.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Alex"
+   ],
+   "props_and_effects": [
+    "totem of undying as a spinning dropped item",
+    "gold block on a fence-post pedestal",
+    "jukebox",
+    "lanterns on fence posts",
+    "lantern block being placed",
+    "rise and pull back"
+   ]
+  },
+  {
+   "line": "Everyone performs, and I never have anything.",
+   "picture": "The camera travels along a line of players beside the stage, a little above hand height. Each holds their act straight out toward the lens so flat items show their faces: Zuri a note block, Noor a goat horn, Alex a green music disc, Sunny his pumpkin. It stops on Steve at the end of the line, who looks down at his empty hand.",
+   "location": "Village square with the wool bandstand (golden hour)",
+   "cast": [
+    "Zuri",
+    "Noor",
+    "Alex",
+    "Sunny",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "held note block",
+    "held goat horn",
+    "held music disc (green, Cat)",
+    "held pumpkin",
+    "arms raised to about horizontal so flat items face the lens",
+    "Steve's empty hand",
+    "sideways tracking move"
+   ]
+  },
+  {
+   "line": "I just get chased home every night.",
+   "picture": "Hard cut from gold to moonlit blue. From Kai's doorstep: the back of Kai's head and shoulder soft in the foreground beside a lantern, his gold block and note block. Steve sprints across the lane left to right, a zombie four blocks behind with its arms out. Kai's head turns to follow him. Steve goes through his front door and it shuts in the zombie's face.",
+   "location": "Village lane from Kai's doorstep to the narrator's front door (moonlit night)",
+   "cast": [
+    "Steve",
+    "zombie",
+    "Kai"
+   ],
+   "props_and_effects": [
+    "zombie walking with arms out",
+    "oak door opening and shutting",
+    "lantern, gold block and note block on Kai's doorstep",
+    "lamp post as key light",
+    "player sprint"
+   ]
+  },
+  {
+   "line": "But a creeper drops a music disc if a skeleton kills it.",
+   "picture": "Night, lanterns lit, the party begun. Over Steve's shoulder at the foot of the stage: Alex pops a disc out of the jukebox and the disc item turns in the air above it in the lantern light. Steve's head follows the disc, then turns slowly away from the stage toward the dark end of the square. Focus pulls from the disc to his profile.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Alex",
+    "Zuri",
+    "Kai"
+   ],
+   "props_and_effects": [
+    "jukebox",
+    "music disc ejected as a spinning dropped item",
+    "lantern bloom",
+    "focus pull"
+   ]
+  },
+  {
+   "line": "So I walked out past the last torch.",
+   "picture": "From behind and low on the exit road. Steve walks away from the lens past the last lamp post, hands empty, no sword. The warm light slides off his back and he goes on into the blue meadow. The camera stays at the torch and lets him get small.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "last lamp post with torches",
+    "warm pool of torch light against moonlight"
+   ]
+  },
+  {
+   "line": "I found a creeper.",
+   "picture": "Low over Steve's shoulder, camera at hip height so the creeper's head stands against the night sky above the horizon, not against the grass. It faces him, perfectly still. Then it takes one slow step toward him.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve",
+    "creeper"
+   ],
+   "props_and_effects": [
+    "creeper standing",
+    "one slow step",
+    "low camera with a clean horizon"
+   ]
+  },
+  {
+   "line": "I found a skeleton.",
+   "picture": "Under a lone oak, the pale skeleton bright against the dark trunk, the moon behind the branches if the film's one moon position allows it. The skeleton turns its skull to the lens and lifts its bow.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "skeleton"
+   ],
+   "props_and_effects": [
+    "skeleton with bow",
+    "skull turn",
+    "bow raised",
+    "lone oak",
+    "moon through the branches"
+   ]
+  },
+  {
+   "line": "I stood in the middle.",
+   "picture": "Low wide side view on the flat meadow, clean horizon, perfectly symmetrical: creeper on the left, skeleton on the right with its bow drawn, both against the sky. Steve walks in from the bottom of the frame, back to us, stops on the exact centre of the line, looks left, looks right. The creeper starts toward him.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve",
+    "creeper",
+    "skeleton"
+   ],
+   "props_and_effects": [
+    "drawn bow",
+    "symmetrical three-figure line against the sky",
+    "two head turns"
+   ]
+  },
+  {
+   "line": "The skeleton shot me.",
+   "picture": "Medium on Steve, three-quarter front from the skeleton's side, the creeper soft behind him. An arrow flicks in from beside the lens and sticks in his chest. Red hurt flash, he rocks back half a step. He does not move away.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve",
+    "creeper"
+   ],
+   "props_and_effects": [
+    "arrow in flight",
+    "arrow stuck in the player's chest",
+    "red hurt flash",
+    "knock-back half step"
+   ]
+  },
+  {
+   "line": "Then it shot me again.",
+   "picture": "The same shot, held without a cut. A second jolt and flash, a second arrow in his shoulder. Steve looks down at the two arrows, then up. The creeper is now right behind his shoulder.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve",
+    "creeper"
+   ],
+   "props_and_effects": [
+    "second arrow stuck in the shoulder",
+    "red hurt flash",
+    "creeper closing in",
+    "one continuous render with the previous beat"
+   ]
+  },
+  {
+   "line": "Then it shot the creeper.",
+   "picture": "The side view from before, tighter, cut on action: Steve is on his last step round the creeper, so the line is now Steve, creeper, skeleton. The creeper turns after him and starts to swell and flash white. An arrow hits it in the back, red flash. A second arrow, red flash, it tips over and is gone in a puff of smoke. Far right, the skeleton lowers its bow. About three and a half seconds; the line is spoken as the first arrow lands.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve",
+    "creeper",
+    "skeleton"
+   ],
+   "props_and_effects": [
+    "creeper fuse swell with white flash",
+    "two arrow hits about twenty frames apart, each with a red flash",
+    "creeper tips over",
+    "smoke puff",
+    "no arrows left sticking in the creeper",
+    "skeleton lowers bow"
+   ]
+  },
+  {
+   "line": "A disc dropped.",
+   "picture": "Ground level. The smoke thins. A music disc turns and bobs just above the grass, a black shape against the moonlit ground, too dark to read. No experience orbs. Steve's feet step into frame and stop in front of it.",
+   "location": "Meadow at the village edge: exit road, last lamp post, lone oaks (moonlit night)",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "music disc as a dropped item in silhouette",
+    "thinning smoke",
+    "no experience orbs"
+   ]
+  },
+  {
+   "line": "I ran to the stage with arrows still in me.",
+   "picture": "The same camera as the zombie chase, from Kai's doorstep, now empty: only his lantern, gold block and note block. Steve sprints the other way, right to left, toward the lantern glow of the square, two arrows sticking out of him, the disc in his hand (it may be edge-on here; the arrows are the subject).",
+   "location": "Village lane from Kai's doorstep to the narrator's front door (moonlit night)",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "two arrows stuck in the player",
+    "held music disc",
+    "player sprint",
+    "party glow at the end of the lane",
+    "camera reused from beat seven"
+   ]
+  },
+  {
+   "line": "Nobody asked.",
+   "picture": "From the front of the stage at head height, a medium three-shot. Steve walks on from the wing, already at stage height, and stops between Sunny and Noor, the arrows plain in the lantern light. Sunny's head turns to the arrows for one beat, then back to the jukebox. Noor does not turn at all.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Sunny",
+    "Noor"
+   ],
+   "props_and_effects": [
+    "arrows stuck in the player",
+    "lantern rim light on the fletching",
+    "one head turn there and back"
+   ]
+  },
+  {
+   "line": "I put my disc in the jukebox.",
+   "picture": "From behind and a little above Steve, over his shoulder with the arrows in the foreground. He walks toward the jukebox at centre stage, the disc in his raised hand. Alex steps aside. Beyond the jukebox Zuri, Kai, Sunny and Noor stand in a staggered half circle facing us, watching him come.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Alex",
+    "Zuri",
+    "Kai",
+    "Sunny",
+    "Noor"
+   ],
+   "props_and_effects": [
+    "jukebox",
+    "held music disc",
+    "arrows stuck in the player",
+    "staggered half circle so no face hides behind a neighbour"
+   ]
+  },
+  {
+   "line": "It was disc eleven, the broken one.",
+   "picture": "Close, from across the jukebox. Steve's arm points straight at the lens so the disc is face-on and sharp, a third of the frame: black, cracked, a piece missing. His face is soft behind it. Beside it Alex's hand holds out her whole green disc for contrast. He lowers the broken one into the jukebox and the first note rises.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Alex"
+   ],
+   "props_and_effects": [
+    "music disc eleven as a close-up hero prop, face to the lens",
+    "green disc (Cat) held beside it",
+    "disc going into the jukebox",
+    "first note particle",
+    "lantern key light"
+   ]
+  },
+  {
+   "line": "It's just someone running away and breathing hard.",
+   "picture": "The jukebox sharp in the foreground, notes drifting up from it. Slow push past it to Steve standing stiff beside it with the two arrows in him. His head turns slowly from the jukebox to the others.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve"
+   ],
+   "props_and_effects": [
+    "jukebox note particles",
+    "arrows stuck in the player",
+    "slow push in",
+    "optional sound: original running feet and panting under the line, not the game's recording"
+   ]
+  },
+  {
+   "line": "Nobody moved.",
+   "picture": "The film's one locked-off frontal wide of the whole stage. Six players stand completely still, all facing the jukebox. The only movement is the notes rising and the lantern glow. Hold a full second after the words.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Alex",
+    "Zuri",
+    "Kai",
+    "Sunny",
+    "Noor"
+   ],
+   "props_and_effects": [
+    "jukebox note particles",
+    "lantern bloom",
+    "all figures frozen",
+    "one-second hold"
+   ]
+  },
+  {
+   "line": "Kai said it sounded just like me coming home.",
+   "picture": "From beside the jukebox, looking along the row of faces. Kai takes one slow step forward and his head turns from the jukebox to Steve. Then Zuri's, Sunny's, Noor's and Alex's heads turn to Steve too, one after another. Steve looks at the jukebox, then at them.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Kai",
+    "Zuri",
+    "Sunny",
+    "Noor",
+    "Alex",
+    "Steve"
+   ],
+   "props_and_effects": [
+    "one slow step by Kai (at least seven frames)",
+    "five head turns in sequence",
+    "jukebox note particles"
+   ]
+  },
+  {
+   "line": "I won Best Vocals.",
+   "picture": "Medium on Steve centre stage, facing the lens, his arm straight out so the totem of undying faces the camera, the two arrows still sticking out of him. The gold pedestal in the bottom of the frame is empty. Slow pull back to reveal the five others crouching up and down fast, the way players clap. Notes and lantern bloom. Hold on Steve standing perfectly still for a second and a half after the last word.",
+   "location": "Village square with the wool bandstand (night, lantern light)",
+   "cast": [
+    "Steve",
+    "Alex",
+    "Zuri",
+    "Kai",
+    "Sunny",
+    "Noor"
+   ],
+   "props_and_effects": [
+    "held totem of undying, face to the lens",
+    "empty gold block pedestal",
+    "arrows stuck in the player",
+    "crouch applause by five players",
+    "jukebox note particles",
+    "slow pull back",
+    "hold after the last word"
+   ]
+  }
+ ],
+ "locations": [
+  "Village square with the wool bandstand, golden hour (beats 1 to 6)",
+  "Village lane from Kai's doorstep to the narrator's front door, moonlit night (beats 7 and 17, same camera both times)",
+  "Village square with the wool bandstand, night under lantern light (beats 8 and 18 to 24)",
+  "Meadow at the village edge with the exit road, last lamp post and lone oaks, moonlit night (beats 9 to 16)"
+ ],
+ "new_assets_needed": [
+  "Five default player skins on the player model: Alex, Zuri, Kai, Sunny, Noor (use the wide variants so Steve's rig is reused)",
+  "Player animations: sprint, crouch and the fast crouch-uncrouch applause, arm swing on a block, arm held straight out with an item, goat horn raised to the face",
+  "Zombie with arms-out walk",
+  "Creeper: walk, turn, fuse swell with white flash, red hurt flash, tip-over death with smoke puff",
+  "Skeleton with bow: skull turn, raise, draw, release, lower",
+  "Arrow: flying projectile, and two arrows stuck in the player that stay attached from beat 13 to the end",
+  "Red hurt flash and half-step knock-back on a player",
+  "Bandstand set on the village square: coloured wool platform one block high and back wall, fence-post pedestal with a gold block, fence posts with lanterns, with a golden-hour and a night lighting set-up",
+  "Note blocks: three hero ones on white wool, a gold block and a pumpkin, plus a row for dressing",
+  "Gold block, pumpkin block and white wool block as hero blocks; note block and pumpkin as held items",
+  "Jukebox block, with note particles rising while it plays and a disc popping out as a dropped item",
+  "Music disc eleven (the broken disc) as a dropped item, a held item and a close-up hero prop",
+  "One ordinary music disc (green, Cat) as a held item and as the ejected item",
+  "Goat horn as a held item",
+  "Totem of undying as a spinning dropped item on the pedestal and as a held item",
+  "Lane dressing: Kai's doorstep with a lantern, a gold block and a note block, facing the narrator's front door",
+  "Two film modules, one per sky (golden hour for beats 1 to 6, moonlit night for beats 7 to 24), encoded separately and joined as Poppy was",
+  "A film-local shadowless moon key light for the meadow shots",
+  "Optional sound: an original recording of running feet and panting for the jukebox (not the game's disc), and the real note block timbres for guitar, bells and didgeridoo"
+ ],
+ "risks": [
+  "It was disc eleven, the broken one: a sixteen-pixel item may not read as broken at phone size, and a held flat item is edge-on from the side. Fallback: keep the arm pointing at the lens so the disc is face-on and a third of the frame, keep Alex's whole green disc beside it, or mount both in item frames on the back wall.",
+  "It's just someone running away and breathing hard: the joke is a sound and the picture cannot show it; the line itself carries it. Fallback: an original recreation of running feet and panting under the line, and if the link to him is still not felt, cut in one second of the beat 7 chase shot, which is already rendered.",
+  "Kai said it sounded just like me coming home: only works if the viewer remembers the chase sixteen lines earlier and knows Kai saw it. Fallback: keep Kai's gold block on his doorstep in beat 7, hold beat 17 on the identical camera, let Kai's head turn alone for half a second before the others, or change the last two words to chased home (same count).",
+  "Then it shot the creeper: the switch from Steve in the middle to the creeper in the middle must read, and a creeper really takes five or more arrows. Fallback: keep beats 12 and 15 on one side-on axis, and if two hits still look cheap in preview add a third, or start the shot with the creeper already flashing red from a hit.",
+  "Creeper at night: green on green in a moonlit meadow with no torch. Fallback: low camera so it stands against the sky, a film-local shadowless moon key on the mobs, or move the action to the edge of the last lamp post's light.",
+  "One moon for the whole night module: the moon behind the oak in beat 11 fixes the light for every night shot. Fallback: drop the moon from beat 11 and put the skeleton against the dark trunk under plain stars.",
+  "Arrows stuck in Steve are thin at phone size and must carry ten shots. Fallback: three-quarter angles with lantern rim light on the fletching, and scale the arrows up by a quarter if they vanish in the wides.",
+  "Sunny keeps his on a pumpkin, and we don't talk about it: non-players may not know a pumpkin makes a didgeridoo. Fallback: a low drone under his single note, or change the line to Sunny keeps his on a pumpkin, so he plays didgeridoo (two words fewer, total 161).",
+  "Wool is guitar and gold is bells cannot be seen. Fallback: play the real timbres under each tap and frame the block underneath large before moving up to the face.",
+  "A disc dropped must hide which disc it is without hiding that it is a disc. Fallback: let the item jump into Steve as a pickup after one turn, before its face catches the light.",
+  "The hard cut from golden hour to night at beat 7 could look like a mistake. The words every night cover it, and the first night frame must be clearly moonlit blue. Fallback: play beats 1 to 6 at night under lanterns as the party warming up (one sky, one module), narration unchanged.",
+  "Night shots on a dark lane: Steve and the zombie can sink into the background. Fallback: a lamp post as key on the lens side and Kai's lantern in the foreground; keep the background no brighter than the subject, as CONTRACT.md warns for dusk.",
+  "Held flat items in beats 6 and 24 (disc, goat horn, totem) turn edge-on if the arm drops or the camera moves to the side. Fallback: check each at phone size in a still; for the totem, hold on the spinning item above the pedestal one beat longer in beat 5 so it is known before he holds it.",
+  "Crouch applause may puzzle non-players. Fallback: add two players jumping, and keep the totem inside the safe area so the win reads on its own.",
+  "Running time: 49 seconds of speech across 24 shots with a two-second minimum lands at about 62 to 66 seconds. Fallback: beats 13 and 14 are already one held shot; then cut Nobody asked (161 words, 23 sentences), then merge the two found lines into I found a creeper and a skeleton.",
+  "Six players on stage in beats 19, 22 and 24: a face can hide behind a neighbour. Fallback: check each face at 360 by 640, stagger the half circle by 0.7 block, and drop Noor from the wides if needed.",
+  "Names read by the narrator voice: Zuri, Kai and Sunny should be safe, but test the three name lines first. Fallback: respell for the voice only (the on-screen captions keep the real names)."
+ ],
+ "problems_fixed_by_checker": [
+  "Count and format: passed, no change needed. I counted 163 words in 24 sentences, longest sentence 12 words, no numerals, dashes, quotation marks, parentheses or semicolons. After my two word swaps it is still 163 words and 24 sentences.",
+  "Minecraft truth, narration: 'a creeper drops a music disc if a skeleton shoots it' is the one line a player would correct, because the skeleton's arrow has to land the killing blow. Changed 'shoots' to 'kills' (same word count). The rule of three that follows (shot me, shot me again, shot the creeper) still reads.",
+  "Minecraft truth, beat 15: the picture killed a full-health creeper with one arrow. The shot now shows two arrow hits about 20 frames apart (a believable skeleton firing rate), each with a red flash, the second one killing. A creeper really needs five or more arrows, so this is still compressed; it is listed as a risk with a fallback.",
+  "Minecraft truth, beat 1: the picture put note particles above all four musicians, but a goat horn makes no note particle and notes rise from the note block, not the player. Notes now pop above the three note blocks only; Noor just raises the horn. The joke (nothing near Steve) is unchanged.",
+  "Minecraft truth, beat 20: Alex's whole disc 'lies on the wool', but a dropped item in Java never lies flat, it hovers and spins (and would be picked up). Alex now holds her green disc out beside his.",
+  "Showable, held flat items: CONTRACT.md says a flat item lies along the hand and is edge-on from the side. The editor's beats 6, 20 and 24 would have shown the disc, the horn and the totem as a thin line. Restaged all three so the arm points straight out at the lens (arm near horizontal), which turns the item's face to the camera. Beat 20, the hero close-up of disc eleven, is now shot from across the jukebox with the disc sharp and Steve's face soft behind it.",
+  "Showable, beat 15 was overloaded: sidestep, creeper turn, fuse swell, hit, tip-over, puff and the skeleton lowering its bow under a five-word line. Kept it as one shot on the same side-on axis as beat 12, but it now opens with Steve already on his last step past the creeper (cut on action) and is given about three and a half seconds; the line is spoken as the first arrow lands.",
+  "Repeated pictures: beats 19, 22 and 24 were all frontal wides of six players on the stage, and beat 3 repeated beat 2's framing exactly. Beat 19 is now over Steve's shoulder walking at the jukebox with the others facing us; beat 22 keeps the only locked-off frontal wide; beat 24 starts as a medium on Steve and pulls back. Beat 3 is mirrored, shot past Steve's soft shoulder with a focus pull instead of a tilt.",
+  "Showable, beat 18: 'Steve steps up onto the bandstand' needs a jump or a stair climb the cast cannot do yet. He now walks on from the wing, already at stage height.",
+  "Spoken risk: Efe (EH-feh) is the one name of the three a narrator voice is likely to mispronounce, and it sits on the film's first joke. Swapped the pumpkin player to Sunny, another default skin, same word count, no extra asset (Efe is dropped from the cast).",
+  "Night readability the editor missed: a creeper is green on green in a moonlit meadow with no torch. Beats 10 and 12 to 15 now use a low camera so the creeper and skeleton stand against the sky above a clean horizon, with a film-local shadowless moon key as fallback. Added to the risks.",
+  "Small consistency fixes: beat 5 listed Noor in the cast but she was not in the picture (removed); beat 16 now states no experience orbs appear, because a skeleton's kill gives none; beat 23 gives Kai one slow step forward so he reads as the speaker without a mouth or chat; beat 24 shows the gold pedestal empty so the totem in Steve's hand reads as the prize.",
+  "Cold read, hook and last line: no change. The chain chased home every night, running away and breathing hard, sounded like me coming home holds on one hearing, helped by the lane camera repeated in beats 7 and 17. The opening is the user's own sentence, and 'I won Best Vocals' is short, a clean reversal of 'except me', and makes his nightly panic the music. I tried longer closers and none beat it.",
+  "Running time: 163 words is about 49 seconds of speech, but 24 shots with a two-second minimum put the cut at roughly 62 to 66 seconds, a little more than the editor's 60 to 64. That is still around a minute, so I did not cut words; the trims are in the risks."
+ ]
+}
