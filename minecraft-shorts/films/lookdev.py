@@ -137,17 +137,35 @@ class Stage:
             s = st.shot("street", 3.0, sky="gold")               # every shot is tagged with the sky it is filmed
             s = st.shot("door", 2.5, sky="night")                #   under; default: the sky in force before it
             s = st.shot("bed", 3.0)                              # (night)
+            torches = dict(near=bed, radius=16.0, inside="house_a")
+            st.lights(s, scale=1.7, **torches)                   # night level ...
             st.sky_change(nar.at("ended"), "gold")               # ... and from this frame on the SAME shot is gold
+            st.lights(s, scale=1.0, at=nar.at("ended"), **torches)      # ... with the torches at their day level
             st.dip(s.frame_start, out=3, hold=0, back=3)         # encoder: dip to black around this cut
             st.finish()
             return {"film": film, "captions": caps, "narration": nar, "stage": st}
 
       * A sky entry holds the arguments of look.set_time and look.setup_compositor: preset ('day' | 'golden' |
-        'dusk' | 'night'), az / el (where the sun, at night the moon, stands), key / ambient (strengths), bloom,
-        grade, vignette, haze, and by their own names celestial_size, clouds, cloud_height, cloud_radius,
+        'dusk' | 'night'), az / el (where the sun, at night the moon, stands: az in degrees counter-clockwise
+        from +X = east, so 90 = north, 180 = west; el in degrees above the horizon), key / ambient (strengths),
+        bloom, grade, vignette, haze, and by their own names celestial_size, clouds, cloud_height, cloud_radius,
         cloud_offset, star_scale. A misspelt key is an error.
-      * sky=None builds the first sky of SKIES. st.sky is that sky's set_time() dict (st.sky["key"] is its sun or
-        moon lamp), st.sky_name its name, st.skies the table.
+      * Write SKIES as a plain assignment at module level (or `from films.x import SKIES`). render.py then knows
+        from the source, without building anything, that the film has several skies. Any other way of getting the
+        name into the module works too (a star import is followed; a SKIES no source line shows is found once the
+        module is imported), but the hidden kind costs one extra build per command. `SKIES = {}` or no SKIES at
+        all is a film with one sky.
+      * sky=None builds the first sky of SKIES, and a FIRST shot without sky= is filmed under that first sky.
+        st.sky is the active sky's set_time() dict (st.sky["key"] is its sun or moon lamp), st.sky_name its name,
+        st.skies the table.
+      * The NAMES in SKIES are labels: renaming one (night -> night_a, when a second night arrives) re-renders
+        nothing. Changing a VALUE of an entry re-renders that sky's frames.
+      * Never key anything in st.sky per shot (st.key(st.sky["key"].data, "energy", ...)): st.sky["key"] is the
+        sun in one build and the moon in the other, the key lands on both, and being CONSTANT it carries into the
+        next shot of the other sky. A sky that should be stronger in some shots is another entry of SKIES; a
+        shot that needs more light gets a film-local lamp keyed visible for that shot.
+      * A film may set its own final resolution and samples in build() (scene.render.resolution_x / _y,
+        scene.cycles.samples), as any film may; they must not depend on `sky`.
       * EVERYTHING ELSE MUST BE THE SAME IN EVERY BUILD: the whole timeline, every actor, every key, every torch
         level, every caption. Only the sky differs. So never write `if sky == "night": ...` around a shot, an
         actor or an import; key a film-local light for the shots that need it instead (it is hidden elsewhere).
@@ -159,7 +177,10 @@ class Stage:
         st.sky_change(frame, sky). Nothing in the scene changes at that frame: it is one shot, one camera, one
         baked camera path, so nothing can jump and motion blur is that of an uncut shot; the frames before it are
         simply rendered in the old sky's build and the frames from it on in the new one's. Torch levels that should
-        change with it: Stage.lights(shot, ..., at=frame). Words: st.sky_change(nar.at("ended"), "gold").
+        change with it: a second Stage.lights(shot, ..., at=frame). That call sets EVERY light again from that
+        frame on: repeat near / radius / groups / extra / inside exactly as in the shot's first call (keep them
+        in one dict, as above), or lights the first call had left out come back on at the change. Words:
+        st.sky_change(nar.at("ended"), "gold"). Moving a sky_change re-renders only the frames whose sky changed.
       * DIPS TO BLACK belong to the encode, not to the frames: st.dip(frame, out=3, hold=0, back=3) makes the
         picture black ON `frame` (normally the first frame of a shot) and the `hold` frames after it, fading out
         over the `out` frames before and back in over the `back` frames after; st.fade(frame0, frame1, g0, g1) is
@@ -169,6 +190,8 @@ class Stage:
         of SKIES re-renders exactly the frames of that sky; re-tagging a shot re-renders that shot; a caption or
         a dip re-renders nothing. Every command builds only the skies it has work in (about 3 s per sky), and
         `render <film> --frames ...` says "0 to render" only when every sky's frames are done.
+      * Tools that render single frames (tools.noise_check and the like): render.Session(film) builds the FIRST
+        sky only; render.session_for(film, frame) builds the sky of the frame that is wanted.
     """
 
     # a SKIES entry: short name -> look.set_time argument, set_time arguments by their own name, compositor arguments
@@ -300,7 +323,8 @@ class Stage:
     def shot(self, name, seconds, sky=None):
         """Next shot of the film, `seconds` long, starting where the previous one ended. In a film with several
         skies (Stage(..., skies=SKIES)) `sky` names the sky it is filmed under; default: the sky in force before
-        it (the previous shot's, or the one a sky_change inside that shot brought)."""
+        it (the previous shot's, or the one a sky_change inside that shot brought; for the film's first shot the
+        first key of SKIES)."""
         s = self.film.shot(name, self._t, self._t + seconds)
         self._t += seconds
         self.in_shot[name] = set()
@@ -336,7 +360,9 @@ class Stage:
         stand-in for bounce light) is on; in every other shot the fills are off, so a brightly scaled interior can
         never light the street through its walls.
         at = a frame inside the shot from which these levels hold instead of from its first frame (a second call
-        for the same shot: the levels step there, e.g. where a sky_change ends the night)."""
+        for the same shot: the levels step there, e.g. where a sky_change ends the night). Every call sets EVERY
+        light, so such a second call must repeat near / radius / groups / extra / inside of the first: a light the
+        first call left out and the second does not is switched on at `at`."""
         f = shot.frame_start if at is None else int(at)
         groups = groups or {}
         inside = (inside,) if isinstance(inside, str) else tuple(inside)

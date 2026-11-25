@@ -8,9 +8,16 @@ for, and the wrong-sky lock. Drives the real command line on films/_multisky_dem
     $BPY -m tools.multisky_selftest lock         # the wrong-sky lock: SkyError from Session and Stamps, and for a
                                                  #   film whose builds differ in more than the sky (_multisky_bad)
     $BPY -m tools.multisky_selftest encode       # --encode --allow-holds, --sheet, --still, --save-blend
+    $BPY -m tools.multisky_selftest edits        # a director's edits: a new shot by name, a longer film, a renamed
+                                                 #   sky (also into a new frame directory), a re-tagged shot
+    $BPY -m tools.multisky_selftest detect       # SKIES through a star import, SKIES no source line shows, an empty
+                                                 #   SKIES: the imported module decides whether a film has several skies
+    $BPY -m tools.multisky_selftest midrun       # the film script edited while a chunk renders
 
 Frames go to the preview variant 180x320_4spp_step8 of the demo (26 frames: 16 golden, 10 night; 11 more of the
-last shot) and nowhere else; 'engine', 'stale' and 'encode' need the frames 'chunks' renders (they run it first when frames are missing).
+last shot) and nowhere else; 'engine', 'stale' and 'encode' need the frames 'chunks' renders (they run it first when
+frames are missing). 'edits', 'detect' and 'midrun' write their own films (tools/multisky_editfilm.py: a bare set, a
+frame in 0.15 s), rewrite them between commands and remove them at the end.
 Engine edits are SIMULATED by rewriting stamps in that variant's meta.json (no engine file is touched), exactly as
 tools/contract_check.py does for a film with one sky. Prints one line per check; exit code = number of failures.
 """
@@ -193,16 +200,29 @@ def part_stale():
     code, out, _ = run(["--frames", "all"] + SMALL)
     check(code == 0 and builds(out) == ["night"] and "1 rendered in this run" in out and DONE in out,
           "the next --frames builds the night sky only and renders that one frame: %r" % lines(out, "frames:")[-1][9:])
-    # a golden frame whose stamp says it was rendered under the night sky (the shot was re-tagged since)
-    rewrite(lambda m: m["frames"]["25"].__setitem__("sky", "night"))
+    # a golden frame whose PNG was rendered under the night sky (its shot was re-tagged since): the stamp names the
+    # other sky and carries that render's fingerprint
+    def retag(m):
+        m["frames"]["25"]["sky"] = "night"
+        m["frames"]["25"]["fp"] = "d" * 16
+    rewrite(retag)
     code, out, _ = run(["--restamp", "25", "--restamp-changed"] + SMALL)
-    check(code == 0 and len(lines(out, "0 frames re-stamped", "1 NOT accepted")) == 1,
-          "a PNG rendered under another sky is not accepted even by --restamp-changed")
+    check(code == 0 and len(lines(out, "0 frames re-stamped", "1 NOT accepted, rendered under another sky", "was 'night'")) == 1,
+          "a PNG rendered under another sky is not accepted even by --restamp-changed: %r"
+          % (lines(out, "NOT accepted") or [out[-200:]])[-1][-110:])
     before = mtimes()
     code, out, _ = run(["--frames", "all"] + SMALL)
     after = mtimes()
-    check(code == 0 and [n for n in after if after[n] != before[n]] == ["f_0025.png"] and builds(out) == ["gold"],
-          "... it is rendered again, in its own sky's build (gold), and nothing else is")
+    check(code == 0 and [n for n in after if after[n] != before[n]] == ["f_0025.png"] and builds(out) == ["gold"]
+          and len(lines(out, "1 stale: rendered under another sky (25: was 'night', now 'gold')")) == 1,
+          "... it is rendered again, in its own sky's build (gold), nothing else is, and the reason is named")
+    # a golden frame whose stamp carries a name the sky had before it was renamed, and this build's fingerprint: the
+    # NAME is a label, the fingerprint is the proof. Kept, relabelled, nothing rendered.
+    rewrite(lambda m: m["frames"]["33"].__setitem__("sky", "sunset"))
+    before = mtimes()
+    code, out, _ = run(["--frames", "all"] + SMALL)
+    check(code == 0 and mtimes() == before and builds(out) == ["gold"] and DONE in out and meta()["frames"]["33"]["sky"] == "gold",
+          "a stamp under a sky's OLD name with the current fingerprint is kept and relabelled (gold built once, nothing rendered)")
     before = mtimes()
     code, out, _ = run(["--frames", "41-49", "--force"] + SMALL)
     after = mtimes()
@@ -300,6 +320,39 @@ except R.SkyError as e:
     check(code == 0 and DONE not in out and len(lines(out, "sky 'night':", "frames requested")) == 1,
           "--sky night by hand does the night's share only and never says '%s': %r"
           % (DONE.strip(), (lines(out, "sky 'night':", "frames requested") or [""])[0][9:]))
+    # tools that render single frames: render.session_for builds the sky of the frame they ask for
+    code = r'''
+import render as R
+t = R.sky_table("%s")
+print("TABLE", t.describe())
+ses = R.session_for("%s", 50)
+print("FOR", ses.sky, ses.owns(50), ses.fingerprint(50)["fp"][:6] != "")
+print("ONE", R.sky_table("bell"))
+''' % (FILM, FILM)
+    p = subprocess.run([sys.executable, "-W", "ignore", "-c", code], cwd=ROOT, stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, text=True)
+    check("FOR night True True" in p.stdout and "TABLE gold 1-42, night 43-82" in p.stdout and "ONE None" in p.stdout,
+          "render.session_for(film, 50) builds the sky of frame 50 (night); render.sky_table: %s"
+          % next((ln[6:] for ln in p.stdout.splitlines() if ln.startswith("TABLE")), p.stdout[-300:]))
+    # what a command killed with SIGKILL leaves in out/test is removed by the next command; a running command's is not
+    test = os.path.join(ROOT, "out", "test")
+    gone = subprocess.Popen([sys.executable, "-c", "pass"])
+    gone.wait()
+    dead, alive = os.path.join(test, "render_sky_selftest_dead"), os.path.join(test, "render_sky_selftest_alive")
+    for d, pid in ((dead, gone.pid), (alive, os.getpid())):
+        os.makedirs(d, exist_ok=True)
+        for fn, text in (("pid", str(pid)), ("sky_0.json", "{}")):
+            with open(os.path.join(d, fn), "w", encoding="utf-8") as fh:
+                fh.write(text)
+    code, out, _ = run(["--frames", "1"] + SMALL)
+    left = sorted(d for d in os.listdir(test) if d.startswith("render_sky_"))
+    check(code == 0 and left == ["render_sky_selftest_alive"],
+          "the temporary directory of a killed command is removed by the next one, a running command's is kept (%s)" % left)
+    for fn in ("pid", "sky_0.json"):
+        if os.path.exists(os.path.join(alive, fn)):
+            os.remove(os.path.join(alive, fn))
+    if os.path.isdir(alive):
+        os.rmdir(alive)
 
 
 def part_encode():
@@ -351,7 +404,230 @@ def part_encode():
             os.remove(b)
 
 
-PARTS = {"chunks": part_chunks, "engine": part_engine, "stale": part_stale, "lock": part_lock, "encode": part_encode}
+# --------------------------------------------------------------------------------------------------------------
+# a director's edits, played on the film tools/multisky_editfilm.py writes (a bare set: a frame in 0.15 s)
+# --------------------------------------------------------------------------------------------------------------
+
+TINY = ["--res", "90x160", "--samples", "1", "--threads", "1"]
+TINY_VARIANT = "90x160_1spp"
+
+
+def edit_dir(film=None, variant=TINY_VARIANT):
+    from tools import multisky_editfilm as E
+
+    return os.path.join(ROOT, "out", "preview", film or E.FILM, variant)
+
+
+def edit_meta(film=None, variant=TINY_VARIANT):
+    with open(os.path.join(edit_dir(film, variant), "meta.json"), encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def edit_mtimes(film=None, variant=TINY_VARIANT):
+    d = edit_dir(film, variant)
+    return {n: os.stat(os.path.join(d, n)).st_mtime_ns for n in sorted(os.listdir(d)) if n.endswith(".png")} \
+        if os.path.isdir(d) else {}
+
+
+def rendered(before, after):
+    """Frame numbers whose PNG is new or was written again."""
+    return [int(n[2:6]) for n in sorted(after) if after[n] != before.get(n)]
+
+
+def stamp_skies(m):
+    """'gold 1-6, night 7-12, ...' from the stamps of a meta.json (what each PNG was rendered under)."""
+    runs = []
+    for f in sorted(int(k) for k in m["frames"]):
+        sky = m["frames"][str(f)].get("sky")
+        if runs and runs[-1][0] == sky and runs[-1][2] == f - 1:
+            runs[-1][2] = f
+        else:
+            runs.append([sky, f, f])
+    return ", ".join("%s %d-%d" % (sky, a, b) for sky, a, b in runs)
+
+
+def no_crash(out):
+    return "Traceback" not in out and "Error" not in out.replace("WARNING CUEW initialization failed: Error", "")
+
+
+def base_film():
+    """The base edit film, rendered completely (30 frames: gold 1-6, night 7-12, gold 13-18, night 19-24, gold 25-30)."""
+    from tools import multisky_editfilm as E
+
+    E.remove_all()
+    E.write()
+    code, out, secs = run(["--frames", "all"] + TINY, film=E.FILM)
+    ok = code == 0 and DONE in out and len(edit_mtimes()) == 30
+    check(ok, "the edit film from nothing: 30 frames, stamps %s (%.0f s)" % (stamp_skies(edit_meta()) if ok else out[-600:], secs))
+    return E
+
+
+def part_edits():
+    """After an edit the last build's sky table is wrong exactly where the director changed the film: a new shot
+    by name, a range beyond the old end, a renamed sky (also in a frame directory that is new), a re-tagged shot."""
+    E = base_film()
+    F = E.FILM
+    # ---- a new shot, asked for by name
+    shots = E.SHOTS + [("e", 6, "night")]
+    E.write(shots=shots)
+    before = edit_mtimes()
+    code, out, _ = run(["--frames", "e"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and rendered(before, edit_mtimes()) == list(range(31, 37)) and DONE in out
+          and "6 requested" in out,
+          "a new shot asked for by name (--frames e): exit code %d, rendered %s: %r"
+          % (code, _r(rendered(before, edit_mtimes())), (lines(out, "frames:") or [out[-300:]])[-1][9:]))
+    # ---- a longer film, asked for by a range beyond the old end
+    shots = shots + [("f", 6, "gold")]
+    E.write(shots=shots)
+    before = edit_mtimes()
+    code, out, _ = run(["--frames", "37-42"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and rendered(before, edit_mtimes()) == list(range(37, 43)) and DONE in out,
+          "a range beyond the old end (--frames 37-42): exit code %d, rendered %s: %r"
+          % (code, _r(rendered(before, edit_mtimes())), (lines(out, "frames:") or [out[-300:]])[-1][9:]))
+    code, out, _ = run(["--restamp", "all"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and ("0 frames re-stamped" in out or "nothing to re-stamp" in out),
+          "--restamp all on the longer film: nothing to do, said truthfully")
+    # ---- the first sky renamed (same values): nothing is rendered, deleted or refused; the stamps are relabelled
+    sun = {"sun": E.SKIES["gold"], "night": E.SKIES["night"]}
+    ren = lambda t, a, b: [(n, k, b if s == a else s) for n, k, s in t]                        # noqa: E731
+    shots = ren(shots, "gold", "sun")
+    E.write(skies=sun, shots=shots, change=(25, "sun"))
+    before = edit_mtimes()
+    code, out, _ = run(["--restamp", "all", "--restamp-changed"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and "NOT accepted" not in out,
+          "sky 'gold' renamed to 'sun': --restamp all --restamp-changed refuses nothing (exit code %d)" % code)
+    code, out, _ = run(["--prune-stale"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and len(edit_mtimes()) == 42, "... --prune-stale deletes nothing (%d PNGs)" % len(edit_mtimes()))
+    code, out, _ = run(["--frames", "all"] + TINY, film=F)
+    m = edit_meta()
+    check(code == 0 and no_crash(out) and edit_mtimes() == before and DONE in out
+          and {r.get("sky") for r in m["frames"].values()} == {"sun", "night"},
+          "... --frames all renders nothing; the stamps now read %s" % stamp_skies(m))
+    code, out, _ = run(["--encode"] + TINY, film=F)
+    check(code == 0 and "'frames': 42" in out, "... and --encode makes the film (exit code %d)" % code)
+    # ---- both skies renamed, and a frame directory that does not exist yet (how a final render starts)
+    both = {"sun": E.SKIES["gold"], "moon": E.SKIES["night"]}
+    shots = ren(shots, "night", "moon")
+    E.write(skies=both, shots=shots, change=(25, "sun"))
+    other = ["--res", "72x128", "--samples", "1", "--threads", "1"]
+    code, out, _ = run(["--frames", "all"] + other, film=F)
+    check(code == 0 and no_crash(out) and DONE in out and len(edit_mtimes(variant="72x128_1spp")) == 42,
+          "both skies renamed, a NEW frame directory: exit code %d, %d frames, stamps %s"
+          % (code, len(edit_mtimes(variant="72x128_1spp")),
+             stamp_skies(edit_meta(variant="72x128_1spp")) if code == 0 else out[-400:]))
+    code, out, _ = run(["--frames", "all"] + TINY, film=F)
+    check(code == 0 and no_crash(out) and edit_mtimes() == before and DONE in out,
+          "... and the old directory: nothing rendered, stamps %s" % stamp_skies(edit_meta()))
+    code, out, _ = run(["--still", "0.3", "--res", "90x160", "--samples", "1"], film=F)
+    check(code == 0 and no_crash(out) and "sky moon" in out, "... --still 0.3 (frame 8, sky 'moon') works too")
+    still = os.path.join(ROOT, "out", "test", F + "_0.3.png")
+    if os.path.exists(still):
+        os.remove(still)
+    # ---- a shot re-tagged (c: sun -> moon): exactly its frames, refused by --restamp-changed, named by their reason
+    shots = [(n, k, "moon" if n == "c" else s) for n, k, s in shots]
+    E.write(skies=both, shots=shots, change=(25, "sun"))
+    code, out, _ = run(["--restamp", "all", "--restamp-changed"] + TINY, film=F)
+    check(code == 0 and len(lines(out, "sky 'moon': restamp", "6 NOT accepted", "another sky", "13-18")) == 1,
+          "shot 'c' re-tagged sun -> moon: --restamp-changed does not accept its 6 PNGs: %r"
+          % (lines(out, "NOT accepted") or [out[-300:]])[-1][9:])
+    code, out, _ = run(["--encode"] + TINY, film=F)
+    check(code == 2, "... --encode refuses the film (exit code %d)" % code)
+    before = edit_mtimes()
+    code, out, _ = run(["--frames", "all"] + TINY, film=F)
+    why = lines(out, "stale: rendered under another sky")
+    check(code == 0 and rendered(before, edit_mtimes()) == list(range(13, 19)) and DONE in out and len(why) == 1
+          and "was 'sun'" in why[0],
+          "... --frames all renders exactly %s again and says why: %r" % (_r(rendered(before, edit_mtimes())), (why or [""])[0][9:]))
+    E.remove_all()
+
+
+def part_detect():
+    """Whether a film has several skies is decided by the film as it IMPORTS, whatever its source looks like."""
+    from tools import multisky_editfilm as E
+
+    E.remove_all()
+    E.write()
+    # ---- SKIES through a star import
+    E.write_star()
+    star = E.OTHERS[0]
+    code, out, _ = run(["--frames", "all"] + TINY, film=star)
+    check(code == 0 and no_crash(out) and DONE in out and len(edit_mtimes(star)) == 30 and "30 requested" in out
+          and sorted(builds(out)) == ["gold", "night"],
+          "SKIES through `from films.x import *`: both skies rendered, %d of 30 frames: %r"
+          % (len(edit_mtimes(star)), (lines(out, "frames:") or [out[-300:]])[-1][9:]))
+    # ---- SKIES that no source line binds: seen once the module is imported
+    E.write_hidden()
+    hid = E.OTHERS[1]
+    code, out, _ = run(["--frames", "all", "--max-seconds", "1"] + TINY, film=hid)
+    n1 = len(edit_mtimes(hid))
+    check(code == 0 and no_crash(out) and (DONE in out) == (n1 == 30) and 0 < n1,
+          "SKIES not visible in the source, first chunk (--max-seconds 1): %d of 30 frames, '%s' %s"
+          % (n1, DONE.strip(), "said" if DONE in out else "not said"))
+    calls = 1
+    while DONE not in out and calls < 12 and code == 0:
+        code, out, _ = run(["--frames", "all", "--max-seconds", "1"] + TINY, film=hid)
+        calls += 1
+    m = edit_meta(hid) if code == 0 else {"frames": {}}
+    check(code == 0 and len(edit_mtimes(hid)) == 30 and DONE in out
+          and all(rec.get("sky") == sky_of(m, int(f)) for f, rec in m["frames"].items()),
+          "... finished after %d calls: 30 frames, stamps %s" % (calls, stamp_skies(m)))
+    code, out, _ = run(["--encode"] + TINY, film=hid)
+    check(code == 0 and "'frames': 30" in out, "... --encode alone (exit code %d)" % code)
+    # ---- one sky, and the name SKIES all the same
+    for write, film, how in ((E.write_empty, E.OTHERS[2], "`SKIES = {}`"), (E.write_none, E.OTHERS[3], "a SKIES that is empty at run time")):
+        write()
+        code, out, _ = run(["--frames", "all"] + TINY, film=film)
+        code2, out2, _ = run(["--frames", "all"] + TINY, film=film)
+        check(code == 0 and no_crash(out) and len(edit_mtimes(film)) == 4 and "frames: 4 requested, 0 already done, 4 to render" in out
+              and code2 == 0 and "frames: 4 requested, 4 already done, 0 to render" in out2,
+              "a film with one sky and %s is rendered as one sky (exit codes %d, %d; %d of 4 frames)"
+              % (how, code, code2, len(edit_mtimes(film))))
+    E.remove_all()
+
+
+def part_midrun():
+    """The film script is edited while a chunk is rendering: no error, nothing wrong, the next call finishes."""
+    import threading
+
+    from tools import multisky_editfilm as E
+
+    E.remove_all()
+    E.write(shots=[("a", 30, "gold"), ("b", 6, "night")], change=None)
+    first = os.path.join(edit_dir(), "f_0003.png")
+    box = {}
+
+    def go():
+        box["r"] = run(["--frames", "all"] + TINY, film=E.FILM)
+
+    th = threading.Thread(target=go)
+    th.start()
+    t0 = time.time()
+    while not os.path.exists(first) and time.time() - t0 < 60:
+        time.sleep(0.05)
+    with open(E.path(), "a", encoding="utf-8") as fh:
+        fh.write("# a comment the director added while the first sky was rendering\n")
+    th.join()
+    code, out, _ = box["r"]
+    n = len(edit_mtimes())
+    check(code == 0 and no_crash(out) and DONE not in out and n == 36
+          and len(lines(out, "changed while this command ran")) == 1,
+          "the film script edited while the first sky rendered: exit code %d, no error, %d of 36 frames, '%s' not said: %r"
+          % (code, n, DONE.strip(), (lines(out, "changed while") or [out[-400:]])[-1][9:140]))
+    before = edit_mtimes()
+    code, out, _ = run(["--frames", "all"] + TINY, film=E.FILM)
+    check(code == 0 and DONE in out and edit_mtimes() == before,
+          "... the next call judges every frame again, renders nothing and says %r" % (lines(out, "frames:") or [""])[-1][9:90])
+    E.remove_all()
+
+
+def _r(frames):
+    import render as R
+
+    return R._ranges(frames) or "nothing"
+
+
+PARTS = {"chunks": part_chunks, "engine": part_engine, "stale": part_stale, "lock": part_lock, "encode": part_encode,
+         "edits": part_edits, "detect": part_detect, "midrun": part_midrun}
 
 if __name__ == "__main__":
     wanted = sys.argv[1:] or list(PARTS)

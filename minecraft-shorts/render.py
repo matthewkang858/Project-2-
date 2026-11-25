@@ -110,11 +110,21 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     keep module-level state between builds, five of them were being rewritten while this was made, and such a
     proof holds only for the code of its day. A fresh process is how every frame so far was rendered and
     judged, needs no proof, and costs 0.6 s per sky: Blender's start and the film's imports.)
+  * WHICH FILMS: a film whose module has a non-empty SKIES. render.py reads that from the SOURCE in a millisecond
+    (declares_skies: an assignment at module level, a named import, `from x import *`; project modules are
+    followed), but what DECIDES is the imported module: a film whose SKIES no source line shows is handed over to
+    the sky-by-sky path after its first build (every command then builds once more than needed, and says so), and
+    `SKIES = {}` is a film with one sky, rendered as any other. So the two can never disagree about a film.
   * THE WRONG SKY IS IMPOSSIBLE, not merely avoided: a Session owns only the frames tagged with its sky.
     Session.fingerprint / render_frame and Stamps.status / fp / mark raise SkyError for any other frame, so no
     code path, present or future, can render, stamp, re-stamp or judge a frame in another sky's build. Every stamp
-    records the sky it was rendered under ('sky'), and a PNG rendered under another sky than its shot now has is
-    stale whatever else matches (status 'sky'; --restamp-changed does not accept it).
+    records the sky it was rendered under ('sky').
+  * A SKY'S NAME IS A LABEL, ITS FINGERPRINT THE PROOF. What a sky is (world, key light, sun / moon, stars, clouds,
+    haze, grade) is part of every frame's scene fingerprint. A PNG whose fingerprint is what its own sky's build
+    expects now is valid under whatever name it was rendered: renaming a key of SKIES (night -> night_a) costs
+    one build per sky and no frame; the stamps are relabelled. A PNG whose fingerprint differs and whose stamp
+    names another sky (its shot was re-tagged, a sky_change moved) is stale with the reason "rendered under
+    another sky (87-95: was 'gold', now 'night')" (status 'sky'); --restamp-changed never accepts such a frame.
   * ONE FRAME DIRECTORY, ONE meta.json: out/frames/<film>/ (previews: one directory per variant, as always).
     Each sky's process writes its own frames' stamps and expectations and carries the other skies' through. The
     other skies' EXPECTATIONS survive only while no source changed since they were written; after an edit their
@@ -125,8 +135,13 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     (films/_multisky_demo.py, 206 frames): a chunk that renders in one sky spends 2.8 to 3.9 s outside its frames
     (0.2 s this process, 0.6 s Blender and the film's imports, 1.8 to 2.6 s the build); the chunk in which one sky
     is finished and the next begins 7.9 s; the call that finds nothing left builds nothing and takes 0.3 s.
-    After an edit every sky with requested frames is built once, judges its frames (16 to 50 ms a frame) and
-    renders what changed.
+  * AFTER AN EDIT (any source of the film changed since meta.json was written) the sky table on disk is the film
+    BEFORE the edit: wrong exactly where the timeline or SKIES were changed (a new shot's name, frames beyond the
+    old end, a renamed sky). Nothing is planned from it. The first process builds the sky that table suggests if
+    the film still has one of that name (else the film's first), does its share of everything asked for and
+    reports the film's real table; the other skies follow from that. Every sky with requested frames is built
+    once, judges its frames (16 to 50 ms a frame) and renders what changed. A brand-new frame directory (the
+    first chunk of a final render) starts the same way.
   * WHAT IT PRINTS (--frames): per sky "[render] sky 'night': 628 frames requested, 120 already done, 508 to
     render at ..." (or "... none to render at ..."), its frames, and at the very end ONE line for the whole film:
         [render] frames: 1440 requested, 1440 already done, 0 to render at 720x1280, 24 samples, 4 threads (2 skies: ...)
@@ -135,6 +150,10 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     The words " 0 to render" appear only in that line and only when every requested frame of every sky is a valid
     frame as the build of its OWN sky judged it: a loop that waits for them cannot stop early. Exit codes are
     the same as for any film (0, 2, 3, 4).
+  * THE FILM SCRIPT MAY BE EDITED WHILE A CHUNK RENDERS, as for any film. The sky processes of one command then
+    built different sources: every frame that was rendered is right and stamped, the command says "a source file
+    of the film changed while this command ran" instead of the film's account and ends with exit code 0 (2 with
+    --encode, which is not attempted); the next call judges every sky again.
   * --max-seconds is the whole command's rendering time: when one sky is finished the next one is built and gets
     what is left; a sky is not started for rendering once the time is used up.
   * EXIT CODE 3 (engine sources changed under existing frames) looks at EVERY sky's frames before any sky renders:
@@ -143,8 +162,8 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     frames show an unchanged scene (--restamp all keeps those). --restamp / --prune-stale combined with --frames
     are finished for every sky before any frame is checked or rendered (each sky is then built twice).
   * --still S and --sheet N: each sky's process renders its own stills and tiles; the sheet is put together at the
-    end. After an edit the sky of second S is first guessed from the last build's table and then verified by
-    the build itself (a wrong guess costs one build, never a wrong picture). --frames takes all, A-B, a single
+    end. After an edit the first process builds the sky the old table gives second S; if the frame is another
+    sky's now, that sky is built next (one build more, never a wrong picture). --frames takes all, A-B, a single
     frame or a shot name as always; a shot with a sky change inside is split between its two skies.
     --restamp, --restamp-changed, --rerender-stale, --prune-stale, --force work per sky; --save-blend writes one
     file per sky: out/blend/<film>.<sky>.blend.
@@ -153,12 +172,20 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     one baked path, actors mid-motion). The frames before it are rendered in one build and the frames from it on
     in the other. So the camera cannot jump and motion blur is that of an uncut shot (tools/multisky_check.py
     proves both on rendered frames).
-  * WHAT COSTS WHAT: an edit to one shot re-renders that shot's frames, in its sky's build; an edit to one entry of
-    SKIES re-renders exactly that sky's frames; re-tagging a shot re-renders that shot; a caption or a dip
-    re-renders nothing (every sky is built once to see that: about 3 s each).
+  * WHAT COSTS WHAT: an edit to one shot re-renders that shot's frames, in its sky's build; an edit to the VALUES
+    of one entry of SKIES re-renders exactly that sky's frames; re-tagging a shot or moving a sky_change
+    re-renders the frames whose sky changed; renaming a sky, a caption or a dip re-render nothing (every sky is
+    built once to see that: about 3 s each).
   * The film must not make anything but the sky depend on build()'s `sky` argument (no shot, actor, light key,
-    caption or import inside `if sky == ...`). render.py notices: a timeline that differs between two skies'
-    builds of the same sources raises SkyError.
+    caption, render setting or import inside `if sky == ...`). render.py notices: a timeline that differs between
+    two skies' builds of the same sources raises SkyError. A film may set its own final resolution and samples in
+    build(), as any film may; they must be the same in every build.
+  * TOOLS that render single frames of a film (noise checks, timing studies): render.Session(name) builds the
+    FIRST sky and refuses the other skies' frames. Use render.session_for(name, frame) (or seconds=...): the
+    Session of that frame's sky; render.sky_table(name) is the film's sky table without a build in this process.
+  * Temporary files: the sky processes' reports and sheet tiles live in out/test/render_sky_*/ while a command
+    runs. A terminated command (timeout) removes its own; what a killed one (SIGKILL) left is removed by the next
+    command for a film with several skies.
 """
 import argparse
 import ast
@@ -236,6 +263,7 @@ def _parse_args(argv):
                          "how render.py runs each sky itself; no --encode and no contact sheet come out of such a call)")
     ap.add_argument("--sky-report", metavar="FILE", help=argparse.SUPPRESS)     # internal: what a sky's process did
     ap.add_argument("--sky-skip", default="", metavar="ACTIONS", help=argparse.SUPPRESS)   # internal: actions left out
+    ap.add_argument("--sky-guess", action="store_true", help=argparse.SUPPRESS)  # internal: --sky is from an old table
     return ap.parse_args(argv)
 
 
@@ -316,25 +344,93 @@ class SkyError(RuntimeError):
     not usable. Never caught inside render.py: a wrong sky must stop the command."""
 
 
-def declares_skies(name):
-    """True when films/<name>.py binds the name SKIES at its top level (an assignment or an import): such a film has
-    several skies and is rendered sky by sky. Read from the source with `ast`: nothing is imported, no Blender."""
-    path = os.path.join(ROOT, "films", name + ".py")
+def _module_statements(body):
+    """Every statement that runs when a module is imported: its body and the bodies of the if / try / with / for /
+    while / match statements in it (not those of functions and classes)."""
+    for node in body:
+        yield node
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        for field in ("body", "orelse", "finalbody"):
+            sub = getattr(node, field, None)
+            if isinstance(sub, list):
+                yield from _module_statements(sub)
+        for sub in list(getattr(node, "handlers", None) or []) + list(getattr(node, "cases", None) or []):
+            yield from _module_statements(sub.body)
+
+
+def _module_file(module, level, importer):
+    """The project file an import statement in `importer` names ('films.x' -> films/x.py), or None when it is not
+    a file of this project."""
+    base = ROOT
+    if level:
+        base = os.path.dirname(importer)
+        for _ in range(level - 1):
+            base = os.path.dirname(base)
+    rel = os.path.join(*module.split(".")) if module else ""
+    for cand in (os.path.join(base, rel + ".py"), os.path.join(base, rel, "__init__.py")):
+        cand = os.path.abspath(cand)
+        if rel and os.path.isfile(cand) and cand.startswith(ROOT + os.sep):
+            return cand
+    return None
+
+
+def _empty_literal(node):
+    """True for the expressions `{}`, `None` and `dict()`: a SKIES bound to one of them declares no sky."""
+    return (isinstance(node, ast.Dict) and not node.keys) or (isinstance(node, ast.Constant) and node.value is None) \
+        or (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "dict"
+            and not node.args and not node.keywords)
+
+
+def _source_binds(path, name, seen):
+    """True when the Python source at `path` binds `name` to something other than an empty literal while it is
+    imported: an assignment, or an import (named or star) that brings the name in; imports of project modules are
+    followed. Read with `ast`: nothing is imported."""
+    if path in seen or len(seen) > 64:
+        return False
+    seen.add(path)
     try:
         with open(path, encoding="utf-8") as f:
             tree = ast.parse(f.read(), path)
     except (OSError, SyntaxError, ValueError):
         return False                               # (building the film reports what is wrong with it)
-    for node in tree.body:
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            if any((a.asname or a.name) == "SKIES" for a in node.names):
+    for node in _module_statements(tree.body):
+        if isinstance(node, ast.Import):
+            if any((a.asname or a.name) == name for a in node.names):
                 return True
-            continue
-        targets = node.targets if isinstance(node, ast.Assign) else \
-            [node.target] if isinstance(node, (ast.AnnAssign, ast.AugAssign)) else []
-        if any(isinstance(n, ast.Name) and n.id == "SKIES" for t in targets for n in ast.walk(t)):
-            return True
+        elif isinstance(node, ast.ImportFrom):
+            for a in node.names:
+                if a.name != "*" and (a.asname or a.name) != name:
+                    continue
+                target = _module_file(node.module, node.level, path)
+                if a.name == "*":
+                    if target is not None and _source_binds(target, name, seen):
+                        return True
+                elif target is None or _source_binds(target, a.name, seen) \
+                        or _module_file((node.module or "") + "." + a.name, node.level, path) is not None:
+                    return True
+        else:
+            targets = node.targets if isinstance(node, ast.Assign) else \
+                [node.target] if isinstance(node, (ast.AnnAssign, ast.AugAssign)) else []
+            for t in targets:
+                plain = isinstance(t, ast.Name) and t.id == name
+                if plain and not isinstance(node, ast.AugAssign) and (node.value is None or _empty_literal(node.value)):
+                    continue                       # `SKIES = {}`, `SKIES: dict`: no sky declared by this line
+                if any(isinstance(x, ast.Name) and x.id == name for x in ast.walk(t)):
+                    return True                    # (also `SKIES["night"] = ...` and `A, SKIES = ...`)
     return False
+
+
+def declares_skies(name):
+    """True when the source of films/<name>.py binds the name SKIES (to more than an empty literal) as the module is
+    imported: an assignment at module level (also inside an if / try there) or an import that brings the name in,
+    named or `from x import *` (project modules are followed). Such a film has several skies and is rendered sky by
+    sky. Read with `ast`: nothing is imported, no Blender, a millisecond.
+
+    This is only the FAST way to know. What decides is the imported module (Session.skies): a film whose SKIES no
+    source line shows is handed over to the sky-by-sky path after its first build (_main_one), and a film whose
+    source binds SKIES to something that turns out empty is rendered as the one-sky film it is."""
+    return _source_binds(os.path.join(ROOT, "films", name + ".py"), "SKIES", set())
 
 
 def _check_segments(segments, skies, frame_start, frame_end, where):
@@ -405,7 +501,10 @@ class Session:
     with ONE of them active (`sky`; default: its first): such a session fingerprints and renders only the frames
     that are tagged with that sky and raises SkyError for any other frame."""
 
-    def __init__(self, name, sky=None):
+    def __init__(self, name, sky=None, guess=False):
+        """sky: the sky to build of a film with several (None: its first). guess=True: `sky` comes from an older
+        sky table; if the film has no such sky (any more) its first sky is built, and a film with one sky is built
+        as it is."""
         import bpy
 
         from engine import look, post
@@ -421,11 +520,13 @@ class Session:
         self.sky = None                                                     # the sky this build has (None: one sky)
         self.segments = None                                                # [(first frame, last frame, sky), ...]
         if self.skies:
+            if guess and sky not in self.skies:
+                sky = None
             self.sky = sky or next(iter(self.skies))
             if self.sky not in self.skies:
                 raise SkyError("film '%s' has no sky %r (SKIES: %s)" % (name, sky, ", ".join(self.skies)))
             result = module.build(self.scene, sky=self.sky)
-        elif sky:
+        elif sky and not guess:
             raise SkyError("film '%s' has one sky (no SKIES in films/%s.py): it cannot be built as sky %r"
                            % (name, name, sky))
         else:
@@ -482,8 +583,9 @@ class Session:
         """Raise SkyError unless this build owns the frame (see owns)."""
         if not self.owns(frame):
             raise SkyError("frame %s of '%s' is filmed under sky %r: it cannot be %s in the build of sky %r (use "
-                           "render.Session(%r, sky=%r))" % (frame, self.name, self.sky_of(frame), what, self.sky,
-                                                           self.name, self.sky_of(frame)))
+                           "render.session_for(%r, %s), or render.Session(%r, sky=%r))"
+                           % (frame, self.name, self.sky_of(frame), what, self.sky, self.name, frame, self.name,
+                              self.sky_of(frame)))
 
     def meta(self):
         """Everything post needs to encode without Blender, plus what the frames depend on."""
@@ -627,8 +729,11 @@ class Stamps:
     def status(self, frame):
         """'valid' | 'missing' | 'unstamped' | 'size' | 'settings' | 'scene' | 'engine' | 'engine+scene' | 'sky'.
         'engine' = rendered with other engine sources but the scene fingerprint is unchanged (re-stampable);
-        'scene' = this frame's own content changed (film edit); 'engine+scene' = both; 'sky' = the PNG was rendered
-        under another sky (the shot was tagged with another sky since). Only for frames of this build's own sky."""
+        'scene' = this frame's own content changed (film edit); 'engine+scene' = both; 'sky' = a changed scene whose
+        stamp names another sky: the PNG was rendered under another sky (the shot was tagged with another sky
+        since). What a sky IS (world, key light, sky sprites, stars, clouds, haze, grade) is in the fingerprint; its
+        NAME in SKIES is a label: a stamp whose fingerprint is current is valid under whatever name it was rendered
+        (a renamed sky costs nothing) and gets this build's name. Only for frames of this build's own sky."""
         self.ses.require(frame, "judged")
         st = self._status.get(frame)
         if st is None:
@@ -649,16 +754,28 @@ class Stamps:
                     return "size"
         except OSError:
             return "missing"
-        if rec.get("sky") is not None and rec.get("sky") != self.ses.sky:
-            return "sky"                              # (a stamp without a sky is judged by its fingerprint alone)
         if rec.get("s") != self.s:
             return "settings"
         same = rec.get("fp") == self.fp(frame)
-        if rec.get("e") != self.e:
+        if rec.get("e") != self.e:                    # (whatever the stamp's sky: other_engine() must agree with this)
             return "engine" if same else "engine+scene"
-        if same and self.ses.sky is not None:
-            rec["sky"] = self.ses.sky                 # (an older stamp without a sky: proven by its fingerprint)
-        return "valid" if same else "scene"
+        if not same:
+            return "sky" if self.foreign(frame) else "scene"
+        if rec.get("sky") != self.ses.sky:
+            # the picture is this build's, proven by its fingerprint: an older stamp without a sky, or the sky was
+            # renamed in SKIES since (in a film that has one sky now, the label goes)
+            if self.ses.sky is None:
+                rec.pop("sky", None)
+            else:
+                rec["sky"] = self.ses.sky
+        return "valid"
+
+    def foreign(self, frame):
+        """The sky a frame's stamp names when that is another one than this build's (None otherwise). Such a PNG
+        is this frame's picture only if its fingerprint says so (status 'valid' / 'engine'); it is never accepted
+        on the director's word (--restamp-changed)."""
+        sky = (self.frames.get(str(frame)) or {}).get("sky")
+        return sky if sky is not None and sky != self.ses.sky else None
 
     def other_engine(self, frame):
         """True when a frame's PNG (of ANY sky) was rendered with these settings but other engine sources: what
@@ -825,10 +942,10 @@ def main(argv=None):
     args = _parse_args(argv)
     if args.sky is None and declares_skies(args.film):
         return _main_skies(args, argv, started)          # several skies: one process per sky, see the docstring
-    return _main_one(args, started)
+    return _main_one(args, started, argv)
 
 
-def _main_one(args, started):
+def _main_one(args, started, argv=()):
     """One process, one build: a film with one sky, or (--sky) one sky's share of a film with several."""
     from PIL import Image
 
@@ -846,24 +963,42 @@ def _main_one(args, started):
     if not (needs_build or args.encode):
         print("nothing to do: give --still, --frames, --sheet, --encode, --restamp, --prune-stale or --save-blend")
         return 1
+    if not needs_build and (post.read_meta(name, variant) or {}).get("sky_segments"):
+        # --encode alone, no source changed since a build with several skies wrote this meta.json: the film HAS
+        # several skies (whatever its source shows), and its frames are judged sky by sky
+        return _main_skies(args, list(argv), started)
 
     ses = None
+    one_sky = False                               # asked for as a sky's process, found to be a film with one sky
     if needs_build:
-        ses = Session(name, sky=args.sky or None)
+        ses = Session(name, sky=args.sky or None, guess=args.sky_guess)
         if worker and not ses.skies:
-            raise SkyError("--sky: films/%s.py has no SKIES (a film with one sky is rendered without --sky)" % name)
+            if args.sky and not args.sky_guess:
+                raise SkyError("--sky: films/%s.py has no SKIES (a film with one sky is rendered without --sky)" % name)
+            # the source binds the name SKIES, the module has none (it is empty): a film with one sky. What decides
+            # is the module: this process does the whole job, exactly as for any film with one sky
+            worker, skip, one_sky = False, set(), True
+        elif not worker and ses.skies:
+            # no line of the source showed it (declares_skies), the imported module has SKIES: several skies after
+            # all. What decides is the module: the film is rendered sky by sky, one process each
+            print(f"[render] films/{name}.py has SKIES ({', '.join(ses.skies)}), though no line of its source binds that "
+                  f"name: rendered sky by sky all the same. (Write `SKIES = ...` or `from x import SKIES` at module "
+                  f"level and no command builds the film this one extra time.)", flush=True)
+            ses.bpy.ops.wm.read_factory_settings(use_empty=True)        # (this build is not used: free it)
+            return _main_skies(args, list(argv), started)
     mb = False if args.no_motion_blur else None
     test_dir = os.path.join(post.OUT, "test")
     sky = ses.sky if ses is not None else None
     tag = "sky '%s': " % sky if worker else ""
     # what this sky's process did, for the process that runs the skies one after the other (_main_skies)
-    report = {"sky": sky, "code": 0, "stills_done": [], "stills_other": {}, "sheet": None, "frames": None}
+    report = {"sky": sky, "code": 0, "stills_done": [], "stills_other": {}, "sheet": None, "frames": None,
+              "one_sky": one_sky}
     if worker:
         report["timeline"] = ses.meta()
 
     def finish(code):
         report["code"] = code
-        if worker and args.sky_report:
+        if args.sky_report:
             with open(args.sky_report + ".part", "w", encoding="utf-8") as fh:
                 json.dump(report, fh)
             os.replace(args.sky_report + ".part", args.sky_report)
@@ -949,11 +1084,14 @@ def _main_one(args, started):
         # accept frames without rendering: by default only those whose picture is provably the same (same settings,
         # same scene fingerprint, other engine sources); --restamp-changed accepts whatever PNG of the right size is there
         targets = [f for f in _frame_list(args.restamp, ses.film, args.step) if ses.owns(f)]
-        take, refuse = [], []
+        take, refuse, alien = [], [], {}
         for f in targets:
             st = book.status(f)
-            if st == "engine" or (args.restamp_changed and st in ("engine+scene", "scene", "unstamped", "settings")):
-                take.append(f)
+            was = book.foreign(f)
+            if st == "engine" or (args.restamp_changed and not was and st in ("engine+scene", "scene", "unstamped", "settings")):
+                take.append(f)                    # ('engine': the fingerprint proves the picture, under any sky name)
+            elif was and st not in ("valid", "missing"):
+                alien.setdefault(was, []).append(f)       # another sky's picture: never kept on the director's word
             elif st not in ("valid", "missing"):
                 refuse.append(f)
         for f in take:
@@ -961,7 +1099,10 @@ def _main_one(args, started):
         print(f"[render] {tag}restamp -> {where}: {len(take)} frames re-stamped without rendering"
               + (f" ({_ranges(take)})" if take else "")
               + (f"; {len(refuse)} NOT accepted, their scene changed or they have no usable stamp ({_ranges(refuse)}): "
-                 f"render them, or pass --restamp-changed to keep them anyway" if refuse else ""))
+                 f"render them, or pass --restamp-changed to keep them anyway" if refuse else "")
+              + (f"; {sum(len(v) for v in alien.values())} NOT accepted, rendered under another sky ("
+                 + "; ".join(f"{_ranges(v)}: was '{k}'" for k, v in alien.items())
+                 + f", now '{ses.sky}'): they are not these frames' picture, render them" if alien else ""))
         book.save()
 
     if do_prune:
@@ -989,7 +1130,11 @@ def _main_one(args, started):
         status = {f: book.status(f) for f in frames}
         by_engine = [f for f in frames if status[f] in ("engine", "engine+scene")]
         by_scene = [f for f in frames if status[f] == "scene"]
-        other = [f for f in frames if status[f] in ("unstamped", "size", "settings", "sky")]
+        other = [f for f in frames if status[f] in ("unstamped", "size", "settings")]
+        by_sky = {}                                          # {the sky their PNG was rendered under: frames}
+        for f in frames:
+            if status[f] == "sky":
+                by_sky.setdefault(book.foreign(f), []).append(f)
         todo = [f for f in frames if args.force or status[f] != "valid"]
         # frames of the OTHER skies that were rendered with other engine sources stop this sky too: nothing of the
         # film is rendered before every sky's frames were looked at (their stamps name the engine; see other_engine)
@@ -1039,6 +1184,9 @@ def _main_one(args, started):
                   f"({', '.join(book.changed_files(by_engine))}); rendered again (--rerender-stale)")
         if other:
             print(f"[render]   {len(other)} stale: other settings, another size or no stamp ({_ranges(other)})")
+        if by_sky:
+            print(f"[render]   {sum(len(v) for v in by_sky.values())} stale: rendered under another sky ("
+                  + "; ".join(f"{_ranges(v)}: was '{k}'" for k, v in by_sky.items()) + f", now '{ses.sky}')")
         book.save()
         t0 = time.time()
         done = 0
@@ -1102,8 +1250,8 @@ def _main_one(args, started):
             print(f"[render] {tag}this sky's frames are judged; the film is encoded by the command without --sky")
         return finish(0)
     if args.encode:
-        return _encode_action(args, name, variant, started)
-    return 0
+        return finish(_encode_action(args, name, variant, started))
+    return finish(0)
 
 
 # --------------------------------------------------------------------------------------------------------------
@@ -1118,8 +1266,11 @@ class Plan:
     its own sky's build (only such a build can write it: see Stamps). status(frame):
       'valid'     the PNG is there, has the right size, and its stamp is what its own sky's build expects now
       'unjudged'  there is a PNG with a stamp, but no build of its sky has judged it since the sources changed
+                  (or its stamp still carries another sky's name: its sky's build relabels or rejects it)
       'stale'     judged, and not the film any more (or no stamp, or another size)
-      'missing'   no PNG"""
+      'missing'   no PNG
+    A Plan is only ever asked while the sky table is the film's own (see _main_skies: never a table from before
+    an edit)."""
 
     def __init__(self, name, variant, args):
         from engine import post
@@ -1157,9 +1308,10 @@ class Plan:
         expect = self.cur.get("fp", {}).get(str(frame))
         if expect is None:
             return "unjudged"
-        if rec.get("s") != self.s or rec.get("e") != self.cur.get("e") or rec.get("fp") != expect \
-                or rec.get("sky") != self.table.sky_of(frame):
+        if rec.get("s") != self.s or rec.get("e") != self.cur.get("e") or rec.get("fp") != expect:
             return "stale"
+        if rec.get("sky") != self.table.sky_of(frame):
+            return "unjudged"                         # (its own sky's build would have relabelled it)
         try:
             with Image.open(self.post.frame_path(self.name, frame, self.variant)) as im:
                 return "valid" if tuple(im.size) == tuple(self.size) else "stale"
@@ -1169,8 +1321,10 @@ class Plan:
 
 def _any_table(name, variant):
     """(Timeline, exact) from whichever meta.json of the film holds a sky table: this variant's, the final frames'
-    or another preview's. exact = True when no source changed since it was written (the table IS the film's);
-    otherwise it is a hint for which sky to build first, and the build itself tells the truth."""
+    or another preview's. exact = True when no source changed since it was written (the table IS the film's).
+    Otherwise it is the table of the film BEFORE an edit: wrong exactly where the director changed the timeline or
+    SKIES. Nothing is planned from such a table; it only says which sky the first process should try to build
+    (Session(..., guess=True)), and that process reports the film's real table."""
     from engine import post
 
     seen, hint = [variant, None], None
@@ -1202,6 +1356,107 @@ def _die_with_parent():
         pass
 
 
+TMP_PREFIX = "render_sky_"
+
+
+def _alive(pid):
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except OSError:
+        return True
+    return True
+
+
+def _sky_tmp():
+    """A directory out/test/render_sky_*/ for the reports and contact-sheet tiles of the sky processes of ONE
+    command (where the contact sheet's tile has always been written; out/test is not in the repository). It holds
+    the command's process id, so that the directories of commands that were killed outright (SIGKILL: no clean-up
+    runs) can be told from those of commands still running: they are removed here."""
+    from engine import post
+
+    root = os.path.join(post.OUT, "test")
+    os.makedirs(root, exist_ok=True)
+    for d in sorted(os.listdir(root)):
+        old = os.path.join(root, d)
+        if not (d.startswith(TMP_PREFIX) and os.path.isdir(old)):
+            continue
+        try:
+            with open(os.path.join(old, "pid"), encoding="utf-8") as fh:
+                dead = not _alive(int(fh.read().strip() or 0))
+        except (OSError, ValueError):
+            dead = time.time() - os.path.getmtime(old) > 3600.0      # (no pid file yet, or one from older code)
+        if dead:
+            _sky_tmp_remove(old)
+    tmp = tempfile.mkdtemp(prefix=TMP_PREFIX, dir=root)
+    with open(os.path.join(tmp, "pid"), "w", encoding="utf-8") as fh:
+        fh.write(str(os.getpid()))
+    return tmp
+
+
+def _sky_tmp_remove(tmp):
+    """Remove such a directory: only the files this module writes there, then the directory if it is empty."""
+    try:
+        for fn in os.listdir(tmp):
+            if fn == "pid" or (fn.startswith("sky_") and fn.endswith((".json", ".json.part", ".png"))):
+                os.remove(os.path.join(tmp, fn))
+        os.rmdir(tmp)
+    except OSError:
+        pass
+
+
+def _run_sky(argv, sky, rep_path, guess=False, skip=(), max_seconds=None):
+    """`render <argv> --sky SKY` in a fresh process. Returns (its report or None, its exit code)."""
+    cmd = [sys.executable, "-m", "render"] + list(argv) + ["--sky", sky, "--sky-report", rep_path]
+    if guess:
+        cmd.append("--sky-guess")
+    if skip:
+        cmd += ["--sky-skip", ",".join(sorted(skip))]
+    if max_seconds is not None:
+        cmd += ["--max-seconds", "%.1f" % max_seconds]
+    sys.stdout.flush()
+    env = dict(os.environ, PYTHONUNBUFFERED="1")
+    code = subprocess.call(cmd, cwd=ROOT, env=env, preexec_fn=_die_with_parent)
+    sys.stdout.flush()
+    try:
+        with open(rep_path, encoding="utf-8") as fh:
+            return json.load(fh), code
+    except (OSError, ValueError):
+        return None, code
+
+
+def sky_table(name):
+    """The sky table of a film with several skies, as a Timeline (sky_of(frame), frame(seconds), segments, skies,
+    shots), WITHOUT building the film in this process: read from a meta.json of the film while no source changed
+    since it was written, else reported by a process that builds the film once. None for a film with one sky."""
+    table, exact = _any_table(name, None)
+    if exact:
+        return table
+    if not declares_skies(name):
+        return None
+    tmp = _sky_tmp()
+    try:
+        rep, code = _run_sky([name], "", os.path.join(tmp, "sky_0.json"), guess=True)
+    finally:
+        _sky_tmp_remove(tmp)
+    if rep is None:
+        raise SkyError("film '%s' could not be built to learn its sky table (exit code %d)" % (name, code))
+    return None if rep.get("one_sky") else Timeline(rep["timeline"])
+
+
+def session_for(name, frame=None, seconds=None):
+    """A Session that can fingerprint and render the given frame (or film second): for a film with several skies
+    the build of THAT frame's sky, for any other film Session(name). For tools that render single frames of a film
+    (noise checks, timing studies): `ses = render.session_for(film, f); ses.configure(...); ses.render_frame(f, path)`.
+    frame=None and seconds=None: the film's first frame."""
+    table = sky_table(name)
+    if table is None:
+        return Session(name)
+    f = int(frame) if frame is not None else table.frame(seconds) if seconds is not None else table.frame_start
+    return Session(name, sky=table.sky_of(min(max(f, table.frame_start), table.frame_end)))
+
+
 def _main_skies(args, argv, started):
     """A film with several skies. This process builds nothing: it works out which skies have work, runs each of them
     in a process of its own (`render <film> <the same arguments> --sky NAME`: a fresh Blender per sky, built exactly
@@ -1221,14 +1476,13 @@ def _main_skies(args, argv, started):
     booked = bool(args.frames or args.restamp or args.prune_stale or args.encode)   # actions that use meta.json
     state = {"table": None, "exact": False, "spent": 0.0, "rendered": 0, "stopped": False, "tiles": {},
              "sheet": None, "left_out": [], "stills_done": [], "frame_info": None, "ran": [], "judged": [],
-             "stopped_skies": set(), "did": set()}
+             "stopped_skies": set(), "did": set(), "sources": []}
+    # exact = the table is the film's as it is now. A table from before an edit is never planned from: see one_pass
     state["table"], state["exact"] = _any_table(name, variant)
     # the reports and contact-sheet tiles of the sky processes live in out/test/render_sky_*/ for the length of this
-    # command (where the contact sheet's tile has always been written; out/test is not in the repository); a
-    # terminated command (timeout) still cleans up after itself and takes its sky process with it
-    tmp_root = os.path.join(post.OUT, "test")
-    os.makedirs(tmp_root, exist_ok=True)
-    tmp = tempfile.mkdtemp(prefix="render_sky_", dir=tmp_root)
+    # command; a terminated command (timeout) still cleans up after itself and takes its sky process with it, and
+    # what a killed one (SIGKILL) left is removed by the next command
+    tmp = _sky_tmp()
 
     def _terminated(signum, _frame):
         raise SystemExit(128 + signum)
@@ -1244,8 +1498,9 @@ def _main_skies(args, argv, started):
         return Plan(name, variant, args)
 
     def needs(skip):
-        """{sky: set of actions} that still need a process of that sky, from what is known now: the sky table (exact,
-        or a hint when a source changed since it was written) and, while usable, meta.json's frame judgments."""
+        """{sky: set of actions} that still need a process of that sky, from the sky table and, while usable,
+        meta.json's frame judgments. A plan only while the table is exact; on a table from before an edit it is
+        no more than guess() makes of it."""
         table, p = state["table"], plan()
         known = p.usable
         out = {}
@@ -1284,32 +1539,35 @@ def _main_skies(args, argv, started):
                     add(table.sky_of(f), "encode")
         return out
 
-    def run(sky, skip):
-        """One sky in its own process. Returns its report (None when it died)."""
-        rep_path = os.path.join(tmp, "sky_%d.json" % len(state["ran"]))
-        cmd = [sys.executable, "-m", "render"] + argv + ["--sky", sky, "--sky-report", rep_path]
-        if skip:
-            cmd += ["--sky-skip", ",".join(sorted(skip))]
-        if args.max_seconds:
-            cmd += ["--max-seconds", "%.1f" % max(0.1, args.max_seconds - state["spent"])]
-        sys.stdout.flush()
-        env = dict(os.environ, PYTHONUNBUFFERED="1")
-        code = subprocess.call(cmd, cwd=ROOT, env=env, preexec_fn=_die_with_parent)
-        sys.stdout.flush()
+    def guess(skip):
+        """The sky in which a table from before an edit would have work first ("" when it cannot say). Only a
+        preference for the first process: a new shot name, a longer film or a renamed sky make such a table wrong,
+        so whatever goes wrong while reading it means "no preference", and the process that is started checks the
+        name against the film as it is now."""
         try:
-            with open(rep_path, encoding="utf-8") as fh:
-                rep = json.load(fh)
-        except (OSError, ValueError):
+            todo = needs(skip)
+            return next((k for k in state["table"].skies + sorted(todo) if k in todo), "")
+        except Exception:                                    # noqa: BLE001 - an old table may fail in any way
+            return ""
+
+    def run(sky, skip, guessed=False):
+        """One sky in its own process. Returns its report (None when it died)."""
+        rep, code = _run_sky(argv, sky, os.path.join(tmp, "sky_%d.json" % len(state["ran"])), guess=guessed, skip=skip,
+                             max_seconds=max(0.1, args.max_seconds - state["spent"]) if args.max_seconds else None)
+        if rep is None:
             print(f"[render] the process of sky '{sky or '(first)'}' ended with exit code {code} and no report")
-            return None, code
         return rep, code
 
     def one_pass(skip):
         """Run every sky that has work for the actions not in `skip`. Returns an exit code to stop with, or None."""
         ran = []
         while True:
-            if state["table"] is None:
-                sky, why = "", {"(to learn the film's sky table)"}      # nothing known yet: the film's first sky
+            guessed = not state["exact"]
+            if guessed:
+                # No table, or one from before an edit. NOTHING is planned from it: the first process builds the
+                # sky such a table suggests if the film still has it (else the film's first sky), does that sky's
+                # share of everything that was asked for, and reports the film's real table.
+                sky, why = guess(skip) if state["table"] is not None else "", {"(to learn the film's sky table)"}
             else:
                 todo = {k: v for k, v in needs(skip).items() if k not in ran}
                 if state["stopped"]:
@@ -1329,13 +1587,18 @@ def _main_skies(args, argv, started):
             sub_skip = set(skip)
             if state["table"] is not None and bool(args.max_seconds) and state["spent"] >= args.max_seconds:
                 sub_skip.add("frames")
-            print(f"[render] sky '{sky or '(first)'}': a process of its own for " + ", ".join(sorted(why))
-                  + ("" if state["exact"] or state["table"] is None else
-                     " (a source changed: the sky table of the last build is only a guess until this one is built)"),
-                  flush=True)
-            rep, code = run(sky, sub_skip)
+            if guessed:
+                print(f"[render] sky '{sky or '(first)'}': a process of its own, to learn the film's sky table and do "
+                      f"its share" + ("" if state["table"] is None else
+                                      " (a source changed since the table on disk was written: that one only suggests "
+                                      "which sky to build first)"), flush=True)
+            else:
+                print(f"[render] sky '{sky}': a process of its own for " + ", ".join(sorted(why)), flush=True)
+            rep, code = run(sky, sub_skip, guessed)
             if rep is None:
                 return code if code > 0 else 1
+            if rep.get("one_sky"):
+                return code                       # a film with ONE sky after all: that process did the whole job
             # (the first sky of a film whose table was unknown does its share of everything that was asked for)
             asked = {a for a, on in (("still", stills), ("sheet", args.sheet), ("restamp", args.restamp),
                                      ("prune", args.prune_stale), ("frames", args.frames), ("blend", args.save_blend),
@@ -1344,6 +1607,7 @@ def _main_skies(args, argv, started):
             ran.append(rep["sky"])
             state["ran"].append(rep["sky"])
             state["table"], state["exact"] = Timeline(rep["timeline"]), True
+            state["sources"].append((rep["sky"], list(rep["timeline"]["sources"]), rep["timeline"]["source_hash"]))
             state["stills_done"] += rep.get("stills_done", [])
             if rep.get("sheet"):
                 state["sheet"] = rep["sheet"]
@@ -1360,8 +1624,14 @@ def _main_skies(args, argv, started):
             if code not in (0, 3):
                 print(f"[render] the process of sky '{rep['sky']}' failed (exit code {code})")
                 return code if code > 0 else 1
-            if sky not in ("", rep["sky"]):
+            if sky not in ("", rep["sky"]) and not guessed:
                 raise SkyError("asked for sky %r, the process built %r" % (sky, rep["sky"]))
+
+    def edited():
+        """True when the sky processes of this command did not all build the same sources although they loaded the
+        same files: somebody edited a file of the film while the command ran (which is allowed at any time)."""
+        files = {tuple(f) for _sky, f, _h in state["sources"]}
+        return len(files) == 1 and len({h for _sky, _f, h in state["sources"]}) > 1
 
     try:
         first = {"frames", "blend", "encode"} if (args.restamp or args.prune_stale) and \
@@ -1400,10 +1670,12 @@ def _main_skies(args, argv, started):
                 print(f"[render] frames -> {where}: STOPPED by frames rendered with other engine sources, nothing "
                       f"rendered in any sky (see above; --restamp {args.frames}, or --rerender-stale). (exit code 3)")
                 return 3
-            if not p.fresh:
-                # (somebody edited a file of the film after the last sky's process had judged its frames)
+            if not p.fresh or edited():
+                # (somebody edited a file of the film between two sky processes, or after the last one: every frame
+                #  that was rendered is right and stamped; what one sky judged before the edit is judged again)
                 print(f"[render] frames -> {where}: a source file of the film changed while this command ran; "
-                      f"nothing can be said about the film until the command is run again")
+                      f"the frames it rendered are kept, but nothing can be said about the whole film until the "
+                      f"command is run again" + (" (not encoded: exit code 2)" if args.encode else ""))
                 return 2 if args.encode else 0
             if not p.usable:
                 raise SkyError("film '%s': %s holds stamps for the settings %r, this command asks for %r: the film's "
@@ -1446,14 +1718,15 @@ def _main_skies(args, argv, started):
 
         # ---- encode: one complete film in meta.json, the encoder is the one every film uses
         if args.encode:
+            if edited():
+                print("[render] encode refused: a source file of the film changed while this command ran; run it again")
+                return 2
             return _encode_action(args, name, variant, started)
         return 0
     finally:
         if old_term is not None:
             signal.signal(signal.SIGTERM, old_term)
-        for fn in os.listdir(tmp):
-            os.remove(os.path.join(tmp, fn))
-        os.rmdir(tmp)
+        _sky_tmp_remove(tmp)
 
 
 if __name__ == "__main__":
