@@ -117,7 +117,7 @@ WHAT THE GAME DOES (read from the classes; the constants at the top carry the cl
   falling  FallingBlock.getDelayAfterPlace = 2: an anvil whose plank is pulled away starts to fall 2 ticks after
            (for engine/fixtures.py; this module leaves it hanging).
 
-MEASURED (`$BPY -m engine.redstone`: 27 numeric checks + 3 in the village; stills out/test/redstone_*.png)
+MEASURED (`$BPY -m engine.redstone`: 26 numeric checks + 3 in the village; stills out/test/redstone_*.png)
   Piston: for moves starting at any phase of a frame, every frame's head (short / long) stays inside the base over
   the whole exposure and the moved block touches the head plate at every sampled moment (no gap, no overlap).
   extend(10.0): frames 8-9 the block model, 10 the short head, 11+ the long one; the head is 0.10 out at the
