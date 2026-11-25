@@ -1,40 +1,73 @@
-"""Render economics: where the time of a final frame goes, and what a one-minute film can drop without it showing
-on a phone. A measuring tool only: it edits no engine file and writes nothing but out/test/econ_*.png and
-out/test/econ_raw/ (its own renders, results.jsonl, summary.json).
+"""Render economics: where the time of a final frame goes, and which cheaper setting a one-minute film can use
+without it showing on a phone. A measuring tool only: it edits no engine file and writes nothing but
+out/test/econ_* (sheets and the encoded test clips) and out/test/econ_raw/ (its own renders, results.jsonl,
+summary.json, quality.json, blind_key.json).
 
     BPY=/path/to/python-with-bpy ; cd <project root>
-    $BPY -m tools.render_economics                      # self-test: no rendering; checks the numbers and rebuilds the
-                                                        #   sheets from what is in out/test/econ_raw (exit code 1 on a
-                                                        #   failed check)
-    $BPY -m tools.render_economics list                 # shots, variants, groups and how many jobs are done
-    $BPY -m tools.render_economics run SHOT GROUP [--budget 200] [--threads 4]
-                                                        # render the jobs of one group for one test shot, resumable:
-                                                        #   finished jobs are skipped, no new job starts after
-                                                        #   --budget seconds (every command stays under 290 s)
-    $BPY -m tools.render_economics sync SHOT            # scene-sync cost of 4 consecutive frames, persistent data
-                                                        #   off and on (tiny pictures: only the sync is measured)
-    $BPY -m tools.render_economics report               # tables + out/test/econ_*.png + econ_raw/summary.json
+    $BPY -m tools.render_economics                # SELF-TEST: no rendering (builds one film three times, ~20 s; add
+                                                  #   --no-build to skip that): checks the stored numbers, prints
+                                                  #   the FINDINGS with the measured numbers; exit code 1 on a failure
+    $BPY -m tools.render_economics findings       # the FINDINGS alone (no Blender scene is built)
+    $BPY -m tools.render_economics quality [SHOT ...]   # rebuild numbers + sheets of the quality study from the stored
+                                                  #   renders (all shots: several minutes; give shots to stay
+                                                  #   under a time limit, the others' results are kept)
+    $BPY -m tools.render_economics list           # shots, variants, groups and how many jobs are done
+    $BPY -m tools.render_economics run SHOT GROUP [--budget 200] [--threads 2]
+                                                  # render the missing jobs of one group for one shot, resumable
+    $BPY -m tools.render_economics seq SHOT V1,V2 [--animated] [--budget 200]
+                                                  # the 8 consecutive frames of the temporal study for some variants
+    $BPY -m tools.render_economics pipeline SHOT [VARIANT]   # one frame rendered exactly as render.py renders a film
+    $BPY -m tools.render_economics sync SHOT      # scene-sync cost of 4 consecutive frames, persistent data off / on
+    $BPY -m tools.render_economics report         # first pass: tables + sheets of the setting sweeps (summary.json)
 
-Public API (film directors and the orchestrator need only RECOMMENDED / SAFE and project()):
+RESULT (details, numbers and the exact change: FINDINGS at the end of this file; `findings` prints it filled in):
+    RECOMMENDED = 'r540s16'   540x960 at 16 samples, Lanczos x2 to 1080x1920 as engine/post.py does already:
+                              half the render time (about 2.9 h instead of 5.8 h per 1,440 frames on 4 free cores)
+    SAFE        = 'r600s16'   600x1066 at 16 samples: about 3.5 h, half of E's softening at 1:1 comes back
+    A film gets either by setting scene.render.resolution_x / _y and scene.cycles.samples in its build(); render.py
+    takes them as the film's own FINAL quality. render.FINAL_RES / FINAL_SAMPLES must stay (the finished films).
 
-    SHOTS            the five test shots: film, frame, the border region the temporal tests render, detail crops
-    VARIANTS         every render-setting variant that was measured (name -> overrides)
-    RECOMMENDED      the recommended final setting for one-minute films (a VARIANTS name) and SAFE, the alternative
-    apply(scene, variant) -> undo        put a variant on a built film's scene (what render.py should do for good)
-    project(seconds_per_frame, frames=1440) -> hours        render time of one film
-    measure(ses, shot, variant, seed=0, border=False, threads=4) -> dict   render one job, timed by phase
-    temporal_sigma(paths, box, size) -> dict     frame-to-frame noise of N renders of one frame (noise_check, N seeds)
-    report() -> dict                 everything that was measured, as tables and sheets
+Public API (a film director needs only the two names above and FINDINGS; the rest is the evidence):
 
-How time is measured. Other agents were rendering on the same four cores during the whole study (load average 6-9),
-so wall-clock seconds are useless. Every job records the CPU seconds of the process (all threads) per phase, taken
-from the render_stats handler: sync = render call -> 'Sample 0/N'; trace = -> 'Finished' (path tracing AND the
-denoiser, which Cycles does not report apart: the denoiser's share is the difference to a denoise-off job);
-comp = compositing; save = the PNG. "Idle 4-thread seconds" below = sync + comp + save + trace / 4, i.e. what four
-free cores need when the trace scales (it does: see THREADS in the report).
+    SHOTS, CROPS       the test shots (film, frame) and the centres of their five 1:1 crops (face, texels, thin,
+                       defocus, dark)
+    VARIANTS           every render setting that was measured (name -> overrides); CANDIDATES = the brief's A-E
+    RECOMMENDED, SAFE  the recommended final setting of the one-minute films and the safer alternative
+    FINDINGS           the conclusions as text; findings() -> the same with the measured tables in front
+    apply(scene, variant) -> undo      put a variant on a built film's scene; restore(undo) takes it off
+    project(seconds_per_frame, frames=1440) -> hours          render time of one film
+    projection() -> {variant: cpu, rel, idle, hours, ...}      cost of the ladder, anchored on the finished films
+    cost_table() -> {shot: {variant: cpu, trace, idle, rel}}   CPU seconds of a frame, every job averaged
+    film_frame_seconds() -> {film: {shot: median, min}}        what the finished films' own frames took (file times)
+    measure(ses, shot, variant, seed, ...) -> record           render one job on a built render.Session, timed by phase
+    run(shot, group) / run_seq(shot, variants) / pipeline_check(shot, variant)   the render commands above
+    ref_path(shot, frame) / variant_path(shot, variant, frame, seed)             the PNGs (reference = the film's frame)
+    deliver(png, how='lanczos') -> PIL 1080x1920               a frame as delivered; the other upscale filters tested
+    ssim(a, b), psnr(a, b), acutance(lum), compare(ref_img, img)                 the numbers behind the pictures
+    quality(shot) -> {letter: numbers}                         every candidate of a shot against the reference
+    temporal(shot, variants) -> stats                          8 consecutive frames, encoded by engine.post.encode
+    boil(shot, variant) -> stats                               tools/noise_check on encoded frames (two noise seeds)
+    identical_frames() -> {film: counts}                       frames whose scene fingerprint repeats (none do)
+    check_final_per_film() -> facts                            how render.py takes a film's own setting; what a global
+                                                               change of render.FINAL_RES would do to finished frames
+    quality_report(shots=None) -> dict                         all of the above as tables + sheets; load_quality()
+    report() -> dict                                           first pass: setting sweeps on a border region
+    selftest() -> exit code
 
-FINDINGS, RECOMMENDED / SAFE and the exact lines to change are in FINDINGS at the end of this file (the report
-prints them with the measured numbers filled in).
+How time is measured. Other agents render on the same four cores, so wall-clock seconds are useless. Every job
+records the CPU seconds of the process (all threads) per phase, from the render_stats handler: sync = render call ->
+'Sample 0/N'; trace = -> 'Finished' (path tracing AND the denoiser); comp = compositing; save = the PNG. CPU seconds
+still rise with the machine's load (the first pass, at load 6-9, read 13-17 % higher than the same jobs at load 2-3),
+so settings are compared inside one process, and hours are anchored on what the finished films' frames really took.
+
+How likeness is measured. The reference of every shot is the finished film's own final frame on disk (a 'base' job
+of this tool is bit-identical to it). Every candidate is upscaled to 1080x1920 by engine.post.upscale and compared
+on BT.709 luma: SSIM (8x8 windows) and PSNR of the whole frame, of the frame at phone size (540x960) and of five
+240-pixel crops; 'REF2' is the reference setting rendered with another noise seed, i.e. what two renders of the
+CURRENT final differ by (nothing can be closer to the reference than that). Temporal: 8 consecutive frames of two
+shots are encoded by engine.post.encode itself (caption included, H.264 crf 16) and decoded again; the noise of a
+clip is its frame-to-frame change in still regions (flat in all 8 frames), and tools/noise_check's two-seed test
+is repeated on encoded frames for every candidate on every shot.
 """
 import json
 import math
@@ -110,6 +143,10 @@ VARIANTS = {
     "r600s16": _v(res=(600, 1066), samples=16), "r600s12": _v(res=(600, 1066), samples=12),
     "r540s16": _v(res=(540, 960), samples=16), "r540s12": _v(res=(540, 960), samples=12),
     "r640s16": _v(res=(640, 1138), samples=16), "r480s16": _v(res=(480, 854), samples=16),
+    # 720x1280 at 16 samples as the FIRST job of a process: the picture render.py would make. ('s16' jobs were
+    # rendered after a 24-sample job in the same Blender session and reuse the first 16 samples of the reference's
+    # own sampling sequence: they are closer to the reference than a real 16-sample film frame would be.)
+    "s16f": _v(samples=16, note="A as render.py would render it (fresh session)"),
     "r540s16_fw": _v(res=(540, 960), samples=16, cycles=dict(filter_width=1.0),
                      note="narrower pixel filter (1.0 px instead of 1.3) for the 2x upscale"),
     # --- adaptive sampling
@@ -174,13 +211,20 @@ GROUPS = {
     # finished film's own frame on disk (bit-identical to a 'base' job: see ref_path)
     "cand": [(v, (0,), False) for v in ("r540s16", "r600s16", "r540", "r640s16", "s16")],
     "probe": [(v, (0,), False) for v in ("r540s12", "r480s16", "r540s16_fw")],   # cheaper still: where does it break?
-    "floor": [("base", (1,), False)],             # the reference with another noise seed: the noise floor
-    "floor_e": [("r540s16", (1,), False)],
-    "remeasure": [("r540s16", (0,), False), ("base", (0,), False)],   # timing check of the first pass (exact threads)
+    # a second noise seed of the same frame (tools/noise_check's method): the reference's own noise floor and the
+    # candidates' boil when nothing moves
+    "boil": [(v, (1,), False) for v in ("r540s16", "base", "r600s16")],
+    "boil_more": [(v, (1,), False) for v in ("r540", "s16", "r640s16")],
+    "boil2": [(v, (1,), False) for v in ("r540", "s16")],
+    "afresh": [("s16f", (0,), False)],            # must be the first job of its process: a group of its own
+    # the whole ladder again in ONE process (same machine load for every rung): the trustworthy cost ratios, and a
+    # check that a second render of a frame is the same picture bit for bit
+    "remeasure": [(v, (0,), False) for v in ("r540s16", "base", "r600s16", "r540", "s16", "r640s16")],
 }
 
-RECOMMENDED = "r540s16"       # set after the measurements: see FINDINGS
-SAFE = "r600s16"
+RECOMMENDED = "r540s16"       # 540x960 at 16 samples: see FINDINGS
+SAFE = "r600s16"              # 600x1066 at 16 samples
+SAME_SETTING = {"s16f": "s16"}   # two names of one setting (the cost and the two-seed noise are kept under 's16')
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -432,10 +476,11 @@ def run(shot, group, budget=200.0, threads=4):
     t_start = time.time()
     done = load_results()
     jobs = []
+    tag = "re" if group == "remeasure" else ""             # 'remeasure' renders everything again, in one process
     for variant, seeds, border in GROUPS[group]:
         for seed in seeds:
-            key = job_key(shot, variant, seed, border, threads)
-            if group != "remeasure" and find_job(shot, variant, seed, border, res=done) is not None:
+            key = job_key(shot, variant, seed, border, threads, tag)
+            if not tag and find_job(shot, variant, seed, border, res=done) is not None:
                 continue                                    # rendered before, with whatever thread count
             if key not in done or not os.path.exists(job_path(key)):
                 jobs.append((variant, seed, border, key))
@@ -468,7 +513,7 @@ def run(shot, group, budget=200.0, threads=4):
         if time.time() - t_start > budget:
             print("[econ] budget used: %d jobs left, run the same command again" % (len(jobs) - n), flush=True)
             break
-        rec = measure(ses, shot, variant, seed, border, threads)
+        rec = measure(ses, shot, variant, seed, border, threads, tag=tag)
         _append(rec)
         n += 1
         print("[econ] %-34s %dx%d %2dspp  sync %.2f  trace %6.1f cpu-s (%5.1f wall)  comp %.2f  save %.2f  load %.1f"
@@ -502,7 +547,7 @@ def run_seq(shot, variants, budget=200.0, threads=2, animated=False):
     for variant in variants:
         for f in seq_frames(shot):
             seed = f if animated else 0
-            if variant_path(shot, variant, f, animated=animated) is None:
+            if seq_frame_path(shot, variant, f, animated) is None:
                 jobs.append((variant, f, seed))
     if not jobs:
         print("[econ] %s sequences %s: nothing to do" % (shot, ",".join(variants)))
@@ -522,6 +567,40 @@ def run_seq(shot, variants, budget=200.0, threads=2, animated=False):
               % (rec["key"], rec["res"][0], rec["res"][1], rec["samples"], rec["trace_cpu"], rec["trace_wall"],
                  rec["load"]), flush=True)
     return 0
+
+
+def pipeline_check(shot, variant="r540s16", threads=2):
+    """Render one frame of a shot exactly the way render.py renders a film at this setting (Session.configure once,
+    then Session.render_frame; no setting is touched between frames): as the FIRST frame of the process, then the
+    frame before it, then the same frame AGAIN. Stores out/test/econ_raw/pipe_<shot>_<variant>_{first,again}.png and
+    appends a record saying which renders hold the same pixels: first == again (a chunked render gives the same
+    frame wherever a chunk starts) and which stored job of this tool they equal."""
+    v = VARIANTS[variant]
+    ses = _session(shot)
+    ses.configure(v["res"] or FINAL_RES, v["samples"] or FINAL_SAMPLES, threads, None)
+    f = SHOTS[shot]["frame"]
+    first = os.path.join(RAW, "pipe_%s_%s_first.png" % (shot, variant))
+    again = os.path.join(RAW, "pipe_%s_%s_again.png" % (shot, variant))
+    tmp = os.path.join(RAW, "_pipe_tmp.png")
+    ses.render_frame(f, first)
+    ses.render_frame(f - 1, tmp)
+    ses.render_frame(f, again)
+    if os.path.exists(tmp):
+        os.remove(tmp)
+    res = load_results()
+    same = {}
+    for key, rec in res.items():
+        if rec.get("kind") is None and rec.get("shot") == shot and rec.get("variant") == variant and not rec.get("border") \
+                and rec.get("seed") == 0 and rec.get("frame") == f and os.path.exists(os.path.join(ROOT, rec["path"])):
+            same[key] = same_pixels(first, os.path.join(ROOT, rec["path"]))
+    row = dict(key="%s|pipeline|%s" % (shot, variant), kind="pipeline", shot=shot, variant=variant, frame=f,
+               first_equals_again=same_pixels(first, again), equals_job=same, threads=threads)
+    _append(row)
+    print("[econ] pipeline %s %s frame %d: first frame of the process == the same frame rendered again later: %s"
+          % (shot, variant, f, row["first_equals_again"]))
+    for k, s_ in same.items():
+        print("[econ]   == stored job %-40s %s" % (k, s_))
+    return row
 
 
 def sync_study(shot, threads=2):
@@ -617,10 +696,11 @@ def error_to(ref_mean, path, box, size=DELIVERY):
 
 
 def _records(res, shot, variant, border, threads=4, tag=""):
+    """Finished jobs of one variant, by seed (threads=None: whatever thread count rendered them)."""
     out = [r for r in res.values() if r.get("shot") == shot and r.get("variant") == variant
-           and r.get("border") == border and r.get("threads") == threads and r.get("tag", "") == tag
-           and r.get("kind") is None]
-    return sorted(out, key=lambda r: r["seed"])
+           and r.get("border") == border and (threads is None or r.get("threads") == threads)
+           and r.get("tag", "") == tag and r.get("kind") is None]
+    return sorted(out, key=lambda r: (r["seed"], -r["threads"]))
 
 
 def idle_seconds(rec, threads=4):
@@ -646,7 +726,7 @@ def _crop_centre(arr, centre, size):
     return arr[y:y + size, x:x + size]
 
 
-def sheet_compare(shot, variants, name, res=None, crop=420, threads=4):
+def sheet_compare(shot, variants, name, res=None, crop=420, threads=None):
     """Side-by-side sheet of full-frame jobs: one column per variant; rows = the 1:1 crops of the delivered
     1080x1920 picture around SHOTS[shot]['details'], then the whole frame at phone size (360x640)."""
     import numpy as np
@@ -793,7 +873,7 @@ def report(verbose=True):
 
     # ---- full frames
     for shot in SHOTS:
-        base = _records(res, shot, "base", False)
+        base = _records(res, shot, "base", False, None)
         if not base:
             continue
         b = base[0]
@@ -803,7 +883,7 @@ def report(verbose=True):
                                                                      b["lights"], b["load"]))
         say("  variant       res        spp  sync   trace cpu-s  comp   save   idle-4-thread s   vs base   h per 1440 fr")
         for v in VARIANTS:
-            recs = _records(res, shot, v, False)
+            recs = _records(res, shot, v, False, None)
             if not recs:
                 continue
             r = recs[0]
@@ -924,11 +1004,11 @@ def report(verbose=True):
 # ----------------------------------------------------------------------------------------------------------------
 
 CANDIDATES = (("REF", "base"), ("A", "s16"), ("B", "r640s16"), ("C", "r600s16"), ("D", "r540"), ("E", "r540s16"))
-PROBES = (("F", "r540s12"), ("G", "r480s16"), ("H", "r540s16_fw"))
+PROBES = (("F", "r540s12"), ("G", "r480s16"), ("H", "r540s16_fw"), ("A*", "s16f"))
 LETTER = dict((v, k) for k, v in CANDIDATES + PROBES)
 PHONE_SIZE = (540, 960)                  # "phone size" of the brief: the delivered frame at half size
 CROP = 224                               # side of the 1:1 crops of the delivered 1080x1920 frame
-UPSCALES = ("lanczos", "bicubic", "lanczos_usm", "nn_lanczos", "mix", "nearest")
+UPSCALES = ("lanczos", "bicubic", "lanczos_usm_mild", "lanczos_usm", "nn_lanczos", "mix", "nearest")
 SEQ_SHOTS = ("night", "hall")            # the temporal study: a nearly locked camera (a 0.3-block drift in 2 s,
                                          #   handheld 0.01) and a dolly along the counter
 # still regions of the temporal study (fractions from the top left): dark and defocused parts of each shot
@@ -938,8 +1018,9 @@ SEQ_BOXES = {
     "hall": dict(bars_defocused=(0.10, 0.02, 0.70, 0.18), wall=(0.72, 0.36, 0.98, 0.60), dark_counter=(0.02, 0.73, 0.40, 0.84),
                  chest_blur=(0.05, 0.86, 0.95, 0.99)),
 }
-ACCEPTED_FLAT = 0.9                      # temporal sigma in flat areas that the finished films were accepted with
-ACCEPTED_P99 = 4.4                       #   (levels of 255) and the worst accepted 99th percentile (a grassy foreground)
+ACCEPTED_FLAT = 0.9                      # temporal noise in flat areas that the finished films were accepted with
+ACCEPTED_P99 = 4.4                       #   (levels of 255) and the 99th percentile once accepted for a grassy foreground
+                                         #   (tools/noise_check on another frame; not reproducible on these shots)
 
 
 def ref_path(shot, frame=None):
@@ -973,7 +1054,7 @@ def deliver(src, how="lanczos", size=DELIVERY):
     """A rendered frame as delivered, 1080x1920 RGB. 'lanczos' is engine.post.upscale itself (what the encoder does
     today); the other filters are the alternatives that were tested: 'bicubic', 'nearest', 'nn_lanczos' (nearest x4,
     then Lanczos down: square texels with softened steps), 'mix' (half nearest, half Lanczos), 'lanczos_usm'
-    (Lanczos, then an unsharp mask of radius 1.5 px, 60 %)."""
+    (Lanczos, then an unsharp mask of radius 1.5 px, 60 %) and 'lanczos_usm_mild' (radius 1.0 px, 35 %)."""
     from PIL import Image, ImageFilter
 
     from engine import post
@@ -995,6 +1076,8 @@ def deliver(src, how="lanczos", size=DELIVERY):
         return Image.blend(im.resize(size, Image.NEAREST), im.resize(size, Image.LANCZOS), 0.5)
     if how == "lanczos_usm":
         return im.resize(size, Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.5, percent=60, threshold=0))
+    if how == "lanczos_usm_mild":
+        return im.resize(size, Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.0, percent=35, threshold=0))
     raise ValueError(how)
 
 
@@ -1297,9 +1380,24 @@ def sheet_blind(shot, letter, name="blind"):
 
 # ---- temporal: 8 consecutive frames, encoded exactly as engine/post.py encodes a film -----------------------------
 
+def seq_frame_path(shot, variant, frame, animated=False):
+    """PNG of one frame of a variant's 8-frame sequence (None when it was not rendered). The reference comes from
+    the finished film; a 24-sample variant may use the still of the shot's own frame (a second render of it is
+    the same picture); a 16-sample variant must have been rendered inside the sequence's own run, because a
+    16-sample still that followed a 24-sample job in its Blender session is another noise realisation (see
+    FINDINGS, 'determinism')."""
+    S = SHOTS[shot]
+    if variant == "base" and not animated:
+        return ref_path(shot, frame)
+    rec = find_job(shot, variant, frame if animated else 0, False, seq_tag(frame, animated))
+    if rec is None and not animated and frame == S["frame"] and (VARIANTS[variant]["samples"] or FINAL_SAMPLES) == FINAL_SAMPLES:
+        rec = find_job(shot, variant, 0, False)
+    return os.path.join(ROOT, rec["path"]) if rec else None
+
+
 def seq_paths(shot, variant, animated=False):
     """The 8 PNGs of a variant's sequence, or None while one is missing."""
-    out = [variant_path(shot, variant, f, animated=animated) for f in seq_frames(shot)]
+    out = [seq_frame_path(shot, variant, f, animated) for f in seq_frames(shot)]
     return None if any(p is None for p in out) else out
 
 
@@ -1307,42 +1405,48 @@ def seq_name(shot, variant, animated=False, frozen=False):
     return "%s_%s%s%s" % (shot, variant, "_animseed" if animated else "", "_frozen" if frozen else "")
 
 
-def seq_encode(shot, variant, animated=False, frozen=False, word="Hello", paths=None):
-    """Encode a variant's 8 frames with engine.post.encode itself (Lanczos to 1080x1920, the caption composited
-    after the upscale, H.264 yuv420p crf 16) -> out/test/econ_seq_<shot>_<variant>.mp4. post.OUT is pointed at
-    out/test/econ_raw/enc for the call, so the frames are read from there and nothing of a real film is touched.
-    frozen=True: frame F eight times (what copying frames with an identical fingerprint gives)."""
+def _encode_frames(name, paths, mp4, word="Hello"):
+    """Encode a list of PNGs as consecutive frames with engine.post.encode itself (Lanczos to 1080x1920, the
+    caption composited after the upscale, H.264 yuv420p crf 16). post.OUT is pointed at out/test/econ_raw/enc for
+    the call, so the frames are read from there and nothing of a real film is touched."""
     import shutil
 
     from engine import post
 
+    film = "_econ_" + name
+    old_out = post.OUT
+    post.OUT = os.path.join(RAW, "enc")
+    try:
+        d = post.frames_dir(film)
+        os.makedirs(d, exist_ok=True)
+        for i, p in enumerate(paths):
+            shutil.copyfile(p, post.frame_path(film, i + 1))
+        n = len(paths)
+        post.write_meta(film, {"fps": 24, "frame_start": 1, "frame_end": n, "captions": [[word, 0.0, n / 24.0]],
+                               "signature": "econ", "frames": {str(i + 1): "econ" for i in range(n)}})
+        post.encode(film, out_path=mp4)
+        for i in range(n):
+            os.remove(post.frame_path(film, i + 1))
+        os.remove(os.path.join(d, "meta.json"))
+        os.rmdir(d)
+    finally:
+        post.OUT = old_out
+    return mp4
+
+
+def seq_encode(shot, variant, animated=False, frozen=False, word="Hello", paths=None):
+    """Encode a variant's 8 consecutive frames exactly as a film is encoded -> out/test/econ_seq_<shot>_<variant>.mp4
+    (None while frames are missing). frozen=True: frame F eight times (what copying frames with an identical
+    fingerprint gives)."""
     paths = paths or seq_paths(shot, variant, animated)
     if paths is None:
         return None
     if frozen:
         paths = [paths[3]] * len(paths)
-    name = "_econ_" + seq_name(shot, variant, animated, frozen)
     mp4 = os.path.join(TEST, "econ_seq_%s.mp4" % seq_name(shot, variant, animated, frozen))
-    newest = max(os.path.getmtime(p) for p in paths)
-    if os.path.exists(mp4) and os.path.getmtime(mp4) > newest:
+    if os.path.exists(mp4) and os.path.getmtime(mp4) > max(os.path.getmtime(p) for p in paths):
         return mp4
-    old_out = post.OUT
-    post.OUT = os.path.join(RAW, "enc")
-    try:
-        d = post.frames_dir(name)
-        os.makedirs(d, exist_ok=True)
-        for i, p in enumerate(paths):
-            shutil.copyfile(p, post.frame_path(name, i + 1))
-        n = len(paths)
-        post.write_meta(name, {"fps": 24, "frame_start": 1, "frame_end": n, "captions": [[word, 0.0, n / 24.0]],
-                               "signature": "econ", "frames": {str(i + 1): "econ" for i in range(n)}})
-        post.encode(name, out_path=mp4)
-        for i in range(n):
-            os.remove(post.frame_path(name, i + 1))
-        os.remove(os.path.join(d, "meta.json"))
-    finally:
-        post.OUT = old_out
-    return mp4
+    return _encode_frames(seq_name(shot, variant, animated, frozen), paths, mp4, word)
 
 
 def insta(mp4):
@@ -1388,17 +1492,24 @@ def temporal_maps(frames):
     return dict(sigma=sigma, noise=noise, pair=pairs.mean(axis=0), pairs=pairs)
 
 
-def flat_mask(frames, grad=4.0):
-    """Pixels of a clip that are 'still regions' for the noise measure: the temporal mean picture is flat there
-    (luma gradient under `grad` levels per pixel, so a slow camera drift changes nothing), and they are outside
-    the caption band."""
+def flat_mask(frames, grad=2.5, reach=3):
+    """Pixels of a clip that are 'still regions' for the noise measure: flat in EVERY frame (luma gradient under
+    `grad` levels per pixel everywhere within `reach` pixels, so that a camera drift of a few pixels moves nothing
+    visible through them), and outside the caption band."""
     import numpy as np
 
     from engine import captions as cap
 
-    lum = luma(frames.astype(np.float32).mean(axis=0))
-    gy, gx = np.gradient(lum)
-    m = np.hypot(gx, gy) < grad
+    g = None
+    for fr in frames:
+        gy, gx = np.gradient(luma(fr))
+        m = np.hypot(gx, gy)
+        g = m if g is None else np.maximum(g, m)
+    k = 2 * reach + 1                                        # box maximum, separable
+    pad = np.pad(g, reach, mode="edge")
+    g = np.max(np.stack([pad[:, i:i + g.shape[1]] for i in range(k)]), axis=0)
+    g = np.max(np.stack([g[i:i + frames.shape[1]] for i in range(k)]), axis=0)
+    m = g < grad
     h = m.shape[0]
     m[int(cap.CAPTION_BAND[0] * h) - 8:int(cap.CAPTION_BAND[1] * h) + 8] = False
     return m
@@ -1489,6 +1600,115 @@ def sheet_seq(shot, variants, animated=(), frozen=(), name="seq", gain=40.0, pla
     return path, stats
 
 
+def sheet_frames(shot, centre, variants=("base", "r600s16", "r540s16"), tag="at", zoom=2, size=150, gain=16.0, n=3):
+    """out/test/econ_frames_<shot>_<tag>.png: a size x size window of the ENCODED clips around `centre`, enlarged
+    `zoom` times: per variant (rows) `n` consecutive frames, then the difference of each consecutive pair x `gain`
+    (what changes from one frame to the next: motion and noise)."""
+    import numpy as np
+    from PIL import Image
+
+    rows = []
+    for v in variants:
+        mp4 = seq_encode(shot, v)
+        if mp4 is None:
+            continue
+        fr = decode(mp4)
+        x0, y0, x1, y1 = _crop_box(centre, size)
+        tiles = []
+        for i in range(n):
+            t = Image.fromarray(fr[2 + i, y0:y1, x0:x1]).resize((size * zoom, size * zoom), Image.NEAREST)
+            tiles.append(_tile_with_caption(t, ["%s f%d" % ("REF" if v == "base" else LETTER.get(v, v), seq_frames(shot)[2 + i])]))
+        for i in range(n - 1):
+            d = np.abs(fr[3 + i, y0:y1, x0:x1].astype(np.float32) - fr[2 + i, y0:y1, x0:x1].astype(np.float32)).max(axis=2)
+            t = Image.fromarray(np.clip(d * gain, 0, 255).astype(np.uint8)).convert("RGB").resize((size * zoom, size * zoom), Image.NEAREST)
+            tiles.append(_tile_with_caption(t, ["diff x%d mean %.2f" % (gain, float(d.mean()))]))
+        rows.append(tiles)
+    if not rows:
+        return None
+    path = os.path.join(TEST, "econ_frames_%s_%s.png" % (shot, tag))
+    _grid(rows).save(path)
+    return path
+
+
+def boil(shot, variant, word="Hello"):
+    """tools/noise_check on ENCODED frames: the same frame rendered with noise seeds 0 and 1, shown alternately for
+    8 frames and encoded as post.py encodes a film; nothing moves, so every frame-to-frame difference is noise that
+    survived the denoiser, the upscale and x264. Returns (stats, difference map, decoded frames) or None; stats:
+    'pair_mean' / 'pair_p99' / 'over6' = noise_check's numbers over the whole frame outside the caption band,
+    'flat_mean' / 'flat_p99' = the same in flat areas, 'sigma_flat' = pair difference / sqrt(2) there."""
+    import numpy as np
+
+    a, b = variant_path(shot, variant, seed=0), variant_path(shot, variant, seed=1)
+    if a is None or b is None:
+        return None
+    name = "%s_%s_boil" % (shot, variant)
+    mp4 = os.path.join(TEST, "econ_seq_%s.mp4" % name)
+    if not (os.path.exists(mp4) and os.path.getmtime(mp4) > max(os.path.getmtime(a), os.path.getmtime(b))):
+        _encode_frames(name, [a, b] * 4, mp4, word)
+    fr = decode(mp4)
+    maps = temporal_maps(fr)
+    flat = flat_mask(fr[:1])
+    h = flat.shape[0]
+    from engine import captions as cap
+
+    band = np.ones_like(flat)
+    band[int(cap.CAPTION_BAND[0] * h) - 8:int(cap.CAPTION_BAND[1] * h) + 8] = False
+    pr = maps["pairs"]
+    st = dict(pair_mean=float(pr[:, band].mean()), pair_p99=float(np.percentile(pr[:, band], 99)),
+              over6=float((pr[:, band] > 6).mean()), flat_mean=float(pr[:, flat].mean()),
+              flat_p99=float(np.percentile(pr[:, flat], 99)), sigma_flat=float(pr[:, flat].mean() / math.sqrt(2.0)),
+              flat_share=float(flat.mean()))
+    lum = luma(fr[0])
+    dark = band & (lum < 40.0)
+    if dark.any():
+        st.update(dark_mean=float(pr[:, dark].mean()), dark_p99=float(np.percentile(pr[:, dark], 99)),
+                  dark_share=float(dark.mean()))
+    for cn in CROP_NAMES:
+        x0, y0, x1, y1 = _crop_box(CROPS[shot][cn])
+        c = pr[:, y0:y1, x0:x1]
+        st["crop_" + cn] = [float(c.mean()), float(np.percentile(c, 99))]
+    # the same before the encoder: tools/noise_check's own numbers on the PNGs as rendered ('raw'), and on the
+    # frames as delivered, upscaled but not encoded ('up')
+    from PIL import Image
+
+    with Image.open(a) as ia, Image.open(b) as ib:
+        ra, rb = np.asarray(ia.convert("RGB")).astype(np.float32), np.asarray(ib.convert("RGB")).astype(np.float32)
+    d = np.abs(ra - rb).max(axis=2)
+    st.update(raw_mean=float(d.mean()), raw_p99=float(np.percentile(d, 99)), raw_over6=float((d > 6).mean()))
+    ua, ub = np.asarray(deliver(a)).astype(np.float32), np.asarray(deliver(b)).astype(np.float32)
+    d = np.abs(ua - ub).max(axis=2)
+    st.update(up_mean=float(d.mean()), up_p99=float(np.percentile(d, 99)), up_over6=float((d > 6).mean()),
+              up_flat_mean=float(d[flat].mean()), up_flat_p99=float(np.percentile(d[flat], 99)))
+    return st, maps["pair"], fr
+
+
+def sheet_boil(shot, variants=("base", "r600s16", "r540s16"), gain=24.0, name="boil"):
+    """out/test/econ_boil_<shot>.png: per variant the encoded frame and the frame-to-frame difference of its
+    two-seed clip x `gain`, at a third of the delivered size; returns (path, {variant: stats})."""
+    import numpy as np
+    from PIL import Image
+
+    cols, stats = [], {}
+    size = (360, 640)
+    for v in variants:
+        r = boil(shot, v)
+        if r is None:
+            continue
+        st, d, fr = r
+        stats[v] = st
+        pic = Image.fromarray(fr[0]).resize(size, Image.LANCZOS)
+        heat = Image.fromarray(np.clip(d * gain, 0, 255).astype(np.uint8)).convert("RGB").resize(size, Image.BILINEAR)
+        lab = "REF" if v == "base" else LETTER.get(v, v)
+        cols.append((_tile_with_caption(pic, ["%s %s" % (lab, v)]),
+                     _tile_with_caption(heat, ["pair %.2f p99 %.1f" % (st["pair_mean"], st["pair_p99"]),
+                                               "flat %.2f p99 %.1f" % (st["flat_mean"], st["flat_p99"])])))
+    if not cols:
+        return None, stats
+    path = os.path.join(TEST, "econ_%s_%s.png" % (name, shot))
+    _grid([[c[0] for c in cols], [c[1] for c in cols]]).save(path)
+    return path, stats
+
+
 # ---- frames that need not be rendered ---------------------------------------------------------------------------
 
 FINISHED = ("bell", "nitwit", "oneword", "poppy_night", "poppy_day")
@@ -1532,13 +1752,174 @@ def same_pixels(a, b):
         return bool((np.asarray(ia.convert("RGB")) == np.asarray(ib.convert("RGB"))).all())
 
 
-def quality_report(verbose=True, sheets=True):
+# ---- cost ---------------------------------------------------------------------------------------------------------
+
+def cost_table(tag=None):
+    """{shot: {variant: {'n', 'cpu', 'trace', 'serial', 'idle', 'load', 'rel'}}}: mean CPU seconds of a whole frame
+    (sync + trace + comp + save) over every full-frame job of that setting (all seeds, the sequence frames too),
+    'idle' = serial part + trace / 4 (seconds on four free cores) and 'rel' = cpu relative to the shot's base.
+    tag='re' takes only the jobs of the 'remeasure' group (the whole ladder in one process)."""
+    res = load_results()
+    acc = {}
+    for r in res.values():
+        if r.get("kind") is not None or r.get("border") or r.get("variant") not in VARIANTS:
+            continue
+        t = r.get("tag", "")
+        if t == "warm" or (tag is not None and t != tag) or (tag is None and t.startswith("pair_")):
+            continue
+        acc.setdefault(r["shot"], {}).setdefault(SAME_SETTING.get(r["variant"], r["variant"]), []).append(r)
+    out = {}
+    for shot, by in acc.items():
+        out[shot] = {}
+        for v, recs in by.items():
+            n = float(len(recs))
+            serial = sum(r["sync_cpu"] + r["comp_cpu"] + r["save"] for r in recs) / n
+            trace = sum(r["trace_cpu"] for r in recs) / n
+            out[shot][v] = dict(n=len(recs), cpu=serial + trace, trace=trace, serial=serial, idle=serial + trace / 4.0,
+                                load=sum(r["load"] for r in recs) / n)
+        base = out[shot].get("base")
+        for v, row in out[shot].items():
+            row["rel"] = row["cpu"] / base["cpu"] if base else None
+    return out
+
+
+def film_frame_seconds(films=FINISHED):
+    """{film: {shot: {'median', 'min', 'n'}}}: seconds between the files of consecutive final frames in
+    out/frames/<film>/ (what render.py really needed per 720x1280 / 24-sample frame with 4 threads, bookkeeping
+    included; 'min' = the machine was free, the median includes other agents' load)."""
+    out = {}
+    for film in films:
+        p = os.path.join(ROOT, "out", "frames", film, "meta.json")
+        if not os.path.exists(p):
+            continue
+        with open(p, encoding="utf-8") as f:
+            m = json.load(f)
+        out[film] = {}
+        for s in m.get("shots", []):
+            ts = []
+            for fr in range(s["frame_start"], s["frame_end"] + 1):
+                q = os.path.join(ROOT, "out", "frames", film, "f_%04d.png" % fr)
+                if os.path.exists(q):
+                    ts.append(os.path.getmtime(q))
+            d = sorted(b - a for a, b in zip(ts, ts[1:]) if 0.0 < b - a < 120.0)
+            if d:
+                out[film][s["name"]] = dict(median=d[len(d) // 2], min=d[0], n=len(d))
+    return out
+
+
+def shot_of(shot):
+    """Name of the film shot that a test shot's frame belongs to (from the film's meta.json), or None."""
+    S = SHOTS[shot]
+    p = os.path.join(ROOT, "out", "frames", S["film"], "meta.json")
+    if not os.path.exists(p):
+        return None
+    with open(p, encoding="utf-8") as f:
+        m = json.load(f)
+    for s in m.get("shots", []):
+        if s["frame_start"] <= S["frame"] <= s["frame_end"]:
+            return s["name"]
+    return None
+
+
+# ---- how a film gets the cheaper final setting, and what a global change would do to the finished films ----------
+
+def check_final_per_film(film="poppy_night", res=(540, 960), samples=16):
+    """Builds, renders nothing, writes nothing. Two questions about render.py, answered on the built scenes:
+    (1) a film whose build() sets scene.render.resolution_x / _y and scene.cycles.samples itself: does render.py
+        take that as the film's FINAL quality (frames in out/frames/<film>/, stamped with that setting)?
+    (2) what would changing render.FINAL_RES / FINAL_SAMPLES for everybody do to a finished film's frames on disk?
+    Returns a dict of the facts (the self-test checks them)."""
+    import importlib
+    import types
+
+    import render as R
+    from engine import post
+
+    real = importlib.import_module("films." + film)
+    name = "_econ_final_probe"
+
+    def build(scene):
+        out = real.build(scene)
+        sc = out["film"].scene
+        sc.render.resolution_x, sc.render.resolution_y = res          # the three lines a one-minute film adds
+        sc.cycles.samples = samples
+        return out
+
+    mod = types.ModuleType("films." + name)
+    mod.build = build
+    sys.modules["films." + name] = mod
+    out = {}
+    try:
+        ses = R.Session(name)
+        variant = R.variant_of(None, None, 1, True)                   # what `render <film> --frames all` computes
+        ses.configure(None, None, R.FINAL_THREADS, None)              # ... and how it configures the session
+        r, c = ses.scene.render, ses.scene.cycles
+        out["own_variant"] = variant
+        out["own_dir"] = os.path.relpath(post.frames_dir(name, variant), ROOT)
+        out["own_settings"] = ses.settings_key()
+        out["own_min_samples"] = c.adaptive_min_samples
+        out["own_res"] = [r.resolution_x, r.resolution_y]
+        f = ses.film.frame_start
+        out["own_fp_g"] = ses.fingerprint(f)["parts"]["g"]
+    finally:
+        sys.modules.pop("films." + name, None)
+    # (2) the finished film itself, once as it is and once with the module constants changed for everybody
+    meta = post.read_meta(film) or {}
+    stamped = meta.get("frames", {})
+    for label, final in (("asis", (R.FINAL_RES, R.FINAL_SAMPLES)), ("global", (tuple(res), samples))):
+        old = R.FINAL_RES, R.FINAL_SAMPLES
+        R.FINAL_RES, R.FINAL_SAMPLES = final
+        try:
+            ses = R.Session(film)
+            ses.configure(None, None, R.FINAL_THREADS, None)
+            book = R.Stamps(ses, film, R.variant_of(None, None, 1, True))      # reads meta.json; never saved here
+            frames = range(ses.film.frame_start, ses.film.frame_end + 1)
+            states = {}
+            for fr in frames:
+                st = book.status(fr)
+                states[st] = states.get(st, 0) + 1
+            out[label + "_states"] = states
+            if label == "asis":
+                out["asis_changed_engine_files"] = book.changed_files(
+                    [fr for fr in frames if book.status(fr) in ("engine", "engine+scene")])
+            out[label + "_settings"] = ses.settings_key()
+            f = ses.film.frame_start
+            out[label + "_fp_g"] = ses.fingerprint(f)["parts"]["g"]
+            out[label + "_stamp_g"] = (stamped.get(str(f)) or {}).get("parts", {}).get("g")
+        finally:
+            R.FINAL_RES, R.FINAL_SAMPLES = old
+    return out
+
+
+QUALITY_JSON = os.path.join(RAW, "quality.json")
+
+
+def load_quality():
+    """The stored result of quality_report() ({} when there is none)."""
+    try:
+        with open(QUALITY_JSON, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def quality_report(verbose=True, sheets=True, shots=None):
     """The second pass as tables: cost and likeness of every candidate on every shot, the upscale filters, the
-    temporal study on encoded frames and the frames that need no render; writes out/test/econ_raw/quality.json and
-    (sheets=True) the sheets out/test/econ_{crops,phone,upscale,seq,blind}_*.png. Returns the summary dict."""
+    temporal study on encoded frames, the two-seed boil test and the frames that need no render; writes
+    out/test/econ_raw/quality.json and (sheets=True) the sheets out/test/econ_{crops,phone,upscale,seq,boil,blind}_*.png.
+    `shots` limits the work to some shots (the stored results of the others are kept). Returns the summary dict."""
     say = print if verbose else (lambda *a, **k: None)
-    out = dict(quality={}, upscale={}, temporal={}, temporal_platform={}, sheets=[], identical=identical_frames())
-    for shot in SHOTS:
+    old = load_quality()
+    out = dict(quality=old.get("quality", {}), upscale=old.get("upscale", {}), temporal=old.get("temporal", {}),
+               temporal_platform=old.get("temporal_platform", {}), boil=old.get("boil", {}),
+               sheets=[p for p in old.get("sheets", []) if os.path.exists(p)], identical=identical_frames())
+    wanted = [s_ for s_ in SHOTS if shots is None or s_ in shots]
+
+    def keep(path):
+        if path and path not in out["sheets"]:
+            out["sheets"].append(path)
+
+    for shot in wanted:
         q = quality(shot)
         if not q:
             continue
@@ -1554,25 +1935,21 @@ def quality_report(verbose=True, sheets=True):
                 "  ".join("%.3f %5.1f " % (row["crops"][c]["ssim"], row["crops"][c]["psnr"]) for c in CROP_NAMES)))
         if sheets:
             for p in (sheet_crops(shot, q=q), sheet_phone(shot), sheet_phone(shot, ("A", "B", "D"), name="phone_abd")):
-                if p:
-                    out["sheets"].append(p)
+                keep(p)
             for letter in ("E", "C", "D"):
-                p = sheet_blind(shot, letter)
-                if p:
-                    out["sheets"].append(p)
-        for letter in ("E", "C"):
+                keep(sheet_blind(shot, letter))
+        for letter in ("E",):
             if letter in q:
                 if sheets:
-                    p, st = sheet_upscale(shot, letter, name="upscale" if letter == "E" else "upscale_c")
-                    if p:
-                        out["sheets"].append(p)
+                    p, st = sheet_upscale(shot, letter)
+                    keep(p)
                 else:
-                    st = {}
+                    st = out["upscale"].get(shot, {}).get(letter, {})
                 out["upscale"].setdefault(shot, {})[letter] = st
                 if st:
                     say("  upscale filters for %s:  " % letter + "   ".join(
                         "%s ssim %.4f phone %.4f sharp x%.2f" % (h, s["ssim"], s["phone_ssim"], s["sharp"]) for h, s in st.items()))
-    for shot in SEQ_SHOTS:
+    for shot in [s_ for s_ in SEQ_SHOTS if s_ in wanted]:
         have = [v for _l, v in CANDIDATES + PROBES if seq_paths(shot, v) is not None]
         if "base" not in have or len(have) < 2:
             continue
@@ -1581,8 +1958,7 @@ def quality_report(verbose=True, sheets=True):
         for platform in (False, True):
             if sheets:
                 path, stats = sheet_seq(shot, have, anim, frozen, name="seq_insta" if platform else "seq", platform=platform)
-                if path:
-                    out["sheets"].append(path)
+                keep(path)
             else:
                 stats = temporal(shot, have, anim, frozen, platform)[0]
             out["temporal_platform" if platform else "temporal"][shot] = stats
@@ -1601,6 +1977,30 @@ def quality_report(verbose=True, sheets=True):
                     100 * f["over6"], a["noise"], a["noise_p99"],
                     " | ".join("%5.2f %5.2f" % (row[b]["noise"], row[b]["noise_p99"]) for b in boxes),
                     ("%.4f %.1f %.4f" % (vr["ssim"], vr["psnr"], vr["phone_ssim"])) if vr else "reference"))
+    for shot in wanted:
+        names = [v for v in ("base", "s16", "r640s16", "r600s16", "r540", "r540s16") if variant_path(shot, v, seed=1)]
+        if "base" not in names:
+            continue
+        if sheets:
+            path, stats = sheet_boil(shot, [v for v in ("base", "r600s16", "r540s16") if v in names])
+            keep(path)
+        stats = {}
+        for v in names:
+            r = boil(shot, v)
+            if r is not None:
+                stats[v] = r[0]
+        out["boil"][shot] = stats
+        say("\nBOIL %s: the same frame with noise seeds 0 and 1 shown alternately, encoded as post.py does; every "
+            "frame-to-frame difference is noise (tools/noise_check on encoded frames). Accepted so far: flat mean "
+            "<= %.1f, p99 <= %.1f" % (shot, ACCEPTED_FLAT, ACCEPTED_P99))
+        say("  setting            as rendered: mean p99 >6 | upscaled: mean p99 flat | ENCODED whole frame: mean  p99  >6 lv "
+            "| flat: mean  p99 | dark (<40): mean  p99 | " + " | ".join("%s mean p99" % c for c in CROP_NAMES))
+        for v, st in stats.items():
+            say("  %-4s %-12s  %4.2f %4.1f %4.2f%% | %4.2f %4.1f %4.2f | %5.2f %5.1f %5.2f%% | %5.2f %5.1f | %5.2f %5.1f | %s" % (
+                "REF" if v == "base" else LETTER.get(v, v), v, st["raw_mean"], st["raw_p99"], 100 * st["raw_over6"],
+                st["up_mean"], st["up_p99"], st["up_flat_mean"], st["pair_mean"], st["pair_p99"], 100 * st["over6"],
+                st["flat_mean"], st["flat_p99"], st.get("dark_mean", 0.0), st.get("dark_p99", 0.0),
+                " | ".join("%4.2f %4.1f" % tuple(st["crop_" + c]) for c in CROP_NAMES)))
     say("\nIDENTICAL FRAMES (scene fingerprints in out/frames/<film>/meta.json):")
     for film, r in out["identical"].items():
         say("  %-12s %3d frames: %d identical to the frame before, %d identical to any earlier frame "
@@ -1608,7 +2008,7 @@ def quality_report(verbose=True, sheets=True):
                                                                       r["same_as_any_earlier"], r["camera_same"],
                                                                       r["objects_same"], r["lights_same"]))
     os.makedirs(RAW, exist_ok=True)
-    with open(os.path.join(RAW, "quality.json"), "w", encoding="utf-8") as f:
+    with open(QUALITY_JSON, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=1)
     if sheets:
         say("\nsheets:")
@@ -1628,14 +2028,136 @@ def listing():
         total = sum(len(seeds) for _v_, seeds, _b in jobs)
         row = []
         for shot in SHOTS:
-            n = sum(job_key(shot, v, s, b) in res for v, seeds, b in jobs for s in seeds)
+            n = sum(find_job(shot, v, s, b, "re" if g == "remeasure" else "", res=res) is not None
+                    for v, seeds, b in jobs for s in seeds)
             row.append("%s %d/%d" % (shot, n, total))
         print("  %-14s %s" % (g, "  ".join(row)))
     return 0
 
 
-def selftest():
-    """No rendering: check the stored measurements for consistency and rebuild the report. Exit code 1 on failure."""
+LADDER = ("base", "s16", "r640s16", "r600s16", "r540", "r540s16")
+
+
+def _setting(v):
+    r = VARIANTS[v]["res"] or FINAL_RES
+    return "%dx%d@%d" % (r[0], r[1], VARIANTS[v]["samples"] or FINAL_SAMPLES)
+
+
+def projection():
+    """{variant: {'cpu', 'rel', 'idle', 'hours', 'hours_low', 'hours_high'}} for the ladder: mean over the five
+    shot types of the CPU seconds of a frame, the cost relative to the current final (mean of the per-shot
+    ratios), seconds per frame on four free cores and hours for 1,440 frames. 'idle' is anchored on what the
+    finished films' own frames took (film_frame_seconds: the free-machine time of each test shot's film shot)
+    times the measured ratio; 'hours_low' / 'hours_high' = the cheapest / dearest of the five shot types."""
+    cost = cost_table()
+    secs = film_frame_seconds()
+    shots = [s for s in ("dusk", "hall", "sun", "night", "face") if "base" in cost.get(s, {})]
+    out = {}
+    for v in LADDER:
+        rows = [(s, cost[s][v]) for s in shots if v in cost[s]]
+        if not rows:
+            continue
+        rel = [r["cpu"] / cost[s]["base"]["cpu"] for s, r in rows]
+        idle = []
+        for (s, r), k in zip(rows, rel):
+            real = (secs.get(SHOTS[s]["film"], {}).get(shot_of(s)) or {}).get("min")
+            base = cost[s]["base"]
+            # the serial part does not shrink with the samples; the trace does
+            idle.append((real or base["idle"]) * (r["serial"] + r["trace"] / 4.0) / (base["serial"] + base["trace"] / 4.0))
+        out[v] = dict(cpu=sum(r["cpu"] for _s, r in rows) / len(rows), rel=sum(rel) / len(rel), idle=sum(idle) / len(idle),
+                      hours=project(sum(idle) / len(idle)), hours_low=project(min(idle)), hours_high=project(max(idle)),
+                      shots=len(rows))
+    return out
+
+
+def findings():
+    """The conclusions with the measured numbers filled in from the stored results (the text of FINDINGS)."""
+    q = load_quality()
+    cost = cost_table()
+    proj = projection()
+    lines = []
+    add = lines.append
+    add("=" * 100)
+    add("RENDER ECONOMICS: FINDINGS  (reference REF = the current final, 720x1280 at 24 samples)")
+    add("=" * 100)
+    add("1. COST: CPU seconds of one frame (sync + path tracing + denoising + compositing + PNG), all jobs of a setting")
+    add("   averaged (n), and in brackets the cost relative to REF on the same shot.")
+    add("   %-7s" % "shot" + "".join("%-22s" % ("%s %s" % ("REF" if v == "base" else LETTER[v], _setting(v))) for v in LADDER))
+    for shot in SHOTS:
+        by = cost.get(shot, {})
+        if "base" not in by:
+            continue
+        add("   %-7s" % shot + "".join(("%-22s" % ("%5.1f (%.2f) n=%d" % (by[v]["cpu"], by[v]["rel"], by[v]["n"]))) if v in by
+                                    else "%-22s" % "-" for v in LADDER))
+    if proj:
+        add("   %-7s" % "mean" + "".join("%-22s" % ("%5.1f (%.2f)" % (proj[v]["cpu"], proj[v]["rel"])) for v in LADDER if v in proj))
+        add("   Four free cores, seconds per frame (anchored on the %s s the finished films' own frames took when the"
+            % "-".join("%.1f" % x for x in (min(_real_seconds()), max(_real_seconds()))))
+        add("   machine was free) and hours for 1,440 frames (range = cheapest .. dearest shot type):")
+        add("   %-7s" % "s/fr" + "".join("%-22s" % (" %.1f" % proj[v]["idle"]) for v in LADDER if v in proj))
+        add("   %-7s" % "hours" + "".join("%-22s" % ("%.1f (%.1f .. %.1f)" % (proj[v]["hours"], proj[v]["hours_low"], proj[v]["hours_high"]))
+                                        for v in LADDER if v in proj))
+    add("")
+    add("2. STILLS against REF as delivered (Lanczos to 1080x1920): SSIM on luma of the whole frame / at phone size")
+    add("   (540x960), worst of the five 1:1 crops, acutance relative to REF. REF2 = REF with another noise seed (what two")
+    add("   renders of the current final differ by); A* = A rendered as render.py would (A itself shares its samples with REF).")
+    for shot, rows in q.get("quality", {}).items():
+        add("   %-7s" % shot + "  ".join("%s %.4f/%.4f/%.3f/x%.2f" % (
+            letter, r["ssim"], r["phone_ssim"], min(c["ssim"] for c in r["crops"].values()), r["sharp"])
+            for letter, r in rows.items() if letter in ("REF2", "A", "A*", "B", "C", "D", "E", "F", "G")))
+    add("")
+    add("3. TEMPORAL, on frames encoded as engine/post.py encodes a film (levels of 255).")
+    add("   a) the same frame with two noise seeds, shown alternately (tools/noise_check's method; nothing moves, every")
+    add("      difference is noise): mean / 99th percentile over the frame, mean in flat areas. Accepted so far: flat <= %.1f."
+        % ACCEPTED_FLAT)
+    for shot, rows in q.get("boil", {}).items():
+        add("      %-7s" % shot + "  ".join("%s %.2f/%.0f/%.2f" % ("REF" if v == "base" else LETTER.get(v, v), st["pair_mean"],
+                                                                st["pair_p99"], st["flat_mean"]) for v, st in rows.items()))
+    add("   b) 8 consecutive frames with the film's own fixed seed: frame-to-frame noise in still regions / worst dark or")
+    add("      defocused box relative to REF.")
+    for shot, rows in q.get("temporal", {}).items():
+        base = rows.get("base")
+        if not base:
+            continue
+        parts = []
+        for nm, st in rows.items():
+            if "frozen" in nm or "animseed" in nm:
+                continue
+            worst = max(st[b]["noise"] / max(base[b]["noise"], 0.05) for b in SEQ_BOXES.get(shot, {}))
+            parts.append("%s %.2f/x%.2f" % ("REF" if nm == "base" else LETTER.get(nm, nm), st["flat"]["noise"], worst))
+        add("      %-7s" % shot + "  ".join(parts))
+        for nm, st in rows.items():
+            if "frozen" in nm or "animseed" in nm:
+                add("      %-7s %s: %.2f" % ("", nm, st["flat"]["noise"]))
+    add("")
+    ident = q.get("identical") or identical_frames()
+    add("4. FRAMES THAT NEED NO RENDER: %d frames of the finished films, %d with the fingerprint of the frame before, %d"
+        % (sum(r["frames"] for r in ident.values()), sum(r["same_as_previous"] for r in ident.values()),
+           sum(r["same_as_any_earlier"] for r in ident.values())))
+    add("   with the fingerprint of any earlier frame. render.py does not look for such frames (it renders every frame).")
+    add("")
+    add(FINDINGS.strip("\n"))
+    return "\n".join(lines)
+
+
+def _real_seconds():
+    secs = film_frame_seconds()
+    out = []
+    for s in ("dusk", "hall", "sun", "night", "face"):
+        r = (secs.get(SHOTS[s]["film"], {}).get(shot_of(s)) or {}).get("min")
+        if r:
+            out.append(r)
+    return out or [0.0]
+
+
+def selftest(build=True):
+    """Checks the stored measurements (no rendering; exit code 1 on a failed check): the settings are legal, a
+    second render of a frame is the same picture bit for bit, the first-pass numbers are consistent, RECOMMENDED and
+    SAFE are cheaper than the current final, as close to it on a phone as the brief asks and inside the accepted
+    temporal noise, the finished films hold no identical frames, the sheets exist, and (build=True: builds one
+    film three times, about 20 s) render.py takes a film's own resolution and samples as its final quality while a
+    change of render.FINAL_RES for everybody would make every finished frame stale. `quality` rebuilds the numbers
+    and the sheets from the stored renders; this reads them (out/test/econ_raw/quality.json)."""
     ok = True
 
     def check(cond, text):
@@ -1653,7 +2175,38 @@ def selftest():
     if not res:
         print("[econ] no measurements stored yet (run the groups first)")
         return 0 if ok else 1
-    summary = report(verbose=True)
+
+    # ---- the same frame rendered again is the same picture, bit for bit
+    n_same = 0
+    for shot, S in SHOTS.items():
+        fin = os.path.join(ROOT, "out", "frames", S["film"], "f_%04d.png" % S["frame"])
+        for rec in res.values():
+            if rec.get("kind") is None and rec.get("shot") == shot and rec.get("variant") == "base" and rec.get("seed") == 0 \
+                    and not rec.get("border") and rec.get("frame") == S["frame"] and rec.get("tag", "") in ("", "re") \
+                    and os.path.exists(fin) and os.path.exists(os.path.join(ROOT, rec["path"])):
+                n_same += 1
+                check(same_pixels(fin, os.path.join(ROOT, rec["path"])),
+                      "%s: the 'base' job %s is bit-identical to the finished film's frame %s (rendered days earlier)"
+                      % (shot, rec["key"], os.path.relpath(fin, ROOT)))
+    check(n_same >= 2, "the current final was rendered again %d times, always the same pixels" % n_same)
+    for rec in res.values():
+        if rec.get("kind") != "pipeline":
+            continue
+        check(rec["first_equals_again"],
+              "%s %s rendered the way render.py renders a film: the first frame of a process and the same frame "
+              "rendered again later hold the same pixels" % (rec["shot"], rec["variant"]))
+        fresh = [k for k, same in rec["equals_job"].items() if same]
+        other = [k for k, same in rec["equals_job"].items() if not same]
+        check(fresh, "  it is the picture of this tool's jobs %s" % ", ".join(fresh))
+        if other:
+            # a quirk of Cycles' persistent session that this tool ran into (render.py never changes the sample
+            # count inside a process): 16 samples after a 24-sample render in the same session = another noise
+            # realisation (the first 16 samples of the 24-sample job's sequence); equal quality, see FINDINGS
+            print("[econ] note  not the picture of %s: 16-sample jobs that followed a 24-sample job in the same "
+                  "Blender session are another noise realisation" % ", ".join(other))
+
+    # ---- first pass (border sweeps of the settings)
+    summary = report(verbose=False)
     for shot, S in summary["shots"].items():
         full = S.get("full", {})
         if "base" in full:
@@ -1661,25 +2214,89 @@ def selftest():
             check(b["trace_cpu"] > 4.0 * (b["sync"] + b["comp"] + b["save"]),
                   "%s: the trace is the bulk of a base frame (%.1f cpu-s against %.2f s serial)"
                   % (shot, b["trace_cpu"], b["sync"] + b["comp"] + b["save"]))
-            for v in (RECOMMENDED, SAFE):
-                if v in full:
-                    check(full[v]["idle"] < b["idle"], "%s: %s is cheaper than base (x%.2f)" % (shot, v, full[v]["rel"]))
-        temp = S.get("temporal", {})
-        if "base" in temp:
-            for v in (RECOMMENDED, SAFE):
-                if v in temp:
-                    check(temp[v]["flat_mean"] < 1.5 and temp[v]["p99"] < 2.0 * max(temp["base"]["p99"], 2.2),
-                          "%s: %s temporal sigma flat %.2f (base %.2f), p99 %.1f (base %.1f)"
-                          % (shot, v, temp[v]["flat_mean"], temp["base"]["flat_mean"], temp[v]["p99"], temp["base"]["p99"]))
-    for p in summary["sheets"]:
+        for v, row in S.get("border", {}).items():
+            if v in ("ad_005", "ad_02", "ad_min4", "ad_min12", "lst05", "tb4", "diff1", "gloss0", "glare_med",
+                     "dn_pf_fast", "dn_pf_none", "dn_q_fast", "dn_q_high", "dn_rgb", "dn_rgb_albedo"):
+                check(abs(row["rel"] - 1.0) <= 0.16, "%s: %s moves the trace by x%.2f (a side issue)" % (shot, v, row["rel"]))
+
+    # ---- cost
+    cost = cost_table()
+    for shot, by in cost.items():
+        if "base" not in by:
+            continue
+        for v, lim in ((RECOMMENDED, 0.60), (SAME_SETTING.get(SAFE, SAFE), 0.78)):
+            if v in by:
+                check(by[v]["rel"] < lim, "%s: %s costs x%.2f of the current final (%.0f against %.0f cpu-s)"
+                      % (shot, v, by[v]["rel"], by[v]["cpu"], by["base"]["cpu"]))
+
+    # ---- second pass (stored by `quality`)
+    q = load_quality()
+    stale = not q or os.path.getmtime(QUALITY_JSON) < os.path.getmtime(RESULTS)
+    check(not stale, "out/test/econ_raw/quality.json is newer than the last render (else run: quality)")
+    rl, sl = LETTER[RECOMMENDED], LETTER[SAFE]
+    for shot, rows in q.get("quality", {}).items():
+        floor = rows.get("REF2")
+        for letter in (rl, sl):
+            row = rows.get(letter)
+            if not row:
+                continue
+            lim = min(0.985, (floor["phone_ssim"] - 0.006) if floor else 0.985)
+            check(row["phone_ssim"] >= lim and row["phone_p99"] <= 9.0,
+                  "%s: %s at phone size: SSIM %.4f (two renders of the current final differ by %s), 99 %% of the "
+                  "pixels within %.1f levels" % (shot, letter, row["phone_ssim"],
+                                                 ("%.4f" % floor["phone_ssim"]) if floor else "?", row["phone_p99"]))
+    for shot, rows in q.get("boil", {}).items():
+        base = rows.get("base")
+        for v in (RECOMMENDED, SAME_SETTING.get(SAFE, SAFE)):
+            st = rows.get(v)
+            if not (st and base):
+                continue
+            # flat areas: the level the finished films were accepted with. The 99th percentile of the whole frame
+            # is judged against the current final's own (5-6 here; the 4.4 once accepted for a grassy foreground
+            # was another frame and another measure: the current final's grass reads 10 by this one): +2 at most
+            check(st["flat_mean"] <= ACCEPTED_FLAT and st["pair_p99"] <= base["pair_p99"] + 2.0,
+                  "%s: %s two-seed noise on encoded frames: flat %.2f (current final %.2f, accepted %.1f), 99th "
+                  "percentile %.0f (current final %.0f; at most +2)" % (shot, v, st["flat_mean"], base["flat_mean"],
+                                                                         ACCEPTED_FLAT, st["pair_p99"], base["pair_p99"]))
+    for shot, rows in q.get("temporal", {}).items():
+        base = rows.get("base")
+        for v in (RECOMMENDED, SAFE):
+            st = rows.get(v)
+            if not (st and base):
+                continue
+            worst = max(st[b]["noise"] / max(base[b]["noise"], 0.05) for b in SEQ_BOXES.get(shot, {}))
+            check(st["flat"]["noise"] <= 1.15 * base["flat"]["noise"] + 0.05 and worst <= 1.25,
+                  "%s: %s over 8 consecutive encoded frames: noise in still regions %.2f (current final %.2f), "
+                  "worst dark / defocused box x%.2f of the current final" % (shot, v, st["flat"]["noise"],
+                                                                             base["flat"]["noise"], worst))
+    ident = identical_frames()
+    check(ident and all(r["same_as_previous"] == 0 and r["same_as_any_earlier"] == 0 for r in ident.values()),
+          "finished films: %d frames, none has the fingerprint of another frame (nothing to copy)"
+          % sum(r["frames"] for r in ident.values()))
+    for p in q.get("sheets", []):
         check(os.path.exists(p), "sheet %s" % os.path.relpath(p, ROOT))
+
+    # ---- how the setting gets into render.py
+    if build:
+        f = check_final_per_film()
+        v = VARIANTS[RECOMMENDED]
+        want = "%dx%d|%dspp|mb1" % (v["res"][0], v["res"][1], v["samples"])
+        check(f["own_variant"] is None and f["own_dir"].startswith(os.path.join("out", "frames")) and f["own_settings"] == want,
+              "a film that sets its own resolution and samples in build() renders FINAL frames (%s) stamped %s"
+              % (f["own_dir"], f["own_settings"]))
+        check(set(f["asis_states"]) <= {"valid", "engine"} and f["asis_fp_g"] == f["asis_stamp_g"],
+              "the finished film as it is: frames %s, look fingerprint unchanged" % f["asis_states"])
+        check(set(f["global_states"]) == {"size"} and f["global_fp_g"] != f["asis_stamp_g"],
+              "render.FINAL_RES / FINAL_SAMPLES changed for everybody: every finished frame turns stale %s"
+              % f["global_states"])
+    print(findings())
     return 0 if ok else 1
 
 
 def main(argv):
     """Entry point."""
-    if not argv:
-        return selftest()
+    if not argv or argv[0] == "--no-build":
+        return selftest(build=not argv)
     cmd = argv[0]
     opt = {}
     rest = []
@@ -1701,14 +2318,114 @@ def main(argv):
         return 0
     if cmd == "run":
         return run(rest[0], rest[1], budget=opt.get("budget", 200.0), threads=int(opt.get("threads", 2)))
+    if cmd == "findings":
+        print(findings())
+        return 0
+    if cmd == "pipeline":
+        pipeline_check(rest[0], rest[1] if len(rest) > 1 else RECOMMENDED, threads=int(opt.get("threads", 2)))
+        return 0
     if cmd == "quality":
-        quality_report(sheets="--no-sheets" not in argv)
+        quality_report(sheets="--no-sheets" not in argv, shots=rest or None)
         return 0
     if cmd == "seq":
         return run_seq(rest[0], rest[1].split(","), budget=opt.get("budget", 200.0),
                        threads=int(opt.get("threads", 2)), animated="--animated" in argv)
     print(__doc__)
     return 1
+
+
+FINDINGS = """
+5. WHAT THE NUMBERS SAY
+   COST. A frame costs pixels, hardly samples: adaptive sampling already stops most pixels before the cap, so A
+   (720x1280 at 16) saves 0-22 % (nothing in daylight) and D (540x960 at 24) costs what E costs in daylight and
+   25 % more at dusk and in the hall. E (540x960 at 16) is 0.43-0.55 of the current final, C (600x1066 at 16)
+   0.51-0.73. The first pass's 81 CPU seconds for a current-final frame were read at load 6-9; at load 2-3 the same
+   frame reads 69-72 (and equals the finished film's frame bit for bit); the ratios are the same at either load.
+   STILLS. Two renders of the CURRENT final (REF and REF2) agree to SSIM 0.990-0.994; that is the floor. A* sits
+   on the floor on all five shots. B, C, D and E are all 0.983-0.989 (phone size 0.987-0.992 against a floor of
+   0.991-0.995): whatever is below 720x1280 loses the same small step and then almost nothing more down to
+   540x960. Blind pairs at phone size (reference and candidate side by side in an order drawn at random, judged
+   before the key was read): E against REF on the five shots: 3 of 5 named right, which is chance; even G
+   (480x854) on the night shot was named wrong. At 1:1 and enlarged, E's fine texels in wide shots (cobblestone
+   of the well, far grass) have softer edges than REF's: edge contrast x0.95-0.98 overall, x0.94 on the worst crop;
+   C x0.97-0.99. Texels stay square, there are no stair-steps, faces and large texels are unchanged.
+   UPSCALE. engine.post.upscale (Lanczos) stays. Nearest and nearest-x4-then-Lanczos keep hard texel edges but
+   put stair-steps on every slanted edge and on depth-of-field blur; an unsharp mask after Lanczos brings the
+   edge contrast back to REF's (x1.00-1.08) and draws a bright fringe along high-contrast texel edges (the white
+   of an eye beside its green); bicubic is softer. A narrower pixel filter for the 2x upscale (H, filter_width 1.0
+   instead of 1.3; night shot only) costs 20 % more and changes nothing measurable.
+   TEMPORAL. (a) Per-frame noise, two seeds of one frame, encoded: E 0.46-1.13 against REF 0.50-0.77 (mean of five
+   shots 0.79 against 0.63), flat areas 0.15-0.69 against 0.20-0.55; the 99th percentile 6-8 against 5-6. Every
+   16-sample setting has that noise whatever its resolution (A 0.59-1.10, C 0.59-1.23), and 24 samples at 540x960
+   (D) are no better on average: it comes with lantern light (hall x1.5, dusk x1.6), not with daylight (x1.0).
+   All flat-area values are inside what the finished films were accepted with (<= 0.9). The 99th percentile once
+   accepted for a grassy foreground (4.4) cannot be compared: by this measure the current final's own frames read
+   5-6 and its night grass 10 (E 11); so it is judged against the current final: at most 2 levels more. The dark
+   defocused houses of the night shot: REF 1.0, every smaller setting 1.4-1.5. (b) What the film really shows, 8 consecutive
+   encoded frames: frame-to-frame noise in still regions is the SAME for REF, A*, C, D and E (night 0.33-0.35,
+   hall 1.41-1.42, every dark or defocused box within 6 % of REF; the worst single number is the 99th percentile
+   in the night shot's far houses, REF 3.6, E 5.1). After an Instagram-like second encode nothing separates them.
+   The fixed noise seed is why (b) is so much calmer than (a): render.py renders every frame with cycles.seed 0,
+   so the residual pattern stays where the picture stays. E with the seed animated (seed = frame number) boils
+   in exactly the place the brief feared: far houses 1.71 against 1.24 (99th percentile 7.9 against 5.1).
+   KEEP THE SEED FIXED.
+   DETERMINISM. A frame rendered again by render.py is the same picture bit for bit: three 'base' jobs equal the
+   finished films' frames rendered days earlier, and at E the first frame of a process equals the same frame
+   rendered later in another position. One trap, in this tool only: inside one Blender session a 16-sample render
+   that follows a 24-sample render is another noise realisation of equal quality (it takes the first 16 samples of
+   the longer sequence). render.py never changes the sample count between final frames, but a call that mixes
+   --still --samples 24 with --frames of a 16-sample film in one process would stamp frames that a later chunk
+   cannot reproduce bit for bit. Render finals in calls of their own, as the contract already says.
+   IDENTICAL FRAMES. None in the finished films (every shot has handheld drift and idle motion: the camera digest
+   never repeats). render.py renders every frame it is asked for and does not look for an equal fingerprint.
+   Because the seed is fixed, a frame with the fingerprint of an earlier one would come out bit-identical, so
+   copying it is exactly what rendering gives: a held picture (x264 codes it as skipped blocks, temporal sigma
+   0.01). That is acceptable and it is what a locked-off shot looks like today; it saves nothing until a film
+   holds a truly still shot (no handheld, no idle motion), so it is not worth a change to render.py now.
+
+6. RECOMMENDATION
+   RECOMMENDED  E = 540x960 at 16 samples (adaptive minimum 5), everything else as now; delivered by the same
+                Lanczos upscale (exactly 2x). Half the time: see the table (about 2.9 h instead of 5.8 h for 1,440
+                frames on four free cores; a film of dusk and lantern shots: 2.9 h instead of 6.4-6.6 h).
+                It is the setting every test still of this project has been judged at (render.py STILL_RES /
+                STILL_SAMPLES, engine/quick.py). What gets worse: small texels in wide shots are a little softer
+                when the delivered frame is inspected at 1:1 beside the current final; the per-frame noise along
+                lantern-lit edges is 1.5 times the current final's and stays under the accepted level. Not
+                visible at phone size, not measurable in consecutive encoded frames.
+   SAFE         C = 600x1066 at 16 samples: about 3.5 h (3.2-3.9 h by shot type). Half of E's loss of edge
+                contrast at 1:1 comes back (x0.97-0.99); the noise and the phone-size picture are E's. There is no
+                step between C and the current final worth taking: B (640x1138) is C plus about 8 % time for one
+                more percent of edge contrast, A saves 0-22 % and D buys nothing.
+   Nothing cheaper than E is recommended: on the night shot (the only one they were rendered for) G (480x854) is
+   softer at 1:1 (x0.92, texels x0.89) for another 18 % and F (540x960 at 12 samples) is further from the reference
+   for 12 %; 540x960 is also the exact half of the delivery size.
+
+7. THE EXACT CHANGE (no engine file and no line of render.py has to change)
+   In the film script of each one-minute film, in build(scene), on the scene the film is built in (any place before
+   the return; verified by check_final_per_film, which builds a film this way):
+       scene.render.resolution_x, scene.render.resolution_y = 540, 960     # SAFE: 600, 1066
+       scene.cycles.samples = 16
+   render.py takes the film's own values as its final quality: Session.__init__ reads them into self.base
+   (render.py line 439), Session.configure keeps them when no --res / --samples is given and sets the adaptive
+   minimum to max(4, samples // 3) = 5 (lines 526-537), variant_of(None, None, 1) is None (lines 236-245), so
+   `render <film> --frames all --max-seconds 240` writes out/frames/<film>/f_####.png at 540x960, stamped
+   '540x960|16spp|mb1', and `--encode` upscales them (engine/post.py upscale, lines 212-215, unchanged).
+   Do NOT pass --res / --samples for finals (that selects a preview directory) and do NOT change
+   render.FINAL_RES / FINAL_SAMPLES (render.py line 177) or the defaults of look.setup_render (engine/look.py
+   line 144): they are the final quality of the four finished films. Changed for everybody, all 1,206 finished
+   frames turn stale (status 'size': the PNG has another size; the 'g' part of every fingerprint changes too) and
+   the next `--frames all` on a finished film would render it again over the delivered frames without stopping,
+   because only engine-source changes stop a run (exit code 3), not a change of settings.
+   A film rendered at E and switched to SAFE later (or back) is rendered again completely: every frame is stale by
+   its size, and --encode refuses frames of mixed sizes, so two settings can never be mixed in one film.
+   Leave scene.cycles.seed at 0 and use_animated_seed off (look.setup_render does not touch them).
+
+8. NOT VERIFIED
+   No finished one-minute film was rendered at E; the evidence is five shot types of the finished films (stills),
+   two of them as 8-frame clips. The Instagram re-encode is a stand-in (720x1280, x264 crf 27), not the platform.
+   The blind pairs were judged by the author of this study on stills, not on moving pictures by the client.
+   Hours are for four free cores; with other agents on the machine the finished films took up to twice as long.
+"""
 
 
 if __name__ == "__main__":

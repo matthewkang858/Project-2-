@@ -29,7 +29,13 @@ def build(scene):
     from films.lookdev import Stage
 
     look.setup_render(scene, res=(540, 960), samples=16, threads=2, motion_blur=True)
-    v = village.build_village(scene, seed=1)
+
+    def edit(b):
+        """The two pens, built into the village (no meadow plants inside the rails)."""
+        animals.pen_set(b, *COW_PEN, gates=[(7, 27)], name="cow_pen")
+        animals.pen_set(b, *COOP, gates=[(-9, 28)], name="coop")
+
+    v = village.build_village(scene, seed=1, edit=edit)
     sky = look.set_time(scene, "day", sun_azimuth=190.0, sun_elevation=42.0)
     look.setup_compositor(scene, bloom=1.0, grade="warm")
     v.set_lantern_energy(0.0)
@@ -37,8 +43,7 @@ def build(scene):
     st = Stage(scene, film, v, sky)
     info = {}
 
-    cow_pen = animals.make_pen(scene, *COW_PEN, gates=[(7, 27)], name="cow_pen")
-    coop = animals.make_pen(scene, *COOP, gates=[(-9, 28)], name="coop")
+    cow_pen, coop = v.sets["cow_pen"], v.sets["coop"]
     cows = [animals.add_cow(st, "cow%d" % i) for i in range(4)] + [animals.add_cow(st, "calf", baby=True)]
     hens = [animals.add_chicken(st, "hen%d" % i) for i in range(5)] + [animals.add_chicken(st, "chick", baby=True)]
     daisy = animals.add_cow(st, "daisy")
@@ -113,11 +118,10 @@ def build(scene):
     f0, f1 = s.frame_start, s.frame_end
     area = coop["area"]
     back = (area[0], area[1] + 3.3, area[2], area[3])                   # the others keep to the back of the coop
-    info["coop"] = animals.wander(hens, f0, f1 + 1, back, seed=8)
     lp = (-9.9, 30.2, 0.0)
     layer.place(f0, lp, math.radians(-150))
     layer.idle(f0, f1 + 1, seed=1)
-    egg = animals.lay_egg(layer, f0 + 14, seed=3, until=f1 + 1, stage=st)
+    egg = animals.lay_egg(layer, f0 + 14, seed=3, until=f1 + 1, stage=st, shot=s)
     sp = (-6.6, 29.6, 0.0)
     hp = (-7.9, 30.1, 0.0)
     steve.place(f0, sp, yaw_to(sp, hp))
@@ -133,17 +137,20 @@ def build(scene):
     hit2 = max(flee, step) + 4
     steve.swing_arm(hit2 - 2)
     gone = lucky.die(hit2, camera=s, attacker=steve, max_back=0.8, seed=6, village=v)
+    loot = animals.drop_loot(lucky, hit2, seed=2, until=f1 + 1, stage=st, shot=s)
+    # the others: keyed last, so that they know where Steve, the layer and the hen that is hit are and will be
+    info["coop"] = animals.wander(hens, f0, f1 + 1, back, seed=8, avoid=[steve, lucky, layer])
     s.lens(28, 3.2)
     s.move((-6.9, 27.1, 1.3), (-8.7, 30.6, 0.55), (-7.1, 27.2, 1.3))
     s.focus(lucky.head)
-    st.use(s, steve, lucky, layer, egg, *hens)
+    st.use(s, steve, lucky, layer, *hens)
     st.hero(s, "hen", lucky)
     st.lights(s, scale=0.0)
     info["coop_beats"] = dict(egg=f0 + 14, hit1=hit1, up=up, flee=flee, hit2=hit2, gone=gone)
 
     st.finish()
     return film, st, dict(cows=cows, hens=hens, daisy=daisy, calf2=calf2, lucky=lucky, layer=layer, steve=steve,
-                          egg=egg, info=info, v=v, cow_pen=cow_pen, coop=coop)
+                          egg=egg, loot=loot, info=info, v=v, cow_pen=cow_pen, coop=coop)
 
 
 def check(scene, film, st, cast):
@@ -168,7 +175,7 @@ def check(scene, film, st, cast):
         want = st.in_shot[name]
         got = {n for n, c in st.cast.items() if rendered(c, s.frame_start + 2)}
         if name == "coop":
-            got |= {cast["egg"].name} if rendered(cast["egg"], s.frame_end) else set()
+            got |= {it.name for it in [cast["egg"]] + cast["loot"] if rendered(it, s.frame_end)}
         expect("shot %-5s frames %d-%d shows %d of the cast" % (name, s.frame_start, s.frame_end, len(want)), got == want,
                "extra %s missing %s" % (sorted(got - want), sorted(want - got)))
     s = shots["pen"]
@@ -222,6 +229,22 @@ def check(scene, film, st, cast):
     expect("coop: the egg is not there before frame %d, lies %.2f from the hen afterwards" % (
         beats["egg"], (egg.rest_pos - cast["layer"].pos_at(beats["egg"])).length),
         not rendered(egg, beats["egg"] - 1) and rendered(egg, beats["egg"]) and rendered(egg, shots["coop"].frame_end))
+    near = min(animals._apart(a.body_points(a.pos_at(f), a.yaw_at(f)), animals._circles(o, f))[0]
+               for f in range(s.frame_start, s.frame_end + 1) for a in cast["hens"]
+               for o in (cast["steve"], cast["lucky"], cast["layer"]) if not (o is cast["lucky"] and o.gone_at(f)))
+    expect("coop: the wandering hens (avoid=) never come closer than %.2f to Steve, the layer or the hen that is hit" % near,
+           near >= 0.24)
+    wheat = info["feed"]["wheat"]
+    seen = []
+    for name in ("pen", "feed", "milk", "coop"):
+        film.goto(shots[name].frame_start + 5)
+        bpy.context.view_layer.update()
+        seen.append(not wheat.hide_render)
+    expect("feed: the wheat is in Steve's hand in its shot only %s" % seen, seen == [False, True, False, False])
+    plants = [c for pen in (cast["cow_pen"], cast["coop"]) for c in pen["cells"] + pen["inside"]
+              if cast["v"].world.block_id(c[0], c[1], int(pen["z"])) in ("short_grass", "tall_grass", "poppy", "dandelion",
+                                                                        "oxeye_daisy", "cornflower")]
+    expect("pens built into the village: %d plants left in the fence cells or inside" % len(plants), not plants)
     # the frame stamps of render.py: the same frame twice gives the same fingerprint; a red frame differs from its neighbour
     fp = stamp.Fingerprinter(scene, film)
     a1 = fp.frame(beats["hit1"] + 3)["fp"]

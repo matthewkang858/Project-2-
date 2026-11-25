@@ -37,83 +37,113 @@ PUBLIC API (frames are film frames)
   break_block(block, frame, camera=None, drop=None, tool="hand", seed=0, glow=0.0, particles=True, until=None)
       -> dict(frame, burst, item, drop)
       The block is gone ON `frame` and the game's break particles fly (ClientLevel.addDestroyBlockEffect: 64 for a
-      full cube; a grass block's are plain dirt, NOT tinted green). drop: None = nothing, "auto" = what the game
-      drops for `tool` (drops()), or an item id: an engine.mobs dropped item pops out of the middle of the block
-      with the game's toss, falls to the floor under the cell and bobs and spins until `until` (default frame +
-      120). dict["item"] is the engine.mobs DroppedItem (item.pick_up(frame): the game lets a player take it
-      PICKUP_DELAY_TICKS = 10 ticks = 12 frames after it appeared; register it with the Stage like any other).
-  break_ticks(block_id, tool="hand", exact=True, hardness=None, efficiency=0, haste=0, on_ground=True,
-              in_water=False) -> int
+      full cube, fewer for other shapes, see outline_boxes; a grass block's are plain dirt, NOT tinted green).
+      drop: None = nothing, "auto" = what the game drops for `tool` (drops()), or an item id: an engine.mobs
+      dropped item pops out of the middle of the block with the game's toss, falls to the floor under the cell
+      and bobs and spins until `until` (default frame + 120). dict["item"] is the engine.mobs DroppedItem
+      (item.pick_up(frame): the game lets a player take it PICKUP_DELAY_TICKS = 10 ticks = 12 frames after it
+      appeared; register it with the Stage like any other).
+  outline_boxes(block_id, props=None, variant=0) -> [(x0, y0, z0, x1, y1, z1), ...]   /   break_particles(...) -> int
+      The boxes the break particles fill (model pixels, Minecraft axes) and how many there are: stone 64, a slab
+      32, a door half placed with place_block 32, stairs 48, an anvil 82, a fence post 16, a torch 12. The game's
+      own outline shape for cubes, slabs, lectern, stonecutter, torches, lanterns and fences; the block's model
+      boxes for everything else (the same solid for stairs, anvils, doors, trapdoors, paths); plants = full cube.
+  break_ticks(block_id, tool="hand", exact=True, held=False, hardness=None, efficiency=0, haste=0,
+              on_ground=True, in_water=False) -> int
       Game ticks from the click to the break (0 = it breaks on the click), by BlockBehaviour.getDestroyProgress
-      and Player.getDestroySpeed. exact=False is the textbook formula: stone by hand 150 ticks = 7.5 s, dirt 15 =
-      0.75 s, netherrack 40 = 2 s. exact=True (default) adds the per-tick progress in single precision as the
-      client does: dirt 15, but stone 151 (7.55 s) and netherrack 41, because the 150th / 40th float sum is
-      0.9999993 / 0.9999996. Golden pickaxe on netherrack: 0. break_seconds / break_frames: the same in seconds /
-      film frames (stone by hand 181 frames). TIMES lists both counts for 22 block-and-tool pairs.
+      and Player.getDestroySpeed: STONE BY HAND 150 = 7.5 s (and it drops nothing), dirt 14 = 0.70 s, netherrack
+      40 = 2.0 s, golden pickaxe on netherrack 0. The client adds the per-tick progress in single precision and
+      breaks the block on the sum that reaches 1: mining_ticks() sums (stone 151, because the 150th float sum is
+      0.9999993; dirt 15; netherrack 41), and the FIRST sum is made on the tick of the click, so the break comes
+      mining_ticks - 1 ticks after it. held=True: a block the held button moves on to (dig's later blocks) is
+      only started on its first tick: mining_ticks. exact=False: the textbook count (150, 15 = 0.75 s, 40).
+      break_seconds / break_frames: the same in seconds / film frames (stone by hand 180 frames). TIMES lists
+      mining_ticks both ways for 22 block-and-tool pairs.
   drops(block_id, tool="hand") -> item id | None      stone by hand None, with a pickaxe "cobblestone"; dirt "dirt".
   mine(player, block, frame_start, tool="auto", duration=None, camera=None, drop="auto", seed=0, glow=0.0,
-       crumbs=True, swing=True, until=None) -> dict(start, frame, ticks, frames, stages, swings, burst, item,
-                                                    instant, tool, drop)
-      The player's mining arm (engine.fx.mining_swings: a swing every 4 ticks = 4.8 frames) while the cracks climb,
-      then the break on dict["frame"] with particles and the drop. duration=None: the game's time for block and
-      tool; duration=48: the same ten stages in 48 frames (11 swings instead of 38: a 7.5 s fist-mining read in
-      2 s). tool="auto" = what the player holds in the right hand (engine.players), else the bare hand. crumbs =
-      the one small crumb per tick that flies off the face being hit. Call it AFTER the player's place() /
-      look_at(); works with engine.players and engine.characters players.
+       crumbs=True, swing=True, until=None) -> dict(start, frame, ticks, mining_ticks, frames, stages, swings,
+                                                    burst, item, instant, tool, drop)
+      frame_start = the click: the first crack stage shows ON it (the game's: stage 0 for stone by hand, stage 1
+      for stone with an iron pickaxe). The player's mining arm (engine.fx.mining_swings: a swing every 4 ticks =
+      4.8 frames) while the cracks climb, then the break on dict["frame"] with particles and the drop.
+      duration=None: the game's time for block and tool (stone by hand 180 frames); duration=48: the same ten
+      stages in 48 frames (11 swings instead of 38: a 7.5 s fist-mining read in 2 s). tool="auto" = what the
+      player holds in the right hand (engine.players), else the bare hand. crumbs = the one small crumb per tick
+      that flies off the face being hit. dict: ticks = the game's from the click to the break, mining_ticks = the
+      sums (ticks + 1). Call it AFTER the player's place() / look_at(); works with engine.players and
+      engine.characters players.
   dig(player, blocks, frame_start, tool="auto", duration=None, **mine_kw) -> [dict, ...]
       Several blocks one after the other with the button held: the next block is started 6 ticks after a break
-      (MultiPlayerGameMode's 5-tick cooldown), 1 tick after an instant one; one unbroken run of arm swings.
+      (MultiPlayerGameMode's 5-tick cooldown), 1 tick after an instant one, and shows nothing on the tick it is
+      started (only a CLICKED block gets its first sum at once); one unbroken run of arm swings.
 
   THE ZOMBIE AT THE DOOR
   door_info(door) -> dict(cell, upper, floor, normal, along, front, center, width, thickness, hinge, yaw, height)
       Where a door prop is when closed: `normal` points out of its FRONT (the side its slab is flush with: for the
       village houses the street side), `along` from the hinge to the free edge, `center` = middle of the front
       face at floor level.
-  stand_point(door, side="front", gap=None, along=0.0) -> ((x, y, z), yaw)
+  stand_point(door, side="front", gap=None, along=0.0, world=None) -> ((x, y, z), yaw)
       Where a mob pressed against the door stands: gap = distance of its centre from the door's face (default 0.3:
       a zombie's hit box is 0.6 wide and the goal needs it to be walking INTO the door), along = sideways shift
-      toward the free edge (negative: toward the hinge).
-  bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, pause=2, every=None, first=2,
+      toward the free edge (negative: toward the hinge). world = the Village: z is then the top of the block the
+      mob stands on (house_f's door has a dirt path in front of it, 1/16 lower than the door's foot); without it
+      z is the door's foot. The world is remembered per door once door_torches or any call has been given it.
+  bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, pause=2, every=None, first=None,
                seed=None, half="upper", arms="raised", place=True, side="front", gap=None, along=0.0,
                shudder=0.0, hit_delay=HIT_DELAY, break_door=False, camera=None, crumbs=0, glow=0.0, drop=False,
                world=None)
-      -> dict(stand, yaw, knocks, hits, stages, resets, frame, burst, item, phase, attempt)
+      -> dict(stand, yaw, knocks, hits, stages, resets, frame, burst, item, phase, next_knock, attempt)
       BreakDoorGoal on film: the zombie (engine.undead) stands against the door, an arm swing starts on every
       frame of `knocks`, the cracks climb 0..9 over `attempt` frames (default the game's 240 ticks = 288 frames),
       and when an attempt ends without the door breaking they are cleared for `pause` frames and start over, for as
-      long as asked. phase = how far the first attempt already is at frame_start (0..1); dict["phase"] is the value
-      to pass to the next call when a later shot continues the knocking (with place=False). every = frames between
-      swings (default 31.2, the game's average; 16 reads as hammering); seed=1 draws the game's irregular rhythm
-      instead (a draw can stay silent for seconds: look at dict["knocks"]). arms "raised" = the -120 degrees of a
-      zombie that has a target (it has: whoever is behind the door), "out" = -80 degrees. hits = knocks +
-      HIT_DELAY (5 frames): the frame the chop is at its lowest.
+      long as asked. phase = how far the first attempt already is at frame_start (0..1). every = frames between
+      swings (default 31.2, the game's average; 16 reads as hammering), the first one `first` frames after
+      frame_start (default 2); seed=1 draws the game's irregular rhythm instead (a draw can stay silent for
+      seconds: look at dict["knocks"]). arms "raised" = the -120 degrees of a zombie that has a target (it has:
+      whoever is behind the door), "out" = -80 degrees. hits = knocks + HIT_DELAY (5 frames): the frame the chop
+      is at its lowest.
+      THE NEXT SHOT GOES ON WITH THE KNOCKING: pass phase=r["phase"] and place=False: the climb runs through the
+      cut, the swing rhythm too (first= then defaults to r["next_knock"] of this zombie's call that ended on
+      frame_start: say first=r["next_knock"] yourself if the calls are not made in film order), and a swing begun
+      just before the cut lands (and shudders the door) after it. With seed= give each shot its own seed.
       shudder > 0: the door jolts on each hit (see shudder()). crumbs=N: N small crumbs off the door per hit (a
       film garnish). break_door=True: the door breaks (Hard difficulty): with attempt=None the one attempt is
       timed to end ON frame_end, the door is gone on that frame and the particles fly (the game's: 32, of the
       LOWER half only, see below; break_door="both" for both halves, 64); drop=True also drops the oak_door item.
-      world = the Village, for the particles to land on.
-  shudder(door, frame, amount=1.0) -> end frame
+      world = the Village, for the particles to land on and the zombie's standing height.
+      The call owns the door's cracks on [frame_start, frame_end) and leaves no trace when it is made again: the
+      same call twice, or again with another length or rhythm, keys the door once.
+  shudder(door, frame, amount=1.0) -> end frame          clear_shudder(door, frame_start=None, frame_end=None)
       NOT the game (a door does not move when hit): the free edge swings SHUDDER_PIXELS (0.5 texture pixel) x amount
-      inward about the hinge on `frame`, rebounds 45 %, and is at rest 3 frames later. See MEASURED for what reads.
+      inward about the hinge on `frame`, rebounds 45 %, and is at rest 3 frames later. See MEASURED for what reads
+      (amount 8). Not additive: the same blow asked for twice, or by two zombies on the same frame, is ONE jolt of
+      the larger amount; Village.door_open keys on the same door are kept. clear_shudder takes blows back.
   break_door(door, frame, camera=None, halves=("lower",), seed=0, glow=0.0, drop=False, until=None, world=None)
       -> dict(frame, burst, item)          the door is gone ON `frame`, with break particles of the halves named.
   door_torches(village, name="house_a") -> [lights]
       The village merges the two wall torches beside a door into ONE point light half way between them: at
       house_a that is inside the head of a zombie at the door. This gives each torch its own light (same total
       energy, same light group, known to Stage.lights) and switches the merged one off. Call it once, before
-      Stage.lights, in every film with somebody on the doorstep at night.
+      Stage.lights, in every film with somebody on the doorstep at night. To BOOST the doorstep's key light name
+      both torches: st.lights(s, scale, extra=[(tuple(L.location), 4.0) for L in breaking.door_torches(v, "house_a")])
+      (look-dev's extra=[((9.7, -7.5, 2.9), 4.0)] is the merged light's place: equally far from the two new
+      lights, it boosts only one of them: 415 W and 104 W at scale 1.3. The same factor on both torches is the
+      same total as that factor on the merged light was: 2 x 415 W.)
+  knock_plan(frame_start, frame_end, every=None, first=2, seed=None) -> (swing frames, next_knock)
   Constants: TICK, DOOR_BREAK_TICKS, DOOR_KNOCK_ODDS, DOOR_SWING_MEAN_FRAMES, HIT_DELAY, SHUDDER_PIXELS,
   DESTROY_COOLDOWN_TICKS, PICKUP_DELAY_TICKS, TOOL_SPEED, BLOCKS (id -> hardness, tool class, needs the tool for
   drops, tier), TIMES, FACTS, DOOR_CAM / FILM_STAGING (the proof cameras and staging for house_a's door).
 
 USING IT IN A FILM (st = films.lookdev.Stage, v = the Village, s = a shot)
-    door = v.doors["house_a"]; breaking.door_torches(v, "house_a")          # once, before st.lights
+    door = v.doors["house_a"]; torches = breaking.door_torches(v, "house_a")   # once, before st.lights
     z = undead.add_zombie(st, "zombie"); st.use(s, z)
+    # shudder: 0 = the game (the door does not move), 4 = barely visible, 8 = a kick that reads on a phone
     r = breaking.bang_on_door(z, door, s.frame_start, s.frame_end + 1, attempt=48, phase=0.35, every=16,
-                              half="both", along=-0.3, shudder=4)
-    # next shot, the same knocking from elsewhere:
+                              half="both", along=-0.3, shudder=8, world=v)
+    # next shot, the same knocking from elsewhere (call bang_on_door in film order):
     breaking.bang_on_door(z, door, s2.frame_start, s2.frame_end + 1, attempt=48, phase=r["phase"], every=16,
-                          half="both", along=-0.3, shudder=4, place=False)
+                          half="both", along=-0.3, shudder=8, place=False, world=v)
+    st.lights(s, scale=1.3, extra=[(tuple(L.location), 2.0) for L in torches])   # a brighter doorstep: BOTH torches
     # the morning after: flesh = mobs.make_dropped_item("rotten_flesh"); flesh.place(f, breaking.stand_point(door)[0])
     rock = breaking.place_block(v.collection, "stone", (-3, 31, 0), world=v); st.cast[rock.name] = rock; st.use(s, rock)
     steve.place(f0, (-2.5, 30.15, 0.0), math.pi); steve.look_at(f0, rock.center, ease=0)
@@ -145,11 +175,16 @@ WHAT THE GAME DOES (read from the classes; FACTS has the numbers)
   mining    progress per tick = speed / hardness / (30 with the right tool for drops, else 100); speed = the
             tool's (wood 2, stone 4, copper 5, iron 6, diamond 8, netherite 9, gold 12) on blocks of its class,
             else 1; + efficiency^2 + 1; x (1 + 0.2 haste); / 5 off the ground; x 0.2 under water. The tick of the
-            click shows nothing, each later tick adds progress and shows stage (int)(progress x 10); the block
-            breaks on the tick progress reaches 1, then nothing can be hit for 5 ticks. Progress >= 1 per tick
-            breaks on the click (golden pickaxe on netherrack), with no pause after it. The arm swings on every
-            tick of mining, cooldown included. Drops: Block.popResource (middle of the block +- 0.25, the item
-            entity's own toss).
+            CLICK already adds progress and shows its stage (Minecraft.handleKeybinds: startAttack(), then
+            continueAttack() in the same tick; startDestroyBlock sets progress 0, continueDestroyBlock adds), and
+            so does every later tick: stage (int)(progress x 10). The block breaks on the tick the sum reaches 1
+            (stone by hand: the 151st sum, 150 ticks = 7.5 s after the click), then nothing can be hit for 5
+            ticks; the block the held button then meets is started on the 6th tick, which adds nothing, and gets
+            its first sum a tick later. Progress >= 1 per tick breaks on the click (golden pickaxe on
+            netherrack), with no pause after it. The arm swings on every tick of mining, cooldown included.
+            Break particles: ClientLevel.addDestroyBlockEffect, for every box
+            of the block's outline shape (as VoxelShape.forAllBoxes merges them) max(2, ceil(size / 0.25)) per
+            axis. Drops: Block.popResource (middle of the block +- 0.25, the item entity's own toss).
   the door  BreakDoorGoal (Zombie, priority 1, only for the zombies that "can break doors": chance 0.1 x the local
             difficulty's special multiplier at spawn, and only while the difficulty is HARD: on Easy and Normal a
             26.x zombie does not touch a door at all). breakTime counts 240 ticks = 12 s; stage =
@@ -185,6 +220,14 @@ MEASURED (`$BPY -m engine.breaking` asserts the numbers; stills out/test/breakin
   blur on the free edge; amount 8 (4 pixels, 14 degrees) smears the whole door for three frames and opens a slit
   at the jamb: a kick that reads. What carries the knocking at any amount is the arm swing and the cracks.
   A 540x960 still of the doorstep at night takes 50-80 s at 16 samples on 2 threads of a loaded machine.
+  Mining (breaking_mine.png, breaking_dirt.png): stone by hand is 180 frames in the game and reads in 48 with
+  duration=48 (ten stages, 11 swings, 64 particles + 40 crumbs, no drop); dirt by hand breaks 17 frames after
+  the click and its item lands beside the hole.
+  Blocks that are not cubes (breaking_shapes.png): an anvil's 82 particles start in its own shape (wide head,
+  waist, foot), a torch's 12 in its 4 x 10 x 4 pixel box. Only a few of a torch's are seen, in the game as
+  here: each particle shows a 4 x 4 texel corner of the block's texture, and a torch's is mostly empty.
+  A door over a dirt path (breaking_path_door.png, house_f): at the door's foot height the zombie floats 1/16
+  block above the path; stand_point(world=v) / bang_on_door(world=v) put it on the path.
 
 NOT THE GAME, AND WHERE THE PICTURE DIFFERS FROM IT
   - The cracks are not a second layer of geometry: each stage is a copy of the door / block whose own material is
@@ -210,12 +253,18 @@ GOTCHAS
   - A cracked door is rendered through its cracked copies (children of the door object, which is hidden
     meanwhile): aim cameras and focus at the door object itself or at a point; it still carries the transform.
   - Key the zombie in frame order (place, then bang_on_door), like every Character; bang_on_door owns its arms.
+    CALL bang_on_door IN FILM ORDER, shot after shot: the door's cracks come out right in any order, but the
+    zombie's keys and a blow carried over a cut need the earlier shot to be keyed first.
+  - shudder() amounts do not add up and a second shudder() cannot LOWER one: clear_shudder(door) first.
+    (bang_on_door made again for the same zombie and frame_start replaces its own blows and cracks.)
+  - mine(): frame_start is the click and already shows a stage; the break is break_frames() later (stone by
+    hand 180 frames, not 181).
   - Particles need camera= (the Shot) or a scene camera; a cut that jumps in time needs fx.stop_particles(frame).
   - The crack stages and the door's absence are CONSTANT keys on integer frames (safe with the 0.5-frame shutter).
   - A film that imports engine.breaking has this file in its engine hash: freeze it while finals render.
 
 SELF-TEST
-    $BPY -m engine.breaking                    37 numeric checks, no rendering (5 s; exit code 1 if one fails)
+    $BPY -m engine.breaking                    49 numeric checks, no rendering (10 s; exit code 1 if one fails)
     $BPY -m engine.breaking stills NAME ...    proof stills out/test/breaking_<name>*.png; names: PROOFS (one or
                                                two names per call stay under the 300 s limit)
     $BPY -m tools.check_breaking_stamp         frame fingerprints: sensitive to every stage, the same in any order
@@ -318,7 +367,10 @@ FACTS = {
     "door_break_difficulty": "hard", "door_break_chance_max": 0.1, "door_give_up_distance": DOOR_GIVE_UP_DISTANCE,
     "door_break_particles": 32, "door_break_particles_half": "lower",
     "zombie_gap": ZOMBIE_WIDTH / 2.0, "zombie_swing_ticks": ZOMBIE_SWING_TICKS,
-    "destroy_cooldown_ticks": DESTROY_COOLDOWN_TICKS, "crack_stages": 10, "crack_alpha_cut": CRACK_ALPHA_CUT,
+    "destroy_cooldown_ticks": DESTROY_COOLDOWN_TICKS, "click_tick_adds_progress": True,
+    "stone_by_hand_sums": 151, "stone_by_hand_ticks_after_click": 150, "stone_by_hand_seconds": 7.5,
+    "dirt_by_hand_ticks_after_click": 14, "netherrack_by_hand_ticks_after_click": 40,
+    "crack_stages": 10, "crack_alpha_cut": CRACK_ALPHA_CUT,
     "crack_blend": "DST_COLOR, SRC_COLOR", "crack_depth_bias": CRACK_DEPTH_BIAS, "crack_texture_scale": 1.0,
     "crack_greys": (61, 155), "drop_spread": DROP_SPREAD, "drop_toss": DROP_TOSS,
 }
@@ -615,12 +667,18 @@ class _Target:
         self._looks[f] = None
         self._rekey()
 
+    def forget(self, frame_start, frame_end, rekey=True):
+        """Drop the crack keys on frame_start <= frame < frame_end (what was keyed before them holds on)."""
+        gone = [f for f in self._looks if frame_start <= f < frame_end]
+        for f in gone:
+            del self._looks[f]
+        if gone and rekey:
+            self._rekey()
+
     def _rekey(self):
         """Rewrite the visibility keys of the object, its cracked copies and its patches from the history."""
         frames = sorted(set(self._looks) | set(self._there) | set(self._shown))
-        if not frames:
-            return
-        times = [frames[0] - 1] + frames
+        times = [(frames[0] if frames else 1) - 1] + frames
         states = [(None, self._there0, True)]
         states += [(_at(self._looks, f, None), _at(self._there, f, self._there0), _at(self._shown, f, True))
                    for f in frames]
@@ -676,10 +734,38 @@ def door_info(door):
             "height": float(hi[2] - lo[2]), "local": (tuple(lo), tuple(hi))}
 
 
-def stand_point(door, side="front", gap=None, along=0.0):
+def _door_world(door, world=None):
+    """The blocks.World a door stands in: the one given (a World or a Village; it is remembered for that door),
+    else the one an earlier call gave (door_torches, bang_on_door, break_door, stand_point), else None."""
+    world = getattr(world, "world", world)
+    t = _door(door)
+    if world is not None:
+        t.world = world
+    return t.world
+
+
+def _stand_height(info, p, world, frame=None):
+    """z of the feet of a mob that stands at point p in front of a door: the top of the block it stands on (a
+    dirt path or farmland is 15/16 high, a bottom slab 1/2), or the door's own foot when no world is known or
+    the block there has a shape this module does not know (stairs: the door step of most village houses)."""
+    if world is None:
+        return info["floor"]
+    view = _SolidView(world, bpy.context.scene.frame_current if frame is None else frame)
+    cx, cy, cz = int(math.floor(p.x)), int(math.floor(p.y)), info["cell"][2]
+    top = view.top_of((cx, cy, cz))
+    if top is not None and top < 1.0:                         # a slab or a path AT the door's foot level
+        return cz + top
+    top = view.top_of((cx, cy, cz - 1))
+    return info["floor"] if top is None else cz - 1 + top
+
+
+def stand_point(door, side="front", gap=None, along=0.0, world=None, frame=None):
     """((x, y, z), yaw) of a mob that stands pressed against the shut door, facing it. gap = distance of its
     centre from the door's face (default 0.3 = half a zombie's 0.6 hit box, where DoorInteractGoal finds it);
-    side "front" = the side the slab is flush with, "back" = the other; along = shift toward the free edge."""
+    side "front" = the side the slab is flush with, "back" = the other; along = shift toward the free edge.
+    world = the Village / blocks.World the door stands in (remembered per door once any call has given it): z is
+    then the top of the block the mob stands on (house_f's door stands over a dirt path, 1/16 below the door's
+    foot); without a world z is the door's foot."""
     info = door_info(door)
     gap = ZOMBIE_WIDTH / 2.0 if gap is None else float(gap)
     n = info["normal"]
@@ -690,7 +776,8 @@ def stand_point(door, side="front", gap=None, along=0.0):
     elif side != "front":
         raise ValueError("breaking.stand_point: side is 'front' or 'back'")
     p = p + n * gap
-    return (float(p.x), float(p.y), info["floor"]), math.atan2(-n.x, n.y)
+    z = _stand_height(info, p, _door_world(door, world), frame)
+    return (float(p.x), float(p.y), float(z)), math.atan2(-n.x, n.y)
 
 
 class DoorCracks(_Target):
@@ -700,6 +787,12 @@ class DoorCracks(_Target):
         super().__init__(door, door.name)
         self.info = door_info(door)
         self.block_id = str(door.get("mc_block", "oak_door"))
+        self.world = None              # the blocks.World it stands in, once a call has given it (_door_world)
+        self._shudders = {}            # blow frame -> {who asked: amount}; the largest on a frame is keyed
+        self._shudder_keys = {}        # frame -> (value this module keyed, the foreign key it replaced | None)
+        self._shudder_rest = None      # the door's angle when it carries no key at all
+        self._bangs = {}               # (mob name, frame_start) of a bang_on_door call -> what it keyed
+        self._swings = {}              # mob name -> {frame its swing starts: frame of the blow}
 
     def _look(self, stage, half=None):
         half = "upper" if half is None else half
@@ -888,17 +981,110 @@ def _material_for(block_id):
     return f
 
 
+_FULL_CUBE = (0.0, 0.0, 0.0, 16.0, 16.0, 16.0)
+_FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}       # blockstate y rotation that turns north to it
+
+
+def _column(sx, y0, y1, sz=None):
+    """Block.column(size, y0, y1) / column(sizeX, sizeZ, y0, y1): a box centred on the block's vertical axis."""
+    sz = sx if sz is None else sz
+    return (8.0 - sx / 2.0, float(y0), 8.0 - sz / 2.0, 8.0 + sx / 2.0, float(y1), 8.0 + sz / 2.0)
+
+
+def _turned(box, facing):
+    """A box given for facing north, for another horizontal facing (Shapes.rotateHorizontal)."""
+    y = _FACING_Y.get(facing, 0)
+    if not y:
+        return box
+    p, q = mc.rotate_point(box[:3], 0, y), mc.rotate_point(box[3:], 0, y)
+    return tuple(min(a, b) for a, b in zip(p, q)) + tuple(max(a, b) for a, b in zip(p, q))
+
+
+def _merged(boxes):
+    """VoxelShape.forAllBoxes of the union of boxes (engine.fx carries the game's merge)."""
+    merge = getattr(fx, "_merge_boxes", None)
+    return list(boxes) if merge is None or len(boxes) < 2 else merge(list(boxes))
+
+
+def _model_boxes(block_id, props, variant=0):
+    """The boxes of a block state's MODEL (model pixels, Minecraft axes): every element that has a volume, with
+    its own and the blockstate's rotation (the box around a tilted element); flat elements (the two planes of a
+    plant, a lantern's chain) are left out."""
+    out = []
+    for part in mc.resolve_blockstate(block_id, props, variant):
+        quads = mc.bake_part(part)                            # in element order, each element's faces together
+        i = 0
+        for e in mc.load_model(part.model).elements:
+            pts = [p for q in quads[i:i + len(e.faces)] for p in q.pts]
+            i += len(e.faces)
+            if not pts:
+                continue
+            lo = [max(0.0, min(p[k] for p in pts)) for k in range(3)]
+            hi = [min(16.0, max(p[k] for p in pts)) for k in range(3)]
+            if min(hi[k] - lo[k] for k in range(3)) > 0.25:
+                out.append(tuple(round(c, 4) for c in lo + hi))
+    return out
+
+
+def outline_boxes(block_id, props=None, variant=0):
+    """The boxes of a block state's outline shape (model pixels, Minecraft axes, x0 y0 z0 x1 y1 z1): what
+    ClientLevel.addDestroyBlockEffect fills with break particles, max(2, ceil(size / 0.25)) per axis and box.
+    The game's own shape for full cubes, the blocks engine.fx knows (lectern, slabs, stonecutter), torches, wall
+    torches, lanterns and fences; for any other block the boxes of its MODEL, which is the same solid for stairs,
+    anvils, doors, trapdoors, dirt paths, farmland and the like; a model without any volume (plants) counts as a
+    full cube. The boxes are merged as VoxelShape.forAllBoxes merges them (an anvil's four boxes come out as
+    seven). Particles: stone 64, a door half 32, stairs 48, an anvil 82, a fence post 16, a torch 12."""
+    block_id = block_id.replace("minecraft:", "")
+    props = dict(props or {})
+    probe = _blocks.World()
+    probe.set(0, 0, 0, block_id, props)
+    if probe.is_full_cube(0, 0, 0):
+        return [_FULL_CUBE]
+    known = [tuple(float(c) for c in b) for b in fx.block_shape(block_id, props)]
+    if known != [_FULL_CUBE]:
+        return known
+    if block_id.endswith("wall_torch"):                       # WallTorchBlock: boxZ(5, 3, 13, 11, 16), turned
+        return [_turned((5.5, 3.0, 11.0, 10.5, 13.0, 16.0), props.get("facing", "north"))]
+    if block_id.endswith("torch"):                            # BaseTorchBlock: column(4, 0, 10)
+        return [_column(4, 0, 10)]
+    if block_id.endswith("lantern"):                          # LanternBlock: column(4, 7, 9) + column(6, 0, 7);
+        up = 1.0 if str(props.get("hanging", "false")) == "true" else 0.0      # hanging: moved up one pixel
+        return _merged([tuple(c + (up if k in (1, 4) else 0.0) for k, c in enumerate(b))
+                        for b in (_column(6, 0, 7), _column(4, 7, 9))])
+    if block_id.endswith("_fence"):                           # FenceBlock(4, 16, 4, 16, 24): post column(4, 0, 16)
+        boxes = [_column(4, 0, 16)]                           # + boxZ(4, 0, 16, 0, 8) toward each connected side
+        boxes += [_turned((6.0, 0.0, 0.0, 10.0, 16.0, 8.0), d) for d in ("north", "east", "south", "west")
+                  if str(props.get(d, "false")) == "true"]
+        return _merged(boxes)
+    try:
+        boxes = _model_boxes(block_id, props, variant)
+    except Exception:                                        # noqa: BLE001 - an odd model: a full cube, as before
+        boxes = []
+    return _merged(boxes) if boxes else [_FULL_CUBE]
+
+
+def break_particles(block_id, props=None, variant=0):
+    """How many break particles a block state throws (ClientLevel.addDestroyBlockEffect over outline_boxes)."""
+    n = 0
+    for b in outline_boxes(block_id, props, variant):
+        k = 1
+        for i in range(3):
+            k *= max(2, int(math.ceil(min(1.0, (b[3 + i] - b[i]) / 16.0) / 0.25 - 1e-9)))
+        n += k
+    return n
+
+
 class Breakable(_Target):
     """One block as its own object (place_block): crack it, break it, put it back. See the module docstring."""
 
-    def __init__(self, ob, block_id, props, cell, world):
+    def __init__(self, ob, block_id, props, cell, world, variant=0):
         super().__init__(ob, ob.name)
         self.block_id, self.props, self.cell, self.world = block_id, dict(props), tuple(cell), world
         self.center = Vector((cell[0] + 0.5, cell[1] + 0.5, cell[2] + 0.5))
         self.top = cell[2] + max(v.co.z for v in ob.data.vertices)
         # the game's outline boxes, Blender block-local: what the break particles fill
         self.shape = [(b[0] / 16.0, 1.0 - b[5] / 16.0, b[1] / 16.0, b[3] / 16.0, 1.0 - b[2] / 16.0, b[4] / 16.0)
-                      for b in fx.block_shape(block_id, props)]
+                      for b in outline_boxes(block_id, props, variant)]
         tex = None
         try:
             tex = mc.load_model(mc.resolve_blockstate(block_id, props)[0].model).textures.get("particle")
@@ -950,7 +1136,7 @@ def place_block(collection, block_id, cell, props=None, world=None, name=None, f
     ob = mc.quads_object(name, quads, _material_for(block_id), collection, origin=(0.0, 0.0, 16.0))
     ob.location = (float(cell[0]), float(cell[1]), float(cell[2]))
     ob["mc_block"] = block_id
-    block = Breakable(ob, block_id, props, cell, world)
+    block = Breakable(ob, block_id, props, cell, world, variant)
     if frame is not None:
         block._there0 = False
         block._there[int(round(frame))] = True
@@ -1116,10 +1302,11 @@ def destroy_progress(block_id, tool="hand", hardness=None, efficiency=0, haste=0
 
 
 def progress_track(block_id, tool="hand", exact=True, **kw):
-    """MultiPlayerGameMode.continueDestroyBlock tick by tick: [destroyProgress after tick 1, 2, ...] up to the
-    tick it reaches 1 (empty = the block breaks on the click). exact=True adds in single precision, as the client
-    does (`destroyProgress += ...` on a float field): for stone by hand the 150th sum is 0.9999993 and the block
-    breaks on tick 151. exact=False is the textbook formula in exact arithmetic (150)."""
+    """MultiPlayerGameMode.continueDestroyBlock sum by sum: [destroyProgress after the 1st, 2nd, ... tick that
+    adds to it] up to the one that reaches 1 (empty = the block breaks on the click). exact=True adds in single
+    precision, as the client does (`destroyProgress += ...` on a float field): for stone by hand the 150th sum is
+    0.9999993 and the 151st breaks the block. exact=False is the textbook formula in exact arithmetic (150).
+    The FIRST sum is made on the tick of the click itself (see break_ticks)."""
     d = destroy_progress(block_id, tool, **kw)
     if d <= 0.0:
         raise ValueError("breaking: %r cannot be broken (hardness -1)" % block_id)
@@ -1138,22 +1325,35 @@ def progress_track(block_id, tool="hand", exact=True, **kw):
     return out
 
 
-def break_ticks(block_id, tool="hand", exact=True, **kw):
-    """Game ticks from the click to the break (0 = the block breaks on the click). exact=True: as the client's
-    single-precision sum gives it (stone by hand 151); exact=False: the formula hardness x 1.5 (x 5 without the
-    right tool) / tool speed seconds, rounded up to a tick (150). kw: hardness, efficiency, haste, on_ground,
-    in_water."""
+def mining_ticks(block_id, tool="hand", exact=True, **kw):
+    """The number of ticks that add mining progress until the block breaks (0 = it breaks on the click).
+    exact=True: as the client's single-precision sum gives it (stone by hand 151, dirt 15, netherrack 41);
+    exact=False: the textbook count ceil(1 / progress per tick) (150, 15, 40). kw: hardness, efficiency, haste,
+    on_ground, in_water."""
     return len(progress_track(block_id, tool, exact=exact, **kw))
 
 
-def break_seconds(block_id, tool="hand", exact=True, **kw):
-    """Seconds the game needs to mine the block (see break_ticks)."""
-    return break_ticks(block_id, tool, exact=exact, **kw) / 20.0
+def break_ticks(block_id, tool="hand", exact=True, held=False, **kw):
+    """Game ticks from the click to the break (0 = the block breaks on the click): mining_ticks - 1, because the
+    tick of the click already adds progress and shows the first stage (Minecraft.handleKeybinds calls startAttack
+    and then continueAttack in the same tick). Stone by hand 150 = 7.5 s, dirt 14 = 0.70 s, netherrack 40 = 2 s.
+    held=True: a block the HELD button moves on to after a break (the later blocks of dig()): its first tick only
+    starts it (MultiPlayerGameMode.startDestroyBlock) and adds nothing, so it takes mining_ticks (stone 151).
+    exact=False: the textbook figure instead, hardness x 1.5 (x 5 without the right tool) / tool speed seconds
+    rounded up to a tick (stone 150, dirt 15 = 0.75 s, netherrack 40): it counts the ticks that mine, not the
+    ticks after the click. kw: hardness, efficiency, haste, on_ground, in_water."""
+    n = mining_ticks(block_id, tool, exact=exact, **kw)
+    return n if (held or not exact) else max(0, n - 1)
 
 
-def break_frames(block_id, tool="hand", exact=True, **kw):
-    """Film frames the game needs to mine the block (ticks x 1.2, rounded)."""
-    return int(round(break_ticks(block_id, tool, exact=exact, **kw) * TICK))
+def break_seconds(block_id, tool="hand", exact=True, held=False, **kw):
+    """Seconds from the click to the break in the game (see break_ticks): stone by hand 7.5."""
+    return break_ticks(block_id, tool, exact=exact, held=held, **kw) / 20.0
+
+
+def break_frames(block_id, tool="hand", exact=True, held=False, **kw):
+    """Film frames from the click to the break (break_ticks x 1.2, rounded): stone by hand 180."""
+    return int(round(break_ticks(block_id, tool, exact=exact, held=held, **kw) * TICK))
 
 
 def drops(block_id, tool="hand"):
@@ -1165,7 +1365,8 @@ def drops(block_id, tool="hand"):
     return _DROPS.get(block_id, block_id)
 
 
-TIMES = {            # (block, tool) -> (ticks by the formula, ticks as the client's float sum gives them)
+TIMES = {            # (block, tool) -> mining_ticks: (by the textbook formula, as the client's float sum gives them);
+    #                    from the click to the break the game takes the second number - 1 (break_ticks)
     ("stone", "hand"): (150, 151), ("stone", "wooden_pickaxe"): (23, 23), ("stone", "iron_pickaxe"): (8, 8),
     ("stone", "golden_pickaxe"): (4, 4), ("cobblestone", "hand"): (200, 201), ("dirt", "hand"): (15, 15),
     ("dirt", "iron_shovel"): (3, 3), ("grass_block", "hand"): (18, 18), ("netherrack", "hand"): (40, 41),
@@ -1213,36 +1414,48 @@ def _held(player, frame):
 
 
 def mine(player, block, frame_start, tool="auto", duration=None, camera=None, drop="auto", seed=0, glow=0.0,
-         crumbs=True, swing=True, until=None, **speed_kw):
-    """A player mines a Breakable from `frame_start` (see the module docstring). Returns dict: start, frame (the
-    break), ticks (the game's), frames (as filmed), stages [(frame, stage)], swings [frames], burst, item, drop,
-    instant, tool. speed_kw: hardness, efficiency, haste, on_ground, in_water."""
+         crumbs=True, swing=True, until=None, held=False, **speed_kw):
+    """A player mines a Breakable from `frame_start`, the frame of the click (see the module docstring). Returns
+    dict: start, frame (the break), ticks (the game's, from the click to the break), mining_ticks (the ticks that
+    add progress: ticks + 1), frames (as filmed), stages [(frame, stage)], swings [frames], burst, item, drop,
+    instant, tool. held=True: the block is not clicked but reached with the button held after another one broke
+    (dig() passes it for its later blocks): the first tick shows nothing and the break comes one tick later.
+    speed_kw: hardness, efficiency, haste, on_ground, in_water."""
     if not isinstance(block, Breakable):
         raise TypeError("breaking.mine takes a Breakable (place_block)")
     f0 = int(round(frame_start))
     if tool == "auto":
         tool = _held(player, f0)
     track = progress_track(block.block_id, tool, **speed_kw)
-    ticks = len(track)
+    sums = len(track)                                         # ticks that add progress; the last one breaks it
+    # Minecraft.handleKeybinds: startAttack() and then continueAttack() in the SAME tick, so the tick of the click
+    # makes the first sum and shows its stage. A block the held button moves on to is only started on its first
+    # tick (MultiPlayerGameMode.continueDestroyBlock -> startDestroyBlock: progress 0, stage -1).
+    lead = 1 if held else 0
+    ticks = 0 if sums == 0 else sums - 1 + lead
     stages = []
-    if ticks == 0:                                            # broken on the click
+    if sums == 0:                                             # broken on the click
         fb, n = f0, 0
     else:
         n = int(round(ticks * TICK)) if duration is None else int(round(duration))
         if n < 1:
             raise ValueError("breaking.mine: duration must be at least one frame")
         fb = f0 + n
-        cur = -1
-        block.crack(f0, -1)                                   # the tick of the click shows nothing yet
-        for f in range(f0 + 1, fb):
+        block.forget(f0, fb, rekey=False)                     # (a second call for the same block starts clean)
+        cur = None
+        for f in range(f0, fb):
             if duration is None:
                 k = int(math.floor((f - f0) / TICK + 1e-6))   # the last tick that has happened by this frame
-                stage = -1 if k < 1 else min(9, int(track[min(k, ticks) - 1] * 10.0))
+                done = min(k + 1 - lead, sums - 1)            # sums made by then (the last one is the break)
+                stage = -1 if done < 1 else min(9, int(track[done - 1] * 10.0))
+            elif held and f == f0 and n > 10:
+                stage = -1
             else:
                 stage = min(9, int(10.0 * (f - f0) / float(n)))
             if stage != cur:
                 block.crack(f, stage)
-                stages.append((f, stage))
+                if stage >= 0:
+                    stages.append((f, stage))
                 cur = stage
     swings = []
     if swing and player is not None:
@@ -1250,22 +1463,24 @@ def mine(player, block, frame_start, tool="auto", duration=None, camera=None, dr
     res = break_block(block, fb, camera=camera, drop=drop, tool=tool, seed=seed, glow=glow, until=until,
                       _f0=f0 if (crumbs and n > 0 and player is not None) else None,
                       _hit_from=player if (crumbs and n > 0) else None)
-    res.update({"start": f0, "ticks": ticks, "frames": n, "stages": stages, "swings": swings, "instant": n == 0,
-                "tool": tool})
+    res.update({"start": f0, "ticks": ticks, "mining_ticks": sums, "frames": n, "stages": stages, "swings": swings,
+                "instant": n == 0, "tool": tool})
     return res
 
 
 def dig(player, blocks, frame_start, tool="auto", duration=None, **mine_kw):
-    """Mine several Breakables one after the other with the button held (a hole: top block first). The next block
-    is started DESTROY_COOLDOWN_TICKS + 1 ticks after a break (1 tick after an instant one); the arm swings without
-    a pause from the first click to the last break. duration = frames per block (None: the game's). Returns the
-    list of mine() dicts."""
+    """Mine several Breakables one after the other with the button held (a hole: top block first). The first is
+    clicked on frame_start; each later one is started DESTROY_COOLDOWN_TICKS + 1 ticks after the break before it
+    (1 tick after an instant one) and its first tick adds nothing (mine(held=True)); the arm swings without a
+    pause from the click to the last break. duration = frames per block (None: the game's). Returns the list of
+    mine() dicts."""
     f = float(frame_start)
     out = []
     mine_kw = dict(mine_kw)
     mine_kw.pop("swing", None)
+    mine_kw.pop("held", None)
     for b in blocks:
-        r = mine(player, b, int(round(f)), tool=tool, duration=duration, swing=False, **mine_kw)
+        r = mine(player, b, int(round(f)), tool=tool, duration=duration, swing=False, held=bool(out), **mine_kw)
         out.append(r)
         f = r["frame"] + (1 if r["instant"] else DESTROY_COOLDOWN_TICKS + 1) * TICK
     if out and player is not None:
@@ -1278,31 +1493,102 @@ def dig(player, blocks, frame_start, tool="auto", duration=None, **mine_kw):
 # ----------------------------------------------------------------------------------------------------
 # the door: shudder, break, torches
 # ----------------------------------------------------------------------------------------------------
-def shudder(door, frame, amount=1.0):
-    """A film gesture, not the game: the door jolts on a blow. Its free edge swings SHUDDER_PIXELS x amount (in
-    texture pixels) inward about the hinge ON `frame`, rebounds 45 %, and is at rest again 3 frames later. Keys go
-    on top of whatever the door's rotation is doing (LINEAR, on whole frames). Returns the frame it is at rest."""
-    info = door_info(door)
-    f = int(round(frame))
-    theta = float(amount) * SHUDDER_PIXELS / 16.0 / max(info["width"], 1e-6)
-    theta *= 1.0 if float(door.get("open_angle", 1.0)) >= 0.0 else -1.0
+_KEY_ATTRS = ("interpolation", "easing", "handle_left_type", "handle_right_type")
+
+
+def _key_at(kps, frame):
+    """The keyframe point on `frame`, or None."""
+    for kp in kps:
+        if abs(kp.co.x - frame) < 1e-4:
+            return kp
+    return None
+
+
+def _rekey_shudder(t):
+    """Rewrite the shudder keys of a door from its history of blows (DoorCracks._shudders): the module's own
+    earlier keys are taken out (a key it had replaced is put back), every other key on the door's rotation
+    (Village.door_open) stays, and the jolts are keyed on top of what that curve does. Rewriting from the history
+    is what makes shudder() safe to call twice: the same blows give the same keys."""
+    door = t.object
     fc = _fcurve(door, "rotation_euler", 2)
     kps = fc.keyframe_points
-    if not len(kps):
-        kp = kps.insert(float(f - 1), float(door.rotation_euler[2]))
-        kp.interpolation = "LINEAR"
-    after = "LINEAR"
-    for kp in kps:
-        if kp.co.x <= f - 1 + 1e-6:
-            after = kp.interpolation
-    times = [f - 1] + [f + i for i in range(len(SHUDDER_SHAPE))]
-    base = [float(fc.evaluate(t)) for t in times]
-    for i, t in enumerate(times):
-        off = 0.0 if i == 0 else SHUDDER_SHAPE[i - 1] * theta
-        kp = kps.insert(float(t), base[i] + off)
-        kp.interpolation = "LINEAR" if i < len(times) - 1 else after
+    if not t._shudder_keys and not len(kps):
+        t._shudder_rest = float(door.rotation_euler[2])       # no key at all: the angle the door is set to
+    for f, (value, foreign) in sorted(t._shudder_keys.items()):
+        kp = _key_at(kps, f)
+        if kp is None or abs(kp.co.y - value) > 1e-6:         # gone or re-keyed by somebody since: theirs
+            continue
+        kps.remove(kp)
+        if foreign is not None:
+            kp = kps.insert(float(f), foreign["y"])
+            for a in _KEY_ATTRS:
+                setattr(kp, a, foreign[a])
+            kp.handle_left, kp.handle_right = foreign["hl"], foreign["hr"]
+    t._shudder_keys = {}
     fc.update()
-    return times[-1]
+    theta = SHUDDER_PIXELS / 16.0 / max(t.info["width"], 1e-6)
+    theta *= 1.0 if float(door.get("open_angle", 1.0)) >= 0.0 else -1.0
+    offs = {}
+    for h, by in sorted(t._shudders.items()):                 # in frame order: a later blow restarts the jolt
+        amount = max(by.values())                             # several askers on one frame: one jolt, the largest
+        offs.setdefault(h - 1, 0.0)
+        for i, s in enumerate(SHUDDER_SHAPE):
+            offs[h + i] = s * theta * amount
+    frames = sorted(offs)
+    if not frames:
+        if not len(kps) and t._shudder_rest is not None:
+            door.rotation_euler[2] = t._shudder_rest
+        return
+    rest = float(door.rotation_euler[2]) if t._shudder_rest is None else t._shudder_rest
+    base = {f: (float(fc.evaluate(f)) if len(kps) else rest) for f in frames}
+    theirs = sorted((kp.co.x, kp.interpolation) for kp in kps)
+    plan = []
+    for i, f in enumerate(frames):
+        last = i == len(frames) - 1 or frames[i + 1] != f + 1
+        after = "LINEAR"                                      # the run's last key hands the curve back as it was
+        for x, interp in theirs:
+            if x <= f + 1e-6:
+                after = interp
+        old = _key_at(kps, f)
+        foreign = None
+        if old is not None:
+            foreign = dict({a: getattr(old, a) for a in _KEY_ATTRS}, y=float(old.co.y),
+                           hl=tuple(old.handle_left), hr=tuple(old.handle_right))
+        plan.append((f, base[f] + offs[f], after if last else "LINEAR", foreign))
+    for f, value, interp, foreign in plan:
+        kp = kps.insert(float(f), value)
+        kp.interpolation = interp
+        t._shudder_keys[f] = (float(kp.co.y), foreign)
+    fc.update()
+
+
+def shudder(door, frame, amount=1.0):
+    """A film gesture, not the game: the door jolts on a blow. Its free edge swings SHUDDER_PIXELS x amount (in
+    texture pixels) inward about the hinge ON `frame`, rebounds 45 %, and is at rest again 3 frames later. The
+    jolts ride on whatever else the door's rotation does (LINEAR keys on whole frames; Village.door_open keys are
+    kept). NOT additive: the blows are remembered per door and the keys rewritten from them, so the same call
+    twice, or two zombies that hit on the same frame, give ONE jolt of the larger amount; a blow less than 4
+    frames after another restarts the motion. clear_shudder() takes blows back. Returns the frame it is at rest."""
+    t = _door(door)
+    f = int(round(frame))
+    if float(amount) > 0.0:
+        by = t._shudders.setdefault(f, {})
+        by[None] = max(by.get(None, 0.0), float(amount))      # (bang_on_door files its blows under (mob, start))
+        _rekey_shudder(t)
+    return f + len(SHUDDER_SHAPE) - 1
+
+
+def clear_shudder(door, frame_start=None, frame_end=None):
+    """Take back the shudder() blows of a door on frame_start <= frame < frame_end (default: all of them); the
+    other keys on its rotation are left alone. Returns how many blows were removed."""
+    t = _door(door)
+    gone = [f for f in t._shudders if (frame_start is None or f >= frame_start)
+            and (frame_end is None or f < frame_end)]
+    for f in gone:
+        del t._shudders[f]
+    if gone:
+        _rekey_shudder(t)
+    return len(gone)
 
 
 def break_door(door, frame, camera=None, halves=("lower",), seed=0, glow=0.0, drop=False, until=None,
@@ -1314,7 +1600,7 @@ def break_door(door, frame, camera=None, halves=("lower",), seed=0, glow=0.0, dr
     t = _door(door)
     f = int(round(frame))
     t.remove(f)
-    world = getattr(world, "world", world)
+    world = _door_world(door, world)
     burst = None
     for half in halves:
         cell = t.info["cell"] if half == "lower" else t.info["upper"]
@@ -1334,10 +1620,14 @@ def door_torches(village, name="house_a"):
     """Give the wall torches beside a village door one point light each, in place of the single light the village
     merges them into (half way between them: inside the head of whoever stands on the doorstep). Same total energy
     and light group; the new lights are in village.lantern_lights / village.lights, so Stage.lights scales them.
-    Returns the new lights (an empty list when there is nothing to split)."""
+    Returns the new lights (an empty list when there is nothing to split); a second call returns the same ones.
+    To boost the doorstep's key light, name BOTH torches (Stage.lights(extra=) boosts the one light nearest to
+    each point, and the old merged position is equally far from the two):
+        st.lights(s, scale=1.3, extra=[(tuple(L.location), 4.0) for L in breaking.door_torches(v, "house_a")])"""
     from . import props
 
     door = village.doors[name]
+    _door_world(door, village)                                # (stand_point and the particles know the set from now on)
     done = door.get("brk_torches")
     if done:
         return [bpy.data.objects[n] for n in done if n in bpy.data.objects]
@@ -1389,37 +1679,51 @@ def door_torches(village, name="house_a"):
 # ----------------------------------------------------------------------------------------------------
 # the zombie at the door
 # ----------------------------------------------------------------------------------------------------
-def knock_frames(frame_start, frame_end, every=None, first=2, seed=None):
-    """Frames on which a door-breaking mob starts an arm swing in [frame_start, frame_end): every `every` frames
-    from frame_start + first (default DOOR_SWING_MEAN_FRAMES, the game's average), or with seed= the game's own
-    draw (each tick 1 chance in DOOR_KNOCK_ODDS, and no new swing while one of 6 ticks is running)."""
+def knock_plan(frame_start, frame_end, every=None, first=2, seed=None):
+    """(frames, next_knock): the frames on which a door-breaking mob starts an arm swing in [frame_start,
+    frame_end), and how many frames after frame_end its next swing is due (pass it as first= to the call that
+    continues the knocking in the next shot: the rhythm then runs through the cut). Every `every` frames from
+    frame_start + first (default DOOR_SWING_MEAN_FRAMES, the game's average); or with seed= the game's own draw
+    (each tick 1 chance in DOOR_KNOCK_ODDS, no new swing while one of 6 ticks is running, none before frame_start
+    + first; next_knock is then the time the running swing still needs)."""
     f0, f1 = float(frame_start), float(frame_end)
     out = []
-    every = DOOR_SWING_MEAN_FRAMES if every is None else every
     if seed is None:
+        step = max(float(DOOR_SWING_MEAN_FRAMES if every is None else every), 1.0)
         f = f0 + float(first)
-        while f < f1 - 1e-6:
+        while int(round(f)) < f0:
+            f += step
+        while int(round(f)) < f1 - 1e-6:
             out.append(int(round(f)))
-            f += max(float(every), 1.0)
-        return sorted(set(out))
+            f += step
+        return sorted(set(out)), f - f1
     r = np.random.default_rng([int(seed) & 0x7FFFFFFF, 1019])
     ticks = int(math.floor((f1 - f0) / TICK + 1e-6))
-    busy = -10 ** 9
+    t0 = int(math.ceil(float(first) / TICK - 1e-6))
+    busy = None
     for t in range(ticks):
-        if r.integers(0, DOOR_KNOCK_ODDS) == 0 and t - busy > ZOMBIE_SWING_TICKS:
+        draw = r.integers(0, DOOR_KNOCK_ODDS) == 0
+        if draw and t >= t0 and (busy is None or t - busy > ZOMBIE_SWING_TICKS):
             out.append(int(round(f0 + t * TICK)))
             busy = t
-    return sorted(set(out))
+    free = f1 if busy is None else f0 + (busy + ZOMBIE_SWING_TICKS + 1) * TICK
+    return sorted(set(out)), max(0.0, free - f1)
 
 
-def bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, pause=2, every=None, first=2,
+def knock_frames(frame_start, frame_end, every=None, first=2, seed=None):
+    """Only the frames of knock_plan(): where a door-breaking mob starts an arm swing in [frame_start, frame_end)."""
+    return knock_plan(frame_start, frame_end, every=every, first=first, seed=seed)[0]
+
+
+def bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, pause=2, every=None, first=None,
                  seed=None, half="upper", arms="raised", place=True, side="front", gap=None, along=0.0,
                  shudder=0.0, hit_delay=HIT_DELAY, break_door=False, camera=None, crumbs=0, glow=0.0, drop=False,
                  world=None):
     """A zombie bangs on a wooden door from frame_start until frame_end (see the module docstring for every
     argument). Returns dict: stand, yaw, knocks (frames a swing starts), hits (frames of the blows), stages
     [(frame, stage)], resets (frames the cracks were cleared), frame (the door broke on it, or None), burst, item,
-    phase (pass it on to continue in the next shot), attempt."""
+    phase and next_knock (phase= and first= of the call that continues in the next shot; first= defaults to
+    it when that call has place=False and starts where this one ended), attempt."""
     f0, f1 = int(round(frame_start)), int(round(frame_end))
     if f1 <= f0:
         raise ValueError("breaking.bang_on_door: frame_end must be after frame_start")
@@ -1437,7 +1741,8 @@ def bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, 
     attempt = game if attempt is None else float(attempt)
     if attempt < 10.0:
         raise ValueError("breaking.bang_on_door: an attempt has ten stages: give it at least 10 frames")
-    pos, yaw = stand_point(door, side=side, gap=gap, along=along)
+    set_world = _door_world(door, world)
+    pos, yaw = stand_point(door, side=side, gap=gap, along=along, frame=f0)
     if place:
         zombie.place(f0, pos, yaw)
     if arms == "raised":
@@ -1445,13 +1750,35 @@ def bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, 
     elif arms != "out":
         raise ValueError("breaking.bang_on_door: arms is 'raised' or 'out'")
     last = f1 if fb is None else fb
-    knocks = [k for k in knock_frames(f0, last, every=every, first=first, seed=seed) if k < last]
+    t = _door(door)
+    who = getattr(zombie, "name", None) or "mob_%d" % id(zombie)
+    source = (who, f0)
+    if first is None:                                         # going on where this mob's last call stopped?
+        prev = [b for (w, _f), b in t._bangs.items() if w == who and b["end"] == f0 and not b["broke"]]
+        first = prev[0]["next_knock"] if (prev and not place) else 2
+    knocks, next_knock = knock_plan(f0, last, every=every, first=first, seed=seed)
     for k in knocks:
         zombie.attack(k)
-    hits = [int(round(k + hit_delay)) for k in knocks]
-    hits = [h for h in hits if h < last]
-    # the cracks: (int)(breakTime / doorBreakTime * 10) on the attacked block, cleared when an attempt is over
-    t = _door(door)
+    # the blows. A swing whose blow falls after `last` is not keyed here: when the knocking goes on in the next
+    # shot without a place() (which would end the swing), that call finds it in the door's record and keys it
+    swings = t._swings.setdefault(who, {})
+    for k in [k for k in swings if f0 <= k < last]:
+        del swings[k]
+    carried = [] if place else [h for k, h in sorted(swings.items()) if k < f0 <= h < last]
+    for k in knocks:
+        swings[k] = int(round(k + hit_delay))
+    hits = sorted(set(carried + [swings[k] for k in knocks if swings[k] < last]))
+    # the cracks: (int)(breakTime / doorBreakTime * 10) on the attacked block, cleared when an attempt is over.
+    # This call owns the door's cracks on [frame_start, last): what was keyed there before is dropped first, and
+    # so is everything an earlier call for this mob from the same frame_start had keyed (the same call made
+    # twice, or made again with another length, leaves nothing behind)
+    old = t._bangs.pop(source, None)
+    if old is not None:
+        t.forget(f0, old["end"] + (1 if old["cleared"] else 0), rekey=False)
+        if old["broke"]:
+            t._there.pop(old["end"], None)
+            t._looks.pop(old["end"], None)
+    t.forget(f0, last, rekey=False)
     cycle = attempt + max(0, int(pause))
     stages, resets, cur = [], [], None
     for f in range(f0, last):
@@ -1464,33 +1791,47 @@ def bang_on_door(zombie, door, frame_start, frame_end, attempt=None, phase=0.0, 
                 resets.append(f)
             cur = stage
     burst, item = None, None
+    # the shudder: this call's blows replace the ones the same call keyed before; blows of other calls stay
+    mine_before = [f for f, by in t._shudders.items() if source in by]
+    for f in mine_before:
+        del t._shudders[f][source]
+        if not t._shudders[f]:
+            del t._shudders[f]
     if shudder:
         for h in hits:
-            globals()["shudder"](door, h, amount=float(shudder))
+            t._shudders.setdefault(h, {})[source] = float(shudder)
+    if mine_before or (shudder and hits):
+        _rekey_shudder(t)
     if crumbs:
         box = t.half_box("upper" if half != "lower" else "lower")
         cell = t.info["upper"] if half != "lower" else t.info["cell"]
         tex = "block/%s_%s" % (t.block_id, "top" if half != "lower" else "bottom")
         for i, h in enumerate(hits):                          # a film garnish: the game shows none for a mob
-            stand_in = _FxBlock("%s_knock%d" % (door.name, i), cell, [box], (tex, None),
-                                getattr(world, "world", world), h)
+            stand_in = _FxBlock("%s_knock%d" % (door.name, i), cell, [box], (tex, None), set_world, h)
             b = fx._hit_particles(stand_in, h, h + int(crumbs) * TICK + 1e-3, Vector(pos) + Vector((0, 0, 1.5)),
                                   camera, seed if seed is not None else i, glow)
             burst = b if burst is None else burst.extend(b)
+    cleared = False
     if fb is not None:
         halves = ("lower", "upper") if break_door == "both" else ("lower",)
         res = globals()["break_door"](door, fb, camera=camera, halves=halves, seed=seed or 0, glow=glow, drop=drop,
                                       world=world)
         burst = res["burst"] if burst is None else burst.extend(res["burst"])
         item = res["item"]
-        phase_end = 0.0
+        phase_end, next_knock = 0.0, None
     else:
-        t.crack(f1, -1, half)                                 # the mob stops: destroyBlockProgress(-1)
-        stages.append((f1, -1))
+        # the mob stops: destroyBlockProgress(-1). Not when something is already keyed ON frame_end: that is the
+        # first stage of the shot that goes on with the knocking, keyed before this one (any call order works)
+        cleared = f1 not in t._looks
+        if cleared:
+            t.crack(f1, -1, half)
+            stages.append((f1, -1))
         c = (phase * attempt + (f1 - f0)) % cycle
         phase_end = c / attempt if c < attempt else 0.0
+    t._bangs[source] = {"end": last, "cleared": cleared, "broke": fb is not None, "next_knock": next_knock}
     return {"stand": pos, "yaw": yaw, "knocks": knocks, "hits": hits, "stages": stages, "resets": resets,
-            "frame": fb, "burst": burst, "item": item, "phase": phase_end, "attempt": attempt}
+            "frame": fb, "burst": burst, "item": item, "phase": phase_end, "next_knock": next_knock,
+            "attempt": attempt}
 
 
 def crack_texels(door, stage, half="upper"):
@@ -1674,8 +2015,71 @@ def build_mine_proof(scene, duration=48):
     return out
 
 
+def build_shapes_proof(scene):
+    """Two blocks that are not cubes on the meadow, an anvil and a torch, broken on the same frame: the particles
+    start in each block's own outline boxes (82 for the anvil, 12 for the torch), not in a full cube."""
+    from films import lookdev
+
+    from . import look, shots, village
+
+    v = village.build_village(scene, seed=1)
+    cfg = MEADOW
+    skyobj = look.set_time(scene, cfg["preset"], sun_azimuth=cfg["az"], sun_elevation=cfg["el"])
+    look.setup_compositor(scene, bloom=cfg["bloom"], grade=cfg["grade"])
+    film = shots.Film(scene, fps=FPS)
+    st = lookdev.Stage(scene, film, v, skyobj)
+    cx, cy, cz = MINE_SPOT
+    ground = v.world.top(cx, cy)
+    cz = (ground + 1) if ground is not None else cz
+    s = st.shot("shapes", 36 / float(FPS))
+    s.lens(26, 5.6)
+    s.move((cx + 5.6, cy + 0.5, cz + 1.0), (cx + 0.5, cy + 0.5, cz + 0.5))
+    s.focus((cx + 0.5, cy + 0.5, cz + 0.4))
+    anvil = place_block(v.collection, "anvil", (cx, cy - 1, cz), {"facing": "north"}, world=v)
+    torch = place_block(v.collection, "torch", (cx, cy + 1, cz), world=v)
+    fb = s.frame_start + 8
+    out = {"film": film, "stage": st, "village": v, "shot": s, "frame": fb, "anvil": anvil, "torch": torch,
+           "bursts": [break_block(b, fb, camera=s, seed=i) for i, b in enumerate((anvil, torch))]}
+    for b in (anvil, torch):
+        st.cast[b.name] = b
+        st.use(s, b)
+    st.lights(s, scale=0.0)
+    st.finish()
+    return out
+
+
+def build_path_door_proof(scene):
+    """A zombie at house_f's door, which has a dirt path in front of it: shot "foot" puts it at the door's foot
+    height (stand_point without a world: 1/16 above the path), shot "path" where stand_point(world=v) puts it."""
+    from films import lookdev
+
+    from . import look, shots, undead, village
+
+    v = village.build_village(scene, seed=1)
+    cfg = DAY
+    skyobj = look.set_time(scene, cfg["preset"], sun_azimuth=cfg["az"], sun_elevation=cfg["el"])
+    look.setup_compositor(scene, bloom=cfg["bloom"], grade=cfg["grade"])
+    film = shots.Film(scene, fps=FPS)
+    st = lookdev.Stage(scene, film, v, skyobj)
+    door = v.doors["house_f"]
+    z = undead.add_zombie(st, "zombie")
+    out = {"film": film, "stage": st, "village": v, "door": door, "zombie": z, "shots": {}, "stand": {}}
+    for name in ("foot", "path"):
+        s = st.shot(name, 12 / float(FPS))
+        pos, yaw = stand_point(door) if name == "foot" else stand_point(door, world=v)
+        z.place(s.frame_start, pos, yaw)
+        s.lens(70, 5.6)
+        s.move((pos[0] - 0.35, pos[1] - 2.6, 0.42), (pos[0] + 0.05, pos[1], 0.08))
+        s.focus((pos[0], pos[1], 0.1))
+        st.use(s, z)
+        st.lights(s, scale=0.0)
+        out["shots"][name], out["stand"][name] = s, pos
+    st.finish()
+    return out
+
+
 PROOFS = ("stages_night", "stages_day", "zombie", "zombie_film", "blow_plain", "blow_shudder", "blow_shudder4",
-          "blow_shudder8", "zfight_night", "zfight_day", "mine", "dirt", "doorbreak", "flesh")
+          "blow_shudder8", "zfight_night", "zfight_day", "mine", "dirt", "doorbreak", "flesh", "shapes", "path_door")
 FILM_STAGING = dict(half="both", along=-0.3)     # what makes the cracks readable past the zombie (see MEASURED)
 
 
@@ -1841,6 +2245,23 @@ def _stills(names):
             deltas = (-1, 0, 2, 6, 30)
             paths = [_render(scene, p["film"], m["frame"] + d, "dirt_%d" % i) for i, d in enumerate(deltas)]
             _sheet(paths, "dirt", 5, ["break %+d" % d for d in deltas])
+        elif name == "shapes":
+            scene = _fresh(res=(405, 720))
+            p = build_shapes_proof(scene)
+            deltas = (-1, 0, 2, 5)
+            paths = [_render(scene, p["film"], p["frame"] + d, "shapes_%d" % i) for i, d in enumerate(deltas)]
+            _sheet(paths, "shapes", 4, ["break %+d" % d for d in deltas])
+            for q in paths:
+                os.remove(q)
+        elif name == "path_door":
+            scene = _fresh(res=(405, 720), motion_blur=False)
+            p = build_path_door_proof(scene)
+            paths = [_render(scene, p["film"], p["shots"][n].frame_start + 4, "path_door_%s" % n)
+                     for n in ("foot", "path")]
+            _sheet(paths, "path_door", 2, ["z = %.4f (the door's foot)" % p["stand"]["foot"][2],
+                                           "z = %.4f (world=v: on the path)" % p["stand"]["path"][2]])
+            for q in paths:
+                os.remove(q)
         else:
             raise SystemExit("breaking: unknown proof %r (one of %s)" % (name, ", ".join(PROOFS)))
     return 0
@@ -1856,10 +2277,18 @@ def _check():
         print("%-4s %s%s" % ("OK" if cond else "FAIL", label, ("  [%s]" % detail) if detail else ""))
 
     # 1. timing
-    got = {k: (break_ticks(*k, exact=False), break_ticks(*k)) for k in TIMES}
-    ok("break_ticks reproduces TIMES: by the formula stone by hand 150 ticks = 7.5 s, dirt 15 = 0.75 s, netherrack "
-       "40 = 2 s, golden pickaxe 0; as the client adds floats: stone 151, netherrack 41",
+    got = {k: (mining_ticks(*k, exact=False), mining_ticks(*k)) for k in TIMES}
+    ok("mining_ticks reproduces TIMES: by the formula stone by hand 150 ticks, dirt 15, netherrack 40, golden "
+       "pickaxe 0; as the client adds floats: stone 151, netherrack 41",
        got == TIMES, ", ".join("%s/%s %s" % (k[0], k[1], v) for k, v in got.items() if TIMES[k] != v))
+    clicks = [break_ticks("stone"), break_ticks("dirt"), break_ticks("netherrack"),
+              break_ticks("netherrack", "golden_pickaxe"), break_ticks("stone", held=True),
+              break_ticks("stone", exact=False), break_frames("stone")]
+    ok("from the click to the break (the tick of the click makes the first sum): stone by hand 150 ticks = 7.5 s = "
+       "180 frames, dirt 14 = 0.70 s, netherrack 40 = 2.0 s, golden pickaxe 0; a block reached with the button "
+       "held takes one tick more (stone 151); the textbook count is 150",
+       clicks == [150, 14, 40, 0, 151, 150, 180] and break_seconds("stone") == 7.5 and break_seconds("dirt") == 0.7,
+       str(clicks))
     ok("seconds = hardness x 1.5 with the right tool, x 5 without, / tool speed (within a tick)",
        all(abs(break_seconds(b, t) - h * (1.5 if c else 5.0) / s) <= 0.0501 for b, t, h, c, s in (
            ("stone", "hand", 1.5, False, 1.0), ("dirt", "hand", 0.5, True, 1.0),
@@ -1873,7 +2302,8 @@ def _check():
     tr = progress_track("stone", "hand")
     st10 = [int(p * 10.0) for p in tr]
     firsts = [st10.index(s) + 1 for s in range(10)]
-    ok("stone by hand: stage (int)(progress x 10) from tick 1, a new stage every 15 ticks, stage 9 until the break",
+    ok("stone by hand: stage (int)(progress x 10) from the first sum, a new stage every 15 sums, stage 9 until the "
+       "break",
        firsts[0] == 1 and all(14 <= b - a <= 16 for a, b in zip(firsts, firsts[1:])) and max(st10[:-1]) == 9
        and st10 == sorted(st10), "first tick of each stage %s" % firsts)
     # 2. the crack textures
@@ -2008,10 +2438,13 @@ def _check():
     steve = players.make_player("check_miner", "steve")
     steve.place(500, (cell[0] + 0.5, cell[1] - 0.9, float(cell[2])), 0.0)
     m = mine(steve, rock, 510, duration=48)
-    ok("mine(duration=48): ten stages in 48 frames, the first on the frame after the click, broken on 558",
-       [st_ for _f, st_ in m["stages"]] == list(range(10)) and m["stages"][0][0] == 511 and m["frame"] == 558
-       and m["ticks"] == 151 and m["drop"] is None and m["item"] is None, str(m["stages"]))
-    ok("... 11 arm swings 4.8 frames apart (the game's 151 ticks would be 38), 64 break particles + 40 crumbs",
+    ok("mine(duration=48): ten stages in 48 frames, stage 0 ON the frame of the click, broken on 558; the game "
+       "would take 150 ticks (151 sums)",
+       [st_ for _f, st_ in m["stages"]] == list(range(10)) and m["stages"][0][0] == 510 and m["frame"] == 558
+       and stage_at(rock, 509) == -1 and stage_at(rock, 510) == 0
+       and m["ticks"] == 150 and m["mining_ticks"] == 151 and m["drop"] is None and m["item"] is None,
+       str(m["stages"]))
+    ok("... 11 arm swings 4.8 frames apart (the game's 150 ticks would be 38), 64 break particles + 40 crumbs",
        len(m["swings"]) == 11 and abs(m["swings"][1] - m["swings"][0] - 4.8) < 1e-6
        and len(m["burst"].particles) == 64 + 40, "%d swings, %d particles" % (len(m["swings"]),
                                                                               len(m["burst"].particles)))
@@ -2023,8 +2456,10 @@ def _check():
        before == [rock.variants[9].name] and after == [], "%s -> %s" % (before, after))
     m2 = mine(steve, turf, 600, seed=5)
     it = m2["item"]
-    ok("grass block by hand: the game's 18 ticks = 22 frames, drops dirt from the middle of the block",
-       m2["ticks"] == 18 and m2["frames"] == 22 and m2["drop"] == "dirt" and it is not None
+    ok("grass block by hand: the game's 17 ticks after the click (18 sums) = 20 frames, drops dirt from the middle "
+       "of the block",
+       m2["ticks"] == 17 and m2["mining_ticks"] == 18 and m2["frames"] == 20 and m2["frame"] == 620
+       and m2["stages"][0] == (600, 0) and m2["drop"] == "dirt" and it is not None
        and all(abs(it.spawn_point[i] - (turf.cell[i] + 0.5)) <= 0.25 + (0.125 if i == 2 else 0) for i in range(3)),
        "ticks %d, spawn %s" % (m2["ticks"], tuple(round(c, 2) for c in it.spawn_point) if it else None))
     under = v.world.get(turf.cell[0], turf.cell[1], turf.cell[2] - 1)[0]
@@ -2038,9 +2473,18 @@ def _check():
     pair = [place_block(v.collection, "stone", (cell[0] + 7, cell[1], cell[2] + 1 - i), world=v) for i in range(2)]
     d2 = dig(steve, pair, 800, tool="hand", duration=24)
     ok("dig: golden pickaxe on netherrack breaks on the click, the next block one tick later; by hand the next "
-       "block starts 6 ticks after the break", [x["instant"] for x in d] == [True, True] and d[0]["frame"] == 700
-       and d[1]["frame"] == 701 and d2[0]["frame"] == 824 and d2[1]["start"] == 831 and d2[1]["frame"] == 855,
+       "block starts 6 ticks after the break and shows nothing on its first frame (the clicked one shows stage 0)",
+       [x["instant"] for x in d] == [True, True] and d[0]["frame"] == 700
+       and d[1]["frame"] == 701 and d2[0]["frame"] == 824 and d2[1]["start"] == 831 and d2[1]["frame"] == 855
+       and stage_at(pair[0], 800) == 0 and stage_at(pair[1], 831) == -1 and stage_at(pair[1], 832) == 0,
        "%s / %s" % ([x["frame"] for x in d], [(x["start"], x["frame"]) for x in d2]))
+    quick = place_block(v.collection, "stone", (cell[0] + 11, cell[1], cell[2]), world=v)
+    mq = mine(steve, quick, 1300, tool="iron_pickaxe")
+    trq = progress_track("stone", "iron_pickaxe")
+    ok("game timing, a clicked block (stone, iron pickaxe: 8 sums of 0.133): stage 1 ON the click frame, broken 7 "
+       "ticks = 8 frames later", mq["mining_ticks"] == 8 and mq["ticks"] == 7 and mq["frame"] == 1308
+       and mq["stages"][0] == (1300, int(trq[0] * 10.0)) and int(trq[0] * 10.0) == 1 and mq["drop"] == "cobblestone",
+       "%s, broken on %d" % (mq["stages"], mq["frame"]))
     view = _SolidView(v.world, 825)
     ok("particles and drops see a broken block's cell as air and an unbroken one as solid",
        not view.solid(pair[0].cell) and view.solid(pair[1].cell) and view.solid((cell[0], cell[1], cell[2] - 1)))
@@ -2100,12 +2544,126 @@ def _check():
     pit = place_from_world(v.collection, w, cells)
     d3 = dig(steve, pit, 1200, tool="wooden_pickaxe")
     rests = [x["item"].rest_pos for x in d3]
-    ok("a hole in a floor (World.build(skip=cells) + place_from_world + dig): 6 ticks a block with a wooden pickaxe, "
-       "each drops netherrack, and both items stay inside the 1 x 1 hole (on the lower block, then on its floor)",
-       len(floor_objs) >= 1 and [x["ticks"] for x in d3] == [6, 6] and [x["drop"] for x in d3] == ["netherrack"] * 2
+    ok("a hole in a floor (World.build(skip=cells) + place_from_world + dig): 6 sums a block with a wooden pickaxe "
+       "(5 ticks after the click, 6 for the second block), each drops netherrack, and both items stay inside the "
+       "1 x 1 hole (on the lower block, then on its floor)",
+       len(floor_objs) >= 1 and [x["ticks"] for x in d3] == [5, 6] and [x["mining_ticks"] for x in d3] == [6, 6]
+       and [x["drop"] for x in d3] == ["netherrack"] * 2
        and all(41.12 <= r.x <= 41.88 and 41.12 <= r.y <= 41.88 for r in rests)
        and abs(rests[0].z + 1.0) < 1e-6 and abs(rests[1].z + 2.0) < 1e-6,
        "rest %s" % [tuple(round(c, 2) for c in r) for r in rests])
+    # 9. what the review found (each on a door and on frames nothing above uses)
+    def curve(d, a, b):
+        fc_ = _fcurve(d, "rotation_euler", 2)
+        return [round(fc_.evaluate(f / 2.0), 6) for f in range(2 * a, 2 * b)]
+
+    def cracks(d, a, b):
+        return [stage_at(d, f) for f in range(a, b)]
+
+    kw = dict(attempt=48, every=16, half="both", along=-0.3, shudder=8)
+    door_b = v.doors["house_b"]
+    zb, zc = undead.make_zombie("check_zombie_b"), undead.make_zombie("check_zombie_c")
+    ra = bang_on_door(zb, door_b, 3001, 3078, **kw)
+    one, looks = curve(door_b, 2990, 3100), cracks(door_b, 2990, 3100)
+    peak = max(abs(a_ - float(door_b["closed_yaw"])) for a_ in one)
+    bang_on_door(zb, door_b, 3001, 3078, **kw)
+    same = curve(door_b, 2990, 3100) == one and cracks(door_b, 2990, 3100) == looks
+    bang_on_door(zc, door_b, 3001, 3078, **dict(kw, along=0.3))
+    two = curve(door_b, 2990, 3100)
+    shudder(door_b, ra["hits"][0], 8)
+    shudder(door_b, ra["hits"][0], 8)
+    ok("shudder is not additive: the same bang_on_door twice, a second zombie knocking in step and shudder() twice "
+       "on a blow all leave ONE jolt of 8 x 0.5 pixel (0.25 rad)", same and two == one
+       and curve(door_b, 2990, 3100) == one and abs(peak - 8 * SHUDDER_PIXELS / 16.0) < 1e-6,
+       "peak %.4f rad" % peak)
+    bang_on_door(zb, door_b, 3001, 3060, **dict(kw, every=20))          # the same call with another length and rhythm
+    bang_on_door(zb, door_b, 3001, 3078, **kw)
+    ok("... and bang_on_door made again with another length and rhythm, then as before, leaves nothing behind",
+       curve(door_b, 2990, 3100) == one and cracks(door_b, 2990, 3100) == looks)
+    rb = bang_on_door(zb, door_b, 3078, 3138, phase=ra["phase"], place=False, **kw)
+    whole = cracks(door_b, 3001, 3138)
+    ok("continuing in the next shot with phase=r['phase'] and place=False (first= is then r['next_knock'] by "
+       "itself): the swings stay 16 frames apart across the cut and the climb goes on (stage 5 on both sides of it)",
+       rb["knocks"][0] - ra["knocks"][-1] == 16 and abs(ra["next_knock"] - 5.0) < 1e-9 and whole[76] == 5
+       and whole[77] == 5 and rb["stages"][0] == (3078, 5),
+       "swings %s | %s, next_knock %.1f" % (ra["knocks"][-2:], rb["knocks"][:2], ra["next_knock"]))
+    door_d, zd = v.doors["house_d"], undead.make_zombie("check_zombie_d")
+    r_late = bang_on_door(zd, door_d, 3078, 3138, phase=ra["phase"], first=ra["next_knock"], **kw)
+    r_early = bang_on_door(zd, door_d, 3001, 3078, **kw)                # the EARLIER shot keyed second
+    ok("call order: the later shot keyed first, then the earlier one: the same cracks as in film order (the "
+       "earlier call does not clear what is keyed on its frame_end)",
+       cracks(door_d, 3001, 3138) == whole and r_early["stages"][-1][1] != -1 and r_late["stages"][0] == (3078, 5),
+       "stages around the cut %s" % cracks(door_d, 3074, 3084))
+    door_c, ze = v.doors["house_c"], undead.make_zombie("check_zombie_e")
+    r1 = bang_on_door(ze, door_c, 3001, 3070, **kw)                     # a swing starts on 3067, its blow is on 3072
+    r2 = bang_on_door(ze, door_c, 3070, 3130, phase=r1["phase"], first=r1["next_knock"], place=False, **kw)
+    jolt = _fcurve(door_c, "rotation_euler", 2).evaluate(3072) - float(door_c["closed_yaw"])
+    ok("a swing begun 3 frames before the cut lands in the next shot: its blow (frame 3072) is in that call's hits "
+       "and the door jolts on it", 3067 in r1["knocks"] and 3072 not in r1["hits"] and r2["hits"][0] == 3072
+       and abs(abs(jolt) - 8 * SHUDDER_PIXELS / 16.0) < 1e-6 and abs(r1["next_knock"] - 13.0) < 1e-9,
+       "hits %s | %s" % (r1["hits"][-2:], r2["hits"][:2]))
+    door_e = v.doors["house_e"]
+    v.door_open("house_e", 3200, True, frames=5)
+
+    def keys_of(d):
+        return [(round(k.co.x, 3), round(k.co.y, 6), k.interpolation, k.handle_left_type,
+                 tuple(round(c, 4) for c in k.handle_left), tuple(round(c, 4) for c in k.handle_right))
+                for k in _fcurve(d, "rotation_euler", 2).keyframe_points]
+
+    theirs = keys_of(door_e)
+    shudder(door_e, 3150, 8)
+    shudder(door_e, 3203, 8)                                            # on top of the opening: replaces the 3205 key
+    during = keys_of(door_e)
+    n_gone = clear_shudder(door_e)
+    ok("the shudder keys only its own frames: Village.door_open's keys are there while the door shudders (the one "
+       "on a shudder frame carries the jolt) and are back exactly after clear_shudder()",
+       len(theirs) == 2 and keys_of(door_e) == theirs and n_gone == 2 and len(during) == 2 + 5 + 5 - 1
+       and during[0][0] == 3149.0 and any(k[0] == 3200.0 and k[1:3] == theirs[0][1:3] for k in during),
+       "%d keys before, %d with two blows, %d after" % (len(theirs), len(during), len(keys_of(door_e))))
+    torches = door_torches(v, "house_a")
+    nearest = [min((o for o in v.lantern_lights if o.get("mc_light") != "fill"),
+                   key=lambda o, L=L: math.dist(o.location, L.location)) for L in torches]
+    old_key = (9.7, -7.5, 2.9)
+    d_old = sorted(round(math.dist(L.location, old_key), 4) for L in torches)
+    ok("door_torches: extra=[(tuple(L.location), k) for L in lights] names each torch (Stage.lights boosts the "
+       "light nearest to a point); the merged light's old position is equally far from both",
+       nearest == list(torches) and len(torches) == 2 and abs(d_old[0] - d_old[1]) < 1e-3, "distances %s" % d_old)
+    counts = {}
+    for bid, pr in (("stone", {}), ("torch", {}), ("wall_torch", {"facing": "east"}), ("oak_fence", {}),
+                    ("oak_fence", {"north": "true", "east": "true"}),
+                    ("oak_stairs", {"facing": "east", "half": "bottom", "shape": "straight"}),
+                    ("anvil", {"facing": "north"}), ("dirt_path", {}), ("lantern", {"hanging": "false"}),
+                    ("oak_door", {"half": "lower", "facing": "east", "hinge": "left", "open": "false"}),
+                    ("oak_slab", {"type": "bottom"}), ("poppy", {})):
+        counts[bid + ("+" if pr.get("north") else "")] = break_particles(bid, pr)
+    want_counts = {"stone": 64, "torch": 12, "wall_torch": 12, "oak_fence": 16, "oak_fence+": 40, "oak_stairs": 48,
+                   "anvil": 82, "dirt_path": 64, "lantern": 16, "oak_door": 32, "oak_slab": 32, "poppy": 64}
+    ok("outline_boxes: break particles by the block's own shape: stone 64, a torch 12, a wall torch 12, a fence "
+       "post 16 (with two arms 40), stairs 48, an anvil 82 (the game merges its four boxes into seven), a door half "
+       "32, a slab 32 (a plant is still a full cube)",
+       counts == want_counts, str({k: c for k, c in counts.items() if want_counts.get(k) != c}))
+    wt = outline_boxes("wall_torch", {"facing": "east"})[0]
+    lamp = place_block(v.collection, "torch", (cell[0] + 13, cell[1], cell[2]), world=v)
+    step = place_block(v.collection, "oak_door", (cell[0] + 15, cell[1], cell[2]),
+                       {"half": "lower", "facing": "east", "hinge": "left", "open": "false"}, world=v)
+    bl, bs = break_block(lamp, 1500), break_block(step, 1500)
+    xs = [p["pos"][0][0] - step.cell[0] for p in bs["burst"].particles]
+    ok("... a torch placed with place_block throws 12 particles from its 4 x 10 x 4 pixel box, a door half 32 from "
+       "its 3-pixel slab; a wall torch facing east is the box x 0..5, y 3..13, z 5.5..10.5",
+       len(bl["burst"].particles) == 12 and len(bs["burst"].particles) == 32
+       and all(abs(p["pos"][0][0] - lamp.center.x) <= 0.125 + 1e-6 and p["pos"][0][2] - lamp.cell[2] <= 0.625 + 1e-6
+               for p in bl["burst"].particles) and max(xs) - min(xs) <= 0.1875 + 1e-6
+       and wt == (0.0, 3.0, 5.5, 5.0, 13.0, 10.5),
+       "torch %d, door half %d (x spread %.3f), wall torch %s"
+       % (len(bl["burst"].particles), len(bs["burst"].particles), max(xs) - min(xs), wt))
+    door_f = v.doors["house_f"]
+    pf_plain = stand_point(door_f)[0]
+    pf = stand_point(door_f, world=v)[0]
+    ok("stand_point(world=v): at house_f (a dirt path in front of the door) the mob stands 1/16 lower than the "
+       "door's foot; at house_a (the door step) on the step, as before; the world is remembered per door",
+       abs(pf_plain[2]) < 1e-9 and abs(pf[2] + 1.0 / 16.0) < 1e-9 and stand_point(door_f)[0] == pf
+       and max(abs(a_ - b_) for a_, b_ in zip(stand_point(door, world=v)[0], (9.7, -7.5, 1.0))) < 1e-4,
+       "house_f %s -> %s" % (tuple(round(c, 4) for c in pf_plain), tuple(round(c, 4) for c in pf)))
     print("[breaking] numeric checks: %d failed%s" % (len(bad), ": " + "; ".join(bad) if bad else ""))
     return len(bad)
 

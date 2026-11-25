@@ -61,12 +61,14 @@ village's own. engine/sets.py holds the set pieces that are built this way. What
   b.allow(what)            permit changes inside a building ('house_a', 'hall', ...), on the 'streets', or in a box
                            (x0, y0, x1, y1); without it a block changed inside a house or on a street is a problem
   b.changed()              the cells the hook has changed so far; b.strict = False turns problems into warnings
-After the hook: torches it removed lose their light, beds and doors it removed lose their anchors and props, and the
-build stops with a ValueError (b.strict) if a block was changed inside a building or on a street without b.allow, if
-a path is blocked or an anchor stands inside a block (Village.validate(): every anchor is taken as a standing spot
-unless it is a bed's or its name ends in _target, _center, _cam, _station or _door). The list is also in
-Village.edit_problems. If the hook re-levels ground under one of the village's own paths, register that path again
-(b.path(name, points_2d, replace=True)): its heights were taken before the hook ran.
+After the hook: torches it removed lose their light, beds and doors it removed lose their anchors and props (a
+required door, house_a / house_b / house_c, is then no longer "missing": Village.removed_doors), and the build
+stops with a ValueError (b.strict) if a block was changed inside a building or on a street without b.allow, if a path
+is blocked or an anchor stands inside a block (Village.validate(): every anchor is taken as a standing spot unless
+it is a bed's or its name ends in _target, _center, _cam, _station or _door). The list is also in
+Village.edit_problems. The village's own anchors and path nodes that stood on the terrain follow ground the hook
+paved or re-levelled under them (Village.regrounded lists them: a dirt_path is 1/16 lower than grass); a path the
+hook registers again (b.path(name, points_2d, replace=True)) gets its heights from the new ground anyway.
 The look's fill light is shadowless (engine/look.py): a roofed or dug-in set piece is NOT dark by itself.
 engine/sets.py can bake the game's own sky light into the blocks (sets.env(b).bake_sky_light).
 """
@@ -163,6 +165,8 @@ class Village:
         self.trees = []           # the oaks as data (see the module docstring: FILM SETS)
         self.sets = {}            # set piece name -> whatever its function returned (engine/sets.py), for the film
         self.edit_problems = []   # what the check after a film's edit hook found (empty = all good)
+        self.removed_doors = set()    # required doors a film's edit hook took out on purpose (b.allow): not "missing"
+        self.regrounded = []      # village anchors / paths whose height followed ground the hook paved or re-levelled
 
     def ground(self, x, y):
         """Height of the terrain surface (z) at world position (x, y)."""
@@ -254,7 +258,7 @@ class Village:
         """Problems with the set: missing required anchors / paths / doors and blocked paths (empty = all good)."""
         out = ["missing anchor " + a for a in REQUIRED_ANCHORS if a not in self.anchors]
         out += ["missing path " + p for p in REQUIRED_PATHS if p not in self.paths]
-        out += ["missing door " + d for d in REQUIRED_DOORS if d not in self.doors]
+        out += ["missing door " + d for d in REQUIRED_DOORS if d not in self.doors and d not in self.removed_doors]
         if self.bell is None:
             out.append("missing bell")
         if not self.lantern_lights:
@@ -369,6 +373,7 @@ class _Builder:
         self._before = None           # World.blocks as they were when the hook was called
         self._natural = None          # the height field as terrain() made it (set when a hook runs)
         self._streets_before = set()
+        self._stood = None            # anchors / path nodes of the village and their walking height before the hook
 
     # ---- terrain ---------------------------------------------------------------------------------
 
@@ -1454,6 +1459,39 @@ class _Builder:
                 out[c] = (w._states[old], None)
         return out
 
+    def _stand_snapshot(self):
+        """The village's anchors and path nodes with the walking height of their column, taken before the hook."""
+        v = self.v
+        return (dict((k, (p, self.walk_z(p[0], p[1]))) for k, p in v.anchors.items()),
+                dict((k, [(p, self.walk_z(p[0], p[1])) for p in pts]) for k, pts in v.paths.items()))
+
+    def _reground(self):
+        """Anchors and path nodes of the village that stood ON the terrain before the hook and that the hook did
+        not register again follow the ground it paved or re-levelled under them (a dirt_path is 1/16 lower)."""
+        v = self.v
+        anchors, paths = self._stood
+
+        def now(p, wz):
+            if wz is None or abs(p[2] - wz) > 1e-6:
+                return None                                  # it did not stand on the terrain (a floor, a bed, a target)
+            z = self.walk_z(p[0], p[1])
+            return None if z is None or abs(z - wz) < 1e-6 else (p[0], p[1], float(z))
+
+        for name, (p, wz) in anchors.items():
+            if v.anchors.get(name) == p:
+                q = now(p, wz)
+                if q is not None:
+                    v.anchors[name] = q
+                    v.regrounded.append(name)
+        for name, nodes in paths.items():
+            pts = v.paths.get(name)
+            if pts is None or len(pts) != len(nodes) or any(a != n[0] for a, n in zip(pts, nodes)):
+                continue                                     # the hook registered it again: its heights are new
+            new = [now(p, wz) or p for p, wz in nodes]
+            if new != pts:
+                v.paths[name] = new
+                v.regrounded.append("path " + name)
+
     def _after_edit(self):
         """Bring the builder's own lists in line with what the hook did to the World, and list what it changed
         where it should not have (see the module docstring)."""
@@ -1461,6 +1499,7 @@ class _Builder:
         changed = self.changed()
         if w.block_id(*self.bell_cell) != "bell":
             raise ValueError("village edit hook: the bell block is gone (the set needs it)")
+        self._reground()
         # torches: a removed one loses its light, a new one gets a light
         kept = []
         for group, bid, p, cell in self.torches:
@@ -1478,8 +1517,11 @@ class _Builder:
                 self.torches.append((self.light_group, st[0], dict(st[1]), cell))
                 self.set_groups.add(self.light_group)
         # doors and beds that are no longer there
-        for e in self.entries.values():
+        for name, e in self.entries.items():
+            had = len(e.get("doors", []))
             e["doors"] = [c for c in e.get("doors", []) if (w.block_id(*c) or "").endswith("_door")]
+            if had and not e["doors"]:
+                v.removed_doors.add(name)                    # (taken out without b.allow: reported below as a change)
         for key in list(v.beds):
             cells = [tuple(int(math.floor(a)) for a in v.beds[key][k]) for k in ("foot", "head")]
             if any(not (w.block_id(*c) or "").endswith("_bed") for c in cells):
@@ -1532,6 +1574,7 @@ class _Builder:
             self._before = dict(self.w.blocks)
             self._streets_before = set(self.path_cells)
             self._natural = self.v._height.copy()
+            self._stood = self._stand_snapshot()
             edit(self)
             problems = self._after_edit()
         self.props_and_mesh()

@@ -1,0 +1,369 @@
+{
+ "film": "_multisky_demo",
+ "json_version": 3,
+ "spec_hash": "80ecf66d168cd0c3",
+ "spec": {
+  "version": 1,
+  "voice": "am_michael",
+  "speed": 1.0,
+  "lead": 0.3,
+  "tail": 1.3,
+  "pause": 0.35,
+  "fps": 24,
+  "lines": [
+   {
+    "id": "sunset",
+    "text": "Our house at sunset.",
+    "spoken": "Our house at sunset.",
+    "pause": 0.35,
+    "speed": 1.0
+   },
+   {
+    "id": "night",
+    "text": "Our house at night.",
+    "spoken": "Our house at night.",
+    "pause": 0.6,
+    "speed": 1.0
+   },
+   {
+    "id": "morning",
+    "text": "Then it is morning.",
+    "spoken": "Then it is morning.",
+    "pause": 0.5,
+    "speed": 1.0
+   },
+   {
+    "id": "sleeps",
+    "text": "When he sleeps, the night just ends.",
+    "spoken": "When he sleeps, the night just ends.",
+    "pause": 0.0,
+    "speed": 1.0
+   }
+  ]
+ },
+ "voice": "am_michael",
+ "lang": "en-us",
+ "speed": 1.0,
+ "sample_rate": 24000,
+ "channels": 1,
+ "fps": 24,
+ "duration": 8.583333,
+ "frames": 206,
+ "lead": 0.3,
+ "tail": 1.3233,
+ "speech_seconds": 5.51,
+ "words_per_second_speaking": 3.448,
+ "words_per_second_overall": 2.73,
+ "timing": "model",
+ "loudness": {
+  "target_lufs": -19.01,
+  "programme_target_lufs": -16.0,
+  "max_true_peak_db": -2.0,
+  "before_lufs": -22.9,
+  "before_true_peak_db": -3.5,
+  "gain_db": 4.18,
+  "limiter_ceiling_db": -2.5,
+  "max_gain_reduction_db": 3.18,
+  "share_limited_over_1db": 0.0422,
+  "share_limited_over_3db": 0.0025,
+  "sentence_level_gain_db": [
+   0.27,
+   -0.08,
+   -0.72,
+   0.08
+  ],
+  "sentence_level_db": [
+   -17.85,
+   -17.79,
+   -17.85,
+   -17.73
+  ],
+  "integrated_lufs": -19.0,
+  "true_peak_db": -2.4,
+  "programme_lufs": -15.99
+ },
+ "wav": "_multisky_demo.wav",
+ "wav_sha1": "0f420485b5483a7bea3273fb7ba7df76777b8faa",
+ "sentences": [
+  {
+   "index": 0,
+   "id": "sunset",
+   "text": "Our house at sunset.",
+   "spoken": "Our house at sunset.",
+   "start": 0.3,
+   "end": 1.505,
+   "pause_after": 0.35,
+   "speed": 1.0,
+   "first_word": 0,
+   "last_word": 3
+  },
+  {
+   "index": 1,
+   "id": "night",
+   "text": "Our house at night.",
+   "spoken": "Our house at night.",
+   "start": 1.855,
+   "end": 2.94,
+   "pause_after": 0.6,
+   "speed": 1.0,
+   "first_word": 4,
+   "last_word": 7
+  },
+  {
+   "index": 2,
+   "id": "morning",
+   "text": "Then it is morning.",
+   "spoken": "Then it is morning.",
+   "start": 3.54,
+   "end": 4.8,
+   "pause_after": 0.5,
+   "speed": 1.0,
+   "first_word": 8,
+   "last_word": 11
+  },
+  {
+   "index": 3,
+   "id": "sleeps",
+   "text": "When he sleeps, the night just ends.",
+   "spoken": "When he sleeps, the night just ends.",
+   "start": 5.3,
+   "end": 7.26,
+   "pause_after": 0.0,
+   "speed": 1.0,
+   "first_word": 12,
+   "last_word": 18
+  }
+ ],
+ "words": [
+  {
+   "text": "Our",
+   "caption": "Our",
+   "start": 0.3,
+   "end": 0.43,
+   "sentence": 0,
+   "source": "energy",
+   "estimated": false,
+   "second": 0.3,
+   "second_source": "energy"
+  },
+  {
+   "text": "house",
+   "caption": "house",
+   "start": 0.43,
+   "end": 0.78,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.42,
+   "second_source": "forced"
+  },
+  {
+   "text": "at",
+   "caption": "at",
+   "start": 0.78,
+   "end": 0.93,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.68,
+   "second_source": "forced"
+  },
+  {
+   "text": "sunset.",
+   "caption": "sunset",
+   "start": 0.93,
+   "end": 1.505,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.9,
+   "second_source": "forced"
+  },
+  {
+   "text": "Our",
+   "caption": "Our",
+   "start": 1.855,
+   "end": 1.985,
+   "sentence": 1,
+   "source": "energy",
+   "estimated": false,
+   "second": 1.855,
+   "second_source": "energy"
+  },
+  {
+   "text": "house",
+   "caption": "house",
+   "start": 1.985,
+   "end": 2.385,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 1.995,
+   "second_source": "forced"
+  },
+  {
+   "text": "at",
+   "caption": "at",
+   "start": 2.385,
+   "end": 2.535,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 2.275,
+   "second_source": "forced"
+  },
+  {
+   "text": "night.",
+   "caption": "night",
+   "start": 2.535,
+   "end": 2.94,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 2.515,
+   "second_source": "forced"
+  },
+  {
+   "text": "Then",
+   "caption": "Then",
+   "start": 3.54,
+   "end": 3.875,
+   "sentence": 2,
+   "source": "energy",
+   "estimated": false,
+   "second": 3.54,
+   "second_source": "energy"
+  },
+  {
+   "text": "it",
+   "caption": "it",
+   "start": 3.875,
+   "end": 4.025,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 3.76,
+   "second_source": "forced"
+  },
+  {
+   "text": "is",
+   "caption": "is",
+   "start": 4.025,
+   "end": 4.25,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 4.02,
+   "second_source": "forced"
+  },
+  {
+   "text": "morning.",
+   "caption": "morning",
+   "start": 4.25,
+   "end": 4.8,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 4.2,
+   "second_source": "forced"
+  },
+  {
+   "text": "When",
+   "caption": "When",
+   "start": 5.3,
+   "end": 5.41,
+   "sentence": 3,
+   "source": "energy",
+   "estimated": false,
+   "second": 5.3,
+   "second_source": "energy"
+  },
+  {
+   "text": "he",
+   "caption": "he",
+   "start": 5.41,
+   "end": 5.51,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 5.4,
+   "second_source": "forced"
+  },
+  {
+   "text": "sleeps,",
+   "caption": "sleeps",
+   "start": 5.51,
+   "end": 6.035,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 5.52,
+   "second_source": "forced"
+  },
+  {
+   "text": "the",
+   "caption": "the",
+   "start": 6.035,
+   "end": 6.16,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 6.1,
+   "second_source": "forced"
+  },
+  {
+   "text": "night",
+   "caption": "night",
+   "start": 6.16,
+   "end": 6.46,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 6.16,
+   "second_source": "forced"
+  },
+  {
+   "text": "just",
+   "caption": "just",
+   "start": 6.46,
+   "end": 6.735,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 6.4,
+   "second_source": "forced"
+  },
+  {
+   "text": "ends.",
+   "caption": "ends",
+   "start": 6.735,
+   "end": 7.26,
+   "sentence": 3,
+   "source": "model",
+   "estimated": false,
+   "second": 6.64,
+   "second_source": "forced"
+  }
+ ],
+ "estimated_words": [],
+ "guarded_words": [],
+ "onset_check": {
+  "words": 4,
+  "not_found": 0,
+  "far": [],
+  "median_ms": 5.0,
+  "min_ms": 5.0,
+  "max_ms": 15.0,
+  "within_1_frame": 4,
+  "within_2_frames": 4
+ },
+ "tools": {
+  "model": "kokoro-v1.0.timed.onnx",
+  "voices": "voices-v1.0.bin",
+  "recogniser": "faster-whisper small.en",
+  "kokoro-onnx": "0.6.1",
+  "faster-whisper": "1.2.1",
+  "onnxruntime": "1.32.0",
+  "ctranslate2": "4.9.1"
+ }
+}

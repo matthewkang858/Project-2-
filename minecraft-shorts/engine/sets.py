@@ -389,11 +389,119 @@ def clear_view(b, a, c, width=1.6):
     return done
 
 
+def _new_name(b, name):
+    """A set piece's name must be new in this village: the same piece built twice would stand in itself."""
+    if name in b.v.sets:
+        raise ValueError("set piece %r exists already in this village: give the second one another name=" % name)
+
+
+def _columns_along(a, c):
+    """[(s0, s1, (cx, cy))]: the columns the ground line a -> c passes through, with the distances from a."""
+    length = math.hypot(c[0] - a[0], c[1] - a[1])
+    ts = {0.0, 1.0}
+    for k in (0, 1):
+        d = c[k] - a[k]
+        if abs(d) > 1e-9:
+            lo, hi = min(a[k], c[k]), max(a[k], c[k])
+            for g in range(int(math.floor(lo)) + 1, int(math.ceil(hi))):
+                ts.add((g - a[k]) / d)
+    ts = sorted(t for t in ts if 0.0 <= t <= 1.0)
+    out = []
+    for t0, t1 in zip(ts, ts[1:]):
+        if (t1 - t0) * length < 1e-6:
+            continue
+        tm = 0.5 * (t0 + t1)
+        col = (int(math.floor(a[0] + (c[0] - a[0]) * tm)), int(math.floor(a[1] + (c[1] - a[1]) * tm)))
+        out.append((t0 * length, t1 * length, col))
+    return out
+
+
+STEP_RUN = 0.6          # a 1-block step is climbed (or dropped) over this much ground, clear of the block's edge
+STEP_CLEAR = 0.3        # ... by half a body's width
+
+
+def ground_path(b, name, points, replace=False, check=True):
+    """Register the walkable polyline `name` through the (x, y) `points` so that it FOLLOWS THE GROUND between
+    them, not only at them (b.path takes the height at its nodes and a walker cuts through whatever lies between).
+    Where the walking height changes from one column to the next a pair of nodes is put in: grass <-> dirt_path
+    (1/16) over 0.3 block, and a 1-block step of the terrain as the hop the game makes of it: the walker rises
+    over STEP_RUN (0.6) block of ground and is up before his body reaches the higher block (down: the other way
+    round). Character.walk moves in straight lines, so at 3 blocks/s a hop is 5 frames. A step of 2 blocks or more
+    cannot be walked: ValueError; so is a path that runs into a block (check=False skips that test). Returns the
+    3D points; the number of hops is len(b.v.sets['paths'][name]['hops'])."""
+    pts2 = [(float(p[0]), float(p[1])) for p in points]
+    if len(pts2) < 2:
+        raise ValueError("ground_path %r needs two points or more" % name)
+    out, hops = [], []
+    for a, c in zip(pts2, pts2[1:]):
+        length = math.hypot(c[0] - a[0], c[1] - a[1])
+        if length < 1e-6:
+            continue
+        cols = _columns_along(a, c)
+        hs = [b.walk_z(col[0] + 0.5, col[1] + 0.5) for _s0, _s1, col in cols]
+        if any(h is None for h in hs):
+            raise ValueError("ground_path %r: no terrain at column %s" % (name, cols[hs.index(None)][2]))
+        nodes = [(0.0, hs[0])]                               # (distance along the leg, height)
+        for i in range(1, len(cols)):
+            s, h0, h1 = cols[i][0], hs[i - 1], hs[i]
+            dh = h1 - h0
+            if abs(dh) < 1e-6:
+                continue
+            if abs(dh) > 1.2:
+                raise ValueError("ground_path %r: a step of %.1f blocks at column %s" % (name, dh, cols[i][2]))
+            if abs(dh) < 0.3:
+                nodes += [(s - 0.15, h0), (s + 0.15, h1)]
+            elif dh > 0:
+                nodes += [(s - STEP_CLEAR - STEP_RUN, h0), (s - STEP_CLEAR, h1)]
+                hops.append((round(a[0] + (c[0] - a[0]) * s / length, 2), round(a[1] + (c[1] - a[1]) * s / length, 2), 1))
+            else:
+                nodes += [(s + STEP_CLEAR, h0), (s + STEP_CLEAR + STEP_RUN, h1)]
+                hops.append((round(a[0] + (c[0] - a[0]) * s / length, 2), round(a[1] + (c[1] - a[1]) * s / length, 2), -1))
+        nodes.append((length, hs[-1]))
+        keep = [nodes[0]]
+        for s, h in nodes[1:-1]:                             # in order along the leg, inside it, no two on one spot
+            s = min(max(s, keep[-1][0] + 0.02), length - 0.02)
+            if s > keep[-1][0] + 0.01:
+                keep.append((s, h))
+        if length > keep[-1][0] + 1e-6:
+            keep.append(nodes[-1])
+        for s, h in keep:
+            p = (a[0] + (c[0] - a[0]) * s / length, a[1] + (c[1] - a[1]) * s / length, float(h))
+            if not out or math.dist(out[-1], p) > 1e-4:
+                out.append(p)
+    old = b.v.paths.get(name)
+    path = b.path(name, out, replace=replace)
+    if check:
+        hits = b.v.path_clear(path)
+        if hits:
+            if old is None:
+                del b.v.paths[name]
+            else:
+                b.v.paths[name] = old
+            raise ValueError("ground_path %r runs into %s" % (name, hits[:2]))
+    b.v.sets.setdefault("paths", {})[name] = dict(hops=hops, points=pts2)
+    return path
+
+
 def floating_oak(b, tree, air=3, logs=2, name="floating_oak", stump="dirt", clear=4.5):
-    """The classic lazy player's tree: the trunk taken, the canopy and its top `logs` logs left hanging over `air`
-    clear blocks of air. tree = a record of b.trees or an (x, y) spot. A small oak's canopy starts 3 blocks below
-    its top, so the tree is re-grown `air` + 3 logs high first (4-6 in the game: air 1-3) if it is not.
-    stump = what is left under the trunk: 'dirt' (as the game leaves it) or 'grass' (grown over)."""
+    """The classic lazy player's tree: the trunk taken, the canopy left hanging `air` clear blocks above the grass
+    with the top `logs` logs of the trunk still in it. tree = a record of b.trees or an (x, y) spot.
+    air   1..3: a small oak's canopy starts 3 blocks below its top and the game's oak has 4-6 logs, so the tree is
+          re-grown air + 3 logs high first if it is not (air 3 = the tallest oak there is; more is refused).
+    logs  1..air + 2 logs left at the top. The top 3 are INSIDE the leaves: logs=2 shows no wood at all except from
+          right below, logs=3 a cut end flush with the underside of the canopy; logs=4 leaves one log hanging
+          under the leaves over air - 1 blocks of air (the picture every player knows), logs=5 two.
+    stump = what is left under the trunk: 'dirt' (as the game leaves it) or 'grass' (grown over).
+    Dict: tree, under, canopy, air, logs, hanging (logs below the leaves), gap (clear blocks over the stump),
+    leaf_bottom, top, base."""
+    _new_name(b, name)
+    air, logs = int(air), int(logs)
+    if not 1 <= air <= 3:
+        raise ValueError("floating_oak: air=%d; the game's small oak has 4-6 logs, so 1..3 clear blocks under its "
+                         "canopy" % air)
+    if not 1 <= logs <= air + 2:
+        raise ValueError("floating_oak: logs=%d; with air=%d there are 1..%d (the oak has %d logs and one block "
+                         "of air must stay under them)" % (logs, air, air + 2, air + 3))
     rng = b.rng_for(name)
     tree = _tree_arg(b, tree, rng, air + 3, name)
     x, y, base = tree["x"], tree["y"], tree["base"]
@@ -417,8 +525,9 @@ def floating_oak(b, tree, air=3, logs=2, name="floating_oak", stump="dirt", clea
     under = b.anchor(name + "_under", (x + 0.5, y + 0.5, float(base)), replace=True)
     canopy = (x + 0.5, y + 0.5, base + h - logs + 0.5 * logs)
     b.v.anchors[name + "_target"] = canopy
-    res = dict(tree=tree, under=under, canopy=canopy, air=air, logs=logs, base=base,
-               leaf_bottom=base + h - 3, top=base + h + 1)
+    hanging = max(0, logs - 3)
+    res = dict(tree=tree, under=under, canopy=canopy, air=air, logs=logs, base=base, hanging=hanging,
+               gap=air - hanging, leaf_bottom=base + h - 3, top=base + h + 1)
     b.v.sets[name] = res
     return res
 
@@ -436,6 +545,7 @@ def bare_oaks(b, spots, heights=(6, 5, 4), name="bare_oaks", level=True):
     matching height in `heights`, is stripped to its logs. level=True first levels the ground they share (the box
     around the spots plus one block) to its most common height and clears it of plants. Anchors <name>_among
     (between the trunks, facing the village square) and <name>_center."""
+    _new_name(b, name)
     rng = b.rng_for(name)
     trees = []
     if level:
@@ -469,7 +579,15 @@ def sand_pyramid(b, center, base=5, layers=3, name="pyramid"):
     """The legend's small pyramid on the grass: `layers` square layers of sand, `base` blocks wide at the bottom and
     2 narrower each layer up, centred on column `center` (x, y). The ground under it is levelled to the centre
     column and cleared. Anchors <name>_beside (a standing spot 1.5 blocks off the middle of its south side),
-    <name>_target; path <name>_round (half way round it, from the south side to the north side by the west)."""
+    <name>_target; path <name>_round (half way round it, from the south side to the north side by the west; it
+    follows the ground, see ground_path; where the ground around the pyramid cannot be walked the path is left
+    out and dict['round'] is None). base must be odd (the pyramid has one block on top) and layers 1..(base+1)/2."""
+    _new_name(b, name)
+    base, layers = int(base), int(layers)
+    if base < 1 or base % 2 == 0:
+        raise ValueError("sand_pyramid: base=%d; an odd width is needed (5 -> 5x5, 3x3, 1)" % base)
+    if not 1 <= layers <= (base + 1) // 2:
+        raise ValueError("sand_pyramid: layers=%d; a base of %d has room for 1..%d" % (layers, base, (base + 1) // 2))
     cx, cy = int(center[0]), int(center[1])
     z0 = b.ground(cx, cy)
     if z0 is None:
@@ -504,7 +622,11 @@ def sand_pyramid(b, center, base=5, layers=3, name="pyramid"):
     beside = b.anchor(name + "_beside", spots["south"], yaw_to(spots["south"], top), replace=True)
     b.v.anchors[name + "_target"] = top
     ring = [spots["south"], (cx + 0.5 - d, cy + 0.5 - d), spots["west"], (cx + 0.5 - d, cy + 0.5 + d), spots["north"]]
-    path = b.path(name + "_round", [(p[0], p[1]) for p in ring], replace=True)
+    try:
+        path = ground_path(b, name + "_round", [(p[0], p[1]) for p in ring], replace=True)
+    except ValueError as e:                                # a tree, a wall or a 2-block bank in the way
+        path = None
+        print("[sets] %s: no path round it (%s)" % (name, e))
     res = dict(center=(cx, cy), ground=z0, base=base, layers=layers, cells=cells, top=top, beside=beside,
                sides=spots, round=path, height=min(layers, half + 1))
     b.v.sets[name] = res

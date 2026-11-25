@@ -116,22 +116,195 @@ def up(p, dz):
 
 class Stage:
     """The built set plus the bookkeeping a multi-shot film needs: who is in which shot, how bright the torches
-    are in each shot, which walls the camera may look through."""
+    are in each shot, which walls the camera may look through, and (new) which SKY each frame is filmed under and
+    where the encoder DIPS TO BLACK.
 
-    def __init__(self, scene, film, v, sky):
-        self.scene, self.film, self.v, self.sky = scene, film, v, sky
+    ONE SKY (every finished film): build the sky yourself and hand its objects over, as before:
+
+        sky = look.set_time(scene, "golden", sun_azimuth=62.0, sun_elevation=27.0)
+        look.setup_compositor(scene, bloom=1.0, grade="warm")
+        st = Stage(scene, film, v, sky)
+
+    SEVERAL SKIES IN ONE FILM (day and night in one module, one frame directory, one mp4). The recipe:
+
+        SKIES = {"gold":  dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm"),      # module level,
+                 "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool")}      # the name SKIES
+
+        def build(scene, sky=None):                       # render.py calls build once per sky it has work in
+            v = village.build_village(scene, seed=1)
+            film = shots.Film(scene, fps=24)
+            st = Stage(scene, film, v, skies=SKIES, sky=sky)     # builds the ACTIVE sky + its compositor
+            s = st.shot("street", 3.0, sky="gold")               # every shot is tagged with the sky it is filmed
+            s = st.shot("door", 2.5, sky="night")                #   under; default: the sky in force before it
+            s = st.shot("bed", 3.0)                              # (night)
+            st.sky_change(nar.at("ended"), "gold")               # ... and from this frame on the SAME shot is gold
+            st.dip(s.frame_start, out=3, hold=0, back=3)         # encoder: dip to black around this cut
+            st.finish()
+            return {"film": film, "captions": caps, "narration": nar, "stage": st}
+
+      * A sky entry holds the arguments of look.set_time and look.setup_compositor: preset ('day' | 'golden' |
+        'dusk' | 'night'), az / el (where the sun, at night the moon, stands), key / ambient (strengths), bloom,
+        grade, vignette, haze, and by their own names celestial_size, clouds, cloud_height, cloud_radius,
+        cloud_offset, star_scale. A misspelt key is an error.
+      * sky=None builds the first sky of SKIES. st.sky is that sky's set_time() dict (st.sky["key"] is its sun or
+        moon lamp), st.sky_name its name, st.skies the table.
+      * EVERYTHING ELSE MUST BE THE SAME IN EVERY BUILD: the whole timeline, every actor, every key, every torch
+        level, every caption. Only the sky differs. So never write `if sky == "night": ...` around a shot, an
+        actor or an import; key a film-local light for the shots that need it instead (it is hidden elsewhere).
+        A frame is right only when it is rendered in the build of its own sky; render.py makes sure of that (it
+        refuses to render, stamp or judge a frame in another sky's build) and renders the film sky by sky.
+      * Torches and lanterns are not part of a sky: Stage.lights(shot, ...) per shot, as always (night shots high,
+        golden shots at 1.0). They are the same in every build.
+      * A SKY CHANGE INSIDE A SHOT (the night ends while the camera keeps moving and the actors keep walking):
+        st.sky_change(frame, sky). Nothing in the scene changes at that frame: it is one shot, one camera, one
+        baked camera path, so nothing can jump and motion blur is that of an uncut shot; the frames before it are
+        simply rendered in the old sky's build and the frames from it on in the new one's. Torch levels that should
+        change with it: Stage.lights(shot, ..., at=frame). Words: st.sky_change(nar.at("ended"), "gold").
+      * DIPS TO BLACK belong to the encode, not to the frames: st.dip(frame, out=3, hold=0, back=3) makes the
+        picture black ON `frame` (normally the first frame of a shot) and the `hold` frames after it, fading out
+        over the `out` frames before and back in over the `back` frames after; st.fade(frame0, frame1, g0, g1) is
+        one ramp of the picture gain (film start: st.fade(1, 7, 0.0, 1.0)). The caption stays at full strength.
+        Changing a dip re-encodes and re-renders nothing. They reach render.py through st.fades.
+      * What costs what: an edit to one shot re-renders that shot (in its sky's build only); an edit to one entry
+        of SKIES re-renders exactly the frames of that sky; re-tagging a shot re-renders that shot; a caption, a
+        dip or the narration timing re-renders nothing. Every command builds only the skies it has work in.
+    """
+
+    # a SKIES entry: short name -> look.set_time argument, set_time arguments by their own name, compositor arguments
+    SKY_SHORT = {"az": "sun_azimuth", "el": "sun_elevation", "key": "key_strength", "ambient": "ambient_strength"}
+    SKY_TIME = ("sun_azimuth", "sun_elevation", "key_strength", "ambient_strength", "celestial_size", "clouds",
+                "cloud_height", "cloud_radius", "cloud_offset", "star_scale")
+    SKY_COMP = ("bloom", "vignette", "grade", "haze")
+
+    def __init__(self, scene, film, v, sky=None, skies=None):
+        self.scene, self.film, self.v = scene, film, v
+        self.skies = None          # {name: settings} of a film with several skies (None: one sky, built by the film)
+        self.sky_name = None       # the name of the sky this build has (None: one sky)
+        self._sky_marks = []       # [(frame, sky name or None = the sky in force before it)]
+        self.fades = []            # picture-gain ramps (t0, t1, g0, g1) in film seconds for the encoder (dip, fade)
+        if skies is not None:
+            if not skies or not all(isinstance(k, str) and isinstance(d, dict) for k, d in skies.items()):
+                raise ValueError("skies must be a non-empty {name: dict(preset=..., az=..., el=..., ...)}")
+            name = next(iter(skies)) if sky is None else sky
+            if name not in skies:
+                raise KeyError("sky %r is not one of this film's skies %s" % (name, sorted(skies)))
+            self.skies, self.sky_name = dict(skies), name
+            sky = self.build_sky(scene, skies[name])
+        self.sky = sky             # what look.set_time returned: 'sun', 'moon', 'key', 'world', ...
         self.cast = {}             # name -> Character
         self.in_shot = {}          # shot name -> set of character names
         self.heroes = {}           # shot name -> [(label, [objects])]: what the shot is ABOUT (kept in the safe area)
         self._light_keys = False
         self._t = 0.0
 
+    # ---- skies
+    @classmethod
+    def build_sky(cls, scene, spec):
+        """Build one entry of a film's SKIES into the scene: look.set_time (world, key light, sun / moon, stars,
+        clouds, haze) and look.setup_compositor (bloom, grade, vignette). Returns set_time's dict."""
+        spec = dict(spec)
+        if "preset" not in spec:
+            raise ValueError("a sky needs a preset ('day' | 'golden' | 'dusk' | 'night'): %r" % (spec,))
+        preset = spec.pop("preset")
+        time_kw = {long: spec.pop(short) for short, long in cls.SKY_SHORT.items() if short in spec}
+        time_kw.update({k: spec.pop(k) for k in cls.SKY_TIME if k in spec})
+        comp_kw = {k: spec.pop(k) for k in cls.SKY_COMP if k in spec}
+        if spec:
+            raise TypeError("unknown sky setting(s) %s; known: preset, %s" % (
+                sorted(spec), ", ".join(list(cls.SKY_SHORT) + list(cls.SKY_TIME) + list(cls.SKY_COMP))))
+        sky = look.set_time(scene, preset, **time_kw)
+        look.setup_compositor(scene, **comp_kw)
+        return sky
+
+    def _sky_mark(self, frame, sky):
+        if self.skies is None:
+            raise ValueError("this Stage has one sky: pass skies=SKIES to Stage() to tag shots with skies")
+        if sky is not None and sky not in self.skies:
+            raise KeyError("sky %r is not one of this film's skies %s" % (sky, sorted(self.skies)))
+        self._sky_marks = [m for m in self._sky_marks if m[0] != int(frame)] + [(int(frame), sky)]
+
+    def sky_change(self, frame, sky):
+        """From `frame` on the film is under `sky` (until the next tagged shot or sky_change): a sky change INSIDE a
+        shot. The scene itself does not change at that frame (same shot, same camera path, same actors mid-motion):
+        only the build that renders the frames does. See the class docstring."""
+        if sky is None:
+            raise ValueError("sky_change needs the name of the sky that begins at that frame")
+        self._sky_mark(frame, sky)
+
+    def sky_segments(self):
+        """The film's sky table: [(first frame, last frame, sky name), ...] in film order, covering every frame
+        (neighbours under the same sky are merged). None for a film with one sky. render.py reads it."""
+        if self.skies is None:
+            return None
+        first, last = self.film.frame_start, self.film.frame_end
+        current = next(iter(self.skies))                     # in force until the first tag: the first sky of SKIES
+        runs = [(first, current)]                            # [(frame, sky)]: where a sky begins
+        for frame, sky in sorted(self._sky_marks):
+            current = current if sky is None else sky
+            if frame > last:
+                continue
+            frame = max(frame, first)
+            if runs[-1][0] == frame:
+                runs[-1] = (frame, current)
+            else:
+                runs.append((frame, current))
+        ends = [f - 1 for f, _s in runs[1:]] + [last]
+        merged = []
+        for (a, sky), b in zip(runs, ends):
+            if merged and merged[-1][2] == sky:
+                merged[-1] = (merged[-1][0], b, sky)
+            else:
+                merged.append((a, b, sky))
+        return merged
+
+    def sky_at(self, frame):
+        """Name of the sky a frame is filmed under (None for a film with one sky)."""
+        for a, b, sky in self.sky_segments() or ():
+            if a <= frame <= b:
+                return sky
+        return None
+
+    # ---- dips to black (encode time: engine/post.py)
+    def fade(self, frame0, frame1, g0=1.0, g1=0.0):
+        """One ramp of the PICTURE gain for the encoder: g0 on frame0, g1 on frame1, linear between (1 = untouched,
+        0 = black); a g1 below 1 is on frame1 itself too, after it the picture is untouched again unless another
+        fade follows. The caption is drawn over it at full strength. Returns the ramps added to self.fades."""
+        if not frame1 > frame0:
+            raise ValueError("fade: frame1 must come after frame0")
+        t = self.film.seconds
+        ramps = [(t(frame0), t(frame1), float(g0), float(g1))]
+        if g1 < 1.0:
+            ramps.append((t(frame1), t(frame1 + 1), float(g1), float(g1)))
+        self.fades.extend(ramps)
+        return ramps
+
+    def dip(self, frame, out=3, hold=0, back=3):
+        """A dip to black centred on a cut: the picture is black ON `frame` (the first frame of the new shot) and on
+        the `hold` frames after it, fades out over the `out` frames before it and back in over the `back` frames
+        after. dip(f, 3, 0, 3) gives the frames f-3 .. f+3 the gains 1, 2/3, 1/3, 0, 1/3, 2/3, 1. Done by the
+        encoder (engine/post.py) on the finished picture, under the caption: no frame is rendered again when a dip
+        is added, moved or removed. Returns the ramps added to self.fades."""
+        t = self.film.seconds
+        ramps = []
+        if out > 0:
+            ramps.append((t(frame - out), t(frame), 1.0, 0.0))
+        if hold > 0 or back <= 0:
+            ramps.append((t(frame), t(frame + max(hold, 1)), 0.0, 0.0))
+        if back > 0:
+            ramps.append((t(frame + hold), t(frame + hold + back), 0.0, 1.0))
+        self.fades.extend(ramps)
+        return ramps
+
     # ---- shots
-    def shot(self, name, seconds):
-        """Next shot of the film, `seconds` long, starting where the previous one ended."""
+    def shot(self, name, seconds, sky=None):
+        """Next shot of the film, `seconds` long, starting where the previous one ended. In a film with several
+        skies (Stage(..., skies=SKIES)) `sky` names the sky it is filmed under; default: the sky in force before
+        it (the previous shot's, or the one a sky_change inside that shot brought)."""
         s = self.film.shot(name, self._t, self._t + seconds)
         self._t += seconds
         self.in_shot[name] = set()
+        if self.skies is not None or sky is not None:
+            self._sky_mark(s.frame_start, sky)
         return s
 
     # ---- cast
@@ -154,14 +327,16 @@ class Stage:
         self.heroes.setdefault(shot.name, []).append((label, obs))
 
     # ---- torches / lanterns
-    def lights(self, shot, scale=1.0, groups=None, near=None, radius=None, extra=(), inside=()):
+    def lights(self, shot, scale=1.0, groups=None, near=None, radius=None, extra=(), inside=(), at=None):
         """Torch / lantern light level for one shot: every light = base energy x scale (`groups` = {group: scale}
         overrides); lights farther than `radius` from `near`, or scaled to 0, are left out of the render.
         extra = [((x, y, z), factor), ...] multiplies the light nearest to each point once more (a practical key).
         inside = the light group(s) of the room this shot is filmed IN: only there the room's shadowless fill (the
         stand-in for bounce light) is on; in every other shot the fills are off, so a brightly scaled interior can
-        never light the street through its walls."""
-        f = shot.frame_start
+        never light the street through its walls.
+        at = a frame inside the shot from which these levels hold instead of from its first frame (a second call
+        for the same shot: the levels step there, e.g. where a sky_change ends the night)."""
+        f = shot.frame_start if at is None else int(at)
         groups = groups or {}
         inside = (inside,) if isinstance(inside, str) else tuple(inside)
         boost = {}

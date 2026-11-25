@@ -20,6 +20,17 @@ and a `deadline` stops the work between two parts, so a one-minute film (0.13 to
 380 s for 1440 frames) survives a command time limit: run the same command again and it continues. render.py
 --encode uses it for every film longer than SEGMENT_OVER frames; shorter films are written in one pass exactly
 as before.
+
+Fades (dips to black): a film may carry "fades" in meta.json, a list of picture-gain RAMPS in film seconds,
+    [t0, t1, g0, g1]      the gain of the picture goes linearly from g0 at t0 to g1 at t1 (0 = black, 1 = untouched)
+A ramp acts on the frames whose time t (frame number f shows t = (f - first frame) / fps, the clock of the captions)
+lies in t0 <= t < t1; outside every ramp the gain is 1; where ramps overlap their gains multiply. A dip to black
+with a hold is three ramps (1 -> 0, 0 -> 0, 0 -> 1); films.lookdev.Stage.dip() writes them from frame numbers.
+The gain is applied to the delivered PICTURE (after the upscale, on the 8-bit display values: gain 0.5 halves
+every channel) and BEFORE the caption is drawn: the caption stays at full strength, the narrator talks through a
+dip. encode(), encode_parts(), contact_sheet() and finish_frame() all do it the same way (fade_gain + apply_gain).
+Fades are no part of a frame's stamp: changing one re-encodes (in parts: only the parts it touches) and re-renders
+nothing. A frame with gain 1 is passed on untouched, so a film without fades is encoded bit for bit as before.
 """
 import hashlib
 import json
@@ -83,6 +94,40 @@ def draw_zones(img):
     for k in range(max(2, w // 240)):
         d.rectangle([int(x0 * w) + k, int(y0 * h) + k, int(x1 * w) - 1 - k, int(y1 * h) - 1 - k], outline=(60, 255, 90, 230))
     return Image.alpha_composite(base, layer).convert("RGB")
+
+
+def check_fades(fades):
+    """Normalise a film's fades to [[t0, t1, g0, g1], ...] (floats, sorted by t0); [] for None. Raises ValueError
+    for anything that is not a list of 4-number ramps with t1 > t0 and gains inside 0..1."""
+    out = []
+    for ramp in fades or ():
+        try:
+            t0, t1, g0, g1 = (float(x) for x in ramp)
+        except (TypeError, ValueError):
+            raise ValueError("a fade is a ramp (t0, t1, g0, g1) in film seconds, not %r" % (ramp,)) from None
+        if not (t1 > t0 and 0.0 <= g0 <= 1.0 and 0.0 <= g1 <= 1.0):
+            raise ValueError("fade %r: needs t1 > t0 and both gains inside 0..1" % (ramp,))
+        out.append([t0, t1, g0, g1])
+    return sorted(out)
+
+
+def fade_gain(fades, t):
+    """Picture gain at film second t for a list of ramps [t0, t1, g0, g1] (see the module docstring): 1.0 outside
+    every ramp, the product where ramps overlap. (A nanosecond of slack keeps a time that was computed as
+    frame / fps on the right side of a ramp's ends.)"""
+    g = 1.0
+    for t0, t1, g0, g1 in fades or ():
+        if t0 - 1e-9 <= t < t1 - 1e-9:
+            g *= g0 + (g1 - g0) * min(1.0, max(0.0, (t - t0) / (t1 - t0)))
+    return min(1.0, max(0.0, g))
+
+
+def apply_gain(img, gain):
+    """The picture times `gain` on its display values (RGB, 8 bit); gain >= 1 returns the image itself, untouched."""
+    if gain >= 1.0:
+        return img
+    lut = [int(i * max(0.0, gain) + 0.5) for i in range(256)]
+    return img.convert("RGB").point(lut * 3)
 
 
 def frames_dir(film, variant=None):
@@ -170,13 +215,15 @@ def upscale(img, size=FINAL_SIZE):
     return img if img.size == tuple(size) else img.resize(tuple(size), Image.LANCZOS)
 
 
-def finish_frame(img, word=None, size=FINAL_SIZE):
-    """Upscale a rendered frame and draw the caption word on it (None = no caption)."""
-    return cap.composite(upscale(img, size), word)
+def finish_frame(img, word=None, size=FINAL_SIZE, gain=1.0):
+    """Upscale a rendered frame and draw the caption word on it (None = no caption). gain < 1 darkens the picture
+    first (a fade: fade_gain(fades, t)); the caption is drawn at full strength on top."""
+    return cap.composite(apply_gain(upscale(img, size), gain), word)
 
 
-def contact_sheet(tiles, labels, words, path, columns=None, gap=6):
-    """Grid of small frames with their caption drawn in and a label (time / shot) above each; saves a PNG."""
+def contact_sheet(tiles, labels, words, path, columns=None, gap=6, gains=None):
+    """Grid of small frames with their caption drawn in and a label (time / shot) above each; saves a PNG.
+    gains = one picture gain per tile (a film's fades at that tile's time); None = all untouched."""
     n = len(tiles)
     if n == 0:
         raise ValueError("no tiles")
@@ -190,6 +237,8 @@ def contact_sheet(tiles, labels, words, path, columns=None, gap=6):
         y = gap + (i // columns) * (th + head + gap)
         lab = cap.label(label, scale=2)
         sheet.paste(lab, (x, y + 1), lab)
+        if gains is not None and gains[i] < 1.0:
+            tile = apply_gain(tile, gains[i])
         sheet.paste(cap.composite(tile, word), (x, y + head))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     sheet.save(path)
@@ -230,12 +279,14 @@ def usable_frames(film, variant=None, frame_start=None, frame_end=None, allow_ho
 
 
 def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
-           crf=16, audio=None, preset="medium", variant=None, allow_holds=False, time_origin=None):
+           crf=16, audio=None, preset="medium", variant=None, allow_holds=False, time_origin=None, fades=None):
     """Upscale every frame to 1080x1920 (Lanczos), composite its caption AFTER the upscale and pipe to ffmpeg
     (H.264 yuv420p, +faststart). Returns the mp4 path. audio=FILE adds sound with mux_audio() (the picture is
     encoded exactly as without it; AAC 192k 48 kHz stereo from t = 0, as long as the picture).
     time_origin = the frame number at which the captions' clock reads 0 (default frame_start; encode_parts() passes
     the film's first frame for every part).
+    fades = picture-gain ramps [t0, t1, g0, g1] on that same clock (default: the film's meta.json; see the module
+    docstring): the picture is darkened after the upscale and before its caption is drawn.
 
     Only frames that are valid for the film's current signature count (see valid_frames). A frame that is missing
     from the range is an ERROR: a crashed render chunk must not turn into a stutter in the delivered film. Pass
@@ -245,6 +296,7 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
     """
     meta = read_meta(film, variant) or {}
     captions = meta.get("captions", []) if captions is None else captions
+    fades = check_fades(meta.get("fades") if fades is None else fades)
     fps = int(fps or meta.get("fps", 24))
     have, frame_start, frame_end = usable_frames(film, variant, frame_start, frame_end, allow_holds)
     have_set = set(have)
@@ -276,7 +328,7 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     t0 = time.time()
     src_frame, base = None, None
-    missing = 0
+    missing = faded = 0
     try:
         for f in wanted:
             use = f
@@ -289,7 +341,13 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
                     base = upscale(im, size)
                 src_frame = use
             word = cap.caption_at(captions, (f - origin) / float(fps))
-            out = cap.composite(base.copy(), word) if word else base
+            pic = base
+            if fades:
+                gain = fade_gain(fades, (f - origin) / float(fps))
+                if gain < 1.0:                                   # the picture only: the caption goes on top of it
+                    pic = apply_gain(base, gain)
+                    faded += 1
+            out = cap.composite(pic.copy(), word) if word else pic
             proc.stdin.write(out.tobytes())
     finally:
         proc.stdin.close()
@@ -308,13 +366,14 @@ def encode(film, captions=None, fps=None, frame_start=None, frame_end=None, out_
                                                         info["codec"], info["sample_rate"], info["channels"],
                                                         info["duration"])
     print(f"[encode] {out_path}: {n} frames ({n / fps:.2f} s) at {fps} fps, {size[0]}x{size[1]}, "
-          f"{missing} held{sound}, {time.time() - t0:.1f}s")
+          f"{missing} held{', %d faded' % faded if fades else ''}{sound}, {time.time() - t0:.1f}s")
     return out_path
 
 
-def _part_key(film, variant, a, b, origin, fps, size, crf, preset, captions, have):
+def _part_key(film, variant, a, b, origin, fps, size, crf, preset, captions, have, fades=()):
     """What a part of a film depends on: its frame files (name, size, modification time; with holds also the frame
-    held into it), the captions visible in it and the encoder settings. Same key = same bytes, not encoded again."""
+    held into it), the captions visible in it, the fades that reach into it and the encoder settings. Same key =
+    same bytes, not encoded again."""
     have_in = [f for f in have if a <= f <= b]
     earlier = [f for f in have if f < a]
     used = ([earlier[-1]] if earlier and (not have_in or have_in[0] > a) else []) + have_in
@@ -324,13 +383,17 @@ def _part_key(film, variant, a, b, origin, fps, size, crf, preset, captions, hav
         stats.append([f, st.st_size, st.st_mtime_ns])
     t0, t1 = (a - origin) / float(fps), (b + 1 - origin) / float(fps)
     caps = [[str(c[0]), float(c[1]), float(c[2])] for c in captions if c[1] < t1 and c[2] > t0]
-    blob = json.dumps([a, b, origin, fps, list(size), crf, preset, caps, stats], sort_keys=True)
+    what = [a, b, origin, fps, list(size), crf, preset, caps, stats]
+    ramps = [list(r) for r in fades or () if r[0] < t1 and r[1] > t0]
+    if ramps:                                                    # (a part without fades keeps the key it always had)
+        what.append({"fades": ramps})
+    blob = json.dumps(what, sort_keys=True)
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()
 
 
 def encode_parts(film, captions=None, fps=None, frame_start=None, frame_end=None, out_path=None, size=FINAL_SIZE,
                  crf=16, audio=None, preset="medium", variant=None, allow_holds=False, segment=SEGMENT_FRAMES,
-                 deadline=None, first_always=True):
+                 deadline=None, first_always=True, fades=None):
     """encode() for a long film, in parts that survive an interrupted command. The range is cut into parts of
     `segment` frames; each is written by encode() (same settings, captions on the film's clock) to
     <out>.part_<a>-<b>.mp4 and recorded in <out>.parts.json with a key of everything it depends on; a part whose
@@ -338,10 +401,11 @@ def encode_parts(film, captions=None, fps=None, frame_start=None, frame_end=None
     the frame count is checked, `audio` is put under the whole film with mux_audio() and the parts are deleted.
     `deadline` (a time.time() value): no new part is started after it, except the first of this call (so that
     every call makes progress; first_always=False drops the exception, for a call that has already spent its time
-    on something else). Returns the mp4 path, or None when parts are still missing (call again with the same
-    arguments)."""
+    on something else). fades: as for encode() (a changed fade re-encodes only the parts it reaches into).
+    Returns the mp4 path, or None when parts are still missing (call again with the same arguments)."""
     meta = read_meta(film, variant) or {}
     captions = meta.get("captions", []) if captions is None else captions
+    fades = check_fades(meta.get("fades") if fades is None else fades)
     fps = int(fps or meta.get("fps", 24))
     have, frame_start, frame_end = usable_frames(film, variant, frame_start, frame_end, allow_holds)
     if audio and not os.path.exists(audio):
@@ -372,7 +436,7 @@ def encode_parts(film, captions=None, fps=None, frame_start=None, frame_end=None
     for a, b in ranges:
         part = "%s.part_%04d-%04d.mp4" % (stem, a, b)
         name = os.path.basename(part)
-        key = _part_key(film, variant, a, b, frame_start, fps, size, crf, preset, captions, have)
+        key = _part_key(film, variant, a, b, frame_start, fps, size, crf, preset, captions, have, fades)
         parts.append(part)
         if book.get(name) == key and os.path.exists(part):
             continue
@@ -381,7 +445,7 @@ def encode_parts(film, captions=None, fps=None, frame_start=None, frame_end=None
             continue
         book.pop(name, None)
         encode(film, captions=captions, fps=fps, frame_start=a, frame_end=b, out_path=part, size=size, crf=crf,
-               preset=preset, variant=variant, allow_holds=allow_holds, time_origin=frame_start)
+               preset=preset, variant=variant, allow_holds=allow_holds, time_origin=frame_start, fades=fades)
         book[name] = key
         with open(book_path + ".tmp", "w", encoding="utf-8") as f:
             json.dump(book, f, indent=1)
@@ -577,3 +641,38 @@ if __name__ == "__main__":
     assert not left, left
     print("parts: 3 parts over 3 calls -> %d frames, %.3f s, largest mean picture difference to the one-pass film "
           "%.2f of 255, sound %s" % (many["frames"], many["duration"], worst, sound))
+    # fades: a dip to black around frame 19 (black ON it, three frames out, two held, three back). The picture goes
+    # dark, the caption on top of it does not; a film without fades is the same file as before, bit for bit
+    t = lambda f: (f - 1) / 24.0                                  # noqa: E731
+    dip = [(t(16), t(19), 1.0, 0.0), (t(19), t(21), 0.0, 0.0), (t(21), t(24), 0.0, 1.0)]
+    gains = [round(fade_gain(check_fades(dip), t(f)), 4) for f in range(15, 26)]
+    assert gains == [1.0, 1.0, 0.6667, 0.3333, 0.0, 0.0, 0.0, 0.3333, 0.6667, 1.0, 1.0], gains
+    plain = encode(film, out_path=os.path.join(OUT, "test", "post_test_nofade.mp4"), allow_holds=True, fades=[])
+    assert video_md5(plain) == video_md5(mp4), "an empty fade list changed the encode"
+    dipped = encode(film, out_path=os.path.join(OUT, "test", "post_test_fade.mp4"), allow_holds=True, fades=dip)
+    c = decoded(dipped)
+    word19 = cap.caption_at(caps, t(19))
+    band = slice(int(480 * cap.CAPTION_BAND[0]), int(480 * cap.CAPTION_BAND[1]))
+    sky = slice(0, 100)                                            # the top of the fake frame: flat blue, no caption
+    assert word19 and c[18, sky].mean() < 20.0 and a[18, sky].mean() > 80.0, (word19, c[18, sky].mean(), a[18, sky].mean())
+    assert c[18, band].max() > 200.0, c[18, band].max()            # the caption is still white on the black frame
+    assert abs(c[14, sky].mean() - a[14, sky].mean()) < 1.0 and abs(c[24, sky].mean() - a[24, sky].mean()) < 1.0
+    ratio = float(c[16, sky].mean() / a[16, sky].mean())           # frame 17: gain 2/3 (limited-range video: about)
+    assert 0.55 < ratio < 0.78, ratio
+    calls = 0
+    part_fade = os.path.join(OUT, "test", "post_test_parts_fade.mp4")
+    while encode_parts(film, out_path=part_fade, allow_holds=True, segment=12, deadline=0.0, fades=dip) is None:
+        calls += 1
+        assert calls < 5
+    d = decoded(part_fade)
+    assert d.shape == c.shape and float(np.abs(d - c).mean(axis=(1, 2)).max()) < 1.5
+    k0 = _part_key(film, None, 1, 12, 1, 24, FINAL_SIZE, 16, "medium", caps, [1, 3, 5, 7, 9, 11])
+    assert k0 == _part_key(film, None, 1, 12, 1, 24, FINAL_SIZE, 16, "medium", caps, [1, 3, 5, 7, 9, 11], check_fades(dip)), \
+        "a fade outside a part changed its key"
+    assert _part_key(film, None, 13, 24, 1, 24, FINAL_SIZE, 16, "medium", caps, [13, 15], check_fades(dip)) != \
+        _part_key(film, None, 13, 24, 1, 24, FINAL_SIZE, 16, "medium", caps, [13, 15])
+    Image.fromarray(np.concatenate([c[i] for i in (15, 16, 17, 18, 20, 21, 22, 23)], axis=1).astype(np.uint8)).save(
+        os.path.join(OUT, "test", "post_fade_strip.png"))
+    print("fades: gains of frames 15-25 %s; frame 19 picture %.1f of 255 (was %.1f), its caption %r still at %.0f; "
+          "frame 17 at %.2f of its brightness; no fades = the same file; in parts the same pictures"
+          % (gains, c[18, sky].mean(), a[18, sky].mean(), word19, c[18, band].max(), ratio))

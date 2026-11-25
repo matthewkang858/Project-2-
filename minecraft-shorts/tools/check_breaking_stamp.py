@@ -4,7 +4,8 @@
 
 A re-render keeps every frame whose fingerprint is unchanged, so each thing breaking.py animates must change the
 fingerprint of exactly the frames whose picture it changes: a crack stage, the half that is cracked, the door's
-shudder, a door or block that is gone, a block mined at another moment. And a fingerprint must not depend on the
+shudder, a door or block that is gone, a block mined at another moment. Making the film's bang_on_door calls
+again must change nothing (the shudder is rewritten from a record of the blows). A fingerprint must not depend on the
 frame a process happens to look at first (the known trap of animated materials, see CONTRACT.md): breaking.py
 swaps objects instead of animating a material, and this proves it on the proof films of engine.breaking.
 The last line is a digest of every fingerprint taken: run the tool twice, the two digests must be equal.
@@ -43,6 +44,12 @@ def prints(proof, frames, order=None):
     return got
 
 
+def door_curve(door, frames):
+    """The door's angle at every half frame of `frames` (what the shudder keys)."""
+    fc = door.animation_data.action.fcurve_ensure_for_datablock(door, "rotation_euler", index=2)
+    return [round(fc.evaluate(f / 2.0), 6) for f in range(2 * frames[0], 2 * frames[-1] + 1)]
+
+
 def runs(frames):
     """[(first, last), ...] of the consecutive runs in a list of frames (for printing)."""
     out = []
@@ -75,6 +82,7 @@ def main():
        distinct == 11 and a[fs[0]] == a[fs[-1]], "%d distinct" % distinct)
     stages = {f: breaking.stage_at(base["door"], f) for f in frames}
     hits = base["bang"]["hits"] + base["far"]["hits"]
+    door_was = door_curve(base["door"], frames)               # (base is gone once the next scene is built)
 
     again = prints(breaking.build_door_proof(fresh(), sky="night", shudder=1.5), frames)
     ok("the same film built again in this process: identical fingerprints", again == a,
@@ -101,6 +109,24 @@ def main():
     changed = [f for f in frames if got[f] != a[f]]
     ok("one stage keyed differently (5 -> 8 on frames %d-%d): those frames and no others" % (f5, nxt - 1),
        changed == list(range(f5, nxt)), "changed %s" % runs(changed))
+
+    p = breaking.build_door_proof(fresh(), sky="night", shudder=1.5)
+    bang = p["shots"]["bang"]
+    far = p["shots"]["far"]
+    for _again in range(2):                                   # the film's own two calls, made a second and third time
+        breaking.bang_on_door(p["zombie"], p["door"], bang.frame_start, bang.frame_end + 1, attempt=40, pause=2,
+                              every=16.0, first=4, half="upper", shudder=1.5, along=0.0, camera=bang,
+                              world=p["village"])
+        breaking.bang_on_door(p["zombie"], p["door"], far.frame_start, far.frame_end + 1, attempt=40, pause=2,
+                              every=16.0, first=4, half="upper", shudder=1.5, along=0.0, camera=far,
+                              world=p["village"], phase=0.55, place=False)
+    got = prints(p, frames)
+    door_now = door_curve(p["door"], frames)
+    changed = [f for f in frames if got[f] != a[f]]
+    ok("both bang_on_door calls of the film made twice more (shudder on): the door's curve and its cracks are "
+       "unchanged, and no frame's fingerprint changes", not changed and door_now == door_was
+       and [breaking.stage_at(p["door"], f) for f in frames] == [stages[f] for f in frames],
+       "changed %s" % runs(changed))
 
     p = breaking.build_door_proof(fresh(), sky="night", shudder=1.5, break_at_end=True)
     got = prints(p, frames)

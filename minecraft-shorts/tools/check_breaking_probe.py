@@ -308,3 +308,64 @@ if __name__ == "__main__":
             k, val = a.split("=")
             opts[k] = val if k in ("cam", "half", "order", "sky") else float(val)
         sys.exit(render(sys.argv[2], [int(x) for x in sys.argv[3].split(",")], **opts))
+
+
+def hole(frames_spec="auto"):
+    """A two-deep hole dug in a blackstone floor of its own (World.build(skip=) + place_from_world + dig)."""
+    from engine import blocks, breaking, look, players, shots
+
+    scene = fresh(res=(405, 720))
+    coll = bpy.data.collections.new("holeset")
+    scene.collection.children.link(coll)
+    w = blocks.World()
+    w.fill(-4, -4, -3, 4, 4, -1, "polished_blackstone_bricks")
+    w.fill(-4, 3, 0, 4, 4, 2, "blackstone")
+    cells = [(0, 0, -1), (0, 0, -2)]
+    w.build(coll, "floor", skip=cells)
+    pit = breaking.place_from_world(coll, w, cells)
+    look.set_time(scene, "golden", sun_azimuth=215.0, sun_elevation=40.0)
+    look.setup_compositor(scene, bloom=1.0, grade="warm")
+    film = shots.Film(scene, fps=24)
+    s = film.shot("dig", 0.0, 3.0)
+    s.lens(32, 4.0)
+    s.move((3.1, -2.9, 2.3), (0.4, 0.3, -0.5))
+    s.focus((0.5, 0.5, -0.5))
+    steve = players.make_player("digger", "steve")
+    steve.place(1, (0.5, -0.45, 0.0), math.pi)
+    steve.look_at(1, (0.5, 0.5, -0.5), ease=0)
+    d = breaking.dig(steve, pit, 6, tool="golden_pickaxe", duration=10, camera=s, until=72)
+    film.finalize()
+    print("dig:", [(x["start"], x["frame"], x["ticks"], x["drop"], x["stages"][:3]) for x in d], flush=True)
+    print("item rests:", [tuple(round(c, 2) for c in x["item"].rest_pos) if x["item"] else None for x in d])
+    frames = [d[0]["frame"] - 2, d[0]["frame"] + 1, d[1]["frame"] - 1, d[1]["frame"] + 2, d[1]["frame"] + 30]
+    for f in frames:
+        t = time.time()
+        film.goto(f)
+        scene.render.filepath = os.path.join(OUT, "check_breaking_hole_%03d.png" % f)
+        bpy.ops.render.render(write_still=True)
+        print("[probe] hole frame %d  %.1f s" % (f, time.time() - t), flush=True)
+    return 0
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "hole":
+    sys.exit(hole())
+
+
+def final_crop(cam="far", frames=(24, 30)):
+    """The door at the FINAL pixel density (720x1280) as a border crop (360x512 px), motion blur on."""
+    scene = fresh(res=(720, 1280), samples=16)
+    p = build_hello(scene, cam=cam)
+    r = scene.render
+    r.use_border = r.use_crop_to_border = True
+    r.border_min_x, r.border_max_x, r.border_min_y, r.border_max_y = 0.25, 0.75, 0.38, 0.78
+    for f in frames:
+        t = time.time()
+        p["film"].goto(f)
+        r.filepath = os.path.join(OUT, "check_breaking_final_%s_%03d.png" % (cam, f))
+        bpy.ops.render.render(write_still=True)
+        print("[probe] final crop %s frame %d  %.1f s" % (cam, f, time.time() - t), flush=True)
+    return 0
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "final":
+    sys.exit(final_crop(sys.argv[2] if len(sys.argv) > 2 else "far"))

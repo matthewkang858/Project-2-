@@ -41,13 +41,23 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
                                             Character or point), legs flailing; a hen flaps and lands after 20
                                             frames, 2.35 back. max_back = room behind it in blocks (a fence).
                                             Then let it run: walk(end, [...], run=True)  (PanicGoal: within 5 blocks)
+                                            A BLOW THAT MEETS IT IN THE AIR (the game allows the next hit 12 frames
+                                            after the last: a hen is then still floating down; also in a hop or a
+                                            fall) does not lift it again, as in the game: it keeps its height and
+                                            vertical speed, takes half its horizontal speed plus the new push (a
+                                            hen: 4.5 blocks in all), and lands on the ground it left, when it would
+                                            have landed anyway. Any frame is a valid frame for the next blow.
       die(frame, camera=None, attacker=None, knockback=True, max_back=None, poof=True, seed=0, village=None)
                                             -> frame + 24, the frame it is GONE: red and knocked back from `frame`,
                                             tips over to its left (flat after 16 frames), then vanishes and 20 white
-                                            poof particles rise where it stood. Stays gone until its next place()
+                                            poof particles rise where it lay. Stays gone until its next place().
+                                            A killing blow in the air: it tips over while it comes down.
       hop(frame, to=None) / fall(frame, to) -> landing frame
                                             a jump (apex 1.25: up one block and 1 forward in 11 frames) / stepping
-                                            off an edge. A chicken flaps and sinks at 2.3 blocks/s (2 blocks: 24 frames)
+                                            off an edge. A chicken flaps and sinks at 2.3 blocks/s (2 blocks: 24
+                                            frames). Out of a walk too (no need to stop): the stride fades into the
+                                            game's walk wave for the ground covered, the legs are straight again
+                                            when it lands, and walk(landing frame, ...) goes on
       Chicken.flap(frame_start, frame_end)  only the wings, as while airborne (hop / fall / hurt call it themselves)
       eye_point(frame) / mouth_point(frame) middle of the head (what others look at and cameras focus on) / a point
                                             just in front of the muzzle or beak (hold the food out to there)
@@ -55,57 +65,91 @@ PUBLIC API  (frames are film frames; "camera" = the Shot that films it, a Film, 
       last_walk (dict: frames, blocks, steps, swing, cycle_frames, stance ...), bursts (its particle bursts)
       nod / shake / shiver / flinch (a small hop): inherited; swing_arm / raise_arm do nothing; hold / lie_down raise
 
+  pen_set(b, x0, y0, x1, y1, gates=[(x, y)], fence="oak_fence", name="pen", clear="all") -> dict   THE PEN OF A FILM
+      Real fence and fence-gate blocks on the ring of cells, built INTO the village: call it in the hook of
+      village.build_village(scene, seed=1, edit=lambda b: animals.pen_set(b, 3, 27, 12, 36, gates=[(7, 27)],
+      name="cow_pen")). The meadow's plants are removed where the fence stands (in the game a fence replaces the
+      plant) and, clear="all", inside (tall grass hides a hen); the ground is levelled if it is not. Afterwards
+      v.sets["cow_pen"] = dict(area, z, cells, gates, inside): wander(herd, f0, f1, pen["area"], z=pen["z"]).
+      Anchors <name>_center and <name>_gate (one block outside the gate, facing in).
+  make_pen(scene, x0, y0, x1, y1, z=0, gates=[(x, y)], fence="oak_fence", ground=None, name="pen") -> dict
+      The same ring as a separate little World on top of whatever is there: FOR TESTS AND BARE FLOORS
+      (ground="grass_block" lays one). On the village's meadow the plants of the ring cells would stand inside the
+      posts and rails: films use pen_set.
+  pen_area(x0, y0, x1, y1) -> area      the free rectangle inside a ring of fence blocks on those cells
   wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None, gait="planted", clearance=None,
-         activity=1.0, watch=None, z=0.0) -> {name: [("stand" | "walk", first frame, last frame, target), ...]}
+         activity=1.0, watch=None, z=0.0, avoid=()) -> {name: [("stand" | "walk" | "turn", first, last, target), ...]}
       A PEN IN ONE CALL: every animal alternates standing, looking around and short straight walks inside the
       rectangle area = (x0, y0, x1, y1), each with its own timing. place=True puts them on free spots at
-      frame_start; place=False goes on from where they stand. No body leaves the rectangle or comes closer than
-      its own width (cow 0.75, hen 0.5; clearance=) to another body or the edge, also while both move.
-  pen_area(x0, y0, x1, y1) -> area      the free rectangle inside a ring of fence blocks on those cells
-  make_pen(scene, x0, y0, x1, y1, z=0, gates=[(x, y)], fence="oak_fence", ground=None, name="pen") -> dict
-      Real fence and fence-gate blocks on the ring of cells, as their own little World (the village is not edited);
-      ["area"] is what wander() wants. ground="grass_block" lays a floor under it (not needed on the village's meadow).
+      frame_start; place=False goes on from where they stand (a walk that is still running ends first: call it
+      shot after shot). No body leaves the rectangle or comes closer than its own width (cow 0.75, hen 0.5;
+      clearance=) to another body or the edge, on any frame, whoever of two stops first (measured over 80 seeds x
+      10 s for both proof pens, and a minute: tools/check_animals_pens.py). An animal rests only where it can
+      turn on the spot (feet 1.70 from the edge for a cow, 1.00 for a hen), so none is boxed in at the fence; one
+      that is hemmed in by the others takes a step or two or turns to face another way ("turn").
+      avoid = who else is in the pen and was keyed BEFORE this call (the player, the cow that follows him, the hen
+      that is hit; or fixed (x, y, radius) circles): the herd keeps its clearance from them on every frame and
+      never stops where they will pass later. Key the heroes first, wander() last.
   pen_report(animals, f0, f1, area) -> (smallest gap between two bodies, smallest distance to the edge)
 
-  follow(animal, leader, frame_start, frame_end, stop=2.5, speed=None, look="eyes") -> frame it has come to rest
-      TemptGoal: the animal walks after a player holding its food whenever he is further than 2.5 blocks, at up to
-      its tempted speed (2.75 blocks/s), and keeps its head on him. look="eyes" is the game (his eyes), look=<the
-      item object> or "item" (leader.held) looks at the food instead. Also a calf after its mother:
-      follow(calf, cow, f0, f1, stop=3.0)  (FollowParentGoal: closer than 3 blocks it stays). Key the leader first.
-  hand_item(player, item, frame_start, frame_end=None) -> Object
-      'wheat' (cows), 'wheat_seeds' (chickens), 'bucket' ... in Steve's right hand for those frames only, with the
-      game's item arm pose. Unlike Character.hold it is keyed, so the next shot can show an empty hand.
+  follow(animals, leader, frame_start, frame_end, stop=2.5, speed=None, look="eyes", clearance=None, avoid=())
+      -> frame the last of them has come to rest
+      TemptGoal: the animal (or a LIST of them: a herd) walks after a player holding its food whenever he is
+      further than 2.5 blocks, at up to its tempted speed (2.75 blocks/s), and keeps its head on him. look="eyes"
+      is the game (his eyes), look=<the item object> or "item" (leader.held) looks at the food instead.
+      A herd in ONE call fans out behind him and comes to rest in an arc, side by side, each facing him (three cows
+      35 degrees and 1.45 blocks apart, four hens 24 degrees and 1.0; six cows or eight hens fill the half circle
+      behind him at stop 2.5). A call per animal works too: each later one knows those keyed before it for the same
+      leader (while their follows overlap in time) and takes the next free place on one side. Bodies never come
+      closer than 0.15 block (clearance=; the game's Entity.push keeps the hit boxes apart): they bear off round
+      one another and round anything in avoid=[...] (Animals / Characters keyed before, (x, y, radius)); a
+      leader who walks into them moves them aside. Also a calf after its mother: follow(calf, cow, f0, f1,
+      stop=3.0)  (FollowParentGoal). Key the leader's walk first. Start with the animal roughly facing him (or
+      face() it first): one that has its back to him swings round at the game's rate, 46 degrees in a frame.
+  hand_item(player, item, frame_start, frame_end) -> Object
+      'wheat' (cows), 'wheat_seeds' (chickens), 'bucket' ... in Steve's right hand for the frames [frame_start,
+      frame_end), with the game's item arm pose. Unlike Character.hold it is keyed, so the next shot can show an
+      empty hand. frame_end is REQUIRED (the shot's frame_end + 1; None raises). The item is also hidden whenever
+      the player is (Stage.finish), and a later hand_item() for him takes over from its frame_start.
   love(animal, frame, camera, frame_end=None, seed=0) -> [Burst]
       Fed: 7 hearts on `frame`, then one every 12 frames until frame_end (default 3 s; the game 30 s).
-  milk(player, frame, frame_start, frame_end=None) -> (bucket, milk_bucket)
-      Item 'bucket' in his hand from frame_start, his arm swings, and from `frame` it is item 'milk_bucket'.
-  lay_egg(chicken, frame, seed=0, until=None, stage=None) -> engine.mobs DroppedItem
+  milk(player, frame, frame_start, frame_end) -> (bucket, milk_bucket)
+      Item 'bucket' in his hand from frame_start, his arm swings, and from `frame` it is item 'milk_bucket' until
+      frame_end (required, as for hand_item).
+  lay_egg(chicken, frame, seed=0, until=None, stage=None, shot=None) -> engine.mobs DroppedItem
       Item 'egg' pops out at her feet (hops 0.38 up, lands after 11 frames, lies still 0.3-0.9 block away after
       18; egg.rest_pos says where), then bobs and spins. Hens lay every 5-10 minutes in the game.
-  drop_loot(animal, frame, items=None, seed=0, stage=None) -> [DroppedItem]
+      In a Stage film: stage=st, shot=s (a Stage hides whatever no shot uses; shot= is st.use(s, egg)).
+  drop_loot(animal, frame, items=None, seed=0, stage=None, shot=None) -> [DroppedItem]
       On the frame of the killing blow: cow 'beef' x 2 + 'leather', chicken 'chicken' + 'feather' (babies nothing).
+      In a Stage film: stage=st, shot=s, as for the egg.
   poof(target, frame, camera, seed=0, size=None, count=20) -> Burst       only the death cloud, for anything
-  knockback_track / air_track / death_angle / hurt_sheet / animal_sheet: the numbers and textures behind the above.
+  knock_flight / knockback_track / air_track / walk_distances / death_angle / hurt_sheet / animal_sheet: the
+  numbers and textures behind the above.
   Constants: COW_WALK, COW_TEMPT, COW_PANIC, CHICKEN_WALK, CHICKEN_PANIC, CHICK_FOLLOW, COW_FOOD, CHICKEN_FOOD,
-  EGG_ITEM, BUCKET_ITEM, MILK_ITEM, TEMPT_STOP, HURT_FRAMES, DEATH_FRAMES, LOOT, FACTS.
+  EGG_ITEM, BUCKET_ITEM, MILK_ITEM, TEMPT_STOP, FOLLOW_ROOM, HURT_FRAMES, DEATH_FRAMES, LOOT, FACTS.
 
 USING THEM IN A FILM (st = films.lookdev.Stage, s = st.shot(...), v = the Village)
-    pen = animals.make_pen(scene, 3, 27, 12, 36, gates=[(7, 27)])        # once; 10 x 10 cells, 8.75 x 8.75 inside
+    def edit(b): animals.pen_set(b, 3, 27, 12, 36, gates=[(7, 27)], name="cow_pen")     # 10 x 10 cells, 8.75 inside
+    v = village.build_village(scene, seed=1, edit=edit); pen = v.sets["cow_pen"]
     cows = [animals.add_cow(st, "cow%d" % i) for i in range(4)] + [animals.add_cow(st, "calf", baby=True)]
-    animals.wander(cows, s.frame_start, s.frame_end + 1, pen["area"], seed=3); st.use(s, *cows)
     steve.place(f0, spot, yaw); wheat = animals.hand_item(steve, "wheat", f0, s.frame_end + 1)
     end = animals.follow(daisy, steve, f0, f0 + 50, look=wheat)           # she walks up and stops 2.3 blocks away
+    end = animals.follow([daisy, bessie, clover], steve, f0, walk_end + 20, look=wheat)   # or a herd after his walk
     steve.swing_arm(end + 6); animals.love(daisy, end + 8, camera=s, frame_end=s.frame_end + 1)
+    animals.wander(cows, s.frame_start, s.frame_end + 1, pen["area"], seed=3, z=pen["z"], avoid=[steve, daisy])
+    st.use(s, steve, daisy, *cows)                                        # (the herd last: it keeps out of their way)
     bucket, full = animals.milk(steve, f0 + 20, f0, s.frame_end + 1)      # in the next shot, after his place()
-    egg = animals.lay_egg(hen, f0 + 14, stage=st); st.use(s, egg)
+    egg = animals.lay_egg(hen, f0 + 14, stage=st, shot=s)
     up = hen.hurt(f, attacker=steve, max_back=0.9); hen.walk(up, [hen.pos_at(up), away], run=True)
-    gone = hen.die(f2, camera=s, attacker=steve); animals.drop_loot(hen, f2, stage=st)
+    hen.hurt(f, attacker=steve); gone = hen.die(f + 12, camera=s, attacker=steve)   # the game's two quick blows
+    loot = animals.drop_loot(hen, f + 12, stage=st, shot=s)
   Rules:
     - Key every animal in frame order, place() before everything else in a shot. A call replaces what the animal
-      was doing from its frame on (a hurt() in mid-walk stops the walk there).
-    - wander() only knows the animals in its list. Steve, a cow that follows him or a hen that gets hit in the same
-      pen must stay out of the others' way: give wander() a sub-rectangle of the pen. A walk that began before
-      frame_end runs on (up to 65 frames): in the next shot place() them or wander(..., place=False).
+      was doing from its frame on (a hurt(), hop() or fall() in mid-walk ends the walk there, cleanly).
+    - wander() only knows the animals in its list and what is in avoid=. Key Steve, a cow that follows him or a
+      hen that gets hit first and pass them as avoid=[...]; the herd then stays out of their way for the whole
+      call. follow() likewise: pass standing animals it must walk round as avoid=[...].
     - Particles (hearts, poof) are world objects with their own lifetimes (hearts 20 frames, poof up to 99, half of
       it gone after 45): a cut that jumps in time needs engine.fx.stop_particles(first frame of the new shot).
     - hand_item() / milk() after the player's place(); place() him again only at their frame_end. A held item is a
@@ -114,8 +158,7 @@ USING THEM IN A FILM (st = films.lookdev.Stage, s = st.shot(...), v = the Villag
       in the shot before: its place() would cut that shot's action short).
     - The red flash is a second set of meshes (built on the first hurt / die); never key hide_render on an animal's
       parts yourself: use show(). st.hero(shot, "hen", hen) is its head (a chick: its body).
-    - make_pen stands the fence on the village's ground as it is: grass tufts and flowers of the meadow stay and
-      poke through a rail here and there; a camera low behind a rail has the fence across the lower half.
+    - A camera low behind a rail has the fence across the lower half: hens need the lens above the top rail.
 
 SIZES (blocks; hit box in brackets)
     cow      1.5625 to the horn tips, back 1.375, 0.75 wide, nose 0.94 in front of its feet, rump 0.625 behind
@@ -123,8 +166,9 @@ SIZES (blocks; hit box in brackets)
     chicken  0.94 to the top of the head, back 0.69, 0.5 wide over the wings, beak 0.5 in front, tail 0.25 behind
              [0.4 x 0.7].                    chick  0.375 tall, 0.25 wide, 0.31 long [0.3 x 0.4]
     Steve is 1.875, a villager 1.99, a fence 1.0 as drawn (1.5 as an obstacle): a cow looks over it, a hen is
-    hidden by the rails from a low camera. In a 10 x 10 cell pen five cows and a calf have room; 8 x 9 cells hold
-    six hens and two chicks easily.
+    hidden by the rails from a low camera. PEN SIZES: 10 x 10 cells for five cows and a calf (six cows still all
+    walk, 6 to 24 times a minute each); 8 x 9 cells for six hens and two chicks. A cow needs an area at least
+    3.4 blocks wide to turn in (a hen 2.0): in a narrower lane they keep the clearance but mostly stand.
 
 GAIT (QuadrupedModel.setupAnim, ChickenModel.setupAnim, LivingEntity.updateWalkAnimation, WalkAnimationState)
     The game: legs cos(p * 0.6662 [+ pi]) * 1.4 * s, pairs right hind + left front and left hind + right front
@@ -135,11 +179,13 @@ GAIT (QuadrupedModel.setupAnim, ChickenModel.setupAnim, LivingEntity.updateWalkA
     the legs can cover: cow 18 frames, calf 9, hen 7, chick 3 (their legs are 5 and 2 pixels long: a blur at the
     game's speed in either gait, as in the game; speed=1.2 calms a hen in a close shot). A sole on the ground
     strays under 0.005 block (measured, also round corners and in turns on the spot, where the legs lean
-    sideways a little to stay put); the swinging pair passes it in the middle of the step. The body sinks up to
-    0.08 block with every step of a cow so that the standing soles stay ON the ground (bob=1); a hen sinks only
-    0.03 and a chick not at all (their feet lift 0.05 / 0.03 block at the ends of a step instead: at 4 steps a
-    second a full bob would make the body tremble).
-    These, the rounded corners and the stepping turn are the module's only departures from the game.
+    sideways a little to stay put; up to 0.03 in a herd of six that jostles for room); the swinging pair passes
+    it in the middle of the step, at ground height: the legs are rigid, there is no knee to lift a hoof with.
+    The body sinks up to 0.08 block with every step of a cow so that the standing soles stay ON the ground
+    (bob=1); a hen sinks only 0.03 and a chick not at all (their feet lift 0.05 / 0.03 block at the ends of a
+    step instead: at 4 steps a second a full bob would make the body tremble).
+    These, the rounded corners, the stepping turn and a landing with straight legs (the game lets the wave run on
+    for half a second after a hop) are the module's only departures from the game.
     Chicken legs are flat in the game (a 1-pixel shank on the back of the leg box, a 3 x 3 foot plate): seen
     exactly from the side the shank is edge-on and vanishes; a chick's wings are 1-pixel horizontal plates.
 
@@ -158,28 +204,41 @@ WHAT THE GAME DOES (read from the classes; FACTS has the short list)
     then falls at 2.3 blocks/s; on the ground its wings are still. No pecking animation exists.
   - Hurt: hurtTime 10 ticks of red overlay (every texel 70 % itself + 30 % red), knockback(0.4) away from the
     attacker, walk animation speed set to 1.5 (the flailing legs), then PanicGoal: it runs to a random spot
-    within 5 blocks at its panic speed, again and again for about 2 s.
+    within 5 blocks at its panic speed, again and again for about 2 s. A mob can be hit again 10 ticks after a
+    hit (LivingEntity.hurtServer: damageCooldownTime = 20, a hit counts once it is 10 or less). knockback(): horizontal speed =
+    half the current + 0.4 away; vertical = min(0.4, half the current + 0.4) ONLY if it stands on the ground: a
+    blow in the air leaves the vertical speed alone. A fist does 1 damage: a hen (4) dies of the fourth blow, a
+    sword kills her with the first.
   - Death: deathTime counts 20 ticks; LivingEntityRenderer tips the body about its feet, 90 degrees *
     sqrt((t - 1) * 0.08), red all the while, legs straight; on tick 20 it is removed and 20 'poof' particles
     (generic_7 ... generic_0, white-grey, 0.2-1.4 wide) appear in its upright hit box and rise. The loot pops out
     on tick 0. Nothing else: no blood, no sound-dependent effect.
+  - Entity.push: mobs whose hit boxes overlap are pushed apart (0.05 blocks per tick each): a herd after one
+    player stands side by side round him, never inside one another.
 
 MEASURED IN THE PROOFS (out/test/animals_*.png, check_animals_*.png)
   - walk: cow 1 block in 24 frames, 2 in 38, 4 in 65 (always + 10 frames of rolling out); hen 1 in 19, 4 in 45.
     A cow turns 90 degrees in 10 frames with two steps.
+  - a hen hit on frame f and again on f + 12: 0.58 up at the second blow, on the ground on f + 20 either way,
+    4.5 blocks from where she stood (one blow: 2.35). Killed by the second blow: gone on f + 36, the poof at
+    ground level 4.5 blocks away.
+  - follow: Steve walks 7-9 blocks at 1.6 blocks/s, three cows trail him in a fan and stand 20 frames after he
+    stops, 2.4 blocks from him.
   - hearts 0.3-0.6 block wide, start up to 0.9 beside the animal and 0.5-1.9 above its feet, rise 0.65.
   - poof: 20 puffs, the last gone 24-99 frames after the death (median 45), rising to 2 blocks (a few to 3.8).
   - cameras that worked: pen from outside, 4.3 above the ground, 24 mm, 5-9 blocks away (landscape proofs); a cow
     two-shot in profile 50 mm from 6.6 blocks; over Steve's left shoulder at the coming cow 26 mm f/3.2; the
-    bucket from behind his right shoulder and above 24 mm; hens through a fence from 1.3 high need the lens above
-    the top rail (1.0).
+    bucket from behind his right shoulder and above 24 mm; a herd after Steve from 6 blocks to his side and 4.6
+    up, 30 mm; hens through a fence from 1.3 high need the lens above the top rail (1.0).
 
-Self-test:  $BPY -m engine.animals [check lineup views walk flap wheat egg hurt die pen]
-    (no argument = check: 46 numeric checks, 4 s; give one or two picture names per call to stay under 300 s;
-    also views_cow / views_calf / views_chicken / views_chick, walk_calf, walk_chick, walk_cow_vanilla,
+Self-test:  $BPY -m engine.animals [check lineup views walk flap hop wheat herd egg hurt hurt2 die pen]
+    (no argument = check: 72 numeric checks, about 40 s; give one or two picture names per call to stay under
+    300 s; also views_cow / views_calf / views_chicken / views_chick, walk_calf, walk_chick, walk_cow_vanilla,
     walk_chicken_vanilla, pen_cow, pen_chicken). Stills: out/test/animals_*.png.
     $BPY -m tools.check_animals_film [shot:offset ...]   a four-shot farm film through films.lookdev.Stage and
-    engine.look (13 checks; stills out/test/check_animals_*.png).
+    engine.look (16 checks; stills out/test/check_animals_*.png).
+    $BPY -m tools.check_animals_pens [seeds]             wander() under stress: every pair of bodies against the
+    clearance it was promised, over many seeds, a minute-long pen, avoid=, a narrow lane (numbers only).
 """
 import bisect
 import heapq
@@ -232,6 +291,9 @@ LOVE_TICKS = 600                                         # Animal.setInLove: inL
 LOVE_HEARTS = 7                                          # Animal.handleEntityEvent(18): 7 heart particles
 LOVE_EVERY = 10                                          # Animal.aiStep: one more heart whenever inLove % 10 == 0
 LOVE_LIFT = 0.5                                          # ... at getRandomY() + 0.5
+FOLLOW_ROOM = 0.15                                       # blocks two followers' bodies keep apart: the game's Entity.push
+#                                                          parts the 0.9-wide cow hit boxes, the bodies are 0.75 wide
+PLAYER_RADIUS = 0.3                                      # half the player's hit box (EntityTypes.PLAYER sized(0.6, 1.8))
 
 # ---- Mob.getMaxHeadYRot() 75, getMaxHeadXRot() 40, getHeadRotSpeed() 10 (degrees, degrees per tick; LookControl)
 HEAD_YAW_MAX = math.radians(75.0)
@@ -288,6 +350,8 @@ FACTS = {
     "love": "fed its food: 7 hearts (event 18), then one every 10 ticks for 600 ticks; TemptGoal stops 2.5 blocks from the player",
     "items": "cow food wheat; chicken food wheat_seeds (and other seeds); bucket -> milk_bucket; egg; loot beef, leather / chicken, feather",
     "death": "tips to its left over ticks 1-13.5, gone on tick 20 with 20 poof particles around the upright hit box",
+    "second blow": "possible 10 ticks after a hit (damageCooldownTime 20, counts at <= 10); in the air: no lift, half the horizontal speed + 0.4",
+    "herd": "Entity.push parts overlapping hit boxes by 0.05 blocks per tick each: followers stand side by side round the player",
 }
 
 
@@ -469,36 +533,61 @@ def _smooth(x):
     return 0.5 - 0.5 * math.cos(math.pi * ch._clamp(x, 0.0, 1.0))
 
 
-def knockback_track(strength=KNOCKBACK, max_back=None, fall=1.0, max_ticks=200):
-    """LivingEntity.knockback + travelInAir from a standing start: [(blocks back, blocks up)] after tick 0, 1, 2 ...
-    until the mob lies still. Speed (strength, min(0.4, -0.0784 / 2 + strength)); every tick: move, then
-    vertical speed = (v - 0.08) * 0.98 and horizontal speed * 0.546 (it stood on the ground when the tick began)
-    or * 0.91 (in the air). fall = Chicken.aiStep's 0.6 on a falling chicken. max_back = room behind it."""
-    if strength <= 0.0:
-        return [(0.0, 0.0)]
-    vx, vy = float(strength), min(0.4, REST_VY / 2.0 + strength)
+def knock_flight(strength=KNOCKBACK, away=(1.0, 0.0), height=0.0, velocity=(0.0, 0.0, REST_VY), max_back=None,
+                 fall=1.0, max_ticks=200):
+    """LivingEntity.knockback + travelInAir: the mob's state after tick 0, 1, 2 ... as (x, y, height above the
+    ground, vx, vy, vz), blocks and blocks per tick, x / y from where the blow met it, until it lies still.
+
+    The blow (LivingEntity.knockback): horizontal speed = half of what it had + strength along `away` (a unit
+    vector); vertical speed = min(0.4, half of what it had + strength) if it stands ON THE GROUND, and UNCHANGED
+    if it is in the air (height > 0: a second blow does not lift it again). Every tick: move, then vertical speed =
+    (v - 0.08) * 0.98 and horizontal speed * 0.546 (it was on the ground when the tick began) or * 0.91 (in the
+    air). fall = Chicken.aiStep's 0.6 on a falling chicken. max_back = room behind it, along `away`.
+    strength 0 = no blow: the flight it is in just goes on."""
+    ax, ay = float(away[0]), float(away[1])
+    vx, vy, vz = (float(c) for c in velocity)
+    h = max(float(height), 0.0)
+    on_ground = h <= 1e-9
+    if strength > 0.0:
+        vx, vy = vx / 2.0 + ax * strength, vy / 2.0 + ay * strength
+        if on_ground:
+            vz = min(0.4, vz / 2.0 + strength)
+    elif on_ground and math.hypot(vx, vy) < 0.003:
+        return [(0.0, 0.0, 0.0, 0.0, 0.0, vz)]
     x = y = 0.0
-    on_ground = True
-    out = [(0.0, 0.0)]
+    out = [(x, y, h, vx, vy, vz)]
     for _tick in range(max_ticks):
         drag = GROUND_DRAG if on_ground else AIR_DRAG
         x += vx
-        if max_back is not None and x > max_back:
-            x, vx = float(max_back), 0.0
         y += vy
-        on_ground = y <= 0.0
+        if max_back is not None:
+            over = x * ax + y * ay - float(max_back)
+            if over > 0.0:
+                along = vx * ax + vy * ay
+                x, y, vx, vy = x - ax * over, y - ay * over, vx - ax * along, vy - ay * along
+        h += vz
+        on_ground = h <= 0.0
         if on_ground:
-            y, vy = 0.0, 0.0
-        vy = (vy - GRAVITY) * 0.98
+            h, vz = 0.0, 0.0
+        vz = (vz - GRAVITY) * 0.98
         vx *= drag
-        if not on_ground and vy < 0.0:
-            vy *= fall
-        if abs(vx) < 0.003:                                               # LivingEntity.aiStep
-            vx = 0.0
-        out.append((x, y))
-        if on_ground and vx == 0.0:
+        vy *= drag
+        if not on_ground and vz < 0.0:
+            vz *= fall
+        if math.hypot(vx, vy) < 0.003:                                    # LivingEntity.aiStep
+            vx = vy = 0.0
+        out.append((x, y, h, vx, vy, vz))
+        if on_ground and vx == 0.0 and vy == 0.0:
             break
     return out
+
+
+def knockback_track(strength=KNOCKBACK, max_back=None, fall=1.0, max_ticks=200, height=0.0, velocity=None):
+    """knock_flight() seen from the side: [(blocks back, blocks up)] after tick 0, 1, 2 ... until the mob lies
+    still. From a standing start: 0.96 up, 2.0 back, on the ground after 10 ticks. height / velocity = (back, up)
+    blocks per tick: the blow meets it in the air (it is not lifted again, see knock_flight)."""
+    vel = (0.0, 0.0, REST_VY) if velocity is None else (float(velocity[0]), 0.0, float(velocity[1]))
+    return [(s[0], s[2]) for s in knock_flight(strength, (1.0, 0.0), height, vel, max_back, fall, max_ticks)]
 
 
 def air_track(vy, drop=0.0, fall=1.0, max_ticks=400):
@@ -515,6 +604,27 @@ def air_track(vy, drop=0.0, fall=1.0, max_ticks=400):
             vy *= fall
         out.append(y)
     return out
+
+
+def walk_distances(total, speed):
+    """Blocks covered after 0, 1, 2 ... frames of a walk of `total` blocks at `speed` blocks/s, as Animal.walk keys
+    it: the mob is driven for total / speed seconds, v' = (cruise - v) / tau, then rolls out, v' = -v / tau (tau =
+    2 frames: the ground's friction 0.546 per tick), and is on its target BRAKE_TAUS * tau frames later."""
+    per_frame = max(float(speed), 1e-3) / FPS
+    push = total / per_frame                                             # frames for which it is driven
+    n = max(2, int(math.ceil(push + BRAKE_TAUS * SPEED_TAU)))
+    tau = SPEED_TAU
+    v_end = per_frame * (1.0 - math.exp(-push / tau))
+    d_end = per_frame * (push - tau * (1.0 - math.exp(-push / tau)))
+
+    def dist(t):
+        if t <= push:
+            return per_frame * (t - tau * (1.0 - math.exp(-t / tau)))
+        return d_end + v_end * tau * (1.0 - math.exp(-(t - push) / tau))
+
+    ds = [min(dist(float(k)), total) for k in range(n + 1)]
+    ds[-1] = total
+    return ds
 
 
 def death_angle(ticks):
@@ -568,6 +678,8 @@ class Animal(ch.Character):
         self._foot = 0                     # which pair steps first on the next planted walk
         self._walk_pos = 0.0               # the game's walkAnimation.position (gait="vanilla" and hurt carry it)
         self._flap = 0.0                   # Chicken.flap
+        self._flap_run = None              # (first frame, [(flap, flapSpeed, flapping) per tick]) of the last flap()
+        self._air = None                   # the flight it is in (a knock-back, hop or fall): see _air_state
         self.last_walk = None
         self.bursts = []
 
@@ -664,6 +776,7 @@ class Animal(ch.Character):
         """Hard-set position and yaw from `frame` on: upright, neutral pose, alive again (use at shot cuts)."""
         super().place(frame, pos, yaw, keep_pose=keep_pose)
         f = int(round(frame))
+        self._air = None
         if not keep_pose:
             for i in (0, 1):
                 if ch._find(self.root, _ROT, i) is not None:
@@ -738,22 +851,9 @@ class Animal(ch.Character):
         elif abs(heading0 - yaw_now) > 0.03:
             f0 = self.turn(f0, heading0, gait=gait)
         total = route.total
-        per_frame = max(float(speed), 1e-3) / FPS
-        push = total / per_frame                                         # frames for which it is driven
-        n = max(2, int(math.ceil(push + BRAKE_TAUS * SPEED_TAU)))
-        tau = SPEED_TAU
-        v_end = per_frame * (1.0 - math.exp(-push / tau))
-        d_end = per_frame * (push - tau * (1.0 - math.exp(-push / tau)))
-
-        def dist(t):
-            """Blocks covered t frames into the walk: v' = (cruise - v) / tau while pushed, then v' = -v / tau."""
-            if t <= push:
-                return per_frame * (t - tau * (1.0 - math.exp(-t / tau)))
-            return d_end + v_end * tau * (1.0 - math.exp(-(t - push) / tau))
-
+        ds = walk_distances(total, speed)
+        n = len(ds) - 1
         frames = [float(f0 + k) for k in range(n + 1)]
-        ds = [min(dist(float(k)), total) for k in range(n + 1)]
-        ds[-1] = total
         spots = [route.point(d) for d in ds]
         yaws = [heading0 + route.turned(d) for d in ds]
         self._travel(frames, spots, yaws, gait=gait, swing=swing, bob=bob)
@@ -763,6 +863,7 @@ class Animal(ch.Character):
 
     def _travel(self, frames, spots, yaws, gait="planted", swing=None, bob=None):
         """Key a root trajectory (a position and a yaw per entry of `frames`) and the legs that carry it."""
+        self._air = None
         fts = np.array(frames, dtype=np.float64)
         xs = np.array([p[0] for p in spots], dtype=np.float64)
         ys = np.array([p[1] for p in spots], dtype=np.float64)
@@ -876,31 +977,47 @@ class Animal(ch.Character):
                               cycle_blocks=2.0 * step, cycle_frames=(2.0 * step / peak) if peak > 1e-9 else None,
                               mean_speed=per_frame * FPS, bob=bob, sink=max(drop) if drop else 0.0)
 
-    def _legs_vanilla(self, frames, fts, dist):
-        """The game's own leg wave for a keyed trajectory: WalkAnimationState ticked along the distance covered."""
+    def _legs_vanilla(self, frames, fts, dist, speed0=0.0, blend=0.0, cap=1.0, land=0.0):
+        """The game's own leg wave for a keyed trajectory: WalkAnimationState ticked along the distance covered.
+        speed0 = the animation speed it starts with; blend = frames over which the pose the legs are in fades into
+        the wave (a hop or a fall out of a planted stride); cap = the largest animation speed (the game: 1);
+        land = frames before the end over which the wave dies away, so that the legs are straight when the
+        trajectory ends (a landing: in the game the wave runs on for half a second while the feet stand)."""
         f0, f1 = frames[0], frames[-1]
         scale = BABY_ANIM_SCALE if self.baby else 1.0
-        speed, pos, prev = 0.0, self._walk_pos, 0.0
+        speed, pos, prev = float(speed0), self._walk_pos, 0.0
         times, vals, peak = [f0], [None], 0.0
         for k in range(1, 6000):
             t = f0 + k * TICK
+            if land > 0.0 and t >= f1 - 1e-6:
+                times.append(f1)
+                vals.append(0.0)
+                break
             d = float(np.interp(min(t, f1), fts, dist))
-            speed += (min(ANIM_PER_BLOCK * (d - prev), 1.0) - speed) * ANIM_LERP
+            speed += (min(ANIM_PER_BLOCK * (d - prev), cap) - speed) * ANIM_LERP
             prev = d
             pos += speed
             peak = max(peak, speed)
             times.append(t)
-            vals.append(math.cos(pos * scale * LEG_RATE) * LEG_SWING * min(speed, 1.0))
+            vals.append(math.cos(pos * scale * LEG_RATE) * LEG_SWING * min(speed, 1.0)
+                        * (_smooth((f1 - t) / land) if land > 0.0 else 1.0))
             if t >= f1 and speed < 0.004:
                 break
         vals[-1] = 0.0
         self._walk_pos = pos
         a, b = self.gait_groups
-        for leg in a:
-            _run(self.legs[leg], _ROT, 0, times, vals)
-        for leg in b:
-            _run(self.legs[leg], _ROT, 0, times, [None] + [-v for v in vals[1:]])
-        self.last_walk.update(swing=LEG_SWING * min(peak, 1.0), cycle_blocks=VANILLA_CYCLE / scale)
+        for sign, group in ((1.0, a), (-1.0, b)):
+            for leg in group:
+                ob = self.legs[leg]
+                mine = [None] + [sign * v for v in vals[1:]]
+                if blend > 0.0:
+                    now = ch._val(ob, _ROT, 0, f0)
+                    for i in range(1, len(mine)):
+                        u = _smooth((times[i] - f0) / blend)
+                        mine[i] = now + (mine[i] - now) * u
+                _run(ob, _ROT, 0, times, mine)
+        if self.last_walk is not None:
+            self.last_walk.update(swing=LEG_SWING * min(peak, 1.0), cycle_blocks=VANILLA_CYCLE / scale)
 
     def turn(self, frame, yaw, ease=None, gait="planted"):
         """Turn the body on the spot to an absolute yaw (radians, 0 faces -Y) the short way round; returns the end
@@ -1044,13 +1161,64 @@ class Animal(ch.Character):
         there = ch._vec3(to, here.z)
         return self._fly(f0, here, there, air_track(0.0, drop=here.z - there.z, fall=self.info["fall"]))
 
+    def _air_state(self, frame):
+        """(height above the ground it will come down on, (vx, vy, vz) in blocks per tick, that ground's z) while a
+        knock-back, hop or fall keyed earlier still carries the animal at `frame`; None when it stands or walks."""
+        air = self._air
+        if air is None or not (air["f0"] - 1e-6 <= frame < air["rest"] - 1e-6):
+            return None
+        states = air["states"]
+        k = min(max(int((frame - air["f0"]) / TICK + 1e-6), 0), len(states) - 1)
+        z = self.pos_at(frame).z
+        ground = air["ground"]
+        if air.get("ground0") is not None and (k < 0.5 * (len(states) - 1) or z < ground - 1e-6):
+            ground = air["ground0"]                                      # a hop UP: still over the ground it left
+        return max(z - ground, 0.0), states[k][3:6], ground
+
+    def _settle(self, f0, legs=True, frames=3):
+        """Out of a planted stride: over `frames` frames the body comes back up to its rest height and the legs'
+        sideways lean (and, legs=True, their swing) goes to zero. Nothing is keyed where nothing is off."""
+        steps = [float(f0 + k) for k in range(frames + 1)]
+
+        def ease(ob, path, i, rest):
+            if ch._find(ob, path, i) is None:
+                return
+            now = ch._val(ob, path, i, f0)
+            if abs(now - rest) > 1e-6:
+                _run(ob, path, i, steps, [None] + [now + (rest - now) * _smooth(k / float(frames)) for k in range(1, frames + 1)])
+
+        ease(self.hips, _LOC, 2, self._rest(self.hips, _LOC, 2))
+        for ob in self.legs.values():
+            ease(ob, _ROT, 1, 0.0)
+            if legs:
+                ease(ob, _ROT, 0, 0.0)
+
     def _fly(self, f0, here, there, heights):
+        """Key a flight from `here` to `there` with a height per tick; returns the landing frame."""
+        before = self.pos_at(f0 - TICK)
         self._halt(f0)
         n = len(heights) - 1
         frames = [f0 + k * TICK for k in range(n + 1)]
         for i in (0, 1):
             _run(self.root, _LOC, i, frames, [here[i] + (there[i] - here[i]) * k / float(n) for k in range(n + 1)])
-        _run(self.root, _LOC, 2, frames, [here.z + h for h in heights[:-1]] + [there.z])
+        zs = [here.z + h for h in heights[:-1]] + [there.z]
+        _run(self.root, _LOC, 2, frames, zs)
+        # the legs: as the game, the walk animation goes on with the ground covered (LivingEntity.calculateEntityAnimation
+        # counts the horizontal move, also in the air); a planted stride fades into it, the body comes back up
+        span = math.hypot(there.x - here.x, there.y - here.y)
+        self._settle(f0, legs=span <= 0.05)
+        if span > 0.05:
+            # (a hop keyed longer than the game's, which covers what a walk does in that time, would throw the legs
+            #  out to 80 degrees: in the air they swing no wider than at one and a half times its walking pace)
+            cap = min(1.0, 1.5 * ANIM_PER_BLOCK * self.walk_speed / 20.0)
+            speed0 = min(ANIM_PER_BLOCK * math.hypot(here.x - before.x, here.y - before.y), cap)
+            self._legs_vanilla(frames, np.array(frames), np.array([span * k / float(n) for k in range(n + 1)]),
+                               speed0=speed0, blend=3.0, cap=cap, land=4.0)
+        step = ((there.x - here.x) / float(n), (there.y - here.y) / float(n))
+        states = [((there.x - here.x) * k / float(n), (there.y - here.y) * k / float(n), zs[k] - there.z, step[0], step[1],
+                   zs[min(k + 1, n)] - zs[k]) for k in range(n + 1)]
+        self._air = dict(f0=float(f0), land=frames[-1], rest=frames[-1], states=states, ground=float(there.z),
+                         ground0=float(here.z) if there.z > here.z + 1e-6 else None)
         self._airborne(f0, frames[-1])
         return int(math.ceil(frames[-1]))
 
@@ -1066,32 +1234,37 @@ class Animal(ch.Character):
         yaw = self.yaw_at(frame)
         return Vector((-math.sin(yaw), math.cos(yaw)))
 
-    def _knock(self, f0, attacker, knockback, max_back, flail):
-        """The knock-back hop from frame f0 and (flail) the legs of a mob that was hit; returns (landing, rest) frames."""
+    def _knock(self, f0, attacker, knockback, max_back, flail, state=None):
+        """The knock-back from frame f0 and (flail) the legs of a mob that was hit; returns (landing, rest) frames.
+        state = its _air_state at f0, read BEFORE the halt: a blow that meets it in the air does not lift it again
+        (LivingEntity.knockback), it flies on from the height and with the speed it has and comes down on the
+        ground it left."""
         strength = KNOCKBACK * (float(knockback) if not isinstance(knockback, bool) else (1.0 if knockback else 0.0))
-        track = knockback_track(strength, max_back, fall=self.info["fall"])
         here, away = self.pos_at(f0), self._away(f0, attacker)
+        height, velocity, ground = state if state is not None else (0.0, (0.0, 0.0, REST_VY), here.z)
+        track = knock_flight(strength, (away.x, away.y), height, velocity, max_back, fall=self.info["fall"])
         n = len(track) - 1
         landing = rest = float(f0)
         if n > 0:
             frames = [f0 + k * TICK for k in range(n + 1)]
-            _run(self.root, _LOC, 0, frames, [here.x + away.x * b for b, _u in track])
-            _run(self.root, _LOC, 1, frames, [here.y + away.y * b for b, _u in track])
-            _run(self.root, _LOC, 2, frames, [here.z + u for _b, u in track])
-            air = [k for k in range(n + 1) if track[k][1] > 0.0]
+            _run(self.root, _LOC, 0, frames, [here.x + q[0] for q in track])
+            _run(self.root, _LOC, 1, frames, [here.y + q[1] for q in track])
+            _run(self.root, _LOC, 2, frames, [here.z] + [ground + q[2] for q in track[1:]])
+            air = [k for k in range(n + 1) if track[k][2] > 0.0]
             landing = f0 + (max(air) + 1) * TICK if air else float(f0)
             rest = frames[-1]
+            self._air = dict(f0=float(f0), land=landing, rest=rest, states=track, ground=float(ground), ground0=None)
             if air:
                 self._airborne(f0, landing)
         if flail:
+            self._settle(f0, legs=False)
             # LivingEntity.handleDamageEvent: walkAnimation.setSpeed(1.5); then the usual update every tick
             scale = BABY_ANIM_SCALE if self.baby else 1.0
-            speed, pos, prev = HURT_ANIM_SPEED, self._walk_pos, 0.0
+            speed, pos = HURT_ANIM_SPEED, self._walk_pos
             times, vals = [float(f0), f0 + TICK], [None, math.cos(pos * scale * LEG_RATE) * LEG_SWING]
             for k in range(1, 400):
-                back = track[min(k, n)][0]
-                speed += (min(ANIM_PER_BLOCK * (back - prev), 1.0) - speed) * ANIM_LERP
-                prev = back
+                q0, q1 = track[min(k - 1, n)], track[min(k, n)]
+                speed += (min(ANIM_PER_BLOCK * math.hypot(q1[0] - q0[0], q1[1] - q0[1]), 1.0) - speed) * ANIM_LERP
                 pos += speed
                 times.append(f0 + (k + 1) * TICK)
                 vals.append(math.cos(pos * scale * LEG_RATE) * LEG_SWING * min(speed, 1.0))
@@ -1112,14 +1285,19 @@ class Animal(ch.Character):
         Character or a point; None = straight back): 0.96 block up, 2.0 back, on the ground again after 10 ticks
         (a chicken floats down with beating wings: 16 ticks, 2.35 back), and the legs flailing as the game's walk
         animation does when a mob is hit. knockback=False: only the flash; a number scales the blow. max_back =
-        blocks of room behind it (a fence). A walk that is running stops here. Returns the frame it stands again."""
+        blocks of room behind it (a fence). A walk that is running stops here. A blow that meets it IN THE AIR (the
+        second hit on a hen, which the game allows 10 ticks = 12 frames after the first while she floats for 20;
+        or in a hop or a fall) does not lift it again: it keeps its height and vertical speed, takes half its
+        horizontal speed plus the new push, and comes down on the ground it left. Returns the frame it stands
+        again."""
         f0 = int(round(frame))
+        state = self._air_state(f0)
         self._halt(f0)
         if flash:
             self._ensure_twins()
             self._flash.append((f0, f0 + HURT_FRAMES))
             self._sync()
-        landing, _rest = self._knock(f0, attacker, knockback, max_back, flail=True)
+        landing, _rest = self._knock(f0, attacker, knockback, max_back, flail=True, state=state)
         return int(math.ceil(max(landing, f0 + 1)))
 
     def die(self, frame, camera=None, attacker=None, knockback=True, max_back=None, poof=True, seed=0, village=None,
@@ -1128,9 +1306,11 @@ class Animal(ch.Character):
         tick later the body tips over to its LEFT about its feet (90 degrees * sqrt((tick - 1) * 0.08): flat after
         13.5 ticks). On tick 20 (frame + 24, the return value) it is gone and the 20 white poof particles appear
         around its upright hit box and rise (camera = the Shot that films it, a Film or a camera object; they face
-        it). Bloodless. It stays gone until its next place()."""
+        it). Bloodless. It stays gone until its next place(). A killing blow that meets it in the air (see hurt())
+        lets the body tip over while it comes down; the poof starts where the body is on the last frame."""
         f0 = int(round(frame))
         gone = f0 + DEATH_FRAMES
+        state = self._air_state(f0)
         # LivingEntityRenderer.extractRenderState: a dead mob's walk animation is 0 (a hard cut, before the halt:
         # the halt then holds the straight legs)
         for ob in self.legs.values():
@@ -1144,7 +1324,7 @@ class Animal(ch.Character):
         self._flash.append((f0, gone))
         self._gone.append((gone, True))
         self._sync()
-        self._knock(f0, attacker, knockback, max_back, flail=False)
+        self._knock(f0, attacker, knockback, max_back, flail=False, state=state)
         ticks = [1.0, 1.02, 1.08, 1.2, 1.4, 1.7] + [2.0 + 0.5 * k for k in range(24)]
         _run(self.root, _ROT, 1, [float(f0)] + [f0 + t * TICK for t in ticks],
              [0.0] + [math.radians(death_angle(t)) for t in ticks])
@@ -1170,7 +1350,11 @@ class Chicken(Animal):
             return int(frame_end)
         f0, f1 = float(frame_start), float(frame_end)
         speed, flapping, phase = 0.0, 1.0, self._flap
-        states = [(phase, speed)]
+        if self._flap_run is not None:                                   # still beating from the flight before:
+            g0, old = self._flap_run                                     # carry on from where the wings are
+            if g0 - 1e-6 <= f0 < g0 + (len(old) - 1) * TICK:
+                phase, speed, flapping = old[int((f0 - g0) / TICK + 1e-6)]
+        states = [(phase, speed, flapping)]
         for k in range(1, 4000):
             in_air = f0 + (k - 1) * TICK < f1 - 1e-6
             speed = ch._clamp(speed + (FLAP_UP if in_air else FLAP_DOWN), 0.0, 1.0)
@@ -1178,12 +1362,13 @@ class Chicken(Animal):
                 flapping = 1.0
             flapping *= FLAP_DECAY
             phase += flapping * FLAP_STEP
-            states.append((phase, speed))
+            states.append((phase, speed, flapping))
             if not in_air and speed <= 0.0:
                 break
         self._flap = phase % (2.0 * math.pi)
+        self._flap_run = (f0, states)
         times, vals = [], []
-        for k, ((p0, s0), (p1, s1)) in enumerate(zip(states, states[1:])):
+        for k, ((p0, s0, _a), (p1, s1, _b)) in enumerate(zip(states, states[1:])):
             for q in range(4):                                           # the renderer lerps flap and flapSpeed
                 u = q / 4.0
                 times.append(f0 + (k + u) * TICK)
@@ -1377,40 +1562,72 @@ def love(animal, frame, camera=None, frame_end=None, seed=0, glow=None, village=
 # ----------------------------------------------------------------------------------------------------
 # helpers for the farm: eggs, milk, following food, a pen and the life in it
 # ----------------------------------------------------------------------------------------------------
-def lay_egg(chicken, frame, seed=0, until=None, stage=None, name=None):
+def _cast(stage, shot, things):
+    """Register dropped items with a films.lookdev.Stage and, given the shot, declare them visible in it."""
+    if stage is None:
+        if shot is not None:
+            raise ValueError("shot= needs stage=: the Stage that owns the shot")
+        return
+    for it in things:
+        stage.cast[it.name] = it
+    if shot is not None:
+        stage.use(shot, *things)
+
+
+def lay_egg(chicken, frame, seed=0, until=None, stage=None, shot=None, name=None):
     """A hen lays an egg on `frame` (Chicken.aiStep: every 6000-11999 ticks; item 'egg'): an item entity appears
     at her feet with the game's toss (hops 0.38, lands after 9 ticks, lies still 0.3-0.9 block away, at most 1.3,
-    after 15), then bobs and spins until `until` (default: 20 s). stage = a films.lookdev.Stage to register it with (then st.use(shot, egg)).
+    after 15), then bobs and spins until `until` (default: 20 s). In a Stage film pass stage=st AND shot=s: a
+    Stage hides every cast member that no shot uses, so an egg registered with stage= alone is never seen (the
+    same as st.use(s, egg) afterwards; for more shots st.use(other_shot, egg)).
     Returns the engine.mobs DroppedItem (.sprite is the focus / hero target, .rest_pos where it lies)."""
     f0 = int(round(frame))
     egg = mobs.make_dropped_item(EGG_ITEM, seed=seed, name=name or ("%s_egg_%d" % (chicken.name, f0)))
     egg.drop(f0, chicken.pos_at(f0), seed=seed)
     egg.animate(f0, f0 + 480 if until is None else until)
-    if stage is not None:
-        stage.cast[egg.name] = egg
+    _cast(stage, shot, [egg])
     return egg
 
 
 LOOT = {"cow": (("beef", 2), ("leather", 1)), "chicken": (("chicken", 1), ("feather", 1)), "calf": (), "chick": ()}
 
 
-def drop_loot(animal, frame, items=None, seed=0, until=None, stage=None):
+def drop_loot(animal, frame, items=None, seed=0, until=None, stage=None, shot=None):
     """What a killed animal leaves, as item entities tossed up from where it stands ON the frame of the killing
     blow (LivingEntity.die drops the loot at once, while the body still tips over). items = [(item id, count), ...];
     default: the loot tables' typical roll: cow ('beef', 2) and ('leather', 1) (the game: 1-3 beef, 0-2 leather),
     chicken ('chicken', 1) and ('feather', 1) (1 raw chicken, 0-2 feathers), babies nothing. An animal that burns
-    drops 'cooked_beef' / 'cooked_chicken'. They bob and spin until `until` (default 20 s). stage = a Stage to
-    register them with. Returns the list of engine.mobs DroppedItems."""
+    drops 'cooked_beef' / 'cooked_chicken'. They bob and spin until `until` (default 20 s). In a Stage film pass
+    stage=st AND shot=s (or st.use(s, *loot) afterwards): a Stage hides every cast member that no shot uses, so
+    loot registered with stage= alone is never seen. Returns the list of engine.mobs DroppedItems."""
     f0 = int(round(frame))
     out = []
     for i, (item_id, count) in enumerate(LOOT[animal.kind] if items is None else items):
         it = mobs.make_dropped_item(item_id, count=count, seed=seed * 17 + i, name="%s_%s_%d" % (animal.name, item_id, f0))
         it.drop(f0, animal.pos_at(f0), seed=seed * 17 + i)
         it.animate(f0, f0 + 480 if until is None else until)
-        if stage is not None:
-            stage.cast[it.name] = it
         out.append(it)
+    _cast(stage, shot, out)
     return out
+
+
+def _sync_hand(player):
+    """Rewrite the visibility of the player's hand items: each is rendered on its own frames, and only while the
+    player's arm is (Character.show, which a Stage calls for every shot, does not know these items)."""
+    arm = player.arm_r
+    fc = ch._find(arm, "hide_render", 0)
+    keyed = fc is not None and len(fc.keyframe_points) > 0
+    cuts = sorted({int(round(kp.co.x)) for kp in fc.keyframe_points}) if keyed else []
+
+    def shown(f):
+        return fc.evaluate(f) < 0.5 if keyed else not arm.hide_render
+
+    for ob, a, b in player.__dict__.get("_hand_items", ()):
+        if b <= a:
+            mobs._visibility_curve(ob, [(a, False)], before=False)
+            continue
+        frames = [a] + [c for c in cuts if a < c < b] + [b]
+        mobs._visibility_curve(ob, [(f, f < b and shown(f)) for f in frames], before=False)
 
 
 def hand_item(player, item, frame_start, frame_end=None, collection=None):
@@ -1418,36 +1635,62 @@ def hand_item(player, item, frame_start, frame_end=None, collection=None):
     ... (an item id) or an object from engine.props.make_item. It sits exactly where Character.hold puts an item
     and the arm is carried in the game's item pose for those frames, but it is NOT player.held: its visibility is
     its own, so one Steve can hold wheat in one shot and nothing in the next (Character.hold cannot be keyed).
+    frame_end is REQUIRED (None raises): the shot's frame_end + 1. An item without an end would stay in the film.
+    The item is also hidden whenever the player is (player.show(), which Stage.finish calls), and a later
+    hand_item() for the same player takes over from its frame_start: a hand holds one thing.
     Call it AFTER the player's place() for that shot, and place() him again only at or after frame_end.
     Returns the item object: a focus / hero target, and follow(..., look=<it>)."""
     from . import fx, props
 
     if getattr(player, "arm_r", None) is None:
         raise ValueError("hand_item() needs the player (a Character with arms)")
-    f0 = int(round(frame_start))
+    if frame_end is None:
+        raise ValueError("hand_item(): frame_end is required: pass the shot's frame_end + 1 (an item without an end "
+                         "would stay in the film, also in shots the player is not in)")
+    f0, f1 = int(round(frame_start)), int(round(frame_end))
+    if f1 <= f0:
+        raise ValueError("hand_item(): frame_end %d is not after frame_start %d" % (f1, f0))
     col = collection if collection is not None else fx._collection()
     ob = props.make_item(item, col) if isinstance(item, str) else item
     ob.parent = player.arm_r
     ob.matrix_parent_inverse = Matrix.Identity(4)
     ob.matrix_basis = ch._held_matrix("hand", player.model_scale)
-    keys = [(min(f0, 1) - 1, 1.0), (f0, 0.0)] + ([(int(round(frame_end)), 1.0)] if frame_end is not None else [])
-    for path in ("hide_render", "hide_viewport"):
-        fx._write(ob, path, 0, [k[0] for k in keys], [k[1] for k in keys], "CONSTANT")
     ob.hide_render = ob.hide_viewport = True
+    held = player.__dict__.setdefault("_hand_items", [])                 # [[object, first frame, end frame]]
+    for rec in held:
+        if rec[1] < f0 < rec[2]:
+            rec[2] = f0                                                  # what he held until now ends here
+    held.append([ob, f0, f1])
+    if "_hand_show" not in player.__dict__:                              # from now on show() takes the items along
+        inner = player.show
+
+        def show(frame, visible=True):
+            """Character.show, and the hand items of engine.animals.hand_item with it."""
+            out = inner(frame, visible)
+            _sync_hand(player)
+            return out
+
+        player._hand_show = inner
+        player.show = show
+    _sync_hand(player)
     ch._cut(player.arm_r, _ROT, 0, f0, ch.ITEM_ARM_PITCH)               # ArmPose.ITEM: 18 degrees forward
-    if frame_end is not None:
-        rest = player._rest(player.arm_r, _ROT, 0)
-        if abs(ch._val(player.arm_r, _ROT, 0, int(round(frame_end))) - ch.ITEM_ARM_PITCH) < 1e-6:
-            ch._cut(player.arm_r, _ROT, 0, int(round(frame_end)), rest)
+    rest = player._rest(player.arm_r, _ROT, 0)
+    if abs(ch._val(player.arm_r, _ROT, 0, f1) - ch.ITEM_ARM_PITCH) < 1e-6:
+        ch._cut(player.arm_r, _ROT, 0, f1, rest)
     return ob
 
 
 def milk(player, frame, frame_start, frame_end=None, collection=None):
     """The milking beat: the player holds an empty 'bucket' from frame_start, uses it on the cow on `frame` (his
     arm swings, furthest forward on `frame`) and from that frame on it is a 'milk_bucket' (AbstractCow.mobInteract:
-    adult cows only, no particles), until frame_end. Two hand_item()s and Character.swing_arm: call it AFTER the
-    player's place() and look_at() for that shot. Returns (bucket, milk_bucket)."""
+    adult cows only, no particles), until frame_end (REQUIRED: the shot's frame_end + 1, see hand_item). Two
+    hand_item()s and Character.swing_arm: call it AFTER the player's place() and look_at() for that shot.
+    Returns (bucket, milk_bucket)."""
     f = int(round(frame))
+    if frame_end is None:
+        raise ValueError("milk(): frame_end is required: pass the shot's frame_end + 1")
+    if not int(round(frame_start)) < f < int(round(frame_end)):
+        raise ValueError("milk(): the use frame %d must lie between frame_start and frame_end" % f)
     bucket = hand_item(player, BUCKET_ITEM, frame_start, f, collection)
     full = hand_item(player, MILK_ITEM, f, frame_end, collection)
     ch._cut(player.arm_r, _ROT, 0, int(round(frame_start)), ch.ITEM_ARM_PITCH)
@@ -1455,49 +1698,233 @@ def milk(player, frame, frame_start, frame_end=None, collection=None):
     return bucket, full
 
 
-def follow(animal, leader, frame_start, frame_end, stop=TEMPT_STOP, speed=None, look="eyes", gait="planted",
-           swing=None, bob=None):
-    """The animal follows a player who holds its food (TemptGoal): whenever `leader` (a Character) is further than
-    `stop` (2.5 blocks) it walks toward him, never faster than its tempted speed (cow 2.75 blocks/s, chicken
-    2.75) and no faster than he walks away, and it keeps looking at him. look = "eyes": at his eyes, which is
-    what the game does; "item": at the item in his hand (leader.held); or any point / Object. Key the leader's
-    walk first. After frame_end the leader counts as standing where he is then; returns the frame the animal has
-    come to rest (>= frame_end)."""
+def _circles(thing, frame):
+    """[(x, y, radius)] the circles that cover something standing in an animal's way at `frame`: an Animal's body
+    (nothing once it is dead and gone), any other Character (0.3 round its feet: the player's hit box is 0.6 wide)
+    or a fixed (x, y, radius)."""
+    if isinstance(thing, Animal):
+        if thing.gone_at(frame):
+            return []
+        return thing.body_points(thing.pos_at(frame), thing.yaw_at(frame))
+    if isinstance(thing, ch.Character):
+        q = thing.pos_at(frame)
+        return [(q.x, q.y, PLAYER_RADIUS)]
+    x, y, r = thing
+    return [(float(x), float(y), float(r))]
+
+
+def _apart(ca, cb):
+    """(gap, ux, uy): the smallest distance between two sets of circles and the unit vector from the first set to
+    the second at the pair that is closest (gap None when a set is empty)."""
+    best = (None, 1.0, 0.0)
+    for xa, ya, ra in ca:
+        for xb, yb, rb in cb:
+            d = math.hypot(xb - xa, yb - ya)
+            g = d - ra - rb
+            if best[0] is None or g < best[0]:
+                best = (g, (xb - xa) / d, (yb - ya) / d) if d > 1e-9 else (g, 1.0, 0.0)
+    return best
+
+
+def _slot_angle(a, b, stop, room):
+    """Radians two animals need between them on a circle of radius `stop` round the one they follow, both facing
+    him, for their bodies to keep `room` blocks apart (bisection on _gap; pi when the circle is too small)."""
+    def gap(t):
+        return _gap(a, (stop, 0.0), -math.pi / 2.0, b, (stop * math.cos(t), stop * math.sin(t)),
+                    math.atan2(-math.cos(t), math.sin(t)))
+
+    lo, hi = 0.0, math.pi
+    if gap(hi) < room:
+        return math.pi
+    for _i in range(30):
+        mid = (lo + hi) / 2.0
+        if gap(mid) < room:
+            lo = mid
+        else:
+            hi = mid
+    return hi
+
+
+def _isotonic(vals):
+    """The non-decreasing sequence nearest to `vals` (least squares; pool adjacent violators)."""
+    blocks = []
+    for v in vals:
+        blocks.append([float(v), 1])
+        while len(blocks) > 1 and blocks[-2][0] / blocks[-2][1] > blocks[-1][0] / blocks[-1][1]:
+            t, c = blocks.pop()
+            blocks[-1][0] += t
+            blocks[-1][1] += c
+    return [t / c for t, c in blocks for _i in range(c)]
+
+
+def follow(animals, leader, frame_start, frame_end, stop=TEMPT_STOP, speed=None, look="eyes", gait="planted",
+           swing=None, bob=None, clearance=None, avoid=()):
+    """An animal, or a LIST of them, follows a player who holds their food (TemptGoal): whenever `leader` (a
+    Character) is further than `stop` (2.5 blocks) it walks toward him, never faster than its tempted speed (cow
+    2.75 blocks/s, chicken 2.75) and no faster than he walks away, and it keeps looking at him. look = "eyes": at
+    his eyes, which is what the game does; "item": at the item in his hand (leader.held); or any point / Object.
+
+    A HERD: pass all of them in one call (or call it once per animal: a later call knows the animals of the earlier
+    calls for the same leader and walks round them; the earlier ones keep their paths). Each gets its own place
+    on the stop circle, side by side in the order they stood round him at frame_start, so they fan out behind him
+    as they walk and come to rest in an arc facing him (three cows: 31 degrees apart, 1.35 blocks from centre to
+    centre). As the game's Entity.push does, no two bodies come closer than `clearance` (default 0.15 block: the
+    game's 0.9-wide cow hit boxes keep the 0.75-wide bodies that far apart): one that would is moved aside. The
+    same holds for everything in `avoid` (Animals / Characters keyed before this call, or (x, y, radius)) and for
+    the leader himself if he walks into them. Seven cows or nine hens fill the half circle behind a player at
+    stop 2.5: more of them need a second call with a larger stop.
+
+    Key the leader's walk first. After frame_end the leader counts as standing where he is then. Returns the frame
+    the last of them has come to rest (>= frame_end)."""
+    herd = [animals] if isinstance(animals, ch.Character) else list(animals)
     f0, f1 = int(round(frame_start)), int(round(frame_end))
-    vmax = (animal.tempt_speed if speed is None else float(speed)) / FPS
+    if not herd:
+        return f1
+    n = len(herd)
+    room = FOLLOW_ROOM if clearance is None else float(clearance)
+    vmax = [(a.tempt_speed if speed is None else float(speed)) / FPS for a in herd]
     gain = 1.0 - math.exp(-1.0 / SPEED_TAU)
     turn = 1.0 - 0.7 ** (1.0 / TICK)                                     # LivingEntity.tickHeadTurn: 0.3 of the gap a tick
-    p = animal.pos_at(f0)
-    yaw = animal.yaw_at(f0)
-    v = 0.0
-    frames, spots, yaws = [float(f0)], [p.copy()], [yaw]
+    P = [a.pos_at(f0) for a in herd]
+    Y = [a.yaw_at(f0) for a in herd]
+    V = [0.0] * n
+    D = [None] * n                                                       # the way each is going (kept while it brakes)
+    round_ = [{} for _i in range(n)]                                     # which way round each passes what is in its way
+    known = leader.__dict__.setdefault("_followers", [])                 # [(animal, first frame, last frame, stop)]
+    earlier = []
+    for rec in known:                                                    # calls that overlap this one in time
+        if rec[2] >= f0 - 24 and rec[1] <= f1 and all(rec[0] is not q for q in herd) \
+                and all(rec[0] is not e[0] for e in earlier):
+            earlier.append(rec)
+    solid = [e[0] for e in earlier] + [o for o in avoid if all(o is not q for q in herd) and all(o is not e[0] for e in earlier)]
+
+    def bearing(q, lead):
+        return math.atan2(q.y - lead.y, q.x - lead.x)
+
+    lead = leader.pos_at(f0)
+    raw = [bearing(q, lead) for q in P]
+    ref = math.atan2(sum(math.sin(t) for t in raw), sum(math.cos(t) for t in raw))
+    B = [ref + ch._wrap(t - ref) for t in raw]                           # unwrapped, followed from frame to frame
+    order = sorted(range(n), key=lambda i: B[i])
+    offs = [0.0]
+    for k in range(n - 1):
+        offs.append(offs[-1] + _slot_angle(herd[order[k]], herd[order[k + 1]], stop - 0.1, room + 0.05))
+    span = 2.0 * math.pi - (_slot_angle(herd[order[-1]], herd[order[0]], stop - 0.1, room + 0.05) if n > 1 else 0.0)
+    if offs[-1] > span > 0.0:                                            # more than the circle holds: squeeze (and push)
+        offs = [o * span / offs[-1] for o in offs]
+    EB = [ref + ch._wrap(bearing(e[0].pos_at(f0), lead) - ref) for e in earlier]
+    side = [[1.0 if ch._wrap(EB[j] - B[i]) >= 0.0 else -1.0 for j in range(len(earlier))] for i in range(n)]
+    eneed = [[_slot_angle(herd[i], earlier[j][0], stop - 0.1, room + 0.05) for j in range(len(earlier))] for i in range(n)]
+
+    frames, spots, yaws = [float(f0)], [[q.copy() for q in P]], [list(Y)]
     f = f0
     while True:
         f += 1
         lead = leader.pos_at(min(f, f1))
-        d = Vector((lead.x - p.x, lead.y - p.y))
-        gap = d.length
-        want = min(max(gap - stop, 0.0), vmax)
-        v += (want - v) * gain
-        if v < 2e-4:
-            v = 0.0
-        if v > 0.0 and gap > 1e-6:
-            p = Vector((p.x + d.x / gap * v, p.y + d.y / gap * v, p.z))
-            yaw += ch._wrap(math.atan2(d.x, -d.y) - yaw) * turn
+        for i in range(n):
+            B[i] += ch._wrap(bearing(P[i], lead) - B[i])
+        flat = _isotonic([B[order[k]] - offs[k] for k in range(n)])
+        theta = [0.0] * n
+        for k in range(n):
+            theta[order[k]] = flat[k] + offs[k]
+        active = []
+        for j, (other, a0, a1, its_stop) in enumerate(earlier):
+            q = other.pos_at(f)
+            EB[j] += ch._wrap(bearing(q, lead) - EB[j])
+            active.append(a0 <= f <= a1 or math.hypot(q.x - lead.x, q.y - lead.y) < its_stop + 1.0)
+        blocks = [(_circles(o, f), room) for o in solid] + [(_circles(leader, f), 0.0)]
+        for i in range(n):
+            lo, hi = -1e9, 1e9
+            for j in range(len(earlier)):
+                if not active[j]:
+                    continue
+                rel = ch._wrap(EB[j] - B[i])
+                if side[i][j] * rel < 0.0 and abs(rel) > math.pi / 2.0:
+                    rel += side[i][j] * 2.0 * math.pi
+                if side[i][j] > 0.0:
+                    hi = min(hi, B[i] + rel - eneed[i][j])
+                else:
+                    lo = max(lo, B[i] + rel + eneed[i][j])
+            theta[i] = (lo + hi) / 2.0 if lo > hi else ch._clamp(theta[i], lo, hi)
+            q = P[i]
+            to_lead = Vector((lead.x - q.x, lead.y - q.y))
+            to_slot = Vector((lead.x + stop * math.cos(theta[i]) - q.x, lead.y + stop * math.sin(theta[i]) - q.y))
+            far = to_slot.length
+            driven = to_lead.length > stop
+            want = min(far, vmax[i]) if driven else 0.0
+            if driven and far > 0.05:                                    # (closer than that it rolls out as it goes)
+                way = to_slot / far
+                if D[i] is not None and way.dot(D[i]) < 0.0:
+                    V[i] = 0.0                                           # its place is behind it now: stop, then go back
+                D[i] = way
+            V[i] += (want - V[i]) * gain
+            if V[i] < 2e-4:
+                V[i] = 0.0
+            if V[i] > 0.0 and D[i] is not None:
+                go = D[i]
+                mine = herd[i].body_points(q, Y[i])
+                for k, (circles, keep) in enumerate(blocks[:-1]):        # something in its way: it bears off and goes
+                    g, ux, uy = _apart(mine, circles)                    # round it, always the same way round
+                    if g is None or g >= keep + 0.6 or D[i].x * ux + D[i].y * uy <= 0.0:
+                        round_[i].pop(k, None)
+                        continue
+                    if k not in round_[i]:                               # the side its way leans to, seen from the middle
+                        cx = sum(c[0] for c in circles) / len(circles) - sum(c[0] for c in mine) / len(mine)
+                        cy = sum(c[1] for c in circles) / len(circles) - sum(c[1] for c in mine) / len(mine)
+                        round_[i][k] = 1.0 if D[i].x * -cy + D[i].y * cx >= 0.0 else -1.0
+                    w = ch._clamp((keep + 0.6 - g) / 0.45, 0.0, 1.0)
+                    bent = go * (1.0 - w) + Vector((-uy, ux)) * (round_[i][k] * w)
+                    if bent.length > 1e-6:
+                        go = bent.normalized()
+                P[i] = Vector((q.x + go.x * V[i], q.y + go.y * V[i], q.z))
+                at_him, at_slot = math.atan2(to_lead.x, -to_lead.y), math.atan2(go.x, -go.y)
+                # it faces the way it goes; over the last block (and while it trails him) it turns to him
+                aim = at_him + ch._wrap(at_slot - at_him) * (1.0 if round_[i] else ch._clamp(far, 0.0, 1.0))
+                Y[i] += ch._wrap(aim - Y[i]) * turn
+        # Entity.push: bodies that would overlap are moved apart (half each; all of it if the other was keyed before)
+        for _pass in range(4):
+            cover = [herd[i].body_points(P[i], Y[i]) for i in range(n)]
+            moved = False
+            for i in range(n):
+                for j in range(i + 1, n):
+                    g, ux, uy = _apart(cover[i], cover[j])
+                    if g is not None and g < room - 1e-6:
+                        d = (room - g) / 2.0
+                        P[i] = Vector((P[i].x - ux * d, P[i].y - uy * d, P[i].z))
+                        P[j] = Vector((P[j].x + ux * d, P[j].y + uy * d, P[j].z))
+                        cover[i], cover[j] = herd[i].body_points(P[i], Y[i]), herd[j].body_points(P[j], Y[j])
+                        moved = True
+                for circles, keep in blocks:
+                    g, ux, uy = _apart(cover[i], circles)
+                    if g is not None and g < keep - 1e-6:
+                        P[i] = Vector((P[i].x - ux * (keep - g), P[i].y - uy * (keep - g), P[i].z))
+                        cover[i] = herd[i].body_points(P[i], Y[i])
+                        moved = True
+            if not moved:
+                break
         frames.append(float(f))
-        spots.append(p.copy())
-        yaws.append(yaw)
-        if f >= f1 and v == 0.0:
+        spots.append([q.copy() for q in P])
+        yaws.append(list(Y))
+        if f >= f1 and all(v == 0.0 for v in V):
             break
         if f > f1 + 72:
             break
-    animal._travel(frames, spots, yaws, gait=gait, swing=swing, bob=bob)
+    # an animal that is held up (no room at its place) pushes on without moving: the walk ends when all stand still
+    last = len(frames) - 1
+    while last > 0 and frames[last - 1] >= f1 and all(
+            (spots[last - 1][i] - spots[-1][i]).length < 1e-4 and abs(yaws[last - 1][i] - yaws[-1][i]) < 1e-4 for i in range(n)):
+        last -= 1
+    frames = frames[:last + 1]
     end = int(frames[-1])
-    if look is not None:
-        target = leader if look == "eyes" else (leader.held if look == "item" else look)
-        if target is None:
-            raise ValueError("follow(look='item'): %s holds nothing (leader.hold(props.make_item('wheat')))" % leader.name)
-        animal.track(f0, end, target)
+    for i, a in enumerate(herd):
+        a._travel(frames, [spots[k][i] for k in range(last + 1)], [yaws[k][i] for k in range(last + 1)],
+                  gait=gait, swing=swing, bob=bob)
+        if look is not None:
+            target = leader if look == "eyes" else (leader.held if look == "item" else look)
+            if target is None:
+                raise ValueError("follow(look='item'): %s holds nothing (leader.hold(props.make_item('wheat')))" % leader.name)
+            a.track(f0, end, target)
+        known.append((a, f0, end, float(stop)))
     return end
 
 
@@ -1513,7 +1940,9 @@ def make_pen(scene, x0, y0, x1, y1, z=0, gates=(), fence="oak_fence", ground=Non
     z (they stand ON the blocks at z - 1), with a fence gate in every cell of `gates` [(x, y), ...] (closed unless
     open_gates). ground = a block id ('grass_block') to lay a floor at z - 1 under it and one block around (leave
     None on the village's own ground). Built as its own little World into the collection `name`; the village is
-    not touched. Returns dict(world, objects, area = pen_area(...), cells = the ring, gates)."""
+    not touched. FOR TESTS AND BARE FLOORS: on the village's meadow the plants of the ring cells stay and stand
+    inside posts and rails, which the game cannot show; a film's pen is pen_set(), built into the village.
+    Returns dict(world, objects, area = pen_area(...), cells = the ring, gates)."""
     from .blocks import World, new_collection
 
     xa, xb, ya, yb = min(x0, x1), max(x0, x1), min(y0, y1), max(y0, y1)
@@ -1535,6 +1964,70 @@ def make_pen(scene, x0, y0, x1, y1, z=0, gates=(), fence="oak_fence", ground=Non
     return dict(world=w, objects=objs, area=pen_area(xa, ya, xb, yb), cells=ring, gates=gates)
 
 
+def pen_set(b, x0, y0, x1, y1, gates=(), fence="oak_fence", name="pen", clear="all", open_gates=False, level=True):
+    """THE PEN OF A FILM: the same ring of fence and gate blocks as make_pen, but built INTO the village, so the
+    meadow's grass tufts and flowers are gone where the fence stands (in the game a fence replaces the plant).
+    Call it inside the village's edit hook:
+
+        def edit(b):                                   # b = the village builder (engine/village.py: FILM SETS)
+            animals.pen_set(b, 3, 27, 12, 36, gates=[(7, 27)], name="cow_pen")
+        v = village.build_village(scene, seed=1, edit=edit)
+        area, z = v.sets["cow_pen"]["area"], v.sets["cow_pen"]["z"]       # for wander(..., area, z=z)
+
+    clear = "all" (default): no plants on the ring or inside it (tall grass hides a hen; a tuft is as tall as a
+    chick) | "ring": only where the fence stands | "tall": the ring, and the two-block tall grass inside.
+    The ring and the inside are reserved (nothing is sown there later). level=True re-levels the pen's columns
+    to the height most of them have (the meadow north of the village is flat up to y 52; a pen across one of its
+    steps would otherwise have a fence on two levels); level=False raises if they differ.
+    Registers the anchors <name>_center (a look target in the middle, at the ground) and, per gate,
+    <name>_gate (<name>_gate_2 ...): a standing spot one block outside the gate, facing in.
+    Returns (and stores as Village.sets[name]) dict(area, z, cells, gates, inside = the cells inside the ring)."""
+    xa, xb, ya, yb = min(x0, x1), max(x0, x1), min(y0, y1), max(y0, y1)
+    if xb - xa < 2 or yb - ya < 2:
+        raise ValueError("pen_set: the ring %s leaves no room inside" % ((xa, ya, xb, yb),))
+    cols = [(x, y) for x in range(xa, xb + 1) for y in range(ya, yb + 1)]
+    heights = [b.ground(x, y) for x, y in cols]
+    if any(h is None for h in heights):
+        raise ValueError("pen_set %r: no terrain under part of %s (b.extend_terrain first)" % (name, (xa, ya, xb, yb)))
+    z = max(set(heights), key=heights.count)
+    if len(set(heights)) > 1:
+        if not level:
+            raise ValueError("pen_set %r: the ground under %s is not level (%s)" % (name, (xa, ya, xb, yb), sorted(set(heights))))
+        for (x, y), h in zip(cols, heights):
+            if h != z:
+                b.set_ground(x, y, z)
+    gates = [tuple(g) for g in gates]
+    ring = [c for c in cols if c[0] in (xa, xb) or c[1] in (ya, yb)]
+    inside = [c for c in cols if c not in ring]
+    for g in gates:
+        if g not in ring:
+            raise ValueError("pen_set %r: the gate %s is not on the ring" % (name, (g,)))
+    gate_id = fence.replace("_fence", "_fence_gate")
+    for x, y in cols:
+        on_ring = (x, y) in ring
+        if on_ring or clear == "all":
+            b.clear_plants(x, y)
+        elif clear == "tall" and b.w.block_id(x, y, z) == "tall_grass":
+            b.clear_plants(x, y)
+        b.reserved.add((x, y))
+        if not on_ring:
+            continue
+        if (x, y) in gates:
+            facing = "south" if y == ya else ("north" if y == yb else ("west" if x == xa else "east"))
+            b.w.set(x, y, z, gate_id, {"facing": facing, "open": "true" if open_gates else "false", "in_wall": "false",
+                                       "powered": "false"})
+        else:
+            b.w.set(x, y, z, fence)
+    res = dict(area=pen_area(xa, ya, xb, yb), z=float(z), cells=ring, gates=gates, inside=inside, name=name)
+    b.v.anchors[name + "_center"] = ((xa + xb + 1) / 2.0, (ya + yb + 1) / 2.0, float(z))
+    for k, (gx, gy) in enumerate(gates):
+        out = (0, -1) if gy == ya else ((0, 1) if gy == yb else ((-1, 0) if gx == xa else (1, 0)))
+        spot = (gx + 0.5 + out[0], gy + 0.5 + out[1])
+        b.anchor(name + "_gate" + ("" if k == 0 else "_%d" % (k + 1)), spot, yaw=math.atan2(-out[0], out[1]), replace=True)
+    b.v.sets[name] = res
+    return res
+
+
 def _gap(a, pa, ya, b, pb, yb):
     """Smallest distance between the bodies of two animals standing at (pa, yaw ya) and (pb, yaw yb)."""
     return min(math.hypot(xa - xb, ya_ - yb_) - ra - rb
@@ -1548,28 +2041,72 @@ def _inside(animal, pos, yaw, area, margin):
                for x, y, r in animal.body_points(pos, yaw))
 
 
+def _reach(animal):
+    """Radius round an animal's feet that its body stays inside however it turns on the spot."""
+    return max(abs(ahead) + r for ahead, r in animal.info["circles"])
+
+
+def _settles(animal, frame, limit=240):
+    """The first frame >= `frame` from which the keyed position and yaw of an animal no longer change (a walk that
+    began earlier runs on until then)."""
+    last = float(frame)
+    for path, i in ((_LOC, 0), (_LOC, 1), (_ROT, 2)):
+        fc = ch._find(animal.root, path, i)
+        if fc is None:
+            continue
+        for kp in fc.keyframe_points:
+            if frame < kp.co.x <= frame + limit:
+                last = max(last, kp.co.x)
+    return int(math.ceil(last - 1e-6))
+
+
 def wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None, gait="planted", clearance=None,
-           activity=1.0, watch=None, z=0.0):
+           activity=1.0, watch=None, z=0.0, avoid=()):
     """Background life for a pen: every animal alternates standing, looking around and short straight walks inside
     the rectangle area = (x0, y0, x1, y1) from frame_start to frame_end, each with its own timing.
 
     place=True (default) first puts them on random free spots at frame_start (hard cut; z = the ground there);
-    place=False starts from where they stand. Nobody leaves the rectangle and no body comes closer than
-    `clearance` (default: its own body width; cow 0.75, chicken 0.5) to another body or to the edge, also while
-    both move: every walk is checked against what the others do at the same time before it is keyed. Walks are
-    1.2-3.2 blocks for a cow, 0.8-2.6 for a chicken, at the game's strolling speed (speed= overrides, blocks/s),
-    after a turn on the spot. activity scales how restless they are (1 = a walk every 3-4 s each); watch = a
-    Character they look at now and then while he is within 6 blocks. For a fenced pen pass pen_area(...) of the
-    fence ring (or the 'area' make_pen returns). Returns {name: [(kind, first frame, last frame, target), ...]}
-    with kind 'stand' | 'walk'. Deterministic for a seed."""
+    place=False starts from where they stand, inside the area (one that is still walking finishes that walk
+    first). Nobody leaves the rectangle and no body comes closer than `clearance` (default: its own body width;
+    cow 0.75, chicken 0.5; for a pair the larger of the two) to another body or to the edge, also while both
+    move and whichever of them stops first: every turn, walk and the stand after it is checked frame by frame
+    against what the others are keyed to do before it is keyed itself. An animal comes to rest only where it can
+    turn on the spot whichever way it faces (its feet at least its reach + clearance from the edge: cow 1.70,
+    calf 1.13, hen 1.00, chick 0.45), so none is ever boxed in against a fence; an area too narrow for that (a cow
+    needs 3.4 blocks, a hen 2.0) falls back to bodies that only keep the clearance, and may then stand for long.
+    Walks are 1.2-3.2 blocks for a cow, 0.8-2.6 for a chicken, at the game's strolling speed (speed= overrides,
+    blocks/s), after a turn on the spot. activity scales how restless they are (1 = a walk every 3-4 s each);
+    watch = a Character they look at now and then while he is within 6 blocks. avoid = what else stands or moves
+    in the area and was keyed BEFORE this call: the player, a cow that follows him, a hen that is hit ...
+    (Characters / Animals: their keyed positions frame by frame; or fixed (x, y, radius) circles, a trough): the
+    herd keeps its clearance from them too. For a fenced pen pass pen_area(...) of the fence ring (or the 'area'
+    make_pen / pen_set return). Returns {name: [(kind, first frame, last frame, target), ...]} with kind 'stand'
+    | 'walk'. Deterministic for a seed. pen_report() measures the result."""
     f0, f1 = int(round(frame_start)), int(round(frame_end))
     animals = list(animals)
+    avoid = [o for o in avoid if all(o is not a for a in animals)]
     area = (min(area[0], area[2]), min(area[1], area[3]), max(area[0], area[2]), max(area[1], area[3]))
     room = {a.name: (a.width if clearance is None else float(clearance)) for a in animals}
     rngs = {a.name: pix.rng(9173 * (int(seed) + 1) + 31 * i + 7) for i, a in enumerate(animals)}
     samples = {}                           # name -> {frame: (x, y, yaw)} of what is keyed; later frames: the last one
     ends = {}
     events = {a.name: [] for a in animals}
+    zone = {}                              # name -> where its feet may come to rest, or None (the area is too narrow)
+    for a in animals:
+        m = _reach(a) + room[a.name]
+        zone[a.name] = (area[0] + m, area[1] + m, area[2] - m, area[3] - m) \
+            if area[2] - area[0] > 2.0 * m and area[3] - area[1] > 2.0 * m else None
+    # what stands or moves in the area besides the herd: per thing [(frame, circles)] whenever its circles change
+    tracks = []
+    for o in avoid:
+        line, was = [], None
+        for f in range(f0, f1 + 73):
+            now = _circles(o, f)
+            key = [tuple(round(c, 4) for c in q) for q in now]
+            if key != was:
+                line.append((f, now))
+                was = key
+        tracks.append(([q[0] for q in line], line))
 
     def pose(a, f):
         """(x, y, yaw) of an animal on frame f as keyed so far (after its last key: where it stopped)."""
@@ -1584,29 +2121,80 @@ def wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None
             rec[f] = (p.x, p.y, a.yaw_at(f))
         ends[a.name] = int(fb)
 
-    def clear(a, f, pos, yaw):
-        """Is the body at (pos, yaw) on frame f inside the area and clear of everybody else there then?"""
-        if not _inside(a, pos, yaw, area, room[a.name]):
-            return False
+    def rests(a, pos, yaw):
+        """May the animal come to rest at (pos, yaw) as far as the edge goes?"""
+        zn = zone[a.name]
+        if zn is None:
+            return _inside(a, pos, yaw, area, room[a.name])
+        return zn[0] <= pos[0] <= zn[2] and zn[1] <= pos[1] <= zn[3]
+
+    def others(a, f, pos, yaw, disc=False):
+        """Is the body at (pos, yaw) on frame f clear of everybody and everything else there then? disc=True: the
+        whole circle it sweeps when it turns on the spot there."""
+        mine = [(pos[0], pos[1], _reach(a))] if disc else a.body_points(pos, yaw)
         for b in animals:
             if b is a or b.name not in samples:
                 continue
             x, y, byaw = pose(b, f)
-            if _gap(a, pos, yaw, b, (x, y), byaw) < max(room[a.name], room[b.name]):
+            if _apart(mine, b.body_points((x, y), byaw))[0] < max(room[a.name], room[b.name]):
+                return False
+        for stamps, line in tracks:
+            g = _apart(mine, line[max(bisect.bisect_right(stamps, f) - 1, 0)][1])[0]
+            if g is not None and g < room[a.name]:
+                return False
+        return True
+
+    def stays(a, f, pos, yaw):
+        """May the animal stand at (pos, yaw) from frame f on: nothing in `avoid` comes by there later in the call
+        (it would stand in the player's way: a standing animal does not step aside)."""
+        mine = a.body_points(pos, yaw)
+        for stamps, line in tracks:
+            for _f, circles in line[max(bisect.bisect_right(stamps, f) - 1, 0):]:
+                g = _apart(mine, circles)[0]
+                if g is not None and g < room[a.name]:
+                    return False
+        return True
+
+    def clear(a, f, pos, yaw):
+        """Is the body at (pos, yaw) on frame f inside the area and clear of everybody else there then?"""
+        return rests(a, pos, yaw) and others(a, f, pos, yaw)
+
+    def passes(a, t, x, y, yaw, heading, target, length, v, home):
+        """Can the animal turn on the spot to `heading` and (length > 0) walk to `target`, starting on frame t,
+        and stand there, with what everybody else is keyed to do? The schedule is the one Animal.walk keys."""
+        swing = ch._wrap(heading - yaw)
+        turn_frames = 0 if abs(swing) <= (0.03 if length > 0.0 else 1e-4) else \
+            max(4, int(round(TURN_FRAMES * min(1.0, abs(swing) / 0.8))))
+        ds = walk_distances(length, v) if length > 0.0 else [0.0]
+        last = turn_frames + len(ds) - 1
+        if not stays(a, t + last, target, heading):
+            return False
+        for k in range(0, max(last, max(ends.values()) - t) + 1):       # ... and while the others finish their walks
+            if k <= turn_frames:
+                spot, hyaw = (x, y), yaw + swing * (_smooth(k / float(turn_frames)) if turn_frames else 1.0)
+            elif k < last:
+                u = ds[k - turn_frames] / length
+                spot, hyaw = (x + (target[0] - x) * u, y + (target[1] - y) * u), heading
+            else:
+                spot, hyaw = target, heading
+            edge = rests(a, spot, hyaw) if home else _inside(a, spot, hyaw, area, 0.0)
+            if not edge or not others(a, t + k, spot, hyaw):
                 return False
         return True
 
     # ---- where they start
+    queue = []
     if place:
         placer = pix.rng(4057 * (int(seed) + 1) + 3)
-        for a in animals:
+        for i, a in enumerate(animals):
+            zn = zone[a.name] or area
             found = []                                                   # of a few free spots, the one with most room
             for attempt in range(4000):
-                pos = (float(placer.uniform(area[0], area[2])), float(placer.uniform(area[1], area[3])))
+                pos = (float(placer.uniform(zn[0], zn[2])), float(placer.uniform(zn[1], zn[3])))
                 yaw = float(placer.uniform(-math.pi, math.pi))
-                if clear(a, f0, pos, yaw):
-                    others = [pose(b, f0) for b in animals if b is not a and b.name in samples]
-                    found.append((min([math.hypot(pos[0] - o[0], pos[1] - o[1]) for o in others] or [0.0]), pos, yaw))
+                if clear(a, f0, pos, yaw) and stays(a, f0, pos, yaw):
+                    near = [pose(b, f0) for b in animals if b is not a and b.name in samples]
+                    found.append((min([math.hypot(pos[0] - o[0], pos[1] - o[1]) for o in near] or [0.0]), pos, yaw))
                     if len(found) >= 6:
                         break
             if not found:
@@ -1615,12 +2203,14 @@ def wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None
             _room, pos, yaw = max(found, key=lambda c: c[0])
             a.place(f0, (pos[0], pos[1], z), yaw)
             record(a, f0, f0)
+            queue.append((f0, i))
     else:
-        for a in animals:
-            record(a, f0, f0)
+        for i, a in enumerate(animals):
+            free = max(f0, min(_settles(a, f0), f1))                     # a walk that is still running: let it end
+            record(a, f0, free)
+            queue.append((free, i))
 
     # ---- what they do, in the order of the frames at which each is free again
-    queue = [(f0, i) for i in range(len(animals))]
     heapq.heapify(queue)
     while queue:
         t, i = heapq.heappop(queue)
@@ -1631,40 +2221,55 @@ def wander(animals, frame_start, frame_end, area, seed=0, place=True, speed=None
         first = not events[a.name]
         here = a.pos_at(t)
         x, y, yaw = here.x, here.y, a.yaw_at(t)
-        go = None
-        if not first and r.random() < ch._clamp(0.8 * activity, 0.0, 1.0):
+        go = spin = None
+        keen = not first and r.random() < ch._clamp(0.8 * activity, 0.0, 1.0)
+        if keen:
             lo, hi = a.info["stroll"]
             v = a.walk_speed if speed is None else float(speed)
-            for _try in range(60):                                       # ahead first, then anywhere, then shorter
-                length = float(r.uniform(lo, hi)) * (1.0 if _try < 40 else 0.6)
-                heading = yaw + float(r.uniform(-1.0, 1.0)) * (math.pi if _try >= 15 else 1.6)
+            # one that stands where it may not rest (place=False, put there by the director) may leave from there
+            home = rests(a, (x, y), yaw) or not _inside(a, (x, y), yaw, area, 0.0)
+            plans = []                             # (heading, length, must it end where it can turn freely)
+            for _try in range(60):                 # ahead first, then anywhere, then shorter
+                plans.append((yaw + float(r.uniform(-1.0, 1.0)) * (math.pi if _try >= 15 else 1.6),
+                              float(r.uniform(lo, hi)) * (1.0 if _try < 40 else 0.6), _try < 30))
+            turn0 = float(r.uniform(0.0, math.pi / 6.0))
+            for length in (lo, 0.6 * lo, 0.35 * lo):                     # then every way round, down to a step or two
+                plans.append((yaw, length, False))
+                plans += [(yaw + turn0 + k * math.pi / 6.0, length, False) for k in range(12)]
+            for heading, length, roomy in plans:
                 target = (x + math.sin(heading) * length, y - math.cos(heading) * length)
-                turn_frames = 0 if abs(ch._wrap(heading - yaw)) < 0.03 else max(4, int(round(TURN_FRAMES * min(1.0, abs(ch._wrap(heading - yaw)) / 0.8))))
-                walk_frames = int(math.ceil(length / v * FPS + BRAKE_TAUS * SPEED_TAU))
-                ok = True
-                for k in range(0, turn_frames + walk_frames + 1, 2):
-                    if k <= turn_frames:
-                        u = _smooth(k / float(turn_frames)) if turn_frames else 1.0
-                        here, hyaw = (x, y), yaw + ch._wrap(heading - yaw) * u
-                    else:
-                        u = min(1.0, (k - turn_frames) * v / FPS / length)
-                        here, hyaw = (x + (target[0] - x) * u, y + (target[1] - y) * u), heading
-                    if not clear(a, t + k, here, hyaw):
-                        ok = False
-                        break
-                if ok:
+                if not rests(a, target, heading):
+                    continue
+                if roomy and not others(a, max(ends.values()), target, heading, disc=True):
+                    continue
+                if passes(a, t, x, y, yaw, heading, target, length, v, home):
                     go = target
                     break
-        if go is not None:
-            end = a.walk(t, [(x, y, z), (go[0], go[1], z)], speed=speed, gait=gait)
+            if go is None:                         # hemmed in: at least turn to face another way, if there is room
+                for k in range(1, 12):
+                    heading = yaw + ch._wrap(turn0 + k * math.pi / 6.0)
+                    if passes(a, t, x, y, yaw, heading, (x, y), 0.0, v, home):
+                        spin = heading
+                        break
+        if go is not None or spin is not None:
+            if go is not None:
+                end = a.walk(t, [(x, y, z), (go[0], go[1], z)], speed=speed, gait=gait)
+                events[a.name].append(("walk", t, end, (round(go[0], 3), round(go[1], 3))))
+            else:
+                end = a.turn(t, spin, gait=gait)
+                events[a.name].append(("turn", t, end, None))
             record(a, t, end)
-            events[a.name].append(("walk", t, end, (round(go[0], 3), round(go[1], 3))))
             pause = int(r.integers(8, 40))
             if end + pause < f1 - 14 and pause >= 14:
                 a.idle(end, end + pause, seed=int(r.integers(0, 1 << 30)), watch=watch)
             heapq.heappush(queue, (end + pause, i))
         else:
-            dur = int(r.integers(6, 50) if first else r.integers(24, 80) / max(activity, 0.05))
+            if first:
+                dur = int(r.integers(6, 50))
+            elif keen:                             # it wanted to go and found no way: it tries again sooner
+                dur = int(r.integers(12, 36))
+            else:
+                dur = int(r.integers(24, 80) / max(activity, 0.05))
             end = min(t + dur, f1)
             if end - t >= 14:
                 a.idle(t, end, seed=int(r.integers(0, 1 << 30)), watch=watch)
@@ -1985,6 +2590,156 @@ def _check():
         min(gaps), max(gaps), gaps[-1], end, vmax, stray, -math.degrees(hy)),
         2.3 < gaps[-1] < 2.7 and max(gaps) < 3.6 and vmax <= COW_TEMPT + 0.02 and stray < 0.03 and hy < 0.0)
 
+    # ---- a blow that meets it in the air (LivingEntity.knockback: no second lift; half its speed + the push)
+    q = knock_flight(0.4, (0.0, 1.0), height=0.58, velocity=(0.0, 0.05, -0.11))
+    expect("knock_flight in the air: vertical speed unchanged (%.3f), horizontal %.3f = 0.05 / 2 + 0.4" % (q[0][5], q[0][4]),
+           q[0][5] == -0.11 and abs(q[0][4] - 0.425) < 1e-12 and q[-1][2] == 0.0)
+    hen.place(3000, (0.0, 100.0, 0.0), 0.0)
+    up1 = hen.hurt(3010, attacker=(0.0, 98.0, 0.0))
+    once = hen.pos_at(up1 + 40).y
+    z_hit = hen.pos_at(3022).z
+    up2 = hen.hurt(3022, attacker=(0.0, 98.0, 0.0))
+    top = max(hen.pos_at(f).z for f in np.arange(3022.0, up2 + 1, 0.2))
+    drops = all(hen.pos_at(f + 0.5).z <= hen.pos_at(f).z + 1e-9 for f in np.arange(3022.0, up2 + 1, 0.5))
+    _evaluate(scene, 3028)
+    red = not hen._twins["body"].hide_render
+    expect("hen hit at 3010 and again at 3022 (the game's earliest second hit), %.2f up: not lifted again (top %.2f), "
+           "sinks all the way, lands at frame %d (alone: %d), z %.3f there and %.3f 100 frames on; thrown %.2f in all "
+           "(one blow: %.2f); red again; wings still beating" % (
+               z_hit, top, up2, up1, hen.pos_at(up2).z, hen.pos_at(up2 + 100).z, hen.pos_at(up2 + 40).y - 100.0, once - 100.0),
+           z_hit > 0.4 and top <= z_hit + 1e-9 and drops and abs(hen.pos_at(up2).z) < 1e-9
+           and abs(hen.pos_at(up2 + 100).z) < 1e-9 and hen.pos_at(up2 + 40).y > once + 1.0 and red
+           and hen._flap_run[1][0][1] == 1.0)
+    hen.place(3100, (0.0, 100.0, 0.0), 0.0)
+    hen.hurt(3110, attacker=(0.0, 98.0, 0.0))
+    gone = hen.die(3122, camera=cam, attacker=(0.0, 98.0, 0.0), seed=1)
+    _evaluate(scene, gone)
+    puffs = [q_["object"].matrix_world.translation.z for q_ in hen.bursts[-1].particles if q_["first"] <= gone < q_["last"]]
+    expect("hen hit at 3110 and killed in the air at 3122: the body comes down while it tips (z %.2f at 3122, %.3f at %d), "
+           "the poof starts %.2f to %.2f above the ground" % (hen.pos_at(3122).z, hen.pos_at(gone - 1).z, gone - 1,
+                                                              min(puffs), max(puffs)),
+           hen.pos_at(3122).z > 0.4 and abs(hen.pos_at(gone - 1).z) < 1e-9 and min(puffs) > -0.5 and max(puffs) < 1.3)
+    cow.place(3200, (5.0, 100.0, 0.0), 0.0)
+    cow.hurt(3210, attacker=(5.0, 98.0, 0.0))
+    e = cow.hurt(3216, attacker=(5.0, 98.0, 0.0))
+    top = max(cow.pos_at(f).z for f in np.arange(3210.0, e + 1, 0.2))
+    expect("cow hit at 3210 and again 6 frames later (faster than the game allows): peak %.3f, stands at z %.3f" % (
+        top, cow.pos_at(e + 40).z), abs(top - 0.9648) < 0.01 and abs(cow.pos_at(e + 40).z) < 1e-9)
+    e = cow.hurt(e, attacker=(5.0, 98.0, 0.0))
+    top = max(cow.pos_at(f).z for f in np.arange(e - 12.0, e + 1, 0.2))
+    expect("... and once more on the frame it stands again: lifted like a first blow (%.3f), still sliding, so thrown "
+           "a little further" % top, abs(top - 0.9648) < 0.01 and abs(cow.pos_at(e + 40).z) < 1e-9)
+    hen.place(3300, (0.0, 110.0, 3.0), 0.0)
+    land = hen.fall(3300, (0.0, 108.5, 0.0))
+    e = hen.hurt(3310, attacker=(0.0, 112.0, 0.0))
+    expect("hen hit while it falls from a pillar (%.2f up at 3310; alone it would land at %d): lands at %d on the ground "
+           "below (z %.3f)" % (hen.pos_at(3310).z, land, e, hen.pos_at(e + 30).z),
+           hen.pos_at(3310).z > 1.0 and abs(hen.pos_at(e + 30).z) < 1e-9 and e > 3312)
+    for at, want_z in ((3, 0.0), (8, 1.0)):
+        cow.place(3400, (5.0, 110.0, 0.0), 0.0)
+        cow.hop(3400, (5.0, 109.0, 1.0))
+        e = cow.hurt(3400 + at, attacker=(5.0, 112.0, 0.0), knockback=0.2)
+        expect("cow hit %d frames into a hop up a block: comes down at z = %.0f (%.3f)" % (at, want_z, cow.pos_at(e + 30).z),
+               abs(cow.pos_at(e + 30).z - want_z) < 1e-9)
+
+    # ---- out of a stride: a hop, a fall, a blow in the middle of a planted walk leave no stride pose behind
+    for a_, what in ((cow, "hop"), (cow, "fall"), (cow, "hurt"), (hen, "hop"), (hen, "fall"), (hen, "hurt"), (calf, "hurt")):
+        a_.place(3500, (0.0, 120.0, 1.0), math.radians(90))
+        a_.walk(3500, [(0.0, 120.0, 1.0), (8.0, 120.0, 1.0)])
+        rest_z = a_._rest(a_.hips, _LOC, 2)
+        wide = max(np.arange(3515.0, 3540.0, 0.25), key=lambda f: abs(ch._val(a_.leg_l, _ROT, 0, f)))
+        f_hit = int(round(wide))
+        open_ = abs(ch._val(a_.leg_l, _ROT, 0, f_hit))
+        here = a_.pos_at(f_hit)
+        if what == "hop":
+            e = a_.hop(f_hit, (here.x + 1.0, here.y, 1.0))
+        elif what == "fall":
+            e = a_.fall(f_hit, (here.x + 1.0, here.y, 0.0))
+        else:
+            e = a_.hurt(f_hit, attacker=(here.x - 2.0, here.y, 1.0))
+        _evaluate(scene, e + 30)
+        legs0 = max(max(abs(ob.rotation_euler.x), abs(ob.rotation_euler.y)) for ob in a_.legs.values())
+        _evaluate(scene, f_hit + 4)
+        soon = abs(a_.hips.location.z - rest_z)
+        _evaluate(scene, e + 30)
+        expect("%s %s on frame %d of a walk (legs %.0f deg open): 30 frames after it lands legs %.4f rad, body %.4f off "
+               "its rest height (%.4f after 4 frames)" % (a_.name, what, f_hit, math.degrees(open_), legs0,
+                                                          abs(a_.hips.location.z - rest_z), soon),
+               legs0 < 1e-6 and abs(a_.hips.location.z - rest_z) < 1e-6 and soon < 1e-6)
+
+    # ---- a herd after one leader: one call for all (a fan on both sides), or a call each (they walk round each other)
+    for kind, n_, mk, joint in (("cow", 3, make_cow, True), ("cow", 3, make_cow, False), ("chicken", 4, make_chicken, True),
+                                ("chicken", 4, make_chicken, False), ("cow", 6, make_cow, True)):
+        steve.place(4000, (0.0, 200.0, 0.0), 0.0)
+        steve.__dict__.pop("_followers", None)
+        herd = [mk("f%s%d%d" % (kind[0], n_, i) + ("j" if joint else "s")) for i in range(n_)]
+        for i, a_ in enumerate(herd):
+            a_.place(4000, ((i - (n_ - 1) / 2.0) * (1.8 if kind == "cow" else 1.0), 204.0 + 0.4 * (i % 2), 0.0), 0.0)
+        w_end = steve.walk(4010, [(0.0, 200.0, 0.0), (0.0, 191.0, 0.0)])
+        if joint:
+            end = follow(herd, steve, 4000, w_end + 20)
+        else:
+            end = max(follow(a_, steve, 4000, w_end + 20) for a_ in herd)
+        gap = min(_gap(a_, a_.pos_at(f), a_.yaw_at(f), b_, b_.pos_at(f), b_.yaw_at(f))
+                  for f in range(4000, end + 30) for i, a_ in enumerate(herd) for b_ in herd[i + 1:])
+        away = [(a_.pos_at(end) - steve.pos_at(end)).length for a_ in herd]
+        xs = sorted(a_.pos_at(end).x for a_ in herd)
+        facing = max(abs(ch._wrap(a_.yaw_at(end) - math.atan2(steve.pos_at(end).x - a_.pos_at(end).x,
+                                                              -(steve.pos_at(end).y - a_.pos_at(end).y)))) for a_ in herd)
+        stray = max(_sole_stray(scene, a_) for a_ in (herd[0], herd[-1]))
+        still = max((a_.pos_at(end + 20) - a_.pos_at(end)).length for a_ in herd)
+        expect("%d %ss follow Steve 9 blocks, %s: bodies never closer than %.3f (promised %.2f); at rest (frame %d) "
+               "%.2f-%.2f from him, x %s, facing him within %.0f deg; soles stray %.4f" % (
+                   n_, kind, "one call" if joint else "a call each", gap, FOLLOW_ROOM, end, min(away), max(away),
+                   [round(x_, 2) for x_ in xs], math.degrees(facing), stray),
+               gap >= FOLLOW_ROOM - 2e-3 and 2.2 < min(away) and max(away) < 2.8 and facing < math.radians(25) and stray < 0.05
+               and still < 1e-6 and (not joint or abs(xs[0] + xs[-1]) < 0.3))
+    steve.__dict__.pop("_followers", None)
+    steve.place(4500, (0.0, 200.0, 0.0), 0.0)
+    w_end = steve.walk(4510, [(0.0, 200.0, 0.0), (0.0, 192.0, 0.0)])
+    cow.place(4500, (0.3, 204.0, 0.0), 0.0)
+    calf.place(4500, (0.0, 197.0, 0.0), math.radians(90))                # stands in her way and stays there
+    end = follow(cow, steve, 4500, w_end + 20, avoid=[calf])
+    gap = min(_gap(cow, cow.pos_at(f), cow.yaw_at(f), calf, calf.pos_at(f), calf.yaw_at(f)) for f in range(4500, end + 1))
+    expect("follow(avoid=[a calf standing in her way]): she walks round it, never closer than %.3f, and ends %.2f from Steve"
+           % (gap, (cow.pos_at(end) - steve.pos_at(end)).length),
+           gap >= FOLLOW_ROOM - 2e-3 and 2.2 < (cow.pos_at(end) - steve.pos_at(end)).length < 2.8)
+
+    # ---- hand items end, and go when the player goes; loot and eggs are used in their shot
+    steve.place(5000, (0.0, 300.0, 0.0), 0.0)
+    try:
+        hand_item(steve, "wheat", 5000, None)
+        refused = False
+    except ValueError:
+        refused = True
+    wheat = hand_item(steve, "wheat", 5000, 5100)
+    steve.show(5040, False)
+    steve.show(5060, True)
+    seeds_ = hand_item(steve, "wheat_seeds", 5080, 5100)
+    vis = {}
+    for f in (4999, 5000, 5039, 5040, 5059, 5060, 5079, 5080, 5099, 5100):
+        _evaluate(scene, f)
+        vis[f] = (not wheat.hide_render, not seeds_.hide_render)
+    expect("hand_item: no frame_end is refused; wheat 5000-5079 but not while Steve is hidden (5040-5059), then the "
+           "seeds take over until 5100 %s" % (vis,),
+           refused and [vis[f] for f in sorted(vis)] == [(False, False), (True, False), (True, False), (False, False),
+                                                         (False, False), (True, False), (True, False), (False, True),
+                                                         (False, True), (False, False)])
+
+    class _Stage:                                                        # what lay_egg / drop_loot need of a Stage
+        def __init__(self):
+            self.cast, self.used = {}, []
+
+        def use(self, shot, *things):
+            self.used += [(shot, t.name) for t in things]
+
+    st_ = _Stage()
+    hen.place(5200, (0.0, 310.0, 0.0), 0.0)
+    loot = drop_loot(hen, 5210, stage=st_, shot="s")
+    egg2 = lay_egg(hen, 5205, stage=st_, shot="s")
+    expect("drop_loot / lay_egg(stage=st, shot=s): registered and used in the shot %s" % (st_.used,),
+           sorted(st_.cast) == sorted(it.name for it in loot + [egg2]) and len(st_.used) == 3)
+
     # ---- a pen
     for kind, n, cells in (("cow", 5, (0, 0, 9, 8)), ("chicken", 6, (20, 0, 26, 6))):
         herd = [make_cow("pc%d" % i) if kind == "cow" else make_chicken("ph%d" % i) for i in range(n)]
@@ -1999,6 +2754,23 @@ def _check():
                        2500, 2740, area, seed=5)
         expect("... the same seed gives the same pen", [e[1:] for ev in events.values() for e in ev]
                == [e[1:] for ev in again.values() for e in ev])
+        more = wander(herd, 2740, 2980, area, seed=6, place=False)       # walks of the first call are still running
+        gap, edge = pen_report(herd, 2500, 2980 + 60, area)
+        walks = [sum(1 for e in events[a_.name] + more[a_.name] if e[0] == "walk") for a_ in herd]
+        expect("... and 10 s more with place=False: gap %.2f, from the fence %.2f, walks per animal %s" % (gap, edge, walks),
+               gap >= herd[0].width - 1e-3 and edge >= herd[0].width - 1e-3 and min(walks) >= 1)
+    herd = [make_cow("ac%d" % i) for i in range(4)]
+    area = pen_area(40, 0, 49, 9)
+    steve.place(6000, (44.4, 2.0, 0.0), math.pi)
+    s_end = steve.walk(6020, [(44.4, 2.0, 0.0), (44.4, 6.0, 0.0)])
+    cow.place(6000, (42.5, 1.9, 0.0), math.pi)
+    follow(cow, steve, 6000, s_end + 10)
+    events = wander(herd, 6000, 6240, area, seed=2, avoid=[steve, cow])
+    near = min(_apart(a_.body_points(a_.pos_at(f), a_.yaw_at(f)), _circles(o, f))[0]
+               for f in range(6000, 6300) for a_ in herd for o in (steve, cow))
+    expect("wander(avoid=[Steve walking through the pen, the cow that follows him]): the herd keeps %.2f from both "
+           "(promised %.2f), %d walks" % (near, herd[0].width, sum(1 for ev in events.values() for e in ev if e[0] == "walk")),
+           near >= herd[0].width - 1e-3)
     print("check:", "all %d passed" % len(ok) if all(ok) else "%d of %d FAILED" % (ok.count(False), len(ok)))
     return all(ok)
 
@@ -2182,7 +2954,7 @@ def _selftest(which):
         steve.look_at(1, cow, ease=0)
         steve.swing_arm(8)
         end = cow.hurt(10, attacker=steve)
-        quick.camera(scene, (-0.4, -7.6, 1.5), (-0.7, 0.0, 1.05), lens=42)
+        quick.camera(scene, (-0.6, -7.6, 1.5), (-0.75, 0.0, 1.05), lens=25)
         stills = []
         for i, f in enumerate((9, 11, 15, 20, 26)):
             scene.frame_set(f)
@@ -2199,7 +2971,7 @@ def _selftest(which):
         cow.place(1, (0.0, 0.0, 0.0), math.radians(20))
         hen.place(1, (0.2, -1.5, 0.0), math.radians(-30))
         steve.look_at(1, cow, ease=0)
-        cam = quick.camera(scene, (-0.6, -8.4, 1.7), (-0.8, 0.0, 1.0), lens=42)
+        cam = quick.camera(scene, (-0.4, -8.4, 1.7), (-0.35, 0.0, 1.0), lens=27)
         steve.swing_arm(8)
         gone = cow.die(10, camera=cam, attacker=steve, max_back=1.0, seed=2)
         hen.die(10, camera=cam, attacker=steve, max_back=1.0, seed=5)
@@ -2212,6 +2984,94 @@ def _selftest(which):
                   not cow._twins["body"].hide_render, "puffs", len(live))
         _tile("animals_die_sheet", stills[:4], cols=4)
         _tile("animals_poof_sheet", stills[4:], cols=3)
+
+    if want("hurt2"):
+        # the ordinary way a hen is hit in the game: the second blow lands 12 frames after the first, while she still
+        # floats down (20 frames in the air); she is not lifted again. Second sheet: that blow kills her in the air.
+        for tag, kill in (("hurt2", False), ("die2", True)):
+            scene = stage(res=(640, 360), blur=True, sun=-140.0)
+            steve, hen = ch.make_player("steve"), make_chicken("hen")
+            steve.place(1, (1.5, -0.1, 0.0), math.radians(-90))
+            hen.place(1, (0.0, 0.0, 0.0), math.radians(-70))
+            steve.look_at(1, hen, ease=0)
+            cam = quick.camera(scene, (-2.2, -9.4, 1.6), (-2.0, 0.0, 0.85), lens=35)
+            steve.swing_arm(8)
+            up1 = hen.hurt(10, attacker=steve)
+            steve.walk(11, [(1.5, -0.1, 0.0), (0.1, -0.1, 0.0)], speed=4.3)
+            steve.track(11, 60, hen)
+            steve.swing_arm(20)
+            if kill:
+                end = hen.die(22, camera=cam, attacker=steve, seed=3)
+                frames = (21, 23, 28, 34, 44, end + 3)
+            else:
+                end = hen.hurt(22, attacker=steve)
+                frames = (9, 13, 21, 23, 27, end + 1)
+            print(tag, "first blow 10 (alone she would stand at %d), second blow 22, %s %d" % (
+                up1, "gone at" if kill else "stands at", end))
+            stills = []
+            for i, f in enumerate(frames):
+                scene.frame_set(f)
+                stills.append(quick.render(scene, "animals_%s_%d" % (tag, i + 1)))
+                print("   frame", f, "hen at", tuple(round(c, 2) for c in hen.root.location), "red",
+                      not hen._twins["body"].hide_render, "tipped %.0f deg" % math.degrees(hen.root.rotation_euler.y),
+                      "wings %.0f deg" % math.degrees(hen.wing_r.rotation_euler.y))
+            _tile("animals_%s_sheet" % tag, stills, cols=3)
+
+    if want("hop"):
+        # out of a planted stride: a cow walks up to a step and hops onto it without stopping; the legs fade into the
+        # game's wave, the body comes back up, and it walks on
+        scene = stage(res=(640, 360), blur=True, sun=-150.0, wall=((1, -2, 8, 2), ("grass_block",)))
+        cow = make_cow("cow")
+        cow.place(1, (-5.0, 0.0, 0.0), math.radians(90))
+        cow.walk(1, [(-5.0, 0.0, 0.0), (2.0, 0.0, 0.0)])
+        f_hop = next(f for f in range(1, 200) if cow.pos_at(f).x >= -0.45)
+        here = cow.pos_at(f_hop)
+        land = cow.hop(f_hop, (here.x + 1.9, 0.0, 1.0))
+        end = cow.walk(land, [tuple(cow.pos_at(land)), (6.0, 0.0, 1.0)])
+        print("cow hops on frame", f_hop, "from x %.2f" % here.x, "lands at", land, "walks on until", end)
+        stills = []
+        for i, f in enumerate((f_hop - 2, f_hop + 3, f_hop + 7, land, land + 4, land + 14)):
+            scene.frame_set(f)
+            at = cow.pos_at(f)
+            quick.camera(scene, (0.4, -8.2, 1.5), (0.4, 0.0, 1.0), lens=35)
+            stills.append(quick.render(scene, "animals_hop_%d" % (i + 1)))
+            print("   frame", f, "cow at", tuple(round(c, 2) for c in at), "legs",
+                  [round(math.degrees(ob.rotation_euler.x)) for ob in cow.legs.values()],
+                  "hips %.3f" % (cow.hips.location.z - cow._rest(cow.hips, _LOC, 2)))
+        _tile("animals_hop_sheet", stills, cols=3)
+
+    if want("herd"):
+        # "a player may hold wheat or seeds and they follow": three cows after Steve in ONE follow() call (a fan on
+        # both sides), and four hens after seeds with a call each (each walks round those keyed before it)
+        for tag, kind, joint in (("cows", "cow", True), ("hens", "chicken", False)):
+            scene = stage(res=(960, 540), sun=-140.0, blur=True)
+            steve = ch.make_player("steve")
+            steve.place(1, (0.0, 3.0, 0.0), 0.0)
+            food = hand_item(steve, "wheat" if kind == "cow" else "wheat_seeds", 1, 400)
+            n = 3 if kind == "cow" else 4
+            herd = [(make_cow if kind == "cow" else make_chicken)("%s%d" % (kind, i)) for i in range(n)]
+            for i, a in enumerate(herd):
+                a.place(1, ((i - (n - 1) / 2.0) * (1.8 if kind == "cow" else 1.0), 7.0 + 0.4 * (i % 2), 0.0), 0.0)
+            steve.raise_arm(1, 30, ease=0)
+            w_end = steve.walk(10, [(0.0, 3.0, 0.0), (0.0, -4.0, 0.0)])
+            if joint:
+                end = follow(herd, steve, 1, w_end + 20, look=food)
+            else:
+                end = max(follow(a, steve, 1, w_end + 20, look=food) for a in herd)
+            steve.face(w_end + 2, herd[n // 2])
+            gap = min(_gap(a, a.pos_at(f), a.yaw_at(f), b, b.pos_at(f), b.yaw_at(f))
+                      for f in range(1, end + 1) for i, a in enumerate(herd) for b in herd[i + 1:])
+            print("herd of %d %ss (%s): Steve stops at frame %d, they rest at %d; bodies never closer than %.2f; they end at %s"
+                  % (n, kind, "one call" if joint else "a call each", w_end, end, gap,
+                     [tuple(round(c, 2) for c in a.pos_at(end).xy) for a in herd]))
+            for i, f in enumerate((w_end - 30, end + 12)):
+                scene.frame_set(f)
+                mid = steve.pos_at(f)
+                if kind == "cow":
+                    quick.camera(scene, (mid.x + 6.2, mid.y - 4.6, 4.6), (mid.x, mid.y + 1.6, 0.6), lens=30)
+                else:                                                    # from above: the fan and the room between them
+                    quick.camera(scene, (mid.x - 2.6, mid.y - 5.4, 5.6), (mid.x + 0.9, mid.y + 1.1, 0.3), lens=38)
+                print("wrote", quick.render(scene, "animals_herd_%s_%d" % (tag, i + 1)))
 
     if want("pen") or want("pen_cow") or want("pen_chicken"):
         _pen_test([k for k in ("cow", "chicken") if want("pen") or want("pen_" + k)])
@@ -2232,25 +3092,34 @@ def _pen_test(kinds, frames=(30, 102), res=(960, 540)):
 
     scene = quick.reset()
     look.setup_render(scene, res=res, samples=16, threads=2, motion_blur=True)
-    v = village.build_village(scene, seed=1)
+
+    def edit(b):
+        """The pens, built into the village (engine/village.py: FILM SETS)."""
+        for kind in kinds:
+            pen_set(b, *PENS[kind]["cells"], gates=[PENS[kind]["gate"]], name="pen_" + kind)
+
+    v = village.build_village(scene, seed=1, edit=edit)
     look.set_time(scene, "day", sun_azimuth=205.0, sun_elevation=46.0)
     look.setup_compositor(scene, bloom=1.0, grade="warm")
     v.set_lantern_energy(0.0)
     herds = {}
     for kind in kinds:
         cfg = PENS[kind]
-        pen = make_pen(scene, *cfg["cells"], gates=[cfg["gate"]], name="pen_" + kind)
+        pen = v.sets["pen_" + kind]
         if kind == "cow":
             herd = [make_cow("cow%d" % i) for i in range(5)] + [make_cow("calf", baby=True)]
         else:
             herd = [make_chicken("hen%d" % i) for i in range(6)] + [make_chicken("chick%d" % i, baby=True) for i in range(2)]
-        events = wander(herd, 1, frames[-1] + 30, pen["area"], seed=cfg["seed"])
+        events = wander(herd, 1, frames[-1] + 30, pen["area"], seed=cfg["seed"], z=pen["z"])
         gap, edge = pen_report(herd, 1, frames[-1] + 30, pen["area"])
         print("%s pen %s, inside %s: %d animals, %d walks in %d frames; smallest gap between bodies %.2f, from the fence %.2f"
               % (kind, cfg["cells"], tuple(round(c, 2) for c in pen["area"]), len(herd),
                  sum(1 for ev in events.values() for e in ev if e[0] == "walk"), frames[-1] + 30, gap, edge))
         for name, ev in events.items():
             print("   %-7s %s" % (name, " ".join("%s %d-%d" % (e[0], e[1], e[2]) for e in ev)))
+        ring = [c for c in pen["cells"] + pen["inside"] if v.world.block_id(c[0], c[1], int(pen["z"])) in
+                ("short_grass", "tall_grass", "poppy", "dandelion", "oxeye_daisy", "cornflower")]
+        print("   plants left on the ring or inside: %d" % len(ring))
         herds[kind] = herd
     for kind in kinds:
         cfg = PENS[kind]
