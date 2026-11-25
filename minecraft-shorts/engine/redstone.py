@@ -55,6 +55,8 @@ PUBLIC API (k = redstone.kit(v) after build_village; every builder returns a par
         13 or more -> RedstoneError, nothing moves; a block of the set's mesh in the way -> RedstoneError.
     .retract(t, pull="auto") -> t + 2.4           a sticky piston pulls the block in front of its head (None: not)
     .cancel(t)        take back the move starting at t (and its blocks' moves)
+    .place(frame, player=None)   not there before `frame` (beat 13: placed on a powered spot it fires at once:
+                      p.place(f, player=efe); p.extend(f) shows the slime face on frame f, the bare arm out by f + 3)
     .travel(t) (0 in .. 1 out)  .extended_at(t)  .look_at_frame(f) ('R' block / 'S' short head / 'L' long head)
     .head_point(t)    arm_inside(piston, frame) -> bool (the check that no head pokes out or leaves a gap)
   PISTON DOOR / ROW
@@ -117,7 +119,7 @@ WHAT THE GAME DOES (read from the classes; the constants at the top carry the cl
   falling  FallingBlock.getDelayAfterPlace = 2: an anvil whose plank is pulled away starts to fall 2 ticks after
            (for engine/fixtures.py; this module leaves it hanging).
 
-MEASURED (`$BPY -m engine.redstone`: 26 numeric checks + 3 in the village; stills out/test/redstone_*.png)
+MEASURED (`$BPY -m engine.redstone`: 27 numeric checks + 3 in the village; stills out/test/redstone_*.png)
   Piston: for moves starting at any phase of a frame, every frame's head (short / long) stays inside the base over
   the whole exposure and the moved block touches the head plate at every sampled moment (no gap, no overlap).
   extend(10.0): frames 8-9 the block model, 10 the short head, 11+ the long one; the head is 0.10 out at the
@@ -225,12 +227,18 @@ def _wire_colors():
     return tuple(out)
 
 
-WIRE_COLORS = _wire_colors()        # power 0..15 -> (r, g, b) 0..255: 0 = (76, 0, 0), 15 = (255, 51, 0)
+WIRE_COLORS = _wire_colors()        # power 0..15 -> (r, g, b) 0..255: 0 = (76, 0, 0), 1 = (112, 0, 0), 15 = (255, 50, 0)
 
 # ---- film choices (NOT the game; each one stated in the docstring) ----------------------------------------------
-DUST_GLOW = 0.6                      # emission of lit dust at power 15 (x power / 15): a shader pack's subtle glow
-TORCH_GLOW = (1.4, 0.65, 0.12)       # redstone torch texture: (strength, only texels brighter than V, the rest)
-REPEATER_GLOW = (0.8, 0.9, 0.0)      # lit repeater: the bright red texels of its top; its torches as TORCH_GLOW
+DUST_GLOW = 0.4                      # emission of lit dust at power 15 (x power / 15): a shader pack's subtle glow
+DUST_ALBEDO = 0.35                   # diffuse colour of power-15 dust x this (linear; weaker dust less, see dust_albedo):
+DUST_ALBEDO_KNEE = 0.3               # the look's sunlit floor is 1.24 x its texture, the shoulder starts at 0.76 and a
+                                     # fully saturated red above it drifts to salmon pink (the look's highlight
+                                     # shoulder + sRGB); dust whose tint red is under KNEE (linear) keeps its colour
+TORCH_GLOW = (0.8, 0.5, 0.12)        # lit redstone torch texels: (the pale core, the bright red, the rest: the stick);
+                                     # pale = HSV value > 0.65 and saturation < 0.6, red = value > 0.65, saturation >= 0.6
+TORCH_RED_ALBEDO = 0.55              # diffuse colour of the bright red torch / repeater texels x this (as DUST_ALBEDO)
+REPEATER_GLOW = (0.0, 0.8, 0.0)      # lit repeater top (repeater_on): its bright red texels glow, nothing else
 LAMP_WATTS = 122.0                   # = 1.11 x the village torch (props: 110 W): the game's brightness ratio of light
                                      # 15 to 14 at two blocks (lightmap.fsh through sets.lightmap: 0.799 / 0.719)
 REDSTONE_TORCH_WATTS = 37.0          # = 0.34 x the torch: level 7 against 14 at two blocks (0.243 / 0.719)
@@ -404,6 +412,152 @@ def _material(texture, tint=None, shade=None, glow=None, dim=None):
     return mat
 
 
+def _styled(texture, tint=None, shade=None, dim=None, albedo=None, red_albedo=None, glow=None, cull=False):
+    """A part's material: engine.blocks' material for the texture (the set's own, tint and dim multiplied in like a
+    tint) with the module's film choices on a copy of it:
+      albedo       the diffuse colour x this (linear), every texel (dust: DUST_ALBEDO through dust_albedo())
+      red_albedo   the diffuse colour of the bright saturated texels only (value > 0.65, saturation >= 0.6) x this
+      glow         (pale, red, rest): emission (the texel's own colour) of the bright pale texels (value > 0.65,
+                   saturation < 0.6: the torch's core), the bright red texels, and every other texel
+      cull         back faces transparent: the game draws blocks with back-face culling (RenderPipelines: the
+                   terrain pipelines keep the default cull), which the lit torch's inward-facing halo relies on
+    The emission is seen, not sampled as a light (the part's point light lights the scene)."""
+    if dim is not None and dim < 0.999:
+        t = tint or (255, 255, 255)
+        tint = tuple(int(round(c * dim)) for c in t)
+    base = _blocks.block_material(texture, tint, None, None, shade)
+    return _restyle(base, albedo, red_albedo, glow, cull)
+
+
+def _restyle(base, albedo=None, red_albedo=None, glow=None, cull=False):
+    """A copy of a Principled game-texture material with _styled()'s film choices (cached by name)."""
+    if albedo is None and red_albedo is None and glow is None and not cull:
+        return base
+    key = "|rs%s%s%s%s" % ("a%.3g" % albedo if albedo is not None else "",
+                           "r%.3g" % red_albedo if red_albedo is not None else "",
+                           "g%.3g,%.3g,%.3g" % tuple(glow) if glow is not None else "", "c" if cull else "")
+    name = base.name + key
+    if len(name) > 63:
+        import hashlib
+
+        name = base.name[:44] + "|" + hashlib.md5((base.name + key).encode()).hexdigest()[:12]
+    mat = bpy.data.materials.get(name)
+    if mat is not None:
+        return mat
+    nt0 = base.node_tree
+    if nt0 is None or not any(n.type == "BSDF_PRINCIPLED" for n in nt0.nodes):
+        return base                                  # (an 'up_thin' two-sided material: never a redstone part)
+    mat = base.copy()
+    mat.name = name
+    nt = mat.node_tree
+    N, L = nt.nodes.new, nt.links.new
+    tex = next(n for n in nt.nodes if n.type == "TEX_IMAGE")
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    outn = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
+
+    def math(op, a, b):
+        n = N("ShaderNodeMath")
+        n.operation = op
+        for i, v in enumerate((a, b)):
+            if isinstance(v, (int, float)):
+                n.inputs[i].default_value = float(v)
+            else:
+                L(v, n.inputs[i])
+        return n.outputs[0]
+
+    hsv = N("ShaderNodeSeparateColor")
+    hsv.mode = "HSV"
+    L(tex.outputs["Color"], hsv.inputs[0])
+    bright = math("GREATER_THAN", hsv.outputs[2], 0.65)
+    satur = math("GREATER_THAN", hsv.outputs[1], 0.5999)
+    red = math("MULTIPLY", bright, satur)
+    pale = math("MULTIPLY", bright, math("SUBTRACT", 1.0, satur))
+    if albedo is not None or red_albedo is not None:
+        fac = float(albedo if albedo is not None else 1.0)
+        if red_albedo is not None:
+            fac = math("MULTIPLY", math("ADD", math("MULTIPLY", red, float(red_albedo) - 1.0), 1.0), fac)
+        sc = N("ShaderNodeVectorMath")
+        sc.operation = "SCALE"
+        L(tex.outputs["Color"], sc.inputs[0])
+        if isinstance(fac, float):
+            sc.inputs["Scale"].default_value = fac
+        else:
+            L(fac, sc.inputs["Scale"])
+        L(sc.outputs["Vector"], bsdf.inputs["Base Color"])
+    if glow is not None:
+        g_pale, g_red, g_rest = (float(v) for v in glow)
+        strength = math("ADD", math("ADD", math("MULTIPLY", red, g_red - g_rest), math("MULTIPLY", pale,
+                                                                                         g_pale - g_rest)), g_rest)
+        L(tex.outputs["Color"], bsdf.inputs["Emission Color"])
+        L(strength, bsdf.inputs["Emission Strength"])
+        mat.cycles.emission_sampling = "NONE"
+    if cull:
+        link = outn.inputs["Surface"].links[0]
+        src = link.from_socket
+        nt.links.remove(link)
+        geo = N("ShaderNodeNewGeometry")
+        clear = N("ShaderNodeBsdfTransparent")
+        mix = N("ShaderNodeMixShader")
+        L(geo.outputs["Backfacing"], mix.inputs[0])
+        L(src, mix.inputs[1])
+        L(clear.outputs[0], mix.inputs[2])
+        L(mix.outputs[0], outn.inputs["Surface"])
+    mat["mc_redstone_style"] = key
+    return mat
+
+
+DUST_HUE_REF = 0.6                   # the linear brightness at which dust_tint() matches the displayed hue (it varies
+                                     # by under 1 degree over 0.3 .. 0.9)
+
+
+def _linear_to_srgb(c):
+    c = max(0.0, float(c))
+    return c * 12.92 if c <= 0.0031308 else 1.055 * c ** (1.0 / 2.4) - 0.055
+
+
+def _grade_saturation():
+    """The saturation of the look's grade (engine.look GRADES 'warm' / 'cool': 0.97)."""
+    from . import look
+
+    return float(min(g["saturation"] for k, g in look.GRADES.items() if k in ("warm", "cool")))
+
+
+def dust_tint(level):
+    """The colour (0..255) dust of a power level is drawn with: the game's (wire_color) with its green raised so that,
+    after the look's grade, the DISPLAYED hue is the game's. The grade's saturation step (0.97, in linear HSV: the
+    smallest channel of every colour rises to 3 % of the largest) lifts the blue of power-15 dust from 12 to 44 in
+    sRGB and turned its hue from the game's 11.8 degrees to a crimson 5.7 (measured: palette_check). Dust whose game
+    colour has no green (power 12 and below) is unchanged; red stays the game's."""
+    r0, g0, _b0 = wire_color(level)
+    if g0 <= 0:
+        return wire_color(level)
+    s = _grade_saturation()
+    hue = g0 / float(r0)                                   # the game's sRGB hue ratio (g - b) / (r - b), b = 0
+    v = DUST_HUE_REF
+    b2 = _linear_to_srgb((1.0 - s) * v)                    # the displayed blue after the grade
+    r2 = _linear_to_srgb(v)
+    g2 = b2 + hue * (r2 - b2)                              # the displayed green the game's hue needs
+    g_lin = (_srgb_to_linear(g2) - (1.0 - s) * v) / s      # ... before the grade
+    x = max(0.0, g_lin / v)                                # green / red in linear light
+    g = _linear_to_srgb(x * _srgb_to_linear(r0 / 255.0)) * 255.0
+    return (r0, int(round(min(255.0, g))), 0)
+
+
+def dust_albedo(level):
+    """The factor on the diffuse colour of dust at a power level (1 up to DUST_ALBEDO_KNEE, DUST_ALBEDO at 15; the
+    linear red it leaves rises with the level): see DUST_ALBEDO."""
+    r = _srgb_to_linear(wire_color(level)[0] / 255.0)
+    r15 = _srgb_to_linear(wire_color(15)[0] / 255.0)
+    if r <= DUST_ALBEDO_KNEE or r15 <= DUST_ALBEDO_KNEE:
+        return 1.0
+    u = (r - DUST_ALBEDO_KNEE) / (r15 - DUST_ALBEDO_KNEE)
+    return 1.0 - (1.0 - DUST_ALBEDO) * u
+
+
+def _srgb_to_linear(c):
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
 def _quads(block_id, props):
     """Every baked Quad of a block state (the game's models, blockstate rotations, uvlock)."""
     return mc.bake_block(block_id, props, 0)
@@ -421,13 +575,25 @@ def _object(kit, name, quads, mat_for, location, collection=None):
     return ob
 
 
-def _plain(block_id, dim=None, glow_for=None):
-    """quad -> material as engine.blocks gives it (tint by the block's tintindex), dimmed / glowing on request."""
+def _plain(block_id, dim=None, style_for=None):
+    """quad -> material as engine.blocks gives it (tint by the block's tintindex), dimmed on request; style_for(q)
+    -> None or the film-choice keywords of _styled() for that quad (a styled quad is never dimmed: it glows)."""
     def f(q):
-        g = glow_for(q) if glow_for else None
-        return _material(q.texture, mc.block_tint(block_id, q.tintindex), getattr(q, "shade", None), g,
-                         None if g else dim)
+        st = style_for(q) if style_for else None
+        tint = mc.block_tint(block_id, q.tintindex)
+        if st:
+            return _styled(q.texture, tint, getattr(q, "shade", None), **st)
+        return _material(q.texture, tint, getattr(q, "shade", None), None, dim)
     return f
+
+
+def _lit_style(q):
+    """The film choices of a LIT torch or repeater face (None: the face is drawn as the set draws it)."""
+    if q.texture == "block/redstone_torch":
+        return dict(red_albedo=TORCH_RED_ALBEDO, glow=TORCH_GLOW, cull=True)
+    if q.texture == "block/repeater_on":
+        return dict(red_albedo=TORCH_RED_ALBEDO, glow=REPEATER_GLOW)
+    return None
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -476,9 +642,39 @@ class Kit:
         except ReferenceError:
             return False
 
-    def _dim(self, sky_light):
+    def _dim(self, sky_light, cell=None):
+        """The brightness a part is drawn with for a sky-light level, EXACTLY as engine.sets draws a World cell at
+        that level (sets.lightmap of Environment._step: levels below 11 in pairs, nothing under LIGHT_FLOOR = 3,
+        the Environment's Brightness gamma), so a part and the baked wall beside it get the same factor.
+        sky_light="auto": the set's own baked level (the brightest empty cell beside the part's cell; 15 where the
+        set has no Environment). None: no dimming."""
         level = self.sky_light if sky_light is None else sky_light
-        return None if level is None else lightmap(level)
+        if level is None:
+            return None
+        from . import sets
+
+        env = getattr(self.world, "sets_environment", None)
+        if level == "auto":
+            level = self.auto_level(cell) if cell is not None else 15
+        gamma = getattr(env, "gamma", sets.LIGHT_GAMMA)
+        f = sets.lightmap(sets.Environment._step(int(round(float(level)))), gamma)
+        return None if f >= 0.999 else f
+
+    def auto_level(self, cell):
+        """The sky light engine.sets baked around a cell: the brightest of the cell and its six neighbours that are
+        not full blocks in the World (a part's visible faces look into them); 15 where nothing was baked."""
+        env = getattr(self.world, "sets_environment", None)
+        if env is None or cell is None:
+            return 15
+        c = _cell(cell)
+        best = None
+        for d in (None,) + DIRS6:
+            n = c if d is None else _add(c, d)
+            if d is not None and self.world is not None and self.world.is_full_cube(*n):
+                continue
+            lv = env.light.get(n, 15)
+            best = lv if best is None else max(best, lv)
+        return 15 if best is None else best
 
     # ---- what is where ----------------------------------------------------------------------------------
     def world_block(self, cell):
@@ -524,6 +720,19 @@ class Kit:
             t = self.tracks[ob.name] = _Track(ob)
         return t
 
+    def unique_name(self, base):
+        """`base`, or base_2, base_3 ... when a part of this kit already has that name (Stage keys st.cast by
+        name: two parts with one name would leave one of them unmanaged at the cuts)."""
+        names = getattr(self, "_names", None)
+        if names is None:
+            names = self._names = set()
+        name, k = base, 1
+        while name in names:
+            k += 1
+            name = "%s_%d" % (base, k)
+        names.add(name)
+        return name
+
     # ---- parts ------------------------------------------------------------------------------------------
     def block(self, block_id, cell, props=None, frame=None, name=None, sky_light=None):
         """A movable block of its own (engine.breaking.place_block: a Breakable) that pistons push and pull."""
@@ -534,7 +743,7 @@ class Kit:
             raise RedstoneError("redstone.block: cell %s holds %s in the set's World: carve it in the hook"
                                 % (cell, self.world_block(cell)[0]))
         b = breaking.place_block(self.collection, block_id, cell, props, world=self.world, name=name, frame=frame)
-        dim = self._dim(sky_light)
+        dim = self._dim(sky_light, cell)
         if dim is not None:
             me = b.object.data = b.object.data.copy()
             for i, m in enumerate(list(me.materials)):
@@ -688,7 +897,7 @@ class _Part:
         self.kit = kit_
         self.cell = _cell(cell)
         base = name or "%s_%d_%d_%d" % (self.kind, self.cell[0], self.cell[1], self.cell[2])
-        self.name = base
+        self.name = kit_.unique_name(base)
         self.looks = None
         self.lights = []
         kit_.parts.append(self)
@@ -763,7 +972,13 @@ class _Movable:
                 _ride_rekey(self.kit, thing, self, fs, fe)
 
     def show(self, frame, visible=True):
+        """Per-shot visibility (the Breakable's)."""
         self.breakable.show(frame, visible)
+
+    @property
+    def objects(self):
+        """[the block's object] (for Stage.hero)."""
+        return [self.object]
 
     @property
     def center(self):
@@ -840,7 +1055,7 @@ class Lever(_Part):
         kit_._claim(self.cell, self)
         self.face, self.facing, self.powered0 = face, facing, bool(powered)
         self.hist = {}                  # frame -> (powered, ease frames)
-        dim = kit_._dim(sky_light)
+        dim = kit_._dim(sky_light, self.cell)
         props = {"face": face, "facing": facing, "powered": "true"}
         part = mc.resolve_blockstate("lever", props)[0]          # powered=true: model block/lever (handle at -45)
         self.part = part
@@ -997,26 +1212,110 @@ def _part_matrix(part):
     return Matrix((cols[0], cols[1], cols[2])).transposed()
 
 
-def flip_by(player, lever, frame, sync="game", look=True, ease=0):
+REACH_LIMIT = math.radians(40.0)     # flip_by(reach=True): the most the film reach raises the arm
+
+
+def _root_fcurves(ob):
+    ad = ob.animation_data
+    if ad is None or ad.action is None:
+        return []
+    fcs = getattr(ad.action, "fcurves", None)
+    if fcs is not None:
+        return list(fcs)
+    out = []
+    for layer in getattr(ad.action, "layers", []):
+        for strip in layer.strips:
+            for bag in getattr(strip, "channelbags", []):
+                out.extend(bag.fcurves)
+    return out
+
+
+def flip_by(player, lever, frame, sync="game", look=True, ease=0, look_from=None, reach=False):
     """A player flips a lever: his arm swing (engine.players attack) starts ON `frame` (the click) and the lever
     changes LEVER_SHOW_TICKS later (sync="game": the frame after), or on the frame his hand is nearest the handle
-    (sync="hand": a film choice that reads in a close-up). look=True turns his head to the handle (6-frame ease
-    ending on the click). Call after his place() / walk. Returns the frame the lever changes on."""
+    (sync="hand": a film choice that reads in a close-up). look=True turns his head to the handle over the frames
+    before the click: from look_from (default: 6 frames before, but never before his last place(): no pre-roll
+    into the shot before; a click on the very frame he is placed gets no turn: place him looking at it).
+    reach=True (a film choice): his arm is lifted during the swing (delta_rotation_euler of the right arm, at most
+    REACH_LIMIT) so his hand passes through the middle of the handle on the frame it is nearest; the plain swing
+    passes up to 0.42 block below a wall lever in the block above the floor. Call after his place() / walk.
+    Returns the frame the lever changes on."""
     hp = lever.hand_point(frame - 1, 0.5)
     if look:
-        player.look_at(frame - 6, hp, ease=6)
+        start = frame - 6 if look_from is None else int(look_from)
+        if look_from is None:
+            cut = _last_cut_any(player, frame)
+            if cut is not None:
+                start = max(start, cut)
+        if frame - start >= 1:
+            player.look_at(start, hp, ease=frame - start)
     player.attack(frame)
+    best = None
+    for f in range(int(frame), int(frame) + 10):
+        d = (Vector(player.item_point("right", f)) - hp).length
+        if best is None or d < best[0]:
+            best = (d, f)
+    if reach:
+        _reach(player, hp, frame, best[1])
     if sync == "hand":
-        best = None
-        for f in range(int(frame), int(frame) + 10):
-            d = (Vector(player.item_point("right", f)) - hp).length
-            if best is None or d < best[0]:
-                best = (d, f)
         f_flip = best[1]
     else:
         f_flip = frame_of(at(frame, LEVER_SHOW_TICKS))
     lever.flip(f_flip, ease)
     return f_flip
+
+
+def _last_cut_any(player, frame):
+    best = None
+    for fc in _root_fcurves(player.root):
+        if fc.data_path != "location":
+            continue
+        for kp in fc.keyframe_points:
+            f = kp.co.x + 0.25
+            if kp.interpolation == "CONSTANT" and abs(f - round(f)) < 1e-3 and round(f) <= frame + 1e-6:
+                best = int(round(f)) if best is None else max(best, int(round(f)))
+    return best
+
+
+def _reach(player, target, frame, f_near):
+    """Lift the right arm about its parent's X axis (through the shoulder) during the swing that starts on `frame`
+    so the hand reaches `target` on f_near: delta_rotation_euler.x keyed 0 -> angle -> 0 (smooth)."""
+    arm = player.arm_r
+    scene = bpy.context.scene
+    cur, sub = scene.frame_current, scene.frame_subframe
+    scene.frame_set(int(f_near))
+    pivot = arm.matrix_world.translation.copy()
+    axis = (arm.parent.matrix_world.to_3x3() @ Vector((1.0, 0.0, 0.0))).normalized() if arm.parent else \
+        Vector((1.0, 0.0, 0.0))
+    scene.frame_set(cur, subframe=sub)
+    hand = Vector(player.item_point("right", f_near))
+    u, v = hand - pivot, Vector(target) - pivot
+    u -= axis * u.dot(axis)
+    v -= axis * v.dot(axis)
+    if u.length < 1e-6 or v.length < 1e-6:
+        return 0.0
+    ang = math.atan2(axis.dot(u.cross(v)), u.dot(v))
+    ang = max(-REACH_LIMIT, min(REACH_LIMIT, ang))
+    end = frame + 6 * TICK + 1.0
+    fc0 = _fcurve(arm, "delta_rotation_euler", 0)
+    keep = [(kp.co.x, kp.co.y) for kp in fc0.keyframe_points if not (frame - 0.01 <= kp.co.x <= end + 0.01)]
+
+    def put(a):
+        ks = sorted(keep + [(float(frame), 0.0), (float(f_near), a), (end, 0.0)])
+        fc = _keys(arm, "delta_rotation_euler", [k[0] for k in ks], [k[1] for k in ks], "BEZIER", index=0)
+        for kp in fc.keyframe_points:
+            kp.handle_left_type = kp.handle_right_type = "AUTO_CLAMPED"
+        fc.update()
+
+    put(ang)                                       # delta rotations sit outside the arm's own: check the direction
+    d_pos = (Vector(player.item_point("right", f_near)) - Vector(target)).length
+    put(-ang)
+    d_neg = (Vector(player.item_point("right", f_near)) - Vector(target)).length
+    if d_pos <= d_neg:
+        put(ang)
+    else:
+        ang = -ang
+    return ang
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1041,7 +1340,7 @@ class Piston(_Part):
         kit_._claim(self.cell, self)
         if extended:
             kit_._claim(self.head_cell, self)
-        dim = kit_._dim(sky_light)
+        dim = kit_._dim(sky_light, self.cell)
         bid = "sticky_piston" if sticky else "piston"
         mat = _plain(bid, dim)
         self.retracted_ob = _object(kit_, self.name + "_block", _quads(bid, {"facing": facing, "extended": "false"}),
@@ -1057,6 +1356,7 @@ class Piston(_Part):
                              "L": [self.base_ob, self.head_long]}, "L" if extended else "R")
         self.moves = {}                 # t0 -> 'extend' | 'retract'
         self.pushed = {}                # t0 -> [movables]
+        self.placed = None              # the frame it is placed on (None: there from the start)
         self._rekey()
 
     # ---- state over time
@@ -1086,13 +1386,29 @@ class Piston(_Part):
             return "R"
         return "S" if self.travel(f + 0.25) <= SHORT_ARM_UNTIL + 1e-9 else "L"
 
+    def place(self, frame, player=None, hand="right"):
+        """Not there before whole frame `frame` (a player's swing starts ON frame - 1 when given: the block is
+        there the frame after the click). A piston placed where it is powered extends in the same tick
+        (PistonBaseBlock.onPlace -> checkIfExtend): p.place(f); p.extend(f). Returns frame."""
+        f = int(frame)
+        if player is not None:
+            player.attack(f - 1, hand)
+        self.placed = f
+        self._rekey()
+        return float(f)
+
     def _rekey(self):
         self.looks.hist.clear()
+        self.looks.initial = None if self.placed is not None else ("L" if self.extended0 else "R")
+        if self.placed is not None:
+            self.looks.set(self.placed, self.look_at_frame(self.placed))
         if self.moves:
             lo = int(math.floor(min(self.moves))) - 2
             hi = int(math.ceil(max(self.moves) + PISTON_FRAMES)) + 2
-            prev = self.looks.initial
+            prev = self.looks.at(lo - 1)
             for f in range(lo, hi + 1):
+                if self.placed is not None and f < self.placed:
+                    continue
                 lk = self.look_at_frame(f)
                 if lk != prev:
                     self.looks.set(f, lk)
@@ -1287,6 +1603,7 @@ class PistonDoor:
     def __init__(self, kit_, cells, side, block="stone", closed=True, name="piston_door", sky_light=None):
         if side not in DIRS6:
             raise RedstoneError("piston_door: side is one of %s" % (DIRS6,))
+        name = kit_.unique_name(name)
         self.kit, self.name, self.side = kit_, name, side
         self.cells = [_cell(c) for c in cells]
         self.pistons, self.blocks = [], []
@@ -1308,7 +1625,21 @@ class PistonDoor:
         return self.kit.extend_all(self.pistons, frame)
 
     def is_open(self, t):
+        """True while the door is (being) opened at film time t."""
         return not self.pistons[0].extended_at(t)
+
+    def power(self, t):
+        """(circuit step) powered pistons extend: the door CLOSES at t (as in the game: a door that opens on a lever
+        has its pistons wired through an inverter, or call open()). Returns t."""
+        if self.is_open(t):
+            self.close(t)
+        return float(t)
+
+    def unpower(self, t):
+        """(circuit step) the pistons lose power and retract: the door OPENS at t. Returns t."""
+        if not self.is_open(t):
+            self.open(t)
+        return float(t)
 
     def show(self, frame, visible=True):
         for p in self.pistons:
@@ -1319,11 +1650,6 @@ class PistonDoor:
     @property
     def objects(self):
         return [o for p in self.pistons for o in p.objects] + [b.object for b in self.blocks]
-
-    def seam(self):
-        """World point in the middle of the door's face on the side away from the pistons' wall... the doorway."""
-        c = Vector(self.cells[0]) + Vector((0.5, 0.5, 0.5))
-        return c
 
 
 def door_cells(cells, side):
@@ -1341,6 +1667,7 @@ class PistonRow:
 
     def __init__(self, kit_, cells, facing, carry="oak_planks", extended=True, sticky=True, name="piston_row",
                  sky_light=None):
+        name = kit_.unique_name(name)
         self.kit, self.name = kit_, name
         self.pistons, self.blocks = [], []
         for i, c in enumerate(cells):
@@ -1362,11 +1689,33 @@ class PistonRow:
         """Every piston extends on `frame`, pushing its block out. Returns the end time."""
         return self.kit.extend_all(self.pistons, frame)
 
+    def extended_at(self, t):
+        """True while the row is (being) extended at film time t (its first piston)."""
+        return self.pistons[0].extended_at(t) if self.pistons else False
+
+    def power(self, t):
+        """(circuit step) every piston powered at t extends (those already out stay). Returns t."""
+        for p in self.pistons:
+            p.power(t)
+        return float(t)
+
+    def unpower(self, t):
+        """(circuit step) every piston loses power at t and retracts, the sticky ones pulling their blocks."""
+        for p in self.pistons:
+            p.unpower(t)
+        return float(t)
+
     def show(self, frame, visible=True):
+        """Per-shot visibility of the pistons and their blocks."""
         for p in self.pistons:
             p.show(frame, visible)
         for b in self.blocks:
             b.show(frame, visible)
+
+    @property
+    def objects(self):
+        """Every object of the row (for Stage.hero)."""
+        return [o for p in self.pistons for o in p.objects] + [b.object for b in self.blocks]
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1407,14 +1756,19 @@ def dust_quads(props):
     out = []
     for k, part in enumerate(mc.resolve_blockstate("redstone_wire", props)):
         for q in mc.bake_part(part):
-            ys = {round(p[1], 4) for p in q.pts}
-            if len(ys) == 1:                                  # a flat piece (y 0.25 +- the thin offset)
-                if next(iter(ys)) < 0.25:
-                    continue                                   # its underside
+            d = q.facing
+            if q.thin and d in mc.DIR_VEC:
+                axis = 1 if d in ("down", "up") else (2 if d in ("north", "south") else 0)
+                edge = 16.0 if d in ("up", "south", "east") else 0.0
+                if abs(q.pts[0][axis] - edge) < 1.0:
+                    continue                                   # the twin facing the block it lies on: never seen
+            pts = q.pts
+            if len({round(p[1], 4) for p in q.pts}) == 1:      # a flat piece (y 0.25 + the thin offset)
                 pts = [(p[0], p[1] + k * DUST_LAYER_PX, p[2]) for p in q.pts]
-                q = mc.Quad(pts, q.uvs, q.texture, q.tintindex, q.overlay, q.cull, q.facing, q.thin,
-                            getattr(q, "shade", None))
-            out.append(q)
+            # one opaque cut-out face lit like an up-facing surface (shade 'up': up normals, a plain material).
+            # NOT engine.mcassets' two-sided 'up_thin' material: that one lets the ray through to the twin it
+            # expects behind it, and with the twin gone the floor showed through and turned the dust pink.
+            out.append(mc.Quad(pts, q.uvs, q.texture, q.tintindex, q.overlay, q.cull, q.facing, False, "up"))
     return out
 
 
@@ -1434,7 +1788,7 @@ class Wire(_Part):
             kit_._claim(c, self)
         self.dots = {_cell(c) for c in dots}
         self.source = _cell(source) if source is not None else cells[0]
-        self.dim = kit_._dim(sky_light)
+        self.dim = kit_._dim(sky_light, self.cell)
         self.states = {c: kit_.wire_state(c, c in self.dots) for c in cells}
         self.looks_by_cell = {}
         self.hist = {c: {} for c in cells}           # cell -> {frame: level}
@@ -1471,11 +1825,19 @@ class Wire(_Part):
             props = dict(self.states[c])
             props["power"] = str(level)
             quads = dust_quads(props)
-            tint = wire_color(level)
-            glow = (DUST_GLOW * level / 15.0, None, 0.0) if level > 0 and DUST_GLOW > 0 else None
+            tint = dust_tint(level)
+            g = DUST_GLOW * level / 15.0
+            a = dust_albedo(level)
+            style = {}
+            if level > 0 and g > 0:
+                style["glow"] = (g, g, g)
+            if a < 0.999:
+                style["albedo"] = a
 
-            def mat(q, tint=tint, glow=glow):
-                return _material(q.texture, tint, getattr(q, "shade", None), glow, None if glow else self.dim)
+            def mat(q, tint=tint, style=style):
+                if style:                                  # lit dust is never dimmed by a dark set: it glows
+                    return _styled(q.texture, tint, getattr(q, "shade", None), **style)
+                return _material(q.texture, tint, getattr(q, "shade", None), None, self.dim)
 
             ob = _object(self.kit, "%s_%d_%d_%d_p%d" % (self.name, c[0], c[1], c[2], level), quads, mat, c)
             ob.visible_shadow = False                  # dust is a flat overlay: it casts no shadow worth tracing
@@ -1567,14 +1929,6 @@ class Wire(_Part):
 # ----------------------------------------------------------------------------------------------------
 # repeater, lamp, torch
 # ----------------------------------------------------------------------------------------------------
-def _glow_for_texture(texture):
-    if texture == "block/redstone_torch":
-        return TORCH_GLOW
-    if texture == "block/repeater_on":
-        return REPEATER_GLOW
-    return None
-
-
 class Repeater(_Part):
     """A repeater (RepeaterBlock) with its delay 1..4, unlit / lit (models repeater_<n>tick[_on])."""
 
@@ -1587,14 +1941,13 @@ class Repeater(_Part):
         kit_._claim(self.cell, self)
         self.toward, self.delay = toward, int(delay)
         self.facing = OPPOSITE[toward]                      # the game's FACING: the input side
-        dim = kit_._dim(sky_light)
+        dim = kit_._dim(sky_light, self.cell)
         obs = {}
         for on in (False, True):
             props = {"facing": self.facing, "delay": str(self.delay), "locked": "false",
                      "powered": "true" if on else "false"}
-            glow = (lambda q: _glow_for_texture(q.texture)) if on else None
             obs[on] = _object(kit_, "%s_%s" % (self.name, "on" if on else "off"), _quads("repeater", props),
-                              _plain("repeater", dim, glow), self.cell)
+                              _plain("repeater", dim, _lit_style if on else None), self.cell)
         self.looks = _Looks({False: [obs[False]], True: [obs[True]]}, bool(powered))
 
     @property
@@ -1660,7 +2013,7 @@ class Lamp(_Lit):
     def __init__(self, kit_, cell, lit=False, name=None, sky_light=None, watts=None):
         super().__init__(kit_, cell, name)
         kit_._claim(self.cell, self)
-        dim = kit_._dim(sky_light)
+        dim = kit_._dim(sky_light, self.cell)
         off = _object(kit_, self.name + "_off", _quads("redstone_lamp", {"lit": "false"}), _plain("redstone_lamp", dim),
                       self.cell)
         on = _object(kit_, self.name + "_on", _quads("redstone_lamp", {"lit": "true"}), _plain("redstone_lamp"),
@@ -1710,7 +2063,7 @@ class Torch(_Lit):
             raise RedstoneError("torch: wall = north | east | south | west (the side it leans out to) or None")
         kit_._claim(self.cell, self)
         self.wall = wall
-        dim = kit_._dim(sky_light)
+        dim = kit_._dim(sky_light, self.cell)
         bid = "redstone_torch" if wall is None else "redstone_wall_torch"
         looks = {}
         for on in (False, True):
@@ -1718,9 +2071,8 @@ class Torch(_Lit):
             if wall:
                 props["facing"] = wall
             quads = _quads(bid, props)
-            glow = (lambda q: _glow_for_texture(q.texture)) if on else None
             looks[on] = [_object(kit_, "%s_%s" % (self.name, "lit" if on else "unlit"), quads,
-                                 _plain(bid, None if on else dim, glow), self.cell)]
+                                 _plain(bid, None if on else dim, _lit_style if on else None), self.cell)]
             if on:
                 top = max(p[1] for q in quads for p in q.pts)
                 pts = [mc.to_blender(p) for q in quads for p in q.pts if p[1] >= top - 3.0]
@@ -1790,13 +2142,12 @@ def hold_torch(player, hand="right", frame=None, glow=True, watts=HELD_TORCH_WAT
     if ob is None or not glow:
         return ob
     ob.data = ob.data.copy()
-    tex = ob.data.materials[0].get("mc_texture", "block/redstone_torch") if ob.data.materials else \
-        "block/redstone_torch"
-    strength, above, base = TORCH_GLOW
-    mat = mc.material(tex, alpha="OPAQUE", emission=strength, emit_above=above, emit_base=base)
-    mat.cycles.emission_sampling = "NONE"
-    ob.data.materials.clear()
-    ob.data.materials.append(mat)
+    mats = list(ob.data.materials)
+    for i, m in enumerate(mats):                  # the sprite's own materials (front / back / edges) restyled
+        if m is None:
+            continue
+        if m.get("mc_texture", "") == "block/redstone_torch":
+            ob.data.materials[i] = _restyle(m, red_albedo=TORCH_RED_ALBEDO, glow=TORCH_GLOW)
     if watts:
         L = _props.make_light("torch", ob.users_collection[0] if ob.users_collection else None)
         L.name = ob.name + "_glow"
@@ -1909,6 +2260,12 @@ ROW = dict(cells=[(x, 43, 3) for x in (14, 15, 16, 17)], facing="north", lever=(
 BENCH = dict(torch=(19, 18, 0), dust=[(20, 18, 0), (21, 18, 0)], repeater=(22, 18, 0), lamp=(23, 18, 1),
              block=(23, 18, 0), piston=(23, 17, 0), piston_facing="south", player=(20.6, 19.55, 0.0))
 LEVER = dict(pier=(7, 24), lever=(7, 25, 1), facing="north")
+PALETTE = dict(cam=(5.5, 35.0, 2.2), target=(5.5, 36.5, 0.0))
+SKIES = {"golden": SKY,                                                  # the look-dev golden hour
+         "dusk": dict(preset="dusk", az=187.0, el=5.0, bloom=1.3, grade="warm"),       # films/lookdev 'lookdev_dusk'
+         "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool")}    # films/_multisky_demo
+CLOSE = dict(dust=[(x, 23, 0) for x in (22, 23, 24, 25)], repeater=(25, 24, 0), torch=(24, 24, 0),
+             cam=(24.75, 25.75, 0.95), target=(24.55, 24.0, 0.42), focus=(24.5, 24.45, 0.55))
 
 
 def proof_set(b):
@@ -2021,6 +2378,13 @@ def build_proof(scene, sky=None):
     cam(s, (21.1, 32.5, 5.0), (21.1, 26.3, 0.4), 25, 11.0)
     out["frames"]["sheet_b"] = s.frame_start + 2
 
+    # ---- close: the lit torch (its halo), a lit repeater and power-15 dust, close enough to count texels
+    P["close_dust"] = k.wire(CLOSE["dust"], power=15)
+    P["close_repeater"] = k.repeater(CLOSE["repeater"], "west", delay=2, powered=True)
+    s = st.shot("close", 0.5)
+    cam(s, CLOSE["cam"], CLOSE["target"], 40, 5.6, focus=CLOSE["focus"])
+    out["frames"]["close"] = s.frame_start + 2
+
     # ---- dust: shapes, and the 16 power levels along a U from a lever
     u = [(x, 40, 0) for x in range(4, 12)] + [(11, 39, 0)] + [(x, 38, 0) for x in range(11, 3, -1)]
     P["lever_dust"] = k.lever((3, 40, 0), "floor", "west", powered=True)
@@ -2034,6 +2398,10 @@ def build_proof(scene, sky=None):
     s = st.shot("dust", 0.5)
     cam(s, (7.6, 28.8, 9.4), (7.6, 36.0, 0.1), 30, 8.0)
     out["frames"]["dust"] = s.frame_start + 2
+    s = st.shot("palette", 0.5)                      # power-15 dust close (the cross and the dot): palette_check()
+    cam(s, PALETTE["cam"], PALETTE["target"], 24, 8.0)
+    out["frames"]["palette"] = s.frame_start + 2
+    out["palette_parts"] = [P["dust_cross"], P["dust_dot"]]
 
     # ---- bench: beat 7 (the narrator plants the torch; the line, the repeater, the lamp, the piston)
     s = st.shot("bench", 1.0)
@@ -2115,7 +2483,7 @@ def build_proof(scene, sky=None):
     return out
 
 
-PROOFS = ("sheet_a", "sheet_b", "dust", "bench", "lever", "column", "row", "door")
+PROOFS = ("sheet_a", "sheet_b", "close", "dust", "bench", "lever", "column", "row", "door")
 STRIP_RES = {"bench": (640, 360), "row": (640, 360), "door": (360, 640), "column": (360, 640),
              "lever": (360, 640)}     # tiles of the strips: landscape for the subjects that lie along a line
 SHEET_RES = (960, 540)               # the two part sheets are landscape (the same pixels as a 540x960 still)
@@ -2192,6 +2560,74 @@ def _stills(names, samples=16):
         w, h = STRIP_RES[name]
         paths.append(_sheet(tiles, name + "_strip", 3 if w > h else len(tiles), labels))
     return paths
+
+
+PALETTE_HUE = (8.0, 15.0)            # power-15 dust as the game draws it in daylight: (255, 50, 0) x the texel, hue
+PALETTE_SAT = 0.85                   # 11.8 degrees, saturation 1.0 (the check's bounds, as the review asked)
+PALETTE_SAT_LOOK = 0.76              # in the finished look: its grade (saturation 0.97 in linear HSV) lets no bright
+                                     # pixel keep more than about 0.81 (min channel >= 3 % of max in linear light)
+
+
+def _hsv(rgb):
+    import colorsys
+
+    h, s, v = colorsys.rgb_to_hsv(*(float(c) / 255.0 for c in rgb))
+    return h * 360.0 if h < 0.5 else h * 360.0 - 360.0, s, v
+
+
+def palette_check(skies=("golden", "dusk"), res=(360, 640)):
+    """Render the 'palette' close-up of power-15 dust in each sky twice (with the dust, and with the dust invisible
+    to the camera), take the pixels the dust covers (changed, eroded by one pixel: no edge pixel mixed with the
+    floor), and check the median of their brighter half: hue PALETTE_HUE, saturation >= PALETTE_SAT. Writes
+    out/test/redstone_palette_<sky>.png. Returns the number of failures."""
+    import os
+
+    from PIL import Image
+
+    fails = 0
+    for sky in skies:
+        scene = _fresh(res=res, samples=16)
+        out = build_proof(scene, sky=SKIES[sky])
+        f = out["frames"]["palette"]
+        path = _render(scene, out["film"], f, "palette_" + sky)
+        tree = getattr(scene, "compositing_node_group", None)
+        sat = tree.nodes.get("look_saturation") if tree is not None else None
+        if sat is not None:
+            sat.mute = True
+        nograde = _render(scene, out["film"], f, "palette_%s_nosat" % sky)
+        if sat is not None:
+            sat.mute = False
+        for part in out["palette_parts"]:
+            for ob in part.objects:
+                ob.visible_camera = False
+        bare = _render(scene, out["film"], f, "palette_%s_nodust" % sky)
+        a = np.asarray(Image.open(path).convert("RGB")).astype(np.float64)
+        c = np.asarray(Image.open(nograde).convert("RGB")).astype(np.float64)
+        b = np.asarray(Image.open(bare).convert("RGB")).astype(np.float64)
+        os.remove(bare)
+        os.remove(nograde)
+        m = np.abs(a - b).sum(axis=2) > 60.0
+        core = m.copy()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            core &= np.roll(np.roll(m, dy, axis=0), dx, axis=1)
+        if core.sum() < 50:
+            print("FAIL palette %s: only %d dust pixels" % (sky, core.sum()))
+            fails += 1
+            continue
+        res_ = []
+        for img in (a, c):
+            px = img[core]
+            top = px[px[:, 0] >= np.median(px[:, 0])]
+            med = np.median(top, axis=0)
+            res_.append((tuple(int(round(v)) for v in med),) + _hsv(med))
+        (col, h, s, v), (col2, h2, s2, _v2) = res_
+        good = PALETTE_HUE[0] <= h <= PALETTE_HUE[1] and s2 >= PALETTE_SAT and s >= PALETTE_SAT_LOOK
+        fails += 0 if good else 1
+        print("%-4s palette %-6s power-15 dust (%d px, brighter half): in the look %s hue %.1f (%g-%g) saturation %.2f "
+              "(>= %.2f, the grade's ceiling); before the grade's saturation step %s hue %.1f saturation %.2f (>= %.2f)"
+              % ("OK" if good else "FAIL", sky, core.sum(), col, h, PALETTE_HUE[0], PALETTE_HUE[1], s,
+                 PALETTE_SAT_LOOK, col2, h2, s2, PALETTE_SAT), flush=True)
+    return fails
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -2296,6 +2732,12 @@ def _check():
         ok("extending an extended piston: RedstoneError", False)
     except RedstoneError:
         ok("extending an extended piston: RedstoneError", True)
+    pp = k.piston((10, 10, 0), "north", sticky=True)
+    pp.place(20)
+    pp.extend(20.0)
+    ok("a piston placed on frame 20 and fired at once: absent before, the slime face (short head) on 20, the arm "
+       "out after", [pp.looks.at(f) for f in (18, 19, 20, 21, 23)] == [None, None, "S", "L", "L"],
+       str([pp.looks.at(f) for f in (18, 19, 20, 21, 23)]))
     # a normal piston leaves the block; a sticky one pulls it
     pn = k.piston((6, 10, 0), "east")
     bn = k.block("stone", (7, 10, 0))
@@ -2438,6 +2880,8 @@ def _main(argv):
             return 2
         _stills(names)
         return 0
+    if argv and argv[0] == "palette":
+        return 1 if palette_check(tuple(argv[1:]) or ("golden", "dusk")) else 0
     n = _check()
     if not argv or argv[0] != "quick":
         n += _check_village()

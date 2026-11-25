@@ -8,7 +8,8 @@ fingerprint of exactly the frames whose picture it changes, and nothing else may
   - the lava's light flicker (keyed light energy),
   - a chest lid opening (keyed rotation, sampled over the shutter),
   - an anvil falling and landing chipped (keyed location, then another object on the landing frame),
-  - items taken by a hopper (engine.mobs DroppedItems keyed by Hopper.stream).
+  - items taken by a hopper (engine.mobs DroppedItems keyed by Hopper.stream): nothing before the release frame,
+  - per-shot show() of a fluid (its six ray flags) and of a chest (hide_render), as films.lookdev.Stage keys them.
 Each case is a small scene of its own (a stone floor and the one thing, final render settings: motion blur on).
 Fingerprints must not depend on the order a process takes the frames in, and the same scene built in another
 PROCESS must give the same digest (the known trap of animated materials, CONTRACT.md): the tool runs itself again
@@ -113,6 +114,16 @@ def case_hopper(st):
     return h.stream(items, 10, every=6, height=2.0, seed=1)
 
 
+def case_show(st):
+    w = fixtures.water_sheet(st, 0, 0, 3, 3, 0, amount=8, name="w", animated=False)
+    c = fixtures.chest(st, (5, 1, 0), "south", animated=False)
+    for thing in (w, c):
+        thing.show(1, False)
+        thing.show(30, True)
+        thing.show(60, False)
+    return w, c
+
+
 def main(child=False):
     digest = hashlib.sha1()
 
@@ -179,7 +190,20 @@ def main(child=False):
     last = max(gone)
     ok("hopper: after the last take the fingerprint stays the same", all(ha[f] == ha[last] for f in FRAMES if f >= last))
     ok("hopper: the same fingerprints in reverse order", ha == hb)
+    first = min(int(round(p["track"][0][0])) for p in plans)
+    ok("hopper: nothing changes before the first release (frame %d), and the frame it is released changes" % first,
+       all(ha[f] == ha[1] for f in FRAMES if f < first) and ha[first] != ha[first - 1])
     digest.update(json.dumps(ha, sort_keys=True).encode())
+
+    # show(): a still water sheet and a static chest hidden 1-29, shown 30-59, hidden from 60
+    scene, film, _things = scene_with(case_show)
+    sa = prints(scene, film)
+    sb = prints(scene, film, order=list(reversed(FRAMES)))
+    ok("show(): a fluid's and a chest's fingerprint changes on exactly the frames they are shown / hidden (30, 60)",
+       changed(sa) == [30, 60], "changed %s" % runs(changed(sa)))
+    ok("show(): the same fingerprints in reverse order; the hidden frames 1 and 60 are equal", sa == sb
+       and sa[1] == sa[60] and sa[1] != sa[30])
+    digest.update(json.dumps(sa, sort_keys=True).encode())
 
     print("DIGEST %s" % digest.hexdigest(), flush=True)
     if not child:

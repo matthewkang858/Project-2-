@@ -8,8 +8,10 @@
     films/hello_door_gold.py   beats 4, 5, 15, 20-22  the child's door in golden light
     films/hello_meadow.py      beats 6-8, 12-14       exit gate, meadow road, forest wall, the three signs
 
-    $BPY -m tools.hello_timeline              the shot plan: frames, words, skies (no scene is built)
-    $BPY -m tools.hello_shots render ...      stills of single shots (see its docstring): the scouting tool
+    $BPY -m tools.hello_timeline [--check]    the shot plan: frames, words, skies (no scene is built); caption proof
+    $BPY -m tools.hello_shots render ...      stills of single shots (see its docstring): THE scouting tool
+    $BPY -m tools.hello_geo --sky S SHOT:F    where every head lands in the frame, face size, facing, what blocks it
+    $BPY -m tools.hello_palette --sky S F     tools/palette_check on one frame at final quality
     $BPY -m render hello --still S [--zones]  one frame through render.py (each sky is one build)
 
 A sequence file exposes ONE FUNCTION PER SHOT, named like the shot:  def dn02_fight(st, s, C, nar)
@@ -20,48 +22,64 @@ A sequence file exposes ONE FUNCTION PER SHOT, named like the shot:  def dn02_fi
     nar  the engine.narration.Narration (nar.at("word", sentence="b04") = the frame the word's caption appears on;
          C.at(s, "word") = the same within shot s)
 build() in films/hello.py calls these functions IN TIMELINE ORDER, each exactly once, after every shot exists.
+FIVE PEOPLE EDIT AT ONCE: build() imports each sequence file, and calls each shot function, inside a guard. A file
+that does not import, or a shot that raises, is printed as "[hello] !!! ..." with its traceback and gets a plain
+stand-in (its location's camera, nobody in it); the other files still build. HELLO_STRICT=1 in the environment
+turns the guard off: hand in only when `HELLO_STRICT=1 $BPY -m tools.hello_shots build --sky <each of your skies>`
+runs without a "!!!" line. Scout with tools/hello_shots.py / hello_geo.py / hello_palette.py (they write no
+meta.json). If you also preview through render.py, use YOUR OWN sample count so no two directors share a preview
+directory (out/preview/hello/270x480_<N>spp): square 5, door_night 6, interior 7, door_gold 9, meadow 10.
 
 THE SEQUENCE CONTRACT (what a sequence director may and must do)
   MAY   edit his own file only: the bodies of its shot functions, its docstrings, private helpers and constants.
         Make further twins of the shared cast with his own tags (C.actor("child", "dg2")). Add a film-local light
-        with C.fill(...) (hidden outside the shots he names). Move a camera of his own shots freely, unless the
-        row below names a SHARED camera or place for it.
+        with C.fill("<prefix>_<name>", ...) (the name starts with his prefix; hidden outside the shots he names).
+        Move a camera of his own shots freely, unless the row below names a SHARED camera or place for it.
   MUST  keep every shot function's name and signature;
         give every shot a camera (s.lens + s.move or s.follow, s.focus, s.handheld: nothing is ever dead still;
-        something already moving on its first frame), its cast (st.use: everybody else is hidden), what it is
-        about (st.hero, inside x 8-82 %, y 14-60 % of the frame, clear of the caption band y 62-72 %) and its torch
-        levels (C.lights once per shot; beat 3 a second time with at=);
+        something already moving on its first frame: C.cam moves with ease "ease_out", at speed on frame 1), its
+        cast (st.use: everybody else is hidden), what it is about (st.hero, inside x 8-82 %, y 14-60 % of the
+        frame, clear of the caption band y 62-72 %) and its torch levels (C.lights once per shot; beat 3 a second
+        time with at=);
         take characters only through C.actor(role, tag) with a tag that starts with HIS prefix (sq, dn, in, dg,
         me), and items through C.item(item_id, tag): no other sequence can then disturb his keys;
         key each character in frame order; place() everybody on the first frame of a shot before any look_at();
         key nobody before a shot starts unless that instance is NOT in the shot before (pre-roll: use a twin);
         use the shared places and cameras where the plan names them (SHARED below), unchanged;
         keep the watcher's face unreadable before dg22 (from behind, cropped above the mouth, or out of focus with
-        the face under about ten pixels at 540x960) and keep his body dead still (C.actor("watcher", ...) is built
-        still: place() him once per shot and turn nothing but, at most, his head);
-        render what he changed (tools/hello_shots.py at 540x960, 16 samples) and LOOK at it.
+        the face under about ten pixels at 540x960: he wears Steve's plain skin, so a readable face shows BLUE eyes
+        and makes the last line false) and keep his body dead still (C.actor("watcher", ...) is built still:
+        place() him once per shot and turn nothing but, at most, his head);
+        render what he changed (tools/hello_shots.py at 540x960, 16 samples) and LOOK at it; run tools/hello_palette
+        on one frame per shot.
   MUST NOT  touch films/hello.py, this file, another sequence file or anything in engine/, render.py, tools/
         (his own new tools/hello_<seq>_*.py excepted); change the narration, the cuts, a sky or the film's length;
         make anything depend on which sky is being built (no `if sky ...`: every build keys the same things);
         call st.shot / st.sky_change / st.dip / st.finish (the film does); key hide_render on a character, its
         armor or its items (st.use does it); boost torches beyond LIGHTS without tools/palette_check; build a
-        character with st.actor / players.make_player directly (it would escape the twin rule).
+        character with st.actor / players.make_player directly (it would escape the twin rule); start a final
+        render (render.py --frames without --res / --samples).
   If a shared place or camera is wrong for his shot, he says so in his result; he does not move it.
 
 SHARED (decided once, used by two shots or two sequences)
   CAMS["door_front"]  beats 2 and 18, exactly (zombie at the door, night)            door_night
   CAMS["beside"]      beat 19: their two backs from the north-west, drifting left     door_night
   CAMS["two_shot"]    beats 4 and 22, exactly, with C.doorstep_fill(s) in both       door_gold
-  CAMS["bed"]         beats 3 and 16, exactly (both beds, the north window)          interior
+  the bed camera      beats 3 and 16 identical to each other: CAMS["bed"] is the start; both shots are the
+                      interior director's, so he may replace it by one constant of his file used in both
   CAMS["gate"]        beats 6 and 7, exactly (hello_set's gate camera, 22 mm)        meadow
   PLACES["watch_door"] + WATCH_YAW: where the watcher stands by the door and which way he faces (the door): beats
                       19, 20, 21, 22; Steve stands exactly there, facing the same way, in beat 4 (so beat 22 can
                       repeat beat 4's picture). Beat 15c (the third jump: the corner of the child's own house)
                       uses the PLACE but he faces the house fronts there (in profile to its camera: no face)
+  PLACES["watch_far"], ["watch_mid"], ["watch_door"], ["watch_window"]: his road toward the child's door, one
+                      step per scene: beyond the next house (15a), the next house (15b), the corner of the child's
+                      house (15c), under its window (17), beside the door (19-22)
   PLACES["hello_child"]  the child at his feet: beats 4, 5 (start), 20 (end), 21, 22
   PLACES["step"]      the zombie's place on the step (breaking.stand_point): beats 2, 18, 19; the rotten flesh
                       lies there in beat 20
   RED_BED / CHILD_BED the beds of Steve and the child: beats 3 and 16 (the red one is Steve's, in front)
+  The skies (films/hello.py SKIES) and the light recipes LIGHTS, MORNING, DOORSTEP_FILL, EYE_GLOW.
 
 Coordinates: Blender blocks, +X east, +Y north, +Z up; ground 0.0, dirt path -1/16, house_a's floor +1.0.
 house_a (the child's house; plains_medium_house_1), checked block by block with tools/hello_probe.py layers:
@@ -72,10 +90,11 @@ house_a (the child's house; plains_medium_house_1), checked block by block with 
   height of a zombie on the step, one block either side of the door); north of the door ONE block of wall
   (y -7) and the corner log (y -6): the house's north-west corner is at (10, -5); south of the door the wall
   runs to y -14 with the ONE glass pane of this front at (10, -11, 2).
-  INSIDE: the table (fence + pressure plate) at (11, -11) under the pane, oak-stairs chairs at (11, -10) (faces
-  north, seat z 1.5) and (11, -12); the beds along the east wall, pillows east: house_a_bed_2 at y -10 (the north
-  one), house_a_bed_1 at y -12 (the south one), each cells x 18..19; night stands (fence + plate) at (19, -9) and
-  (19, -13); a wall torch between the pillows at (19, -11, 2); two-pane windows in the north wall of the bed wing
+  INSIDE (as the film has it; _edit changes two things, marked *): * the oak-stairs chair RIGHT UNDER the pane at
+  (11, -11) (facing east: its seat is the west half, z 1.5) and the table (fence + pressure plate) beside it at
+  (11, -10) (the template has them the other way round); the second chair at (11, -12); the beds along the east
+  wall, pillows east: house_a_bed_2 at y -10 (the north one), house_a_bed_1 at y -12 (the south one), each cells
+  x 18..19; a night stand (fence + plate) at (19, -9) (* the one at (19, -13) is taken out); a wall torch between the pillows at (19, -11, 2); two-pane windows in the north wall of the bed wing
   (17..18, -8, 2: right behind the north bed), in its south wall (17..18, -14, 2) and in the west wing's south
   wall (12..13, -14, 2) and north wall (12..13, -6, 2); a gable pane at (20, -11, 4).
   Cutaways (Village.cutaways, Stage.see_through / remove): house_a_east (east end), house_a_south (south wall
@@ -104,9 +123,41 @@ RED_BED, CHILD_BED = "house_a_bed_1", "house_a_bed_2"
 BED_COLORS = {RED_BED: "red"}
 
 
+NIGHT_STAND_OUT = (19, -13)            # house_a's night stand south of the red bed's pillow (fence + pressure plate)
+
+
 def _edit(b):
-    """The village's edit hook: everything the story adds to the set (engine/sets.py hello_set, as it is)."""
+    """The village's edit hook: everything the story changes in the set.
+    1. engine/sets.py hello_set, as it is (forest wall, floating oak, bare oaks, sand pyramid).
+    2. house_a's night stand at (19, -13) is taken out: it is the one thing between CAMS["bed"] and Steve's head on
+       the red bed's pillow (a ray from every lens position along the south wall under the roof hits its pressure
+       plate; out/test/check_hello_technical_night_160_hi.png shows his body without his head). The room keeps the
+       other night stand (19, -9) beside the child's bed.
+    3. house_a's table and its north chair change places: the chair (oak stairs facing east: its seat is the west
+       half, x 11..11.5, z 1.5) stands RIGHT UNDER the one pane of the west front (10, -11, 2), the table (fence +
+       pressure plate) beside it at (11, -10). "The child stands on the chair beside the table under the west
+       window", nose to the pane: its eyes (z 2.3) are then in the middle of the pane, seen straight through it
+       from the plaza (beat 17). With the template's layout the chair is NORTH of the pane's opening and a 1-block
+       wall shows only a sliver of the child's face, at the sill (out/test/hello_scout_win2_crop.png).
+    Everything else in the houses is the template."""
     sets.hello_set(b)
+    x, y = NIGHT_STAND_OUT
+    b.allow((x, y, x, y))
+    for z in (1, 2):
+        if b.w.block_id(x, y, z) in ("oak_fence", "oak_pressure_plate"):
+            b.w.set(x, y, z, None)
+    (cx, cy), (tx, ty) = WINDOW_CHAIR_CELL, WINDOW_TABLE_CELL
+    b.allow((cx, min(cy, ty), cx, max(cy, ty)))
+    fence, plate, chair = b.w.get(cx, cy, 1), b.w.get(cx, cy, 2), b.w.get(tx, ty, 1)
+    if fence and fence[0] == "oak_fence" and chair and chair[0] == "oak_stairs":
+        b.w.set(cx, cy, 2, None)                                      # the table's pressure plate
+        b.w.set(cx, cy, 1, "oak_stairs", dict(chair[1] or {}, facing="east", shape="straight"))
+        b.w.set(tx, ty, 1, "oak_fence", dict(fence[1] or {}))
+        if plate:
+            b.w.set(tx, ty, 2, plate[0], dict(plate[1] or {}))
+
+
+WINDOW_CHAIR_CELL, WINDOW_TABLE_CELL = (11, -11), (11, -10)     # see _edit, 3.
 
 
 def build_set(scene):
@@ -139,22 +190,32 @@ PLACES = {
     "hello_child": (9.25, -6.41),         # the child at his feet for the hello (beats 4, 5, 20 end, 21, 22): a
     #                                       block in front of him toward the door, right of the two-shot's line
     "run_off": (4.6, -3.2),               # beat 5: the child runs off along the plaza toward here
-    # ---- "one house closer" (beat 15): the three places, far to near, seen north along the house fronts
-    "watch_far": (8.3, 14.6),             # beyond the next house (house_b), at the corner of house_f
+    # ---- "one house closer" (beat 15): the three places, far to near, seen north along the house fronts from CAMS
+    #      "house_fronts": they lie almost on one line toward the lens (x 45 / 42 / 40 % of the frame), so he does
+    #      not wander across the picture, he grows: face 31 / 44 / 140 px wide (all three in profile)
+    "watch_far": (8.3, 11.5),             # beyond the next house (house_b), in front of house_f's south-east corner
+    #                                       (the log at (8, 12)). Was (8.3, 14.6): that is INSIDE house_f's east wall
+    #                                       and the camera saw no figure (ray to his eyes: oak log at 21.9 blocks)
     "watch_mid": (8.4, 5.2),              # at the next house: in front of house_b
     #   (the third is "watch_door")
-    # ---- the plaza seen through the west window (beat 17)
-    "watch_plaza": (3.4, -6.7),           # on the plaza north of the door, 7 blocks out, facing the house: on the
-    #                                       line from CAMS "window" through the pane
-    "window": (10.5, -10.5, 2.5),         # middle of the one glass pane of the west wall
-    "window_chair": (11.5, -9.5, 1.5),    # the seat of the oak-stairs chair north of the table: the child stands here
+    # ---- beat 17, the story's fallback (seen from OUTSIDE, over his shoulder, the child's face in the pane)
+    "watch_window": (7.3, -10.95),        # on the plaza 2.7 blocks out from the west wall, in front of the one
+    #                                       pane, his back to CAMS "window_out", facing the pane: between
+    #                                       the corner of beat 15 and the door of beat 19, a step closer than both.
+    #                                       (The plaza place of the first plan, (3.4, -6.7), was below the sill line
+    #                                       of every inside camera: the pane is 2 blocks above the plaza.)
+    "window": (10.5, -10.5, 2.5),         # middle of the one glass pane of the west wall (x 10, y -11..-10, z 2..3)
+    "window_chair": (11.25, -10.5, 1.5),  # the child on the SEAT of the chair right under the pane (_edit, 3.: the
+    #                                       stairs face east, the seat is their west half, z 1.5): its eyes at
+    #                                       z 2.3 in the middle of the pane, 0.75 block behind the glass
     # ---- the square (beats 1, 9, 10, 11)
     "guard": (-1.2, -6.3),                # beat 1: Steve on guard south of the bell, looking down the south street
     "guard_child": (-0.45, -6.0),         # ... the child at his leg
     "watch_square": (0.5, 9.6),           # beats 9, 10, 11: the watcher at the mouth of the exit road, facing south
     "grownups": ((4.0, 3.0), (5.3, 3.8)),     # beat 10: the farmer and the toolsmith, facing each other, north-east
     #                                       of the well (which fills x -2..2, y -2..2 with its roof posts)
-    "grownups_child": (5.4, 1.6),         # ... the child in front of them, left of the line to the gap
+    "grownups_child": (5.3, 2.1),         # ... the child in front of them, left of the line to the gap, 2.5 blocks
+    #                                       from the lens (nearer, its head was in the caption band at the frame edge)
     "stare_child": (0.5, 6.4),            # beat 11: the child alone in the middle of the path, staring up at him
     # ---- the meadow (beats 6, 7, 8, 12, 13, 14): hello_set's anchors are in C.A (forest_gap, floating_oak_under,
     #      bare_oaks_among, pyramid_beside, ...); these are the film's own
@@ -181,17 +242,32 @@ CAMS = {
     # lens's right shoulder), at the child's height, 3 blocks south of him looking north up at his face; the child
     # soft in the lower right foreground, the house front at the right edge. Chosen so that no lamp post stands
     # within a third of the frame of his head (the posts at (7, -3) and (6, 9) are on every line from the door).
-    # (projected: his eyes standing y 37 %, crouched y 51 %, x 50 %; the child's head x 63-100 %, y 58-80 %)
-    "two_shot": dict(pos=(8.8, -8.4, 1.35), target=(8.9, -5.4, 1.2), lens=40.0, fstop=2.4),
-    # beat 15: locked frame from the step's south end, looking north along the house fronts over the child
-    "house_fronts": dict(pos=(9.25, -9.9, 1.25), target=(8.6, 3.0, 1.6), lens=50.0, fstop=2.4),
-    # beats 3 and 16: from just outside the south wall of the bed wing (house_a_south see-through), across both
-    # beds: Steve's red bed in front, the child's bed beyond, the north window right behind it
-    "bed": dict(pos=(18.15, -14.75, 2.55), target=(18.75, -9.0, 1.85), lens=24.0, fstop=3.2),
-    # beat 17: inside, from the room's south-east, at the west window: the child's profile on the chair (right),
-    # the pane beyond it (left), the plaza outside through the glass; a slow push toward the window
-    "window": dict(pos=(15.0, -12.9, 2.3), target=(12.17, -10.84, 2.25), lens=40.0, fstop=2.8,
-                   pos1=(14.6, -12.6, 2.3), target1=(12.17, -10.84, 2.25)),
+    # MEASURED ON RENDERS (the rendered eye pixels sit about 6 % of the frame below eye_point's projection):
+    #   standing (beat 4): eyes y 36 %, head top y 16 %;  crouched (beats 4 and 22): eyes y 49 %, chin y 55 %:
+    #   the whole face inside y 14-60 %, the chin clear of the caption band (62-72 %); x 50 %; face 178 px wide.
+    #   (out/test/hello_scout_twoshot_dg04_hello_226.png, _dg22_eyes_1480.png and their _zones.png)
+    # The target was z 1.2 at first: the crouched chin then sat IN the caption band (eyes 56 %), and the words
+    # "blue" and "eyes" were drawn on his chin under the white eyes.
+    "two_shot": dict(pos=(8.8, -8.4, 1.35), target=(8.9, -5.4, 1.0), lens=40.0, fstop=2.4),
+    # beat 15 (a start: the door_gold director owns it): locked, 60 mm, from the plaza just west of house_a's south-west
+    # corner (out from under its eaves), looking north along the house fronts past the child on the step: its head
+    # x 58-82 %, y 46-58 %, the two door torches above it (y 23-28 %); his three places nearly on one line behind it
+    # (eyes x about 28 / 28 / 37 %, y 46 / 47 / 54 %), every one clear of every block (ray casts at knees, chest and
+    # eyes). (The first camera, 9.25, -9.9, had the child at x 107 % and the far place inside a wall.)
+    "house_fronts": dict(pos=(8.85, -14.6, 2.2), target=(9.8, 4.0, 1.3), lens=60.0, fstop=2.4),
+    # beats 3 and 16 (the interior director keeps them identical; see the contract): from outside the south wall
+    # of the bed wing (st.see_through(s, "house_a_south"): invisible to the camera, it still keeps the light out),
+    # 2.5 blocks south of it, 32 mm, across both beds to the north window. Projected: the child's head on the far
+    # pillow x 50-63 %, y 46-54 %; Steve's head on the red pillow x 62-80 %, y 49-59 % (nothing between: the night
+    # stand that hid it is taken out by _edit); the north window x 12-31 %, y 36-43 %; the wall torch between the
+    # pillows above them (x 50 %, y 40 %). The first camera (18.15, -14.75, 2.55) had his head behind the night
+    # stand's plate and at x 80-94 % (palette_check: hero 10 % inside the safe area).
+    "bed": dict(pos=(18.0, -16.5, 2.75), target=(19.4, -9.0, 1.6), lens=32.0, fstop=3.2),
+    # beat 17, the story's fallback: OUTSIDE on the plaza, low, south-west of the pane, behind him: his dark back
+    # and shoulder in the left foreground (soft), the child's face through the torch-lit pane at the centre (the
+    # line from the lens through the pane reaches the child's eyes: ray cast, glass only); a very slow push in
+    "window_out": dict(pos=(3.4, -12.5, 2.5), target=(10.6, -10.6, 2.25), lens=58.0, fstop=2.4,
+                       pos1=(3.6, -12.45, 2.5), target1=(10.6, -10.6, 2.25)),
     # beats 6 and 7 (the same frame): hello_set's gate camera, 22 mm (the figure at the gap is 30 px at 540x960)
     "gate": dict(pos=(0.9, 22.6, 0.75), target=(0.5, 57.6, 2.5975), lens=22.0, fstop=4.0),
     # beat 1: Steve and the child at the bell from the south-east, child height, a slow push in
@@ -200,9 +276,11 @@ CAMS = {
     # beat 9: long lens from the south-east corner of the square up to the mouth of the exit road, east of the
     # well (a line from the south side of the square straight up the road goes through it)
     "square_long": dict(pos=(5.5, -8.5, 1.35), target=(0.5, 9.6, 1.5), lens=85.0, fstop=2.0),
-    # beat 10: low, north-east of the well, on the line from watch_square through the gap between the adults
-    "grownups": dict(pos=(6.6, 0.5, 0.6), target=(4.65, 3.4, 1.45), lens=32.0, fstop=2.6,
-                     pos1=(6.5, 0.62, 0.62), target1=(4.65, 3.4, 1.45)),
+    # beat 10: low, north-east of the well, on the line from watch_square through the gap between the adults.
+    # Projected at 645: him in the gap x 55 %, eyes y 49 % (was 64 %: in the caption band); the two adults' eyes
+    # y 39 % (the farmer's head x -4..43 %, the toolsmith's 70..98 %: the square director brings them in a little).
+    "grownups": dict(pos=(7.0, 0.0, 0.9), target=(4.4, 3.6, 0.8), lens=35.0, fstop=2.6,
+                     pos1=(6.88, 0.14, 0.9), target1=(4.4, 3.6, 0.8)),
     # beat 11: 2 blocks behind him and just west of his right hip (his right is west): the line to the child passes
     # 0.17 block beside his body, so his hip and hand fill the left quarter of the frame, soft
     "hip": dict(pos=(-0.3, 11.6, 1.0), target=(0.55, 6.4, 0.8), lens=66.0, fstop=2.6,
@@ -214,10 +292,19 @@ CAMS = {
 LIGHTS = {
     "gold": dict(scale=1.0),                                   # daylight: torches at their own level
     "night_door": dict(scale=1.3, door=2.0),                   # look-dev night level; BOTH door torches x 2: the key
+    #                                                            (palette_check passes: stone G/R 0.98-0.99)
     "night_room": dict(scale=1.2, groups={"house_a": 1.3}, inside="house_a"),   # the room at night: its torches
     #                                                            and its fill together (never one alone)
-    "gold_room": dict(scale=1.0, groups={"house_a": 0.7}, inside="house_a"),    # the same room once the night ended
+    "gold_room": dict(scale=1.0, groups={"house_a": 0.35}, inside="house_a"),   # the same room once the night
+    #                                                            ended: torches nearly out; C.morning(s) lights it
 }
+
+# beat 3, from the word "ended": the morning in the room. A warm shadowless film-local light inside the north window
+# (behind the child's bed), on from the sky change to the end of the shot, together with LIGHTS "gold_room" (torches
+# at 0.35): the room must get BRIGHTER at the snap, not darker (the first plan, house_a 1.3 -> 0.7 and nothing else,
+# measured beds and floor x0.79, walls x0.80). C.morning(s) keys it; measured on out/test/hello_scout_night_in03_bed_160
+# against hello_scout_gold_in03_bed_195 (see the interior docstring for the numbers).
+MORNING = dict(pos=(18.4, -9.0, 2.7), watts=1300.0, color=(1.0, 0.9, 0.78))
 
 EYE_GLOW = 1.5                         # emission of the white eyes in beat 22 (players.HEROBRINE_GLOW is 3.0, made
 #                                        for dusk and night; in golden light 1.5 is "faintly glowing")
@@ -304,14 +391,16 @@ class Hello:
             return dict(self.set["cameras"][name[4:]])
         return dict(CAMS[name])
 
-    def cam(self, s, name, focus=None, handheld=0.008, seed=None, move=True, **over):
+    def cam(self, s, name, focus=None, handheld=0.008, seed=None, move=True, ease="ease_out", **over):
         """Put a shared camera on shot s: lens, position / aim (with its move when it has one and move=True),
         focus (default: its target) and a gentle handheld. over = entries to replace (lens=, pos=, pos1= ...).
-        Returns the spec used."""
+        ease: of the move; default 'ease_out' = AT SPEED ON THE FIRST FRAME, slowing to the last (engine.shots'
+        own default 'smooth' starts from rest: a 0.35-block push over 71 frames moved 0.03 block in the first half
+        second, a still). 'linear' for a constant drift. Returns the spec used."""
         c = dict(self.camera_spec(name), **over)
         s.lens(c["lens"], c.get("fstop", 2.8))
         if move and "pos1" in c:
-            s.move(c["pos"], c["target"], c["pos1"], c.get("target1", c["target"]))
+            s.move(c["pos"], c["target"], c["pos1"], c.get("target1", c["target"]), ease=ease)
         else:
             s.move(c["pos"], c["target"])
         s.focus(focus if focus is not None else c["target"])
@@ -512,14 +601,25 @@ class Hello:
             kw["at"] = at
         self.st.lights(s, **kw)
 
+    SHARED_FILLS = ("doorstep", "morning")       # the lead's own fills (C.doorstep_fill, C.morning)
+
     def fill(self, name, pos, watts, shots, color=(1.0, 0.98, 0.95)):
         """A film-local shadowless fill light (props.make_light("fill")) that is on in the given shots only and
         hidden everywhere else (a hidden object is in no frame's stamp). `shots` = Shots and / or (first frame,
-        last frame) spans: beat 3 can light the room from its sky change on with C.fill("morning", pos, W,
-        [(C.T[s.name].change, s.frame_end)], color=(1.0, 0.85, 0.65)) (keyed by frame, so the same in every
-        build: allowed). One name = one light with one strength: the doorstep fill of beats 4 and 22 is
-        C.doorstep_fill(s), called in both shots."""
+        last frame) spans (keyed by frame, so the same in every build: allowed). The NAME starts with your
+        sequence prefix ("dg_bounce", "in_moon": KeyError otherwise; "doorstep" and "morning" are the lead's), and
+        one name = one light: calling it again with the same name adds shots, and raises ValueError if pos, watts
+        or color differ (two sequences can never share a light by accident)."""
+        if name not in self.SHARED_FILLS and name[:2] not in SEQUENCES:
+            raise KeyError("fill name %r must start with your sequence prefix: %s" % (name, ", ".join(SEQUENCES)))
         lamp = self._fills.get(name)
+        if lamp is not None:
+            same = (all(abs(a - b) < 1e-6 for a, b in zip(lamp.location, pos))
+                    and abs(lamp.data.energy - watts) < 1e-6
+                    and all(abs(a - b) < 1e-6 for a, b in zip(lamp.data.color, color)))
+            if not same:
+                raise ValueError("fill %r exists with another position, strength or colour: one name = one light"
+                                 % name)
         if lamp is None:
             lamp = self._fills[name] = props.make_light("fill", self.v.collection)
             lamp.name = "hello_fill_" + name
@@ -540,6 +640,13 @@ class Hello:
         """The near-neutral fill on his face for the two shots that compare the eyes: beat 4 and beat 22, the same
         light at the same strength (he faces the house; the golden sun that lights its front is behind him)."""
         return self.fill("doorstep", self.DOORSTEP_FILL["pos"], self.DOORSTEP_FILL["watts"], [s])
+
+    def morning(self, s, frame=None):
+        """Beat 3: the morning in the room from `frame` (default: the shot's sky change, the word "ended") to the
+        end of shot s: MORNING (a warm shadowless light inside the north window). Use it together with
+        C.lights(s, "gold_room", at=frame, <the same near / radius as the night call>)."""
+        f = self.T[s.name].change if frame is None else int(frame)
+        return self.fill("morning", MORNING["pos"], MORNING["watts"], [(f, s.frame_end)], color=MORNING["color"])
 
     # ------------------------------------------------------------------ time jumps
     @staticmethod

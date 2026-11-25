@@ -8,17 +8,20 @@ THE PLACE (house_a's west front, hello_common's docstring): door cell (10, -8), 
   block of wall and the corner log: the house's north-west corner is at (10, -5).
   PLACES: "watch_door" (8.9, -5.4) = his spot, facing HC.WATCH_YAW (toward "watch_face" (9.75, -7.2): the door);
   "hello_child" (9.25, -6.41) = the child at his feet, between him and the door; "step", "step_child", "door_in",
-  "run_off", "watch_far", "watch_mid".
+  "run_off", "watch_far" (8.3, 11.5), "watch_mid" (8.4, 5.2).
 THE SKY: "gold" = sun at azimuth 215 (west-south-west), elevation 24: it lights the west front of the house and
   the plaza before it. He faces the door, so in the doorstep two-shot the sun is behind him and his face is in
   his own shade: C.doorstep_fill(s) is the film-local shadowless fill on his face, the SAME light at the SAME
   strength in dg04 and dg22. Decided on stills: with the fill (out/test/hello_scout_twoshot_dg04_hello_226.png,
   _dg22_eyes_1475.png) the face is lit and the indigo eye pixel reads blue; without it
   (hello_scout_twoshot_nofill_*.png) the face is a stop darker and the iris dark purple.
-THE TWO-SHOT, as scouted (CAMS["two_shot"], 40 mm f/2.4 from (8.8, -8.4, 1.35), 3 blocks south of him): his eyes at
-  y 31 % standing and 41 % crouched, x 50 %; a house front and its roofline behind him (the fixed line the crouch
-  reads against); the child's head a soft pink block at the lower right (x 75-100 %, y 50-100 %). No lamp post
-  within a third of the frame of his head (every line from the door itself has one behind his head).
+THE TWO-SHOT (CAMS["two_shot"], 40 mm f/2.4 from (8.8, -8.4, 1.35) aimed at (8.9, -5.4, 1.0), 3 blocks south of
+  him), MEASURED ON RENDERS (out/test/hello_scout_gold_dg04_hello_226_zones.png, _dg22_eyes_1480_zones.png): his eyes
+  at y 36 % standing (head top 16 %) and y 49 % crouched (chin 56 %, clear of the caption band 62-72 %), x 50 %, face
+  178 px wide; a house front and its roofline behind him (the fixed line the crouch reads against); the child's head
+  a soft pink block at the lower right (x 56-100 %, y 52-96 %). No lamp post within a third of the frame of his head.
+  (Aimed at z 1.2 at first, the crouched chin was IN the caption band: "blue" and "eyes" drawn on his chin.)
+  palette_check dg22@1480: every check passes (hero watcher x 33-77 %, y 32-56 %, 100 % inside the safe area).
 THE TWO SHOTS THAT MUST MATCH: dg04_hello and dg22_eyes use CAMS["two_shot"] EXACTLY through _two_shot() (no
   override; the same handheld seed TWO_SHOT_SEED in both, since C.cam would otherwise derive it from the shot
   name), the same fill, the same light levels, Steve in dg04 and the watcher in dg22 on "watch_door" facing
@@ -40,6 +43,8 @@ def _two_shot(s, C):
 
 def dg04_hello(st, s, C, nar):
     """BEAT 4  "Every morning he crouched at me, twice."   frames 211-271 (61 f, 2.54 s), sky gold.
+    MEASURED (stub): standing eyes y 36 %, crouched 49 % (see the module docstring); the child's head x 56-100 %:
+    its nose shows only if its body is turned a little to the lens (three-quarter from behind).
     Words: Every 213, morning 219, he 227, crouched 230, at 241, me 244, twice 248. The pause after it is 0.45 s.
 
     STORY: Golden morning on the plaza at the foot of the doorstep. Steve has stepped outside and stands two blocks
@@ -57,7 +62,8 @@ def dg04_hello(st, s, C, nar):
       frame 211       his head already moving (looking down at the child: Player.watch(f0, f1, child) snaps on f0)
       "morning" 219   his face: white and dark blue eye pixels readable
       "crouched" 230 .. "twice" 248   the two crouches (C.crouch_twice(steve, frame)): the second one ON "twice"
-                      or just before it reads best (e.g. first down on 236, second down on 248)
+                      or just before it reads best (e.g. first down on 236, second down on 248); each drop moves
+                      his eyes from y 36 % to 49 % against the roofline
       the whole shot  the child low in the foreground, nose showing (three-quarter from behind)
     SHARED: CAMS["two_shot"] + C.doorstep_fill(s) (via _two_shot), PLACES "watch_door" + HC.WATCH_YAW, "hello_child":
       EXACTLY as in dg22. Cast: C.actor("steve_iron", "dg"), C.actor("child", "dg").
@@ -101,6 +107,9 @@ def dg05_nod(st, s, C, nar):
     SHARED: PLACES "watch_door", "hello_child", "run_off". Cast: C.actor("steve_iron", "dg") and
       C.actor("child", "dg") (both in dg04, the shot before: place them on f0, key nothing before it).
     NEIGHBOURS: before, dg04_hello; after, me06_leave (the gate: one day he walks into the woods). Hard cuts.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): on "hello" (284) the child's eyes x 47 %, y 53 %,
+      but Steve's right arm is between the lens and its face (ray hits steve_iron_dg_arm_r 0.6 from the lens); by
+      310 the child has run past the lens (x 231 %).
     STUB: the camera at his hip looks down at the child; it nods on "hello" and runs off toward run_off.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -138,6 +147,13 @@ def dg15_a(st, s, C, nar):
     """BEAT 15, first jump  "Every time I look,"   frames 915-946 (32 f, 1.33 s), sky gold.
     Words: Every 917, time 924, I 932, look 936.
 
+    MEASURED (stub, CAMS "house_fronts" 60 mm from (8.85, -14.6, 2.2)): the child's head x 58-82 %, y 46-58 % (seen
+    from behind as staged: turn it), him at watch_far eyes x 28 %, y 46 % (face 31 px, profile), at watch_mid x 28 %,
+    y 47 % (44 px), at watch_door x 37 %, y 54 % (about 120 px, profile: no eyes); all three clear of every block.
+    Rendered: out/test/hello_scout_gold_dg15_a_936_zones.png (him small at house_f's corner, x 28 %), _dg15_c_975_
+    zones.png (him at the corner, profile, no eyes). The underside of house_a's eaves crosses the top right of the
+    frame (the lens stands just west of them): keep it as a frame or lower the lens.
+
     STORY (all of beat 15, "Every time I look, he is one house closer."): Late gold at the child's door. The baby
     villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands
     small and soft beyond the next house. The child looks away and back, jump cut in the same frame: he is at the
@@ -145,7 +161,8 @@ def dg15_a(st, s, C, nar):
     Cast: baby villager (narrator), the watcher (background, out of focus). Effects: two jump cuts in a locked frame,
     each covered by the child's head turn, focus stays on the child.
 
-    THE THREE SHOTS: dg15_a (he is at "watch_far", beyond the next house), dg15_b (at "watch_mid", the next house),
+    THE THREE SHOTS: dg15_a (he is at "watch_far", beyond the next house, at house_f's corner; the first plan's spot
+      was inside house_f's wall and showed no figure), dg15_b (at "watch_mid", the next house),
       dg15_c (at "watch_door", the corner of the child's own house: where he stands in beats 19-22). ONE locked
       frame for all three (CAMS "house_fronts" is a start; it is not shared with another sequence); the cuts are on
       word boundaries (b before "he", c before "closer"); dg15_b is 0.88 s: short on purpose, the jumps quicken.
@@ -162,7 +179,8 @@ def dg15_a(st, s, C, nar):
       (east): "same pose", and the camera from the south never sees his eyes. Scouted: facing the door (WATCH_YAW)
       at "watch_door" his face was frontal and readable at 4.6 blocks (out/test/hello_scout_gold_dg15_c_985.png,
       rendered before this change): never that. He turns to WATCH_YAW between beat 15 and beat 19 (other days).
-      The child in dg15_a was at the frame's right edge, outside the safe area (x > 82 %): frame it further in.
+      The camera is yours to change (it is not shared); keep the three places (they are shared with nobody either,
+      but "watch_door" is his place in beats 19-22).
     STUB: the child on the step, him at watch_far, the locked frame.
     """
     _fronts(st, s, C, "watch_far")
@@ -209,6 +227,11 @@ def dg20_walkup(st, s, C, nar):
     SCOUTED: a camera from the south looking north along the wall (70 mm from (9.0, -12.6)) showed his face
       frontally (hello_scout_gold_dg20_walkup_1335.png): he faces the door. Side-on from the plaza (west), looking
       at the wall, he is seen from behind his right shoulder and the frame top crops him at the shoulders.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): at 1290 the walking child is outside the frame
+      (eyes x 106 %, y 14 %), at "hello" 1334 its eyes x 65 %, y 35 %; his head is IN the frame at the top left (x
+      0-30 %, y 0-17 %, 105 degrees off his nose: no eyes, but not cropped at the shoulders as the beat wants). At
+      50 mm, 5 blocks away the frame is about 2 blocks wide: it cannot hold the door (y -7.5) and him (y -5.4)
+      both; go wider or further than 7 blocks.
     STUB: the flesh spins on the step, the door opens, the child walks from door_in to hello_child and nods; a low
       side-on camera from the plaza looking east at the wall, the frame top at his shoulders.
     """
@@ -233,9 +256,10 @@ def dg20_walkup(st, s, C, nar):
 
 
 def dg21_crouch(st, s, C, nar):
-    """BEAT 21  "He crouched, once, and he stayed down."   frames 1358-1444 (87 f, 3.62 s), sky gold.
-    Words: He 1360, crouched 1362, once 1373, and 1386, he 1389, stayed 1391, down 1400. Then 1.5 s of silence
-    (about 1413-1444): the story's "one second of silence"; nothing moves but the handheld.
+    """BEAT 21  "He crouched, once, and he stayed down."   frames 1358-1447 (90 f, 3.75 s), sky gold.
+    Words: He 1360, crouched 1363, once 1374, and 1388, he 1390, stayed 1393, down 1401 (spoken a tenth slower than
+    the rest of the film: speed 0.9; "down" ends on 1414). Then 1.5 s of silence (1415-1447): the story's "one
+    second of silence"; nothing moves but the handheld.
 
     STORY: The same place, camera a little behind his shoulder line, the frame cropped at his chin. He sinks slowly
     into the sneak pose: the torso leans forward and his head comes down into the picture from above, seen
@@ -245,16 +269,19 @@ def dg21_crouch(st, s, C, nar):
     crouch over a full second, held, no music.
 
     MUST BE SEEN, ON WHICH WORD
-      "crouched" 1362 .. "once" 1373   the slow crouch begins (C.crouch_slow(him, frame, frames=24): the game snaps
+      "crouched" 1363 .. "once" 1374   the slow crouch begins (C.crouch_slow(him, frame, frames=24): the game snaps
                       this pose; the slow sink is the one deliberate untruth, it is his)
-      "down" 1400     he is down, leaning over the child; his head entered the frame from above, three-quarter from
+      "down" 1401     he is down, leaning over the child; his head entered the frame from above, three-quarter from
                       behind: the back and side of his head, never his eyes
-      1413 .. 1444    the silence: hold; the child's head tipped up at him
+      1415 .. 1447    the silence: hold; the child's head tipped up at him
     SHARED: PLACES "watch_door" + HC.WATCH_YAW, "hello_child". Cast: C.actor("watcher", "dg") (in dg20, the shot
       before: place on f0), C.actor("child", "dg2") (likewise).
     NEIGHBOURS: before, dg20_walkup; after, dg22_eyes (the two-shot of beat 4: the white eyes). Hard cuts.
     RISKS (story): the sneak pose can vanish at phone size: crop at his chin so the head ENTERS the picture as he
       sinks. A sneaking player is still taller than a baby villager: he leans over it, his head does not come level.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): at "down" 1401 the child's eyes x 49 %, y 53 %
+      (face 236 px, 28 degrees off the lens); his head x -89..37 %, y 10-66 %, 128 degrees off his nose (from
+      behind: no eyes).
     STUB: he crouches slowly from "once"; the child looks up; a camera behind his left shoulder looking down.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -271,9 +298,10 @@ def dg21_crouch(st, s, C, nar):
 
 
 def dg22_eyes(st, s, C, nar):
-    """BEAT 22  "The player had blue eyes."   frames 1445-1531 (87 f, 3.62 s), sky gold. The film's last shot.
-    Words: The 1447, player 1449, had 1458, blue 1462, eyes 1470. Then the 2-second hold (about 1483-1531) and the
-    end of the film (cut to black = the end of the video).
+    """BEAT 22  "The player had blue eyes."   frames 1448-1544 (97 f, 4.04 s), sky gold. The film's last shot.
+    Words: The 1450, player 1453, had 1463, blue 1467, eyes 1475 (speed 0.9, like beat 21; "eyes" ends on 1489).
+    Then the hold on the white eyes, 1490-1538 (2.0 s), and the CUT TO BLACK: the encoder blacks out the last six
+    frames, 1539-1544 (films/hello.py END_BLACK); the Reel then loops to frame 1.
 
     STORY: The camera of beat 4, exactly, the same roofline behind his head. His face, turned down to the child and
     the lens, fills the upper part of the frame: where the blue was, both pixels of each eye are blank white,
@@ -284,15 +312,15 @@ def dg22_eyes(st, s, C, nar):
     black.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1445      already down (C.crouch_held on f0), his face to the child and the lens; the white eyes
-      "blue" 1462 .. "eyes" 1470   the white eyes unmistakable (HC.EYE_GLOW; judged on the scouting still)
-      1483 .. 1531    hold; nothing moves but the handheld and, at most, a tiny head settle
+      frame 1448      already down (C.crouch_held on f0), his face to the child and the lens; the white eyes
+      "blue" 1467 .. "eyes" 1475   the white eyes unmistakable (HC.EYE_GLOW; out/test/hello_scout_gold_dg22_eyes_1480)
+      1490 .. 1538    hold; nothing moves but the handheld and, at most, a tiny head settle; 1539-1544 black
     SHARED: _two_shot (CAMS["two_shot"] + the doorstep fill: EXACTLY dg04's), "watch_door" + HC.WATCH_YAW,
       "hello_child". Cast: C.actor("watcher_eyes", "dg") (the white-eyed skin: THIS SHOT ONLY),
       C.actor("child", "dg2") (in dg21: place on f0).
-    NEIGHBOURS: before, dg21_crouch; after, nothing (the film ends on frame 1531).
+    NEIGHBOURS: before, dg21_crouch; after, nothing (the film ends on frame 1544, black from 1539).
     RISKS (story): never trim the second of silence before this line or the two-second hold after it (kept: 1.5 s
-      pause, 2.0 s tail).
+      pause; the tail is 2.3 s, of which the last 0.25 s is black).
     STUB: the white-eyed watcher crouched on watch_door, looking down at the child, the two-shot camera.
     """
     f0, f1 = s.frame_start, s.frame_end

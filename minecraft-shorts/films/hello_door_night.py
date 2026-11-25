@@ -62,6 +62,8 @@ def dn02_fight(st, s, C, nar):
       leaving frame left rhymes with the watcher being found on the left in beat 19.
     SCOUTED (out/test/hello_scout_night_dn02_fight_100.png): the door between its two torches, warm key, the zombie
       knocking with arms out; the stub's Steve stands with his back to the lens in front of the zombie.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): at 100 the zombie's eyes x 32 %, y 25 % (head y
+      17-31 %), Steve's x 61 %, y 45 % (from behind, 156 degrees: right for a fighter seen past).
     STUB: the zombie knocks through the whole shot, Steve stands at "fight_to"; no fight is staged yet.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -104,6 +106,8 @@ def dn18_knock(st, s, C, nar):
       is felt against beat 2. The watcher is NOT in this shot (not in st.use): dn19 reveals him.
     SCOUTED (out/test/hello_scout_night_dn18_knock_1150.png): the cracks show on the door past the zombie, the
       right of the frame empty.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the zombie's eyes x 32 %, y 25 % (as dn02), the
+      right third empty.
     STUB: the knocking with the recommended staging for the whole shot.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -150,6 +154,9 @@ def dn19_beside(st, s, C, nar):
     SCOUTED (out/test/hello_scout_night_dn19_beside_1196.png, _1250.png): the reveal works (his teal shoulder at the
       left edge on the first frame, their two backs by the end), but at the end he is too large and the zombie's
       head sits right above his: a longer lens from further back, or a smaller drift.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): at "watched" 1222 his eyes x 21 %, y 43 % (158
+      degrees off his nose: his back), the zombie's x 53 %, y 21 %; at 1250 him x 32 %, the zombie x 55 %: the
+      zombie's head sits above and right of his, both clear of each other in x by about 8 %.
     STUB: he stands on "watch_door" facing the door, the zombie knocks on, CAMS "beside" with its drift.
     """
     f0, f1 = s.frame_start, s.frame_end

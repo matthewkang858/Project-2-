@@ -41,7 +41,13 @@ def sq01_guard(st, s, C, nar):
       house behind him); the child is at the right edge in the caption band, too small. The child is half his
       height: both faces in the upper half of the frame only work if the child is NEARER the lens than Steve
       (perspective), e.g. the child 2 blocks from a low lens, Steve 3.5-4 blocks, the lens just above the child's
-      eyes looking up a little.
+      eyes looking up a little. The two adults stand behind Steve's sword arm in this framing (hidden).
+    THE FIRST SECOND: C.cam moves with ease 'ease_out' (at speed on frame 1); the push is only 0.35 block, so give
+      the first second an event too: the child's head tipping up to him over frames 1-12, or Steve's head turning
+      from the path to the lens on "player" (32). The voice starts on frame 8.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the child's eyes x 81 %, y 71 % (head x 64-110 %:
+      at the right edge, in the caption band); Steve's eyes x 39 %, y 42 % (face 139 px); both adults behind
+      Steve's arm (ray casts hit it).
     STUB: Steve on "guard" facing south, the child at his leg looking up, two adults idling behind, CAMS "guard".
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -91,11 +97,16 @@ def sq09_watches(st, s, C, nar):
       bell stand between the south of the square and the road: check the line of sight (CAMS "square_long" looks
       past the well's east side).
     SCOUTED (out/test/hello_scout_gold_sq09_watches_572.png, from the square's south-east corner): he stands at the
-      mouth of the road with a lamp post beside him, and HIS FACE IS READABLE (eyes and all, 85 mm f/2.0): that
-      breaks the face rule and must be fixed first (much shallower focus on the villagers, f/1.2, or a shorter
+      mouth of the road with a lamp post beside him, and HIS FACE IS READABLE (eyes and all, 85 mm f/2.0; measured:
+      60 px wide, 15 degrees off his nose). THE STAKE: he wears Steve's plain skin, so a readable face shows Steve's
+      indigo eyes, and the film's last line, "The player had blue eyes", would be false of the man we saw: a broken
+      story, not only a broken rule. It must be fixed first (much shallower focus on the villagers, f/1.2, or a shorter
       lens, so that his face is under about ten pixels and soft). The well's mossy wall fills the left 40 % of
       the frame: move the lens east or let the villagers cross in front of it. (The first stub camera, from
       (1.6, -9.8), looked straight through the well.)
+    MEASURED (stub, tools.hello_geo, projection and ray casts): his eyes x 50 %, y 49 %, face 60 px, 15 degrees off
+      his nose: READABLE (see SCOUTED); the farmer, the librarian and both children are outside the frame at frame
+      572 (x -146..-49 %): re-time or re-aim.
     STUB: the farmer and the librarian cross, two children run, he stands at "watch_square" facing south.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -142,10 +153,18 @@ def sq10_grownups(st, s, C, nar):
     RISKS (story): the line is a thought with no action: keep him visible in the gap between the two adults and hold
       the child's head turn toward him to the last frame. The child stands in front of the adults, not tucked
       between them (a face tucked against a neighbour is a third hidden: CONTRACT.md).
-    SCOUTED (out/test/hello_scout_gold_sq10_grownups_660.png): the farmer (left) and the toolsmith (right) frame the
-      gap, he stands small and still in it, the child in front at the lower left: the story's picture. The child's
-      face is low (in the caption band) and the adults face the lens more than each other: turn them to profile.
-      (The first stub put the child inside the well's corner block.)
+    SCOUTED (out/test/hello_scout_gold_sq10_grownups_660.png, the FIRST camera): the farmer (left) and the toolsmith
+      (right) frame the gap, he stands small and still in it, the child in front at the lower left; but he stood
+      in the caption band (eyes y 64 %) and so did the child's face (y 72 %). (The first stub put the child inside
+      the well's corner block.)
+    MEASURED (stub, the camera aimed lower and the child moved to (5.3, 2.1), 2.5 blocks from the lens; rendered:
+      out/test/hello_scout_gold_sq10_grownups_645_zones.png): him in the gap, eyes x 55 %, y 42 %, face 41 px, 34
+      degrees off his nose: IN THAT RENDER HIS EYES ARE READABLE (white and indigo): the same stake as sq09; open the
+      aperture and hold the focus on the child (or the adults) until his face is a soft blur, or turn his head away;
+      the adults' eyes y 32 %, but their heads are cut by the frame edges (farmer x -7..43 %, toolsmith x 71..100 %):
+      bring them closer together or the lens back; the child's eyes x 40 %, y 59 %, its head box x 21..59 %,
+      y 44..67 % touching him from below: turn and place it so his small figure stays clear above its head. The
+      adults face the lens more than each other: turn them to profile.
     STUB: the two adults face each other and nod, the child in front looks at the road, he stands far behind.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -192,6 +211,9 @@ def sq11_stare(st, s, C, nar):
       frame, the child at the right in profile looking toward him; the child's head is partly in the caption band
       and not yet tipped back: lower the lens or bring the child up in the frame, and tighten on the head (the
       push). (The first stub camera stood inside his body.)
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the child's eyes x 53 %, y 58 % (head y 43-65 %:
+      its chin in the caption band), face 175 px, 9 degrees off the lens; his body fills the left of the frame
+      (head out of frame above: good); both running children hidden behind his torso at 700.
     STUB: he stands at "watch_square" facing south; the camera behind his right hip looks at the child on the road.
     """
     f0, f1 = s.frame_start, s.frame_end

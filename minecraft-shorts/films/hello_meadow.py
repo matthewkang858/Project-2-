@@ -1,6 +1,7 @@
 """The Hello, sequence MEADOW: the exit gate, the meadow road, the dark forest wall at its end and the three signs
 (the floating oak, the bare oaks, the sand pyramid). Beats 6, 7, 8, 12, 13, 14 (shots me06_leave, me07_return,
-me08_nohello, me12_floating, me13_bare, me14_pyramid), sky "meadow". One function per shot; the contract is in
+me08_nohello, me12_floating, me13_bare, me14_pyramid), sky "meadow" (me07 and me08: "dawn"). One function per
+shot; the contract is in
 films/hello_common.py (tags "me...", C.actor, C.cam, C.lights, st.use / st.hero).
 
 THE PLACE (engine/sets.py hello_set, built into the village: read its docstring, "FOR THE DIRECTOR OF THE HELLO"):
@@ -13,9 +14,17 @@ THE PLACE (engine/sets.py hello_set, built into the village: read its docstring,
   gate, side, inside, deep, floating, bare, pyramid; proof stills out/test/sets_sheet_a.png, sets_sheet_b.png.
   Plant-free for cameras: the road and the lane west of it (x -3..3) up to the gap, the bay x -11..-4, y 50..57,
   and the ground between each set camera and its subject. Thick grass 3-7 blocks in front of the trunks.
-THE SKY: "meadow" = the look-dev golden sun (azimuth 62: north-east, behind the wood; elevation 27) with NO haze, so
-  the gaps between the trunks are black (with the village's haze the wall is dark brown). Every proof still of
+THE SKIES: "meadow" = the look-dev golden sun (azimuth 62: north-east, behind the wood; elevation 27) with NO haze,
+  so the gaps between the trunks are black (with the village's haze the wall is dark brown). Every proof still of
   hello_set was made under exactly this sky. Keep the wood behind the subjects.
+  "dawn" (me07, me08: "He came back at sunrise"): the same, the sun low behind the wood (azimuth 75, elevation 9),
+  no haze: the glow sits on the tree line, the road is in soft shade, the wall stays black. After the dip it is
+  plainly another light than beat 6's afternoon (out/test/hello_scout_dawn_me07_return_470.png against
+  hello_scout_meadow_me07_return_470.png; hello_scout_dawn_me08_nohello_520.png). The story's risk "if it still
+  feels like the same afternoon" is answered by the sky, since its night insert cannot be had (fixed cuts).
+TAGS TAKEN (twins): child_me (me06, me07, me12, me13), child_me2 (me08: pre-rolled from frame 473, i.e. INSIDE
+  me07: never use it in me07), child_me3 (me14: pre-rolled), watcher_me (me07, me08, me13), steve_diamond_me (me06).
+  A new twin: the next free tag, me4, me5 ...
 THE WATCHER (beats 7, 8, 13): C.actor("watcher", "me") = plain Steve, dead still; never his face (beat 7: 30 px tall
   at the gap with the 22 mm gate lens, face unreadable but his eye whites are two pale dots: keep him soft).
 LIGHT: C.lights(s, "gold", near=<point>, radius=12) (daylight; the village's torches are far away: keep them off).
@@ -63,6 +72,9 @@ def me06_leave(st, s, C, nar):
       tree line. The child on "gate_child" is dead centre and seen from BEHIND (a brown box on a pink box): turn
       it to a three-quarter profile (body toward the meadow, look cheated toward the lens) and/or move it off the
       road's axis so he walks past it.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the child's eyes x 31 %, y 56 %, 168 degrees off
+      the lens (from BEHIND); Steve's head 19 px wide on "armor" (356), 12 px at 410: small; the armor reads by its
+      colour and the glint more than its shape.
     STUB: Steve walks the road from about y 31 to y 50 in the shot; the child on "gate_child" facing up the road.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -81,7 +93,7 @@ def me06_leave(st, s, C, nar):
 
 
 def me07_return(st, s, C, nar):
-    """BEAT 7  "He came back at sunrise without it."   frames 421-484 (64 f, 2.67 s), sky meadow; the encoder dips
+    """BEAT 7  "He came back at sunrise without it."   frames 421-484 (64 f, 2.67 s), sky dawn; the encoder dips
     to black ON frame 421 (dip out 4, hold 1, back 4: black on 421-422, up again by 426).
     Words: He 423, came 426, back 433, at 439, sunrise 442, without 457, it 467.
 
@@ -98,15 +110,18 @@ def me07_return(st, s, C, nar):
       "without" 457 .. "it" 467    bare arms, bare head, teal shirt: no armor, no sword
     SHARED: CAMS "gate" exactly as in me06 (the same handheld seed is fine). PLACES "gate_child", C.A["forest_gap"]
       (he stands there facing the village; yaw 0 faces south). Cast: C.actor("watcher", "me"), and the child: the
-      child of me06 is in the shot before: place it on f0 (no pre-roll) or use a twin C.actor("child", "me2").
+      child of me06 is in the shot before: place it on f0 (no pre-roll needed: the frame is black until 422), or a
+      FRESH twin C.actor("child", "me4"). NOT "me2": me08 pre-rolls child_me2 from frame 473, inside this shot.
+    SKY: "dawn" (the module docstring): the same camera, another light.
     NEIGHBOURS: before, me06_leave; after, me08_nohello (the same road from the side: the child runs up to him).
-    RISKS (story): the golden sky plays both evening and morning; the dip and the figure large enough that bare
-      arms and a bare head show carry the time jump; beat 8's teal shoulder confirms it. "If it still feels like the
-      same afternoon, add a two-second night insert of the empty road from the same camera with no narration": NOT
-      available (the narration fixes every cut); say so if you think it is needed. Plain Steve skin (sets notes:
-      his eye whites are two pale dots at 30 px: the white-eyed skin would be brighter).
+    RISKS (story): the golden sky plays both evening and morning: answered by the "dawn" sky, the dip and the
+      figure large enough that bare arms and a bare head show; beat 8's teal shoulder confirms it. The night insert
+      the story offers is not available (the narration fixes every cut). Plain Steve skin (sets notes: his eye
+      whites are two pale dots at 30 px: the white-eyed skin would be brighter).
     SCOUTED (out/test/hello_scout_meadow_me07_return_470.png): he reads as a small teal figure in the gap; the
       child is the same brown box from behind as in me06 (fix both the same way).
+    MEASURED (stub, tools.hello_geo, projection and ray casts): him at forest_gap: face 8 px (unreadable, as
+      wanted), x 50 %, y 52 %; the child as in me06 (from behind).
     STUB: he stands at forest_gap facing the village, the child on gate_child looks up the road.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -122,7 +137,7 @@ def me07_return(st, s, C, nar):
 
 
 def me08_nohello(st, s, C, nar):
-    """BEAT 8  "He didn't crouch."   frames 485-540 (56 f, 2.33 s), sky meadow.
+    """BEAT 8  "He didn't crouch."   frames 485-540 (56 f, 2.33 s), sky dawn (the morning of beat 7).
     Words: He 487, didn't 490, crouch 497. The pause after it is 1.3 s (frames ~510-540: nothing comes back).
 
     STORY: The same road from the side, at child height. The shot opens on the child's last two running steps. It
@@ -147,6 +162,9 @@ def me08_nohello(st, s, C, nar):
     SCOUTED (out/test/hello_scout_meadow_me08_nohello_520.png): his teal shoulder soft at the left edge, the child
       facing the lens on the road, the village beyond: the story's frame. The child stands in the caption band
       (y 62-72 %): raise it in the frame (camera lower, or the child further off).
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the child's eyes x 53 %, y 61 % (head y 49-66 %:
+      its chin in the caption band), 10 degrees off the lens; his head soft at the left edge (x -101..15 %), 150
+      degrees off his nose (no face).
     STUB: the child runs from y 51 to road_stop and nods; the camera behind his left shoulder looks down the road.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -188,6 +206,8 @@ def me12_floating(st, s, C, nar):
     NEIGHBOURS: before, sq11_stare (the square); after, me13_bare. Hard cuts.
     SCOUTED (out/test/hello_scout_meadow_me12_floating_780.png): the canopy and its hanging log against the sky,
       the child small under it, low in the frame (in the caption band): bring it up or closer.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): the child's eyes x 50 %, y 65 % (in the caption
+      band), face 37 px: too small and too low.
     STUB: the child under the tree looking up; hello_set's floating camera with a small push.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -221,6 +241,9 @@ def me13_bare(st, s, C, nar):
     NEIGHBOURS: before, me12_floating; after, me14_pyramid. Hard cuts.
     SCOUTED (out/test/hello_scout_meadow_me13_bare_830.png): the bare trunks, his back among them; the child is at
       the LEFT edge, seen from behind: turn it to profile.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): him among the bare oaks x 48 %, y 58 %, 165 degrees
+      off his nose (his back, good); the child's eyes x 12 %, y 72 % (in the caption band, at the edge, 157 degrees
+      off the lens: from behind).
     STUB: he stands among the bare oaks facing south, the child at the edge looking at him.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -257,6 +280,8 @@ def me14_pyramid(st, s, C, nar):
     NEIGHBOURS: before, me13_bare; after, dg15_a (late gold at the child's door). Hard cuts.
     SCOUTED (out/test/hello_scout_meadow_me14_pyramid_900.png): the pyramid and the bare trunks behind it read; on
       frame 900 the child is out of sight behind the pyramid: time the walk so it stops in view.
+    MEASURED (stub, tools.hello_geo, projection and ray casts): child_me3 is OUTSIDE the frame the whole shot (eyes
+      x 116 % at 877, 124 % at 905), and at 905 a grass tuft stands between it and the lens.
     STUB: the child walks the first part of pyramid_round; the camera tracks sideways a little.
     """
     f0, f1 = s.frame_start, s.frame_end

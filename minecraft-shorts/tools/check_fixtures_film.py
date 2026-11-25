@@ -68,13 +68,13 @@ def build(scene):
     frames, info = {}, {}
 
     # ---- slide (3 s)
-    s = st.shot("slide", 3.0)
+    s = st.shot("slide", 4.0)
     f0 = s.frame_start
     g = st.cast["golem"] = mobs.make_iron_golem("golem")
-    pos = (-17.5, 41.0, 3.0)
+    pos = (-17.5, 39.6, 3.0)
     g.place(f0, pos, yaw_to(pos, (-30.0, 41.0)))
     st.use(s, g)
-    r = fx.slide(g, f0 + 6, "south", 41.0 - 38.0 + 0.7, drop=3.1)
+    r = fx.slide(g, f0 + 6, "south", 39.6 - 38.0 + 0.7, drop=3.1)
     animals.poof(g, r["gone"], camera=s)
     out["lava"].flicker(r["edge"], r["edge"] + 40, at=r["gone"])
     s.lens(30, 5.6)
@@ -94,8 +94,8 @@ def build(scene):
         st.use(s, it)
         items.append(it)
     plans = out["hopper"].stream(items, f0 + 10, every=6, height=2.2)
-    s.lens(40, 4.0)
-    s.move((12.0, 42.2, 2.2), (9.5, 46.5, 1.5))
+    s.lens(30, 4.0)
+    s.move((12.6, 40.8, 3.0), (9.5, 46.5, 2.5))
     s.focus((9.5, 46.5, 1.7))
     st.lights(s, scale=0.0)
     frames["hopper"] = [f0 + 2, plans[0]["landed"] or plans[0]["frame"] - 1, plans[2]["frame"] - 1]
@@ -144,6 +144,15 @@ def main(argv):
     for k, v in built["frames"].items():
         print("  frames %s: %s" % (k, v))
     film = built["film"]
+    if "--lava-fix" in argv:                      # a candidate fix, tried on this probe's copy of the scene only:
+        for mat in bpy.data.materials:            # the lava shown at its texture's own colour (the game draws it
+            if mat.name.startswith("fx/lava_"):   # full-bright), no sunlit diffuse under the glow
+                bsdf = mat.node_tree.nodes["Principled BSDF"]
+                for link in list(mat.node_tree.links):
+                    if link.to_socket == bsdf.inputs["Base Color"]:
+                        mat.node_tree.links.remove(link)
+                bsdf.inputs["Base Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+                bsdf.inputs["Emission Strength"].default_value = float(os.environ.get("LAVA_EMIT", "1.0"))
     for arg in argv:
         if arg.startswith("-"):
             continue
@@ -151,7 +160,7 @@ def main(argv):
         for i in [int(x) for x in idx.split(",")] if idx else range(len(built["frames"][shot])):
             f = built["frames"][shot][i]
             film.goto(f)
-            path = os.path.join(OUT, "check_fixtures_%s_%d" % (shot, i))
+            path = os.path.join(OUT, "check_fixtures_%s_%d%s" % (shot, i, "_lavafix" if "--lava-fix" in argv else ""))
             scene.render.filepath = path
             t = time.time()
             bpy.ops.render.render(write_still=True)

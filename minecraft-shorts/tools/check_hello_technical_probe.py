@@ -38,8 +38,12 @@ def main(argv):
         if not ses.owns(f):
             print("[probe] frame %d not in sky %s, skipped" % (f, sky))
             continue
-        ses.configure((270, 480), 4, 2, True)
-        path = os.path.join(OUT, "check_hello_technical_%s_%d.png" % (sky, f))
+        resv = (270, 480)
+        spp = 4
+        if "--hi" in argv:
+            resv, spp = (540, 960), 16
+        ses.configure(resv, spp, 2, True)
+        path = os.path.join(OUT, "check_hello_technical_%s_%d%s.png" % (sky, f, "_hi" if "--hi" in argv else ""))
         t = time.time()
         ses.render_frame(f, path)
         print("[probe] rendered %s in %.1f s" % (path, time.time() - t))

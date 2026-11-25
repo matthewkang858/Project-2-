@@ -16,7 +16,6 @@ removes the ring oak at (-25, 37) and the meadow oak at (-13, 47) and clears the
                                y 34      Steve holding an anvil
                                y 40      four static chests (latch north / east / south / west) and a double chest
                                y 44      an animated chest (opens), a hopper on a chest (the ingot stream)
-                               y 50      five hoppers: down, north, east, south, west
   west of the road             x -11..-5, y 29..36: the glass pod on its stone pillar (a cleric and a lantern inside,
                                          a librarian on the balcony north of it: behind two walls of glass)
                                x -19..-15, y 31..35: platform A: water as the GAME spreads it (sources along its
@@ -24,9 +23,16 @@ removes the ring oak at (-25, 37) and the meadow oak at (-13, 47) and clears the
                                x -19..-15, y 39..43: platform B: the film's cheat, a level sheet 1/9 deep (amount 1)
                                          drawn flowing south, the same slot (the golem slides into it)
                                x -21..-15, y 49..55: a 7 x 7 lava lake sunk in the ground ("far lava")
-Names (golden hour): chest chest_open hopper hoppers platform_a platform_b platform_top slide pod_out pod_cut pod_in
-lava_far anvils hold fall fallen flicker; night sky: night (platform A), night_far, night_flicker. Strips (several
-frames side by side, 270x480 each): chest_open (3), hopper (5), fall (6), slide (5), flicker (6).
+                               x -30..-26, y 31..35: platform C (beat 11): a 2/9 sheet and a slot whose lava is a
+                                         GLOW only (fixtures.lava_glow: a light and a strip, no lava blocks), a lantern
+  east                         y 50      a column of five hoppers: spout down, north, east, south, west (bottom up)
+                               y 56      an animated double chest (opens), a villager beside it
+  the village                  the glass-pane window of the house at x 4..8, y 12..20 (a villager inside)
+Names (golden hour): chest chest_open double_open hopper hoppers platform_a platform_b platform_top slide pod_out
+pod_cut pod_in lava_far anvils hold fall fallen flicker pane glow_slot; night sky: night (platform A), night_far,
+night_flicker; no sun (the night preset with moon, bounce and haze off and the fill at 12 %: a stand-in for the
+Nether): nether (platform C's glow slot and a lantern), nether_far. Strips (several frames side by side, 270x480
+each): chest_open (3), double_open (3), hopper (5), fall (6), slide (5), flicker (6).
 """
 import math
 import os
@@ -37,6 +43,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "out", "test")
 GOLD = dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm")
 NIGHT = dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool")
+NETHER = dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="warm", key=0.0, ambient=0.12, haze=0.0)
 
 # shot name -> (seconds, frames to render as offsets into the shot (one = a still, several = a strip))
 SHOTS = [
@@ -44,9 +51,11 @@ SHOTS = [
     ("platform_b", 1.0, [12]), ("platform_top", 1.0, [12]), ("pod_out", 1.0, [12]), ("pod_cut", 1.0, [12]),
     ("pod_in", 1.0, [12]), ("lava_far", 1.0, [12]), ("anvils", 1.0, [12]), ("hold", 1.0, [12]),
     ("fall", 3.0, None), ("fallen", 1.0, [12]), ("slide", 5.0, None), ("hoppers", 1.0, [12]),
-    ("flicker", 2.0, [4, 6, 8, 12, 20, 34]),
+    ("flicker", 2.0, [4, 6, 8, 12, 20, 34]), ("double_open", 2.0, [2, 9, 22]), ("pane", 1.0, [12]),
+    ("glow_slot", 1.0, [12]),
 ]
 NIGHT_SHOTS = {"night": "platform_a", "night_far": "lava_far", "night_flicker": "flicker"}
+NETHER_SHOTS = {"nether": "glow_slot", "nether_far": "lava_far"}
 STRIP_RES = (270, 480)
 
 
@@ -65,7 +74,7 @@ def build_set(b):
         oak = b.tree_at(x, y)                                # the meadow oak over the lava lake
         if oak is not None:
             sets.remove_tree(b, oak)
-    zones = [(3, 27, 14, 60), (-31, 27, -4, 47), (-23, 47, -13, 57)]
+    zones = [(3, 27, 14, 60), (-35, 24, -4, 47), (-23, 47, -13, 57)]
     for x0, y0, x1, y1 in zones:
         for x in range(x0, x1 + 1):
             for y in range(y0, y1 + 1):
@@ -87,8 +96,8 @@ def build_set(b):
                      ((5, "north"), (7, "east"), (9, "south"), (11, "west"))]
     out["chest"] = fx.chest(b, (7, 44, 0), "north")
     out["double"] = fx.chest(b, (13, 40, 0), "south", animated=False, partner=(14, 40, 0))
-    out["hoppers"] = [fx.hopper(b, (x, 50, 0), f) for x, f in ((4, "down"), (6, "north"), (8, "east"), (10, "south"),
-                                                               (12, "west"))]
+    out["hoppers"] = [fx.hopper(b, (8, 50, z), f) for z, f in enumerate(("down", "north", "east", "south", "west"))]
+    out["double_open"] = fx.chest(b, (4, 56, 0), "south", partner=(5, 56, 0))
     out["hopper"], out["hopper_chest"] = fx.hopper_on_chest(b, (11, 44, 0), "north", animated=False)
 
     # ---- west: the glass pod on its pillar
@@ -110,6 +119,16 @@ def build_set(b):
             water = fx.water_sheet(b, -19, y0, -15, y1, 3, toward="south", amount=1, name="water_b")
         lava = fx.lava(b, [(x, y, -1) for x in range(-19, -14) for y in (y0 - 2, y0 - 1)], name="lava_" + name)
         out["water_" + name], out["lava_" + name] = water, lava
+    # ---- west: platform C, beat 11's picture: a thin sheet (2/9) and a slot lit by a lava GLOW only
+    w.fill(-30, 31, 0, -26, 35, 2, "stone")                  # the platform: top at z 3
+    w.fill(-30, 28, -1, -26, 28, 2, "stone")                 # the slot's outer wall, flush with the platform
+    for x in range(-30, -25):
+        for y in (29, 30):
+            w.set(x, y, -1, None)                            # the slot (y 29 .. 30) dug into the ground
+    w.fill(-30, 29, -2, -26, 30, -2, "stone")
+    out["water_c"] = fx.water_sheet(b, -30, 31, -26, 35, 3, toward="south", amount=2, name="water_c")
+    out["glow_c"] = fx.lava_glow(b, -30, 29, -26, 30, -1 + fx.FLUID_SOURCE_HEIGHT, name="glow_c")
+    b.torch((-28, 28, 3), "lantern", {"hanging": "false"}, group="glow_c")
     # ---- west: the far lava lake
     w.fill(-21, 49, -2, -15, 55, -2, "stone")
     out["lake"] = fx.lava(b, [(x, y, -1) for x in range(-21, -14) for y in range(49, 56)], name="lake")
@@ -217,9 +236,84 @@ def shot_pod(st, s, h, mode):
 
 
 def shot_hoppers(st, s, h):
-    """engine.blocks' hopper model in every facing: down, north, east, south, west (left to right)."""
-    _cam(s, (8.5, 59.6, 1.7), (8.5, 50.5, 0.45), 20, 8.0)
+    """engine.blocks' hopper model in every facing, a column of five seen from the south-east, bottom to top:
+    spout down, north (away, right), east (toward the lens, right), south (toward the lens, left), west (away,
+    left)."""
+    _cam(s, (11.9, 46.6, 2.7), (8.5, 50.5, 2.45), 30, 8.0, (8.5, 50.5, 2.5))
     st.lights(s, scale=0.0)
+
+
+def shot_double_open(st, s, h):
+    """The animated DOUBLE chest opening (frames: shut, +5, open), a villager beside it."""
+    from films.lookdev import yaw_to
+
+    f0 = s.frame_start
+    c = h["double_open"]
+    c.open(f0 + 4)
+    vil = st.actor("double_vil", "farmer")
+    p = (6.9, 56.2, 0.0)
+    vil.place(f0, p, yaw_to(p, (5.0, 52.0)))
+    vil.look_at(f0, c.center, ease=0)
+    st.use(s, vil)
+    _cam(s, (5.6, 52.6, 1.6), (5.4, 56.5, 0.6), 30, 4.0, c.center)
+    st.lights(s, scale=0.0)
+
+
+def _pane_spot(v):
+    """A glass-pane window of a village house: (cell, outward unit vector (x, y)), chosen near (6, 12)."""
+    w = v.world
+    best = None
+    for c, sid in w.blocks.items():
+        if w._states[sid][0] != "glass_pane" or c[2] > 2:
+            continue
+        d = abs(c[0] - 6) + abs(c[1] - 12)
+        if best is None or d < best[0]:
+            best = (d, c)
+    c = best[1]
+    props = w.get(*c)[1]
+    along_x = props.get("east") == "true" or props.get("west") == "true"
+    for out in (((0, -1), (0, 1)) if along_x else ((-1, 0), (1, 0))):
+        n = (c[0] + out[0], c[1] + out[1], c[2])
+        if w.block_id(*n) is None and w.block_id(n[0], n[1], n[2] - 1) is None:
+            return c, out
+    return c, ((0, -1) if along_x else (-1, 0))
+
+
+def shot_pane(st, s, h):
+    """A village window of glass PANES, close, from outside, a villager inside behind it."""
+    from films.lookdev import yaw_to
+
+    f0 = s.frame_start
+    c, out = _pane_spot(st.v)
+    w = st.v.world
+    inside = (c[0] + 0.5 - out[0] * 1.6, c[1] + 0.5 - out[1] * 1.6)
+    z = c[2] - 1
+    while w.block_id(int(math.floor(inside[0])), int(math.floor(inside[1])), z) is not None:
+        z += 1
+    vil = st.actor("pane_vil", "librarian")
+    p = (inside[0], inside[1], float(z))
+    cam = (c[0] + 0.5 + out[0] * 2.4 + out[1] * 0.7, c[1] + 0.5 + out[1] * 2.4 - out[0] * 0.7, c[2] + 0.6)
+    vil.place(f0, p, yaw_to(p, cam))
+    st.use(s, vil)
+    _cam(s, cam, (c[0] + 0.5, c[1] + 0.5, c[2] + 0.45), 30, 5.6, (c[0] + 0.5, c[1] + 0.5, c[2] + 0.5))
+    st.lights(s, scale=1.0, near=(c[0], c[1], c[2]), radius=6.0)
+    h["pane_cell"] = c
+
+
+def shot_glow_slot(st, s, h):
+    """Beat 11's picture on platform C: from the side (west) and a little below the rim, a golem standing in the
+    2/9 sheet, the slot at the platform's south edge lit by lava_glow."""
+    from engine import mobs
+
+    f0 = s.frame_start
+    g = st.cast.get("golem_c")
+    if g is None:
+        g = st.cast["golem_c"] = mobs.make_iron_golem("golem_c")
+    g.place(f0, (-28.0, 32.4, 3.0), math.radians(160.0))
+    st.use(s, g)
+    _cam(s, (-34.6, 33.6, 2.6), (-28.0, 30.6, 3.0), 28, 5.6, (-28.0, 31.5, 3.2))
+    # no sun (the Nether stand-in): the lava glow and the lantern on the rim are the only light
+    st.lights(s, scale=0.0, groups={"glow_c": 1.0 if h.get("sky") is NETHER else 0.0})
 
 
 def shot_flicker(st, s, h):
@@ -289,10 +383,15 @@ def shot_slide(st, s, h):
     start = (-17.0, 41.5, 3.0)
     g.place(f0, start, math.radians(90.0))           # facing west, the current pushes it south: sideways
     # its middle must be 0.7 past the rim (y 39) before it falls: 2.5 + 0.7 blocks, then 3.9 down into the lava
-    r = fx.slide(g, f0 + 4, "south", 3.2, drop=3.9)
+    r = fx.slide(g, f0 + 4, "south", 3.2, drop=3.9)          # hidden ON r["gone"] (vanish=True)
     h["slide"] = r
+    from engine import animals
+
+    animals.poof(g, r["gone"], camera=s, village=st.v)
+    h["lava_b"].flicker(r["edge"], r["edge"] + 40, at=r["gone"])
     st.use(s, g)
-    _cam(s, (-26.6, 40.0, 3.4), (-17.0, 38.8, 2.6), 30, 5.6, (-17.0, 39.5, 3.2))
+    # from the slot's open west end, above the rim: the golem slides toward the camera's right and drops in
+    _cam(s, (-24.9, 37.9, 4.6), (-17.5, 38.7, 1.5), 22, 5.6, (-17.0, 38.6, 2.0))
     st.lights(s, scale=1.0, near=(-16.0, 37.0, 3.0), radius=12.0)
 
 
@@ -304,7 +403,7 @@ BUILDERS = {
     "pod_out": lambda st, s, h: shot_pod(st, s, h, "out"), "pod_cut": lambda st, s, h: shot_pod(st, s, h, "cut"),
     "pod_in": lambda st, s, h: shot_pod(st, s, h, "in"), "lava_far": shot_lava_far, "anvils": shot_anvils,
     "hold": shot_hold, "fall": shot_fall, "fallen": shot_fallen, "slide": shot_slide, "hoppers": shot_hoppers,
-    "flicker": shot_flicker,
+    "flicker": shot_flicker, "double_open": shot_double_open, "pane": shot_pane, "glow_slot": shot_glow_slot,
 }
 
 
@@ -318,10 +417,15 @@ def build(scene, sky=None, res=(540, 960), samples=16, threads=2):
     look.setup_render(scene, res=res, samples=samples, threads=threads)
     out = {}
     v = village.build_village(scene, seed=1, edit=lambda b: out.update(build_set(b)))
-    sk = look.set_time(scene, sky["preset"], sun_azimuth=sky["az"], sun_elevation=sky["el"])
-    look.setup_compositor(scene, bloom=sky["bloom"], grade=sky["grade"])
+    sk = look.set_time(scene, sky["preset"], sun_azimuth=sky["az"], sun_elevation=sky["el"],
+                       key_strength=sky.get("key", 1.0), ambient_strength=sky.get("ambient", 1.0))
+    if sky.get("key", 1.0) == 0.0:                           # no sun, no moon: their bounce lamps go too
+        for lamp in sk.get("bounce") or ():
+            lamp.data.energy = 0.0
+    look.setup_compositor(scene, bloom=sky["bloom"], grade=sky["grade"], haze=sky.get("haze"))
     film = shots.Film(scene, fps=24)
     st = Stage(scene, film, v, sk)
+    out["sky"] = sky
     frames = {}
     for name, secs, offs in SHOTS:
         s = st.shot(name, secs)
@@ -340,8 +444,8 @@ def _strip_offsets(name, s, h):
         plans = h["hopper_plans"]
         lands = [p["landed"] for p in plans if p["landed"] is not None]
         takes = [p["frame"] for p in plans]
-        want = [lands[0] - 4 if lands else f0 + 6, lands[0] + 2 if lands else f0 + 10, takes[0], takes[1] + 1,
-                takes[-1] + 2]
+        first = int(round(plans[0]["track"][0][0]))
+        want = [first - 1, lands[0] + 2 if lands else f0 + 10, takes[0], takes[1] + 1, takes[-1] + 2]
         return [w - f0 for w in want]
     if name == "fall":
         d = h["drops"][0]
@@ -350,7 +454,7 @@ def _strip_offsets(name, s, h):
     if name == "slide":
         r = h["slide"]
         a, e, g = r["frame"], r["edge"], r["gone"] or r["frame_end"]
-        return [a - f0, (a + e) // 2 - f0, e - f0, (e + g) // 2 - f0, g - f0]
+        return [a - f0, e - f0, (e + g) // 2 - f0, g - f0, g + 6 - f0]
     return [12]
 
 
@@ -381,19 +485,21 @@ def _check(scene, film, frame, path, name, heroes=()):
 
 
 def render(names, night=False):
-    """Render the named stills / strips to out/test/fixtures_<name>.png."""
+    """Render the named stills / strips to out/test/fixtures_<name>.png. night: False (golden hour), True (the
+    night sky) or 'nether' (no sun, no moon)."""
     import bpy
     from PIL import Image, ImageDraw
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     t0 = time.time()
-    built = build(scene, NIGHT if night else GOLD)
+    built = build(scene, NETHER if night == "nether" else NIGHT if night else GOLD)
     film = built["film"]
     print("[fixtures proof] built in %.1f s" % (time.time() - t0), flush=True)
     os.makedirs(OUT, exist_ok=True)
+    table = NETHER_SHOTS if night == "nether" else NIGHT_SHOTS
     for name in names:
-        shot = NIGHT_SHOTS.get(name, name) if night else name
+        shot = table.get(name, name) if night else name
         frames = built["frames"][shot]
         path = os.path.join(OUT, "fixtures_%s.png" % name)
         t = time.time()
@@ -426,15 +532,19 @@ def main(argv):
     """Command line: names (see the module docstring); 'night' / 'night_far' build the night sky."""
     names = [a for a in argv if not a.startswith("-")] or ["chest"]
     night = [n for n in names if n in NIGHT_SHOTS]
-    gold = [n for n in names if n not in NIGHT_SHOTS]
+    nether = [n for n in names if n in NETHER_SHOTS]
+    gold = [n for n in names if n not in NIGHT_SHOTS and n not in NETHER_SHOTS]
     unknown = [n for n in gold if n not in BUILDERS]
     if unknown:
-        print("unknown proof names %s; known: %s %s" % (unknown, sorted(BUILDERS), sorted(NIGHT_SHOTS)))
+        print("unknown proof names %s; known: %s %s %s" % (unknown, sorted(BUILDERS), sorted(NIGHT_SHOTS),
+                                                           sorted(NETHER_SHOTS)))
         return 2
     if gold:
         render(gold)
     if night:
         render(night, night=True)
+    if nether:
+        render(nether, night="nether")
     return 0
 
 
