@@ -44,14 +44,14 @@ FRONTS_SEED = 15
 # beat 5: over his LEFT shoulder (the empty hand: the sword arm is on the other side), looking down at the child
 NOD_CAM = dict(pos=(9.75, -4.3, 1.1), target=(9.2, -6.5, 0.3), lens=32.0, fstop=2.4,
                pos1=(9.73, -4.4, 1.09), target1=(9.2, -6.5, 0.3))
-NOD_RUN = [(8.7, -6.95), (8.4, -8.4), (7.3, -10.9)]     # beat 5: the child runs off along the plaza, away from
-#                                                         the lens, west of the step
+NOD_RUN = [(8.85, -7.0), (8.75, -8.0), (8.4, -11.2)]    # beat 5: the child runs off along the plaza, straight
+#                                                         away from the lens, past the step's west face
 # beat 20: low, close behind his right hip (north-west of him), looking past him at the door
 WALK_CAM = dict(pos=(7.4, -4.7, 0.35), target=(9.6, -7.15, 0.45), lens=32.0, fstop=2.4,
                 pos1=(7.48, -4.78, 0.36), target1=(9.6, -7.15, 0.45))
 # beat 21: behind his right shoulder line, cropped at his chin, down on the child
-CROUCH_CAM = dict(pos=(7.65, -4.95, 1.15), target=(9.0, -6.2, 0.55), lens=40.0, fstop=2.4,
-                  pos1=(7.73, -5.02, 1.14), target1=(9.0, -6.2, 0.55))
+CROUCH_CAM = dict(pos=(7.7, -5.0, 1.4), target=(9.0, -6.2, 0.7), lens=40.0, fstop=2.4,
+                  pos1=(7.76, -5.1, 1.39), target1=(9.02, -6.22, 0.7))
 
 
 def _head_point(c, frame, yaw_deg, pitch_deg=0.0, dist=3.0):

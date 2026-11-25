@@ -225,6 +225,7 @@ def in17_window(st, s, C, nar):
     him = C.watcher(s, "in", place="watch_window", yaw=HC.yaw_to(HC.PLACES["watch_window"], HC.PLACES["window"]))
     C.put(kid, f0, KID_WINDOW, toward=(KID_WINDOW[0] - 1.0, KID_WINDOW[1]))
     kid.look_at(f0, him, ease=0)                          # out through the pane at him (and so nearly at the lens)
+    him.watch(f0, f1, kid)                                # his head up at the pane from the first frame; body still
     st.use(s, kid)
     # the child's face is turned away from the room's torch (11, -8, 3): a small warm film-local light inside the
     # pane, in front of its face, stands in for the torch light the game would show on it (shadowless, invisible)

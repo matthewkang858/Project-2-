@@ -394,6 +394,8 @@ tools/narrate.py --selftest`).
 | `engine/piglins.py` | Piglin, brute, baby; admire, barter with lobbed results, axe swing, dance, fall, hurt, death poof. |
 | `engine/animals.py` | Cow, calf, chicken, chick; wander in pens, follow, eat, milk, lay eggs, hurt, death; `pen_set` through the village hook. |
 | `engine/sets.py` + `village.build_village(..., edit=hook)` | Film-specific blocks go INTO the village world before it is meshed and lit (torches become lights, paths and anchors follow). `hello_set`: dark oak forest wall, floating oak, bare oaks, sand pyramid, with anchors, paths and cameras. Docstring says how to add a set piece. |
+| `engine/redstone.py` | Lever, piston and sticky piston (push limit 12, piston doors, rows of pistons carrying planks), redstone dust with power levels, repeater, lamp (a real light), redstone torch (placed and held), `signal / unsignal` sequencing with the game's delays. Parts go into empty cells left by the village hook; `redstone.kit(v)` after the build. |
+| `engine/fixtures.py` | Chest (single and double, opening lid), hopper absorbing dropped items, still and flowing water, lava (surface, glow-only strip, real orange light, flicker), glass boxes with per-wall cutaways, falling blocks and anvils (the game's gravity, landing as blocks, chipping), extra beds that appear on a frame. |
 | `engine/breaking.py` | The game's destroy-stage cracks on doors and single blocks, breakable / placeable blocks, mining with the game's timing (compressible), the zombie banging on a door (cracks climb and reset, optional shudder), `door_torches`. |
 
 **Final quality is set by each new film, in build()** (study: `tools/render_economics.py findings`, independently
