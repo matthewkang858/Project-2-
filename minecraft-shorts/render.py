@@ -131,10 +131,13 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     frames count as 'not judged' until their own sky's build has looked at them. meta.json describes the whole
     timeline (shots with their sky, 'sky_segments', 'skies'), so --encode sees one complete film.
   * NO BUILD WITHOUT WORK: while no source changed since meta.json was written, the frames' judgments in it are
-    still true, and the command builds only the skies that have a frame to render. Measured on the village
-    (films/_multisky_demo.py, 206 frames): a chunk that renders in one sky spends 2.8 to 3.9 s outside its frames
-    (0.2 s this process, 0.6 s Blender and the film's imports, 1.8 to 2.6 s the build); the chunk in which one sky
-    is finished and the next begins 7.9 s; the call that finds nothing left builds nothing and takes 0.3 s.
+    still true, and the command builds only the skies that have a frame to render. Measured on the village with a
+    one-minute film (films/_multisky_minute.py: 1,440 frames, two skies, five segments): a chunk that renders in
+    one sky spends 3.0 s outside its frames (0.2 s this process, 0.6 s Blender and the film's imports, 1.5 to
+    1.7 s the build), the chunk in which one sky is finished and the next begins 5.2 s; inside the frame loop
+    each frame costs its fingerprint (16 to 20 ms) and one meta.json write (14 ms at 1,440 stamps, 403 KB); the
+    call that finds nothing left builds nothing and takes 0.5 s. After an edit, both skies are built and all
+    1,440 frames judged in 32 s.
   * AFTER AN EDIT (any source of the film changed since meta.json was written) the sky table on disk is the film
     BEFORE the edit: wrong exactly where the timeline or SKIES were changed (a new shot's name, frames beyond the
     old end, a renamed sky). Nothing is planned from it. The first process builds the sky that table suggests if
@@ -149,11 +152,17 @@ Several skies in one film (day and night in ONE module, one frame directory, one
         [render] frames: 1440 requested, 932 done (60 in this run), 508 left at ... (sky 'night': 508); re-run ...
     The words " 0 to render" appear only in that line and only when every requested frame of every sky is a valid
     frame as the build of its OWN sky judged it: a loop that waits for them cannot stop early. Exit codes are
-    the same as for any film (0, 2, 3, 4).
+    the same as for any film (0, 2, 3, 4). Before each sky's process starts: "[render] sky 'night': a process of
+    its own for frames" (the actions it has), or after an edit "[render] sky 'gold': a process of its own, to
+    learn the film's sky table and do its share". A film rendered from its first chunk to its last says
+    " 0 to render" in the chunk that renders its last frame; the next call builds nothing.
   * THE FILM SCRIPT MAY BE EDITED WHILE A CHUNK RENDERS, as for any film. The sky processes of one command then
-    built different sources: every frame that was rendered is right and stamped, the command says "a source file
-    of the film changed while this command ran" instead of the film's account and ends with exit code 0 (2 with
-    --encode, which is not attempted); the next call judges every sky again.
+    built different sources (each report names the files its build read and their hash; a file whose hash is not
+    what a process built from was edited during the command, also when the edit adds an import): every frame
+    that was rendered is right and stamped, the command says "a source file of the film changed while this
+    command ran" instead of the film's account and ends with exit code 0 (2 with --encode, which is not
+    attempted); the next call judges every sky again. Only when no file changed and two skies' builds still read
+    different files or made different timelines is that the film's fault (SkyError).
   * --max-seconds is the whole command's rendering time: when one sky is finished the next one is built and gets
     what is left; a sky is not started for rendering once the time is used up.
   * EXIT CODE 3 (engine sources changed under existing frames) looks at EVERY sky's frames before any sky renders:
@@ -175,7 +184,7 @@ Several skies in one film (day and night in ONE module, one frame directory, one
   * WHAT COSTS WHAT: an edit to one shot re-renders that shot's frames, in its sky's build; an edit to the VALUES
     of one entry of SKIES re-renders exactly that sky's frames; re-tagging a shot or moving a sky_change
     re-renders the frames whose sky changed; renaming a sky, a caption or a dip re-render nothing (every sky is
-    built once to see that: about 3 s each).
+    built once to see that: about 3 s each, plus 16 to 50 ms per frame to judge).
   * The film must not make anything but the sky depend on build()'s `sky` argument (no shot, actor, light key,
     caption, render setting or import inside `if sky == ...`). render.py notices: a timeline that differs between
     two skies' builds of the same sources raises SkyError. A film may set its own final resolution and samples in
@@ -185,7 +194,10 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     Session of that frame's sky; render.sky_table(name) is the film's sky table without a build in this process.
   * Temporary files: the sky processes' reports and sheet tiles live in out/test/render_sky_*/ while a command
     runs. A terminated command (timeout) removes its own; what a killed one (SIGKILL) left is removed by the next
-    command for a film with several skies.
+    command for a film with several skies (the directory holds its command's process id and start time: a
+    directory whose process is gone, a zombie or another process by now is removed, a running command's is not).
+    A killed sky process never leaves a partial frame: a PNG is written as f_####_part.png and renamed once
+    complete (a _part file left by a kill is not a frame and is overwritten by the next render of that frame).
 """
 import argparse
 import ast
@@ -1185,8 +1197,12 @@ def _main_one(args, started, argv=()):
         if other:
             print(f"[render]   {len(other)} stale: other settings, another size or no stamp ({_ranges(other)})")
         if by_sky:
+            # (a name SKIES no longer has: the sky was renamed AND its frames' scene differs, e.g. a value of the
+            #  sky changed too; the fingerprint parts say what)
             print(f"[render]   {sum(len(v) for v in by_sky.values())} stale: rendered under another sky ("
-                  + "; ".join(f"{_ranges(v)}: was '{k}'" for k, v in by_sky.items()) + f", now '{ses.sky}')")
+                  + "; ".join(f"{_ranges(v)}: was '{k}'" + ("" if k in ses.skies else ", a name SKIES no longer has")
+                              for k, v in by_sky.items()) + f", now '{ses.sky}'; changed: "
+                  + book.why_scene([f for v in by_sky.values() for f in (v[0], v[-1])]) + ")")
         book.save()
         t0 = time.time()
         done = 0
@@ -1359,7 +1375,25 @@ def _die_with_parent():
 TMP_PREFIX = "render_sky_"
 
 
-def _alive(pid):
+def _proc_start(pid):
+    """(state, start time) of a process from /proc/<pid>/stat, or None when there is no such process."""
+    try:
+        with open("/proc/%d/stat" % pid, encoding="ascii", errors="replace") as fh:
+            rest = fh.read().rsplit(")", 1)[1].split()
+        return rest[0], rest[19]                  # (fields 3 and 22 of proc(5): state, starttime)
+    except (OSError, IndexError):
+        return None
+
+
+def _alive(pid, start=None):
+    """True while the process that wrote a temporary directory is still running: not gone, not a zombie that
+    nobody has reaped yet (a process killed outright whose parent died with it), and not another process that
+    was given the same number since (`start` = its start time as written in the directory)."""
+    if pid <= 0:
+        return False
+    if os.path.isdir("/proc/self"):
+        st = _proc_start(pid)
+        return st is not None and st[0] != "Z" and (start is None or st[1] == start)
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -1384,14 +1418,19 @@ def _sky_tmp():
             continue
         try:
             with open(os.path.join(old, "pid"), encoding="utf-8") as fh:
-                dead = not _alive(int(fh.read().strip() or 0))
-        except (OSError, ValueError):
-            dead = time.time() - os.path.getmtime(old) > 3600.0      # (no pid file yet, or one from older code)
+                words = fh.read().split()
+            dead = not _alive(int(words[0]), words[1] if len(words) > 1 else None)
+        except (OSError, ValueError, IndexError):
+            try:                                  # (no pid file yet, or one from older code)
+                dead = time.time() - os.path.getmtime(old) > 600.0
+            except OSError:
+                dead = False
         if dead:
             _sky_tmp_remove(old)
     tmp = tempfile.mkdtemp(prefix=TMP_PREFIX, dir=root)
+    st = _proc_start(os.getpid())
     with open(os.path.join(tmp, "pid"), "w", encoding="utf-8") as fh:
-        fh.write(str(os.getpid()))
+        fh.write("%d %s" % (os.getpid(), st[1] if st else ""))
     return tmp
 
 
@@ -1628,10 +1667,11 @@ def _main_skies(args, argv, started):
                 raise SkyError("asked for sky %r, the process built %r" % (sky, rep["sky"]))
 
     def edited():
-        """True when the sky processes of this command did not all build the same sources although they loaded the
-        same files: somebody edited a file of the film while the command ran (which is allowed at any time)."""
-        files = {tuple(f) for _sky, f, _h in state["sources"]}
-        return len(files) == 1 and len({h for _sky, _f, h in state["sources"]}) > 1
+        """True when a file that one of this command's sky processes built from has changed since that process read
+        it: somebody edited the film (or anything it loads) while the command ran, which is allowed at any time.
+        (Two processes that loaded different files from UNCHANGED sources are not an edit: that is a film whose
+        build depends on the active sky, and the account below says so.)"""
+        return any(source_hash(files) != h for _sky, files, h in state["sources"])
 
     try:
         first = {"frames", "blend", "encode"} if (args.restamp or args.prune_stale) and \
@@ -1697,7 +1737,7 @@ def _main_skies(args, argv, started):
             size = "%dx%d, %d samples, %d threads" % (
                 (info["res"][0], info["res"][1], info["samples"], info["threads"]) if info else
                 (p.size[0], p.size[1], args.samples or table.base[2], args.threads or FINAL_THREADS))
-            skies_note = "%d skies: %s" % (len(table.skies), ", ".join(table.skies))
+            skies_note = "%d sk%s: %s" % (len(table.skies), "y" if len(table.skies) == 1 else "ies", ", ".join(table.skies))
             n_left = len(wanted) - len(valid)
             if n_left == 0:
                 now = f"{state['rendered']} rendered in this run, " if state["rendered"] else ""

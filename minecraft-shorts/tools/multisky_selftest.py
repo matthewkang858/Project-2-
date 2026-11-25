@@ -12,7 +12,8 @@ for, and the wrong-sky lock. Drives the real command line on films/_multisky_dem
                                                  #   sky (also into a new frame directory), a re-tagged shot
     $BPY -m tools.multisky_selftest detect       # SKIES through a star import, SKIES no source line shows, an empty
                                                  #   SKIES: the imported module decides whether a film has several skies
-    $BPY -m tools.multisky_selftest midrun       # the film script edited while a chunk renders
+    $BPY -m tools.multisky_selftest midrun       # the film script edited while a chunk renders (a comment, an added
+                                                 #   import), and a chunk killed with SIGKILL (its temp directory)
 
 Frames go to the preview variant 180x320_4spp_step8 of the demo (26 frames: 16 golden, 10 night; 11 more of the
 last shot) and nowhere else; 'engine', 'stale' and 'encode' need the frames 'chunks' renders (they run it first when
@@ -214,7 +215,7 @@ def part_stale():
     code, out, _ = run(["--frames", "all"] + SMALL)
     after = mtimes()
     check(code == 0 and [n for n in after if after[n] != before[n]] == ["f_0025.png"] and builds(out) == ["gold"]
-          and len(lines(out, "1 stale: rendered under another sky (25: was 'night', now 'gold')")) == 1,
+          and len(lines(out, "1 stale: rendered under another sky (25: was 'night', now 'gold'; changed: ")) == 1,
           "... it is rendered again, in its own sky's build (gold), nothing else is, and the reason is named")
     # a golden frame whose stamp carries a name the sky had before it was renamed, and this build's fingerprint: the
     # NAME is a label, the fingerprint is the proof. Kept, relabelled, nothing rendered.
@@ -617,6 +618,40 @@ def part_midrun():
     code, out, _ = run(["--frames", "all"] + TINY, film=E.FILM)
     check(code == 0 and DONE in out and edit_mtimes() == before,
           "... the next call judges every frame again, renders nothing and says %r" % (lines(out, "frames:") or [""])[-1][9:90])
+    # ---- the same, but the edit makes the film load one more project file (the two skies' builds then load
+    #      different files, which without an edit would be a film whose build depends on its sky)
+    E.clear()
+    E.write(shots=[("a", 30, "gold"), ("b", 6, "night")], change=None)
+    box.clear()
+    th = threading.Thread(target=go)
+    th.start()
+    t0 = time.time()
+    while not os.path.exists(first) and time.time() - t0 < 60:
+        time.sleep(0.05)
+    with open(E.path(), "a", encoding="utf-8") as fh:
+        fh.write("import tools.multisky_editfilm  # noqa: E402,F401  (added while the first sky was rendering)\n")
+    th.join()
+    code, out, _ = box["r"]
+    check(code == 0 and no_crash(out) and DONE not in out and len(edit_mtimes()) == 36
+          and len(lines(out, "changed while this command ran")) == 1,
+          "... an edit that adds an import while the first sky renders: exit code %d, no error, %d of 36 frames"
+          % (code, len(edit_mtimes())))
+    code, out, _ = run(["--frames", "all"] + TINY, film=E.FILM)
+    check(code == 0 and DONE in out, "... and the next call says %r" % (lines(out, "frames:") or [out[-300:]])[-1][9:60])
+    # ---- a command killed outright (SIGKILL, no clean-up runs): its temporary directory goes with the next command
+    test = os.path.join(ROOT, "out", "test")
+    E.clear()
+    E.write(shots=[("a", 90, "gold"), ("b", 6, "night")], change=None)
+    had = {d for d in os.listdir(test) if d.startswith("render_sky_")}
+    p = subprocess.run(["timeout", "-s", "KILL", "3", sys.executable, "-W", "ignore", "-m", "render", E.FILM,
+                        "--frames", "all"] + TINY, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    left = {d for d in os.listdir(test) if d.startswith("render_sky_")} - had
+    parts = [n for n in os.listdir(edit_dir()) if n.endswith("_part.png")] if os.path.isdir(edit_dir()) else []
+    code, out, _ = run(["--frames", "all"] + TINY, film=E.FILM)
+    still = left & {d for d in os.listdir(test) if d.startswith("render_sky_")}
+    check(p.returncode != 0 and len(left) == 1 and not still and code == 0 and DONE in out,
+          "SIGKILL during a chunk (exit code %d) left %s and %d partial PNG names (%s); the next command removed it "
+          "and finished the film" % (p.returncode, sorted(left), len(parts), "none" if not parts else parts))
     E.remove_all()
 
 

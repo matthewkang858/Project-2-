@@ -1,4 +1,291 @@
-"""FIXTURES (docstring is written at the end of the build: see the bottom of the work order)."""
+"""FIXTURES: chests, the hopper, water, lava, glass, falling blocks and anvils, for films three ("Twenty Minutes":
+the iron farm), five ("Leg Day": twelve anvils) and six ("Six Seconds": a chest, a lava glow, gravel).
+
+New module; edits no other file. Every number is transcribed from the Java Edition 26.x client classes (named next
+to it below and in WHAT THE GAME DOES); textures and models are the game's own, through engine.mcassets and
+engine.blocks (so colours, tints and materials match the rest of the set). Blender axes as everywhere: +X east,
++Y north, +Z up, 1 block = 1 unit, characters face -Y at yaw 0, 24 fps (the game runs 20 ticks per second: 1 tick
+= 1.2 frames; TICK). Frames are film frames.
+
+WHERE THINGS ARE BUILT: every builder takes `where` first:
+  - the village builder `b` INSIDE the edit hook (village.build_village(scene, edit=hook)): the blocks go into
+    b.w and, where they never move, into the village's one mesh (lit and checked like the village's own);
+  - a built Village `v` (after build_village returned): only separate objects can be added then;
+  - site(collection, world=None): a stand-alone place without a village (tests, a set of its own).
+  What is its own object and what is mesh is said for each builder below. Cells a fixture draws itself are
+  "claimed": they stay in the World (falls, particles and paths see them) but World.build() leaves them out.
+
+PUBLIC API
+  CHEST (block entity: ChestModel + ChestRenderer; engine.blocks cannot draw it right, see GOTCHAS)
+  chest(where, cell, facing="south", animated=True, partner=None, name=None) -> Chest
+      A chest with its latch toward `facing`, box for box as ChestModel builds it on entity/chest/normal.png
+      (base 14x10x14, lid 14x5x14, latch 2x4x1). partner = the neighbouring cell of a DOUBLE chest, beside it along
+      its front (the game's left/right halves, normal_left/_right.png, no inner faces). animated=False: ONE
+      object whose mesh every static chest of that kind shares (set dressing in any number: closed for good).
+      animated=True: base object + lid object (child, pivot on the hinge).
+  Chest   .object (base: origin = bottom centre of its first cell) .lid .cells .facing .kind .center .objects()
+          open(frame) -> frame it is fully open (frame + 12)     the lid starts to rise ON frame
+          close(frame) -> frame it is shut (frame + 12)           it lingers open, then drops
+          set_open(True)  open from before the film starts        openness_at(f) / angle_at(f)
+      Timing: ChestLidController +0.1 openness per tick (10 ticks = 12 frames), drawn as 1 - (1 - o)^3 by
+      ChestRenderer: 87.5 % of the way after half the time; lid.xRot = -openness x 90 degrees.
+  HOPPER (a block model: engine.blocks draws it in every facing, checked on fixtures_hoppers.png)
+  hopper(where, cell, facing="down") -> Hopper        in the hook: part of the village mesh; else its own object
+  hopper_on_chest(where, cell, facing="south", animated=True, partner=None) -> (Hopper, Chest)
+      The collection point of a farm: a chest at `cell` and a hopper on top, spout down (cell + 1 up).
+  Hopper  .cell .rim (z of its top) .bowl (z of the bowl's floor, where items lie) .mouth (middle of the floor)
+          absorb(item, frame, start=None, height=2.5, velocity=(0, 0, 0), offset=(0, 0)) -> plan dict
+              an engine.mobs DroppedItem released ON frame `height` blocks over the bowl falls (ItemEntity
+              gravity 0.04, drag 0.98) and is taken the way HopperBlockEntity takes it: plan["frame"] = the frame
+              it is gone, plan["landed"] = the frame it touched down (None: taken in the air, which is what an
+              idle hopper does the tick the item's box enters the block above it), plan["track"].
+          stream(items, frame, every=5, height=2.5, start=None, spread=0.2, seed=0, land=True) -> [plan, ...]
+              Several items dropped one after the other (every `every` frames, seeded jitter), taken ONE item
+              entity per 8 ticks (9.6 frames): they land, pile up in the bowl and vanish in turn. land=True: the
+              hopper is busy when the first one arrives (it has just passed an item down), so that one lands too.
+          busy(frame)    the hopper moved an item ON frame: it takes nothing for 8 ticks
+          Call absorb / stream in film order. Register the items with the Stage (st.cast[it.name] = it).
+  WATER AND LAVA (FluidRenderer.tesselate: the game has no JSON model for fluids)
+  water(where, cells, sources=None, flow=None, animated=True, name=None) -> Fluid
+      cells = a list (all source blocks, or with sources=[...] the game's own spread from them: 8, 7, 6 ... one
+      less per block) or {cell: amount} (8 = source, 8/9 high; 1..7 = flowing, amount/9 high). Sloping corner
+      heights (calculateAverageHeight), water_still on still tops, water_flow turned along the current on flowing
+      tops and on every side, sides toward full opaque cubes left out, the water_overlay texture on sides against
+      glass / leaves / ice (the game DRAWS those), plains water tint (63, 118, 228), alpha 180/255 from the texture,
+      0.001 insets as the game's (no z-fighting with the floor). The textures run at the game's speed (still: 32
+      images x 2 ticks, flow: 32 x 1 tick) as one object per image shown in turn. flow=(east, north) forces a
+      current on every top. Casts no shadow (what is under it stays lit).
+  water_sheet(where, x0, y0, x1, y1, z, toward=None, amount=1, name=None, animated=True) -> Fluid
+      A LEVEL sheet amount/9 deep over the floor cells x0..x1, y0..y1 (cells at height z), drawn flowing
+      `toward` ('north' ...) or still: the film's cheat; the game's water thins one step per block.
+  lava(where, cells, sources=None, flow=None, animated=True, name=None, light=True, watts_per_block=40,
+       color=LAVA_LIGHT_COLOR) -> Fluid
+      The same geometry with lava_still (20 images back and forth, 2 ticks) / lava_flow (16 x 3 ticks), glowing
+      (blocks.EMISSIVE strength 3), opaque, and a warm AREA light over each flat stretch of its surface, facing up,
+      invisible to the camera, smoothed falloff, 40 W per block up to 1600 W per light (LAVA_MAX_WATTS).
+  lava_glow(where, x0, y0, x1, y1, z, strip=True, animated=True, name=None, watts_per_block=40, color=...) -> Fluid
+      Lava as a glow only: the light over columns x0..x1, y0..y1 at height z and (strip=True) a flat glowing lava
+      strip under it, no blocks: a slot whose lava is out of sight, a lake far below a bridge.
+  lava_light(collection, rect, z, watts_per_block=40, color=..., name=..., max_watts=1600, smooth=0.5) -> light
+  Fluid   .kind .cells {cell: amount} .objects .lights .name; top(cell) (z of the surface there), surface, flow(cell)
+          level(frame, scale)        the lava light x scale from frame on (CONSTANT, like Stage.lights per shot)
+          flicker(f0, f1, at=None, amount=None, seed=0)
+              the lava light flickers on f0..f1. at=None: a slow +-8 % unrest. at=frame: something falls in ON that
+              frame: the light drops to 45 % for two frames, flares to 170 % and settles over a second; steady
+              before `at`. Only the light: the lava's texture glows on as before. (Not the game: film choice.)
+          light_factor(frame)
+  flow_amounts(cells, sources) -> {cell: amount}        the game's spread (WaterFluid drop-off 1 per block)
+  animation_of(texture) -> (images, order, ticks each)  /  texture_schedule(order, ticks) -> (period, [index per frame])
+  A MOB ON THE CURRENT (an iron farm's golem)
+  slide(mob, frame, toward, distance, drop=0.0, start=None, v0=0.0) -> dict(frame, edge, frame_end, gone, track)
+      Keys a mob's root (engine.mobs IronGolem, any Character) pushed `distance` blocks toward `toward` by the
+      current, then falling `drop` blocks: +0.014 per tick along the current, x 0.8 per tick in water (1.4
+      blocks/s at full speed: 1 block in 19 ticks, 3 in 47), then gravity 0.08 with air drag. No leg motion. A
+      golem (1.4 wide) falls when its middle is 0.7 past the rim, and only into a gap 2 blocks wide. edge = first
+      falling frame, gone = first frame its head (2.7) is below its starting feet. Call after place(), in order.
+  slide_track(distance, drop=0.0, v0=0.0) -> [(tick, along, down)]
+  GLASS
+  glass_box(where, x0, y0, z0, x1, y1, z1, walls=("north", "east", "south", "west", "roof"), openings=(),
+            block_id="glass", name="glass") -> GlassBox
+      A room of glass BLOCKS on the box of cells (walls on its outer columns, a roof filling layer z1). Cells in
+      `openings` or already holding another block (a cobblestone plug, a door) get none. Every glass block is its
+      own small object with the faces the game draws (none between two glass blocks, none toward full cubes), and
+      the walls are registered as cutaways exactly like the village's own:
+          Village.cutaways['<name>_north' | '_east' | '_south' | '_west' | '_roof' | '_all']
+          st.see_through(shot, "pod_south")     films.lookdev.Stage: invisible to the CAMERA only, for that shot
+          st.remove(shot, "pod_roof")           really gone for that shot (light comes in)
+          fixtures.see_through(st, shot, box.objects(wall="south", x=[3, 4]))     single blocks
+      The corner columns belong to the north and south walls. Build it inside the hook (the cutaways must exist
+      before the Stage keys them).
+  GlassBox  .walls {wall: [cells]} .panes {cell: object} .groups {cutaway: [objects]} .inside (room cells)
+            objects(wall=None, cells=None, x=None, y=None, z=None) -> [objects]
+  see_through(stage, shot, objects)     camera-invisible for one shot, any objects
+  SINGLE BLOCKS, FALLING BLOCKS AND ANVILS
+  block(where, block_id, cell, props=None, frame=None, name=None) -> Block
+      One block as its own object, exactly as engine.blocks draws it there (model, random variant, tint, facing):
+      only for what moves, appears or is taken away. frame=f: it appears ON f (the second bed, a placed anvil).
+  Block   .object .block_id .props .cell (where it stands now) .center .drop (its fall() dict) .objects()
+          show(frame, visible) (a Stage's per-shot switch: st.cast[blk.name] = blk; st.use(shot, blk))
+          place_at(frame) / remove(frame)  there from / gone from frame (and in / out of the World: a fall()
+                                           made after plank.remove(f) goes through the plank's cell)
+          state_at(frame)                  'anvil', then 'chipped_anvil' after a chipping landing, or None
+  shelf(where, cells, block_id="anvil", props=None, frame=None) -> [Block]     a row of blocks ready to fall
+  bed(where, foot_cell, facing="north", color="red", frame=None, name=None) -> dict(foot, head, pos, yaw, show)
+      A bed as two Blocks appearing ON `frame`; pos / yaw for Character.lie_down.
+  fall(block_or_id, cell_from=None, frame=1, world=None, hang=2, chip=None, seed=0, props=None, land=None,
+       head=1.95) -> dict
+      The falling block entity: the block loses its support ON `frame`, hangs 2 ticks (FallingBlock delay), then
+      falls (gravity 0.04, drag 0.98 per tick) and stands again in the first free cell above the solid block under
+      it in `world` (the builder, the Village or a site; land= names the cell). A landing on a dirt path, slab or
+      other block that is not a full block high is refused: in the game the block BREAKS there. chip: None/False
+      (lands as it was), True (an anvil one stage more damaged: anvil -> chipped -> damaged -> gone), 'game' (the
+      game's chance for that height, drawn from seed). Works the same for sand, gravel, concrete powder.
+      dict: block, frame_release, frame_drop (first frame it is lower), frame_land (the first frame it STANDS: the
+      game deals its damage on landing: key hurt() / die() HERE), time_land (exact), cell, from_cell, height,
+      ticks, speed (blocks per frame at the end), state (what it lands as), chipped, damage (health points; 0 for
+      sand and gravel), chance, head_frame (first frame its underside is at or below the landing floor + `head`),
+      frame_at(z) (the exact frame its underside passes height z), track [(frame, z)].
+  release(blocks, frame, world=None, chip=None, seed=0, hang=2, head=1.95) -> [fall dict, ...]
+      Several blocks lose their support ON THE SAME FRAME (twelve pistons pull their planks): one call, each its
+      own object. chip: None, True, 'game', a number (that many, chosen by seed), indices, or one bool per block.
+  strikes(drops, spots, half_width=0.3, height=1.95) -> {name: dict(drop, frame_land, head_frame, damage)}
+      Who is under which block (spots = {name: feet point}); the entity box is 0.98 wide.
+  fall_track(height) / fall_ticks(height) / fall_speed(height) / landing_cell(world, cell)
+  anvil_damage(height, helmet=False) / anvil_chip_chance(height)
+  hold_anvil(player, stage=0, hand="right", frame=None)     = player.hold('anvil' | 'chipped_anvil' |
+      'damaged_anvil', ...): engine.players draws a held block with the block model's own third-person transform
+      (block/block.json: 75 / 45 degrees, x 0.375), as the game does.
+  site(collection, world=None) / claim(world, cells)
+  Constants: TICK, CHEST_*, HOPPER_COOLDOWN_TICKS 8, FALL_DELAY_TICKS 2, FALL_GRAVITY 0.04, FALL_DRAG 0.98,
+  ANVIL_*, HELMET_FACTOR 0.75, PILLAGER_HEALTH 24, FLUID_SOURCE_HEIGHT 8/9, WATER_PUSH 0.014, WATER_DRAG 0.8,
+  WATER_SLIDE_SPEED 1.4, GOLEM_WIDTH 1.4, LAVA_* (light), LAVA_LIGHT_WARM (a shader-pack orange).
+
+WHAT IS MESH AND WHAT IS AN OBJECT
+  village mesh (inside the hook): hoppers, standing anvils and every block set with b.w.set (the floor of a
+      platform, the pod's pillar, the anvil wall), the lava lake's surroundings.
+  own objects: chests (static ones share one mesh), water and lava (one object per texture image, all but one
+      hidden on any frame), the lava lights, every glass block of a glass_box (cutaways), every block(), shelf()
+      and bed() (they move, appear or are taken away), items, the golem.
+
+USING IT IN A FILM (st = films.lookdev.Stage, v = the Village)
+    def hook(b):
+        b.w.fill(x0, y0, 0, x1, y1, 2, "stone")                            # a platform, top at z 3
+        out["water"] = fixtures.water_sheet(b, x0, y0, x1, y1, 3, toward="south", amount=1)
+        out["lava"] = fixtures.lava(b, [(x, y0 - 1, -1) for x in range(x0, x1 + 1)])   # a slot, sunk in the ground
+        out["pod"] = fixtures.glass_box(b, -11, 29, 4, -5, 33, 6, name="pod")
+        out["hopper"], out["chest"] = fixtures.hopper_on_chest(b, (11, 44, 0), "north", animated=False)
+        out["planks"] = [fixtures.block(b, "oak_planks", (x, 29, 7)) for x in range(4, 16)]
+        out["anvils"] = fixtures.shelf(b, [(x, 29, 8) for x in range(4, 16)], "anvil", {"facing": "north"})
+    v = village.build_village(scene, seed=1, edit=hook)
+    st.see_through(s, "pod_roof")                                          # beat 21: the roof hidden to the camera
+    g = mobs.make_iron_golem("golem"); st.cast["golem"] = g; st.use(s, g)
+    g.place(f0, (x, y, 3.0), yaw); r = fixtures.slide(g, f0 + 6, "south", 3.2, drop=3.9)
+    animals.poof(g, r["gone"], camera=s); out["lava"].flicker(r["edge"], r["edge"] + 40, at=r["gone"])
+    plans = out["hopper"].stream(items, f0 + 4, every=6, height=2.2)       # items = mobs.make_dropped_item(...)
+    for p in out["planks"]: p.remove(f)                                    # the pistons pull: then
+    drops = fixtures.release(out["anvils"], f, world=v, chip=list(range(0, 12, 2)))
+    hits = fixtures.strikes(drops, {"captain": feet, ...})                 # hits["captain"]["frame_land"]
+    for blk in out["anvils"] + out["planks"]: st.cast[blk.name] = blk; st.use(s, blk)   # or leave them always on
+
+WHAT THE GAME DOES (read from the 26.x client classes; no game file or code is copied)
+  chest     ChestModel.createSingleBodyLayer: bottom addBox(1, 0, 1, 14, 10, 14) texOffs(0, 19); lid addBox(1, 0,
+            0, 14, 5, 14) at PartPose.offset(0, 9, 1); lock addBox(7, -2, 14, 2, 4, 1) at the same offset; 64x64.
+            Double halves: 15 wide, every face but the joined one. setupAnim: lid.xRot = -(open x 1.5707964), the
+            lock follows. ChestRenderer.submit: open = 1 - (1 - o)^3; the model is drawn Y-up, turned by
+            -facing.toYRot() about the block centre (no mirroring). ChestLidController.tickLid: +-0.1 per tick.
+            ChestBlock: a LEFT half's partner is clockwise of its facing (facing south: the left half is east).
+  hopper    HopperBlockEntity.MOVE_ITEM_SPEED 8 (setCooldown after any move); Hopper.SUCK_AABB =
+            Block.column(16, 11, 32): from the bowl's floor (11 px) to the top of the block above; suckInItems takes
+            the first item entity in it and returns (one per transfer); block entities tick after entities, so an
+            item is taken on the tick it moves into the box. models/block/hopper.json: bowl floor at 11 px, walls 2
+            px thick. ItemEntity: 0.25 x 0.25, gravity 0.04, drag 0.98.
+  fluids    FluidRenderer: MAX_FLUID_HEIGHT 0.8888889; height = amount / 9; corners = calculateAverageHeight with
+            heights >= 0.8 counted ten times; tops lowered 0.001, sides moved in 0.001, bottoms raised 0.001; still
+            sprite on a top with no flow, else the flow sprite turned to atan2(flow.z, flow.x) - pi/2 over its middle
+            half; sides use u 0..0.5, v (1 - h) / 2..0.5 of the flow sprite, or the overlay sprite when the
+            neighbour is a HalfTransparentBlock (glass, ice, slime, honey) or LeavesBlock; isFaceOccludedByNeighbor
+            drops a side the neighbour's shape covers. Water tint from the biome: plains (63, 118, 228).
+            water_still.png.mcmeta frametime 2 (32 images), water_flow 1 (32 images, 32 px: the sprite covers 2 x 2
+            blocks of texture), lava_still 2 with the frames 0..19..1, lava_flow 3. FlowingFluid: water drops 1 per
+            block, lava in the overworld 2.
+  pushing   Entity.WATER_FLOW_SCALE 0.014 (baseTick, normalised flow for every entity but players);
+            LivingEntity.travelInWater: x 0.8 horizontally after the move (getWaterSlowDown); travelInAir 0.91;
+            gravity 0.08; IronGolem hit box 1.4 x 2.7.
+  falling   FallingBlock.getDelayAfterPlace 2 ticks; FallingBlockEntity: gravity 0.04, move, x 0.98; it lands in
+            the cell it is in and becomes the block there if that cell can be replaced and the block can survive,
+            else it breaks and drops itself; causeFallDamage: i = ceil(fall - 1), damage min(floor(i x 2), 40)
+            (AnvilBlock.falling: setHurtsEntities(2.0, 40)), to every living entity in its 0.98 box; an anvil then
+            becomes AnvilBlock.damage(state) when nextFloat() < 0.05 + i x 0.05 (gone after damaged).
+            LivingEntity.hurtServer: DAMAGES_HELMET (falling_anvil, falling_block) and a full head slot: x 0.75.
+            Pillager MAX_HEALTH 24. Sand and gravel do not hurt (hurtEntities false).
+
+MEASURED (proof stills out/test/fixtures_*.png, 540x960, 16 samples, 2 threads, 9-28 s each; golden hour = the
+look-dev sun azimuth 62, elevation 27; night = the look-dev moon)
+  - Chests (fixtures_chest.png, fixtures_chest_open.png): the game's chest, latch silver, lid seam dark; four
+    facings and a double chest (one 2-pixel latch on the seam); opening: frame +5 = 80 % up, +12 fully open,
+    the dark inside of the lid and the black inside of the base showing as in the game.
+  - Hopper (fixtures_hopper.png, fixtures_hoppers.png): engine.blocks draws the hopper model right in all five
+    facings (spout down / to the side). Ingots and a poppy dropped 2.2 blocks: land, lie, vanish 9.6 frames apart.
+  - Water (fixtures_platform_a / _b / _top.png): A = the game's own spread from sources along the far edge (8 7 6
+    5 4: 0.89 .. 0.44 deep, a sloping surface, knee-deep on a golem at the sources); B = water_sheet(amount=1),
+    1/9 deep. From 0.7 above the floor (beat 11's "side and a little below") A reads as a clear blue body of
+    water with the floor under it; B reads as a wet, sky-reflecting film with a thin blue edge, at the golem's
+    feet. B is "a thin still blue sheet at foot level"; A is what an iron farm really looks like. For a sheet that
+    shows more blue from low cameras use amount=2 (2/9). Seen from above (_top) both read as water.
+  - Lava light: lava-lit stone in the slot measures G/R 0.87-0.91 (golden hour) and 0.89-0.91 (night, with the
+    moon); the first colour (1, 0.6, 0.3) gave 0.81-0.84 and burnt the stone beside the lava white. The palette
+    check (lit stone G >= 0.92 R, on the frame's median) passed on every proof still; a frame lit by lava ALONE
+    would be at about 0.87 (torch light alone: 0.88). The orange read comes, as with torches, from the lava's own
+    glowing texture and its bloom. LAVA_LIGHT_WARM is there for a glow whose stone is not in the picture.
+    40 W per block = a lantern's light straight above a one-block pool (the lantern's 140 W point light gives
+    W / (4 pi (d^2 + 1)), the area light W / (pi d^2)).
+  - Night (fixtures_night.png, fixtures_night_flicker.png): the slot glows, its walls warm; flicker at=f: frame f
+    visibly darker, f + 2 brighter, steady again after about a second.
+  - Glass (fixtures_pod_out / _cut / _in.png): glass BLOCKS read as Minecraft glass from outside and inside: one
+    frame line per block edge, the diagonal streaks, no double lines between blocks. A villager behind one wall
+    reads plainly, one behind two walls (the librarian on the balcony in _out) still reads, fainter. pod_cut: the
+    south wall hidden to the camera only; the other walls, roof and lantern unchanged.
+  - Falling anvils (fixtures_fall.png, fixtures_fallen.png, fixtures_anvils.png): planks gone on the release
+    frame, the anvils hang (frames +0, +1), fall 8 blocks in 21 ticks, motion blur on the last frames, stand on the
+    cobblestones on frame_land; the chosen ones land chipped. 8 blocks: 14 damage; 13 blocks: 24 (kills a pillager);
+    15: 28; 17 with a banner on the head: 24.
+  - Golem slide (fixtures_slide.png): pushed 3.2 blocks in 60 frames (50 ticks), over the rim and 3.9 blocks
+    down into the 2-wide slot in 12 more frames; the slot's lava light lights it from below as it goes down.
+  - Translucency: water costs one transparent bounce per surface a ray crosses (top, a side, the bottom: at most
+    three), glass one per face (a wall: two). engine.look allows 12 and build_village raises that to 48: no black
+    holes in any proof (the pod: two walls and a roof of glass with water, plants and the village behind them).
+  - engine.stamp: tools/check_fixtures_stamp.py: the fingerprint changes on exactly the frames the water's image,
+    the lava light, the chest lid, the falling anvil (and its chipped swap) and the hopper's items change, in any
+    frame order, and two processes give the same digest.
+
+NOT THE GAME, AND WHERE THE PICTURE DIFFERS FROM IT
+  - Light: the game's block light is one colour for every source and does not add up (a lava lake lights like one
+    block, level 15 falling to 0 over 15 blocks); here the lava light is a warm area light that adds up to a cap
+    and falls off physically. The game shades fluid faces by direction (top 1.0, sides 0.8 / 0.6); here the
+    scene's light does it. Water reflects the sky (the look's shader-pack water: roughness 0.12); vanilla water
+    does not. The game's water at night is darker by its own light level; here it is lit by the moon.
+  - The water's flow texture is turned per cell as the game does, but its scrolling is the texture's own
+    animation (as in the game); a water_sheet is a level sheet the game never makes by itself.
+  - The chest lid's sides stand 0.02 pixel proud of the base where the two boxes share one pixel of height (the
+    game draws them coplanar); the double chest is the game's; chest textures are the plain ones (no Christmas).
+  - Lava flicker, the golem's slide as a keyed root (the game's golem also tries to walk), the glass_box's
+    camera cutaways: film tools. Water flowing over an edge (falling water) and fluid side faces against
+    partial blocks (slabs) are drawn whole (the game clips them to the neighbour's shape).
+  - A falling block becomes visible as moving 1.2 frames after the game's client would show it (the entity's
+    first tick is interpolated from its spawn tick): within the hang, never in the landing.
+  - Glass: the end face of a wall next to a hidden (see_through) wall is missing, as the game culls faces between
+    two glass blocks: from outside it is the open edge of a transparent block, invisible in the proofs.
+
+GOTCHAS
+  - engine.blocks draws a chest block (World.build) as a single closed chest whose lid and base sides overlap
+    coplanar over one pixel, and a double chest as two singles: build chests with fixtures.chest (it claims the
+    cells). Never b.w.set a "chest" yourself.
+  - Fluids and glass are built ONCE, from the World as it is when you call them: build the floor, the walls and
+    the slot first, the water / lava / glass last (a block added next to water afterwards does not cull its side).
+  - The lava lights are not torches: Stage.lights does not touch them; Fluid.level(frame, scale) per shot.
+  - At night or in the Nether (no sun) the lava light is the key: a 2-wide slot gives 80 W per block of length;
+    the Nether's own ambient light is not in engine.look (a scene without sun is the night preset's moon and sky).
+    Raise watts_per_block for a lava-lit cave, keep LAVA_LIGHT_COLOR where stone is in the picture.
+  - Key items, golems and blocks in film order (place, then slide / stream / fall); fall() and release() after
+    the plank's remove(); call fall() once per block (a second call re-keys it).
+  - A golem needs a 2-wide gap to fall; a falling block needs a full block (or a top slab) to land on.
+  - Water is drawn where you put it and nowhere else: at an open edge the game's water would pour over (falling
+    water, not built here). Give a platform a rim (glass, slabs, a wall) wherever the camera sees an edge.
+  - Hopper.stream() makes the first item land (the hopper is busy): land=False shows the game's idle hopper,
+    which takes it out of the air one block above the rim.
+  - The proof set (tools/fixtures_proof.py) removes two oaks and stands in the meadow; copy its hook, not its
+    numbers, into a film.
+
+SELF-TEST
+    $BPY -m engine.fixtures                       55 numeric checks, no rendering (2 s; exit code 1 if one fails)
+    $BPY -m engine.fixtures stills NAME ...       proof stills out/test/fixtures_<name>.png through the real
+                                                  village and look (tools/fixtures_proof.py; 10-30 s each, up to
+                                                  eight per call): chest chest_open hopper hoppers platform_a
+                                                  platform_b platform_top slide pod_out pod_cut pod_in lava_far
+                                                  anvils hold fall fallen flicker; night night_far night_flicker
+    $BPY -m tools.check_fixtures_stamp            frame fingerprints follow every animation, in any order and
+                                                  process (5 s)
+"""
 import math
 import types
 
@@ -25,15 +312,18 @@ CHEST_SEAM = 0.02                    # model pixels the lid's sides stand proud 
 HOPPER_COOLDOWN_TICKS = 8            # HopperBlockEntity.MOVE_ITEM_SPEED: setCooldown(8) after any transfer
 HOPPER_SUCK = (11.0 / 16.0, 2.0)     # Hopper.SUCK_AABB = Block.column(16, 11, 32): from the bowl's floor to the top
 #                                      of the block ABOVE the hopper, the whole column wide
-HOPPER_BOWL_FLOOR = 11.0 / 16.0      # models/block/hopper.json: the bowl's floor is the top of box (0, 10, 0)-(16, 11, 16)
+HOPPER_BOWL_FLOOR = 11.0 / 16.0      # models/block/hopper.json: the bowl's floor = top of box (0, 10, 0)-(16, 11, 16)
 HOPPER_BOWL_HALF = 6.0 / 16.0        # ... and its walls are 2 px thick: the hollow is 12 px wide
 ITEM_SIZE = 0.25                     # EntityType.ITEM: 0.25 x 0.25
 ITEM_GRAVITY, ITEM_DRAG = 0.04, 0.98     # ItemEntity.getDefaultGravity; tick(): velocity * 0.98 after the move
 # ---- FallingBlock, FallingBlockEntity, AnvilBlock
-FALL_DELAY_TICKS = 2                 # FallingBlock.getDelayAfterPlace: ticks from losing its support to becoming an entity
-FALL_GRAVITY, FALL_DRAG = 0.04, 0.98     # FallingBlockEntity.getDefaultGravity; Entity.getAirDrag (velocity * 0.98 per tick)
+FALL_DELAY_TICKS = 2                 # FallingBlock.getDelayAfterPlace: ticks from losing its support to falling
+FALL_GRAVITY, FALL_DRAG = 0.04, 0.98     # FallingBlockEntity.getDefaultGravity; then velocity * 0.98 per tick
 ANVIL_DAMAGE_PER_BLOCK = 2.0         # AnvilBlock.FALL_DAMAGE_PER_DISTANCE (falling(): setHurtsEntities(2.0f, 40))
 ANVIL_DAMAGE_MAX = 40                # AnvilBlock.FALL_DAMAGE_MAX
+HELMET_FACTOR = 0.75                 # LivingEntity.hurtServer: DamageTypeTags.DAMAGES_HELMET (falling_anvil, ...) and
+#                                      anything in the HEAD slot: amount * 0.75
+PILLAGER_HEALTH = 24.0               # Pillager.createAttributes: MAX_HEALTH 24
 ANVIL_CHIP = (0.05, 0.05)            # FallingBlockEntity.causeFallDamage: nextFloat() < 0.05 + ceil(fall - 1) * 0.05
 ANVIL_STAGES = ("anvil", "chipped_anvil", "damaged_anvil", None)     # AnvilBlock.damage(state); None = it breaks
 FALLING_ENTITY_WIDTH = 0.98          # EntityType.FALLING_BLOCK: 0.98 x 0.98
@@ -42,13 +332,22 @@ FLUID_SOURCE_HEIGHT = 8.0 / 9.0      # FluidRenderer.MAX_FLUID_HEIGHT 0.8888889 
 FLUID_INSET = 0.001                  # FluidRenderer: tops are lowered and sides moved in by 0.001
 FLUID_HEAVY = (0.8, 10.0)            # addWeightedHeight: a neighbour 0.8 or higher counts ten times in a corner's mean
 WATER_PUSH = 0.014                   # Entity.WATER_FLOW_SCALE: blocks per tick^2 a current adds to a mob standing in it
-WATER_DRAG = 0.8                     # LivingEntity.getWaterSlowDown: horizontal velocity * 0.8 per tick in water
-WATER_SLIDE_SPEED = WATER_PUSH / (1.0 - WATER_DRAG) * 20.0     # 1.4 blocks/s: where push and drag balance
+WATER_DRAG = 0.8                     # LivingEntity.getWaterSlowDown / travelInWater: horizontal velocity * 0.8 per
+#                                      tick AFTER the move (the push is added first, in Entity.baseTick)
+WATER_SLIDE_SPEED = WATER_PUSH / (1.0 - WATER_DRAG) * 20.0     # 1.4 blocks/s moved at the balance of push and drag
+MOB_GRAVITY, AIR_DRAG_H, AIR_DRAG_V = 0.08, 0.91, 0.98      # LivingEntity: gravity 0.08, travelInAir: x 0.91 / 0.98
+GOLEM_WIDTH = 1.4                    # EntityType.IRON_GOLEM hit box 1.4 x 2.7: it needs a gap 2 blocks wide to fall
 # ---- this module's look choices (see MEASURED in the docstring)
 WATER_ROUGHNESS, WATER_SPECULAR = 0.12, 0.5      # the values engine.blocks gives its own (static) water
 LAVA_EMISSION = 3.0                  # engine.blocks.EMISSIVE["block/lava_still"]
-LAVA_LIGHT_COLOR = (1.0, 0.60, 0.30)
-LAVA_WATTS_PER_BLOCK = 60.0          # area-light watts per block of lava surface
+LAVA_LIGHT_COLOR = (1.0, 0.80, 0.60)  # the game has ONE block-light colour (lava = torch = lantern); this is a step
+#                                      warmer than props.TORCH_COLOR (1, 0.88, 0.72): see MEASURED for the palette
+LAVA_LIGHT_WARM = (1.0, 0.62, 0.32)  # a shader-pack orange, for a glow whose stone is not in the picture
+LAVA_WATTS_PER_BLOCK = 40.0          # area-light watts per block of lava surface (a lantern's 140 W point light gives
+#                                      the same light straight above it at 35 W per block: see MEASURED)
+LAVA_MAX_WATTS = 1600.0              # a lake's light stops growing at 40 blocks of surface (the game's light does not
+#                                      add up at all: every block of lava is level 15, a lake lights like one block)
+LAVA_SMOOTH = 0.5                    # Light Falloff smoothing (the wall right beside the lava is not burnt white)
 LAVA_LIGHT_LIFT = 0.02               # the light sits this far above the lava surface
 
 _DIR = mc.DIR_BLENDER
@@ -565,10 +864,15 @@ class Block:
         self._presence.states = [s for s in self._presence.states if s[0] >= frame]
         self._presence.initial = None
         self._presence.set(frame, self.block_id)
+        if self.world is not None:
+            self.world.set(self.cell[0], self.cell[1], self.cell[2], self.block_id, self.props)
 
     def remove(self, frame):
-        """The block is gone from `frame` on."""
+        """The block is gone from `frame` on (and from the World: a fall() made after this call goes through its
+        cell: pull the plank, then release the anvil on it)."""
         self._presence.set(frame, None)
+        if self.world is not None and self.world.block_id(*self.cell) == self.state_at(frame - 1):
+            self.world.set(self.cell[0], self.cell[1], self.cell[2], None)
 
     def state_at(self, frame):
         """Block id it is drawn as at `frame` ('anvil', then 'chipped_anvil' after a chipping landing), or None."""
@@ -651,12 +955,15 @@ def fall_speed(height):
     return tr[-2][1] - tr[-3][1] if len(tr) > 2 else tr[-1][1]
 
 
-def anvil_damage(height):
-    """Half hearts a falling anvil deals to what it lands on after `height` blocks: min(floor(ceil(h - 1) * 2), 40);
-    0 for a fall of one block or less. A pillager has 24: 13 blocks kill it; 17 when it wears a banner or a helmet
-    (headgear takes a quarter off: not transcribed here, the story's own number)."""
+def anvil_damage(height, helmet=False):
+    """Health points (half hearts) a falling anvil (or any falling block: the same rule, sand and gravel deal none)
+    takes off what it lands on after `height` blocks: min(floor(ceil(h - 1) * 2), 40); 0 for one block or less.
+    helmet=True: something worn on the head (a helmet, the captain's banner) takes a quarter off
+    (LivingEntity.hurtServer: DAMAGES_HELMET x 0.75). A pillager has 24: 13 blocks kill it bare-headed, 17 with
+    the banner on."""
     n = int(math.ceil(height - 1.0 - 1e-9))
-    return 0 if n <= 0 else int(min(math.floor(n * ANVIL_DAMAGE_PER_BLOCK), ANVIL_DAMAGE_MAX))
+    d = 0 if n <= 0 else int(min(math.floor(n * ANVIL_DAMAGE_PER_BLOCK), ANVIL_DAMAGE_MAX))
+    return d * HELMET_FACTOR if helmet else d
 
 
 def anvil_chip_chance(height):
@@ -961,22 +1268,21 @@ class Hopper:
         return out
 
     def _apply(self, item, plan):
-        """Key an engine.mobs DroppedItem along a plan: it appears at the release, falls, lies, and is gone."""
+        """Key an engine.mobs DroppedItem along a plan the way DroppedItem.drop keys its toss: it is a new entity ON
+        the release frame (hard cut there), falls, lies in the bowl, and is gone ON plan['frame']."""
+        from . import characters as ch
+
         track = plan["track"]
         f0 = int(round(track[0][0]))
-        item.place(f0, track[0][1], age=0.0)
-        root = item.root
-        frames = [t for t, _p in track]
+        clash = sorted(f for f, _there, _kind in getattr(item, "_exists", ()) if f0 < f <= plan["frame"])
+        if clash:
+            raise ValueError("%s: a place() / drop() / pick_up() is keyed on frame %d, while the hopper's item is "
+                             "still falling or lying: key an item's moves in frame order" % (item.name, clash[0]))
+        item.place(f0, track[0][1], age=0.0)                # a new entity: age 0, visible from f0
         for i in range(3):
-            fc = _fcurve(root, "location", i)
-            for kp in list(fc.keyframe_points):
-                if kp.co.x > f0 - 0.2:
-                    fc.keyframe_points.remove(kp, fast=True)
-            for t, p in zip(frames, track):
-                if t > f0 - 0.2:
-                    kp = fc.keyframe_points.insert(float(t), float(p[1][i]))
-                    kp.interpolation = "LINEAR"
-            fc.update()
+            keys = [(float(t), float(p[i]), "LINEAR") for t, p in track]
+            if len(keys) >= 2:
+                ch._segment(item.root, "location", i, keys, "LINEAR")
         item.rest_pos = None
         item.animate(f0, plan["frame"])
         item.pick_up(plan["frame"])
@@ -1183,11 +1489,12 @@ def _fluid_mesh(field, flow_override=None):
             pts = [(x, y, z + e), (x, y + 1, z + e), (x + 1, y + 1, z + e), (x + 1, y, z + e)]
             out["still"].append((pts, [(0.0, 16.0), (0.0, 0.0), (16.0, 0.0), (16.0, 16.0)]))
         zb = z + (e if render_down else 0.0)
-        # sides: (direction, first corner (x, y, h), second corner), seen from outside left to right
-        sides = (("north", (x + 1, y + 1 - e, hn_e), (x, y + 1 - e, hn_w)),
-                 ("south", (x, y + e, hs_w), (x + 1, y + e, hs_e)),
-                 ("west", (x + e, y + 1, hn_w), (x + e, y, hs_w)),
-                 ("east", (x + 1 - e, y, hs_e), (x + 1 - e, y + 1, hn_e)))
+        # sides as FluidRenderer.tesselate walks them: (direction, the corner with u = 0 (x, y, h), the corner with
+        # u = 8): north from its west end, south from its east end, west from its south end, east from its north end
+        sides = (("north", (x, y + 1 - e, hn_w), (x + 1, y + 1 - e, hn_e)),
+                 ("south", (x + 1, y + e, hs_e), (x, y + e, hs_w)),
+                 ("west", (x + e, y, hs_w), (x + e, y + 1, hn_w)),
+                 ("east", (x + 1 - e, y + 1, hn_e), (x + 1 - e, y, hs_e)))
         for d, a_, b_ in sides:
             dx, dy, _dz = _DIR[d]
             n = (x + dx, y + dy, z)
@@ -1199,9 +1506,10 @@ def _fluid_mesh(field, flow_override=None):
             ha, hb = a_[2], b_[2]
             if max(ha, hb) <= 0.0:
                 continue
-            pts = [(a_[0], a_[1], z + ha), (a_[0], a_[1], zb), (b_[0], b_[1], zb), (b_[0], b_[1], z + hb)]
+            # wound so the normal points out of the cell (the game draws a second, reversed copy; Cycles needs one)
+            pts = [(b_[0], b_[1], z + hb), (b_[0], b_[1], zb), (a_[0], a_[1], zb), (a_[0], a_[1], z + ha)]
             # u 0 .. 0.5 of the sprite, v (1 - h) / 2 .. 0.5
-            uvs = [(0.0, 8.0 * (1.0 - ha)), (0.0, 8.0), (8.0, 8.0), (8.0, 8.0 * (1.0 - hb))]
+            uvs = [(8.0, 8.0 * (1.0 - hb)), (8.0, 8.0), (0.0, 8.0), (0.0, 8.0 * (1.0 - ha))]
             see_through = field.kind == "water" and nid is not None and (
                 nid.endswith("glass") or nid.endswith("_leaves") or nid in ("ice", "slime_block", "honey_block"))
             out["overlay" if see_through else "flow"].append((pts, uvs))
@@ -1312,11 +1620,30 @@ def _rectangles(cells):
     return out
 
 
+def _smooth_falloff(light, smooth):
+    """Emission strength = Light Falloff(1, smooth).Quadratic: 1 / (d^2 + smooth) instead of 1 / d^2 (the way
+    engine.props softens its torches), so what touches the light is not burnt white."""
+    try:
+        light.use_nodes = True
+        nt = light.node_tree
+        nt.nodes.clear()
+        out = nt.nodes.new("ShaderNodeOutputLight")
+        em = nt.nodes.new("ShaderNodeEmission")
+        fall = nt.nodes.new("ShaderNodeLightFalloff")
+        fall.inputs["Strength"].default_value = 1.0
+        fall.inputs["Smooth"].default_value = float(smooth)
+        nt.links.new(fall.outputs["Quadratic"], em.inputs["Strength"])
+        nt.links.new(em.outputs[0], out.inputs["Surface"])
+    except (AttributeError, RuntimeError, KeyError) as exc:      # no light nodes in this build: plain falloff
+        print("[fixtures] light falloff nodes unavailable (%s)" % exc)
+
+
 def lava_light(collection, rect, z, watts_per_block=LAVA_WATTS_PER_BLOCK, color=LAVA_LIGHT_COLOR, name="lava_light",
-               max_watts=None):
+               max_watts=LAVA_MAX_WATTS, smooth=LAVA_SMOOTH):
     """The light lava throws: an AREA light the size of the lava surface (x0, y0, x1, y1 in block edges) at height
-    z, shining up, `watts_per_block` per block of surface. Its strength per block of lava is constant, so a slot
-    and a lake light what is right above them alike; a lake's reach grows with its size."""
+    z, shining up (nothing below or level with the surface is lit), `watts_per_block` per block of surface up to
+    max_watts. A slot and a small pool light what is right above them alike; a lake's reach grows with its size up
+    to the cap. Returns the light object (mc_light = 'lava', base_energy = its watts)."""
     x0, y0, x1, y1 = (float(c) for c in rect)
     data = bpy.data.lights.new(name, "AREA")
     data.shape = "RECTANGLE"
@@ -1328,16 +1655,21 @@ def lava_light(collection, rect, z, watts_per_block=LAVA_WATTS_PER_BLOCK, color=
         data.spread = math.pi
     except (AttributeError, TypeError):
         pass
+    if smooth:
+        _smooth_falloff(data, smooth)
     ob = bpy.data.objects.new(_unique(name), data)
     ob.location = ((x0 + x1) / 2.0, (y0 + y1) / 2.0, float(z))
     ob.rotation_euler = (math.pi, 0.0, 0.0)              # an area light shines along its -Z: turn it to face up
+    ob.visible_camera = False                            # the camera sees the lava's own glowing texture, never
+    ob.visible_glossy = False                            # a lit rectangle over it (nor its mirror image in water)
     ob["mc_light"] = "lava"
     ob["base_energy"] = data.energy
     collection.objects.link(ob)
     return ob
 
 
-def _fluid(where, kind, cells, sources, flow, animated, name, light, watts_per_block, falling=()):
+def _fluid(where, kind, cells, sources, flow, animated, name, light, watts_per_block, falling=(),
+           color=LAVA_LIGHT_COLOR):
     world, coll, v, _b = _where(where)
     if isinstance(cells, dict):
         amounts = {_cell(c): int(a) for c, a in cells.items()}
@@ -1376,6 +1708,7 @@ def _fluid(where, kind, cells, sources, flow, animated, name, light, watts_per_b
         variants = {}
         for k, index in enumerate(images):
             me = base if k == 0 else base.copy()
+            me.materials.clear()                          # (a copy made after k == 0 carries image 0's material)
             me.materials.append(_fluid_material(kind, texture, index, tint))
             ob = bpy.data.objects.new("%s_%s_%02d" % (name, group, index), me)
             coll.objects.link(ob)
@@ -1394,7 +1727,7 @@ def _fluid(where, kind, cells, sources, flow, animated, name, light, watts_per_b
             for (x0, y0, x1, y1) in _rectangles(cols):
                 top = max(z + tops[(x, y, z)] for x in range(x0, x1 + 1) for y in range(y0, y1 + 1))
                 fl.lights.append(lava_light(coll, (x0, y0, x1 + 1, y1 + 1), top + LAVA_LIGHT_LIFT,
-                                            watts_per_block=watts_per_block, name=name + "_light"))
+                                            watts_per_block=watts_per_block, color=color, name=name + "_light"))
     if hasattr(v, "sets") and isinstance(v.sets, dict):
         v.sets.setdefault("fixtures", {})[name] = fl
     return fl
@@ -1412,11 +1745,11 @@ def water(where, cells, sources=None, flow=None, animated=True, name=None):
 
 
 def lava(where, cells, sources=None, flow=None, animated=True, name=None, light=True,
-         watts_per_block=LAVA_WATTS_PER_BLOCK):
+         watts_per_block=LAVA_WATTS_PER_BLOCK, color=LAVA_LIGHT_COLOR):
     """Lava: the same geometry rules as water with block/lava_still (20 images, back and forth, 2 ticks each) and
-    lava_flow, glowing, opaque, and with light=True an orange area light over every flat stretch of its surface
-    (Fluid.lights; Fluid.level(frame, scale), Fluid.flicker(f0, f1, at=...)). Returns a Fluid."""
-    return _fluid(where, "lava", cells, sources, flow, animated, name, light, watts_per_block)
+    lava_flow (3 ticks each), glowing, opaque, and with light=True a warm area light over every flat stretch of its
+    surface (Fluid.lights; Fluid.level(frame, scale), Fluid.flicker(f0, f1, at=...)). Returns a Fluid."""
+    return _fluid(where, "lava", cells, sources, flow, animated, name, light, watts_per_block, color=color)
 
 
 def water_sheet(where, x0, y0, x1, y1, z, toward=None, amount=1, name=None, animated=True):
@@ -1434,7 +1767,8 @@ def water_sheet(where, x0, y0, x1, y1, z, toward=None, amount=1, name=None, anim
     return _fluid(where, "water", cells, None, flow, animated, name or "water_sheet", False, 0.0)
 
 
-def lava_glow(where, x0, y0, x1, y1, z, strip=True, animated=True, name=None, watts_per_block=LAVA_WATTS_PER_BLOCK):
+def lava_glow(where, x0, y0, x1, y1, z, strip=True, animated=True, name=None, watts_per_block=LAVA_WATTS_PER_BLOCK,
+              color=LAVA_LIGHT_COLOR):
     """Lava as a glow only: the lava light over the rectangle of block columns x0..x1, y0..y1 at height z, and with
     strip=True a flat lava-textured, glowing surface just under it (no lava blocks, no sides): for a slot whose
     lava is out of sight and for a far lake. Returns a Fluid (its .cells are empty; .lights, level(), flicker())."""
@@ -1460,6 +1794,7 @@ def lava_glow(where, x0, y0, x1, y1, z, strip=True, animated=True, name=None, wa
         variants = {}
         for k, index in enumerate(images):
             me = base if k == 0 else base.copy()
+            me.materials.clear()
             me.materials.append(_fluid_material("lava", texture, index))
             ob = bpy.data.objects.new("%s_still_%02d" % (name, index), me)
             coll.objects.link(ob)
@@ -1468,10 +1803,82 @@ def lava_glow(where, x0, y0, x1, y1, z, strip=True, animated=True, name=None, wa
         if shown is not None and len(variants) > 1:
             _cycle_visibility(variants, shown)
     fl.lights.append(lava_light(coll, (xa, ya, xb, yb), z + LAVA_LIGHT_LIFT, watts_per_block=watts_per_block,
-                                name=name + "_light"))
+                                color=color, name=name + "_light"))
     if hasattr(v, "sets") and isinstance(v.sets, dict):
         v.sets.setdefault("fixtures", {})[name] = fl
     return fl
+
+
+# ----------------------------------------------------------------------------------------------------
+# A MOB PUSHED BY A CURRENT (Entity fluid pushing + LivingEntity.travelInWater / travelInAir)
+# ----------------------------------------------------------------------------------------------------
+def slide_track(distance, drop=0.0, v0=0.0, max_ticks=4000):
+    """A mob standing in flowing water, pushed `distance` blocks along the current from speed v0 (blocks per tick),
+    then (drop > 0) falling `drop` blocks off the edge it has reached. Per tick in the water: + 0.014 along the
+    current (Entity.WATER_FLOW_SCALE, added in baseTick), move, horizontal speed x 0.8 (getWaterSlowDown); in the
+    air: speed - 0.08 vertical, move, x 0.91 sideways and x 0.98 vertical. Returns [(tick, along, down)] from
+    (0, 0, 0) to the tick it has dropped `drop` (the last entry clipped). 1.4 blocks/s at full speed, reached in
+    about a second: 1 block takes 18 ticks from rest, 2 blocks 32, 3 blocks 47."""
+    out = [(0, 0.0, 0.0)]
+    v, s = float(v0), 0.0
+    n = 0
+    while s < distance - 1e-9:
+        n += 1
+        if n > max_ticks:
+            raise ValueError("a slide of %r blocks does not end" % (distance,))
+        u = v + WATER_PUSH
+        s = min(s + u, float(distance))
+        v = u * WATER_DRAG
+        out.append((n, s, 0.0))
+    if drop > 0:
+        vz, d = 0.0, 0.0
+        while d < drop - 1e-9:
+            n += 1
+            if n > max_ticks:
+                raise ValueError("a drop of %r blocks does not end" % (drop,))
+            vz -= MOB_GRAVITY
+            s += v
+            d = min(d - vz, float(drop))
+            v *= AIR_DRAG_H
+            vz *= AIR_DRAG_V
+            out.append((n, s, d))
+    return out
+
+
+def slide(mob, frame, toward, distance, drop=0.0, start=None, v0=0.0):
+    """Key a mob (engine.mobs IronGolem or any Character) sliding on the current: from `start` (default where it
+    stands at `frame`) `distance` blocks toward `toward` ('north' ... or an (east, north) vector), then falling
+    `drop` blocks: slide_track's timing, no leg motion (a pushed golem does not walk). A golem 1.4 wide only falls
+    when its middle is 0.7 past the edge: distance = edge - start + 0.7, and the gap must be 2 blocks wide (in a
+    1-block slot it hangs on the rim). Call it in frame order, after place(). Returns dict(frame (start), edge
+    (first frame it is falling), frame_end (it has dropped `drop`), gone (first frame its head, 2.7 above its
+    feet, is below where its feet started: out of sight below the floor), track [(frame, (x, y, z))])."""
+    from . import characters as ch
+
+    if isinstance(toward, str):
+        d = _DIR[toward]
+        dx, dy = float(d[0]), float(d[1])
+    else:
+        dx, dy = float(toward[0]), float(toward[1])
+        n = math.hypot(dx, dy)
+        dx, dy = dx / n, dy / n
+    if start is None:
+        p0 = tuple(float(c) for c in mob.pos_at(frame))
+    else:
+        p0 = tuple(float(c) for c in start)
+    tr = slide_track(distance, drop, v0)
+    keys = [(frame + n * TICK, (p0[0] + dx * s, p0[1] + dy * s, p0[2] - dz)) for n, s, dz in tr]
+    if start is not None:
+        for i in range(3):
+            ch._cut(mob.root, "location", i, frame, p0[i], hold_rest=False)
+    for i in range(3):
+        ch._segment(mob.root, "location", i, [(t, p[i], "LINEAR") for t, p in keys], "LINEAR")
+    first_fall = next((t for (t, p), (_n, _s, dz) in zip(keys, tr) if dz > 0), None)
+    height = 2.7
+    gone = next((t for t, p in keys if p[2] + height < p0[2]), None)
+    return dict(frame=int(frame), edge=None if first_fall is None else int(math.ceil(first_fall - TICK - 1e-6)),
+                frame_end=int(math.ceil(keys[-1][0] - 1e-6)), gone=None if gone is None else int(math.ceil(gone - 1e-6)),
+                track=keys)
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1628,7 +2035,7 @@ def _check():
     ok("lid easing 1 - (1 - o)^3: half the time = 87.5 % of the angle", abs(c.angle_at(16) / CHEST_LID_ANGLE - 0.875)
        < 1e-9, "%.4f" % (c.angle_at(16) / CHEST_LID_ANGLE))
     shut = c.close(40)
-    ok("chest.close(40) is shut on frame 52 and still 87.5 % open... no: 12.5 % of the way after half the time",
+    ok("chest.close(40) is shut on frame 52; half way through closing the lid is still 87.5 % open (it lingers)",
        shut == 52 and abs(c.angle_at(46) / CHEST_LID_ANGLE - 0.875) < 1e-9 and c.angle_at(52) < 1e-9,
        "%.4f" % (c.angle_at(46) / CHEST_LID_ANGLE))
     scene.frame_set(16)
@@ -1777,6 +2184,53 @@ def _check():
     objs = w2.build(coll, "claimtest")
     ok("a claimed cell is left out of World.build and its neighbours get their faces toward it",
        sum(len(o.data.polygons) for o in objs) == 12, str(sum(len(o.data.polygons) for o in objs)))
+
+    # ---- what the first attempt got wrong, and what was added since
+    mats = {o.data.materials[0].name for o in fl.objects if "_still_" in o.name}
+    ok("every image of the animated water has its OWN material (%d objects, %d materials)" % (
+        len([o for o in fl.objects if "_still_" in o.name]), len(mats)),
+       len(mats) == len([o for o in fl.objects if "_still_" in o.name]) and all(
+           len(o.data.materials) == 1 for o in fl.objects))
+    side = _FluidField(fw, "water", {(3, 3, 0): 8})
+    q, _t = _fluid_mesh(side)
+    north = [pts for pts, uvs in q["flow"] if all(abs(p[1] - (4 - FLUID_INSET)) < 1e-9 for p in pts)]
+    n_ = north[0] if north else None
+    ok("a north side face: u = 0 at its west end (FluidRenderer), normal pointing north",
+       n_ is not None and abs(n_[3][0] - 3.0) < 1e-9 and abs(n_[0][0] - 4.0) < 1e-9)
+    tr1, tr3 = slide_track(1.0), slide_track(3.0)
+    ok("a mob pushed by a current: 1 block in 19 ticks, 3 blocks in 47, 1.4 blocks/s at full speed",
+       tr1[-1][0] == 19 and tr3[-1][0] == 47 and abs(WATER_SLIDE_SPEED - 1.4) < 1e-9, "%d / %d" % (
+           tr1[-1][0], tr3[-1][0]))
+    lt = lv.lights[0]
+    ok("the lava light: 40 W per block, smoothed falloff, invisible to camera rays", abs(
+        lt["base_energy"] - 5 * LAVA_WATTS_PER_BLOCK) < 1e-6 and lt.data.use_nodes and not lt.visible_camera)
+    big = lava(st, [(x, y, 0) for x in range(0, 9) for y in range(20, 29)], name="t_lake")
+    ok("a 9 x 9 lake's light is capped at %g W" % LAVA_MAX_WATTS,
+       len(big.lights) == 1 and abs(big.lights[0].data.energy - LAVA_MAX_WATTS) < 1e-6)
+    gl = lava_glow(st, 0, 32, 1, 33, -2.0, name="t_glow")
+    ok("lava_glow: one light and a glowing strip of 4 faces, no lava blocks", len(gl.lights) == 1 and len(gl.cells) == 0
+       and all(len(o.data.polygons) == 4 for o in gl.objects))
+    ok("anvil damage with something on the head: x 0.75 (17 blocks kill a captain: 24)",
+       anvil_damage(17, helmet=True) == 24.0 and anvil_damage(16, helmet=True) < PILLAGER_HEALTH)
+    w.fill(0, 40, -1, 3, 40, -1, "cobblestone")
+    plank = block(st, "oak_planks", (1, 40, 4))
+    g = block(st, "gravel", (1, 40, 5))
+    plank.remove(30)
+    gd = fall(g, frame=30, world=st)
+    ok("plank.remove(30) clears its cell: gravel released on 30 falls through it to the road (5 blocks, no damage)",
+       gd["cell"] == (1, 40, 0) and gd["height"] == 5.0 and gd["damage"] == 0 and w.block_id(1, 40, 4) is None
+       and w.block_id(1, 40, 0) == "gravel")
+    scene.frame_set(29)
+    before = plank.object.hide_render
+    scene.frame_set(30)
+    ok("the plank is drawn until frame 29 and gone from frame 30", before is False and plank.object.hide_render is True)
+    bd = bed(st, (6, 40, 0), "north", "red", frame=50)
+    scene.frame_set(49)
+    hid = (bd["foot"].object.hide_render, bd["head"].object.hide_render)
+    scene.frame_set(50)
+    shown = (bd["foot"].object.hide_render, bd["head"].object.hide_render)
+    ok("bed(frame=50): both halves appear ON frame 50", hid == (True, True) and shown == (False, False))
+    scene.frame_set(1)
     print("[fixtures] %d failed%s" % (len(failed), (": " + "; ".join(failed)) if failed else ""))
     return len(failed)
 

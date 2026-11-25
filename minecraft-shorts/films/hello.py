@@ -1,29 +1,33 @@
-"""The Hello: 63.8 narrated seconds, 22 sentences, 24 shots, three skies. Told by a baby villager.
+"""The Hello: 63.8 narrated seconds (1531 frames), 22 sentences, 24 shots, three skies. Told by a baby villager.
 
     "In this town, the player used to protect us. ... He crouched, once, and he stayed down. The player had blue
      eyes."      (stories/herobrine.json: the story, the picture of every beat, the risks and their fallbacks)
 
 This file is the lead director's: the narration (the clock of the film), the skies, the shot plan and build().
-The pictures are made by five sequence files, one location each, one function per shot (the contract and
-everything they share: films/hello_common.py):
+The pictures are made by five sequence files, one location each, one function per shot (the contract, the set,
+the places, the shared cameras, the cast and the helpers: films/hello_common.py):
 
     films/hello_square.py      sq01 sq09 sq10 sq11                 village square, golden hour
     films/hello_door_night.py  dn02 dn18 dn19                      the child's door at night
-    films/hello_interior.py    in03 in16 in17                      inside the child's house
+    films/hello_interior.py    in03 in16 in17                      inside the child's house (beat 3 ends in gold)
     films/hello_door_gold.py   dg04 dg05 dg15_a/b/c dg20 dg21 dg22 the child's door in golden light
     films/hello_meadow.py      me06 me07 me08 me12 me13 me14       exit gate, meadow road, forest wall, the signs
 
     $TTS tools/narrate.py hello --check                  # the voice is spoken and committed: narration/hello.*
-    $BPY -m render hello --still 12.0 --zones            # one frame (540x960, 16 samples); each still costs one
-                                                         #   build of its sky
-    $BPY -m render hello --sheet 12                      # out/test/hello_sheet.png (all three skies)
-    $BPY -m tools.hello_timeline                         # the shot plan with frames and words (no scene is built)
+    $BPY -m tools.hello_timeline [--json]                # the shot plan with frames and words; caption proof
+    $BPY -m tools.hello_shots render --shots dg04_hello --frame 226 --zones      # stills of single shots (one
+                                                         #   build per sky; 540x960, 16 samples by default)
+    $BPY -m tools.hello_shots tiles --sky gold; ... sheet   # one tile per shot -> out/test/hello_shots_sheet.png
+    $BPY -m render hello --still 12.0 --zones            # one frame through render.py
     $BPY -m render hello --frames dn02_fight --res 270x480 --samples 8 --threads 2     # one shot as a preview
     $BPY -m render hello --frames all --max-seconds 240  # FINAL frames: this film's final quality is 540x960 at
                                                          #   16 samples (set in build(); never pass --res/--samples)
 
 THE VOICE IS COMMITTED. Changing a word, a pause, the voice or the speed below makes narration/hello.json stale
 (build stops) and, once spoken again, moves every cut after it: do not, unless the orchestrator says so.
+
+THE SHOT LENGTHS: every shot is 1.25 to 4.25 s except dg15_b (0.88 s, "he is one house"): the middle one of the
+three jump cuts of beat 15, which quicken on purpose; the cuts sit on word boundaries ("he", "closer").
 """
 from engine import narration, shots
 from films import hello_common as HC
@@ -65,15 +69,17 @@ NARRATION = {
 
 # The skies (films.lookdev.Stage: arguments of look.set_time / look.setup_compositor). render.py builds the film
 # once per sky that has work. az = where the sun (at night the moon) stands, degrees counter-clockwise from east.
+# Three entries, each for a reason:
 SKIES = {
-    # the village in golden light: square (1, 9-11), the child's door (4, 5, 15, 20-22), the end of beat 3.
-    # A low sun in the south-west: house_a's door faces west, so its front, the plaza before it and the house
-    # fronts north of it are in the sun (with the look-dev sun, azimuth 62, that whole side is in the house's own
-    # shadow), and it comes through the south windows onto the beds when the night ends.
+    # the village in golden light: the square (1, 9-11), the child's door (4, 5, 15, 20-22), the end of beat 3.
+    # A low sun in the west-south-west (films/_multisky_demo.py's): house_a's door faces west, so its front and the
+    # plaza before it are in the sun (with the look-dev sun, azimuth 62, that whole side is in the house's own
+    # shadow); the square's cameras look north-west to north, 80-120 degrees off it. Faces turned to the house
+    # (the two-shot of 4 and 22) are lit by the film-local doorstep fill (hello_common.Hello.doorstep_fill).
     "gold": dict(preset="golden", az=215.0, el=24.0, bloom=1.0, grade="warm"),
     # the meadow (6-8, 12-14): the look-dev sun in the north-east, behind the wood, and NO distance haze: with the
     # preset's haze the forest wall 35 blocks away is dark brown, without it the gaps between the trunks are black
-    # (engine/sets.py, measured). All of hello_set's proof stills were made under exactly this sky.
+    # (engine/sets.py, measured). Every proof still of hello_set was made under exactly this sky.
     "meadow": dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm", haze=0.0),
     # night at the door and in the house (2, 3, 16-19): the look-dev night, the moon in the west over the plaza,
     # so the house front has a cool fill under the warm key of its two door torches.

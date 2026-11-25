@@ -1,1 +1,309 @@
-"""stub"""
+"""The Hello, sequence DOOR GOLD: the front of the child's house in golden light (morning, and late gold in beat
+15). Beats 4, 5, 15, 20, 21, 22 (shots dg04_hello, dg05_nod, dg15_a, dg15_b, dg15_c, dg20_walkup, dg21_crouch,
+dg22_eyes), sky "gold". One function per shot; the contract is in films/hello_common.py (tags "dg...", C.actor,
+C.cam, C.lights, st.use / st.hero).
+
+THE PLACE (house_a's west front, hello_common's docstring): door cell (10, -8), the oak step at (9, -8) (high half
+  x 9.5..10 at z 1.0, low half x 9..9.5 at z 0.5), wall torches either side at head height; north of the door one
+  block of wall and the corner log: the house's north-west corner is at (10, -5).
+  PLACES: "watch_door" (8.9, -5.4) = his spot, facing HC.WATCH_YAW (toward "watch_face" (9.75, -7.2): the door);
+  "hello_child" (9.25, -6.41) = the child at his feet, between him and the door; "step", "step_child", "door_in",
+  "run_off", "watch_far", "watch_mid".
+THE SKY: "gold" = sun at azimuth 215 (west-south-west), elevation 24: it lights the west front of the house and
+  the plaza before it. He faces the door, so in the doorstep two-shot the sun is behind him and his face is in
+  his own shade: C.doorstep_fill(s) is the film-local shadowless fill on his face, the SAME light at the SAME
+  strength in dg04 and dg22. Decided on stills: with the fill (out/test/hello_scout_twoshot_dg04_hello_226.png,
+  _dg22_eyes_1475.png) the face is lit and the indigo eye pixel reads blue; without it
+  (hello_scout_twoshot_nofill_*.png) the face is a stop darker and the iris dark purple.
+THE TWO-SHOT, as scouted (CAMS["two_shot"], 40 mm f/2.4 from (8.8, -8.4, 1.35), 3 blocks south of him): his eyes at
+  y 31 % standing and 41 % crouched, x 50 %; a house front and its roofline behind him (the fixed line the crouch
+  reads against); the child's head a soft pink block at the lower right (x 75-100 %, y 50-100 %). No lamp post
+  within a third of the frame of his head (every line from the door itself has one behind his head).
+THE TWO SHOTS THAT MUST MATCH: dg04_hello and dg22_eyes use CAMS["two_shot"] EXACTLY through _two_shot() (no
+  override; the same handheld seed TWO_SHOT_SEED in both, since C.cam would otherwise derive it from the shot
+  name), the same fill, the same light levels, Steve in dg04 and the watcher in dg22 on "watch_door" facing
+  WATCH_YAW, the child on "hello_child". The roofline behind his head is what makes the crouch read: keep it.
+HIS FACE: never readable before dg22 (dg15: out of focus, small or turned away; dg20: cropped at the shoulders;
+  dg21: cropped at the chin, three-quarter from behind). In dg22 the white eyes must be unmistakable.
+LIGHT: C.lights(s, "gold", near="door", radius=16).
+"""
+from films import hello_common as HC
+
+TWO_SHOT_SEED = 7          # the handheld of dg04 and dg22: the same seed, so the two frames match
+
+
+def _two_shot(s, C):
+    """The camera of beats 4 and 22, exactly, with its fill (call it in both)."""
+    C.cam(s, "two_shot", seed=TWO_SHOT_SEED, handheld=0.004)
+    C.doorstep_fill(s)
+
+
+def dg04_hello(st, s, C, nar):
+    """BEAT 4  "Every morning he crouched at me, twice."   frames 211-271 (61 f, 2.54 s), sky gold.
+    Words: Every 213, morning 219, he 227, crouched 230, at 241, me 244, twice 248. The pause after it is 0.45 s.
+
+    STORY: Golden morning on the plaza at the foot of the doorstep. Steve has stepped outside and stands two blocks
+    from the door, facing it, no helmet. The child has come down the step and stands at his feet. Close two-shot
+    from child height, camera with its back to the door looking out: the child low in the foreground, three-quarter
+    from behind with its nose showing, Steve's face filling the upper part of the frame, pitched down at the child,
+    the white and dark blue eye pixels clearly readable, a roofline across the plaza as a fixed line behind his
+    head. He drops into the sneak pose and stands again, twice, quickly. The last shot of the film uses this
+    camera exactly. About 3 seconds.
+    Cast: Steve, baby villager (narrator). Effects: player sneak pose, two quick crouches (six frames down and six
+    up), fixed roofline behind his head so the drop reads, film-local neutral fill on his face, the same one as in
+    beat 22.
+
+    MUST BE SEEN, ON WHICH WORD
+      frame 211       his head already moving (looking down at the child: Player.watch(f0, f1, child) snaps on f0)
+      "morning" 219   his face: white and dark blue eye pixels readable
+      "crouched" 230 .. "twice" 248   the two crouches (C.crouch_twice(steve, frame)): the second one ON "twice"
+                      or just before it reads best (e.g. first down on 236, second down on 248)
+      the whole shot  the child low in the foreground, nose showing (three-quarter from behind)
+    SHARED: CAMS["two_shot"] + C.doorstep_fill(s) (via _two_shot), PLACES "watch_door" + HC.WATCH_YAW, "hello_child":
+      EXACTLY as in dg22. Cast: C.actor("steve_iron", "dg"), C.actor("child", "dg").
+    NEIGHBOURS: before, in03_bed (the room turned gold on "ended"); after, dg05_nod (reverse angle: the child nods
+      and runs off).
+    RISKS (story): blue eyes: the iris texel is #523d89, the trousers' indigo; under warm light it can read purple or
+      dark: the near-neutral fill, the face at least a third of the frame wide. The sneak pose is a drop of a third
+      of a block plus a lean and can vanish at phone size: the fixed roofline, six frames down and six up.
+    STUB: Steve on watch_door looking at the child, two crouches from "crouched", the child looking up at him.
+    """
+    f0, f1 = s.frame_start, s.frame_end
+    steve = C.actor("steve_iron", "dg")
+    kid = C.actor("child", "dg")
+    C.put(steve, f0, "watch_door", yaw=HC.WATCH_YAW)
+    C.put(kid, f0, "hello_child", toward="watch_door")
+    kid.look_at(f0, steve, ease=0)
+    steve.watch(f0, f1, kid)
+    C.crouch_twice(steve, C.at(s, "crouched"))
+    st.use(s, steve, kid)
+    _two_shot(s, C)
+    s.focus(steve.head)
+    st.hero(s, "steve", steve)
+    C.lights(s, "gold", near="door", radius=16.0)
+
+
+def dg05_nod(st, s, C, nar):
+    """BEAT 5  "That meant hello."   frames 272-318 (47 f, 1.96 s), sky gold.
+    Words: That 274, meant 279, hello 284. The pause after it is 1.0 s (about 290-318: the run off; the story turns).
+
+    STORY: Reverse angle from beside Steve's hip, his arm and iron leg at the edge of the frame. The baby villager
+    looks straight up at him and nods twice in answer, the only hello a villager can do, then turns and runs off
+    along the plaza with its big head bobbing. About 2 seconds.
+    Cast: baby villager (narrator), Steve (hip and arm only). Effects: baby villager nod twice (existing nod), baby
+    villager run.
+
+    MUST BE SEEN, ON WHICH WORD
+      frame 272       the child looking straight up (the head tipped back, toward the lens side)
+      "hello" 284     the two nods (C.hello_nod: 14 frames)
+      about 298 .. 318    it turns and runs off along the plaza, head bobbing (Character.walk(run=True))
+      the whole shot  his iron leg and arm at the frame edge, soft; nothing of his face
+    SHARED: PLACES "watch_door", "hello_child", "run_off". Cast: C.actor("steve_iron", "dg") and
+      C.actor("child", "dg") (both in dg04, the shot before: place them on f0, key nothing before it).
+    NEIGHBOURS: before, dg04_hello; after, me06_leave (the gate: one day he walks into the woods). Hard cuts.
+    STUB: the camera at his hip looks down at the child; it nods on "hello" and runs off toward run_off.
+    """
+    f0, f1 = s.frame_start, s.frame_end
+    steve = C.actor("steve_iron", "dg")
+    kid = C.actor("child", "dg")
+    C.put(steve, f0, "watch_door", yaw=HC.WATCH_YAW)
+    C.put(kid, f0, "hello_child", toward="watch_door")
+    kid.look_at(f0, steve, ease=0)
+    end = C.hello_nod(kid, C.at(s, "hello"))
+    here = C.P("hello_child")
+    kid.walk(end + 4, [here, (8.0, -6.6, here[2]), C.P("run_off")], run=True)
+    steve.idle(f0, f1 + 1)
+    st.use(s, steve, kid)
+    C.cam(s, "two_shot", pos=(8.05, -5.15, 1.05), target=(9.1, -6.3, 0.75), lens=32.0, fstop=2.4, focus=kid.head)
+    st.hero(s, "child", kid)
+    C.lights(s, "gold", near="door", radius=16.0)
+
+
+def _fronts(st, s, C, place):
+    """Beat 15, one of its three jump cuts: the locked frame along the house fronts, the child on the step, him at
+    `place`."""
+    f0, f1 = s.frame_start, s.frame_end
+    kid = C.actor("child", "dg")
+    p = HC.PLACES[place]
+    him = C.watcher(s, "dg", place=place, yaw=HC.yaw_to(p, (p[0] + 1.0, p[1])))      # in profile: facing the fronts
+    C.put(kid, f0, "step_child", toward=(5.0, -6.0))
+    kid.look_at(f0, him, ease=0)
+    st.use(s, kid)
+    C.cam(s, "house_fronts", focus=kid.head, seed=15, handheld=0.003)
+    st.hero(s, "child", kid)
+    C.lights(s, "gold", near="door", radius=16.0)
+
+
+def dg15_a(st, s, C, nar):
+    """BEAT 15, first jump  "Every time I look,"   frames 915-946 (32 f, 1.33 s), sky gold.
+    Words: Every 917, time 924, I 932, look 936.
+
+    STORY (all of beat 15, "Every time I look, he is one house closer."): Late gold at the child's door. The baby
+    villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands
+    small and soft beyond the next house. The child looks away and back, jump cut in the same frame: he is at the
+    next house, same pose. Once more: he is at the corner of the child's own house. About 3 seconds.
+    Cast: baby villager (narrator), the watcher (background, out of focus). Effects: two jump cuts in a locked frame,
+    each covered by the child's head turn, focus stays on the child.
+
+    THE THREE SHOTS: dg15_a (he is at "watch_far", beyond the next house), dg15_b (at "watch_mid", the next house),
+      dg15_c (at "watch_door", the corner of the child's own house: where he stands in beats 19-22). ONE locked
+      frame for all three (CAMS "house_fronts" is a start; it is not shared with another sequence); the cuts are on
+      word boundaries (b before "he", c before "closer"); dg15_b is 0.88 s: short on purpose, the jumps quicken.
+    MUST BE SEEN, ON WHICH WORD
+      "look" 936      the child's head turned up the house fronts toward him (cheated toward the lens)
+      each cut        the child's head turning AWAY just before it and BACK just after it (cover the jump)
+      "closer" 968    him at the corner of the house, much bigger, still out of focus: his face NOT readable
+    SHARED: PLACES "watch_door" + HC.WATCH_YAW in dg15_c (or his facing there may differ, see below), "step_child".
+      Cast: C.actor("child", "dg"), C.actor("watcher", "dg") (the same instances in a, b, c: each placed on f0).
+    NEIGHBOURS: before, me14_pyramid (the meadow); after, in16_empty (night, his bed empty). Hard cuts.
+    RISKS (story): jump cuts in a locked frame can look like a render error: cover each jump with the child's head
+      turning away and back, or cut to a one-second close-up of the child between the positions (not available:
+      the cuts are fixed; use the head turn). HIS FACE: in all three he stands IN PROFILE, facing the house fronts
+      (east): "same pose", and the camera from the south never sees his eyes. Scouted: facing the door (WATCH_YAW)
+      at "watch_door" his face was frontal and readable at 4.6 blocks (out/test/hello_scout_gold_dg15_c_985.png,
+      rendered before this change): never that. He turns to WATCH_YAW between beat 15 and beat 19 (other days).
+      The child in dg15_a was at the frame's right edge, outside the safe area (x > 82 %): frame it further in.
+    STUB: the child on the step, him at watch_far, the locked frame.
+    """
+    _fronts(st, s, C, "watch_far")
+
+
+def dg15_b(st, s, C, nar):
+    """BEAT 15, second jump  "he is one house"   frames 947-967 (21 f, 0.88 s), sky gold.
+    Words: he 949, is 951, one 954, house 961. (See dg15_a for the beat.) Him at "watch_mid" (the next house)."""
+    _fronts(st, s, C, "watch_mid")
+
+
+def dg15_c(st, s, C, nar):
+    """BEAT 15, third jump  "closer."   frames 968-997 (30 f, 1.25 s), sky gold.
+    Words: closer 968. The pause after it is 0.8 s (to 997): he is at our corner; hold. (See dg15_a for the beat.)
+    Him at "watch_door" (the corner of the child's own house: his place in beats 19-22)."""
+    _fronts(st, s, C, "watch_door")
+
+
+def dg20_walkup(st, s, C, nar):
+    """BEAT 20  "So this morning I walked up to him and waited for my hello."   frames 1258-1357 (100 f, 4.17 s),
+    sky gold. Words: So 1260, this 1264, morning 1270, I 1280, walked 1284, up 1293, to 1297, him 1300, and 1312,
+    waited 1315, for 1324, my 1328, hello 1334. The pause after it is 0.5 s.
+
+    STORY: Golden morning at the same door. One piece of rotten flesh spins on the step where the zombie stood. He has
+    not moved from his spot. The door opens and the baby villager comes out, down the step, walking not running,
+    up to him. Side-on long lens along the house wall: the child stops at his feet, tips its head all the way back
+    and nods twice. He is cropped at the shoulders by the top of the frame. About 4.2 seconds.
+    Cast: baby villager (narrator), the watcher (cropped at the shoulders). Effects: rotten flesh dropped item,
+    spinning; door opening; nod twice.
+
+    MUST BE SEEN, ON WHICH WORD
+      frame 1258      the rotten flesh already spinning on the step (C.item("rotten_flesh", "dg"): place on f0 at
+                      C.P("step"), animate(f0, f1 + 1)); he stands on watch_door (dead still)
+      "morning" 1270  the door opens (C.v.door_open("house_a", frame, open=True)); the child steps out
+      "walked" 1284 .. "him" 1300   it walks (not runs) down the step and up to him: the step's high half is z 1.0,
+                      its low half z 0.5, the path -0.06 (give the walk those heights)
+      "waited" 1315 .. "hello" 1334   it stops on "hello_child", head tipped all the way back, two nods
+      the whole shot  he is cropped at the shoulders by the top of the frame: NO face
+    SHARED: PLACES "watch_door" + HC.WATCH_YAW (he has not moved since dn19), "hello_child", "step", "door_in". Cast:
+      C.actor("child", "dg2") (a twin: the "dg" child is placed elsewhere in dg15, fine either way),
+      C.actor("watcher", "dg"), C.item("rotten_flesh", "dg").
+    NEIGHBOURS: before, dn19_beside (night: their two backs, the zombie knocking); after, dg21_crouch (the same
+      place: he crouches over the child). Hard cuts.
+    SCOUTED: a camera from the south looking north along the wall (70 mm from (9.0, -12.6)) showed his face
+      frontally (hello_scout_gold_dg20_walkup_1335.png): he faces the door. Side-on from the plaza (west), looking
+      at the wall, he is seen from behind his right shoulder and the frame top crops him at the shoulders.
+    STUB: the flesh spins on the step, the door opens, the child walks from door_in to hello_child and nods; a low
+      side-on camera from the plaza looking east at the wall, the frame top at his shoulders.
+    """
+    f0, f1 = s.frame_start, s.frame_end
+    him = C.watcher(s, "dg", place="watch_door")
+    kid = C.actor("child", "dg2")
+    flesh = C.item("rotten_flesh", "dg")
+    flesh.place(f0, C.P("step"))
+    flesh.animate(f0, f1 + 1)
+    C.v.door_open("house_a", C.at(s, "morning") - 4, open=True, frames=6)
+    door_in = C.P("door_in")
+    kid.place(f0, door_in, HC.yaw_to(door_in, C.P("step")))
+    here = C.P("hello_child")
+    route = [door_in, (9.75, -7.45, 1.0), (9.25, -7.35, 0.5), (8.75, -7.0, here[2]), here]
+    end = kid.walk(C.at(s, "morning"), route, speed=1.9)
+    kid.look_at(end, him, ease=6)
+    C.hello_nod(kid, max(end + 8, C.at(s, "hello")))
+    st.use(s, kid, flesh)
+    C.cam(s, "two_shot", pos=(3.9, -6.3, 0.5), target=(9.1, -6.1, 0.1), lens=50.0, fstop=2.4, focus=kid.head)
+    st.hero(s, "child", kid)
+    C.lights(s, "gold", near="door", radius=16.0)
+
+
+def dg21_crouch(st, s, C, nar):
+    """BEAT 21  "He crouched, once, and he stayed down."   frames 1358-1444 (87 f, 3.62 s), sky gold.
+    Words: He 1360, crouched 1362, once 1373, and 1386, he 1389, stayed 1391, down 1400. Then 1.5 s of silence
+    (about 1413-1444): the story's "one second of silence"; nothing moves but the handheld.
+
+    STORY: The same place, camera a little behind his shoulder line, the frame cropped at his chin. He sinks slowly
+    into the sneak pose: the torso leans forward and his head comes down into the picture from above, seen
+    three-quarter from behind, pitched down at the child. He is still taller than the child, so he ends leaning
+    over it. He holds there. Neither of them moves. One second of silence. About 3.5 seconds.
+    Cast: the watcher (three-quarter from behind), baby villager (narrator). Effects: player sneak pose, one slow
+    crouch over a full second, held, no music.
+
+    MUST BE SEEN, ON WHICH WORD
+      "crouched" 1362 .. "once" 1373   the slow crouch begins (C.crouch_slow(him, frame, frames=24): the game snaps
+                      this pose; the slow sink is the one deliberate untruth, it is his)
+      "down" 1400     he is down, leaning over the child; his head entered the frame from above, three-quarter from
+                      behind: the back and side of his head, never his eyes
+      1413 .. 1444    the silence: hold; the child's head tipped up at him
+    SHARED: PLACES "watch_door" + HC.WATCH_YAW, "hello_child". Cast: C.actor("watcher", "dg") (in dg20, the shot
+      before: place on f0), C.actor("child", "dg2") (likewise).
+    NEIGHBOURS: before, dg20_walkup; after, dg22_eyes (the two-shot of beat 4: the white eyes). Hard cuts.
+    RISKS (story): the sneak pose can vanish at phone size: crop at his chin so the head ENTERS the picture as he
+      sinks. A sneaking player is still taller than a baby villager: he leans over it, his head does not come level.
+    STUB: he crouches slowly from "once"; the child looks up; a camera behind his left shoulder looking down.
+    """
+    f0, f1 = s.frame_start, s.frame_end
+    him = C.watcher(s, "dg", place="watch_door")
+    kid = C.actor("child", "dg2")
+    C.put(kid, f0, "hello_child", toward="watch_door")
+    kid.look_at(f0, him, ease=0)
+    him.look_at(f0, kid, ease=0)
+    C.crouch_slow(him, C.at(s, "once"), frames=24)
+    st.use(s, kid)
+    C.cam(s, "two_shot", pos=(7.7, -5.0, 1.5), target=(9.0, -6.2, 0.85), lens=40.0, fstop=2.4, focus=kid.head)
+    st.hero(s, "child", kid)
+    C.lights(s, "gold", near="door", radius=16.0)
+
+
+def dg22_eyes(st, s, C, nar):
+    """BEAT 22  "The player had blue eyes."   frames 1445-1531 (87 f, 3.62 s), sky gold. The film's last shot.
+    Words: The 1447, player 1449, had 1458, blue 1462, eyes 1470. Then the 2-second hold (about 1483-1531) and the
+    end of the film (cut to black = the end of the video).
+
+    STORY: The camera of beat 4, exactly, the same roofline behind his head. His face, turned down to the child and
+    the lens, fills the upper part of the frame: where the blue was, both pixels of each eye are blank white,
+    faintly glowing. He stays down. Hold two seconds on the two of them, the child's big head below the white eyes,
+    then cut to black. About 4 seconds.
+    Cast: the watcher (face, first time seen), baby villager (narrator). Effects: white-eyed Steve skin, eyes
+    slightly emissive in this shot only, same camera and same fill light as beat 4, two-second hold, then cut to
+    black.
+
+    MUST BE SEEN, ON WHICH WORD
+      frame 1445      already down (C.crouch_held on f0), his face to the child and the lens; the white eyes
+      "blue" 1462 .. "eyes" 1470   the white eyes unmistakable (HC.EYE_GLOW; judged on the scouting still)
+      1483 .. 1531    hold; nothing moves but the handheld and, at most, a tiny head settle
+    SHARED: _two_shot (CAMS["two_shot"] + the doorstep fill: EXACTLY dg04's), "watch_door" + HC.WATCH_YAW,
+      "hello_child". Cast: C.actor("watcher_eyes", "dg") (the white-eyed skin: THIS SHOT ONLY),
+      C.actor("child", "dg2") (in dg21: place on f0).
+    NEIGHBOURS: before, dg21_crouch; after, nothing (the film ends on frame 1531).
+    RISKS (story): never trim the second of silence before this line or the two-second hold after it (kept: 1.5 s
+      pause, 2.0 s tail).
+    STUB: the white-eyed watcher crouched on watch_door, looking down at the child, the two-shot camera.
+    """
+    f0, f1 = s.frame_start, s.frame_end
+    him = C.watcher(s, "dg", place="watch_door", role="watcher_eyes")
+    kid = C.actor("child", "dg2")
+    C.put(kid, f0, "hello_child", toward="watch_door")
+    C.crouch_held(him, f0)
+    kid.look_at(f0, him, ease=0)
+    him.watch(f0, f1, kid)
+    st.use(s, kid)
+    _two_shot(s, C)
+    s.focus(him.head)
+    st.hero(s, "watcher", him)
+    C.lights(s, "gold", near="door", radius=16.0)
