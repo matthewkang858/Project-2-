@@ -1,0 +1,304 @@
+{
+ "film": "_multisky_check_b",
+ "json_version": 3,
+ "spec_hash": "0262557989fffa89",
+ "spec": {
+  "version": 1,
+  "voice": "am_michael",
+  "speed": 1.0,
+  "lead": 0.3,
+  "tail": 1.1,
+  "pause": 0.35,
+  "fps": 24,
+  "lines": [
+   {
+    "id": "sunset",
+    "text": "Our square at sunset.",
+    "spoken": "Our square at sunset.",
+    "pause": 0.35,
+    "speed": 1.0
+   },
+   {
+    "id": "door",
+    "text": "The same door at night, until morning comes.",
+    "spoken": "The same door at night, until morning comes.",
+    "pause": 0.45,
+    "speed": 1.0
+   },
+   {
+    "id": "again",
+    "text": "And night again.",
+    "spoken": "And night again.",
+    "pause": 0.0,
+    "speed": 1.0
+   }
+  ]
+ },
+ "voice": "am_michael",
+ "lang": "en-us",
+ "speed": 1.0,
+ "sample_rate": 24000,
+ "channels": 1,
+ "fps": 24,
+ "duration": 6.958333,
+ "frames": 167,
+ "lead": 0.3,
+ "tail": 1.1183,
+ "speech_seconds": 4.74,
+ "words_per_second_speaking": 3.165,
+ "words_per_second_overall": 2.708,
+ "timing": "model",
+ "loudness": {
+  "target_lufs": -19.01,
+  "programme_target_lufs": -16.0,
+  "max_true_peak_db": -2.0,
+  "before_lufs": -22.6,
+  "before_true_peak_db": -3.4,
+  "gain_db": 3.77,
+  "limiter_ceiling_db": -2.5,
+  "max_gain_reduction_db": 2.81,
+  "share_limited_over_1db": 0.0158,
+  "share_limited_over_3db": 0.0,
+  "sentence_level_gain_db": [
+   0.0,
+   1.02,
+   -0.44
+  ],
+  "sentence_level_db": [
+   -17.73,
+   -17.59,
+   -17.6
+  ],
+  "integrated_lufs": -19.0,
+  "true_peak_db": -2.4,
+  "programme_lufs": -15.99
+ },
+ "wav": "_multisky_check_b.wav",
+ "wav_sha1": "84dfd12e984325b5a8fbd685a39c0f4cfd61ff03",
+ "sentences": [
+  {
+   "index": 0,
+   "id": "sunset",
+   "text": "Our square at sunset.",
+   "spoken": "Our square at sunset.",
+   "start": 0.3,
+   "end": 1.475,
+   "pause_after": 0.35,
+   "speed": 1.0,
+   "first_word": 0,
+   "last_word": 3
+  },
+  {
+   "index": 1,
+   "id": "door",
+   "text": "The same door at night, until morning comes.",
+   "spoken": "The same door at night, until morning comes.",
+   "start": 1.825,
+   "end": 4.51,
+   "pause_after": 0.45,
+   "speed": 1.0,
+   "first_word": 4,
+   "last_word": 11
+  },
+  {
+   "index": 2,
+   "id": "again",
+   "text": "And night again.",
+   "spoken": "And night again.",
+   "start": 4.96,
+   "end": 5.84,
+   "pause_after": 0.0,
+   "speed": 1.0,
+   "first_word": 12,
+   "last_word": 14
+  }
+ ],
+ "words": [
+  {
+   "text": "Our",
+   "caption": "Our",
+   "start": 0.3,
+   "end": 0.42,
+   "sentence": 0,
+   "source": "energy",
+   "estimated": false,
+   "second": 0.3,
+   "second_source": "energy"
+  },
+  {
+   "text": "square",
+   "caption": "square",
+   "start": 0.42,
+   "end": 0.77,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.4,
+   "second_source": "forced"
+  },
+  {
+   "text": "at",
+   "caption": "at",
+   "start": 0.77,
+   "end": 0.92,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.7,
+   "second_source": "forced"
+  },
+  {
+   "text": "sunset.",
+   "caption": "sunset",
+   "start": 0.92,
+   "end": 1.475,
+   "sentence": 0,
+   "source": "model",
+   "estimated": false,
+   "second": 0.9,
+   "second_source": "forced"
+  },
+  {
+   "text": "The",
+   "caption": "The",
+   "start": 1.825,
+   "end": 1.91,
+   "sentence": 1,
+   "source": "energy",
+   "estimated": false,
+   "second": 1.825,
+   "second_source": "energy"
+  },
+  {
+   "text": "same",
+   "caption": "same",
+   "start": 1.91,
+   "end": 2.235,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 1.905,
+   "second_source": "forced"
+  },
+  {
+   "text": "door",
+   "caption": "door",
+   "start": 2.235,
+   "end": 2.535,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 2.185,
+   "second_source": "forced"
+  },
+  {
+   "text": "at",
+   "caption": "at",
+   "start": 2.535,
+   "end": 2.66,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 2.445,
+   "second_source": "forced"
+  },
+  {
+   "text": "night,",
+   "caption": "night",
+   "start": 2.66,
+   "end": 2.99,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 2.645,
+   "second_source": "forced"
+  },
+  {
+   "text": "until",
+   "caption": "until",
+   "start": 3.28,
+   "end": 3.61,
+   "sentence": 1,
+   "source": "energy",
+   "estimated": false,
+   "second": 3.28,
+   "second_source": "energy"
+  },
+  {
+   "text": "morning",
+   "caption": "morning",
+   "start": 3.61,
+   "end": 3.96,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 3.545,
+   "second_source": "forced"
+  },
+  {
+   "text": "comes.",
+   "caption": "comes",
+   "start": 3.96,
+   "end": 4.51,
+   "sentence": 1,
+   "source": "model",
+   "estimated": false,
+   "second": 3.845,
+   "second_source": "forced"
+  },
+  {
+   "text": "And",
+   "caption": "And",
+   "start": 4.96,
+   "end": 5.1,
+   "sentence": 2,
+   "source": "energy",
+   "estimated": false,
+   "second": 4.96,
+   "second_source": "energy"
+  },
+  {
+   "text": "night",
+   "caption": "night",
+   "start": 5.1,
+   "end": 5.4,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 5.1,
+   "second_source": "forced"
+  },
+  {
+   "text": "again.",
+   "caption": "again",
+   "start": 5.4,
+   "end": 5.84,
+   "sentence": 2,
+   "source": "model",
+   "estimated": false,
+   "second": 5.34,
+   "second_source": "forced"
+  }
+ ],
+ "estimated_words": [],
+ "guarded_words": [],
+ "onset_check": {
+  "words": 4,
+  "not_found": 0,
+  "far": [],
+  "median_ms": 2.5,
+  "min_ms": 0.0,
+  "max_ms": 5.0,
+  "within_1_frame": 4,
+  "within_2_frames": 4
+ },
+ "tools": {
+  "model": "kokoro-v1.0.timed.onnx",
+  "voices": "voices-v1.0.bin",
+  "recogniser": "faster-whisper small.en",
+  "kokoro-onnx": "0.6.1",
+  "faster-whisper": "1.2.1",
+  "onnxruntime": "1.32.0",
+  "ctranslate2": "4.9.1"
+ }
+}

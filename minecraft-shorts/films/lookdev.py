@@ -166,8 +166,9 @@ class Stage:
         one ramp of the picture gain (film start: st.fade(1, 7, 0.0, 1.0)). The caption stays at full strength.
         Changing a dip re-encodes and re-renders nothing. They reach render.py through st.fades.
       * What costs what: an edit to one shot re-renders that shot (in its sky's build only); an edit to one entry
-        of SKIES re-renders exactly the frames of that sky; re-tagging a shot re-renders that shot; a caption, a
-        dip or the narration timing re-renders nothing. Every command builds only the skies it has work in.
+        of SKIES re-renders exactly the frames of that sky; re-tagging a shot re-renders that shot; a caption or
+        a dip re-renders nothing. Every command builds only the skies it has work in (about 3 s per sky), and
+        `render <film> --frames ...` says "0 to render" only when every sky's frames are done.
     """
 
     # a SKIES entry: short name -> look.set_time argument, set_time arguments by their own name, compositor arguments

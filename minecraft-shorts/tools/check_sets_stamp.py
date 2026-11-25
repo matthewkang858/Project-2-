@@ -4,7 +4,7 @@
 
 The set is static geometry, so the question is not "which frames change" but "is everything the set is made of
 IN the fingerprint": a re-render must not keep old frames after the set changed. One camera (the exit-gate framing
-of "The Hello"), one frame, six builds of the village:
+of "The Hello"), one frame, ten builds of the village:
 
     plain      no hook                       the village of the finished films
     hello      sets.hello_set                 the reference
@@ -12,6 +12,9 @@ of "The Hello"), one frame, six builds of the village:
     noshade    the forest without baked sky light   differs from 'hello' in the objects only (block colours)
     nobiome    the forest in plains colours   differs in the objects only
     moved      the sand pyramid one block further east     differs in the objects only
+    far        the forest 6 blocks further out (layout forest_gap)          differs in the objects only
+    logs2      the floating oak with 2 logs instead of 4 (floating=)        differs in the objects only
+    clear      the meadow sky: the same set, haze=0.0                       differs in the global part only
     plain2     no hook, after all of these    must equal 'plain' (a hook leaves nothing behind in the process)
 
 Exit code 1 if an expectation fails.
@@ -35,10 +38,13 @@ def build(variant):
         "noshade": lambda b: sets.hello_set(b, forest=dict(shade=False)),
         "nobiome": lambda b: sets.hello_set(b, forest=dict(biome=False)),
         "moved": lambda b: sets.hello_set(b, layout=dict(pyramid=(13, 45))),
+        "far": lambda b: sets.hello_set(b, layout=dict(forest_gap=(0.5, 64))),
+        "logs2": lambda b: sets.hello_set(b, floating=dict(logs=2)),
+        "clear": lambda b: sets.hello_set(b),
     }
     v = village.build_village(scene, seed=1, edit=edits[variant])
     look.set_time(scene, "golden", sun_azimuth=62.0, sun_elevation=27.0)
-    look.setup_compositor(scene, bloom=1.0, grade="warm")
+    look.setup_compositor(scene, bloom=1.0, grade="warm", haze=0.0 if variant == "clear" else None)
     film = shots.Film(scene, fps=24)
     s = film.shot("gate", 0.0, 1.0)
     s.lens(32.0, 4.0)
@@ -52,7 +58,7 @@ def main():
     from engine import stamp
 
     got, bad = {}, 0
-    for variant in ("plain", "hello", "hello2", "noshade", "nobiome", "moved", "plain2"):
+    for variant in ("plain", "hello", "hello2", "noshade", "nobiome", "moved", "far", "logs2", "clear", "plain2"):
         scene, film, v = build(variant)
         fp = stamp.Fingerprinter(scene, film)
         t = time.time()
@@ -78,6 +84,9 @@ def main():
     expect("forest without its baked sky light", "hello", "noshade", "o")
     expect("forest without its biome colours", "hello", "nobiome", "o")
     expect("the pyramid one block further east", "hello", "moved", "o")
+    expect("the forest 6 blocks further out", "hello", "far", "o")
+    expect("the floating oak with 2 logs instead of 4", "hello", "logs2", "o")
+    expect("the same set under the haze-free meadow sky", "hello", "clear", "g")
     print("[check_sets_stamp] %s" % ("all as expected" if not bad else "%d FAILED" % bad))
     return 1 if bad else 0
 

@@ -1,12 +1,14 @@
-"""Multi-sky demo: 8.5 narrated seconds in the real village under TWO skies, five sky segments, one module, one
-frame directory, one mp4. THE TEMPLATE for a film whose story alternates between day and night.
+"""Multi-sky demo: 8.6 narrated seconds in the real village under TWO skies, five sky segments (gold, night, gold,
+night, gold), one module, one frame directory, one mp4. THE TEMPLATE for a film whose story alternates between
+day and night.
 
     "Our house at sunset. / Our house at night. / Then it is morning. / When he sleeps, the night just ends."
 
     shot          sky              what it proves
     front_gold    gold             house_a's front in golden light, the farmer strolling past its door
-    front_night   night            THE SAME PLACE, lit by its door torch and the lamp post: a hard cut between two skies,
-                                   and the farmer walks straight through it (one walk() keyed across both shots)
+    front_night   night            THE SAME PLACE (a touch tighter, 32 mm), lit by its two door torches: a hard cut
+                                   between two skies, and the farmer walks straight through it (one walk() keyed
+                                   across both shots)
     morning       gold             after a DIP TO BLACK (the encoder's, on the cut): the librarian at the well
     street        night, then gold ONE continuous shot: the camera pushes up the east street, the shepherd walks
                                    toward it, and on the word "ends" the night is over (Stage.sky_change): moon, stars
@@ -19,11 +21,17 @@ have work; every command is resumable and may be interrupted at any frame):
     $BPY -m render _multisky_demo --sheet 10             # out/test/_multisky_demo_sheet.png (both skies, the dip)
     $BPY -m render _multisky_demo --still 1.0,3.0 --captioned         # one still per sky: two builds
     $BPY -m render _multisky_demo --frames all --res 360x640 --samples 8 --threads 2 --max-seconds 200
-                                                         # preview frames, sky by sky; repeat until "0 to render"
+                                                         # preview frames, sky by sky; repeat until the last line
+                                                         #   says "0 to render" (never before every sky is done)
     $BPY -m render _multisky_demo --frames street --res 360x640 --samples 8 --threads 2      # one shot (two skies)
     $BPY -m render _multisky_demo --res 360x640 --samples 8 --encode
                                                          # -> out/preview/_multisky_demo_360x640_8spp.mp4 with sound
   (a final film: the same without --res / --samples / --threads -> out/frames/_multisky_demo/, out/_multisky_demo.mp4)
+
+Proofs on this film: `$BPY -m tools.multisky_check change` (the sky change inside 'street': same camera path, same
+motion blur as the uncut shot), `... verify` (the frame directory against fresh builds), `... cuts MP4` (the frames
+either side of every sky boundary and through the dip, from the encoded film), `$BPY -m tools.multisky_selftest`
+(every render.py flag and exit code on a film with several skies).
 
 What to copy into a real film: SKIES at module level, build(scene, sky=None), Stage(..., skies=SKIES, sky=sky), a sky
 on every shot, Stage.sky_change for a change inside a shot, Stage.dip for a dip to black, and NOTHING else that

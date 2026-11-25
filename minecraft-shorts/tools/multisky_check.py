@@ -3,6 +3,7 @@
     $BPY -m tools.multisky_check inprocess     # is a SECOND build in one Blender process the same as a fresh process?
     $BPY -m tools.multisky_check inprocess oneword poppy_night bell      # ... for other films, built in turn, twice
     $BPY -m tools.multisky_check change        # the sky change inside a shot: camera path and motion blur
+    $BPY -m tools.multisky_check verify        # the preview's frames at every sky boundary against fresh builds
     $BPY -m tools.multisky_check cuts MP4      # frames either side of every sky cut, the change and the dip, from the mp4
 
 inprocess   Builds gold, night and gold again in ONE process (render.Session three times) and, for 20 frames of each
@@ -15,6 +16,10 @@ change      The demo's last shot changes sky at a frame F. Two proof films hold 
             night shot's, the frames from F on to the uncut golden shot's; the camera's world matrix at the shutter's
             open, middle and close is the same in every build and moves on steadily across F. Writes the strip
             out/test/multisky_change.png (look at it). Exit code 1 if a check fails.
+verify      Renders the frames either side of every sky boundary of the demo again, each alone in a fresh process
+            with its own sky, and compares them with the PNGs of the preview directory (360x640_8spp): the
+            directory holds the film, every frame under its own sky. (Identical, or the same picture with another
+            noise pattern: see verify() for why a frame's pixels depend on what its process rendered before.)
 cuts        Decodes the frames either side of every sky boundary and through every dip from an encoded mp4 and
             writes out/test/multisky_cuts_<n>.png strips, with the mean brightness of the picture and of the
             caption band per frame (a dip darkens the picture, never the caption).
@@ -245,6 +250,60 @@ def _change(tmp):
     return fails
 
 
+def _differ(a, b):
+    """(largest channel difference, share of differing pixels, mean absolute difference) of two PNG files."""
+    import numpy as np
+    from PIL import Image
+
+    x = np.asarray(Image.open(a).convert("RGB")).astype(np.int16)
+    y = np.asarray(Image.open(b).convert("RGB")).astype(np.int16)
+    d = np.abs(x - y)
+    return int(d.max()), float((d.max(axis=2) > 0).mean()), float(d.mean())
+
+
+def verify():
+    """The demo's preview directory against fresh builds: the frames either side of every sky boundary (and the
+    film's first and last) are rendered again, each ALONE in a fresh process built with the frame's own sky, and
+    compared with the PNGs in out/preview/_multisky_demo/360x640_8spp/. Returns the number of wrong frames.
+
+    'identical' is not always reachable, and that has nothing to do with skies: a process that has rendered a shot
+    with another set of torches before renders the torch-lit parts of a later shot with another noise pattern
+    (Cycles keeps its data between frames; measured: up to 21 of 255 in about a tenth of the pixels at 8 samples,
+    0.1 of 255 on average). So a frame counts as right when it is identical OR differs by less than 0.5 of 255 on
+    average; the same frame under the other sky differs by 20 to 60."""
+    import render as R
+    from engine import post
+
+    variant = R.variant_of(RES, SAMPLES, 1)
+    tl = R.Timeline(post.read_meta(FILM, variant))
+    frames = sorted({tl.frame_start, tl.frame_end} | {f for a, b, _s in tl.segments for f in (a, b)})
+    tmp = tempfile.mkdtemp(prefix="multisky_verify_", dir=OUT)
+    bad = same = 0
+    try:
+        for f in frames:
+            sky = tl.sky_of(f)
+            rec = _fresh(FILM, sky, tmp, 1, [f])
+            worst, share, mean = _differ(rec["png"][str(f)], post.frame_path(FILM, f, variant))
+            # the contrast: the neighbouring frame across the boundary, which is under the other sky
+            near = f + 1 if tl.sky_of(f + 1) not in (None, sky) else f - 1 if tl.sky_of(f - 1) not in (None, sky) else None
+            other = _differ(post.frame_path(FILM, near, variant), post.frame_path(FILM, f, variant))[2] if near else None
+            ok = mean < 0.5
+            bad += not ok
+            same += worst == 0
+            print("%-4s frame %3d (%s): the directory's PNG %s a fresh %s build's render%s"
+                  % ("OK" if ok else "FAIL", f, sky,
+                     "is pixel-identical to" if worst == 0 else "is the same picture as" if ok else "DIFFERS from", sky,
+                     ("" if worst == 0 else " (mean difference %.3f of 255, largest %d, %.1f %% of the pixels)"
+                      % (mean, worst, 100 * share))
+                     + ("" if other is None else "; frame %d under the other sky differs by %.1f on average" % (near, other))),
+                  flush=True)
+    finally:
+        _cleanup(tmp)
+    print("[verify] %d frames at the sky boundaries of %s: %d pixel-identical, %d the same picture with another noise "
+          "pattern, %d wrong" % (len(frames), tl.describe(), same, len(frames) - same - bad, bad))
+    return bad
+
+
 def cuts(mp4, film=FILM, res=RES, samples=SAMPLES):
     """Strips of the frames around every sky boundary and every dip of an encoded film (see the module docstring)."""
     import numpy as np
@@ -299,6 +358,8 @@ if __name__ == "__main__":
         sys.exit(inprocess(sys.argv[2:]))
     if what == "change":
         sys.exit(1 if change() else 0)
+    if what == "verify":
+        sys.exit(1 if verify() else 0)
     if what == "cuts" and len(sys.argv) > 2:
         sys.exit(cuts(sys.argv[2]))
     print(__doc__)

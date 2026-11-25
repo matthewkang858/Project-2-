@@ -12,7 +12,9 @@ four finished films, after engine/village.py got its `edit=` hook (engine/sets.p
                                                   #   old edge of the terrain: new terrain, a torch and a lantern
                                                   #   with their lights, a bed, an animated door, anchors, a path;
                                                   #   a village torch and a village bed taken away; and the check
-                                                  #   that stops a block put into a house or onto a street
+                                                  #   that stops a block put into a house or onto a street;
+                                                  #   a required door removed with and without b.allow; the
+                                                  #   village's anchors / paths following paved or lowered ground
                                                   #   (--hook --still also renders out/test/sets_hook_camp.png)
 
 What is compared (every part is a sha1 over a sorted, rounded text form):
@@ -310,6 +312,48 @@ def hook_test(still=False):
     quick.setup(scene)
     v2 = village.build_village(scene, seed=1, edit=meant)
     check("with b.allow the same edits pass", v2.edit_problems == [], v2.edit_problems)
+
+    # a required door taken out on purpose: its prop is gone and nothing is "missing"; without b.allow it is a problem
+    def door_cells(b):
+        return [c for c in b.entries["house_b"]["doors"] for c in ((c[0], c[1], c[2]), (c[0], c[1], c[2] + 1))]
+
+    def no_door(b):
+        b.allow("house_b")
+        for c in door_cells(b):
+            b.w.set(c[0], c[1], c[2], None)
+
+    scene = quick.reset()
+    quick.setup(scene)
+    v3 = village.build_village(scene, seed=1, edit=no_door)
+    check("a required door removed with b.allow: no prop, not 'missing', the other doors untouched",
+          "house_b" not in v3.doors and v3.edit_problems == [] and v3.validate() == []
+          and v3.removed_doors == {"house_b"} and "house_a" in v3.doors and "house_c" in v3.doors,
+          (sorted(v3.doors), v3.edit_problems, v3.removed_doors))
+    raises("the same door removed without b.allow stops the build",
+           lambda b: [b.w.set(c[0], c[1], c[2], None) for c in door_cells(b)], "inside house_b")
+
+    # the village's own anchors and paths follow ground the hook paves or re-levels under them
+    def worn(b):
+        b.pave(0, 46)                                          # under meadow_far and a node of exit_road
+        b.set_ground(0, 54, -1)                                # one block down under the last node of exit_road
+        for c in ((-1, 54), (1, 54), (0, 53), (0, 55)):
+            b.set_ground(c[0], c[1], -1)
+        b.path("nitwit_leaves", [(p[0], p[1]) for p in b.v.paths["nitwit_leaves"]], replace=True)
+        seen["walk"] = (b.walk_z(0.5, 46.0), b.walk_z(0.8, 54.0))
+        b.strict = False
+
+    scene = quick.reset()
+    quick.setup(scene)
+    v4 = village.build_village(scene, seed=1, edit=worn)
+    far, last = v4.anchors["meadow_far"], v4.paths["exit_road"][-1]
+    check("meadow_far and exit_road follow a paved / lowered column (and say so)",
+          abs(far[2] - seen["walk"][0]) < 1e-6 and abs(far[2] + 0.0625) < 1e-6 and abs(last[2] - seen["walk"][1]) < 1e-6
+          and abs(last[2] + 1.0) < 1e-6 and "meadow_far" in v4.regrounded and "path exit_road" in v4.regrounded,
+          (far, last, seen["walk"], v4.regrounded))
+    check("a path the hook registers again is not touched twice, and anchors off the ground stay",
+          "path nitwit_leaves" not in v4.regrounded and abs(v4.paths["nitwit_leaves"][-1][2] + 1.0) < 1e-6
+          and all(v4.anchors[k] == plain.anchors[k] for k in plain.anchors if k != "meadow_far"),
+          v4.regrounded)
     return bad
 
 

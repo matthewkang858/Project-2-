@@ -5,7 +5,8 @@ for, and the wrong-sky lock. Drives the real command line on films/_multisky_dem
     $BPY -m tools.multisky_selftest chunks       # a chunked render to the end; "0 to render" only when it IS the end
     $BPY -m tools.multisky_selftest engine       # exit code 3 across skies, --restamp, --rerender-stale
     $BPY -m tools.multisky_selftest stale        # --prune-stale, a re-tagged shot's frame, --force, a wrong guess
-    $BPY -m tools.multisky_selftest lock         # the wrong-sky lock: SkyError from Session and Stamps
+    $BPY -m tools.multisky_selftest lock         # the wrong-sky lock: SkyError from Session and Stamps, and for a
+                                                 #   film whose builds differ in more than the sky (_multisky_bad)
     $BPY -m tools.multisky_selftest encode       # --encode --allow-holds, --sheet, --still, --save-blend
 
 Frames go to the preview variant 180x320_4spp_step8 of the demo (26 frames: 16 golden, 10 night; 11 more of the
@@ -86,7 +87,7 @@ def part_chunks(fresh=True):
             os.remove(os.path.join(DIR, n))
     calls, said_early, outs = 0, False, []
     while calls < 12:
-        code, out, secs = run(["--frames", "all", "--max-seconds", "9"] + SMALL)
+        code, out, secs = run(["--frames", "all", "--max-seconds", "4"] + SMALL)
         calls += 1
         outs.append(out)
         if code != 0:
@@ -96,14 +97,16 @@ def part_chunks(fresh=True):
         said_early = said_early or any(DONE in ln for ln in out.splitlines())
     m = meta()
     n_png = len(mtimes())
-    check(DONE in outs[-1] and not said_early and calls >= 3,
-          "a chunked render (--max-seconds 9) needed %d calls; only the last one said '%s'" % (calls, DONE.strip()))
+    check(DONE in outs[-1] and not said_early and calls >= 2,
+          "a chunked render (--max-seconds 4) needed %d calls; only the last one said '%s'" % (calls, DONE.strip()))
     check(n_png == 26 and len(m["frames"]) == 26 and all(rec.get("sky") == sky_of(m, int(f)) for f, rec in m["frames"].items()),
           "26 frames in ONE directory (%s), every stamp records the sky of its frame (%d golden, %d night)"
           % (os.path.relpath(DIR, ROOT), sum(r["sky"] == "gold" for r in m["frames"].values()),
              sum(r["sky"] == "night" for r in m["frames"].values())))
     first = builds(outs[0])
-    check(first == ["gold"], "the first call built the film's first sky only (%s) and stopped on time" % first)
+    out_of_time = bool(lines(outs[0], "sky 'gold': stopping after"))
+    check(first[:1] == ["gold"] and (first == ["gold"]) == out_of_time,
+          "the first call built the film's first sky (%s) and, its time used up inside it, no other" % first)
     two = [builds(o) for o in outs if len(builds(o)) == 2]
     check(len(two) <= 1 and all(len(builds(o)) <= 2 for o in outs),
           "skies built per call: %s (two only in the call in which the first sky ran out of frames)" % [builds(o) for o in outs])
@@ -111,7 +114,7 @@ def part_chunks(fresh=True):
     check(per_sky and not any(DONE in ln for ln in per_sky), "no per-sky line says '%s' (%d such lines, e.g. %r)"
           % (DONE.strip(), len(per_sky), per_sky[-1][9:]))
     # the call after the end: nothing is built, and it is fast
-    code, out, secs = run(["--frames", "all", "--max-seconds", "9"] + SMALL)
+    code, out, secs = run(["--frames", "all", "--max-seconds", "4"] + SMALL)
     check(code == 0 and DONE in out and not builds(out) and "built" not in out,
           "the call after the last frame builds nothing and says %r (%.1f s)" % (lines(out, "frames:")[-1][9:], secs))
     # one shot by name: a shot with a sky change inside is split between its two skies (with --step 8 these are the
@@ -278,6 +281,21 @@ except R.SkyError as e:
           "... while its own frames work as always (%s)" % next((ln for ln in out.splitlines() if ln.startswith("OWN")), out[-300:]))
     check("UNKNOWN SkyError" in out and "ONESKY SkyError" in out,
           "an unknown sky name, and a sky for a film with one sky, are refused")
+    # a film whose builds differ in more than the sky (films/_multisky_bad.py: a caption) is refused, not rendered
+    bad = "_multisky_bad"
+    bdir = os.path.join(ROOT, "out", "preview", bad, VARIANT)
+    code, out, _ = run(["--frames", "41-49"] + SMALL, film=bad)
+    made = sorted(os.listdir(bdir)) if os.path.isdir(bdir) else []
+    check(code not in (0, 3) and "SkyError" in out and "another 'captions'" in out and DONE not in out
+          and "f_0049.png" not in made,
+          "a film whose night build has other captions than its golden build stops with SkyError (exit code %d); the "
+          "night frame 49 was not rendered (written: %s)" % (code, made))
+    for n in made:
+        os.remove(os.path.join(bdir, n))
+    if os.path.isdir(bdir):
+        os.rmdir(bdir)
+        if not os.listdir(os.path.dirname(bdir)):
+            os.rmdir(os.path.dirname(bdir))
     code, out, _ = run(["--frames", "all", "--sky", "night"] + SMALL)
     check(code == 0 and DONE not in out and len(lines(out, "sky 'night':", "frames requested")) == 1,
           "--sky night by hand does the night's share only and never says '%s': %r"

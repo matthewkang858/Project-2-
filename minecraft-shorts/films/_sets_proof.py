@@ -1,7 +1,9 @@
 """Proof stills for engine/sets.py: the set of "The Hello" (hello_set) in the real village, cast and look.
 
-Not a film: one 1-second shot per still, golden hour (the look-dev sun, azimuth 62, elevation 27); the night
-still is films/_sets_proof_night.py (a module has one sky).
+Not a film: one 1-second shot per still, golden hour (the look-dev sun, azimuth 62, elevation 27) with the
+distance haze of the look switched off (SKY: haze=0.0, the "meadow" sky entry the film should use for these beats:
+with the preset's haze the wall is dark brown, without it the gaps between the trunks are black); the night still is
+films/_sets_proof_night.py (a module has one sky).
 
     $BPY -m engine.sets gate gap            # -> out/test/sets_gate.png, sets_gap.png (540x960, 16 samples, 2 threads)
     $BPY -m engine.sets night               # the forest edge under the look-dev moon
@@ -13,6 +15,8 @@ still is films/_sets_proof_night.py (a module has one sky).
     gap       beat 7   the same frame: a small figure standing at the gap, bare arms and head
     side      beat 8   the tree line from the side on the road, the child three blocks short of him
     inside             from inside the forest, out along the corridor to the meadow and the village
+    deep               from the gap further in: the corridor, a watcher at its far end, the dark bank behind the wood
+    edge               close on the tree line east of the gap: trunks, leaves, the grass and tall grass in front
     floating  beat 12  the floating oak, the baby villager under it, against the sky
     bare      beat 13  the three bare oaks, a figure among them from behind, the village roofs beyond
     pyramid   beat 14  the sand pyramid, the baby villager beside it, the bare trunks behind
@@ -24,8 +28,10 @@ from engine import look, sets, shots, village
 from films.lookdev import Stage, up, yaw_to
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SKY = dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm")
-PROOF = ["gate", "gap", "side", "inside", "floating", "bare", "pyramid"]
+SKY = dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm", haze=0.0)
+if os.environ.get("SETS_HAZE"):                              # try another haze: SETS_HAZE=0.16 (the golden preset's own)
+    SKY["haze"] = None if os.environ["SETS_HAZE"] == "preset" else float(os.environ["SETS_HAZE"])
+PROOF = ["gate", "gap", "side", "inside", "deep", "edge", "floating", "bare", "pyramid"]
 NIGHT = ["night"]
 STILL_AT = 0.5                      # seconds into each 1-second shot
 FOREST_OPTIONS = {}                 # keyword arguments for sets.dark_forest in these stills (default: none)
@@ -43,7 +49,7 @@ def _player(st, name, skin="steve"):
 
 
 def _cam(s, cam, focus=None):
-    s.lens(cam["lens"], cam.get("fstop", 4.0))
+    s.lens(float(os.environ.get("SETS_LENS", cam["lens"])), cam.get("fstop", 4.0))
     s.move(cam["pos"], cam["target"])
     s.focus(focus if focus is not None else cam["target"])
 
@@ -116,8 +122,30 @@ def shot_inside(st, s, hello):
     st.lights(s, scale=0.0)
 
 
+def shot_deep(st, s, hello):
+    """From the gap looking further in: the corridor, a watcher at its far end, the trunk that closes it and the
+    dark bank behind the wood (no slit of sky)."""
+    f0 = s.frame_start
+    him = _player(st, "watcher_d", "herobrine")
+    him.place(f0, st.v.anchors["forest_deep"], st.v.yaws["forest_gap"])
+    st.use(s, him)
+    _cam(s, hello["cameras"]["deep"], him.head)
+    st.lights(s, scale=0.0)
+
+
+def shot_edge(st, s, hello):
+    """Close on the tree line east of the gap: trunk, leaves, bare shaded grass under the overhang, the thick
+    grass and tall grass where the sky is open."""
+    gap = st.v.anchors["forest_gap"]
+    st.use(s)
+    _cam(s, dict(pos=(gap[0] + 6.5, gap[1] - 8.6, 1.3), target=(gap[0] + 9.5, gap[1] - 1.6, 1.9), lens=30.0, fstop=4.0),
+         (gap[0] + 9.0, gap[1] - 3.0, 1.5))
+    st.lights(s, scale=0.0)
+
+
 def shot_floating(st, s, hello):
-    """Beat 12: the canopy and its two logs hang in the air; the child stands in the gap underneath, looking up."""
+    """Beat 12: the canopy hangs three blocks above the grass, one log of the trunk still under it; the child stands
+    in the gap underneath, looking up."""
     f0 = s.frame_start
     kid = st.actor("kid5", "farmer", child=True)
     fl = hello["floating"]
@@ -176,8 +204,9 @@ def shot_night(st, s, hello):
     st.lights(s, scale=0.0)
 
 
-BUILDERS = {"gate": shot_gate, "gap": shot_gap, "side": shot_side, "inside": shot_inside, "floating": shot_floating,
-            "bare": shot_bare, "pyramid": shot_pyramid, "night": shot_night}
+BUILDERS = {"gate": shot_gate, "gap": shot_gap, "side": shot_side, "inside": shot_inside, "deep": shot_deep,
+            "edge": shot_edge, "floating": shot_floating, "bare": shot_bare, "pyramid": shot_pyramid,
+            "night": shot_night}
 
 
 def build_film(scene, names, sky, with_set=True):
@@ -187,7 +216,7 @@ def build_film(scene, names, sky, with_set=True):
     v = village.build_village(scene, seed=1,
                               edit=(lambda b: out.update(hello=sets.hello_set(b, forest=kw))) if with_set else None)
     sk = look.set_time(scene, sky["preset"], sun_azimuth=sky["az"], sun_elevation=sky["el"])
-    look.setup_compositor(scene, bloom=sky["bloom"], grade=sky["grade"])
+    look.setup_compositor(scene, bloom=sky["bloom"], grade=sky["grade"], haze=sky.get("haze"))
     film = shots.Film(scene, fps=24)
     st = Stage(scene, film, v, sk)
     if with_set:
@@ -266,10 +295,15 @@ def render_map(path, half=44.0, center=(0.0, 52.0)):
 
 
 def main(names, res=(540, 960), samples=16, threads=2):
-    """Render the named proof stills to out/test/sets_<name>.png ('all' = every one, 'map' = the top-down map)."""
+    """Render the named proof stills to out/test/sets_<name>.png ('all' = every one, 'map' = the top-down map).
+    Experiments: SETS_HAZE=0.16 | preset, SETS_LENS=32 (every shot), SETS_RES=270x480, SETS_TAG=_x (file suffix)."""
     import time
 
     import render as R
+
+    if os.environ.get("SETS_RES"):
+        res = tuple(int(a) for a in os.environ["SETS_RES"].split("x"))
+        samples = min(samples, 8)
 
     if "all" in names:
         names = PROOF + NIGHT + ["map"]
@@ -284,7 +318,7 @@ def main(names, res=(540, 960), samples=16, threads=2):
         ses.configure(res, samples, threads, None)
         for n in wanted:
             t = time.time()
-            path = os.path.join(out_dir, "sets_%s.png" % n)
+            path = os.path.join(out_dir, "sets_%s%s.png" % (n, os.environ.get("SETS_TAG", "")))
             ses.render_frame(still_frame(ses.film, n), path)
             print("[sets proof] %-9s -> %s  %.1f s" % (n, path, time.time() - t), flush=True)
     return 0

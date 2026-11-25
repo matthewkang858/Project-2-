@@ -105,8 +105,11 @@ Several skies in one film (day and night in ONE module, one frame directory, one
   * ONE PROCESS PER SKY. `render <film> ...` for such a film builds nothing itself. It works out which skies have
     work and runs each as `render <film> <the same arguments> --sky NAME`: a fresh Blender process that builds the
     film with that sky and does that sky's share of every action. (Why a process and not a second build in the
-    same one: engine modules keep module-level state between builds, and a fresh process is exactly how every
-    film so far was built and judged; it costs half a second per sky. The measurements are in tools/multisky_check.py.)
+    same one: `tools.multisky_check inprocess` found second builds in one process identical to fresh ones on
+    every film it could try (11 builds of 5 films: 220 fingerprints, 11 rendered frames), but engine modules
+    keep module-level state between builds, five of them were being rewritten while this was made, and such a
+    proof holds only for the code of its day. A fresh process is how every frame so far was rendered and
+    judged, needs no proof, and costs 0.6 s per sky: Blender's start and the film's imports.)
   * THE WRONG SKY IS IMPOSSIBLE, not merely avoided: a Session owns only the frames tagged with its sky.
     Session.fingerprint / render_frame and Stamps.status / fp / mark raise SkyError for any other frame, so no
     code path, present or future, can render, stamp, re-stamp or judge a frame in another sky's build. Every stamp
@@ -118,9 +121,12 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     frames count as 'not judged' until their own sky's build has looked at them. meta.json describes the whole
     timeline (shots with their sky, 'sky_segments', 'skies'), so --encode sees one complete film.
   * NO BUILD WITHOUT WORK: while no source changed since meta.json was written, the frames' judgments in it are
-    still true, and the command builds only the skies that have a frame to render (a chunk of a final render:
-    one sky, 3 s; the last call, which finds nothing left: no build at all, half a second). After an edit every
-    sky with requested frames is built once, judges its frames and renders what changed.
+    still true, and the command builds only the skies that have a frame to render. Measured on the village
+    (films/_multisky_demo.py, 206 frames): a chunk that renders in one sky spends 2.8 to 3.9 s outside its frames
+    (0.2 s this process, 0.6 s Blender and the film's imports, 1.8 to 2.6 s the build); the chunk in which one sky
+    is finished and the next begins 7.9 s; the call that finds nothing left builds nothing and takes 0.3 s.
+    After an edit every sky with requested frames is built once, judges its frames (16 to 50 ms a frame) and
+    renders what changed.
   * WHAT IT PRINTS (--frames): per sky "[render] sky 'night': 628 frames requested, 120 already done, 508 to
     render at ..." (or "... none to render at ..."), its frames, and at the very end ONE line for the whole film:
         [render] frames: 1440 requested, 1440 already done, 0 to render at 720x1280, 24 samples, 4 threads (2 skies: ...)
@@ -132,7 +138,7 @@ Several skies in one film (day and night in ONE module, one frame directory, one
   * --max-seconds is the whole command's rendering time: when one sky is finished the next one is built and gets
     what is left; a sky is not started for rendering once the time is used up.
   * EXIT CODE 3 (engine sources changed under existing frames) looks at EVERY sky's frames before any sky renders:
-    the first sky's process checks the stamps of the other skies' requested frames too (a stamp names its engine
+    a sky's process checks the stamps of the other skies' requested frames too (a stamp names its engine
     sources, no build is needed for that) and stops. The other skies are then built only to report which of their
     frames show an unchanged scene (--restamp all keeps those). --restamp / --prune-stale combined with --frames
     are finished for every sky before any frame is checked or rendered (each sky is then built twice).
@@ -148,8 +154,8 @@ Several skies in one film (day and night in ONE module, one frame directory, one
     in the other. So the camera cannot jump and motion blur is that of an uncut shot (tools/multisky_check.py
     proves both on rendered frames).
   * WHAT COSTS WHAT: an edit to one shot re-renders that shot's frames, in its sky's build; an edit to one entry of
-    SKIES re-renders exactly that sky's frames; re-tagging a shot re-renders that shot; a caption, a dip, a pause
-    of the narration re-render nothing (every sky is built once to see that: about 3 s each).
+    SKIES re-renders exactly that sky's frames; re-tagging a shot re-renders that shot; a caption or a dip
+    re-renders nothing (every sky is built once to see that: about 3 s each).
   * The film must not make anything but the sky depend on build()'s `sky` argument (no shot, actor, light key,
     caption or import inside `if sky == ...`). render.py notices: a timeline that differs between two skies'
     builds of the same sources raises SkyError.
@@ -916,6 +922,8 @@ def _main_one(args, started):
         if worker:
             report["sheet"] = {"n": n, "labels": labels, "words": words, "gains": gains, "tiles": kept}
             if not args.sky_report:
+                if os.path.exists(tmp):
+                    os.remove(tmp)
                 print(f"[render] {tag}{len(tiles)} of the {n} sheet tiles are this sky's; the sheet itself is made by "
                       f"the command without --sky")
         else:
@@ -1213,11 +1221,12 @@ def _main_skies(args, argv, started):
     booked = bool(args.frames or args.restamp or args.prune_stale or args.encode)   # actions that use meta.json
     state = {"table": None, "exact": False, "spent": 0.0, "rendered": 0, "stopped": False, "tiles": {},
              "sheet": None, "left_out": [], "stills_done": [], "frame_info": None, "ran": [], "judged": [],
-             "stopped_skies": set()}
+             "stopped_skies": set(), "did": set()}
     state["table"], state["exact"] = _any_table(name, variant)
-    # the reports and contact-sheet tiles of the sky processes live in out/tmp/render_sky_*/ for the length of this
-    # command; a terminated command (timeout) still cleans up after itself and takes its sky process with it
-    tmp_root = os.path.join(post.OUT, "tmp")
+    # the reports and contact-sheet tiles of the sky processes live in out/test/render_sky_*/ for the length of this
+    # command (where the contact sheet's tile has always been written; out/test is not in the repository); a
+    # terminated command (timeout) still cleans up after itself and takes its sky process with it
+    tmp_root = os.path.join(post.OUT, "test")
     os.makedirs(tmp_root, exist_ok=True)
     tmp = tempfile.mkdtemp(prefix="render_sky_", dir=tmp_root)
 
@@ -1327,6 +1336,11 @@ def _main_skies(args, argv, started):
             rep, code = run(sky, sub_skip)
             if rep is None:
                 return code if code > 0 else 1
+            # (the first sky of a film whose table was unknown does its share of everything that was asked for)
+            asked = {a for a, on in (("still", stills), ("sheet", args.sheet), ("restamp", args.restamp),
+                                     ("prune", args.prune_stale), ("frames", args.frames), ("blend", args.save_blend),
+                                     ("encode", args.encode)) if on}
+            state["did"] |= ((set(why) & set(SKY_ACTIONS)) or asked) - sub_skip
             ran.append(rep["sky"])
             state["ran"].append(rep["sky"])
             state["table"], state["exact"] = Timeline(rep["timeline"]), True
@@ -1361,6 +1375,10 @@ def _main_skies(args, argv, started):
             if state["stopped"]:
                 break
         table = state["table"]
+        for flag, action, what in ((args.restamp, "restamp", "re-stamp"), (args.prune_stale, "prune", "prune")):
+            if flag and action not in state["did"] and not state["stopped"]:
+                print(f"[render] {action} -> {where}: nothing to {what}, every frame concerned is a valid frame of the "
+                      f"film (no sky was built for it)")
 
         # ---- contact sheet: the tiles of all skies, put together here
         if args.sheet and state["sheet"]:
@@ -1436,8 +1454,6 @@ def _main_skies(args, argv, started):
         for fn in os.listdir(tmp):
             os.remove(os.path.join(tmp, fn))
         os.rmdir(tmp)
-        if not os.listdir(tmp_root):
-            os.rmdir(tmp_root)
 
 
 if __name__ == "__main__":

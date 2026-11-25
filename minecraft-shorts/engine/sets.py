@@ -12,46 +12,65 @@ A film passes a hook to the village builder and calls set pieces inside it:
     road = v.paths["road_to_forest"]              # exit_gate -> the gap -> out of sight behind a trunk
 
 PUBLIC API (every set piece is called inside the hook with the builder first, puts its blocks into b.w, registers
-its anchors / yaws / paths on the Village, stores its result in Village.sets[name] and returns it)
+its anchors / yaws / paths on the Village, stores its result in Village.sets[name] and returns it; a name that
+exists already in the village is refused, and so is an argument a piece cannot honour: nothing is bent silently)
 
-    hello_set(b, layout=None, forest=None) -> dict
-        The whole meadow of "The Hello" (positions: HELLO; layout={...} moves a piece, forest={...} are keyword
-        arguments for dark_forest): the dark forest across the end of the exit road, the floating oak west of the
-        road, three bare oaks on the east bank and the sand pyramid in front of them as seen from the road. The
-        three small pieces stand outside a 28-35 mm frame from the exit gate (beat 6 is before any of them).
-        Keys: forest, floating, bare, pyramid (the dicts below), cameras (name -> dict(pos, target, lens, fstop):
-        the framings of the proof stills gate / side / inside / floating / bare / pyramid: a start, not a rule;
-        the ground between each camera and its subject carries no plants), path = 'road_to_forest'.
+    hello_set(b, layout=None, forest=None, floating=None, bare=None, pyramid=None) -> dict
+        The whole meadow of "The Hello" (positions: HELLO): the dark forest across the end of the exit road, the
+        floating oak west of the road, three bare oaks on the east bank and the sand pyramid in front of them as
+        seen from the road. The three small pieces stand outside a 28-35 mm frame from the exit gate (beat 6 is
+        before any of them). layout={...} moves a piece (forest_gap / floating / bare / pyramid; the forest: tested
+        for y 56..70, closer it would swallow the other pieces and the build stops saying so); forest / floating /
+        bare / pyramid = keyword arguments for the piece's own function (floating defaults to HELLO_FLOATING,
+        logs=4). The wood's light is baked last. Keys: forest, floating, bare, pyramid (the dicts below), cameras
+        (name -> dict(pos, target, lens, fstop): the framings of the proof stills gate / side / inside / deep /
+        floating / bare / pyramid: a start, not a rule; the ground between each camera and its subject carries no
+        plants), path = 'road_to_forest', layout.
     dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest", ...) -> dict
         A dark oak forest edge: the game's own dark oaks (DarkOakTrunkPlacer / DarkOakFoliagePlacer: 2x2 trunks 6-9
         high, bent tops, hanging branches, the 3-4 layer canopy) in `rows` rows that curve toward the village at
-        both ends; the floor climbs behind the second row; plain oaks, tufts and tall grass along the edge; a thin
-        dirt trail from the end of the village road to a 3-block gap between two trunks; a level corridor behind
-        it. The wood is dark forest BIOME (darker grass, greener leaves, blended over 5 columns as in the game)
-        and carries the game's own SKY LIGHT baked into its blocks (see Environment): that, not the scene's light,
-        is what makes it a black wall under this look. Options in its own docstring.
+        both ends; the floor climbs behind the second row and ends in a steep bank behind the last trunks (no sky
+        through the wood from inside); plain oaks where there is room, thick grass and tall grass along the edge
+        where the sky is open; a thin dirt trail over the last 13 blocks to a 3-block gap between two trunks; a
+        level corridor behind it. The wall runs east-west and is entered going north; it can stand anywhere
+        (gap=): nearer, further up the rising meadow, or beside the village as a second wood with another name.
+        The wood is dark forest BIOME (darker grass, greener leaves, blended over 5 columns as in the game) and
+        carries the game's own SKY LIGHT baked into its blocks (see Environment): that, not the scene's light, is
+        what makes it a black wall under this look. Options in its own docstring.
         Anchors: <name>_gap (he stands here, on the tree line, facing the village), <name>_gap_in (the end of a
         walk in: 3 blocks in and behind the east trunk of the gap, hidden from every camera on the road),
         <name>_deep (the far end of the corridor, 6 blocks in), <name>_approach (3.5 blocks short of the gap),
-        <name>_inside_cam (a camera spot in the corridor, looking out). Path road_to_<name>: exit_gate -> gap ->
-        gap_in. Dict: those points, trees / oaks (records), tree_line, road_z, bounds, top, counts.
+        <name>_inside_cam (a camera spot in the corridor, looking out). Path road_to_<name>: from exit_gate along
+        the village road (or from approach_from=, or from 14 blocks out when the gap is not up the exit road) ->
+        gap -> gap_in, following the ground (ground_path). Dict: those points, trees / oaks (records), tree_line,
+        road_z, bounds, top, hops, cut_paths, contains(x, y, margin), front(x), counts (dark_oaks, oaks planted of
+        oaks_wanted, logs, leaves, blocks_added, dark_cells).
+    shade_forest(b, forest) -> cells         bake the wood's sky light (dark_forest does it itself unless
+        bake=False): call it last, after every piece that stands in or beside the wood; again = re-bake
     floating_oak(b, tree, air=3, logs=2, name="floating_oak", stump="dirt", clear=4.5) -> dict
-        The lazy player's tree: a vanilla small oak whose trunk is gone, the top `logs` logs left in the canopy
-        over `air` clear blocks of air. tree = a record (b.trees, b.tree_at(x, y)) or an (x, y) spot. A small oak's
-        leaves start 3 below its top, so the tree is re-grown air + 3 logs high first (6 for air 3: the game's
-        tallest). With logs=2 the cut end sits one block up inside the leaves and shows only from almost below;
-        logs=3 leaves it flush with the underside of the canopy. stump: the block under the trunk ('dirt' as the
-        game leaves it, or 'grass'). Plants within `clear` blocks are removed (a tuft is as tall as a baby villager).
-        Anchors <name>_under (stand here), <name>_target (the hanging logs). Dict: tree, under, canopy,
-        leaf_bottom, top, base.
+        The lazy player's tree: a vanilla small oak whose trunk is gone, the canopy left `air` (1..3) clear blocks
+        above the grass with the top `logs` logs still in it. tree = a record (b.trees, b.tree_at(x, y)) or an
+        (x, y) spot. A small oak's leaves start 3 below its top, so the tree is re-grown air + 3 logs high first
+        (6 for air 3: the game's tallest). The top 3 logs are INSIDE the leaves: logs=2 shows no wood at all
+        except from right below, logs=3 a cut end flush with the underside; logs=4 (what hello_set uses) leaves
+        one log hanging under the leaves over air - 1 blocks of air: the picture every player knows. The
+        story's "two logs over three blocks of air" cannot both be seen on a vanilla oak. stump: the block under
+        the trunk ('dirt' as the game leaves it, or 'grass'). Plants within `clear` blocks are removed.
+        Anchors <name>_under (stand here), <name>_target (the logs left). Dict: tree, under, canopy, air, logs,
+        hanging, gap, leaf_bottom, top, base.
     bare_oak(b, tree) -> record                  an oak stripped to its logs, not one leaf left
     bare_oaks(b, spots, heights=(6, 5, 4), name="bare_oaks", level=True) -> dict
         Leafless oaks together, planted at `spots` [(x, y), ...] (or the oaks that stand there) on ground levelled
         for them. Anchors <name>_among (between the trunks, facing the village), <name>_center (look target).
     sand_pyramid(b, center, base=5, layers=3, name="pyramid") -> dict
-        The legend's pyramid: square layers of sand, 5x5 / 3x3 / 1, on levelled, cleared grass. Anchors
-        <name>_beside (1.5 blocks off the middle of its south side), <name>_target (its apex); path <name>_round
-        (half way round it by the west); dict: sides (standing spots south / west / north / east), cells, top.
+        The legend's pyramid: square layers of sand, 5x5 / 3x3 / 1 (base must be odd), on levelled, cleared grass.
+        Anchors <name>_beside (1.5 blocks off the middle of its south side), <name>_target (its apex); path
+        <name>_round (half way round it by the west, following the ground; dict['round'] is None where a tree or
+        a 2-block bank is in the way); dict: sides (standing spots south / west / north / east), cells, top.
+    ground_path(b, name, points, replace=False) -> 3D points
+        Register a path that follows the ground BETWEEN its (x, y) points too: a pair of nodes where grass meets
+        dirt_path (1/16) and, at each 1-block step of the terrain, a hop: up over 0.6 block of ground, clear of
+        the block's edge. Steps of 2 blocks and blocked paths are refused (ValueError).
     plant_oak(b, x, y, rng, height=None, where="set") -> record       one vanilla small oak, 4-6 logs or `height`
     plant_dark_oak(b, x, y, rng, height=None, where="set", accept=None) -> record
         One vanilla dark oak; (x, y) = the south-west cell of its 2x2 trunk; accept(shape) picks a variation.
@@ -61,39 +80,61 @@ its anchors / yaws / paths on the Village, stores its result in Village.sets[nam
         The pure shapes as cell offsets (Blender axes) from the trunk's base cell (dark oak: its south-west log).
     env(b) -> Environment                        biome colours and baked sky light of the builder's World:
         .set_biome(columns)                      these (x, y) columns are dark forest (5x5 blend around them)
-        .bake_sky_light(b.ground, x0, y0, x1, y1)    compute the game's sky light in a box of columns and draw
-                                                 every block face there as dark as the game would
+        .bake_sky_light(b.ground, x0, y0, x1, y1, where=None)    compute the game's sky light in a box of columns
+                                                 and draw every block face there as dark as the game would
+                                                 (a second call replaces the first)
         .level_at(x, y, z)                       sky light 0..15 at a point (15 = open sky)
     lightmap(level) -> 0..1                      the game's brightness for a sky light level (lightmap.fsh)
     dark_forest_colors() -> (grass, foliage)     (80, 122, 50), (89, 174, 48), from the game's colormaps
 
 FOR THE DIRECTOR OF "THE HELLO" (measured on the proof stills, 540x960, look-dev golden sun azimuth 62 / elevation 27)
-    - Tree line at y 58: 33.5 blocks beyond exit_gate. From the 'gate' camera (32 mm, 0.75 above the road at y
-      22.6) the wall spans the whole width and stands between 28 % and 56 % of the frame height; a player at
-      forest_gap is 45 px tall at 540x960 (60 px at 720x1280; 53 px with 28 mm): shirt, bare arms and head read,
-      the face does not, but the eye whites of the plain Steve skin still show as two pale dots.
-    - How dark the wall is from the gate is set by the look's haze, not by the wood: measured mean luminance of
-      the trunk zone 62 / 255 against 104 for the sunlit meadow and 165 for the sky. For a blacker wall lower the
-      haze of that film (look.setup_compositor(..., haze=...)); dark_forest(brightness=0.0) (the game's "Moody")
-      blackens the wood in close shots (side, inside) and changes almost nothing from the gate.
+    - HAZE OFF FOR THE MEADOW. The look's distance haze decides whether the wall is black: with the golden
+      preset's own haze (0.16) the trunk zone seen from the gate has a mean luminance of 67 / 255, its darkest
+      tenth 56 (dark brown); with haze=0.05 it is 47 (darkest tenth 33); with haze=0.0 it is 34, the darkest tenth
+      10: black gaps between the trunks (sunlit meadow 112, sky 174). Give beats 6-8 and 12-14 a sky entry of their own that differs from
+      the village's in haze alone: SKIES["meadow"] = dict(preset="golden", az=62.0, el=27.0, bloom=1.0,
+      grade="warm", haze=0.0) (films.lookdev.Stage, films/_multisky_demo.py). All golden proof stills are rendered
+      that way. At night the preset's haze (0.45) turns the wood into grey fog from 15 blocks (trunk zone
+      (55, 53, 77)); haze=0.1 gives (25, 23, 36), haze=0.0 (4, 4, 3); the night still uses 0.04.
+      dark_forest(brightness=0.0) (the game's "Moody") blackens the wood in close shots only.
+    - Tree line at y 58: 33.5 blocks beyond exit_gate. The 'gate' camera sits 0.75 above the road two blocks
+      inside the gate; its lens sets the size of the figure at forest_gap: 22 mm (HELLO_GATE_LENS) = 30 px tall at
+      540x960, 40 px at 720x1280, head 10 px: teal shirt, bare arms and head read, the face does not; the eye
+      whites of the plain Steve skin are still two pale dots, so use plain Steve, not the white-eyed skin, in
+      beat 7. 32 mm = 59 px (the first version's lens), 28 mm = 51 px. With 22 mm the wall spans the whole width
+      between 35 % and 50 % of the frame height (canopy 35-44 %, trunks 44-50 %). For a smaller figure still,
+      move the forest: hello_set(b, layout={"forest_gap": (0.5, 66)}) puts it 8 blocks further up the meadow
+      (33 px; the road then climbs one block at y 58: one hop in the path, see films/_sets_walk.py).
     - The sun belongs in the northern half of the sky (azimuth 20-160: behind or beside the wood). The wall is then
-      in its own shade and the last 20 blocks of road lie in the wood's shadow. A sun in the south lights the
-      trunk fronts; the baked sky light keeps the inside dark either way.
+      in its own shade and the last 20 blocks of road lie in the wood's shadow. A sun in the south-west (azimuth
+      230) lights the trunk fronts (measured by the reviewer: trunk zone 69 instead of 64 at preset haze).
     - Characters are not blocks: inside the wood a figure is lit by the scene like anywhere else (sun shadow yes,
-      but the look's fill and bounce lamps are shadowless). He does not go black in there; he goes out of sight:
-      walk him along road_to_forest, whose last leg turns behind the east trunk (forest_gap_in), and hide him
-      there (show(frame, False)). At night the look's haze greys the far inside of the wood: trunks are darker
-      than what lies behind them (out/test/sets_night.png).
+      but the look's fill and bounce lamps are shadowless). He does not go black in there: Steve in diamond stays
+      bright in the corridor for about a second, then slides behind the east trunk (road_to_forest ends at
+      forest_gap_in; show(frame, False) there; out/test/sets_walkin_sheet.png). So END BEAT 6 BEFORE HE PASSES
+      THE TREE LINE (small and bright against the black wall is what the story asks for), or cut on the frame he
+      goes behind the trunk.
+    - Beat 12: the 'floating' camera stands 10 blocks east-north-east of the oak, 0.5 above the grass, 26 mm: the
+      whole canopy, the hanging log and two blocks of air under it against the western sky. A normal oak 15
+      blocks behind and a grassy bank are in the frame's lower third.
     - Camera spots that are kept free of plants: the road and the lane west of it up to the gap (x -3..3), a bay
       west of the road in front of the tree line (x -11..-4, y 50..57: the 'side' camera), and the ground between
-      each camera of hello_set(...)["cameras"] and its subject. Everywhere else along the tree line tall grass
-      stands as high as a baby villager.
+      each camera of hello_set(...)["cameras"] and its subject. Nothing grows under the leaves of the wood; the
+      thick grass and tall grass (as high as a baby villager) stand 3 to 7 blocks in front of the trunks.
+    - In the shade of the wall a grass tuft seen close shows one of its two crossed planes much darker than the
+      other (a plant is lit from the viewer's side only: engine/mcassets.py, reported). It does not show in the
+      gate and side framings; keep close shots off the tall grass at the tree line, or clear it there
+      (sets.clear_view / b.clear_plants, or dark_forest(edge_plants=0)).
+    - The village's own meadow_far anchor and its paths exit_road / nitwit_leaves now run over the trail: they are
+      regrounded automatically (Village.regrounded). A forest moved onto the exit road cuts those paths at the
+      tree line (dict['cut_paths']).
     - tools/palette_check.py does not know the darkened / dark-forest tints of the wood's blocks: its plant and
       ground checks are meaningless inside the wood.
 
 HOW TO ADD A SET PIECE (the five later films)
     One function per piece: def iron_farm(b, at, name="iron_farm", ...) -> dict.
-    1. Take a random generator of your own: rng = b.rng_for(name) (never b.rng: that is the village's sequence).
+    1. Refuse a second piece of the same name (_new_name(b, name)) and arguments you cannot honour (ValueError).
+       Take a random generator of your own: rng = b.rng_for(name) (never b.rng: that is the village's sequence).
     2. Prepare the ground: b.extend_terrain(...) where the piece reaches beyond the disc of terrain,
        b.set_ground(x, y, z) to level, b.clear_plants / b.sow for what grows, b.pave for paths. Then put blocks
        into b.w (b.w.set / fill). Torches: b.torch(cell, ...) or a plain b.w.set of a torch block: either way they
@@ -103,11 +144,13 @@ HOW TO ADD A SET PIECE (the five later films)
        MEANT to change a house or a street say so, b.allow("house_a") / b.allow("streets"): otherwise the build
        stops with the list of what was changed where.
     4. Register what the director needs: b.anchor(name + "_x", (x, y), yaw) for standing spots (2D = on the
-       ground), b.path(name + "_y", [...]) for walks. Village.validate() treats every anchor as a place where a
-       figure stands unless its name ends in _target, _center, _cam or _station: name look targets and camera
-       spots that way, or keep them in the returned dict only.
+       ground), ground_path(b, name + "_y", [...]) for walks over open ground (b.path for ones with heights of
+       their own: stairs, floors). Village.validate() treats every anchor as a place where a figure stands unless
+       its name ends in _target, _center, _cam or _station: name look targets and camera spots that way, or keep
+       them in the returned dict only.
     5. A piece that must be dark inside (a hall under the ground, a wood): env(b).bake_sky_light(...) LAST, when
-       all its blocks are placed. b.v.sets[name] = result; return result, with counts in it.
+       all its blocks are placed, or leave it to the layout function that knows when everything stands (as
+       hello_set does with shade_forest). b.v.sets[name] = result; return result, with counts in it.
     The hook is the only way in: when build_village returns, the world is one mesh per material and nothing can
     be added to it (separate props after the fact are engine/props.py and engine/fx.py).
 
@@ -127,6 +170,9 @@ WHAT THE GAME DOES (transcribed from the 26.3 client jar; no game file is copied
                1/2 (always on the top row). Soil: soil_beneath_tree puts dirt under a trunk unless the block is in
                the tag cannot_replace_below_tree_trunk (dirt, coarse dirt, rooted dirt, mud, moss, podzol): a
                grass block under a trunk becomes dirt, so a felled trunk leaves a dirt block.
+    grass      SpreadingSnowyBlock.randomTick / canStayAlive: a grass block whose upper neighbour lets no light in
+               (LightEngine.getLightDampeningInto >= 15: any full opaque block, such as sand) turns into its base
+               block, dirt: the blocks under the pyramid's bottom layer are dirt.
     dark forest  worldgen/feature/dark_forest_vegetation.json (16 tries per chunk): huge brown mushroom 2.5 %,
                huge red 5 %, then dark oak 2/3, birch 20 %, fancy oak 10 %, else plain oak: of all trees about
                62 % dark oaks, 22 % plain oaks. Biome colours (Biome.getGrassColor / getFoliageColor, colormaps at
@@ -136,11 +182,17 @@ WHAT THE GAME DOES (transcribed from the 26.3 client jar; no game file is copied
                from assets/minecraft/shaders/core/lightmap.fsh (see Environment below).
     Sand, logs, leaves, mushrooms are the game's own block models and textures (engine.blocks / engine.mcassets).
 
-Self-test:  $BPY -m engine.sets                    numbers only (the shapes against the classes' rules, hello_set
-                                                   built into the village: anchors, paths, light, counts): 10 s
+Self-test:  $BPY -m engine.sets                    numbers only: the shapes against the classes' rules, hello_set
+                                                   built into the village (anchors, paths on the ground, light,
+                                                   counts), then the pieces MOVED (the forest at y 46..70, a
+                                                   second wood, a pyramid on a bank) and the refusals: 60 s.
+                                                   `$BPY -m engine.sets quick` leaves the moves out: 10 s
             $BPY -m engine.sets gate gap side ...  the proof stills out/test/sets_<name>.png through the real look
-                                                   (films/_sets_proof.py: gate gap side inside floating bare
-                                                   pyramid night map; about 40 s each, at most 3 per call)
+                                                   (films/_sets_proof.py: gate gap side inside deep edge floating
+                                                   bare pyramid night map; 15-45 s each, at most 4 per call)
+            $BPY -m engine.sets walkin | hop       motion sheets out/test/sets_walkin_sheet.png (the walk into the
+                                                   wood from the gate camera, every 5th frame) and sets_hop_sheet.png
+                                                   (10 consecutive frames of a hop up a step): 4 minutes each
             $BPY -m tools.check_sets_hook --film   the village without a hook is unchanged (digests + the stamps
                                                    of the finished film "The Nitwit"); --hook: the hook's promises
             $BPY -m tools.check_sets_stamp         the set is in the frame fingerprints (engine/stamp.py)
@@ -428,47 +480,70 @@ def ground_path(b, name, points, replace=False, check=True):
     over STEP_RUN (0.6) block of ground and is up before his body reaches the higher block (down: the other way
     round). Character.walk moves in straight lines, so at 3 blocks/s a hop is 5 frames. A step of 2 blocks or more
     cannot be walked: ValueError; so is a path that runs into a block (check=False skips that test). Returns the
-    3D points; the number of hops is len(b.v.sets['paths'][name]['hops'])."""
+    3D points; Village.sets['_paths'][name]['hops'] lists the steps as (x, y, +1 | -1)."""
     pts2 = [(float(p[0]), float(p[1])) for p in points]
+    pts2 = [p for i, p in enumerate(pts2) if i == 0 or math.dist(p, pts2[i - 1]) > 1e-6]
     if len(pts2) < 2:
-        raise ValueError("ground_path %r needs two points or more" % name)
-    out, hops = [], []
+        raise ValueError("ground_path %r needs two different points or more" % name)
+    legs, total = [], 0.0                                    # (distance at its start, a, c, length)
     for a, c in zip(pts2, pts2[1:]):
         length = math.hypot(c[0] - a[0], c[1] - a[1])
-        if length < 1e-6:
-            continue
-        cols = _columns_along(a, c)
-        hs = [b.walk_z(col[0] + 0.5, col[1] + 0.5) for _s0, _s1, col in cols]
-        if any(h is None for h in hs):
-            raise ValueError("ground_path %r: no terrain at column %s" % (name, cols[hs.index(None)][2]))
-        nodes = [(0.0, hs[0])]                               # (distance along the leg, height)
-        for i in range(1, len(cols)):
-            s, h0, h1 = cols[i][0], hs[i - 1], hs[i]
-            dh = h1 - h0
-            if abs(dh) < 1e-6:
-                continue
-            if abs(dh) > 1.2:
-                raise ValueError("ground_path %r: a step of %.1f blocks at column %s" % (name, dh, cols[i][2]))
-            if abs(dh) < 0.3:
-                nodes += [(s - 0.15, h0), (s + 0.15, h1)]
-            elif dh > 0:
-                nodes += [(s - STEP_CLEAR - STEP_RUN, h0), (s - STEP_CLEAR, h1)]
-                hops.append((round(a[0] + (c[0] - a[0]) * s / length, 2), round(a[1] + (c[1] - a[1]) * s / length, 2), 1))
+        legs.append((total, a, c, length))
+        total += length
+
+    def at(dist):                                            # the (x, y) at a distance along the polyline
+        for s0, a, c, length in legs:
+            if dist <= s0 + length + 1e-9:
+                k = min(1.0, max(0.0, (dist - s0) / length))
+                return (a[0] + (c[0] - a[0]) * k, a[1] + (c[1] - a[1]) * k)
+        return legs[-1][2]
+
+    runs = []                                                # [distance from, distance to, walking height, column]
+    for s0, a, c, length in legs:
+        for t0, t1, col in _columns_along(a, c):
+            h = b.walk_z(col[0] + 0.5, col[1] + 0.5)
+            if h is None:
+                raise ValueError("ground_path %r: no terrain at column %s" % (name, col))
+            if runs and abs(runs[-1][2] - h) < 1e-6:
+                runs[-1][1] = s0 + t1
             else:
-                nodes += [(s + STEP_CLEAR, h0), (s + STEP_CLEAR + STEP_RUN, h1)]
-                hops.append((round(a[0] + (c[0] - a[0]) * s / length, 2), round(a[1] + (c[1] - a[1]) * s / length, 2), -1))
-        nodes.append((length, hs[-1]))
-        keep = [nodes[0]]
-        for s, h in nodes[1:-1]:                             # in order along the leg, inside it, no two on one spot
-            s = min(max(s, keep[-1][0] + 0.02), length - 0.02)
-            if s > keep[-1][0] + 0.01:
-                keep.append((s, h))
-        if length > keep[-1][0] + 1e-6:
-            keep.append(nodes[-1])
-        for s, h in keep:
-            p = (a[0] + (c[0] - a[0]) * s / length, a[1] + (c[1] - a[1]) * s / length, float(h))
-            if not out or math.dist(out[-1], p) > 1e-4:
-                out.append(p)
+                runs.append([s0 + t0, s0 + t1, h, col])
+    profile, hops = [(0.0, runs[0][2])], []                  # (distance, height): the walker's height along the way
+    for prev, run in zip(runs, runs[1:]):
+        edge, h0, h1 = run[0], prev[2], run[2]
+        dh = h1 - h0
+        if abs(dh) > 1.2:
+            raise ValueError("ground_path %r: a step of %.1f blocks at column %s" % (name, dh, run[3]))
+        if abs(dh) < 0.3:
+            pair = [(edge - 0.15, h0), (edge + 0.15, h1)]
+        elif dh > 0:
+            pair = [(edge - STEP_CLEAR - STEP_RUN, h0), (edge - STEP_CLEAR, h1)]
+        else:
+            pair = [(edge + STEP_CLEAR, h0), (edge + STEP_CLEAR + STEP_RUN, h1)]
+        if abs(dh) >= 0.3:
+            q = at(edge)
+            hops.append((round(q[0], 2), round(q[1], 2), 1 if dh > 0 else -1))
+        for dist, h in pair:
+            dist = min(max(dist, profile[-1][0] + 0.02), total - 0.02)
+            if dist > profile[-1][0] + 0.01:
+                profile.append((dist, h))
+    if total > profile[-1][0] + 1e-6:
+        profile.append((total, runs[-1][2]))
+
+    def height(dist):
+        for (d0, h0), (d1, h1) in zip(profile, profile[1:]):
+            if dist <= d1:
+                return h0 + (h1 - h0) * (dist - d0) / max(1e-9, d1 - d0)
+        return profile[-1][1]
+
+    marks = sorted(set([d for d, _h in profile] + [leg[0] for leg in legs] + [total]))
+    out = []
+    for dist in marks:
+        if out and dist - last < 1e-4:
+            continue
+        x, y = at(dist)
+        out.append((x, y, float(height(dist))))
+        last = dist
     old = b.v.paths.get(name)
     path = b.path(name, out, replace=replace)
     if check:
@@ -479,7 +554,7 @@ def ground_path(b, name, points, replace=False, check=True):
             else:
                 b.v.paths[name] = old
             raise ValueError("ground_path %r runs into %s" % (name, hits[:2]))
-    b.v.sets.setdefault("paths", {})[name] = dict(hops=hops, points=pts2)
+    b.v.sets.setdefault("_paths", {})[name] = dict(hops=hops, points=pts2)
     return path
 
 
@@ -611,6 +686,8 @@ def sand_pyramid(b, center, base=5, layers=3, name="pyramid"):
             for y in range(cy - r, cy + r + 1):
                 b.w.set(x, y, z0 + k, "sand")
                 cells.append((x, y, z0 + k))
+                if k == 0 and b.w.block_id(x, y, z0 - 1) == "grass_block":
+                    b.w.set(x, y, z0 - 1, "dirt")          # SpreadingSnowyBlock.randomTick: no light, no grass
     top = (cx + 0.5, cy + 0.5, z0 + min(layers, half + 1))
     d = half + 2.0                                         # 1.5 blocks clear of the bottom layer
     sides = {"south": (cx + 0.5, cy + 0.5 - d), "west": (cx + 0.5 - d, cy + 0.5), "north": (cx + 0.5, cy + 0.5 + d),
@@ -858,7 +935,7 @@ def _noise(x, seed, pitch):
 def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest", spacing=6.0, bay=4.0,
                 climb=4, corridor=6, oaks=7, trail=13, mushrooms=6, biome=True, shade=True, side_bay=11,
                 keep_clear=(), brightness=LIGHT_GAMMA, approach_from=None, edge_plants=1.0, floor_plants=0.0,
-                back=4, bake=True):
+                back=4, bake=True, trail_from="unset"):
     """THE WOODS: a dark oak forest edge (see the module docstring). The wall runs east-west, is entered going
     NORTH (+Y) and may stand anywhere there is or can be terrain; a wood facing another way is not built.
 
@@ -907,6 +984,8 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
     seed = int(rng.integers(0, 1 << 20))
     count0 = len(w.blocks)
     back = max(0, int(back or 0))
+    if trail_from != "unset":                                   # the first version's spelling: an absolute y, or None
+        trail = 0 if trail_from is None else fy - int(trail_from)
     trail = max(0, int(trail or 0))
 
     def front(x):                                               # y of the tree line at x
@@ -938,9 +1017,9 @@ def dark_forest(b, gap=(0.5, 58), half_width=26, depth=22, rows=4, name="forest"
             flank = min(1.0, max(0.0, (half_width + 5.0 - abs(x - gx)) / 7.0))
             rise = (y - (fr + spacing)) / max(1.0, depth - spacing - 2.0)
             up = climb * min(1.0, max(0.0, rise)) * flank + 0.45 * _noise(x * 1.7 + y * 0.6, seed + 3, 5.0)
-            behind = y - (fr + depth + 1.0)                     # >= 0: behind the last row's trunks
-            if back and behind >= 0.0:
-                up += min(back, 2 * (1 + int(behind))) * flank
+            past = y - (fr + depth + 1.0)                       # >= 0: behind the last row's trunks
+            if back and past >= 0.0:
+                up += min(back, 2 * (1 + int(past))) * flank
             z = h + max(0, int(math.floor(up + 0.5)))
             if (abs(x - gx) <= 2.6 and fr - 4 <= y <= fy + corridor + 1) or (x == gcx + 3 and fy + 2 <= y <= fy + 4):
                 z = road_z                                      # the way in (and the spot behind the east trunk):
@@ -1188,31 +1267,54 @@ HELLO = dict(
     bare=((17, 44), (20, 46), (17, 48)),  # three new oaks on the east bank ...
     pyramid=(12, 45),                     # ... and the pyramid in front of them as seen from the road
 )
+HELLO_FLOATING = dict(air=3, logs=4)      # the canopy 3 blocks above the grass, one log hanging under it over 2 of air
+HELLO_GATE_LENS = 22.0                    # the figure at the gap: 40 px tall at 720x1280 (32 mm: 59 px)
 
 
-def hello_set(b, layout=None, forest=None):
+def hello_set(b, layout=None, forest=None, floating=None, bare=None, pyramid=None):
     """Everything "The Hello" films beyond the exit gate, placed along the meadow road (see HELLO for where):
     the dark forest across the end of the road (beats 6-8), the floating oak west of the road against the open
     western sky (beat 12), three bare oaks on the east bank and the sand pyramid in front of them as seen from the
     road (beats 13, 14). The three small pieces stand 10 blocks or more off the road, outside a 28-35 mm frame from
-    the exit gate: beat 6 happens before any of them exists. Returns dict(forest, floating, bare, pyramid, cameras,
-    path); also Village.sets['hello']."""
+    the exit gate: beat 6 happens before any of them exists.
+    layout   moves a piece: forest_gap (x, y) (tested for y 56..70 with the other pieces where they are; closer,
+             the wood would swallow them and the build stops saying which), floating (x, y), bare ((x, y), ...),
+             pyramid (x, y).
+    forest / floating / bare / pyramid   keyword arguments for dark_forest / floating_oak (default HELLO_FLOATING:
+             logs=4) / bare_oaks / sand_pyramid.
+    The wood's light is baked last, when all four pieces stand. Returns dict(forest, floating, bare, pyramid,
+    cameras, path, layout); also Village.sets['hello']."""
+    _new_name(b, "hello")
     L = dict(HELLO)
+    unknown = set(layout or {}) - set(L)
+    if unknown:
+        raise KeyError("hello_set: layout has no %s (known: %s)" % (sorted(unknown), ", ".join(sorted(L))))
     L.update(layout or {})
     bx = sum(p[0] for p in L["bare"]) / float(len(L["bare"]))
     by = sum(p[1] for p in L["bare"]) / float(len(L["bare"]))
     kw = dict(keep_clear=[(L["floating"][0], L["floating"][1], 13.0), (L["pyramid"][0], L["pyramid"][1], 12.0),
                           (bx, by, 13.0)])
     kw.update(forest or {})
-    forest = dark_forest(b, gap=L["forest_gap"], **kw)
-    floating = floating_oak(b, b.tree_at(*L["floating"], radius=1.5) or L["floating"])
-    bare = bare_oaks(b, L["bare"])
-    pyramid = sand_pyramid(b, L["pyramid"])
-    res = dict(forest=forest, floating=floating, bare=bare, pyramid=pyramid, path="road_to_forest", layout=L)
+    kw["bake"] = False
+    wood = dark_forest(b, gap=L["forest_gap"], **kw)
+    for label, spots, margin in (("floating oak", [L["floating"]], 5.5), ("bare oaks", list(L["bare"]), 4.0),
+                                 ("pyramid", [L["pyramid"]], 5.0)):
+        for x, y in spots:
+            if wood["contains"](x + 0.5, y + 0.5, margin):
+                raise ValueError("hello_set: the %s at %s would stand in the wood (tree line y %d there): move it "
+                                 "or the forest with layout=" % (label, (x, y), round(wood["front"](x + 0.5))))
+    fk = dict(HELLO_FLOATING)
+    fk.update(floating or {})
+    fl = floating_oak(b, b.tree_at(*L["floating"], radius=1.5) or L["floating"], **fk)
+    ba = bare_oaks(b, L["bare"], **(bare or {}))
+    py = sand_pyramid(b, L["pyramid"], **(pyramid or {}))
+    res = dict(forest=wood, floating=fl, bare=ba, pyramid=py, path="road_to_" + wood["name"], layout=L,
+               exit_gate=tuple(b.v.anchors.get("exit_gate", (0.5, 24.5, -0.0625))))
     res["cameras"] = hello_cameras(res)
     for key in ("floating", "bare", "pyramid"):            # the ground between each of these cameras and its subject
         c = res["cameras"][key]                            # carries no plants
         clear_view(b, c["pos"], c["target"], 2.2)
+    shade_forest(b, wood)                                  # last: everything that stands beside the wood is there
     b.v.sets["hello"] = res
     return res
 
@@ -1223,19 +1325,25 @@ def hello_cameras(res):
     fl = res["floating"]
     py = res["pyramid"]
     ba = res["bare"]
+    eg = res.get("exit_gate", (0.5, 24.5, -0.0625))
     cams = {
-        # beats 6 and 7: low on the road two blocks inside the exit gate, the forest wall across the end
-        "gate": dict(pos=(0.9, 22.6, 0.75), target=(gap[0], gap[1], 2.6), lens=32.0, fstop=4.0),
+        # beats 6 and 7: low on the road two blocks inside the exit gate, the forest wall across the end. The lens
+        # sets the size of the figure at the gap (HELLO_GATE_LENS)
+        "gate": dict(pos=(eg[0] + 0.4, eg[1] - 1.9, eg[2] + 0.8125), target=(gap[0], gap[1], gap[2] + 2.66),
+                     lens=HELLO_GATE_LENS, fstop=4.0),
         # beat 8: from the side on the road, at child height, the tree line running away to the right
         "side": dict(pos=(gap[0] - 8.6, gap[1] - 2.6, 0.7), target=(gap[0], gap[1] - 1.4, 1.0), lens=35.0,
                      fstop=2.8),
         # from inside the forest, out along the corridor to the meadow and the village
         "inside": dict(pos=res["forest"]["inside_cam"], target=(gap[0] - 0.1, gap[1] - 14.0, 0.9), lens=26.0,
                        fstop=4.0),
-        # beat 12: low, from the east-north-east (the forest behind the camera), the canopy against the western sky
-        "floating": dict(pos=(fl["under"][0] + 4.6, fl["under"][1] + 1.4, 0.35),
-                         target=(fl["under"][0] - 0.2, fl["under"][1] - 0.1, fl["leaf_bottom"] - 0.5), lens=22.0,
-                         fstop=4.0),
+        # from the gap, further in: the corridor, the trunk that closes it, the dark bank behind the wood
+        "deep": dict(pos=(gap[0] - 0.6, gap[1] - 2.1, gap[2] + 1.56), target=(gap[0], gap[1] + 6.4, gap[2] + 1.66),
+                     lens=24.0, fstop=4.0),
+        # beat 12: low and level from 10 blocks east-north-east (the forest behind the camera): the whole canopy,
+        # the hanging log and the gap under it against the western sky
+        "floating": dict(pos=(fl["under"][0] + 9.5, fl["under"][1] + 3.0, fl["under"][2] + 0.5),
+                         target=(fl["under"][0], fl["under"][1], fl["under"][2] + 2.6), lens=26.0, fstop=4.0),
         # beat 13: from north of the bare oaks, the village roofs beyond
         "bare": dict(pos=(ba["among"][0] + 2.6, ba["among"][1] + 8.6, ba["among"][2] + 1.0),
                      target=(ba["among"][0] - 0.1, ba["among"][1], ba["among"][2] + 2.5), lens=30.0, fstop=4.0),
@@ -1327,7 +1435,15 @@ def _check_set():
     scene = quick.reset()
     quick.setup(scene)
     out = {}
-    v = village.build_village(scene, seed=1, edit=lambda b: out.update(hello=hello_set(b), b=b))
+
+    def edit(b):
+        out.update(hello=hello_set(b), b=b)
+        wood, e = out["hello"]["forest"], env(b)
+        first = (wood["counts"]["dark_cells"], dict(e.light))
+        again = shade_forest(b, wood)                      # baking twice must change nothing
+        out["rebake"] = (first[0], again, first[1] == e.light)
+
+    v = village.build_village(scene, seed=1, edit=edit)
     h, b, w, A = out["hello"], out["b"], v.world, v.anchors
     print("[sets] village %d blocks / %d faces (%d triangles); with hello_set %d blocks / %d faces (%d triangles), "
           "built in %.1f s" % (blocks0, faces0, 2 * faces0, len(w.blocks), v.face_count, 2 * v.face_count,
@@ -1418,6 +1534,43 @@ def _check_set():
         ang = math.degrees(math.atan2(abs(x - gate[0]) - 2.5, y - gate[1]))
         if ang < 19.9:
             bad.append("%s is %.1f degrees off the road axis from the exit gate: inside a 28 mm frame" % (label, ang))
+    # the village's own anchors and paths still stand ON the ground where the trail was paved under them
+    off = [k for k, q in plain.anchors.items() if q[1] > 24 and abs(q[2] - plain.ground(q[0], q[1])) < 0.07
+           and b.walk_z(q[0], q[1]) is not None and abs(A[k][2] - b.walk_z(q[0], q[1])) > 1e-6]
+    off += ["path %s %s" % (k, tuple(round(a, 2) for a in q)) for k, pts in v.paths.items() if k in plain.paths
+            for q in pts if q[1] > 24 and abs(q[2] - b.walk_z(q[0], q[1])) > 1e-6]
+    if off:
+        bad.append("village anchors / path nodes not at walking height after the hook: %s" % off[:4])
+    # the new paths follow the ground: between two nodes never more than 1/16 off it, except on a hop
+    for name in ("road_to_forest", "pyramid_round"):
+        bad += _path_on_ground(b, name, v.paths.get(name, []))
+    road = v.paths["road_to_forest"]
+    if any(c[1] < a[1] - 1e-6 for a, c in zip(road, road[1:])) or f["hops"]:
+        bad.append("road_to_forest doubles back or hops (%s): %s" % (f["hops"], [tuple(round(a, 1) for a in q) for q in road]))
+    # nothing grows under the leaves (a cross plant in that shade renders with black texels under this look)
+    cover = {(c[0], c[1]) for t in v.trees for c in t["leaves"]}
+    x0, y0, x1, y1 = f["bounds"]
+    shaded = [c for c, sid in w.blocks.items() if x0 <= c[0] <= x1 and y0 <= c[1] <= y1 and (c[0], c[1]) in cover
+              and f["contains"](c[0] + 0.5, c[1] + 0.5, 4.0)
+              and w._states[sid][0] in PLANTS and "mushroom" not in w._states[sid][0]]
+    if shaded:
+        bad.append("%d plants under leaves in the wood, e.g. %s" % (len(shaded), shaded[:3]))
+    edge = sum(1 for c, sid in w.blocks.items() if x0 <= c[0] <= x1 and y0 <= c[1] <= y1
+               and w._states[sid][0] in ("short_grass", "tall_grass") and c[1] < f["front"](c[0] + 0.5))
+    if edge < 50:
+        bad.append("only %d tufts along the forest edge" % edge)
+    # the light is baked last, is the same when baked again, and leaves other pieces' trees alone
+    n1, n2, same = out["rebake"]
+    if n1 != n2 or not same:
+        bad.append("baking the wood's light twice differs: %d then %d cells, same levels: %s" % (n1, n2, same))
+    ft = fl["tree"]
+    lit = [c for c in e.light if abs(c[0] - ft["x"]) <= 2 and abs(c[1] - ft["y"]) <= 2]
+    if lit:
+        bad.append("the floating oak carries %d cells of the wood's baked light" % len(lit))
+    if f["counts"]["oaks"] != len(f["oaks"]) or f["counts"]["oaks_wanted"] != 7:
+        bad.append("edge oak counts %s" % f["counts"])
+    print("[sets] road_to_forest: %d nodes, hops %s; edge tufts %d; regrounded %s; cut %s" % (
+        len(road), f["hops"], edge, v.regrounded, f["cut_paths"]))
     probs = v.validate()
     if probs:
         bad.append("validate: %s" % probs)
@@ -1427,13 +1580,139 @@ def _check_set():
     return bad
 
 
+def _path_on_ground(b, name, pts):
+    """Failures: places where a walker on the path would be more than 1/16 off the ground between two nodes (the
+    legs that climb or drop a block are the hops)."""
+    bad = []
+    for a, c in zip(pts, pts[1:]):
+        if abs(c[2] - a[2]) > 0.5:
+            continue
+        n = max(2, int(math.dist(a[:2], c[:2]) * 8))
+        for i in range(n + 1):
+            x, y = a[0] + (c[0] - a[0]) * i / n, a[1] + (c[1] - a[1]) * i / n
+            lin = a[2] + (c[2] - a[2]) * i / n
+            wz = b.walk_z(x, y)
+            # (a walker is up half a body before a step and down half a body after it: his column is still the low one)
+            if wz is None or (abs(wz - lin) > 0.07 and not 0.9 < lin - wz < 1.1):
+                bad.append("path %s is %.2f off the ground at (%.2f, %.2f)" % (name, lin - (wz or 0.0), x, y))
+                break
+    return bad
+
+
+def _check_moves():
+    """The pieces at other places and with arguments they cannot honour. Returns a list of failures."""
+    import time
+
+    from . import quick, village
+
+    bad = []
+    t0 = time.time()
+
+    def build(edit, seed=1):
+        scene = quick.reset()
+        quick.setup(scene)
+        return village.build_village(scene, seed=seed, edit=edit)
+
+    def refused(label, edit, text):
+        try:
+            build(edit)
+        except (ValueError, KeyError) as e:
+            if text not in str(e):
+                bad.append("%s: refused, but with %r" % (label, str(e)[:160]))
+            return
+        bad.append("%s: not refused" % label)
+
+    # 1. the forest anywhere along the road: closer than the default, at it, and up the rising meadow
+    rows = []
+    for y in (46, 50, 54, 58, 62, 66, 70):
+        out = {}
+        try:
+            v = build(lambda b: out.update(f=dark_forest(b, gap=(0.5, y)), b=b))
+        except ValueError as e:
+            bad.append("dark_forest at y %d: %s" % (y, str(e)[:200]))
+            continue
+        f, b = out["f"], out["b"]
+        road = v.paths["road_to_forest"]
+        if v.edit_problems:
+            bad.append("dark_forest at y %d: %s" % (y, v.edit_problems))
+        if any(c[1] < a[1] - 1e-6 for a, c in zip(road, road[1:])):
+            bad.append("dark_forest at y %d: road_to_forest doubles back: %s" % (y, [round(q[1], 1) for q in road]))
+        if abs(road[0][1] - v.anchors["exit_gate"][1]) > 1e-6 or math.dist(road[-1], f["gap_in"]) > 1e-6:
+            bad.append("dark_forest at y %d: road_to_forest does not run from exit_gate to %s_gap_in" % (y, f["name"]))
+        if len(f["hops"]) != sum(1 for a, c in zip(road, road[1:]) if abs(c[2] - a[2]) > 0.5):
+            bad.append("dark_forest at y %d: hops %s do not match the path" % (y, f["hops"]))
+        bad += _path_on_ground(b, "road_to_forest (y %d)" % y, road)
+        rows.append("y %d: %d hops, z %.2f, cut %s" % (y, len(f["hops"]), f["gap"][2], f["cut_paths"] or "-"))
+    print("[sets] forest moved along the road: " + "; ".join(rows))
+    # 2. hello_set with the forest further out; a second wood beside the village; a pyramid on a bank
+    for y in (56, 64, 70):
+        try:
+            v = build(lambda b: hello_set(b, layout={"forest_gap": (0.5, y)}))
+            if v.edit_problems:
+                bad.append("hello_set, forest at y %d: %s" % (y, v.edit_problems))
+        except ValueError as e:
+            bad.append("hello_set, forest at y %d: %s" % (y, str(e)[:200]))
+    refused("hello_set with the forest on top of the other pieces",
+            lambda b: hello_set(b, layout={"forest_gap": (0.5, 48)}), "would stand in the wood")
+    out = {}
+
+    def two(b):
+        hello_set(b)
+        out["west"] = dark_forest(b, gap=(-55.5, 20), name="west", half_width=12, depth=12, rows=2, trail=0, oaks=0)
+        out["bank"] = sand_pyramid(b, (-21, 60), name="bank_pyramid")       # an oak stands in its way round
+        out["low"] = floating_oak(b, (30, 34), air=2, logs=3, name="floating_low")
+        out["b"] = b
+
+    try:
+        v0 = build(lambda b: out.update(step=sand_pyramid(b, (12, 59), name="step_pyramid"), b0=b))   # on the first rise
+        rnd = out["step"]["round"]
+        nh = len(v0.sets["_paths"]["step_pyramid_round"]["hops"]) if rnd else 0
+        if rnd is None or nh < 1 or v0.edit_problems:
+            bad.append("a pyramid on the meadow's first rise: path %s, %d hops, %s" % (rnd, nh, v0.edit_problems))
+        else:
+            bad += _path_on_ground(out["b0"], "step_pyramid_round", rnd)
+        v = build(two)
+        west = out["west"]
+        if v.edit_problems or "west_gap" not in v.anchors or "road_to_west" not in v.paths:
+            bad.append("a second wood: %s" % (v.edit_problems,))
+        if abs(v.paths["road_to_west"][0][1] - (20 - 14.0)) > 1e-6:
+            bad.append("a second wood off the exit road: its path starts at %s" % (v.paths["road_to_west"][0],))
+        bad += _path_on_ground(out["b"], "road_to_west", v.paths["road_to_west"])
+        if out["bank"]["round"] is not None:
+            bad += _path_on_ground(out["b"], "bank_pyramid_round", out["bank"]["round"])
+        print("[sets] second wood 'west': %d dark oaks, hops %s; pyramid on the first rise: path round it with %d "
+              "hops; pyramid beside an oak: %s; low floating oak: %d logs over %d of air" % (
+                  west["counts"]["dark_oaks"], west["hops"], nh,
+                  "no path round it" if out["bank"]["round"] is None else "a path round it",
+                  out["low"]["logs"], out["low"]["gap"]))
+    except (ValueError, KeyError) as e:
+        bad.append("a second wood, a pyramid on a bank, a low floating oak: %s: %s" % (type(e).__name__, str(e)[:240]))
+    # 3. arguments that cannot be honoured are refused, not bent
+    refused("hello_set twice", lambda b: (hello_set(b), hello_set(b)), "exists already")
+    refused("two woods of one name", lambda b: (dark_forest(b, gap=(0.5, 58)), dark_forest(b, gap=(0.5, 58))),
+            "exists already")
+    refused("sand_pyramid(base=4)", lambda b: sand_pyramid(b, (12, 45), base=4), "odd width")
+    refused("sand_pyramid(layers=4)", lambda b: sand_pyramid(b, (12, 45), layers=4), "room for")
+    refused("floating_oak(air=4)", lambda b: floating_oak(b, (-13, 47), air=4), "4-6 logs")
+    refused("floating_oak(logs=6)", lambda b: floating_oak(b, (-13, 47), logs=6), "one block")
+    refused("hello_set(layout={'forrest_gap': ...})", lambda b: hello_set(b, layout={"forrest_gap": (0.5, 60)}),
+            "layout has no")
+    print("[sets] moves and refusals: %s (%.0f s)" % ("OK" if not bad else "FAILED", time.time() - t0))
+    return bad
+
+
 def _selftest(names):
-    """Numbers (no names) or proof stills (names of films/_sets_proof.py PROOF, or 'all')."""
-    if names:
+    """Numbers (no names; 'quick' leaves out the moved sets), proof stills (names of films/_sets_proof.py) or a
+    motion sheet ('walkin' / 'hop': films/_sets_walk.py)."""
+    if names and names[0] in ("walkin", "hop"):
+        from films import _sets_walk
+
+        return _sets_walk.main(names[:1])
+    if names and names != ["quick"]:
         from films import _sets_proof
 
         return _sets_proof.main(names)
-    bad = _check_shapes() + _check_set()
+    bad = _check_shapes() + _check_set() + ([] if names else _check_moves())
     for line in bad:
         print("FAIL", line)
     print("[sets] self-test: %s" % ("all passed" if not bad else "%d FAILED" % len(bad)))
