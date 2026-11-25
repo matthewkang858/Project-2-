@@ -174,6 +174,7 @@ SELF-TEST
     $BPY -m tools.check_redstone_stamp         frame fingerprints (two processes; about a minute)
 """
 import math
+import os
 
 import bpy
 import numpy as np
@@ -2252,8 +2253,11 @@ AREAS = {
     "column": (30, 12, 34, 16),      # beat 9: an upward piston under twelve iron blocks
     "door": (4, 42, 10, 49),         # "Two Apples": the one-block cell whose back wall opens on sticky pistons
     "row": (11, 41, 22, 52),         # beats 13 / 19: sticky pistons in a wall top with planks and anvils
+    "lights": (36, 13, 44, 19),      # night: a village torch, a redstone lamp and a redstone torch side by side
 }
-DOOR = dict(cells=[(7, 47, 0), (7, 47, 1)], side="east", cell=(7, 46), villager=(7.5, 46.45, 0.0))
+DOOR = dict(cells=[(7, 47, 0), (7, 47, 1)], side="east", cell=(7, 46), villager=(7.5, 46.45, 0.0), lever=(8, 45, 1),
+            roof=[(x, y, 2) for x in range(5, 10) for y in range(43, 46)] + [(7, 46, 2)])
+LIGHTS = dict(torch=(37, 18, 0), lamp=(40, 18, 0), rtorch=(43, 18, 0), wall_y=19)
 COLUMN = dict(piston=(32, 14, 0), lever=(33, 14, 0), blocks=12)
 ROW = dict(cells=[(x, 43, 3) for x in (14, 15, 16, 17)], facing="north", lever=(13, 42, 4),
            dust=[(x, 42, 4) for x in (14, 15, 16, 17)])
@@ -2268,9 +2272,10 @@ CLOSE = dict(dust=[(x, 23, 0) for x in (22, 23, 24, 25)], repeater=(25, 24, 0), 
              cam=(24.75, 25.75, 0.95), target=(24.55, 24.0, 0.42), focus=(24.5, 24.45, 0.55))
 
 
-def proof_set(b):
-    """The village hook of the proof: stone floors and the static blocks the parts stand on, in AREAS."""
-    for name in ("sheet_a", "sheet_b", "dust", "bench", "column", "row"):
+def proof_set(b, dark=False):
+    """The village hook of the proof: stone floors and the static blocks the parts stand on, in AREAS. dark=True: the
+    door's box gets engine.sets' baked sky light (the dark variant)."""
+    for name in ("sheet_a", "sheet_b", "dust", "bench", "column", "row", "lights"):
         x0, y0, x1, y1 = AREAS[name]
         bench(b, x0, y0, x1, y1, name="redstone_" + name, level=0)
     w = b.w
@@ -2302,6 +2307,10 @@ def proof_set(b):
     w.fill(13, 42, 0, 18, 43, 3, "stone")
     for c in ROW["cells"]:
         w.set(c[0], c[1], c[2], None)
+    # the lights bench (night): a village torch, a lamp and a redstone torch standing on the floor, a wall behind
+    x0, y0, x1, y1 = AREAS["lights"]
+    w.fill(x0, LIGHTS["wall_y"], 0, x1, LIGHTS["wall_y"], 1, "stone")
+    b.torch(LIGHTS["torch"], "torch", {}, group="rs_lights")
     # the door: a closed stone box with the aisle, the cell, the door cells, the pistons' wall and the box behind
     x0, y0, x1, y1 = AREAS["door"]
     for x in range(x0, x1 + 1):
@@ -2311,26 +2320,35 @@ def proof_set(b):
     w.fill(x0, y0, -1, x1, y1, 2, "stone")
     hollow = [(x, y, z) for x in range(5, 10) for y in range(43, 46) for z in (0, 1)]           # the aisle
     hollow += [(7, 46, z) for z in (0, 1)] + [(7, 48, z) for z in (0, 1)]                        # cell, box
-    hollow += door_cells(DOOR["cells"], DOOR["side"])
-    hollow += [(x, 46, z) for x in (8, 9) for z in (0, 1)]      # the end wall's aisle side, open for the camera
+    hollow += door_cells(DOOR["cells"], DOOR["side"]) + [DOOR["lever"]]
     for c in hollow:
         w.set(c[0], c[1], c[2], None)
     b.torch((6, 45, 1), "wall_torch", {"facing": "south"}, group="rs_door")
     b.torch((5, 44, 1), "wall_torch", {"facing": "east"}, group="rs_door")
     b.allow(AREAS["door"])
+    if dark:                                     # the game's sky light baked in (engine.sets): the box is sealed
+        from . import sets
+
+        sets.env(b).bake_sky_light(b.ground, x0, y0, x1, y1)
+    for c in DOOR["roof"]:                       # the roof over the aisle and the cell: objects the camera does
+        w.set(c[0], c[1], c[2], None)            # not see (build_proof), after the bake that counted them
     b.v.sets["redstone_proof"] = dict(areas=AREAS)
     return b.v.sets["redstone_proof"]
 
 
-def build_proof(scene, sky=None):
+def build_proof(scene, sky=None, dark_door=False):
     """The proof film: one shot per proof (see PROOFS), every part built in the village by proof_set + a Kit.
-    Returns dict(film, stage, village, kit, shots, frames: {still name: frame})."""
+    sky: a SKIES name or entry (default the golden hour); dark_door: the door's box with engine.sets' baked sky
+    light and the door's parts at sky_light="auto". Returns dict(film, stage, village, kit, shots, frames: {still
+    name: frame or [frames]}, parts)."""
     from films import lookdev
 
     from . import look, players, shots, village
 
+    if isinstance(sky, str):
+        sky = SKIES[sky]
     cfg = dict(SKY, **(sky or {}))
-    v = village.build_village(scene, seed=1, edit=proof_set)
+    v = village.build_village(scene, seed=1, edit=lambda b: proof_set(b, dark=dark_door))
     skyobj = look.set_time(scene, cfg["preset"], sun_azimuth=cfg["az"], sun_elevation=cfg["el"])
     look.setup_compositor(scene, bloom=cfg["bloom"], grade=cfg["grade"])
     film = shots.Film(scene, fps=FPS)
@@ -2466,26 +2484,44 @@ def build_proof(scene, sky=None):
     cam(s, (20.6, 50.4, 6.2), (15.4, 43.6, 3.5), 24, 8.0)
     out["frames"]["row"] = [f0 + 5, f0 + 7, f0 + 10]
 
-    # ---- the door of "Two Apples": the librarian in his cell, the back wall opening behind him
+    # ---- the door of "Two Apples": the librarian in his cell, the back wall opening behind him (the camera above
+    #      the aisle; the roof over the aisle and the cell is there for light and shadow, invisible to the camera)
     s = st.shot("door", 2.0)
     f0 = s.frame_start
-    door = P["door"] = k.piston_door(DOOR["cells"], DOOR["side"], block="stone", closed=True)
+    dl = "auto" if dark_door else None
+    roof = [k.block("stone", c, sky_light=dl) for c in DOOR["roof"]]
+    for r in roof:
+        r.object.visible_camera = False
+    door = P["door"] = k.piston_door(DOOR["cells"], DOOR["side"], block="stone", closed=True, sky_light=dl)
+    lev = P["door_lever"] = k.lever(DOOR["lever"], "wall", "south", sky_light=dl)
     dad = st.actor("dad", "librarian")
     dad.place(f0, DOOR["villager"], 0.0)
-    t_open = f0 + 8
-    door.open(t_open)
-    door.close(f0 + 30)
+    door.open(lev.flip(f0 + 8))
+    door.close(lev.flip(f0 + 30))
     st.use(s, dad)
-    cam(s, (9.55, 43.6, 1.3), (7.7, 47.1, 0.95), 18, 5.6, focus=(8.0, 47.0, 1.0))
+    cam(s, (7.05, 44.35, 4.3), (7.55, 47.2, 1.0), 26, 4.0, focus=(7.5, 47.0, 1.2))
     st.lights(s, scale=1.0, groups={"rs_door": 1.4}, near=(7.5, 45.0, 1.0), radius=4.0)
     out["frames"]["door"] = [f0 + 7, f0 + 9, f0 + 12, f0 + 29, f0 + 31, f0 + 34]
+    out["frames"]["door_dark"] = [f0 + 7, f0 + 12, f0 + 34]
+    out["door_parts"] = dict(door=door, lever=lev, roof=roof)
+
+    # ---- lights (night): a village torch, a redstone lamp and a redstone torch on the floor, side by side
+    s = st.shot("lights", 0.5)
+    f0 = s.frame_start
+    P["lights_lamp"] = k.lamp(LIGHTS["lamp"], lit=True)
+    P["lights_rtorch"] = k.torch(LIGHTS["rtorch"], lit=True)
+    cam(s, (40.5, 10.6, 3.6), (40.5, 16.6, 0.2), 30, 8.0)
+    st.lights(s, scale=1.0, groups={"rs_lights": 1.0}, near=(40.5, 17.0, 0.5), radius=6.0)
+    out["frames"]["lights"] = f0 + 2
     st.finish()
     return out
 
 
-PROOFS = ("sheet_a", "sheet_b", "close", "dust", "bench", "lever", "column", "row", "door")
+PROOFS = ("sheet_a", "sheet_b", "close", "dust", "bench", "lever", "column", "row", "door", "door_dark", "lights")
 STRIP_RES = {"bench": (640, 360), "row": (640, 360), "door": (360, 640), "column": (360, 640),
-             "lever": (360, 640)}     # tiles of the strips: landscape for the subjects that lie along a line
+             "lever": (360, 640), "door_dark": (360, 640)}     # strip tiles: landscape for subjects along a line
+PROOF_BUILD = {"door_dark": dict(dark_door=True), "lights": dict(sky="night")}    # stills that need their own build
+LANDSCAPE = ("sheet_a", "sheet_b", "lights")
 SHEET_RES = (960, 540)               # the two part sheets are landscape (the same pixels as a 540x960 still)
 
 
@@ -2545,24 +2581,131 @@ def _sheet(paths, name, cols, labels=None):
 
 
 def _stills(names, samples=16):
-    """Render the proof stills named (PROOFS): sheets at 540x960, strips as tiles at STRIP_RES."""
-    scene = _fresh(samples=samples)
-    out = build_proof(scene)
-    film = out["film"]
-    paths = []
+    """Render the proof stills named (PROOFS): single stills at 540x960 (LANDSCAPE ones 960x540), strips as tiles at
+    STRIP_RES; the names of PROOF_BUILD get a build of their own."""
+    groups = {}
     for name in names:
-        fr = out["frames"][name]
-        if isinstance(fr, int):
-            paths.append(_render(scene, film, fr, name, res=SHEET_RES if name.startswith("sheet") else (540, 960)))
-            continue
-        tiles = [_render(scene, film, f, "%s_f%d" % (name, f), res=STRIP_RES[name]) for f in fr]
-        labels = ["frame %d" % f for f in fr]
-        w, h = STRIP_RES[name]
-        paths.append(_sheet(tiles, name + "_strip", 3 if w > h else len(tiles), labels))
+        cfg = PROOF_BUILD.get(name, {})
+        groups.setdefault(tuple(sorted(cfg.items())), []).append(name)
+    paths = []
+    for cfg, group in groups.items():
+        scene = _fresh(samples=samples)
+        out = build_proof(scene, **dict(cfg))
+        film = out["film"]
+        for name in group:
+            fr = out["frames"][name]
+            if isinstance(fr, int):
+                paths.append(_render(scene, film, fr, name, res=SHEET_RES if name in LANDSCAPE else (540, 960)))
+                continue
+            tiles = [_render(scene, film, f, "%s_f%d" % (name, f), res=STRIP_RES[name]) for f in fr]
+            labels = ["frame %d" % f for f in fr]
+            w, h = STRIP_RES[name]
+            paths.append(_sheet(tiles, name + "_strip", 3 if w > h else len(tiles), labels))
     return paths
 
 
-PALETTE_HUE = (8.0, 15.0)            # power-15 dust as the game draws it in daylight: (255, 50, 0) x the texel, hue
+def _pixel(scene, point):
+    """(x, y) pixel of a world point in the scene camera's render (top-left origin)."""
+    from bpy_extras.object_utils import world_to_camera_view
+
+    co = world_to_camera_view(scene, scene.camera, Vector(point))
+    r = scene.render
+    return int(round(co.x * r.resolution_x)), int(round((1.0 - co.y) * r.resolution_y))
+
+
+def _lum(img, xy, half=3):
+    """Median linear luminance of a (2 half + 1)^2 pixel box of an sRGB image array."""
+    x, y = xy
+    box = img[max(0, y - half):y + half + 1, max(0, x - half):x + half + 1].reshape(-1, 3) / 255.0
+    lin = np.where(box <= 0.04045, box / 12.92, ((box + 0.055) / 1.055) ** 2.4)
+    return float(np.median(lin @ np.array([0.2126, 0.7152, 0.0722])))
+
+
+def _light_off(obs, off=True):
+    """Take lights out of the lighting (ray visibility; their keyed energy / visibility stay as they are)."""
+    for L in obs:
+        for a in ("visible_diffuse", "visible_glossy", "visible_transmission", "visible_volume_scatter"):
+            setattr(L, a, not off)
+
+
+def light_study(which="floor", res=(640, 360)):
+    """MEASURED light of the module's sources (renders, prints a table; see the docstring's MEASURED):
+    'floor'  night, LIGHTS bench: the floor 1, 2, 3 blocks in front of a village torch, a lit lamp and a redstone
+             torch, each light alone minus all off, against the game's ratios (lightmap of the levels there);
+    'lamp'   golden hour, the bench of beat 7: the narrator's face with the lamp at LAMP_WATTS x 1 / 4 / 8;
+    'held'   dusk, the same bench: his face with the held redstone torch at 30 / 120 / 300 W."""
+    from PIL import Image
+
+    scene = _fresh(res=res, samples=16)
+    sky = {"floor": "night", "lamp": "golden", "held": "dusk"}[which]
+    out = build_proof(scene, sky=sky)
+    film, P = out["film"], out["parts"]
+    path = lambda n: "%s/redstone_study_%s.png" % (_out_dir(), n)       # noqa: E731
+
+    def shot(name, frame):
+        _render(scene, film, frame, "study_" + name)
+        return np.asarray(Image.open(path(name)).convert("RGB")).astype(np.float64)
+
+    rows = []
+    if which == "floor":
+        f = out["frames"]["lights"]
+        film.goto(f)
+        torch_light = min((o for o in out["village"].lantern_lights if o.get("group") == "rs_lights"),
+                          key=lambda o: (o.location - Vector(LIGHTS["torch"]) - Vector((0.5, 0.5, 0.5))).length)
+        srcs = {"torch": (torch_light, LIGHTS["torch"], 14), "lamp": (P["lights_lamp"].light, LIGHTS["lamp"], 15),
+                "redstone torch": (P["lights_rtorch"].light, LIGHTS["rtorch"], 7)}
+        allL = [v[0] for v in srcs.values()]
+        _light_off(allL)
+        base = shot("off", f)
+        got = {}
+        for name, (L, cell, level) in srcs.items():
+            _light_off([L], False)
+            img = shot(name.replace(" ", "_"), f)
+            _light_off([L])
+            got[name] = []
+            for d in (1, 2, 3):
+                xy = _pixel(scene, (cell[0] + 0.5, cell[1] + 0.5 - d, 0.0))
+                got[name].append(max(1e-6, _lum(img, xy) - _lum(base, xy)))
+        _light_off(allL, False)
+        for name, (L, cell, level) in srcs.items():
+            for i, d in enumerate((1, 2, 3)):
+                game = lightmap(level - d) / lightmap(14 - d)
+                rows.append("%-15s floor %d block(s) out: +%.4f (linear luminance), x%.2f the torch's; the game x%.2f "
+                            "(light %d against %d)" % (name, d, got[name][i], got[name][i] / got["torch"][i], game,
+                                                      level - d, 14 - d))
+        os.remove(path("off"))
+    else:
+        f = out["frames"]["bench"][-1] if which == "lamp" else out["frames"]["bench"][0]
+        film.goto(f)
+        efe = out["stage"].cast["efe"]
+        eye = Vector(efe.eye_point(f))
+        cheek = eye + Vector((0.0, 0.0, -0.12))
+        if which == "lamp":
+            L = P["bench_lamp"].light
+            levels = [LAMP_WATTS * k for k in (1.0, 4.0, 8.0)]
+        else:
+            item = efe.item("right")
+            L = bpy.data.objects.get(item.get("redstone_glow_light", ""))
+            levels = [30.0, 120.0, 300.0]
+        base_e = L.data.energy
+        _light_off([L])
+        base = shot(which + "_off", f)
+        xy = _pixel(scene, cheek)
+        b0 = _lum(base, xy, 2)
+        _light_off([L], False)
+        for wt in levels:
+            L.data.energy = wt
+            img = shot("%s_%dW" % (which, wt), f)
+            v1 = _lum(img, xy, 2)
+            rows.append("%-5s %5.0f W: the face (pixel %s) %.4f -> %.4f linear, x%.2f" % (which, wt, xy, b0, v1,
+                                                                                         v1 / max(b0, 1e-6)))
+        L.data.energy = base_e
+    for r in rows:
+        print("[redstone study] " + r, flush=True)
+    return rows
+
+
+PALETTE_HUE = (8.0, 15.0)          # power-15 dust as the game draws it in daylight: (255, 50, 0) x the texel, hue
 PALETTE_SAT = 0.85                   # 11.8 degrees, saturation 1.0 (the check's bounds, as the review asked)
 PALETTE_SAT_LOOK = 0.76              # in the finished look: its grade (saturation 0.97 in linear HSV) lets no bright
                                      # pixel keep more than about 0.81 (min channel >= 3 % of max in linear light)
@@ -2879,6 +3022,10 @@ def _main(argv):
             print("unknown still(s) %s; names: %s" % (bad, ", ".join(PROOFS)))
             return 2
         _stills(names)
+        return 0
+    if argv and argv[0] == "study":
+        for w in argv[1:] or ("floor",):
+            light_study(w)
         return 0
     if argv and argv[0] == "palette":
         return 1 if palette_check(tuple(argv[1:]) or ("golden", "dusk")) else 0
