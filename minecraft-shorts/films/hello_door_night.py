@@ -19,15 +19,101 @@ THE LIGHT: C.lights(s, "night_door"): every torch at the look-dev night level 1.
   key; the moon stands in the west behind the camera and gives the wall a cool fill. Scouted:
   out/test/hello_scout_door_night*.png. Do not raise the torches further without tools/palette_check (lit
   cobblestone beside them is at the palette limit).
-THE KNOCKING: engine.breaking.bang_on_door(zombie, C.door, f0, f1 + 1, **KNOCK, world=C.v, camera=s, glow=0.2),
-  called in film order; the next shot continues it with place=False and phase=r["phase"] (breaking notes).
-  Particles need camera=s; at night crumbs need glow=0.2 to read.
+THE KNOCKING: engine.breaking.bang_on_door(zombie, C.door, f0, f1, **KNOCK, world=C.v, camera=s, glow=0.2),
+  called in film order; dn19 continues dn18's with place=False and phase=r["phase"] (breaking notes). Particles
+  need camera=s; at night crumbs need glow=0.2 to read. A swing must already be under way on the first frame of
+  dn02 and dn18: _zombie_preroll places the zombie a few frames before the shot (it is in neither shot before:
+  sq01, in17) and starts one swing there; bang_on_door then goes on with place=False and first= the next swing.
+  Only the zombie (hidden outside its shots) is keyed before a shot; the door is keyed from the shot's first
+  frame on. Blows: every 16 frames, the door jolts 0.25 rad for a frame (shudder 8) and drops 3 crumbs.
+THE FIGHT (dn02): Steve sprints in, turns to the zombie, one swing on "zombie"; undead.hurt gives the red flash
+  and the legs' flail, _shove the travel (the game's knock-back under the eaves: no hop into them, off the step).
+
+    $BPY -m tools.hello_door_night_probe dn02_fight 72-144:2      per-frame heads in the frame, crack stage, door
 """
+import math
+
 from engine import breaking, undead
 from films import hello_common as HC
 
 KNOCK = dict(attempt=44, every=16, half="both", along=-0.3, shudder=8, crumbs=3)   # the staging that reads (breaking
 #                                                       notes), plus a few wood crumbs per blow (story: "wood crumbs")
+DN02_LEAD = 4          # beat 2: the zombie's pre-rolled swing starts 4 frames before the shot (under way on 72)
+DN02_PHASE = 0.3       # beat 2: cracks at stage 3 on the first frame, stage 7 when Steve's blow ends the attempt
+DN18_LEAD = 1          # beat 18: the swing starts on 1100: blows then land on 1105, 1121, 1137 ("knocked" 1138),
+#                        1153 ("door"), 1169 ("sunrise" 1170), 1185, and go on in beat 19 (1201, 1217, 1233, 1249)
+DN18_PHASE = 0.591     # beat 18: cracks at stage 5 on 1101; reset 1119-1120 (between two blows: a reset ON a blow
+#                        read as the blow mending the door); stage 9 from 1161 ("until" 1162); reset 1165-1166; the
+#                        blow of 1169 ("sunrise" 1170) starts the next attempt on a clean door
+STEVE_FROM = (8.3, -11.7)      # beat 2: Steve's run starts beyond the right edge of door_front
+STEVE_TO = (8.75, -8.4)        # ... and ends here, 1.5 blocks south-west of the zombie: turned to it (north-east)
+#                                his sword arm is on the lens's side (from fight_to, facing north, it was behind him)
+STEVE_GO = 68          # ... on this frame (pre-roll), at sprint speed, sliding to a halt
+KNOCKBACK = 1.25       # the knock-back of Steve's blow: a sprint hit's (the game adds a knockback level for one)
+OUT = (5.5, -7.6)      # beat 2: where Steve looks out over the plaza once the zombie is gone (29 deg off the lens)
+LOOK_LEFT = (6.0, -5.0, 1.6)   # ... and the small head turn to the left (north, where the zombie went)
+
+
+EAVES_Z = 3.0          # the underside of house_a's eaves (oak stairs at x 9, z 3, y -11..-5) above the step
+STEP_EDGE = -7.0       # the step's north edge (cell (9, -8)): the zombie is on it while any of its 0.6 is south of it
+HOLD = 1               # _shove: the hit zombie stays put for one frame before it flies (the client interpolates a
+#                        mob's position over 3 ticks, so it lingers about a tick in the hurt colour): the blow's frame
+#                        is a sharp red zombie on the step, not a smear (motion blur opens at the frame for half a frame)
+SWING_LEAD = 2         # dn02: Steve's swing starts 2 frames before the blow, so his arm is up (highest 2.4 frames in)
+#                        on the flash frame: the client starts the swing on the click, the hurt arrives a tick later
+
+
+def _shove(C, z, frame, k):
+    """The knock-back of Steve's blow as the game plays it HERE: straight north along the wall (his blow comes
+    from the south; the wall stops any push into it), with a ceiling. undead.hurt's hop (0.96 up) would put the
+    zombie's head 0.9 block into the eaves above the step (their underside is 1.05 above its head), so this
+    replaces its travel keys with the same LivingEntity physics (knockback speed 0.4 x k, vertical min(0.4, ...),
+    then per tick: move, gravity 0.08, drag 0.98 / 0.91 in the air, 0.546 on the ground) with two collisions:
+    the eaves (the head stops under them) and the step (it drops to the grass once it is off it). The red flash
+    and the legs' flail stay undead.hurt's. Returns the frame it is at rest."""
+    from engine import characters as ch
+    p0 = z.pos_at(frame)
+    height = undead.ZOMBIE_SIZE[1]
+    vh = undead.KNOCKBACK * float(k)
+    vy = min(0.4, undead.REST_VY / 2.0 + vh)
+    d, h, ground = 0.0, p0.z, True
+    track = []
+    for _ in range(60):
+        d += vh
+        y = p0.y + d
+        floor = p0.z if y - 0.3 < STEP_EDGE else C.stand((p0.x, y))[2]
+        h_new = h + vy
+        if y - 0.3 < -4.0 and h_new + height > EAVES_Z:        # under the eaves: the head stops there
+            h_new, vy = EAVES_Z - height, 0.0
+        ground = h_new <= floor + 1e-6
+        if ground:
+            h_new, vy = floor, 0.0
+        h = h_new
+        track.append((y, h))
+        vy = (vy - undead.GRAVITY) * undead.AIR_DRAG_Y
+        vh *= undead.GROUND_DRAG if ground else undead.AIR_DRAG
+        if ground and vh < 0.003:
+            break
+    for i, values in ((1, [y for y, _h in track]), (2, [h for _y, h in track])):
+        keys = ([(frame, None, "LINEAR"), (frame + HOLD, (p0.y, p0.z)[i - 1], "LINEAR")]
+                + [(frame + HOLD + (n + 1) * undead.TICK, v, "LINEAR") for n, v in enumerate(values)])
+        ch._segment(z.root, "location", i, keys, "LINEAR")
+    return int(math.ceil(frame + HOLD + len(track) * undead.TICK))
+
+
+def _zombie_preroll(C, z, f0, lead):
+    """The zombie already on the step and in mid-swing on frame f0 (pre-roll: it must be in no shot before):
+    placed on bang_on_door's own stand point a little before f0, arms raised, one swing started `lead` frames
+    before f0; its blow lands just after f0 and shudders the door (breaking.shudder; the wood crumbs of this one
+    blow are not drawn). Only the zombie is keyed before f0 (hidden there by st.use); the door is keyed from f0
+    on. The knocking of the shot then goes on with first = KNOCK["every"] - lead. Returns the stand point."""
+    k = f0 - lead
+    stand, yaw = breaking.stand_point(C.door, along=KNOCK["along"], world=C.v, frame=k - 2)
+    z.place(k - 2, stand, yaw)
+    z.aggro(k - 2, True, ease=0)
+    z.attack(k)
+    breaking.shudder(C.door, int(round(k + breaking.HIT_DELAY)), KNOCK["shudder"])
+    return stand
 
 
 def dn02_fight(st, s, C, nar):
@@ -52,28 +138,65 @@ def dn02_fight(st, s, C, nar):
                       the knocking (bang_on_door's frame_end) on the blow.
       "knocked" 113 .. 144    Steve planted square in front of the door, sword in hand, the zombie gone; a small
                       head turn after it to the left keeps him alive to frame 144
-    SHARED: CAMS["door_front"] unchanged (beat 18 must match it frame for frame in framing); PLACES "step",
-      "fight_from", "fight_to". Cast: C.actor("zombie", "dn"), C.actor("steve_iron", "dn").
+    SHARED: CAMS["door_front"] unchanged (beat 18 must match it frame for frame in framing); PLACES "step".
+      Cast: C.actor("zombie", "dn"), C.actor("steve_iron", "dn").
     NEIGHBOURS: before, sq01_guard (golden square, Steve and the child at the bell); after, in03_bed (Steve asleep
       in the red bed). Hard cuts both sides; nothing of this shot continues.
     RISKS (story): with no kill shown the fight must read from ONE swing: the red flash, a hop that carries the
       zombie fully out of frame, and Steve ending square in front of the door. Watch the two wall torches at head
       height for tangents with the zombie's and Steve's heads. A zombie has 20 health: it must not die. The zombie
       leaving frame left rhymes with the watcher being found on the left in beat 19.
-    SCOUTED (out/test/hello_scout_night_dn02_fight_100.png): the door between its two torches, warm key, the zombie
-      knocking with arms out; the stub's Steve stands with his back to the lens in front of the zombie.
-    MEASURED (stub, tools.hello_geo, projection and ray casts): at 100 the zombie's eyes x 32 %, y 25 % (head y
-      17-31 %), Steve's x 61 %, y 45 % (from behind, 156 degrees: right for a fighter seen past).
-    STUB: the zombie knocks through the whole shot, Steve stands at "fight_to"; no fight is staged yet.
+
+    WHAT IT DOES NOW
+      66-72   pre-roll (_zombie_preroll, DN02_LEAD 4): the zombie on the step, arms raised, a swing started on 68;
+              its blow lands on 73 (the door jolts). bang_on_door from 72 to the blow: the next swing 84 (blow 89,
+              jolt + crumbs), cracks stage 3 on 72 climbing to 7; cleared on 94 when the zombie is knocked off.
+      68-91   Steve (pre-roll) sprints from STEVE_FROM (8.3, -11.7) to STEVE_TO (8.75, -8.4) and slides to a halt
+              (still from about 86); his body comes in at the right edge on 76 ("fought"), fully in by 82.
+      88-93   he turns his body to the zombie (north-east): his sword arm is then on the lens's side (from
+              "fight_to", facing north, the whole swing was hidden behind his back: rendered). His swing starts
+              on 92 (SWING_LEAD 2: the game starts the swing on the click, the hurt comes a tick later): on 94 the
+              arm is up (-90 deg) and the sword stands above his right shoulder; its tip shows there to 101.
+      94      "zombie": undead.hurt (red flash 94-105, legs flail). The travel is _shove: the zombie holds on the
+              step for one frame (HOLD: 94 is a sharp, red zombie with its arms up, on the word), then goes north
+              along the wall at a sprint hit's knock-back (KNOCKBACK 1.25), stopped under the eaves (undead's hop
+              would put its head 0.9 block into them), dropping off the step; a smear from 95, its head off the
+              left edge from 99, out of frame entirely from 101, at rest on the grass at (9.7, -4.43) on 111, never
+              seen again. No death.
+      102-112 his head follows it to the left; 113 ("knocked") .. 123 he turns to face out over the plaza (OUT,
+              29 deg off the lens): planted before the door, the iron sword in his right hand at the frame's left;
+              130 ("door" + 2) a small head turn to the left, after it; held to 144.
+      camera  door_front exactly, handheld 0.008; focus on the door, racked to Steve's head from "that" (108).
+    MEASURED (tools/hello_door_night_probe, render): zombie head x 19-44 %, y 17-31 % until the blow; Steve's
+      head x 42-77 %, y 35-51 % from 84 to the end (from behind 150 deg while he swings; 36-38 deg off the lens
+      when faced out, 72 deg after the head turn); palette_check dn02@90 passes (stone G/R 0.99, heroes 100 %).
+      The sword lies across the caption band (y 60-72 %, x 5-35 %) once he faces out: the caption sits on it.
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
     steve = C.actor("steve_iron", "dn")
-    breaking.bang_on_door(z, C.door, f0, f1 + 1, world=C.v, camera=s, glow=0.2, **KNOCK)
-    C.put(steve, f0, "fight_to", toward="step")
-    steve.idle(f0, f1 + 1)
+    blow = C.at(s, "zombie")                                   # 94: the sword lands on the word
+    stand = _zombie_preroll(C, z, f0, DN02_LEAD)               # (pre-roll: zombie_dn is in no shot before)
+    r = breaking.bang_on_door(z, C.door, f0, blow, place=False, first=KNOCK["every"] - DN02_LEAD, phase=DN02_PHASE,
+                              world=C.v, camera=s, glow=0.2, **KNOCK)
+    # Steve: pre-rolled (steve_iron_dn is in no shot before), sprinting in from beyond the right edge
+    start, end = C.stand(STEVE_FROM), C.stand(STEVE_TO)
+    steve.place(STEVE_GO - 2, start, HC.yaw_to(start, end))
+    e = steve.walk(STEVE_GO, [start, end], sprint=True, ramp=(False, True))
+    steve.face(blow - 6, z, ease=5)                            # squares up to it: his sword side to the lens
+    steve.attack(blow - SWING_LEAD)                            # arm up on the flash frame (94), not 2 frames later
+    undead.hurt(z, blow, attacker=(stand[0], stand[1] - 1.3, stand[2]), knockback=KNOCKBACK)
+    rest = _shove(C, z, blow, KNOCKBACK)
+    steve.track(blow + 8, blow + 18, z, step=3, ease=4)        # looks after it (once his swing is over: the
+    #                                                            swing keys his head too, fx.arm_swings)
+    out = steve.face(C.at(s, "knocked"), OUT, ease=10)        # planted before the door, facing out, sword in hand
+    steve.look_at(C.at(s, "door") + 2, LOOK_LEFT, ease=10)    # a small turn of the head after it, to the left
+    C.memo.setdefault("dn_log", []).append(           # (printed by tools/hello_door_night_probe)
+        "dn02 steve walk %d-%d, blow %d, zombie at rest %d, faced out %d; knocks %s hits %s stages %s" % (
+            STEVE_GO, e, blow, rest, out, r["knocks"], r["hits"], r["stages"]))
     st.use(s, z, steve)
     C.cam(s, "door_front", focus=C.P("door"))
+    s.focus(steve.head, at_s=(C.at(s, "that") - 1) / 24.0, rack_s=0.5)
     st.hero(s, "zombie", z)
     st.hero(s, "steve", steve)
     C.lights(s, "night_door", near="door", radius=24.0)
@@ -104,16 +227,29 @@ def dn18_knock(st, s, C, nar):
       Fallback: exaggerated arm swings (every=16), wood crumbs on each hit (crumbs=, glow=0.2), cracks that climb
       and visibly reset so it is clear this door holds. Keep the empty right side wide enough that Steve's absence
       is felt against beat 2. The watcher is NOT in this shot (not in st.use): dn19 reveals him.
-    SCOUTED (out/test/hello_scout_night_dn18_knock_1150.png): the cracks show on the door past the zombie, the
-      right of the frame empty.
-    MEASURED (stub, tools.hello_geo, projection and ray casts): the zombie's eyes x 32 %, y 25 % (as dn02), the
-      right third empty.
-    STUB: the knocking with the recommended staging for the whole shot.
+
+    WHAT IT DOES NOW
+      1098-1100  pre-roll (_zombie_preroll, DN18_LEAD 1; zombie_dn is not in in17): the zombie placed on the step,
+              arms raised, a swing started on 1100: it is under way on 1101 and lands on 1105 (the door jolts).
+      1101-1192  bang_on_door(place=False, first=15, phase DN18_PHASE 0.591): swings 1116, 1132, 1148, 1164, 1180;
+              blows (jolt 0.25 rad + 3 crumbs) 1121, 1137 ("knocked" 1138), 1153 ("door"), 1169 ("sunrise"
+              1170), 1185. Cracks: stage 5 on 1101, 9 on 1115, reset 1119-1120 (between blows), climbing again,
+              9 from 1161 ("until" 1162), reset 1165-1166, stage 0 from 1167: the blow on 1169 hits a clean door
+              (stage 5 at the cut). The rhythm and the cracks go on in dn19 (C.memo["dn_bang"]).
+      camera  door_front exactly as dn02 (handheld 0.008), focus on the door. Nobody else: the right third (the
+              cobblestone wall and the south torch, where Steve came in) stays empty.
+    MEASURED (tools/hello_door_night_probe, render): the zombie's head x 19-44 %, y 17-31 % the whole shot; the
+      door at x 33-60 %; nothing at x > 62 % but the wall and its torch. palette_check dn18@1150 passes (stone
+      G/R 0.99, hero 100 % inside).
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
-    r = breaking.bang_on_door(z, C.door, f0, f1 + 1, phase=0.35, world=C.v, camera=s, glow=0.2, **KNOCK)
+    _zombie_preroll(C, z, f0, DN18_LEAD)                       # (pre-roll: zombie_dn is not in in17_window)
+    r = breaking.bang_on_door(z, C.door, f0, f1 + 1, place=False, first=KNOCK["every"] - DN18_LEAD,
+                              phase=DN18_PHASE, world=C.v, camera=s, glow=0.2, **KNOCK)
     C.memo["dn_bang"] = r
+    C.memo.setdefault("dn_log", []).append("dn18 knocks %s hits %s stages %s resets %s phase out %.3f next %.1f" % (
+        r["knocks"], r["hits"], r["stages"], r["resets"], r["phase"], r["next_knock"]))
     st.use(s, z)
     C.cam(s, "door_front", focus=C.P("door"))
     st.hero(s, "zombie", z)
@@ -153,20 +289,40 @@ def dn19_beside(st, s, C, nar):
       door he would stand at the child's window).
     SCOUTED (out/test/hello_scout_night_dn19_beside_1196.png, _1250.png): the reveal works (his teal shoulder at the
       left edge on the first frame, their two backs by the end), but at the end he is too large and the zombie's
-      head sits right above his: a longer lens from further back, or a smaller drift.
-    MEASURED (stub, tools.hello_geo, projection and ray casts): at "watched" 1222 his eyes x 21 %, y 43 % (158
-      degrees off his nose: his back), the zombie's x 53 %, y 21 %; at 1250 him x 32 %, the zombie x 55 %: the
-      zombie's head sits above and right of his, both clear of each other in x by about 8 %.
-    STUB: he stands on "watch_door" facing the door, the zombie knocks on, CAMS "beside" with its drift.
+      head sits right above his: a longer lens from further back, or a smaller drift (CAMS "beside" is shared:
+      not changed here, reported).
+
+    WHAT IT DOES NOW
+      him     C.watcher(s, "dn"): on watch_door facing WATCH_YAW, placed once on 1193, nothing keyed: dead still.
+      zombie  not placed again (the same spot as dn18): bang_on_door(place=False, phase from dn18) carries the
+              rhythm over the cut: swings 1196, 1212, 1228, 1244, blows 1201, 1217, 1233, 1249; cracks stage 5
+              on 1193 (as on 1192), 9 on 1207, reset 1211-1212, climbing to 9 on 1253, clean again on 1257. It
+              never turns to him.
+      camera  CAMS "beside" unchanged, its drift with ease_out (at speed on 1193); focus on him (his back sharp,
+              the zombie soft) the whole shot. (A rack to the zombie on "watched" was dropped: from about 1215 the
+              shared camera puts the zombie's forearm on the crown of his head on every blow, 1216-1218,
+              1232-1234, 1248-1250; a sharp arm on his soft head read as a blow on him, a soft one behind his
+              sharp head reads a little more as behind him. The fix is the camera's: reported to the lead.)
+    MEASURED (tools.hello_geo, tools/hello_door_night_probe, render): his head x -30..10 % on 1193 (a sliver of
+      his hair and his teal shoulder are at the left edge on the first frame: the shared camera and place give
+      that), -23..16 % on "stood", -14..24 % on "beside", 2..39 % on "watched", 13..47 % (y 33-50 %) from 1240;
+      143-165 deg off his nose throughout: the back of his head, no eye. The zombie's head x 27-68 %, y 11-28 %
+      (99 % inside the safe area on 1245). The north torch flame stays 4 % or more clear of the zombie's head and
+      18 % above his. palette_check dn19@1245 passes (stone G/R 1.00, his shirt hue 183, heroes 99 / 100 %).
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
-    C.watcher(s, "dn")                         # on watch_door, facing HC.WATCH_YAW, dead still (st.use done)
+    him = C.watcher(s, "dn")                   # on watch_door, facing HC.WATCH_YAW, dead still (st.use done)
     r = C.memo.get("dn_bang", {})
-    breaking.bang_on_door(z, C.door, f0, f1 + 1, phase=r.get("phase", 0.0), place=False, world=C.v, camera=s,
-                          glow=0.2, **KNOCK)
+    r2 = breaking.bang_on_door(z, C.door, f0, f1 + 1, phase=r.get("phase", 0.0), place=False, world=C.v, camera=s,
+                               glow=0.2, **KNOCK)
+    C.memo.setdefault("dn_log", []).append("dn19 knocks %s hits %s stages %s" % (r2["knocks"], r2["hits"],
+                                                                              r2["stages"]))
     st.use(s, z)
     w = C.P("watch_door")
-    C.cam(s, "beside", focus=(w[0], w[1], 1.5))
+    C.cam(s, "beside", focus=(w[0], w[1], 1.5))     # on his back the whole shot (no rack to the zombie: with the
+    #   shared camera the zombie's forearm comes down onto the crown of his head on every blow; kept soft behind
+    #   his sharp head it reads a little more as "behind him" than as a blow on him; the real fix is the lead's)
     st.hero(s, "zombie", z)
+    st.hero(s, "watcher", him)
     C.lights(s, "night_door", near="door", radius=24.0)

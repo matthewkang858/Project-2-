@@ -5,37 +5,36 @@ films/hello_common.py (tags "in...", C.actor, C.cam, C.lights, C.fill, st.use / 
 
 THE ROOM (hello_common's docstring has it block by block): the bed wing x 15..20, y -14..-8; the beds along the
   east wall, pillows east: Steve's RED bed is the SOUTH one, HC.RED_BED = "house_a_bed_1" (anchor (19.0, -11.5,
-  1.56)), the child's white bed the NORTH one, HC.CHILD_BED = "house_a_bed_2" (19.0, -9.5, 1.56); the two-pane
-  window of the north wall (17..18, -8, 2) is right behind the child's bed; a wall torch between the pillows
-  (19, -11, 2); ONE night stand, at (19, -9) beside the child's bed (the film takes the other one out: it hid
-  Steve's head from every lens along the south wall). The west wing: the one pane facing the plaza at (10, -11, 2);
-  the film moves house_a's chair RIGHT UNDER it (oak stairs facing east at (11, -11): the seat is its west half, z
-  1.5; PLACES "window_chair") and the table beside it at (11, -10) (hello_common._edit).
-THE CAMERA of beats 3 and 16: CAMS["bed"] is the start, and both shots are yours: keep them IDENTICAL to each other
-  (if you change it, write one constant in this file and use it in both). Now: from outside the south wall of the
-  bed wing (st.see_through(s, "house_a_south"): invisible to the camera only, it still keeps the light out), 2.5
-  blocks south of it, 32 mm, across Steve's bed in front to the child's bed and the north window.
-  MEASURED (projection, out/test/hello_scout_night_in03_bed_160_zones.png): the child's head x 50-63 %, y 46-54 %;
-  Steve's head x 62-80 %, y 49-59 % (nothing between: ray cast); the north window x 12-31 %; the wall torch between
-  the pillows above them. palette_check in03@160 and in16@1020: heroes 100 % inside the safe area, stone, planks,
-  skin and Steve's trousers pass; ONE FAIL at night: Steve's shirt hue 213 (26, 35, 47; 170-196 wanted): the cool
-  night grade on a dark teal. A warm shadowless light over the beds (200 W) did not move it and made the night
-  brighter, so it was taken out: try lighting his torso from the torch's side, or accept and say so.
-  The window shows, at night, the dark village north of the house with the lit block of the lamp post at (16, -3)
-  (an orange square in the right pane); in gold, daylit houses. No sky with stars is reachable from a camera that
-  holds both heads (every line through the panes ends on a block: tools.hello_geo --through).
+  1.56)), the child's white bed the NORTH one, HC.CHILD_BED = "house_a_bed_2" (19.0, -9.5, 1.56); a wall torch
+  between the pillows (19, -11, 2); above it, in the east gable, ONE glass pane (20, -11, 4) (the bed wing has no
+  ceiling: the roof's ridge is at z 6, so the pane is seen from inside); the two-pane window of the north wall
+  (17..18, -8, 2) behind the child's bed. The west wing: the one pane facing the plaza at (10, -11, 2); the film
+  moves house_a's chair RIGHT UNDER it (oak stairs facing east at (11, -11): the seat is its west half, z 1.5, the
+  back its east half, z 2.0) and the table beside it at (11, -10) (hello_common._edit).
+THE BED CAMERA of beats 3 and 16 (BED_CAM, ONE constant used by both shots, with the same linear push speed, so
+  in16 is exactly the first 49 frames of in03's camera path): inside the room, high at the west end of the bed wing
+  and a little toward Steve's side, 21 mm, looking east down both beds to the pillows. The red bed with Steve in
+  iron is at the right and nearer, the child's white bed at the left, the wall torch between the pillows, and the
+  gable pane above it, through which the camera sees SKY: purple night with stars, then (from "ended") blue sky
+  with white clouds. (The plan's camera stood outside the south wall, 32 mm: both heads were 60-80 px blobs
+  touching each other in a small lit box in the middle of a dark frame, and its north window showed the lamp-post
+  block, never a sky: every line through those panes from a camera that holds both heads ends on a block.)
+  MEASURED (tools.hello_geo, 540x960): at 146 the child's head x 19-34 %, y 50-58 %, face 58 px (eyes y 53 %);
+  Steve's head x 62-75 %, y 52-61 %, face 64 px (eyes y 55 %); a quarter of the frame width between the heads; the
+  pane about x 42-64 %, y 10-25 % (sky through its middle and top: ray casts --through; its lowest row shows the
+  canopy of a tree east of the house). At 210 (end of the push): child 17-35 %, Steve 63-77 %, faces 61 / 67 px.
 THE SKIES: "night" (moon in the west, azimuth 176, elevation 21) and, from the word "ended" in beat 3, "gold"
   (sun azimuth 215, elevation 24). The film calls st.sky_change; the shot keys the light on both sides:
   C.lights(s, "night_room", **room) and, from the change, C.lights(s, "gold_room", at=change, **room) (the SAME
   near / radius: Stage.lights at= sets every light again) + C.morning(s, change) (hello_common.MORNING: a warm
   shadowless 1300 W light inside the north window, behind the child's bed).
-  MEASURED at the snap (mean luminance, the same camera, 160 night against 195 gold): window 79 -> 132 (x1.7),
-  walls 113 -> 186 (x1.65), floor 46 -> 96 (x2.1), beds 58 -> 77 (x1.33: their sides face the camera, away from the
-  window), whole frame 44 -> 112. The first plan (torches 1.3 -> 0.7, nothing else) made the room DARKER (x0.8).
-  palette_check in03@195: every check passes (stone G/R 0.94).
+  MEASURED at the snap with BED_CAM (mean luminance of 540x960 stills, 181 night against 195 gold,
+  out/test/hello_in_t5_in03_bed_181.png / _195.png): the pane 84 -> 156 (x1.85), walls 117 -> 183 (x1.56), floor
+  72 -> 140 (x1.93), the child's bed 127 -> 188 (x1.48), the red bed 92 -> 116 (x1.26), whole frame 80 -> 142
+  (x1.77). palette_check in03@160 (night), in03@195 (gold), in16@1020 pass every check they make.
 LIGHT: house_a's torches and its room fill are one group ("house_a"): raise them only together (LIGHTS
   "night_room"); lit cobblestone and villager skin are at the palette limit in there (CONTRACT.md). Film-local
-  lights: C.fill("in_<name>", ...) (the name must start with "in").
+  lights: C.fill("in_<name>", ...) (the name must start with "in"): only "in_pane" (beat 17).
 """
 import math
 
@@ -44,11 +43,11 @@ from mathutils import Vector
 from engine import characters
 from films import hello_common as HC
 
-PANE_FILL = dict(pos=(11.05, -10.85, 2.95), watts=120.0, color=(1.0, 0.88, 0.72))    # in17: on the child's face
+PANE_FILL = dict(pos=(11.05, -10.85, 2.95), watts=260.0, color=(1.0, 0.88, 0.72))    # in17: on the child's face
 # beat 17: the child stands on the HIGH back half of the chair under the pane (oak stairs facing east: x 11.5..12,
-# top z 2.0), toward the north side of the chair, so the camera from the south-west sees it centred in the pane. On the
-# seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16, 0.16 above the sill: only the eyes showed.
-KID_WINDOW = (11.75, -10.25, 2.0)
+# top z 2.0), at the north side of the chair, so the camera from the south-west sees it centred in the pane. On
+# the seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16, 0.16 above the sill: only the eyes showed.
+KID_WINDOW = (11.75, -10.15, 2.0)
 
 # THE BED CAMERA of beats 3 and 16 (one constant, both shots): inside the room, high at the west end of the bed
 # wing, a little toward Steve's side, looking east down the two beds to their pillows: the red bed and Steve at the
@@ -60,10 +59,10 @@ BED_PUSH = 0.0035
 BED_SEED = 31
 CHILD_TURN = math.radians(35.0)     # the child's head turned toward Steve's pillow (about the body's long axis)
 
-# beat 17 (the story's fallback, from outside): low behind his right shoulder, under the starry sky, a slow push
-# that rises toward the pane so the child's face comes up over the sill
-WINDOW_CAM = dict(pos=(5.0, -12.4, 1.75), target=(10.0, -10.6, 2.6), lens=28.0, fstop=2.0,
-                  pos1=(5.55, -12.2, 1.85), target1=(10.0, -10.55, 2.6))
+# beat 17 (the story's fallback, from outside): low behind his right shoulder, below his eyes, looking up: the
+# starry sky over the roof, his head beside the lit pane, a slow push in (ease_out: at speed on the first frame)
+WINDOW_CAM = dict(pos=(4.8, -12.6, 1.1), target=(10.0, -10.6, 2.7), lens=30.0, fstop=2.0,
+                  pos1=(5.3, -12.42, 1.2), target1=(10.0, -10.6, 2.7))
 
 
 def _beds(C):
@@ -100,38 +99,36 @@ def in03_bed(st, s, C, nar):
     and the child in the lying pose, one camera rendered under the night sky and the golden sky, hard cut between
     them on a word boundary, wall torch scaled down so the window carries the change.
 
-    MUST BE SEEN, ON WHICH WORD
-      145 .. 181      night: the window dark blue with stars, the room lit by its torches; both asleep, locked off
-                      (only the handheld lives, tiny)
-      "ended" 182     the SAME frame in gold: the window bright, morning light in the room; nobody moves. The
-                      change is the film's (st.sky_change); the torches step with it (C.lights(..., at=change)) and
-                      C.morning(s, change) switches the morning light on: the room must get BRIGHTER (measured x1.65
-                      on the walls, x2.1 on the floor: the module docstring)
-    SHARED: the bed camera identical to in16_empty's (CAMS["bed"] or your own constant used in both); the light of
-      the night part identical to in16_empty's. HC.RED_BED / HC.CHILD_BED. Cast: Steve asleep =
-      C.actor("steve_bed", "in") (plain Steve, no armor, empty hands: see SCOUTED), C.actor("child", "in").
-      Player.sleep = Character.lie_down(frame, bed anchor, yaw): see _beds().
+    WHAT IT NOW DOES (BED_CAM, module docstring): from the west end of the bed wing, high, looking east down both
+    beds: Steve in iron (chestplate, leggings, boots, no helmet, empty hands) asleep on the red bed at the right,
+    nearer; the child in its white bed at the left; the wall torch between the pillows; above it the gable pane,
+    the room's window to the sky. A slow linear dolly in (0.0035 block a frame, 0.23 block over the shot) and a
+    tiny handheld: moving on frame 145.
+      145 .. 149      both lie still, the child's face up (only its brow and eyes reach the lens)
+      "slept" 152     the child turns its head 35 degrees toward him (150 .. 162, about the body's long axis): its
+                      face comes round to him and to the lens and stays there to the end of the shot
+      145 .. 181      night: purple sky with stars in the pane, the torch-lit cobblestone wall, warm floor
+      "ended" 182     the SAME frame in gold (the film's st.sky_change): blue sky and white clouds in the pane, the
+                      torches down to 0.35 (C.lights "gold_room", at=182, same near / radius) and C.morning on: the
+                      whole room brighter (whole frame x1.77, pane x1.85, floor x1.93, walls x1.56, the child's bed
+                      x1.48, the red bed x1.26). Nobody moves: the push and the handheld go on through the change.
+    WHY IRON: the brief has him in iron in beats 1 to 5 and a player sleeps in his armor; with this camera his face
+      reads on the pillow (64 px, eyes y 55 %), and the plain teal shirt stays the watcher's sign (beats 7 onward).
+      The sword is taken out of his hand for the night (Player.hold(None)).
+    SHARED: BED_CAM is the bed camera of in16_empty too (same constant, same push speed, same handheld seed); the
+      night light ("night_room", near house_a_center, radius 14) is in16's. HC.RED_BED / HC.CHILD_BED.
+      Cast: C.actor("steve_iron", "in"), C.actor("child", "in"). Player.sleep = Character.lie_down.
     NEIGHBOURS: before, dn02_fight (the door at night); after, dg04_hello (the doorstep in golden morning: he is up
       and crouches at the child). Hard cuts.
-    RISKS (story): a hard cut from night to gold inside one frame can read as a glitch, and the join sits inside a
-      sentence: keep the beds and the window large and locked so only the light changes; the join is exactly on the
-      first frame of "ended" (done). The "four-frame dissolve with the window going first" is NOT available (the
-      sky is per frame; a dissolve would need both skies in one frame). If the side window is too small from this
-      camera, the story's fallback is the bed camera between the pillows looking down the room to the west window.
-      The room's change is now carried by the light (C.morning + the torches at 0.35), not only by the window; the
-      beds themselves gain least (x1.33): a second warm light from the south (the side the camera is on) would
-      lift their faces, if you want more. The child's head turned toward Steve while lying: Character.look_at on a
-      lying figure turns the head about the body's long axis (check the sign on a still).
-    SCOUTED (out/test/hello_scout_night_in03_bed_160_zones.png, hello_scout_gold_in03_bed_195_zones.png): the
-      story's composition (the red bed and Steve in front, the child's head on the far pillow, the window behind,
-      the torch between the pillows); at "ended" the window, the walls and the floor brighten (numbers in the module
-      docstring). Steve's head and the child's head touch in the picture (Steve's x 62-80 %, the child's x 50-63 %,
-      both y 46-59 %): turn the child's head toward him and the lens and check that its face stays clear.
-      Plain Steve skin (no armor) on purpose: the brief asks for iron in beats 1 to 5 and a player sleeps in his
-      armor, but in iron he lay on the bed as one grey block (out/test/hello_scout_bedlow_in03_bed_160_v0.png). The
-      cost: in this shot he wears the look the watcher wears later. If you put the iron back (C.actor("steve_iron",
-      "in") with lie_down), his face must read on the pillow toward the lens; then say so in your result.
-    STUB: both asleep, CAMS "bed", the night torches; from the change the gold levels and C.morning.
+    RISK (story): the hard change from night to gold inside one frame can read as a glitch: the camera keeps moving
+      through it and nobody moves, so only the light changes; the "four-frame dissolve" is not available (one sky
+      per frame).
+    MEASURED: hello_geo at 146: child's head x 19-34 %, y 50-58 %, face 58 px; Steve's head x 62-75 %, y 52-61 %,
+      face 64 px; at 210: 17-35 % / 63-77 %, 61 / 67 px. palette_check in03@160 (night): stone G/R 0.98, planks
+      s 0.48, heroes steve and child 100 % inside the safe area; in03@195 (gold): stone G/R 0.94, planks s 0.54, robe
+      hue 18, heroes 100 % inside. (The shirt check of the plan's night still is not made any more: the chestplate
+      covers the shirt.) Stills: out/test/hello_in_final_in03_bed_175_zones.png (night, after the head turn),
+      hello_in_final_in03_bed_195_zones.png (gold), hello_in_t5_in03_bed_181.png (the last night frame).
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve_iron", "in")
@@ -163,18 +160,18 @@ def in16_empty(st, s, C, nar):
     Cast: baby villager (narrator). Effects: red hero bed, empty; same camera as beat 3, night only; moonlit window
     that does not change.
 
-    MUST BE SEEN, ON WHICH WORD
-      the whole shot  the frame of in03's night part, the red bed EMPTY in front, the child awake in its bed, head
-                      turned toward the empty bed (and so toward the lens); locked off, only a tiny handheld
-    SHARED: CAMS["bed"] and the same light as in03's night part (C.lights "night_room", same near / radius), so the
-      two frames match but for Steve. Cast: C.actor("child", "in").
-    MEASURED (stub): the child's head x 50-63 %, y 46-54 %; palette_check in16@1020 passes every check
-      (out/test/hello_scout_night_in16_empty_1020_zones.png: the empty red bed in front reads at once).
+    WHAT IT NOW DOES: BED_CAM exactly as in03 (the same start, the same linear push speed and handheld seed: these
+    49 frames are in03's first 49), the same night light. The red bed at the right is EMPTY and made; the child
+    lies in its bed at the left with its head already turned 35 degrees to the empty pillow (and so to the lens) from
+    the first frame, held to the last: in03's pose after "slept", without him. The pane above the torch shows the
+    purple night sky with stars for the whole shot. Moving on frame 998: the push and the handheld.
+    SHARED: BED_CAM, the night light of in03 ("night_room", near house_a_center, radius 14), CHILD_TURN.
+      Cast: C.actor("child", "in") (placed again on 998: lie_down is a cut).
+    MEASURED: hello_geo at 998: the child's head x 18-36 %, y 49-59 %, face 58 px; at 1046: 17-36 %, 61 px.
+      palette_check in16@1020: stone G/R 0.97, planks s 0.49, hero child 100 % inside the safe area.
+      Still: out/test/hello_in_final_in16_empty_1020_zones.png.
     NEIGHBOURS: before, dg15_c (late gold at the door: he is at the corner of the house); after, in17_window (the same
       night, the child at the window). Hard cuts.
-    CUT PRIORITY (story): the second cut would drop this line and play "The nights last all night" over beat 3's
-      camera; not needed (the film is 64.3 s).
-    STUB: the child in its bed, CAMS "bed", the night torches.
     """
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "in")
@@ -204,21 +201,36 @@ def in17_window(st, s, C, nar):
     the wall or the table: out/test/hello_scout_night_in17_window_1075.png showed no figure). From outside the
     picture also keeps his progression: the corner (15c), under the window (17), beside the door (19).
 
-    MUST BE SEEN, ON WHICH WORD
-      frame 1047      the push already moving (C.cam's ease_out: at speed on the first frame)
-      "nights" 1051 .. "night" 1073   the child's face in the pane, looking out at him; his dark head and shoulder
-                      in the left foreground, from behind (never his face), soft
-    SHARED: PLACES "window_chair" (the child on the seat right under the pane, eyes z 2.3), "window", "watch_window"
-      (7.3, -10.95): him 2.7 blocks out, facing the pane. CAMS "window_out" (a start: 58 mm from (3.4, -12.5, 2.5)
-      over his right shoulder, a slow push). Cast: C.actor("child", "in") (in in16 before: place it on f0),
-      C.actor("watcher", "in").
-    MEASURED (stub, out/test/hello_scout_night_in17_window_1060_zones.png): the child's eyes x 52 %, y 51 % in the
-      pane (it looks out at him, 8 degrees off the lens; its nose meets the sill: a camera a little higher shows
-      it); his head x -5..34 %, y 67-90 % (the caption sits on it: a big soft foreground shape, allowed). The
-      child's face is lit by PANE_FILL ("in_pane", 120 W, torch colour, inside the room above-left of it): without
-      it the face was a dark brown shape. palette_check in17@1060 passes (hero child 100 % inside the safe area).
+    WHAT IT NOW DOES (WINDOW_CAM): low on the plaza behind his right shoulder, below his eyes (z 1.1), 30 mm f/2.0,
+    looking up at the house front: the starry night sky and the moon's glow over the roof fill the top third; the
+    lit pane below the eaves with the CHILD'S WHOLE FACE in it (brow, eyes, nose, crossed arms below), looking out
+    and down at him; his head (from behind, tipped up at the pane: Player.watch from the first frame) beside the
+    pane at the same height, his teal shoulder and arm big and soft in the lower left; his body dead still. A slow
+    push in (ease_out: at speed on frame 1047, 0.54 block over the shot) with the handheld on top. Nothing else
+    moves: the two of them look at each other through "nights" 1051 .. "night" 1073 and the 0.9 s after it.
+    THE CHILD STANDS ON THE CHAIR'S BACK (KID_WINDOW (11.75, -10.15, 2.0), the high east half of the oak stairs,
+      top z 2.0), not on its seat: on the seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16 (the PLACES
+      comment says 2.3), 0.16 above the sill, and from any camera outside only the eyes and the top of the nose
+      showed (the plan's still). On the back its eyes are at z 2.66, in the middle of the pane. It stands at the
+      north side of the chair so that the camera, south-west of the pane, sees it centred in the opening.
+    WHY LOW: the night reads at once (stars: the house front itself is moonlit and warm like dusk), he stands under
+      the window as a figure (head, shoulder, arm), and the lens sees his head from behind and below: his face is
+      never seen (153-157 degrees off the lens).
+    SHARED: PLACES "watch_window" (7.3, -10.95), unchanged, facing the pane; the night light of the room
+      ("night_room": the torch-lit room seen through the pane). CAMS "window_out" is replaced by WINDOW_CAM (it is
+      this shot's only). Cast: C.actor("child", "in") (in in16 before: placed again on 1047: lie_down / place are
+      cuts), C.actor("watcher", "in") via C.watcher. Film-local light PANE_FILL ("in_pane", 260 W, torch colour) in
+      the room between the glass and the child's face: without it the face is a dark brown shape; at 120 W it was a
+      muddy mauve no brighter than the logs around the pane (face rgb 75,59,65 against 66,55,57); at 260 W it is
+      about 1.3x the logs (face rgb 99,76,75 against 74,61,59 and 78,65,60 at 1065) and the green eyes read.
+    MEASURED (hello_geo): at 1047 the child's eyes x 54 %, y 56 %, head x 48-60 %, y 52-58 %, face 53 px, 9 degrees
+      off the lens; his head x -1..32 %, y 51-66 %, 157 degrees off; at 1100: child head x 48-60 %, y 52-59 %, face
+      57 px; his head x -14..28 %, y 50-69 % (the caption band crosses his head and the wall: a big soft foreground
+      shape). palette_check in17@1065 (PANE_FILL 260 W): stone G/R 1.01, planks s 0.32, the child's skin s 0.32,
+      Steve shirt hue 189, his trousers min channel 37, hero child x 49-59 %, y 53-58 %, 100 % inside the safe area;
+      in17@1100: G/R 1.02, planks s 0.33, skin s 0.33, shirt hue 189, trousers 36, hero child 100 % inside.
+      Still: out/test/hello_in_final_in17_window_1065_zones.png.
     NEIGHBOURS: before, in16_empty; after, dn18_knock (outside: the zombie at the door, the same night). Hard cuts.
-    STUB: the child on the chair looking out at him, him on watch_window facing the pane, CAMS "window_out".
     """
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "in")

@@ -85,9 +85,13 @@ def cmd_keys(args):
             hy = c.head.matrix_world.to_euler()
             e = c.head.matrix_world.translation
             co = world_to_camera_view(scene, cam, Vector(c.eye_point(f)))
-            line.append("%s (%.2f %.2f %.2f) yaw %4.0f head %4.0f/%3.0f eye %4.1f%%,%4.1f%%" % (
+            fwd = (c.head.matrix_world.to_3x3() @ Vector((0, -1, 0))).normalized()
+            to_cam = (cp - Vector(c.eye_point(f))).normalized()
+            off = math.degrees(fwd.angle(to_cam))
+            rel = math.degrees(c.head.rotation_euler.z)
+            line.append("%s (%.2f %.2f %.2f) yaw %4.0f head %4.0f/%3.0f rel %4.0f off %4.0f eye %4.1f%%,%4.1f%%" % (
                 n, p.x, p.y, p.z, math.degrees(c.root.matrix_world.to_euler().z), math.degrees(hy.z),
-                math.degrees(hy.x), co.x * 100, (1 - co.y) * 100))
+                math.degrees(hy.x), rel, off, co.x * 100, (1 - co.y) * 100))
         print("  ".join(line))
     return 0
 
