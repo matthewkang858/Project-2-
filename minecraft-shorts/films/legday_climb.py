@@ -61,10 +61,28 @@ from films import legday_set as LS
 # THE TWO CAMERAS OF THE REPEATS: ONE constant each, used by the gold shot AND its dusk repeat. They start as the
 # lead's CAMS "climb" / "legs" (legday_common); they are THIS sequence's to change (both shots change together:
 # tools.legday_state checks that cl22 = cl11 and cl23 = cl12, cameras included, frame for frame).
-CLIMB_CAM = dict(LC.CAMS["climb"], pos1=(5.6, 25.6, 0.85), target1=(-0.94, 42.4, 8.5))   # + a slow creep in,
-#                                                       planned over CLIMB_FRAMES (_repeat_cam: the same rate in both)
-LEGS_CAM = dict(LC.CAMS["legs"])                       # its track planned over LEGS_CAM_FRAMES
+# CLIMB_CAM (cl11 = cl22): a CRANE that rides up with the four from the road, south-east of them, low at first (3
+#   blocks up, the stair's foot and the road edge in the frame's bottom corner), rising to 10 and backing off east
+#   to 11 as it pans from the climbers to the shelf (planned over CLIMB_FRAMES: by "wall" the shelf with its planks
+#   and anvils has come in at the right, against the sky). 24 mm. Looking north-west (the sun 135 degrees off the
+#   axis: the face lit, the climbers' shadows to their left on it, the risers in shade). The four keep their
+#   stagger across the frame (a diagonal from lower left to upper right) the whole shot: the lead's b11 looked
+#   along the stair and stacked them (1.3 steps apart, 23-29 % high).
+CLIMB_CAM = dict(pos=(6.5, 26.5, 3.0), target=(-0.5, 32.5, 6.5), pos1=(11.0, 33.0, 10.0), target1=(0.0, 45.0, 14.5),
+                 lens=24.0, fstop=4.0)
+CLIMB_FOCUS = "kai"           # the focus rides on this climber's head (the second of the four: the group's middle)
+# LEGS_CAM (cl12 = cl23): low on their right side, 28 degrees behind square (looking west-north-west, 5 degrees
+#   down), 4.6 blocks off, 25 mm f/2.4, TRACKING up the stair at 92 % of their pace (they gain half a block on it):
+#   Kai's legs big in their stride at the left, Steve's legs a step above and ahead, the anvils in their right hands
+#   on the camera side, the lit treads and shaded tread fronts sliding down past them. From the front-above the
+#   stair's own steps hid their feet (out/test/legday_climbD_cl12_legday_761_v*); 45 degrees behind (az 135) hid the
+#   anvils behind their arms (legday_climbG_cl12_legday_758_v0); beside the lens (the lead's b12) Kai filled the
+#   lower frame (legs hero 23 % inside).
+LEGS_CAM = dict(pos=(3.55, 30.10, 5.75), target=(-0.5, 32.25, 5.35), pos1=(3.55, 35.27, 10.93),
+                target1=(-0.5, 37.42, 10.52), lens=25.0, fstop=2.4)
 LEGS_CAM_FRAMES = 45
+LOOK_AHEAD = (6.0, 2.5)       # every climber looks up the stair: at a point 6 blocks ahead, 2.5 above his eyes
+#                               (about 23 degrees up), keyed once on the shot's first frame (no ease)
 # NO HANDHELD IN THE REPEATS: engine.shots draws the handheld drift from FILM time (frame / fps), so the same seed
 # gives another drift 700 frames later (measured: 5.6 mm and 8.7 mm apart). The moves carry the life (linear: at
 # speed on frame 1), planned per frame so a 70- and a 73-frame shot share their first 70 frames.
@@ -72,9 +90,10 @@ CLIMB_SEED = 31               # (kept for a director who adds a drift of his own
 LEGS_SEED = 47
 CLIMB_PACE = 3.0              # blocks / s HORIZONTAL up the stair: one step every 8 frames (the story: never under
 #                               7); walked along the slope-1 ramp at CLIMB_PACE * sqrt(2) (legs about +-68 degrees)
-CLIMBERS = (("steve", 4.0), ("kai", 5.3), ("zuri", 6.6), ("ari", 7.9))   # (role, step: y = 27 + step) on the
-#                                                       shot's first frame, 1.3 apart: Ari reaches step 17.4 (of 17.7)
-#                                                       on CLIMB_FRAMES, nobody tops out inside cl22's 73 frames
+CLIMBERS = (("steve", 3.0), ("kai", 4.6), ("zuri", 6.2), ("ari", 7.8))   # (role, step: y = 27 + step) on the
+#                                                       shot's first frame, 1.6 apart (2.3 blocks along the stair: four
+#                                                       figures, never a clump): Ari reaches step 17.3 (of 17.7) on
+#                                                       CLIMB_FRAMES, nobody tops out inside cl22's 73 frames
 CLIMB_FRAMES = 76             # the length every climb walk is planned for (>= cl22's 73): cl11 = cl22's first 70
 LEGGERS = (("steve", 5.6), ("kai", 4.4))       # cl12 / cl23: the camera tracks up the stair beside them (LEGS_CAM,
 #                                                0.4 block/s slower): Steve 2.0 steps ahead of the lens, his legs in
@@ -123,6 +142,8 @@ def _climbers(C, s, tag, cast, frames, dusk):
         a, b = (-0.5, y0, _ramp_z(y0)), (-0.5, y1, _ramp_z(y1))
         p.place(f0, a, LC.yaw_to(a, b))
         C.carry_anvil(p, dusk=dusk)
+        eye = LS.stair_z(y0) + p.eye_height
+        p.look_at(f0, (-0.5, y0 + LOOK_AHEAD[0], eye + LOOK_AHEAD[1]), ease=0)    # up the stair, held
         p.walk(f0, [a, b], speed=CLIMB_PACE * 2 ** 0.5, ramp=(False, False))
         _on_treads(p, f0, f1)
         out.append(p)
@@ -145,7 +166,8 @@ def _climb(st, s, C, tag, sky):
     """cl11 and cl22: CLIMB_CAM, the four climbers, the lights of the sky."""
     cl = _climbers(C, s, tag, CLIMBERS, CLIMB_FRAMES, dusk=(sky == "dusk"))
     st.use(s, *cl)
-    _repeat_cam(C, s, CLIMB_CAM, CLIMB_FRAMES)
+    focus = [p for p, (role, _step) in zip(cl, CLIMBERS) if role == CLIMB_FOCUS][0]
+    _repeat_cam(C, s, CLIMB_CAM, CLIMB_FRAMES, focus=focus.head)
     st.hero(s, "climbers", *cl)
     C.lights(s, sky, near=(-1.0, 40.0, 8.0), radius=26.0)
     return cl

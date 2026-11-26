@@ -160,11 +160,21 @@ def main(argv):
                         p.name, _fmt(hb), face, off, first_hit(scene, dg, cp, eye, own=_own(p)) or "clear"))
                     continue
                 lb = _box(scene, cam, [p.leg_r, p.leg_l], proj)
+                legs_seen = []
+                for leg in (p.leg_r, p.leg_l):
+                    obs_ = [o for o in [leg] + list(leg.children_recursive) if o.type == "MESH"]
+                    for o in obs_[:1]:
+                        cen = sum((o.matrix_world @ Vector(c) for c in o.bound_box), Vector()) / 8.0
+                        foot = o.matrix_world @ Vector(min(o.bound_box, key=lambda c: (o.matrix_world @ Vector(c)).z))
+                        legs_seen.append("%s%s" % ("K" if first_hit(scene, dg, cp, cen, own=_own(p)) is None else
+                                                   "k", "F" if first_hit(scene, dg, cp, foot, own=_own(p)) is None
+                                                   else "f"))
                 it = p.item("right", f)
                 ab = _box(scene, cam, [it], proj) if it is not None else None
                 ap_ = it.matrix_world.translation.copy() if it is not None else None
-                print("   %-10s head %s face %3.0f px off %3.0f %-14s | legs %s | anvil %s %s" % (
+                print("   %-10s head %s face %3.0f px off %3.0f %-14s | legs %s seen %s | anvil %s %s" % (
                     p.name, _fmt(hb), face, off, first_hit(scene, dg, cp, eye, own=_own(p)) or "clear", _fmt(lb),
+                    "/".join(legs_seen),
                     _fmt(ab), (first_hit(scene, dg, cp, ap_, own=_own(p) | {it.name}) or "clear") if ap_ else ""))
             for label, obs in heroes:
                 u = _box(scene, cam, obs, proj)

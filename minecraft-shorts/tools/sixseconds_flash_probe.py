@@ -170,7 +170,8 @@ def cmd_check(argv):
     scene.camera = bpy.data.objects.new("probe_cam", cd)
     scene.collection.objects.link(scene.camera)
     worst = 0.0
-    for seed, frame, spot in ((17, 991, (401.45, 16.8, 0.0)), (3, 1009, (-395.05, 1.1, 0.0)), (40, 1028, (5.45, 14.8, 0.0))):
+    cases = ((17, 991, (401.45, 16.8, 0.0)), (3, 1009, (-395.05, 1.1, 0.0)), (40, 1028, (5.45, 14.8, 0.0)))
+    for seed, frame, spot in cases:
         real = piglins.poof(Vector(spot), frame, camera=scene.camera, size=(0.6, 1.8), seed=seed)
         mine = particles(spot, frame, seed)
         assert len(real.particles) == sum(len(p["spans"]) for p in mine), "particle count"
@@ -182,7 +183,7 @@ def cmd_check(argv):
     print("mirror matches poof(): stages, frames, sizes equal; worst position difference %.2e" % worst)
 
 
-def score(world, frames):
+def score(world, frames, gold_weight=1.5):
     tot = dict(vis=0.0, spill=0.0, hidden=0.0, brute=0.0, drops=0.0, gold=0.0, n=0)
     for f, quads in frames:
         for u0, u1, v0, v1, z, fill in quads:
@@ -192,7 +193,8 @@ def score(world, frames):
             behind = z > BRUTE_DEPTH - 0.1
             on_brute = sum(_overlap(box, r) for r in REGIONS["brute"]) / full * area
             tot["spill"] += _overlap(box, ((82, 140), (-20, 120))) / full * area
-            tot["hidden"] += (_overlap(box, ((95, 140), (-20, 120))) + _overlap(box, ((84, 95), (45, 120)))) / full * area
+            cut = _overlap(box, ((95, 140), (-20, 120))) + _overlap(box, ((84, 95), (45, 120)))
+            tot["hidden"] += cut / full * area
             seen = _overlap(box, ((8, 82), (14, 60))) / full * area
             tot["vis"] += max(0.0, seen - (on_brute if behind else 0.0))
             if not behind:
@@ -204,7 +206,7 @@ def score(world, frames):
     n = max(1, tot["n"])
     for k in ("vis", "spill", "hidden", "brute", "drops", "gold"):
         tot[k] /= n                                         # per picture frame
-    tot["score"] = tot["vis"] - tot["hidden"] - 3.0 * tot["brute"] - 3.0 * tot["drops"] - 1.5 * tot["gold"]
+    tot["score"] = tot["vis"] - tot["hidden"] - 3.0 * tot["brute"] - 3.0 * tot["drops"] - gold_weight * tot["gold"]
     return tot
 
 
@@ -220,6 +222,7 @@ def cmd_puffs(argv):
     ap.add_argument("--offsets", default="6,8,10,12")
     ap.add_argument("--top", type=int, default=6)
     ap.add_argument("--worlds", default="bridge,treasure,home")
+    ap.add_argument("--gold", type=float, default=1.5, help="weight of the gold-pile cover in the score")
     ap.add_argument("--budget", type=float, default=240.0, help="seconds: stop the search and print what is done")
     a = ap.parse_args(argv)
     import time
@@ -234,7 +237,7 @@ def cmd_puffs(argv):
                 print("(budget spent: seeds %d-%d only)" % (lo, seed - 1))
                 break
             for off in offsets:
-                res.append((score(world, simulate(world, seed, off, rows, sprites)), seed, off))
+                res.append((score(world, simulate(world, seed, off, rows, sprites), a.gold), seed, off))
         res.sort(key=lambda r: -r[0]["score"])
         print("== %s (%d candidates)" % (world, len(res)))
         stub = [r for r in res if r[1] == {"bridge": 17, "treasure": 18, "home": 19}[world] and r[2] == 8]

@@ -234,7 +234,7 @@ def sq01_squats(st, s, C, nar):
       Steve's eyes x 49 %, y 30 %, face 109 px; Zuri x 25 %, Ari x 76 %, y 35 %, faces 64 px; crouched (62) Steve's
       eyes y 37 %; his anvil y 42-51 % standing, 50-62 % crouched (Zuri's and Ari's 45-56 %): above the caption band;
       the feet in the band, the bottom 30 % grass. Kai x 91 % on frame 1, behind Steve at 32, out at the left from about 62. The narrator x 88 %,
-      y 43 %, face 22 px, clear all shot (legday_geo spots). palette_check sq01@32: all ok, hero x 20-81 %, y 26-40 %,
+      y 43 %, face 22 px, clear all shot (legday_geo spots). palette_check sq01@32: all ok, hero x 20-81 %, y 23-37 %,
       100 % inside. legday_state: nobody inside a block (Kai's first lap clipped the well's corner: rerouted).
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -307,9 +307,8 @@ def sq02_reps(st, s, C, nar):
       separate blocks").
     NOW: SQ02_CAM 22 mm f/2.8, timed by SQ02_KEYS (_ease): close from the south-east (6.45, -19.0, 1.25), drifting
       slowly to "drops" (8 % of the move by 128), 20 % by 145, the pull-back 145-188 (to 92 %, about 1.3 blocks a
-      second) and
-      settling at (3.45, -20.5, 1.8) looking north: Steve in profile beside stone 2, the row receding north, the
-      pickaxe on the path at the left. steve_sq2 mines stone 1 from frame -50 (the game's 180 frames: stage 6 on 73,
+      second; 152-184 at first: 1.7, a pull more than a drift) and settling at (3.45, -20.5, 1.8) looking north:
+      Steve in profile beside stone 2, the row receding north, the pickaxe on the path at the left. steve_sq2 mines stone 1 from frame -50 (the game's 180 frames: stage 6 on 73,
       the burst on "drops" 130, no drop), looks down at the spot (136-142), walks one block north at 2.6 blocks/s
       from 153 (14 frames), turns square to stone 2 (5 frames) with his head, and begins it 6 frames later (the
       fx swing run writes the head ABSOLUTE from the pose at its first request: the look must be finished before)
