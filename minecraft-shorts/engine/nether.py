@@ -6,6 +6,15 @@ the game's models and textures through engine.blocks; the bridge's legs and the 
 bastion structure templates with the game's processor rules. Blender axes as everywhere: +X east, +Y north, +Z up,
 1 block = 1 unit, characters face -Y at yaw 0, 24 fps.
 
+FIRST GOTCHA: THE GAME'S BASTION PIECES ARE READ FROM THE CLIENT JAR. assets/mc holds only the village structures
+(tools/fetch_assets.py KEEP has no 'data/minecraft/structure/bastion/'). build_bastion prints where it reads them
+from on every build ("[nether] bastion templates from ..."): assets/mc/data/minecraft/structure/bastion/ if a later
+fetch extracts them, else the jar at $MC_CLIENT_JAR, ~/.cache/minecraft-shorts/client-26.3.jar (JAR_CACHE), or the
+scratchpad copy this module was written with (gone in any later session). With none of them build_bastion raises
+FileNotFoundError naming the fix: `$BPY -m tools.nether_fetch_jar` downloads the official 26.3 jar from Mojang to
+JAR_CACHE (checked against Mojang's SHA-1; proved: 41,483,720 bytes, e877b6a0...), `--check` only verifies the one in
+use. The durable fix is one line in tools/fetch_assets.py KEEP (its owner's file).
+
 HOW A NETHER FILM DECLARES ITS LOOK (render.py and films.lookdev.Stage accept both)
     ONE NETHER SKY (film six as written: every location is the Nether):
         bas = nether.build_bastion(scene)                        # all three sets, one World
@@ -22,7 +31,8 @@ HOW A NETHER FILM DECLARES ITS LOOK (render.py and films.lookdev.Stage accept bo
       nether.Stage is films.lookdev.Stage whose build_sky also knows preset "nether" (any other preset goes to
       look.set_time as before); everything else (sky_segments, sky_change, dip, lights) is the Stage's own. Proved
       in-process with render.Session(film, sky=...) for three skies (`$BPY -m engine.nether skies`); render.py's
-      one-process-per-sky command line was NOT run on it (it needs a films/<name>.py on disk).
+      one-process-per-sky command line on a two-biome Nether SKIES film was run by the review (--still 0.5,1.5,
+      exit 0).
     Never call look.set_time after set_nether (it would replace the Nether's world and lamps).
 
 PUBLIC API
@@ -47,27 +57,36 @@ PUBLIC API
         The three sets in one World, 400 blocks apart (ORIGINS; the game's fog is total at 96, so no set sees
         another). layout = {"home" | "bridge" | "treasure": (x, y, z) set origin, "pit": (x, y) the pit's SW cell
         in home coordinates}; an unknown key raises KeyError. lantern_watts: each lantern's point light (default
-        LANTERN_WATTS 200 W; Stage.lights scales it per shot). Build: 0.5-0.9 s, about 10,500 faces.
+        LANTERN_WATTS 200 W; Stage.lights scales it per shot). Build: 0.6 s, about 10,500 faces, 13 lanterns.
     Bastion (the Village-shaped handle films.lookdev.Stage and the engine modules expect)
         world, collection, anchors, yaws, paths, doors {} , lantern_lights, lights {group: [lights]}, cutaways,
         sets {set: dict(origin, bounds, lights=dict(near, radius), anchors, cameras)}, cameras {name: dict(pos,
-        target, lens, fstop, beats, note, set)}, lava {name: fixtures Fluid | Light}, chests, pit_blocks, pit_last,
-        pit_cells, pillar, whole, face_count, edit_problems
-        ground(x, y) / set_lantern_energy(scale, groups) / only_lights_near(point, radius) / cutaway(name, hide,
-        frame) / validate()                    as the Village's
+        target, lens, fstop, beats, note, set, cast, sees, pit, pillar, focus, lights)}, lava {name: fixtures Fluid
+        | Light}, chests, pit_blocks, pit_last, pit_cells, pit_fill, pillar, whole, face_count, edit_problems
+        ground(x, y, z_from=GROUND_FROM) / set_lantern_energy(scale, groups) / only_lights_near(point, radius) /
+        cutaway(name, hide, frame) / validate()   as the Village's (validate also runs check_cameras); ground
+                                                  ignores what hangs over a column (roof, beam, lantern bracket)
         lights_for(set_name) -> dict(near, radius)      st.lights(s, 1.0, **bas.lights_for("home")): that set only
-        pit_open(shot, keep=())                 the 2 x 2 pit is dug in this shot (see THE PIT)
+        pit_open(shot, keep=())                 the 2 x 2 pit is dug in this shot, its fill light on (THE PIT)
         pit_state(frame) -> 'whole' | 'open' | 'digging'
+        pit_drop(piglins, frame, stagger=12, place=True) -> [(walk start, step-off, landing frame)]   beat 6
+        pillar_in(shot) / pillar_from(frame)    the netherrack pillar stands in that shot / from then on
+        lava_flicker(f0, f1, amount=0.4, seed=0)   the home corridor's lava light flickers (beat 18)
+        check_cameras() -> [problems]           cameras in the air; what each `sees` in its frame and unhidden
+    yaw_to(src, dst) -> yaw                     a character at src facing dst (the yaw for place / anchors)
+    project(cam_pos, cam_target, lens, point) -> (u, v) | None    where a point lands in a 9:16 frame (u, v 0..1,
+                                                v from the top), engine.shots' camera (36 mm side vertical, no roll)
+    sight_blocked(world, a, b) -> (distance, cell, block) | None   the first block hiding b from a
     load_template(name, processor=None, seed=0, keep_lava=False) -> engine.structures.Template
         A bastion piece ("bridge/legs/leg_0", "treasure/bases/centers/center_0", ...) with its pool's processor
-        rules applied (PIECES, PROCESSORS; degrade()); read from assets/mc/data/minecraft/structure/bastion/ when
-        it exists, else from the client jar ($MC_CLIENT_JAR or JAR_CANDIDATES): template_source() says which.
+        rules applied (PIECES, PROCESSORS; degrade()); template_source(quiet=True) says where it is read from.
     check_still(scene, image_path, heroes=()) -> report     the Nether palette checks (see CHECKS)
     fog_amount(distance) / lightmap(level, gamma=0.5)       the game's fog factor and Nether lightmap colour
-    register_proof_film() / render_proofs(names) / render_maps()    the proofs (SELF-TEST)
+    register_proof_film() / render_proofs(names) / render_maps() / render_cams(names)    the proofs (SELF-TEST)
     Constants: FOG_COLORS, BASTION_BIOMES, FOG_START 10, FOG_END 96, AMBIENT_LIGHT_COLOR "#302821",
     AMBIENT_LIGHT 0.1, SKY_LIGHT_FACTOR 0, CARDINAL_SHADE, BLOCK_LIGHT_TINT "#ffd88c", BLOCK_FACTOR 1.4,
-    LIGHT_LEVEL, NETHER_LOOK, AO_DISTANCE 5, GRADES, SKY_KEYS, HOME, BRIDGE, TREASURE, ORIGINS, LANTERN_WATTS.
+    LIGHT_LEVEL, NETHER_LOOK, AO_DISTANCE 5, GRADES, SKY_KEYS, HOME, BRIDGE, TREASURE, ORIGINS, LANTERN_WATTS 200,
+    PIT_FILL_WATTS 9, JAR_CACHE, JAR_CANDIDATES.
 
 WHAT THE GAME DOES (read from the 26.3 jar; nothing is copied into the project)
     data/minecraft/dimension_type/the_nether.json: has_skylight false, has_ceiling true, skybox "none",
@@ -86,7 +105,8 @@ WHAT THE GAME DOES (read from the 26.3 jar; nothing is copied into the project)
     of blackstone gilded; rampart_degradation 40 % cracked; bridge 30 %; treasure_rooms 35 %.
 
 THE SETS (cells and anchors in Blender coordinates; the home set's origin is (0, 0, 0), so its numbers are world
-numbers; every floor is at z 0; bas.anchors["..."] / bas.yaws["..."] / bas.cameras["..."])
+numbers; every floor is at z 0; bas.anchors["..."] / bas.yaws["..."] / bas.cameras["..."]; top-down plans with
+every anchor and camera: out/test/nether_map_home / _bridge / _treasure.png)
     HOME (one fixed layout, every home shot; built block by block in the bastion palette, the game's processors on
     walls and floor): a narrow deep courtyard, floor x 0..8, y -2..17, walls 10 high (north 12) with polished
     basalt columns and crenellations, a broken parapet on the open south edge over the void, the lava sea 29
@@ -95,93 +115,169 @@ numbers; every floor is at z 0; bas.anchors["..."] / bas.yaws["..."] / bas.camer
     both walls and a lava wall closing it at y 33: the orange glow through the gateway, a silhouette's backlight
     and the corridor key light (fixtures lava at the game's block-light colour + an area light on the lava wall).
     The GUARD STAIR x 0..1 rises north along the west wall (y 6..9) to the LANDING x 0..2, y 10..17, standing
-    height 4, right beside the gateway's west jamb. The GOLD WALL: 21 gold blocks in the east wall's inner face (x
-    9, y 7..13, z 0..2), basalt-framed, with the one-block blackstone STEP in front of it (x 8, y 7..13, top z 1).
-    The PIT: cells x 3..4, y 4..5, two deep, in a patch of plain blackstone (x 1..7, y 2..8: never gilded, never
-    gold), floor z -2. Lanterns (light groups): home_landing (over the landing), home_gate (two, either side of the
-    gateway, one over the landing's corner), home_gold (two, over the step), home_pit (low on the west wall).
-    Anchors: home_landing (the brute on guard, in profile from the gate frame, yaw east), home_landing_edge (beat 1,
-    facing the 'landing' camera), home_stair_foot, home_gateway (in the gateway facing out: beats 17 / 18),
-    home_corridor, home_entry (a runner's start by the lava wall), home_gold_1..4 (y 7.6 / 9.2 / 10.8 / 12.4, x 7.3,
-    yaw east: facing the gold), home_step_1..4_item (the step's top in front of each: an ingot for beat 21),
-    home_gold_target, home_pit_center, home_pit_1..4 (the pit floor's four places), home_rim_w / _s / _e / _n
-    (standing at the rim, facing it), home_pit_drop_1..3 (0.3 past the rim: piglins.Piglin.fall from there),
-    home_boot_mark (the skid stops here, beat 5), home_flash (beat 16), home_center. Paths: home_run_in (lava wall
-    -> gateway -> boot mark), home_to_rim, home_stair_up (to home_landing), home_pit_walk_1..3 (gold places ->
-    drop points). Cameras: gate (beats 3 18 19 23: 22 mm from the south end, low), landing (1), ingot_row (2 21),
-    boot (5), pit (6 20), rim_side (9 10), inside_gate (4), corridor (17), flash (16). Cutaways:
-    home_corridor_roof, home_south_parapet (st.see_through / st.remove).
+    height 4, right beside the gateway's west jamb. The GOLD WALL: 21 gold blocks in the east wall's inner face
+    (x 9, y 9..15, z 0..2), basalt-framed, with the one-block blackstone STEP in front of it (x 8, y 9..15, top
+    z 1). The PIT: cells x 4..5, y 6..7, two deep, in a patch of plain blackstone (x 1..7, y 2..9: never gilded,
+    never gold), floor z -2. Lanterns (light groups): home_landing (over the landing), home_gate (two, either side
+    of the gateway, one 1 block over the brute's head at home_landing), home_gold (two, over the step), home_pit
+    (low on the west wall south of the stair). Cutaways: home_corridor_roof, home_south_parapet.
+    ANCHORS (yaws in bas.yaws; facing as noted)
+        home_landing (2.7, 17.45, 4) facing east: the brute on guard at the landing's north-east corner;
+            home_landing_look (5.2, 17.9, 4.6) is what he watches (the gateway's mouth, 10 deg north of east): in
+            the 'gate' frame his head is 88 deg off the line of sight, a clean profile.
+        home_landing_edge (2.65, 16.25, 4) facing the 'landing' camera; home_landing_edge_look just past its lens.
+        home_stair_foot (0.95, 4.6); home_gateway (4.5, 19) facing out (north: beats 17, 18); home_gateway_target;
+        home_corridor (4.5, 27); home_entry (4.5, 31.5): a runner's start by the lava wall.
+        home_gold_1..4 at (7.3, 9.6), (6.3, 11.2), (7.3, 12.8), (7.3, 14.4) facing east (the gold); _2 stands a
+            block further back so the 'gate' frame shows three piglins apart. bas.yaws["home_gold_ne"]: facing the
+            gold diagonally (the ingot row's piglins). home_step_1..4_item (8.5, y, 1): an ingot on the step in
+            front of each. home_gold_target (9, 12.5, 1.5).
+        home_pit_center (5, 7, -2); home_pit_1..4 (the pit floor's four places, z -2); home_rim_w (3.6, 7) / _s /
+            _e / _n (standing at the rim, facing the pit); home_strike (2.35, 7) facing east: where the brute hits
+            the player at home_rim_w (beat 9); home_pit_drop_1..3 (5.7, 6.5) (5.7, 7.5) (4.5, 7.7): 0.3 past the
+            rim, where Piglin.fall starts; home_pit_approach_1..3 one block back from each drop.
+        home_boot_mark (3.65, 6.75) facing south, beside the west rim: the skid stops here (beat 5) and he digs
+            where he stopped; home_flash (4.5, 14.5) facing
+            south (beat 16, the gateway behind him); home_center (4.5, 8).
+    PATHS: home_run_in (lava wall -> gateway -> boot mark), home_run_past (beat 19: lava wall -> through the gateway
+        and home_gateway -> past the 'gate' camera's right side and out of its frame), home_to_rim (boot mark ->
+        home_rim_w), home_stair_up (stair foot -> home_landing), home_pit_walk_1..3 (gold places -> drop points:
+        4.2 / 4.7 / 6.0 blocks, 2.1 / 2.4 / 3.1 s at the piglin walk speed), home_pit_approach_1..3 (1 block).
     THE PIT: its eight blackstone blocks are engine.breaking Breakables (bas.pit_blocks; NOT in the World), the
     set's mesh has the pit's walls behind them. Without a call every shot shows the floor whole.
         bas.pit_open(s)                                 # this shot: dug (beats 7-10, 20)
         bas.pit_open(s6, keep=[bas.pit_last.cell])      # beat 6: dug but its last block, which the film breaks:
         breaking.mine(runner, bas.pit_last, f, camera=s6)   # holding the iron pickaxe: 7 ticks, drops blackstone
-      Every block is back on the shot's last frame + 1 unless the next shot opens the pit too; calls in any
-      order give the same keys (tools/check_nether_stamp.py: only the dug shot's fingerprints change).
+        bas.pit_drop(pigs, f + 12)                      # beat 6: three piglins step off the rim a beat apart
+      pit_drop places piglin k on home_pit_approach_k at that frame (facing the pit), walks it the block to
+      home_pit_drop_k from frame + (k - 1) * 12 and drops it (the game's gravity): MEASURED it steps off 14
+      frames after its start and lands 9 frames later inside the pit: frame + 23 / 35 / 47 (at (5.26, 6.5),
+      (5.26, 7.5), (4.5, 7.26), z -2). From the gold places instead use home_pit_walk_k + Piglin.fall (2-3 s).
+      Every pit block is back on the shot's last frame + 1 unless the next shot opens the pit too; calls in any
+      order give the same keys. While the pit is dug its FILL (bas.pit_fill: a 9 W shadowless warm point light
+      near the pit floor, not a lantern, so Stage.lights leaves it alone) is keyed on, off in every other frame.
       PHYSICS: world=bas (piglins.barter / launch, mobs drops, breaking) sees the pit DUG; in shots where the
-      floor is whole pass world=bas.whole, or an item dropped on the pit cells falls in.
-      Checked (scratch test): the runner at home_rim_w mines bas.pit_last in 7 ticks; a piglin walking
-      home_pit_walk_1 with ramp=(4, 0) and fall(end, -2.0) lands inside the pit; piglins.barter(lob=True) toward
-      an explicit floor point beside the rim (e.g. home_rim_w + (-0.4, -0.6)) rests there. toward=<the runner>
-      standing at the rim does NOT: its rest spot 0.45 m from his feet on the piglin's side lies over the open pit
-      and the item is keyed floating there at z 0 (an engine.piglins issue, reported).
+      floor is whole pass world=bas.whole, or an item dropped on the pit cells falls in. piglins.barter(lob=True)
+      toward an explicit floor point beside the rim (e.g. home_rim_w + (-0.4, -0.6)) rests there; toward=<the
+      runner> standing at the rim does NOT (its rest spot 0.45 from his feet lies over the open pit: an
+      engine.piglins issue, reported).
+    BEAT 18'S FLICKER: bas.lava_flicker(s.frame_start, s.frame_end) on the gate shot: the corridor channels' lava
+    lights and the lava wall's area light (home_lava_wall_light) together, +-40 %. The lava surfaces themselves
+    glow as before (their texture animates); what flickers is the light on the jambs, the corridor and a figure
+    in the gateway. MEASURED (tools/check_nether_glow.py): the gateway region of the gate frame changes 5.6 / 255
+    between the weakest and the strongest frame. The other lava lights (bas.lava: fixtures Fluids with .lights,
+    .level(frame, scale), .flicker(f0, f1, at=...)) are not touched by Stage.lights.
     BRIDGE (another bastion): a deck 5 wide (walkway x -1..1 of polished blackstone bricks, 30 % cracked as the
-    game's bridge processor, low broken walls on the edges), y -8..44, between pairs of basalt pillars (y 2, 15,
-    28, 41; x -4..-3 and 3..4) that rise from the lava sea 24 below (a lit lava glow) to 7 above the deck; the
+    game's bridge processor; low broken brick walls on the edges with a polished basalt post every 6 blocks; no
+    edge wall at y 16..21, beside the netherrack pillar, nor at x 2, y 3..5, the boot camera's spot), y -8..44,
+    between pairs of basalt pillars (y 2, 15, 28, 41; x -4..-3 and 3..4; basalt banded with polished blackstone
+    bricks every 7, polished basalt at the top, gold block and gilded blackstone on each head, as the game's own
+    bridge piece caps its pillars) that rise from the lava sea 24 below (a lit lava glow) to 7 above the deck; the
     game's own bridge legs (bridge/legs/leg_0, leg_1) under it; ONE lantern on three chains from a beam over the
-    deck (group bridge_lantern), 1 block above a brute's head at bridge_brute. The player's netherrack pillar:
-    bas.pillar, three Breakables at (0, 19, 0..2) local, not in the World: register them per shot
-    (for b in bas.pillar: st.cast[b.name] = b; then st.use(shot, *bas.pillar) from beat 13 on). Anchors:
-    bridge_start, bridge_boot_mark, bridge_player (beat 12), bridge_brute (blocking, under his lantern, facing
-    the runner), bridge_middle, bridge_pillar_foot (facing it), bridge_pillar_top (standing height 3),
-    bridge_flash. Cameras: bridge_boot (11), bridge_shoulder (12), bridge_pillar (13), bridge_profile (14),
-    bridge_top (15), bridge_flash (16), bridge_wide.
+    deck (group bridge_lantern), 1 block above a brute's head at bridge_brute; four lanterns on a chain under the
+    deck's edges at y 7 and 33 (group bridge_under, as the game's bridge piece hangs them).
+    THE NETHERRACK PILLAR: bas.pillar, three Breakables at (0, 19, 0..2) local, not in the World and NOT BUILT
+    unless a call says so: bas.pillar_from(first frame of beat 13) (built there, standing in every later shot) or
+    bas.pillar_in(shot) per shot (gone again after the shot unless the next has it too). Registering them with the
+    Stage (st.cast[b.name] = b; st.use(...)) is optional on top: it can only hide them further.
+    Anchors: bridge_start, bridge_boot_mark (0.5, 6.5), bridge_player (0.5, 10.6) facing north, bridge_player_look
+    (the brute's face), bridge_brute (0.5, 16.5) facing south under his lantern, bridge_brute_look (the player's
+    face), bridge_middle, bridge_pillar_foot (0.5, 18.25) facing the pillar, bridge_pillar_top (0.5, 19.5, 3)
+    facing south, bridge_pillar_top_target (its head), bridge_flash. Path bridge_run_in.
     TREASURE (a third bastion's corner): blackstone walls with basalt columns (treasure_rooms processor), the game's
     treasure-room centre treasure/bases/centers/center_0 (the gold pile with its chest) sunk one block, a heap of
     loose gold blocks right of the brute's place and a chest left of it (engine.fixtures chests), two lanterns
-    (group treasure). Anchor treasure_flash; cameras treasure_flash (16), treasure_wide.
+    (group treasure). Anchors treasure_flash, treasure_pile_target.
     THE FLASH CUTS (beat 16): home_flash / bridge_flash / treasure_flash with the cameras of the same names: the
     camera is always 5 blocks in front of the brute at 1.45, 35 mm, so he stays locked in the frame.
     LIGHT PER SHOT: st.lights(s, scale, groups={"home_gold": 1.5, ...}, **bas.lights_for("home")): lanterns of the
-    other sets are off. The lava lights (bas.lava: fixtures Fluids with .lights, .level(frame, scale),
-    .flicker(f0, f1, at=...); "home_lava_wall_light" is a plain area Light) are not touched by Stage.lights: the
-    lava flicker of beat 18 is bas.lava["home_channels"].flicker(f0, f1).
+    other sets are off.
+
+CAMERAS (bas.cameras[name]: pos, target, lens mm, fstop, beats, note, and the staging they were verified with:
+cast [(kind, anchor, look anchor[, yaw])], pit, pillar, lights. Every one was rendered through render.Session with
+that cast (`$BPY -m engine.nether cams`: out/test/nether_cam_<name>.png, sheets out/test/nether_cams_sheet_*.png)
+and is ray-checked by check_cameras: in the air, and its `sees` anchors in frame and unhidden. What each delivers:
+    gate (beats 3 18 19 23; 30 mm from (5.2, 1, 1.8)): the gateway and the corridor glow in the middle, the brute
+        on the landing upper left in profile (10.0 % of the frame height: 64 px at 360 x 640; his feet just
+        behind the landing's edge), the three piglins at the gold nearer and lower on the right, apart, the gold
+        wall at the right edge. Beat 18: the brute at home_gateway is a silhouette against the glow. Beat 19:
+        home_run_past runs through his spot and out of the frame. Beat 23 (the brute at a gold place turning his
+        head to the gateway) cannot end in a clean profile from this camera: the gateway lies behind him along
+        its line of sight (geometry, any camera at the courtyard's south part).
+    landing (1; 22 mm at eye level on the landing): the brute at home_landing_edge big at frame left looking just
+        past the lens, the gold wall, its lantern and three piglins behind and below him on the right. Not the
+        scripted LONG lens: the landing is 3 wide, the brute 2.3 from the lens; any lower than eye level and the
+        landing's own edge hides the piglins (ray-checked).
+    ingot_row (2 21; 40 mm from the north-west at snout height): piglins at home_gold_3 / home_gold_1 turned to
+        the gold (yaw home_gold_ne) admiring in three-quarter profile, ingots toward the lens, the gold wall and
+        its lantern behind them; the brute at home_gold_4 the dark shape at the left edge.
+    boot (5; 50 mm on the floor south-west of the pit, floor whole): the boots at home_boot_mark in the middle
+        (45-56 % of the height, above the caption band), the runner cut at the chest, the piglins at the gold
+        behind them (heads at 19-25 %; the legs hide one), the gold wall at the right.
+    pit (6 20; 28 mm, high from the south-west): the runner at home_rim_w, the piglins' heads at rim level in the
+        pit, the gold wall above. rim_side (9 10; 35 mm from the south): the runner in profile at the west rim,
+        the brute at home_strike behind him at frame left, the pit at the right, the gateway glow beyond.
+    inside_gate (4; 24 mm at the floor inside the gateway): the runner coming at the lens out of the corridor,
+        the brute small on the landing at the upper left (his head and torso over its edge).
+    corridor (17; 35 mm): the brute in the gateway facing out past the lens, left of centre, piglins soft
+        through the gateway. flash (16; 35 mm): the brute at home_flash, the gateway and its glow behind him.
+    bridge_boot (11; 50 mm on the deck's east edge, matched to 'boot'): the boots at bridge_boot_mark in the
+        middle (47-60 %), the runner entering from frame left, the void and the far edge wall behind. bridge_shoulder (12; 50 mm): over the player's shoulder at
+        bridge_player, the brute blocking under his lantern. bridge_pillar (13; 30 mm, side-on from the east over
+        the void): the player crouched on the pillar top at 13-29 % of the height, the brute at its foot 39-58 %.
+        bridge_profile (14; 35 mm from 5.3 blocks): the brute in profile, head up, feet at 57 %, the pillar at
+        the right edge. bridge_top (15; 30 mm): high behind the player on the pillar, his back the big shape at
+        the right, the brute's upturned face beside his shoulder below. bridge_flash (16). bridge_wide: the
+        bridge, its pillars and the lava far below (no beat).
+    treasure_flash (16): the brute, the gold pile and the chest behind. treasure_wide: the corner (no beat).
+    Shots with no camera here: beats 7, 8 and 22 (over the shoulder into the pit, the boots at the rim, the
+    ingot-and-face close-up).
 
 MEASURED (540x960, 16 samples, motion blur and depth of field, through render.Session; check_still)
-    gate (beat 3): gold rgb(170,135,39) hue 44 s 0.77; unlit blackstone 24-33 of 255; the brute on the landing x 34
-    %, y 39 %; the piglins at x 66-73 %. landing (1): brute luminance 60 vs blackstone 31 (x 1.9). ingot_row (2 /
-    21): gold hue 43, piglin skin rgb(120,76,52) hue 21 s 0.57 (texture hue 5-15, s 0.25-0.45: warmer and more
-    saturated under the lanterns, still pink-tan), brute x 3.1. bridge (12): Steve's shirt hue 171 (palette_check
-    floor 170: AT the limit), brute x 1.65. treasure (16): gold hue 45, brute x 2.45. bridge_wide: the brute 50
-    blocks away is only x 1.47 (a tiny figure; give him his lantern up close-ups). At full saturation the game's
-    ambient #302821 turned the shirt green (hue 166) and the lava lights at a shader-pack orange (1, 0.62, 0.32)
-    made skin s 0.61: hence ambient_sat 0.5 and the game's own block-light tint for lava. A 540x960 still takes
-    10-23 s on 2 threads of the shared machine.
+    gate (beat 3): gold rgb(168,131,36) hue 43 s 0.79; blackstone 32 of 255; the brute's head at x 20-24 %, y
+    32-36 %; piglin skin hue 21 s 0.60. gate_18: the brute in the gateway 1.59 x the blackstone. landing (1): the
+    brute 1.53 x the blackstone, gold hue 46. ingot_row (2 / 21): gold hue 46, piglin skin rgb(131,83,56) hue 22 s
+    0.57. pit (6): Steve's shirt hue 174, pants min channel 27. bridge (12): Steve's shirt hue 172, brute 1.71 x.
+    bridge_wide: brute 1.59 x (was 1.47 before the pillars were banded and darkened). treasure (16): gold hue
+    45, brute 2.67 x. The pit's interior (tools/check_nether_glow.py): 0.27 x the rim floor without its fill,
+    0.56 x with it (the game: two light levels less, about 0.65, then smooth lighting's corner shade). A
+    540x960 still takes 6-10 s on 2 threads of the shared machine.
     CHECKS: check_still adds "gold reads as gold" (lit gold_block hue 38-58, s >= 0.45), "brute separates from
-    blackstone" (his median luminance >= 1.5 x the blackstone's in the frame, and >= 25), "piglin skin stays pink"
-    (hue 0-30, s <= 0.62) to tools/palette_check's. Of palette_check's own checks only Steve's (pants, shirt) and
-    the heroes' safe area apply in a bastion: "stone not magenta" has no cobblestone / stone / stone bricks to
-    measure (and lava-lit stone fails it by design: fixtures' notes), "robe hue" and "face saturation" need
-    villagers, "planks" oak, "plants lit like the ground" grass: none of them exists in the Nether.
+    blackstone" (only where the brute is a hero of the shot: his median luminance >= 1.5 x the blackstone's in
+    the frame, and >= 25), "piglin skin stays pink" (hue 0-30, s <= 0.62) to tools/palette_check's. Of
+    palette_check's own checks only Steve's (pants, shirt) and the heroes' safe area apply in a bastion: "stone
+    not magenta" has no cobblestone / stone / stone bricks to measure (and lava-lit stone fails it by design:
+    fixtures' notes), "robe hue" and "face saturation" need villagers, "planks" oak, "plants lit like the ground"
+    grass: none of them exists in the Nether.
 
 NOT THE GAME
     The fog is a compositor mix over the Mist pass (the game fogs each vertex); the frame clears to the fog
     colour, as the game's. The ambient is half as saturated as #302821 and partly occluded (Fast GI, AO 5 blocks);
-    the lift lamps put back a share without occlusion. The under-glow lamps are a film choice (the game has no
-    lava-sea light at a distance). Lantern light falls off as smoothed inverse square, not the game's one level per
-    block. Magma blocks do not glow (engine.blocks.EMISSIVE has no magma); none is used. The home courtyard,
-    bridge deck, pillars and treasure walls are built block by block in the bastion palette (no vanilla piece has
-    the story's fixed layout); the legs and the treasure pile are vanilla pieces.
+    the lift lamps put back a share without occlusion. The under-glow lamps, the pit fill and the strength of the
+    beat-18 flicker are film choices (the game's block light flickers by a few per cent). Lantern light falls off
+    as smoothed inverse square, not the game's one level per block. Magma blocks do not glow (engine.blocks.
+    EMISSIVE has no magma); none is used. The home courtyard, bridge deck, pillars and treasure walls are built
+    block by block in the bastion palette; the legs and the treasure pile are vanilla pieces. The game's own
+    bridge piece (bastion/bridge/bridge_pieces/bridge.nbt, 31 x 19 x 16) was tried and not used: it is a
+    two-level ruin 16 wide with towers, its top deck 10 wide with broken parapets at several heights and no
+    straight walkway a brute can block (rendered: out/test/nether_cam_vbridge.png); its basalt-banded parapets,
+    gold-capped pillar heads and chained under-deck lanterns were borrowed instead.
 
 SELF-TEST
-    $BPY -m engine.nether                    numbers and invariants, no rendering (about 5 s; exit 1 on a failure)
+    $BPY -m engine.nether                    numbers, layout, cameras (ray-checked), pillar / pit fill / flicker keys,
+                                             no rendering (about 5 s; exit 1 on a failure)
     $BPY -m engine.nether gate landing ...   proof stills through render.Session -> out/test/nether_<name>.png,
                                              each measured by check_still; names: PROOFS (landing ingot_row gate
                                              gate_18 pit bridge bridge_wide treasure); `proofs` = all (about 2 min)
+    $BPY -m engine.nether cams [names]       every camera suggestion with its cast at 270x480 ->
+                                             out/test/nether_cam_<name>.png + a sheet (all 18: two commands)
     $BPY -m engine.nether map                top-down maps with anchors and cameras: out/test/nether_map_<set>.png
     $BPY -m engine.nether cli                render.py's own command line on the proof film (--still 2.5 --zones)
     $BPY -m engine.nether skies              a three-biome SKIES film built sky by sky by render.Session
-    $BPY -m tools.check_nether_stamp         fingerprints: equal in two processes; pit_open changes that shot only
+    $BPY -m tools.check_nether_stamp         fingerprints: equal in two processes and in reverse order; pit_open,
+                                             pillar_in and lava_flicker each change their shot's frames only
+    $BPY -m tools.check_nether_glow          the pit fill and the beat-18 flicker, measured on renders
+    $BPY -m tools.nether_fetch_jar [--check] the client jar the bastion pieces are read from
 """
 import math
 import os
@@ -217,7 +313,8 @@ BASTION_BIOMES = ("crimson_forest", "nether_wastes", "soul_sand_valley", "warped
 # data/minecraft/dimension_type/the_nether.json
 FOG_START = 10.0                 # attributes "minecraft:visual/fog_start_distance"
 FOG_END = 96.0                   # attributes "minecraft:visual/fog_end_distance" (AtmosphericFogEnvironment.setupFog
-#                                  also caps it at 96); fog.glsl linear_fog_value: 0 up to the start, 1 at the end,
+#                                  moves it toward min(96, end) only with its rain multiplier: no effect in the
+#                                  Nether); fog.glsl linear_fog_value: 0 up to the start, 1 at the end,
 #                                  linear between, over the SPHERICAL distance from the eye, mixed toward the fog colour
 AMBIENT_LIGHT_COLOR = "#302821"  # attributes "minecraft:visual/ambient_light_color" (the overworld: #0a0a0a)
 AMBIENT_LIGHT = 0.1              # "ambient_light" (kept by the dimension type; the 26.x lightmap uses the colour)
@@ -680,7 +777,8 @@ CHAIN = {"axis": "y", "waterlogged": "false"}
 UP = {"axis": "y"}
 FLAME_GLOW_GROUPS = ("block_lantern", "block_fire")
 LANTERN_WATTS = 200.0            # a bastion lantern's point light (engine.props' lantern; Stage.lights scales it per shot)
-PIT_FILL_WATTS = 16.0            # the pit's own shadowless fill (Bastion.pit_fill), on only in pit_open shots: the
+GROUND_FROM = 4                  # Bastion.ground scans down from this cell: nobody stands higher than the landing
+PIT_FILL_WATTS = 9.0            # the pit's own shadowless fill (Bastion.pit_fill), on only in pit_open shots: the
 #                                  game's ambient reaches a pit's floor unoccluded (MEASURED in the module docstring)
 
 
@@ -786,10 +884,19 @@ class Bastion:
         self._flicker_spans = []
 
     # ---- Village-like helpers
-    def ground(self, x, y, z_from=40, z_to=-40):
-        """Walking surface z of the column at (x, y) (top of the highest solid block; slabs / stairs as
-        blocks.World.surface), or None."""
-        return self.world.surface(int(math.floor(x)), int(math.floor(y)), z_from, z_to)
+    def ground(self, x, y, z_from=GROUND_FROM, z_to=-40):
+        """Walking surface z of the column at (x, y): the top of the highest solid block at or below cell z_from
+        (slabs / stairs as blocks.World.surface), or None. The default (GROUND_FROM, cell 4: the landing's top
+        is the highest place anyone stands) skips what hangs overhead: the corridor roof, the bridge's lantern
+        beam, a lantern's bracket; lanterns and chains are never ground. Pass z_from=40 for the very top."""
+        w = self.world
+        cx, cy = int(math.floor(x)), int(math.floor(y))
+        for z in range(int(z_from), int(z_to) - 1, -1):
+            bid = w.block_id(cx, cy, z)
+            if bid is None or bid in ("lantern", "soul_lantern", "iron_chain", "chain") or not w.is_solid(cx, cy, z):
+                continue
+            return w.surface(cx, cy, z, z_to)
+        return None
 
     def set_lantern_energy(self, scale=1.0, groups=None):
         """Scale every lantern light (or those of some groups) relative to its built-in energy; 0 hides it."""
@@ -875,8 +982,9 @@ class Bastion:
         """Beat 6 in one call: piglin k (1..3) stands on home_pit_approach_k (one block outside the rim, facing it)
         and, from `frame` + (k - 1) * stagger, walks the block to home_pit_drop_k and falls to the pit floor (the
         game's gravity: 2 blocks in 8.4 frames). place=False: they are already there. The pit must be open then
-        (pit_open). Returns [(walk start, step-off frame, landing frame)]. MEASURED with the defaults: steps off 13
-        frames after its start, lands 9 frames later (frame + 22 / 34 / 46 for the three)."""
+        (pit_open). Returns [(walk start, step-off frame, landing frame)]. MEASURED with the defaults: each steps
+        off 14 frames after its start and lands 9 frames later, inside the pit: frame + 23 / 35 / 47 for the three
+        (landing at (5.26, 6.5), (5.26, 7.5), (4.5, 7.26), z -2; none on the kept pit_last cell)."""
         out = []
         for k, p in enumerate(piglins, 1):
             path = self.paths["home_pit_approach_%d" % k]
@@ -1270,13 +1378,13 @@ def _home(b, layout):
     b.path("home_pit_walk_1", [(gxs[0], gys[0], 0.0), (px + 2.7, py + 0.5, 0.0), (px + 1.7, py + 0.5, 0.0)])
     b.path("home_pit_walk_2", [(gxs[1], gys[1], 0.0), (px + 2.7, py + 1.5, 0.0), (px + 1.7, py + 1.5, 0.0)])
     b.path("home_pit_walk_3", [(gxs[2], gys[2], 0.0), (px + 0.5, py + 2.7, 0.0), (px + 0.5, py + 1.7, 0.0)])
-    boot = (px + 1.2, py + 2.9)
+    boot = (px - 0.35, py + 0.75)                             # beside the west rim: he digs where he stopped
     b.anchor("home_boot_mark", boot[0], boot[1], 0.0, S)              # the runner's skid stops here (beat 5)
     b.anchor("home_flash", gc, 14.5, 0.0, S)                          # beat 16: the gateway behind him
     b.anchor("home_center", gc, 8.0, 0.0)
     b.path("home_run_in", [(gc, c1 - 0.5, 0.0), (gc, 19.0, 0.0), (gc, 12.0, 0.0), (boot[0], boot[1], 0.0)])
     b.path("home_run_past", [(gc, c1 - 0.5, 0.0), (gc, 19.0, 0.0), (gc + 1.9, 9.0, 0.0), (gc + 2.1, 0.5, 0.0)])
-    b.path("home_to_rim", [(boot[0], boot[1], 0.0), (px - 0.4, py + 2.6, 0.0), (px - 0.4, pcy, 0.0)])
+    b.path("home_to_rim", [(boot[0], boot[1], 0.0), (px - 0.4, pcy, 0.0)])
     b.path("home_stair_up", [(0.95, sy0 - 1.4, 0.0), (0.95, float(sy0), 0.0), (0.95, float(sy0 + lz), float(lz)),
                              (1.4, float(sy0 + lz) + 1.5, float(lz)), lnd])
     G = [("piglin", "home_gold_%d" % k, "home_gold_target") for k in (1, 2, 3)]
@@ -1302,9 +1410,9 @@ def _home(b, layout):
              cast=[("piglin_admire", "home_gold_3", None, NE), ("piglin_admire", "home_gold_1", None, NE),
                    ("brute", "home_gold_4", "home_step_4_item"), ("ingot", "home_step_4_item", None)],
              sees=("home_gold_1", "home_gold_3"), focus="home_gold_3")
-    b.camera("boot", (px - 0.8, py + 0.6, 0.25), (EX - 1.63, gys[0] + 1.32, 0.5), 50, 2.0, beats=(5,),
-             note="on the floor at the pit's south-west corner (floor whole), across at the gold wall: the boots "
-                  "stop at home_boot_mark mid-frame, the three piglins behind them",
+    b.camera("boot", (px - 2.8, py - 2.2, 0.25), (px + 1.06, py + 2.4, 0.12), 50, 2.0, beats=(5,),
+             note="on the floor south-west of the pit (floor whole), 50 mm across at the gold wall: the boots stop "
+                  "at home_boot_mark mid-frame above the caption band, the piglins at the gold behind them",
              cast=[("steve", "home_boot_mark", None)] + [("piglin", "home_gold_%d" % k, "home_boot_mark")
                                                           for k in (1, 2, 3)],
              sees=("home_boot_mark:shins", "home_gold_1", "home_gold_2", "home_gold_3"), focus="home_boot_mark")
@@ -1412,7 +1520,7 @@ def _bridge(b, layout):
     b.anchor("bridge_flash", lx + 0.5, ly + 0.5, 0.0, S)
     b.path("bridge_run_in", [(0.5, -6.0, 0.0), (0.5, 6.5, 0.0)])
     PIL = [("steve_crouch", "bridge_pillar_top", None), ("brute", "bridge_pillar_foot", "bridge_pillar_top_target")]
-    b.camera("bridge_boot", (2.6, 4.3, 0.25), (-1.4, 8.4, 0.85), 50, 2.0, beats=(11,),
+    b.camera("bridge_boot", (2.6, 4.3, 0.25), (-1.4, 8.4, 0.2), 50, 2.0, beats=(11,),
              note="the boot shot on the deck, matched to home 'boot': on the floor at the east edge (no wall there), "
                   "40 mm across the walkway; the legs come in from frame left and stop at bridge_boot_mark mid-frame",
              cast=[("steve", "bridge_boot_mark", None)], sees=("bridge_boot_mark:shins",), focus="bridge_boot_mark")
@@ -1621,7 +1729,7 @@ def build_bastion(scene, layout=None, sets=SETS, seed=6, name="bastion", lantern
         except (AttributeError, TypeError):
             pass
         ob = bpy.data.objects.new("light_home_pit_fill", data)
-        ob.location = (cx, cy, max(k[2] for k in bas.pit_blocks) + 0.35)
+        ob.location = (cx, cy, min(k[2] for k in bas.pit_blocks) + 0.9)      # low: the walls darken upward
         ob.hide_render = True
         ob["group"] = "home_pit_fill"
         ob["base_energy"] = PIT_FILL_WATTS
@@ -1694,8 +1802,6 @@ def _proof_build(scene):
     runner.hold("iron_pickaxe")
     brute, pigs = pool["brute"][0], pool["piglin"]
     boots = piglins.add_item(st, "golden_boots", name="drop_boots")
-    for blk in bas.pillar:                                  # the Stage route as well: hidden outside its shots
-        st.cast[blk.name] = blk
     for still, cam in PROOF_CAMS:
         s = st.shot(still, 1.0)
         if still == "gate_18":                              # beat 18: the landing empty, the brute in the gateway
@@ -1716,7 +1822,6 @@ def _proof_build(scene):
         st.hero(s, "brute" if hero is brute else "piglin", hero)
         if still == "bridge_wide":
             bas.pillar_in(s)                                # with the netherrack pillar (beats 13-15)
-            st.use(s, *bas.pillar)
         if still == "treasure":                             # beat 16: a puff beside him, golden boots at his feet
             spot = Vector(A["treasure_flash"]) + Vector((1.2, -0.2, 0.0))
             piglins.poof(spot, s.frame_start - 8, camera=s, size=(0.6, 1.8), seed=3)
@@ -2055,6 +2160,59 @@ def _check():
     for name, c in bas.cameras.items():
         if c["set"] in bas.sets and math.dist(c["pos"], c["target"]) < 0.5:
             ok(False, "camera %s has no direction" % name)
+    cam_problems = bas.check_cameras()
+    ok(not cam_problems, "every camera in the air, every anchor it `sees` in its frame and in the clear (%d cameras): %s"
+       % (len(bas.cameras), cam_problems or "no problems"))
+    missing = sorted({e[1] for c in bas.cameras.values() for e in c["cast"] if isinstance(e[1], str)
+                      and e[1] not in bas.anchors} | {e[2] for c in bas.cameras.values() for e in c["cast"]
+                                                      if isinstance(e[2], str) and e[2] not in bas.anchors})
+    ok(not missing and all(c["cast"] for c in bas.cameras.values()), "every camera has a cast of known anchors %s"
+       % (missing or ""))
+    # the gate frame (beats 3, 18, 19, 23): the brute on the landing big enough, in profile; the piglins apart
+    g = bas.cameras["gate"]
+    lp = bas.anchors["home_landing"]
+    feet = project(g["pos"], g["target"], g["lens"], lp)
+    head = project(g["pos"], g["target"], g["lens"], (lp[0], lp[1], lp[2] + 2.0))
+    ok(feet[1] - head[1] >= 0.095, "gate: the brute on the landing is %.1f %% of the frame height (>= 9.5; 360 x 640: "
+       "%.0f px)" % (100 * (feet[1] - head[1]), 640 * (feet[1] - head[1])))
+    look_dir = Vector(bas.anchors["home_landing_look"]) - Vector(lp)
+    view = Vector(lp) - Vector(g["pos"])
+    yaw_off = math.degrees(math.atan2(look_dir.y, look_dir.x))
+    prof = math.degrees(Vector((look_dir.x, look_dir.y)).angle(Vector((view.x, view.y))))
+    ok(abs(yaw_off) <= 30.0 and 75.0 <= prof <= 105.0, "gate: he looks %.0f deg north of east at the gateway's mouth; "
+       "his head is %.0f deg off the line of sight (90 = a clean profile)" % (yaw_off, prof))
+    us = sorted(project(g["pos"], g["target"], g["lens"], (bas.anchors["home_gold_%d" % k][0],
+                                                            bas.anchors["home_gold_%d" % k][1], 1.6))[0] for k in (1, 2, 3))
+    ok(min(b - a for a, b in zip(us, us[1:])) >= 0.04 and 0.0 < us[0] and us[-1] < 1.0,
+       "gate: the three piglins' heads at u %s (apart, in frame)" % [round(u, 2) for u in us])
+    gr = {n: bas.ground(*bas.anchors[n][:2]) for n in ("home_landing", "home_corridor", "bridge_brute", "home_gold_4",
+                                                       "home_pit_center", "home_rim_w", "treasure_flash")}
+    ok(gr == {"home_landing": 4.0, "home_corridor": 0.0, "bridge_brute": 0.0, "home_gold_4": 0.0,
+              "home_pit_center": -2.0, "home_rim_w": 0.0, "treasure_flash": 0.0},
+       "ground() under the roof, the beam and the lantern brackets: %s" % gr)
+    # the netherrack pillar: not built by default; pillar_in / pillar_from
+    ok(not any(b.there_at(f) for b in bas.pillar for f in (0, 50, 500)), "the netherrack pillar is not there by default")
+    bas.pillar_in((100, 120))
+    bas.pillar_from(300)
+    ok(all(b.there_at(100) and b.there_at(120) and not b.there_at(121) and not b.there_at(299) and b.there_at(5000)
+           for b in bas.pillar), "pillar_in((100, 120)) / pillar_from(300): there 100-120 and from 300 on, not between")
+    # the pit's fill light follows pit_open; the beat-18 flicker keys the wall light with the channels
+    fill = bas.pit_fill
+    states = []
+    for f in (49, 50, 80, 90, 91):
+        scene.frame_set(f)
+        states.append((f, round(fill.data.energy, 1), fill.hide_render))
+    ok([e > 0 for _f, e, _h in states] == [False, True, True, True, False] and
+       [h for _f, _e, h in states] == [True, False, False, False, True],
+       "the pit fill is on exactly in the pit_open shots (frames 50-90): %s" % states)
+    bas.lava_flicker(200, 240)
+    wall = bas.lava["home_lava_wall_light"]
+    es = []
+    for f in (199, 205, 215, 225, 235, 241, 260):
+        scene.frame_set(f)
+        es.append(round(wall.data.energy))
+    ok(es[0] == es[-2] == es[-1] == round(wall["base_energy"]) and len(set(es[1:5])) >= 3,
+       "lava_flicker(200, 240): the lava wall light %s W (steady outside, moving inside)" % es)
     print("[nether] check: %d failure(s)" % len(fails))
     return len(fails)
 

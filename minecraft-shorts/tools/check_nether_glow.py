@@ -10,7 +10,8 @@ import types
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FILM = "nether_glow_check"
-PIT_RATIO_MIN = 0.55      # pit floor / rim floor luminance with the fill (the game: about 0.65, two light levels less)
+PIT_RATIO = (0.4, 0.65)   # pit floor / rim floor luminance with the fill: not black (the game: two light levels less,
+#                           about 0.65, then smooth lighting's corner shade), still darker, so the hole reads as a hole
 FLICKER_MIN = 5.0         # 1/255: the gateway glow's change between the flicker's weakest and strongest frame
 
 
@@ -99,10 +100,10 @@ def main():
         print("[glow] pit %-8s pit floor / far walls %.1f, rim floor %.1f (of 255): ratio %.2f  (%d / %d points)"
               % (tag, pit, rim, pit / max(rim, 1e-6), len(pit_uv), len(rim_uv)))
     ratio = res["fill"][0] / max(res["fill"][1], 1e-6)
-    ok = ratio >= PIT_RATIO_MIN
+    ok = PIT_RATIO[0] <= ratio <= PIT_RATIO[1]
     fails += not ok
-    print("[glow] %-4s pit with its fill: %.2f x the rim (>= %.2f; without the fill %.2f)"
-          % ("ok" if ok else "FAIL", ratio, PIT_RATIO_MIN, res["no fill"][0] / max(res["no fill"][1], 1e-6)))
+    print("[glow] %-4s pit with its fill: %.2f x the rim (%.2f..%.2f; without the fill %.2f)"
+          % ("ok" if ok else "FAIL", ratio, PIT_RATIO[0], PIT_RATIO[1], res["no fill"][0] / max(res["no fill"][1], 1e-6)))
 
     # ---- (2) the beat-18 flicker
     g = next(x for x in film.shots if x.name == "gate_18")
