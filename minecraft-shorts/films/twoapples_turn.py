@@ -66,18 +66,23 @@ def tu07_hall(st, s, C, nar):
       cutaway model (weak pass).
     STUB NOW: the set's staging; dad's head front, then up at the lens's end position from "last". Hero: dad.
     """
-    f0, f1 = s.frame_start, s.frame_end
     A = C.A
-    cam = C.camera_spec("set:b07")
-    cells = C.cells(s, "tu", look=lambda n: TC.up(A["ug_aisle_%s" % n], 1.4) if n != "dad"
-                    else TC.up(A["ug_aisle_dad"], TC.LOOK_FRONT_DZ))
+    cells = C.cells(s, "tu")
     dad = cells["dad"]
-    up_at = max(f0 + 1, C.at(s, "last") - 4)
-    dad.look_at(up_at, cam["pos1"], ease=10)
-    C.cam(s, "set:b07", focus=dad.head)
+    dad.look_at(C.at(s, "last") - DAD_LOOK_LEAD, TU07_RIDE["pos1"], ease=10)     # he looks down at the child
+    C.cam_keys(s, None, [(s.frame_start + d, u) for d, u in TU07_KEYS], handheld=0.004, **TU07_RIDE)
+    C.rack(s, dad, C.at(s, "dad"), frames=12)          # the windows sharp on the ride, then dad from "dad"
     st.hero(s, "dad", dad)
     C.lights(s, "hall")
-    C.glow(s, "down_fill")
+
+
+# tu07: THE COUNTER RIDE AT A CHILD'S EYE HEIGHT (the story's fallback, the lead's choice: the look down read as a
+# cutaway model in every look at it). East along the aisle 0.75 above the floor, looking up through the windows at
+# the faces over their job blocks; from east of the solid pier at x 6 (the set builder's note) to dad's window.
+TU07_RIDE = dict(pos=(6.9, -11.0, TC.F + 0.75), target=(8.6, -13.6, TC.F + 1.45),
+                 pos1=(13.05, -11.05, TC.F + 0.78), target1=(14.25, -13.4, TC.F + 1.5), lens=24.0, fstop=2.8)
+TU07_KEYS = ((0, 0.0), (35, 0.62), (50, 0.86), (68, 0.985), (87, 1.0))   # (frames into the shot, share of the ride)
+DAD_LOOK_LEAD = 4      # tu07: dad's head turns down to the lens this many frames before "last"
 
 
 def tu09_lever(st, s, C, nar):
@@ -122,17 +127,21 @@ def tu09_lever(st, s, C, nar):
     C.put(steve, f0, "ug_lever_stand")
     st.use(s, steve)
     swing = max(f0, C.at(s, "lever") - SWING_LEAD)
-    r = C.wall_open(swing, who=s.name, player=steve, repeater=4, sync="hand")
+    r = C.wall_open(swing, who=s.name, player=steve, repeater=WALL_DELAY, sync="hand")
     C.memo["tu_lever"] = r
-    flip = r["flip"] if r else swing + 6
-    opened = r["open"] if r else swing + 18
-    C.cam_hold(s, "set:b09", flip + 2, frame_end=opened - 1, focus=A["ug_lever_target"])
-    C.rack(s, A["ug_door_target"], flip + 3, frames=10)
+    opened = r["open"] if r else swing + 36
+    pan = C.at(s, "dad's")
+    C.cam_hold(s, "set:b09", pan, frame_end=opened - 1, focus=A["ug_lever_target"])
+    C.rack(s, A["ug_door_target"], pan, frames=12)
     st.hero(s, "dad", cells["dad"])
     C.lights(s, "hall")
 
 
-SWING_LEAD = 4         # tu09: Steve's swing starts this many frames before "lever"
+SWING_LEAD = 4         # tu09: Steve's swing starts this many frames before "lever" (the flip lands on it)
+WALL_DELAY = 14        # tu09: the hidden repeater delay in redstone ticks (engine.underground open_wall `repeater`:
+#                        2 game ticks a step; 14 = a chain of four repeaters at 4 + 4 + 4 + 2 behind the pier, legal
+#                        in the game): the pistons move on "opens", 36 frames after the flip on "lever" (with 4 they
+#                        moved on "and", 25 frames before "opens", after a 9-frame whip pan: the technical check)
 
 
 def tu10_hug(st, s, C, nar):
@@ -232,5 +241,6 @@ def tu12_green(st, s, C, nar):
     zdad.aggro(f, ease=0)
     st.use(s, zdad)
     C.cam(s, "set:b12", focus=dad.head, handheld=0.004)
-    st.hero(s, "zombie dad", zdad)
+    st.hero(s, "dad", dad)                         # the villager until "green" (hidden from the swap)
+    st.hero(s, "zombie dad", zdad)                 # the zombie villager from the swap (hidden before it)
     C.lights(s, "hall")

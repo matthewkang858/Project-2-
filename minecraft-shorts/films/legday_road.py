@@ -8,19 +8,23 @@ STATUS: SHOT by the road director (the lead's stubs replaced; each docstring has
   rd15  the file from the meadow's east verge, 40 mm, 22 degrees off its line: five pillagers read as five, the
         captain in front with the banner at the left third, the lone oak at the right edge; his eyes find the lens
         on "pillagers"; a creep back and a pan with them
-  rd16  the three sprint at a low 28 mm that tracks back: Kai left, Steve centre, Zuri right (1.1 apart sideways,
-        1.1 / 2.1 back); Steve's attack swings into the air on the way, the last ON "punch"; on "them" three arrows
-        thud into the road a block in front of them, each lets go of the sprint and stops dead in 3 ticks, looks
-        down at his arrow, then up the road at the patrol
-  rd19  LOCKED 14 mm low on the road's east half, 5.7 blocks short of the captain's death: the file walks at the
-        lens under the shelf, the planks snap in on "back", the captain's eyes go up, the anvils fall as one dark
-        receding line, the impact on "fell", red, the five tip east (toward the lens's side), the poofs
+  rd16  the three sprint at a low 28 mm that tracks back with them: Kai left, Steve centre, Zuri right (1.1 apart
+        sideways, 1.1 / 2.1 back); Steve's attack swings into the air on the way, the last ON "punch"; on "them"
+        three arrows thud into the road a block in front of them, each lets go of the sprint and stops dead in 3
+        ticks, looks down at his arrow, then up the road at the patrol
+  rd19  LOCKED 14 mm at knee height beside the strip, 2.4 blocks short of the captain's death: the file walks at
+        the lens under the plank row, the planks snap in on "back", the captain's head and banner tip up, the anvils
+        come down the face as one dark line, the near ones slam in on "fell", red, the five tip east (toward the
+        lens's side), the poofs
   rd20  the push in to the drops (the lead's camera), their spin phased so the banner is broad-side between
         "banner" and the end, the bottle just after "bottle"
   rd21  low 24 mm south-south-east of Steve: he walks in from the left, stops on "still" with his back to us and
-        looks up at the narrator (a figure at the wall top's corner, the focus racks to him), and on "cheating"
-        looks down at the anvil beside him and turns round to the stairs: his face comes to the lens (sq10's turn)
-TOOLS: tools/legday_road_probe.py (ground heights, positions, the runners' speeds, Steve's head per 3 frames).
+        looks up at the narrator (a small figure at the wall top's corner who swings his torch at him, the focus
+        racks to him), and on "cheating" looks down at the anvil beside him and turns round to the stairs: his face
+        comes to the lens (sq10's turn)
+TOOLS: tools/legday_road_probe.py (ground heights, positions, the runners' speeds, Steve's head per 3 frames, where
+  the drops lie and their spin); tools/legday_road_zones.py (the Reels zones drawn on legday_palette's own renders).
+MOTION: out/test/legday_road_motion.mp4 (render.py previews, 270x480, 10 samples, step 2, joined at 12 fps).
 
 THE PLACE (films/legday_set.py, "THE ANVIL WALL"): the exit road (dirt path x -1..1) runs north along the wall's road
   face (x = -1, looking EAST into the morning sun). Under the shelf, x -1..1, y 45..57: COBBLESTONE paving (top z 0):
@@ -78,12 +82,12 @@ RD16_CAM = dict(pos=(2.3, 38.6, 0.3), target=(1.3, 29.0, 1.1), pos1=(2.4, 45.4, 
                 lens=28.0, fstop=2.8)
 # beat 19: LOCKED (the story: only the tiniest handheld), 14 mm f/5.6 at knee height (0.15) on the road right beside
 # the strip (x 1.9, 0.9 east of the anvils' cells), 2.4 blocks short of where the captain dies, looking north along
-# the wall's foot and up at 25 degrees. The file walks at the lens under the plank row (the row at the top of the
+# the wall's foot and up at 23.5 degrees. The file walks at the lens under the plank row (the row at the top of the
 # frame), the captain grows to a big low angle, his head and banner tip back as the anvils come down the face, the
 # near anvils slam in from above on "fell" and he tips toward the lens's side. Scouted against the set's b19 (2.3,
 # 42.5: the file small at the centre-right) and eight others (out/test/legday_rd19var*_rd19_drop_*: from 5 to 10
 # blocks back the file stays small, and the planks hide the anvils standing on them from any low camera)
-RD19_CAM = dict(pos=(1.9, 47.5, 0.15), target=(0.16, 57.35, 4.81), lens=14.0, fstop=5.6)
+RD19_CAM = dict(pos=(1.9, 47.5, 0.15), target=(0.16, 57.35, 4.5), lens=14.0, fstop=5.6)
 RD20_CAM = dict(pos=(3.7, 45.3, 0.6), target=(1.45, 49.65, 0.3), pos1=(2.75, 47.65, 0.42), target1=(1.45, 49.65, 0.3),
                 lens=35.0, fstop=2.8)            # a push in to the banner and the bottle (the set's b20, re-aimed on the
 #                                                  lead's drop spots: PLACES banner_spot / bottle_spot)
@@ -94,7 +98,8 @@ RD20_FACE = {"banner": ("banner", 21), "bottle": ("bottle", 8)}      # (word of 
 # beat 21: low (0.22), 3.4 blocks south-south-east of steve_among_anvils, 24 mm f/4, looking up the face at 26
 # degrees: Steve big in the lower left third, the narrator at narrator_edge above him at the wall top's north-east
 # corner against the sky (the retracted plank row runs up to him); a slow push in. Scouted: 22 mm from 3.5 (Steve
-# right under the narrator, 11 px), 28 mm from 3.0 (his back fills the frame), this (13-14 px, Steve's eyes 54 %)
+# right under the narrator, 11 px), 28 mm from 3.0 (his back fills the frame), 30 and 35 mm from 2.5-2.7 (his head
+# in the caption band, the narrator hardly bigger), this (13-14 px, Steve's eyes 54 %)
 RD21_CAM = dict(pos=(3.15, 43.96, 0.22), target=(-0.68, 53.2, 5.21), pos1=(3.07, 44.1, 0.23),
                 target1=(-0.64, 53.2, 5.15), lens=24.0, fstop=4.0)
 # the release word ("back" 1169) and the captain's landing y (49.6) are the LEAD'S: legday_common RELEASE /
@@ -102,9 +107,9 @@ RD21_CAM = dict(pos=(3.15, 43.96, 0.22), target=(-0.68, 53.2, 5.21), pos1=(3.07,
 
 # beat 16: the three runners, sprinting at speed from the first frame (ramp in False) and letting go of the sprint
 # key a frame after their arrow lands (the game's ground friction then stops them dead in about 3 ticks: 0.34 block
-# of slide). Their
-# stops are staggered 1.1 sideways and 1.1 / 2.1 back (the CONTRACT: 0.7 block at least, or two runners read as
-# one two-headed shape). (role, x, y where they stand still, frame the sprint key is let go, from "them")
+# of slide). Their stops are staggered 1.1 sideways and 1.1 / 2.1 back (the CONTRACT: 0.7 block at least, or two
+# runners read as one two-headed shape). (role, x, y where they stand still, frame the sprint key is let go, from
+# "them")
 RUNNERS = (("steve", 2.0, 39.0, -1), ("kai", 3.1, 37.9, 1), ("zuri", 0.55, 36.9, 2))
 SPRINT_TICK = 5.612 / 20.0                        # engine.players SPRINT_SPEED in blocks per game tick
 SLIDE = SPRINT_TICK * 0.546 / (1.0 - 0.546)       # the slide to a halt after the key is let go (GROUND_FRICTION)
@@ -199,11 +204,15 @@ def rd16_punch(st, s, C, nar):
       degrees down from the patrol up the road, scale 1.25); each lets go of the sprint a frame later (983, 985,
       986) and the game's ground friction stops him dead within 3 ticks (0.34 block); each looks down at his arrow
       the frame after it lands, then up the road at the patrol (behind the lens) 6 frames after stopping. Heroes:
-      Steve; Kai and Zuri. Lights gold near (0.5, 36).
-    MEASURED (tools.legday_geo): on "punch" 976 eyes Kai x 25 %, Steve 42 %, Zuri 58 % (y 43-47 %), faces 40 / 47 /
-      34 px, all within 10 degrees of the lens, none blocked; on 990 (stopped) Kai 22 %, Steve 44 %, Zuri 65 %, faces
-      52 / 60 / 44 px (the stub had Zuri behind Steve's arm at x 62 / 65 %). Stills: out/test/legday_rd_rd16_punch_985
-      _zones.png (the first staging), out/test/legday_rdsc_rd16_punch_977 / _990_zones.png (this one).
+      Steve; Kai and Zuri. Lights gold near (0.5, 36). The anchor runners_stop (0.55, 39.2) is not used (no other
+      shot or check reads it): Steve stops at (2.0, 39.0), the middle of the three as this camera sees them, Zuri on
+      the anchor's line x 0.55.
+    MEASURED (tools.legday_geo, the tracking camera): on 950 eyes Kai x 25 %, Steve 41 %, Zuri 56 % (y 45-48 %),
+      faces 36 / 42 / 31 px; on "punch" 976 x 24 / 43 / 60 %, faces 43 / 50 / 36 px; on 990 (stopped) x 22 / 44 / 65
+      %, faces 52 / 59 / 43 px; all within 15 degrees of the lens, none blocked (the stub had Zuri behind Steve's arm
+      at x 62 / 65 %; the first track kept them specks until 975). palette_check rd16@976: all ok (heroes 100 %
+      inside). Stills: out/test/legday_pal_rd16_punch_976_zones.png, out/test/legday_rd_rd16_punch_988_zones.png
+      (stopped, the three arrows in the road in front of them). Motion: the preview frames 945-995.
     """
     f0, f1 = s.frame_start, s.frame_end
     them = C.at(s, "them")
@@ -285,7 +294,7 @@ def rd19_drop(st, s, C, nar):
     THE CHIPS: release(..., chip=list(LC.CHIPPED)): the frozen draw (10 of 12 chip, 3 and 4 stay whole); the dusk
       set that "came back up" is chipped the same way (legday_common THE CHIPPED ANVILS). Do not change it.
     NOW: RD19_CAM LOCKED (handheld 0.002), 14 mm f/5.6 at knee height beside the strip, 2.4 blocks short of the
-      captain's death, looking north along the wall's foot and up at 25 degrees (see RD19_CAM for the scouting);
+      captain's death, looking north along the wall's foot and up at 23.5 degrees (see RD19_CAM for the scouting);
       focus on the captain's head. C.march_patrol("rd19") (the clock: the captain at y 55.0 on 1142, 52.9 on "back"
       1169, 49.86 on the landing 1210), all five on the strip in a clean file walking at the lens under the planks.
       On C.release_frame() ("back" 1169) the row retracts (C.row.retract) and the day set is released
@@ -297,6 +306,14 @@ def rd19_drop(st, s, C, nar):
       and the captain's bottle and banner on bottle_spot / banner_spot, big in the foreground
       (C.memo["rd_drops"]), their spin phased for rd20 (RD20_FACE). Heroes: the captain, the file. Lights gold near
       (0, 50, 4).
+    MEASURED (tools.legday_geo; palette_check on 1170, 1204, 1212: all ok, the captain 100 % inside): on "back" the
+      captain's head x 41-47 %, y 53-57 %, face 33 px, the four behind him 25-15 px in a line to x 55 %; on 1200
+      (falling) his face 55 px at x 33 %, the banner tipped back, the anvils a dark line down the face above the
+      file; on the impact 65 px, red, tipping toward the lens's side (x 48-65 %). The planks snap in at the top of
+      the frame on 1170-1172 (y 0-20 %, partly under the Reels top icons); the anvils' two-frame hang happens above
+      the frame's top (from this low camera the planks hide the anvils standing on them) and the anvils come into
+      the frame from about 1190. Stills: out/test/legday_pal_rd19_drop_1170 / _1204 / _1212_zones.png. Motion: the
+      preview frames 1142-1248 (the poofs 1232-1248 carry over the cut into rd20).
     """
     f0, f1 = s.frame_start, s.frame_end
     f_back = C.release_frame()
@@ -390,6 +407,10 @@ def rd20_banner(st, s, C, nar):
       (50 degrees off on the word itself and at the push's end: 64 % of its width) and the bottle 8 frames after
       "bottle" (the scout of the stub had the banner edge-on ON "banner"). Heroes: the banner and the bottle. Lights
       gold near (1, 51).
+    MEASURED (tools.legday_geo): the banner at x 43 % on 1252, 40 % on "banner", 32 % on 1306; the bottle at x 56 /
+      58 / 64 %, both at y 36-49 % on 1306 (the middle third); rd19's smoke still drifting over the anvils 1250-1262.
+      palette_check rd20@1300: all ok, the pair x 24-72 %, y 40-61 %, 99 % inside. Still: out/test/legday_pal_rd20_
+      banner_1300_zones.png. Motion: the preview frames 1250-1306.
     """
     items = _drops(st, s, C, "rd20")
     C.cam(s, None, focus=(1.45, 49.65, 0.3), **RD20_CAM)
@@ -440,9 +461,17 @@ def rd21_still(st, s, C, nar):
       narrator above him in the frame; the focus racks to the narrator from 1319 (0.5 s) and back to Steve from
       1336. On "cheating": his head drops to the anvil beside him (1340-1345), then he turns round to the stair
       (1346-1355, body and head: engine.players face / look_at) and his face comes to the lens (the rhyme of sq10's
-      turn away), held to the end; nothing new in 1370-1372. efe_rd (C.narrator: his redstone torch) at
-      narrator_edge tracks Steve with his head. The drops on their spots at the frame's bottom right. Heroes:
-      Steve, the narrator. Lights gold near (0, 50, 8), radius 16.
+      turn away), held to the end; nothing new in 1370-1372. efe_rd at narrator_edge, his redstone torch in his LEFT
+      hand (the lens's side: it stands against the sky), tracks Steve with his head and swings his torch hand on
+      "still" + 3 and on "redstone" + 1 (a player's arm swing: he reads by moving). The drops on their spots at the
+      frame's bottom right. Heroes: Steve, the narrator. Lights gold near (0, 50, 8), radius 16.
+    MEASURED (tools.legday_geo; palette_check on 1335 and 1358: all ok, both heroes 100 % inside): Steve's eyes x 34-35
+      %, y 54 %, face 91-92 px, 157-161 degrees off while he looks up (his back: the look reads by his head tipping
+      toward the narrator above him), 42 degrees off from 1356 (his face, three-quarter, nose up), head box y 48-62 %;
+      the narrator at x 61 %, y 22.5 %, face 13-14 px, a head-and-shoulders figure just under the end of the plank
+      row. LIMIT (reported): from any road camera with Steve in the frame the narrator 18 blocks up stays this small
+      (scouted 22 / 24 / 28 / 30 / 35 mm: 11-18 px, the closer ones put Steve's head in the caption band).
+      Stills: out/test/legday_pal_rd21_still_1335 / _1358_zones.png. Motion: the preview frames 1307-1371.
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd2")

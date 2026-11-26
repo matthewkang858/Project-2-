@@ -37,6 +37,8 @@ def main(argv):
     scene, st = ses.scene, ses.result["stage"]
     scene.render.resolution_x, scene.render.resolution_y = 540, 960
     shots = {s.name: s for s in ses.film.shots}
+    C = ses.result["context"]
+    print("[sq] memo: %s" % {k: v for k, v in C.memo.items() if k.startswith("sq")})
 
     def proj(cam, p):
         co = world_to_camera_view(scene, cam, Vector(p))

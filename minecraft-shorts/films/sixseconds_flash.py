@@ -31,7 +31,10 @@ THE LEAD'S REVIEW PASS (the story check, confirmed on the stills: out/test/sixse
   right (the puff a little behind). And a flat item spinning on the ground is EDGE-ON twice a turn (the boots were a
   thin gold sliver on 1023-1027): the stub phases the boots and the extra drop with C.rest(..., face=<the lens>,
   face_at=first picture frame + 3) so they show the lens their broad side on the cut's first picture frames (they
-  turn about 40 degrees over a cut; the boots read as boots on every frame looked at). Stills after the pass:
+  turn about 40 degrees over a cut; the boots read as boots on every frame looked at). FIX PASS (review, motion):
+  phased on first + 3 they turned up to 64 degrees off by the END of the long home cut (1072: a gold sliver), so
+  they are now phased on the MIDDLE picture frame of each cut (face_at = (first + last) // 2: 1009, 1031, 1057):
+  at most 26 / 19 / 36 degrees off broadside on any picture frame (81 % of their width or more). Stills after the pass:
   out/test/sixseconds_scout_fl16_bridge_1002_zones.png, _fl16_treasure_1025.png, _fl16_home_1045.png (boots clear at
   the bottom left, x about 18-28 %, y 55-60 %; the extra drop at the right edge of the puff).
   STILL OPEN (the lead's; answered in THE PUFF below): the puff stands at x 75-100 % (its particles rise and
@@ -132,10 +135,12 @@ def _flash(st, s, C, n):
     st.use(s, brute)
     seed, before = PUFF[s.name]
     C.puff(s, "six_flash_puff_%s" % world, f0 - before, seed=seed)
-    # the boots and the extra drop show the lens their broad side on the cut's first picture frames (edge-on they
-    # are a gold sliver)
-    C.rest(s, "golden_boots", "fl%d" % n, "six_flash_boots_%s" % world, face=lens, face_at=first + 3)
-    C.rest(s, extra, "fl%d" % n, "six_flash_extra_%s" % world, face=lens, face_at=first + 3)
+    # the boots and the extra drop show the lens their broad side in the MIDDLE of the cut's picture frames, so
+    # they turn as far off it at the start as at the end (the game's 2.39 degrees a frame: at most 26 / 19 / 36
+    # degrees off in the three cuts; phased on first + 3 the home boots were 64 degrees off, a gold sliver, by 1072)
+    mid = (first + f1) // 2
+    C.rest(s, "golden_boots", "fl%d" % n, "six_flash_boots_%s" % world, face=lens, face_at=mid)
+    C.rest(s, extra, "fl%d" % n, "six_flash_extra_%s" % world, face=lens, face_at=mid)
     C.cam(s, cam, focus=brute.head, handheld=0.003)
     st.hero(s, "brute", brute)
     C.lights(s, light)
@@ -151,13 +156,15 @@ def fl16_bridge(st, s, C, nar):
     NOW: CAMS["flash_bridge"] unchanged (handheld 0.003, focus on his head), the brute at flash_bridge facing the
       lens; on 999 his head turned 24 degrees to the puff and down, coming round 1001-1008, on the lens from 1008
       (the frame before "I") to the cut; the runner's puff (seed 204, from 987) a column of puffs beside his left arm
-      rising and thinning; the boots (frame left) and the gravel (at his left foot) phased to the lens on 1002; no
-      pillar.
+      rising and thinning; the boots (frame left) and the gravel (at his left foot) phased to the lens on 1009 (the
+      middle picture frame: 24 degrees off on 999, 26 on 1020); no pillar.
     MEASURED (out/test/sixseconds_fl_fl16_bridge_999_zones.png, _1009_zones.png; tools.sixseconds_geo
       fl16_bridge:999/1009/1020; tools.sixseconds_palette --sky soul 1009): eyes x 50.1 %, y 24.6 % on all three
       frames, head x 32.5-68.0 % / y 19.1-32.3 % turned, x 32.6-67.4 % / y 19.8-30.9 % on the lens, face 120 px;
       brute x 1.63 the blackstone (rule 1.5; the stub measured 1.56 on 1002); hero x 38-62 %, y 20-31 %, 100 %
-      inside; the puff x 64-98 %, y 14-57 % on 999 (most of it inside x 82 %; its edge against his ear on 999 only),
+      inside; the puff x 64-98 %, y 14-57 % on 999 (most of it inside x 82 %; its edge on the right side of his
+      turned head, cheek and ear, on 999-1002: the probe's turned-head box scores it brute 16.8; the draws with less
+      face overlap, 123:10 / 123:12, spill three times as far past x 82 % or hide three times as much: kept),
       x 67-92 %, y 14-40 % on 1009; boots x 12-27 %, y 50-57 %; gravel x 64-74 %, y 52-58 %. Motion: preview
       frames 999-1020 looked at (out/test/sixseconds_flash_motion.mp4, frames 0-21).
     NEIGHBOURS: before, br15_wait (the same world: the runner on the pillar); after, fl16_treasure (snap to black).
@@ -174,13 +181,16 @@ def fl16_treasure(st, s, C, nar):
     NOW: CAMS["flash_treasure"] unchanged, the brute at flash_treasure; the same look as the bridge from the first
       picture frame: turned to the puff on 1023, coming round 1025-1032 (through "stack"), on the lens to the cut;
       the puff (seed 308, from 1013) a dense column in front of the gold pile beside his left arm; the boots (in
-      front of the chest's foot) and the pearl phased to the lens on 1026.
+      front of the chest's foot) and the pearl phased to the lens on 1031 (19 degrees off on 1023 and 1039).
     MEASURED (out/test/sixseconds_fl_fl16_treasure_1023_zones.png, _1030.png; geo fl16_treasure:1023/1032;
       palette --sky wastes 1030): eyes x 50.0 %, y 24.6 % (the bridge's to 0.1 %), head x 32.3-68.1 % turned,
       x 31.4-68.5 % on the lens, face 120 px; brute x 3.17, gold hue 45 s 0.85; hero x 40-62 %, y 21-31 %, 100 %
       inside; the chest x 5-28 %, the pile x 68-100 % / y 23-48 % with the puff in front of its left half (every
-      draw at the shared anchor covers it: module docstring), the pearl x 62-74 % / y 50-57 % clear on 1030; the top
-      of the puff touches his left ear around 1030. Motion: frames 1023-1039 (mp4 frames 24-40), black 1021-1022.
+      draw at the shared anchor covers it: module docstring; on 1023-1030 it stands over the part of the pile a phone
+      shows, x 68-82 %, which reads as clean gold blocks from about 1031; the review's search, seeds 0-149 started
+      8-20 frames before, found nothing better: 10:20 clears the pile but sits over his head, 56:20 covers it the
+      same way; the chest carries "treasure" throughout), the pearl x 62-74 % / y 50-57 % clear on 1030; the top of
+      the puff touches his left ear around 1030. Motion: frames 1023-1039 (mp4 frames 24-40), black 1021-1022.
     NEIGHBOURS: before, fl16_bridge; after, fl16_home (snap to black).
     """
     _flash(st, s, C, 2)
@@ -196,7 +206,8 @@ def fl16_home(st, s, C, nar):
     NOW: CAMS["flash_home"] unchanged, the brute at flash_home, the gateway and the corridor's lava glow behind his
       head, the floor whole (no C.pit); the same look: turned to the puff on 1042, coming round 1044-1051, then the
       stare at the lens for 21 frames into gt17; the puff (seed 332, from 1030) a big cloud beside his left arm that
-      rises up the right side of the frame; the boots and the pickaxe phased to the lens on 1045.
+      rises up the right side of the frame; the boots and the pickaxe phased to the lens on 1057 (36 degrees off on
+      1042 and 1072, where the first + 3 phase left them 64 degrees off: a sliver).
     MEASURED (out/test/sixseconds_fl_fl16_home_1042_zones.png, _1053_zones.png; geo fl16_home:1042/1051/1072;
       palette --sky wastes 1053): eyes x 50.0 %, y 24.6 %, head x 32.3-68.1 % turned, x 32.0-67.8 % on the lens,
       face 120 px, his head against the lava of the corridor's end; brute x 1.87 the blackstone; hero x 38-62 %,

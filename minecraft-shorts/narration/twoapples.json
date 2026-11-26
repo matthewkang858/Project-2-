@@ -1,7 +1,7 @@
 {
  "film": "twoapples",
  "json_version": 3,
- "spec_hash": "6869f0c304244512",
+ "spec_hash": "4dae4599811a56b4",
  "spec": {
   "version": 1,
   "voice": "am_michael",
@@ -169,7 +169,7 @@
     "id": "b23",
     "text": "The player only needs one zombie.",
     "spoken": "The player only needs one zombie.",
-    "pause": 0.7,
+    "pause": 1.15,
     "speed": 1.0
    },
    {
@@ -187,13 +187,13 @@
  "sample_rate": 24000,
  "channels": 1,
  "fps": 24,
- "duration": 64.875,
- "frames": 1557,
+ "duration": 65.333333,
+ "frames": 1568,
  "lead": 0.3,
- "tail": 2.325,
+ "tail": 2.3333,
  "speech_seconds": 49.75,
  "words_per_second_speaking": 3.296,
- "words_per_second_overall": 2.635,
+ "words_per_second_overall": 2.616,
  "timing": "model",
  "loudness": {
   "target_lufs": -19.01,
@@ -263,7 +263,7 @@
   "programme_lufs": -16.09
  },
  "wav": "twoapples.wav",
- "wav_sha1": "89a5477c8b6351793769ef5401cdca06dfc08f40",
+ "wav_sha1": "14c8e938d6c3daeda9b5cd05cc916271109cec80",
  "sentences": [
   {
    "index": 0,
@@ -536,7 +536,7 @@
    "spoken": "The player only needs one zombie.",
    "start": 58.47,
    "end": 60.415,
-   "pause_after": 0.7,
+   "pause_after": 1.15,
    "speed": 1.0,
    "first_word": 153,
    "last_word": 158
@@ -546,8 +546,8 @@
    "id": "b24",
    "text": "He kept the smaller one.",
    "spoken": "He kept the smaller one.",
-   "start": 61.115,
-   "end": 62.55,
+   "start": 61.565,
+   "end": 63.0,
    "pause_after": 0.0,
    "speed": 0.9,
    "first_word": 159,
@@ -2307,56 +2307,56 @@
   {
    "text": "He",
    "caption": "He",
-   "start": 61.115,
-   "end": 61.255,
+   "start": 61.565,
+   "end": 61.705,
    "sentence": 23,
    "source": "energy",
    "estimated": false,
-   "second": 61.115,
+   "second": 61.565,
    "second_source": "energy"
   },
   {
    "text": "kept",
    "caption": "kept",
-   "start": 61.255,
-   "end": 61.53,
+   "start": 61.705,
+   "end": 61.98,
    "sentence": 23,
    "source": "model",
    "estimated": false,
-   "second": 61.235,
+   "second": 61.685,
    "second_source": "forced"
   },
   {
    "text": "the",
    "caption": "the",
-   "start": 61.53,
-   "end": 61.655,
+   "start": 61.98,
+   "end": 62.105,
    "sentence": 23,
    "source": "model",
    "estimated": false,
-   "second": 61.455,
+   "second": 61.905,
    "second_source": "forced"
   },
   {
    "text": "smaller",
    "caption": "smaller",
-   "start": 61.655,
-   "end": 62.205,
+   "start": 62.105,
+   "end": 62.655,
    "sentence": 23,
    "source": "model",
    "estimated": false,
-   "second": 61.675,
+   "second": 62.125,
    "second_source": "forced"
   },
   {
    "text": "one.",
    "caption": "one",
-   "start": 62.205,
-   "end": 62.55,
+   "start": 62.655,
+   "end": 63.0,
    "sentence": 23,
    "source": "model",
    "estimated": false,
-   "second": 62.075,
+   "second": 62.525,
    "second_source": "forced"
   }
  ],

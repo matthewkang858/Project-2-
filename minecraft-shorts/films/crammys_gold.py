@@ -22,9 +22,29 @@ pre-rolled). A twin: C.actor("steve", "gd2") ...
 NEIGHBOURS: gd06_line is followed by rd07_chased: THE HARD CUT TO NIGHT (the road sequence, from Kai's doorstep).
 """
 
+import math
+
 from films import crammys_common as CC
 
-GD01_CAM = CC.CS.CAMERAS["b01"]          # (the set builder's suggestions; make them this file's own constants)
+# ---------------------------------------------------------------------------------------------------------------- gd01
+# the set builder's b01 (music b1 aimed 0.25 lower): 35 mm f/2 at z 1.85 from the corridor, a slow push in of 0.6
+GD01_CAM = dict(pos=(-18.6, -0.6, 0.9), target=(-6.8, 0.25, 1.6), pos1=(-18.2, -0.55, 0.9),
+                target1=(-6.8, 0.25, 1.6), lens=33.0, fstop=2.0)
+GD01_STEVE = (5.35, 0.06)          # on the line from the lens to the totem, 5.35 blocks out and 0.06 to its left
+#                                    (north): his head hides the totem, his body the gold block (see gd01)
+GD01_YAW_OFF = 30.0                # degrees his body is turned from the lens (three-quarter front, to screen right)
+GD01_LOOK = (-6.6, 1.0, 2.62)      # "back to them": the middle of the four acts at eye height
+GD01_NOOR = (-5.55, 0.9, 1.0)      # Noor 0.4 north of the set's "noor" (-5.55, 0.5): clear of Steve's head
+GD_SUNNY = (-6.6, -1.7, 1.0)       # Sunny behind his note block on the pumpkin (cell y -2..-1; the set's "sunny": y -1.3)
+
+
+def _on_line(C, cam, aim, dist, left=0.0):
+    """The standing point `dist` blocks from the camera along the ground line toward `aim`, `left` blocks to the
+    left of that line (seen from the camera): a figure there hides `aim` from the lens."""
+    dx, dy = aim[0] - cam[0], aim[1] - cam[1]
+    n = math.hypot(dx, dy)
+    ux, uy = dx / n, dy / n
+    return C.stand((cam[0] + ux * dist - uy * left, cam[1] + uy * dist + ux * left))
 
 
 def gd01_everyone(st, s, C, nar):
@@ -72,25 +92,37 @@ def gd01_everyone(st, s, C, nar):
     bd = C.bd
     steve = C.actor("steve", "gd")
     z, k, su, no = (C.actor(n, "gd") for n in ("zuri", "kai", "sunny", "noor"))
-    C.put(steve, f0, "steve_front")
-    for p, spot in ((z, "zuri"), (k, "kai"), (su, "sunny"), (no, "noor")):
+    lens = (GD01_CAM["pos"][0], GD01_CAM["pos"][1], 1.75)
+    sp = _on_line(C, GD01_CAM["pos"], C.bd.pedestal_top, *GD01_STEVE)
+    C.put(steve, f0, sp, yaw=CC.yaw_to(sp, lens) + math.radians(GD01_YAW_OFF))
+    for p, spot in ((z, "zuri"), (k, "kai")):
         C.put(p, f0, spot)
+    C.put(su, f0, GD_SUNNY, yaw=C.yaw("sunny"))
+    C.put(no, f0, GD01_NOOR, yaw=C.yaw("noor"))
+    # the acts: a note in the air from the first frames, then a note above each of the three blocks during
+    # "everyone is musical" (33-60), Noor's horn up to her face on "everyone" (a horn makes no note)
+    every = C.at(s, "everyone")
     C.hold(no, "goat_horn", s)
-    no.toot(f0 + 4, f1)
-    bd.tap("zuri", z, f0 + 2, camera=s)                     # a note already rising on the first frames
-    bd.tap("kai", k, f0 + 14, camera=s)
-    bd.tap("sunny", su, f0 + 26, camera=s)
-    bd.tap("zuri", z, f0 + 40, camera=s)
-    bd.tap("kai", k, f0 + 52, camera=s)
-    lens = (GD01_CAM["pos"][0], GD01_CAM["pos"][1], 1.7)
+    no.toot(every - 4, f1 - 6)
+    for who, p, frames in (("zuri", z, (f0 + 1, every - 3, every + 13)),
+                           ("kai", k, (f0 + 11, every + 3, every + 19)),
+                           ("sunny", su, (f0 + 21, every + 8, every + 24))):
+        for f in frames:
+            bd.tap(who, p, f, camera=s)
+    # Steve: the narrator to the lens; on "everyone" he turns round to look at them (body and head: the head alone
+    # stops at 70 degrees and showed only his hair), on "except" back to the lens, there by "me"
     steve.look_at(f0, lens, ease=0)
-    turn = C.at(s, "musical") - 6
-    steve.look_at(turn, C.eyes("kai"), ease=10)              # his head back to them ...
-    steve.look_at(C.at(s, "except") - 2, lens, ease=10)        # ... and to the front
+    turn = every - 2
+    steve.idle(f0, turn - 1)
+    C.turn_to(steve, turn, GD01_LOOK, ease=10)
+    back = C.at(s, "except") - 3
+    yaw34 = CC.yaw_to(sp, lens) + math.radians(GD01_YAW_OFF)
+    steve.face(back, (sp[0] + 3.0 * math.sin(yaw34), sp[1] - 3.0 * math.cos(yaw34), sp[2]), ease=10)
+    steve.look_at(back, lens, ease=10)
     C.totem(s)
     st.use(s, steve, z, k, su, no)
     st.hero(s, "steve", steve)
-    C.cam(s, "set:b01", focus=steve.head)
+    C.cam(s, None, focus=steve.head, **GD01_CAM)
     C.lights(s, "gold")
 
 

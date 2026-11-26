@@ -168,7 +168,9 @@ NARRATION = {
         {"text": "Babies grow up in twenty minutes.", "id": "b20", "pause": 0.9},  # the chase needs its time
         {"text": "I'm still small.", "id": "b21", "pause": 0.7},
         {"text": "The night I came down, the zombie found me first.", "id": "b22", "pause": 0.45},
-        {"text": "The player only needs one zombie.", "id": "b23", "pause": 0.7},  # the poof, the look down
+        {"text": "The player only needs one zombie.", "id": "b23", "pause": 1.15},  # THE LONGEST PAUSE: before
+        #   the last line (the poof, the sword lowered, the look down; then the box). It was 0.7, shorter than three
+        #   earlier pauses (the story check): opened to 1.15 (The Hello: 1.5); the film 64.88 -> 65.33 s
         # the last line a tenth slower: the storyteller slows down for the punchline (the series' endings)
         {"text": "He kept the smaller one.", "id": "b24", "speed": 0.9},
     ],

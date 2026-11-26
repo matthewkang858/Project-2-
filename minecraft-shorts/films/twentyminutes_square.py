@@ -27,8 +27,86 @@ PREVIEWS through render.py: --samples 5 (PREVIEW_SAMPLES["square"]).
 """
 import math
 
+from engine import characters as CH
 from engine import towers
 from films import twentyminutes_common as TC
+from films import twentyminutes_set as TS
+
+# ---------------------------------------------------------------------------------------------------------------------
+# THIS SEQUENCE'S OWN CAMERAS AND PLACES (the contract: the square owns CAMS "plaza", "tilt", "hat" and PLACES
+# "baby_square"; each redefined at most ONCE, here, and used unchanged by every shot that shares it)
+# ---------------------------------------------------------------------------------------------------------------------
+# CAMS "plaza" REDEFINED (sq01 only): the lens 0.25 HIGHER than the lead's (z 0.8, still the height of the baby's
+# head) and aimed 0.8 lower, with a slow linear push of 0.2 toward the baby. Measured (tools.twentyminutes_geo,
+# sq01:30): at the lead's z 0.55 the well's two-high rim hid house_c's door below its top third and the two adults on
+# the plaza were hidden either by the rim (x < 30 %) or by the baby's head (x 28-66 %): their run and the door read
+# nowhere. At z 0.8 their heads clear the rim (eyes "clear" at x 16-28 %) and the door shows from z 1.6 up; the lowered
+# aim keeps the baby's head above the caption band and the pod's roof under it at y 13.6 %.
+PLAZA = dict(TC.CAMS["plaza"], pos=(9.3, -0.6, 0.7), target=(-21.85, 18.65, -0.2), pos1=(9.17, -0.52, 0.67), fstop=5.0,
+             ease="linear")
+# sq01: Steve walks at the lens from the plaza's north-west corner and STOPS 2.0 blocks short of the baby on "player",
+# at the frame's right (eyes x 67 %, y 32 %); he passes it in sq02
+STEVE_IN = [(-3.74, 9.45), (5.0, 2.6)]
+# sq01: the armorer and the shepherd stand west of the plaza at the left of the frame (left of the baby's head, their
+# heads above the well's rim), turn from Steve and hurry into house_c (TS.HOUSE_C_IN: the dirt path, the oak-stairs
+# step, the door cell, inside); its door snaps open before the first and shuts behind the second (a door has no
+# swing in the game)
+FLEE = (("armorer", (-8.4, 7.05), 22), ("shepherd", (-7.1, 7.2), 25))   # (role, spot, frame offset of the run)
+BABY_LOOK_OFF = 70.0       # the baby's nose at most this far from the lens (C.cheat): nose and the near eye show
+# sq03: the baby starts 0.9 behind Steve (towers' push_baby) and, on "takes", runs three steps after them to stop with
+# its centre this far behind his (0.7 clear of his legs: his half-width 0.3, its 0.15)
+# CAMS "tilt" REDEFINED (sq04_tilt only): the lead's linear tilt with its START panned 3 degrees right (heading 150.8
+# instead of 153.8; the same 36.7-block aim distance, the same pitch -8.5, the same end): the baby's head box at the
+# cut was x 50-88 % (past the safe area's 82); the move is now an almost pure tilt (2.4 degrees of pan, 11.4 of tilt)
+TILT = dict(TC.CAMS["tilt"], target=(-22.39, 17.11, -4.87))
+TILT_SIDE = 78.0           # sq04_tilt: the baby's nose this far from the lens on the cut (to its right: the profile)
+# CAMS "hat" REDEFINED (sq04_hat only): 300 mm instead of 200 from the same spot on the plaza, aimed at her head and
+# drifting 0.12 down over the shot (a long lens floats: the sway on the aim is 0.05 at 37 blocks): her head and hat
+# fill about half the width; with 200 mm the glass frames of the near wall and the roof and the pillar's stone top
+# filled the frame around a small hat (the lead's tile)
+HAT = dict(TC.CAMS["hat"], lens=300.0, target=(-20.5, 18.45, 11.62), target1=(-20.5, 18.45, 11.5), ease="linear")
+HAT_SWAY = 0.05
+PUSH_BABY = ("push_baby", 1.15, 5)          # (start, centre gap at the stop, frames after "grownups" it runs)
+# sq03: SIDE-ON at baby height from the plaza's north side (the set's b03 stood west of them, 18 mm: three small
+# figures in a wide frame, Steve beside her rather than behind her, and its pan ran on to x 3.0, so Mom left the
+# frame by the cut); 24 mm 2.9 blocks from the path, the pan following Mom (who moves right) and ending between Mom
+# and the baby; the sun behind the lens lights their faces
+PUSH_CAM = dict(pos=(5.0, 10.4, 0.5), target=(6.6, 6.0, 0.9), target1=(5.1, 6.0, 0.9), lens=20.0, fstop=2.8,
+                ease="linear")
+# sq02: Steve walks on from where he stopped, past the baby's north-north-east side, between it and the low sun
+# (azimuth 62 = bearing 28, elevation 27): his torso's shadow crosses its face as he passes 0.9 from it (the story's
+# "his shadow crosses its face"; on the lead's camera from the north-west his path was on the sunny side). The lens
+# is on the far side of his path, 2.7 from the baby at bearing 53 (north-east), 50 mm: the baby's face front
+# three-quarter, his legs crossing the foreground right to left on "not".
+STEVE_PAST = [(7.35, 2.64), (12.15, 0.9)]
+FACE_CAM = dict(pos=(9.02, 3.15, 0.72), target=(6.40, 1.13, 0.45), lens=45.0, fstop=2.0,
+                pos1=(8.94, 3.09, 0.71), ease="linear")
+
+
+def _track_points(c, f0, f1, point_at, step=2):
+    """Keep c's head on point_at(f) (a point that moves with the frame) from f0 to f1 in ONE smooth curve, re-aimed
+    every `step` frames (Character.track, for a cheated look). Key look_at(f0, point_at(f0), ease=0) first."""
+    yk, pk = [(f0, None)], [(f0, None)]
+    f = f0 + step
+    while f < f1:
+        yaw, pitch = c._aim(point_at(f), f)
+        yk.append((f, yaw))
+        pk.append((f, -pitch))
+        f += step
+    yaw, pitch = c._aim(point_at(f1), f1)
+    yk.append((f1, yaw))
+    pk.append((f1, -pitch))
+    CH._segment(c.head, CH._ROT, 2, yk, "BEZIER")
+    CH._segment(c.head, CH._ROT, 0, pk, "BEZIER")
+    return f1
+
+
+def _first_frame(c, f0, f1, test):
+    """The first frame in f0..f1 at which test(c.pos_at(frame)) holds (f1 when it never does)."""
+    for f in range(int(f0), int(f1) + 1):
+        if test(c.pos_at(f)):
+            return f
+    return int(f1)
 
 
 def sq01_afraid(st, s, C, nar):
@@ -67,27 +145,45 @@ def sq01_afraid(st, s, C, nar):
       tilting to 3.4 up from f0 + 30; Steve along tm_steve_square from f0; the two along their flee paths (the
       shepherd 5 frames later), the door open / shut on the set's offsets. Hero: the baby.
     """
-    f0, v = s.frame_start, C.v
+    f0, f1, v = s.frame_start, s.frame_end, C.v
     baby = C.actor("baby", "sq")
-    bp = C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
-    by = C.yaw("tm_baby_square")
     steve = C.actor("steve", "sq")
-    path = v.paths["tm_steve_square"]
-    steve.place(f0, path[0], TC.yaw_to(path[0], path[1]))
-    steve.walk(f0, path)
-    ahead = (bp[0] + 2.0 * math.sin(by), bp[1] - 2.0 * math.cos(by))
-    baby.look_at(f0, (ahead[0], ahead[1], bp[2] + 1.2), ease=0)
-    baby.look_at(f0 + 30, (ahead[0], ahead[1], bp[2] + 3.4), ease=24)
-    arm, she = C.actor("armorer", "sq"), C.actor("shepherd", "sq")
-    ends = []
-    for c, key, delay in ((arm, "tm_flee_armorer", 0), (she, "tm_flee_shepherd", 5)):
-        pts = v.paths[key]
-        c.place(f0, pts[0], TC.yaw_to(pts[0], pts[1]))
-        ends.append(c.walk(f0 + delay, pts, run=True))
-    v.door_open("house_c", ends[0] - 12, open=True, frames=5)
-    v.door_open("house_c", ends[1] + 1, open=False, frames=5)
-    st.use(s, baby, steve, arm, she)
-    C.cam(s, "plaza", focus=baby.head)
+    adults = [(C.actor(role, "sq"), spot, delay) for role, spot, delay in FLEE]
+    # place() everybody on the first frame, then the looks
+    C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
+    steve.place(f0, C.stand(STEVE_IN[0]), TC.yaw_to(STEVE_IN[0], STEVE_IN[1]))
+    for c, spot, _d in adults:
+        C.put(c, f0, spot, toward=STEVE_IN[0])          # they stand facing the player coming across the plaza
+    # Steve: at speed on frame 1, straight at the lens, slowing to a stop 2 blocks short of the baby on "player"
+    steve.walk(f0, [C.stand(p) for p in STEVE_IN], ramp=(False, True))
+    stop = _first_frame(steve, f0, f1, lambda p: (p.x - STEVE_IN[1][0]) ** 2 + (p.y - STEVE_IN[1][1]) ** 2 < 1e-4)
+    steve.look_at(f0, (STEVE_IN[1][0], STEVE_IN[1][1], 1.62), ease=0)        # eyes ahead while he walks
+    steve.watch(C.at(s, "afraid") - 6, f1, baby, ease=10)                    # ... down at the baby from "afraid"
+    # the baby: its head on him all shot, cheated to BABY_LOOK_OFF from the lens (its body is 99 degrees off the
+    # lens: from behind its looked-at-him head was a blank pink box), so its nose and near eye show; it tilts up
+    # as he comes (his eyes rise from 4 to 25 degrees above its own)
+    cam_pos = PLAZA["pos"]
+
+    def at_him(f):
+        return C.cheat(baby, f, tuple(steve.eye_point(f)), cam_pos, max_off=BABY_LOOK_OFF)
+
+    baby.look_at(f0, at_him(f0), ease=0)
+    _track_points(baby, f0, f1, at_him, step=3)
+    # the two adults: heads on him from frame 1, turn and hurry into house_c; the door snaps open before the first
+    # and shuts behind the second, on "afraid"
+    ins = []
+    for c, spot, delay in adults:
+        c.look_at(f0, steve, ease=0)
+        c.track(f0, f0 + delay, steve, step=3, ease=2)
+        route = [C.stand(spot)] + [tuple(p) for p in TS.HOUSE_C_IN]
+        ins.append(c.walk(f0 + delay, route, run=True))
+    first_at_door = _first_frame(adults[0][0], f0, f1, lambda p: p.x < -9.3)
+    last_in = _first_frame(adults[1][0], f0, f1, lambda p: p.x < -11.25)
+    v.door_open("house_c", first_at_door - 2, open=True, frames=1)
+    v.door_open("house_c", last_in + 2, open=False, frames=1)
+    C.memo["sq_door"] = (first_at_door - 2, last_in + 2, stop)
+    st.use(s, baby, steve, *[c for c, _s, _d in adults])
+    C.cam(s, None, focus=baby.head, **PLAZA)
     st.hero(s, "baby", baby)
     C.lights(s, "square")
 
@@ -116,18 +212,26 @@ def sq02_imnot(st, s, C, nar):
     NOW (stub = the set's stage_b02): camera "set:b02" (4.69, 2.57, 0.72) -> the baby, 50 mm f/2; Steve along
       tm_steve_past from f0 + 6; the baby's head on him every 4 frames. Hero: the baby.
     """
-    f0, v = s.frame_start, C.v
+    f0, f1 = s.frame_start, s.frame_end
     baby = C.actor("baby", "sq")
-    C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
     steve = C.actor("steve", "sq")
-    path = v.paths["tm_steve_past"]
-    steve.place(f0, path[0], TC.yaw_to(path[0], path[1]))
-    steve.walk(f0 + 6, path)
-    baby.look_at(f0, steve, ease=0)
-    for f in range(f0 + 4, s.frame_end + 1, 4):
-        baby.look_at(f, steve, ease=3)
+    C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
+    a, b = (C.stand(p) for p in STEVE_PAST)
+    steve.place(f0, a, TC.yaw_to(a, b))
+    # he walks at the game's speed from the cut and is level with the baby's north-north-east (its face in his
+    # torso's shadow) on "not"; past the lens he walks out of the frame's left edge
+    steve.walk(f0, [a, b], ramp=(False, False))
+    steve.look_at(f0, (b[0] + 1.0, b[1] - 0.36, 1.62), ease=0)        # he looks where he walks: never at it
+    # the baby's head follows him, cheated to BABY_LOOK_OFF from the lens while he is behind its shoulder; tilted up
+    cam_pos = FACE_CAM["pos"]
+
+    def at_him(f):
+        return C.cheat(baby, f, tuple(steve.eye_point(f)), cam_pos, max_off=BABY_LOOK_OFF)
+
+    baby.look_at(f0, at_him(f0), ease=0)
+    _track_points(baby, f0, f1, at_him, step=2)
     st.use(s, baby, steve)
-    C.cam(s, "set:b02", focus=baby.head)
+    C.cam(s, None, focus=baby.head, handheld=0.004, **FACE_CAM)
     st.hero(s, "baby", baby)
     C.lights(s, "square")
 
@@ -165,22 +269,33 @@ def sq03_grownups(st, s, C, nar):
       the plaza's north path), focus on Mom; her head turned 2 west, 2.2 north, 1.6 up every 12 frames; the baby on
       push_baby runs from f0 + 24 to 1.2 behind Steve. Hero: Mom.
     """
-    f0, v = s.frame_start, C.v
+    f0, f1, v = s.frame_start, s.frame_end, C.v
     steve, mom = C.actor("steve", "sq"), C.actor("mom", "sq")
-    r0 = v.paths["tower_push_square"][0]
-    route = [tuple(r0), (r0[0] - _push_length(s.frame_end - 2 - f0), r0[1], r0[2])]
-    towers.push(steve, mom, f0, route)
-    for f in range(f0, s.frame_end + 1, 12):
-        p = mom.pos_at(f)
-        mom.look_at(f, (p.x - 2.0, p.y + 2.2, p.z + 1.6), ease=0 if f == f0 else 4)
     baby = C.actor("baby", "sq")
-    C.put(baby, f0, "push_baby")
-    fb = f0 + 24
-    here, his = baby.pos_at(fb), steve.pos_at(fb + 10)
-    baby.walk(fb, [tuple(here), (max(his.x + 1.2, here.x - 1.6), here.y, here.z)], run=True)
-    baby.look_at(fb, mom, ease=4)
+    r0 = v.paths["tower_push_square"][0]
+    route = [tuple(r0), (r0[0] - _push_length(f1 - 2 - f0), r0[1], r0[2])]
+    towers.push(steve, mom, f0, route)                   # place()s both ON f0
+    C.put(baby, f0, PUSH_BABY[0], toward=r0)
+    end = mom.pos_at(f1)
+    # Mom: her head up and to the side, toward the tower she is pushed to (WNW, 18 degrees up): the straw hat's
+    # brim and her nose to the lens three-quarter (she may look where the push takes her: before the pod)
+    pod = C.A["pod_target"]
+    mom.look_at(f0, pod, ease=0)
+    _track_points(mom, f0, f1, lambda f: pod, step=4)
+    # Steve looks where he pushes, never at the baby (eyes level along the path)
+    steve.look_at(f0, (end.x - 6.0, end.y, 1.62), ease=0)
+    # the baby: its head on Mom; after "grownups", once Steve shoves her on, it runs after them and stops 0.7 clear
+    # of his legs, its head still on her
+    baby.look_at(f0, mom, ease=0)
+    fb = C.at(s, "grownups") + PUSH_BABY[2]
+    here, his = baby.pos_at(fb), steve.pos_at(f1)
+    stop = (his.x + PUSH_BABY[1], here.y, here.z)
+    baby.track(f0, fb, mom, step=3, ease=2)
+    e = baby.walk(fb, [tuple(here), stop], run=True)
+    baby.track(e, f1, mom, step=3, ease=3)
+    C.memo["sq_push"] = (fb, e, tuple(round(c, 2) for c in end), tuple(round(c, 2) for c in stop))
     st.use(s, steve, mom, baby)
-    C.cam(s, "set:b03", focus=mom.head)
+    C.cam(s, None, focus=mom.head, **PUSH_CAM)
     st.hero(s, "mom", mom)
     C.lights(s, "square")
 
@@ -238,16 +353,25 @@ def sq04_tilt(st, s, C, nar):
       baby_square looking at the pod (pod_target); Mom on mom_glass on the zombie (C.on_zombie); the zombie in its cell
       (look=Mom). Hero: the baby (the pod is a point, not an object: check it on the stills).
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     baby = C.actor("baby", "sq")
-    C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
-    baby.look_at(f0, C.A["pod_target"], ease=0)
     mom = C.actor("mom", "sq")
+    bp = C.put(baby, f0, "baby_square", yaw=C.yaw("tm_baby_square"))
     C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0, until=s.frame_end)
+    # the baby: on the cut its head is turned to its right, level, the nose TILT_SIDE degrees from the lens (its
+    # profile against the well's wall: from behind, looking at the pod, it was a blank pink box at 165 degrees);
+    # on "mom" it turns and lifts its head to the pod over 14 frames (the head stops 70 degrees from its body: from
+    # here a lost profile tipped back, the back of its head, soft by then) and holds it there
+    eye = baby.eye_point(f0)
+    lens = TILT["pos"]
+    b = math.atan2(lens[0] - eye.x, lens[1] - eye.y) - math.radians(TILT_SIDE)
+    baby.look_at(f0, (eye.x + 2.0 * math.sin(b), eye.y + 2.0 * math.cos(b), eye.z - 0.15), ease=0)
+    up = C.at(s, "mom")
+    baby.look_at(up, C.A["pod_target"], ease=14)
+    C.on_zombie(mom, f0, until=f1)
     C.zombie(s, "sq", look=mom)
     st.use(s, baby, mom)
-    C.cam(s, "tilt", focus=baby.head)
+    C.cam(s, None, focus=baby.head, **TILT)
     C.rack(s, TC.TS.POD_FRONT, C.at(s, "at"), frames=10)     # sharp on the pod from 222: 8 frames before the cut
     st.hero(s, "baby", baby)
     C.lights(s, "square")
@@ -279,15 +403,22 @@ def sq04_hat(st, s, C, nar):
     NOW (stub = the set's stage_b04_long): CAMS "hat", focus on Mom; Mom on mom_glass on the zombie; the zombie in its
       cell; the panes on the lines to her hidden. Hero: Mom.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     mom = C.actor("mom", "sq")
     mp = C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0, until=s.frame_end)
+    C.on_zombie(mom, f0, until=f1)
     C.zombie(s, "sq", look=mom)
     st.use(s, mom)
-    c = C.cam(s, "hat", focus=mom.head, handheld=0.003)
-    pts = [(mp[0], mp[1], mp[2] + dz) for dz in (1.0, 1.35, 1.62, 1.95, 2.1)]
-    pts += [(mp[0] + dx, mp[1], mp[2] + 1.6) for dx in (-0.3, 0.3)]
+    c = C.cam(s, None, focus=mom.head, handheld=HAT_SWAY, **HAT)
+    # every pane of the near wall and the roof in the picture is hidden (a grid of lines from the lens to her depth):
+    # only the far walls' frames stay behind her, so it reads as glass without lines across the frame
+    d = (mp[0] - c["pos"][0], mp[1] - c["pos"][1])
+    n = math.hypot(*d)
+    right = (d[1] / n, -d[0] / n)
+    eye = mom.eye_point(f0)
+    pts = [(eye.x + a * right[0], eye.y + a * right[1], eye.z + b)
+           for a in (-1.2, -0.9, -0.6, -0.3, 0.0, 0.3, 0.6, 0.9, 1.2)
+           for b in (-1.0, -0.7, -0.4, -0.1, 0.2, 0.5, 0.8, 1.1, 1.4)]
     C.panes(s, c["pos"], pts, n=3)
     st.hero(s, "mom", mom)
     C.lights(s, "square")

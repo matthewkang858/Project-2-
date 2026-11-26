@@ -35,6 +35,7 @@ frames the stubs leave in C.memo: rd07_frames).
 """
 import math
 
+from engine import characters, shots
 from films import crammys_common as CC
 
 # rd07 and rd17 film through the SHARED camera C.cam(s, "lane", ...) (films/crammys_common.py CAMS["lane"]: 16 mm f/2.8
@@ -47,18 +48,46 @@ RD17_RUN = ((-1.3, 24.0), (-1.4, 18.5), (-1.5, 15.7), (-1.6, 13.0), (-1.4, 9.0),
 #                                        the WEST side of the road (in view over Kai's column from x 90 % at y 18.5
 #                                        to x 3 % at y 12); its point RD17_MID (-1.5, 15.7) is mid-frame
 RD17_MID = 2
-RD17_EARLY = 0.7                        # on "arrows" he is this far short of RD17_MID (x 60 %): his arrows stick out
+RD17_EARLY = 1.15                       # on "arrows" he is this far short of RD17_MID (x 65 %): his arrows stick out
 #                                        to his front right, so they show while he comes in from the right
-RD09_D0 = 2.6                           # rd09: Steve's distance along crammys_walk_out on frame 1 (in frame, walking)
+RD09_D0 = 1.2                           # rd09: Steve's distance along RD09_WALK on frame 1 (in frame, walking)
+# rd09: low behind him at the gate (the set's b09, 20 mm from (-1.5, 18.8, 0.55), static there), re-aimed 0.25 to the
+# right so that his head is inside the safe area on frame 1 (x 64-83 %), with a slow rise (0.55 -> 0.7) and tilt up
+# drifting a touch left: the last torch comes further into the top left as he gets small in the middle
+RD09_CAM = dict(pos=(-1.5, 18.8, 0.55), target=(1.45, 34.0, 1.6), pos1=(-1.5, 18.72, 0.7),
+                target1=(1.2, 34.0, 1.85), lens=20.0, fstop=2.8)
+RD09_WALK = ((-0.35, 20.6), (0.45, 25.5), (0.6, 30.0), (1.7, 31.9), (1.9, 32.1), (2.6, 33.4), (5.0, 35.6))
+#                                         his way out: up the WEST half of the exit road between the gate's lamp
+#                                         posts, then crammys_walk_out from (0.6, 30) on to the creeper (md10)
 # THE CHASE (rd07; measured with tools/crammys_probe track rd07_chased 509-564:3)
-RD07_RUN = ((-1.4, 8.5), (-1.5, 12.0), (-1.75, 14.4), (-2.4, 15.45), (-3.0, 15.5, 0.0), (-4.0, 15.5, 1.0),
-            (-4.5, 15.5, 1.0), (-5.9, 15.5, 1.0))      # Steve's way home: up the WEST side of the road (lane_home's
-#                                                    x 0.3 is behind Kai's column), the step, the door, inside
+RD07_RUN = ((-1.4, 8.5), (-1.5, 12.0), (-1.75, 14.4), (-2.4, 15.45), (-2.7, 15.5),
+            (-4.5, 15.5), (-5.9, 15.5))      # Steve's way home: up the WEST side of the road (lane_home's x 0.3 is
+#                                              behind Kai's column), over his stairs, through the door, inside.
+#                                              Walked FLAT (Player.walk measures a path in 3D: risers in the path
+#                                              slowed his sprint by 2 frames to the door), then the height re-keyed
+#                                              by _step_up with RD07_STEPS
+RD07_STEPS = ((-2.7, 0.5), (-3.2, 1.0))     # house_e's cobblestone stairs ((-4, 15), facing west: the low step
+#                                              x -3.5..-3 tops at z 0.5, the high one x -4..-3.5 at z 1, the house
+#                                              floor z 1): the game steps a player up a riser of 0.6 or less at once
+#                                              when his 0.6-wide box meets it, i.e. when his centre is 0.3 short of
+#                                              it (x -2.7 and -3.2); the lead's 1-block ramp from x -3 sank his feet
+#                                              into the stair. (x where the step-up starts, the height after it)
+RD07_STEP_FRAMES = 0.8                  # the rise of one step-up (a fraction of a tick, blurred)
 RD07_STEVE_D0 = 3.0                     # Steve's distance along RD07_RUN on frame 1 (sprinting; at the left edge)
 RD07_ZOMBIE_GAP = 0.45                  # the zombie this far behind him on frame 1 (it falls back: 2.33 vs 5.61 b/s)
 RD07_DOOR_X = -3.9                      # the door's threshold (the step's west edge is x -4.0)
 RD07_CLEAR_X = -5.35                    # past the shut door's panel (x -5.0 .. -4.81) by half his width
-RD07_OPEN_LEAD = 6                      # the door opens this many frames before he reaches it
+RD07_OPEN_LEAD = 6                      # his right-click opens the door this many frames before he reaches it
+RD07_TURN = 3                           # frames of his turn back to the door inside (a player turns with the mouse)
+RD07_SHUT_AFTER_NIGHT = 1               # his right-click that shuts the door: this many frames after "night" appears
+#                                         (the door is shut one frame later, in the middle of the word)
+RD07_KAI_LOOK = 4                       # Kai's head leaves his note block for the road this many frames after the cut
+RD07_KAI_TAP = 2                        # Kai taps his note block this many frames before the cut (the note one tick
+#                                         later: in the air on frame 1; the swing at its top 2.4 frames after the tap)
+RD07_KAI_HAND = "left"                  # his near hand: turned to the block (south-south-west), his right arm is on
+#                                         the far side of his body from the lens and its swing was not seen
+#                                         (crammys_road_rd07_chased_510: a left-handed player, the game's "Main
+#                                         Hand: Left" option, swings the left arm)
 
 
 def _along(path, d):
@@ -72,6 +101,38 @@ def _frame_x(c, a, b, x):
         if c.pos_at(f).x <= x:
             return f
     return int(b)
+
+
+def _step_up(c, f_from, f_to, steps, rise=RD07_STEP_FRAMES):
+    """Re-key the height of a walk west along y (c.walk(f_from, flat route) ending on f_to) so that it steps up each
+    riser as the game does: the height holds until the root's x passes the riser's `edge` (a fractional frame),
+    then rises to `z_after` over `rise` frames while he runs on at full speed. Returns the step-up frames."""
+    z = c.pos_at(f_from).z
+    keys, out, f = [(float(f_from), None, "LINEAR")], [], int(f_from)
+    for edge, z_after in steps:
+        while f < f_to and c.pos_at(f + 1).x > edge:
+            f += 1
+        a, b = c.pos_at(f).x, c.pos_at(f + 1).x
+        t = f + (a - edge) / (a - b) if abs(a - b) > 1e-6 else float(f)
+        keys += [(t, z, "LINEAR"), (t + rise, z_after, "LINEAR")]
+        out.append(t)
+        z = z_after
+    keys.append((float(f_to), z))
+    characters._segment(c.root, "location", 2, keys)
+    return out
+
+
+def _door_snap(C, name, a, b):
+    """A door changes state AT ONCE in the game (no swing): v.door_open(..., frames=1) keys each change over one
+    frame, and the motion blur of that frame showed a ghosted half-open panel (The Hello, dg20). Hold every key of
+    the door's swing channel from frame a to b CONSTANT (films/hello_door_gold.py's fix)."""
+    for d in C.v._door_sets[name]:
+        for fc in shots.fcurves_of(d):
+            if fc.data_path == "rotation_euler" and fc.array_index == 2:
+                for k in fc.keyframe_points:
+                    if a <= k.co.x <= b:
+                        k.interpolation = "CONSTANT"
+                fc.update()
 
 
 def rd07_chased(st, s, C, nar):
@@ -125,37 +186,57 @@ def rd07_chased(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     kai = C.actor("kai", "rd")
-    C.put(kai, f0, "kai_lane", yaw=C.yaw("lane_kai"))
+    bells = C.bd.notes["lane"]                                 # his note block on gold at the top of his column
     steve = C.actor("steve", "rd")
     z = C.actor("zombie", "rd")
     path = [C.stand(p) if len(p) == 2 else p for p in RD07_RUN]
-    # Steve: already sprinting on frame 1 (at the frame's left edge), up the west side of the road where the lens
-    # sees him over Kai's column, straight through his door (opened as he comes: a player right-clicks a door from
-    # up to 4.5 blocks away) into the house
-    run = _along(path, RD07_STEVE_D0)
-    steve.place(f0, run[0], CC.yaw_to(run[0], run[1]))
-    in_end = steve.walk(f0, run, sprint=True, ramp=(False, True))
-    fd = _frame_x(steve, f0, in_end, RD07_DOOR_X)              # his feet at the door's threshold
-    fin = _frame_x(steve, f0, in_end, RD07_CLEAR_X)            # clear of the shut door's panel (x -5.0, his half width)
-    steve.attack(fd - RD07_OPEN_LEAD, "right")                 # the right-click that opens it ...
-    C.v.door_open("house_e", fd - RD07_OPEN_LEAD)              # ... open over 5 frames, before he reaches it
-    shut = fin + 1
-    steve.attack(shut, "right")                                # inside, the right-click that shuts it (in the dark
-    C.v.door_open("house_e", shut, open=False)                 # of the doorway); shut 5 frames later
+    # Kai on his doorstep, turned to his note block (a player faces the block he plays), playing his bells as the
+    # night shot opens: the swing ON the cut, the note one tick later, rising over the block (frame 1 moves); the
+    # same Kai of beat 3 ("he plays bells") at his own door
+    # (kai_rd is in no shot before this one: he is placed RD07_KAI_TAP frames before the cut, so that the note is
+    # already in the air on frame 1 and his arm is at the top of its swing)
+    C.put(kai, f0 - RD07_KAI_TAP, "kai_lane", toward=bells.center[:2])
     # the zombie, arms out, BEHIND him on the same way at the game's 2.33 blocks/s (he sprints at 5.61: it falls
-    # back), walking on up to the foot of his door step after the door has shut
-    zp = [p for p in path if p[2] < 0.5] + [C.P("zombie_stop")]
+    # back), walking on up to the foot of his stairs after the door has shut, and standing there facing it
+    zp = list(path[:5]) + [C.P("zombie_stop")]
     zp = [p for p in zp if p[0] > C.P("zombie_stop")[0] - 1e-6]
     zrun = _along(zp, max(0.0, RD07_STEVE_D0 - RD07_ZOMBIE_GAP))
     z.place(f0, zrun[0], CC.yaw_to(zrun[0], zrun[1]))
     z.aggro(f0, ease=0)
     zend = z.walk(f0, zrun)
-    # Kai's head follows Steve (on frame 1 it is already turning toward him, down the road to the south) and then
-    # the zombie at the shut door
-    kai.look_at(f0, steve.eye_point(f0 + 6), ease=0)
-    kai.track(f0 + 1, fin, steve, step=3, ease=5)
-    kai.look_at(fin + 3, z, ease=8)
-    C.memo["rd07_frames"] = dict(door=fd, inside=fin, shut=shut, walk_end=in_end, zombie_stop=zend)
+    z.look_at(zend, C.P("lane_door_target"), ease=6)           # its head up at the shut door
+    # Steve: already sprinting on frame 1 (at the frame's left edge), up the west side of the road where the lens
+    # sees him over Kai's column, up his stairs, through his door (his right-click opens it as he comes: a player
+    # reaches a door from up to 4.5 blocks) into the house; inside he turns back and right-clicks it shut
+    run = _along(path, RD07_STEVE_D0)
+    steve.place(f0, run[0], CC.yaw_to(run[0], run[1]))
+    in_end = steve.walk(f0, run, sprint=True, ramp=(False, True))
+    ups = _step_up(steve, f0, in_end, RD07_STEPS)              # his two step-ups onto the stairs
+    fd = _frame_x(steve, f0, in_end, RD07_DOOR_X)              # his feet at the door's threshold
+    fin = _frame_x(steve, f0, in_end, RD07_CLEAR_X)            # clear of the shut door's panel (x -5.0, his half width)
+    opens = fd - RD07_OPEN_LEAD
+    steve.attack(opens, "right")                               # the right-click that opens it: the door is open one
+    C.v.door_open("house_e", opens, frames=1)                  # tick later (the server's block update), at once
+    turned = steve.turn(fin - 1, CC.yaw_to((-5.9, 15.5), (-4.0, 15.5)), ease=RD07_TURN)   # back round to the door
+    #                                                            (still sliding west: he let go of the keys) ...
+    steve.look_at(turned, z, ease=3)                           # ... a look back out at the zombie coming ...
+    shut = max(turned + 2, C.at(s, "night") + RD07_SHUT_AFTER_NIGHT)
+    steve.attack(shut, "right")                                # ... and the right-click that shuts it on "night"
+    C.v.door_open("house_e", shut, open=False, frames=1)       # (shut one tick later, at once)
+    _door_snap(C, "house_e", opens, shut + 2)
+    # Kai: the tap on the cut, his eyes on the note; then his head goes to the road as Steve comes in (512), follows
+    # him up to his door, and his body comes round after it to the zombie at the shut door (the head alone turns
+    # at most 70 degrees)
+    kai.look_at(f0 - RD07_KAI_TAP, bells.center, ease=0)      # his eyes on the block's face
+    bells.tap(kai, f0 - RD07_KAI_TAP, use=False, camera=s, seed=7, hand=RD07_KAI_HAND)    # a left-click: the block
+    #                                                            plays its note again (no re-tuning)
+    look = f0 + RD07_KAI_LOOK
+    kai.track(look, fin, steve, step=3, ease=6)
+    C.turn_to(kai, fin + 2, z, ease=10)
+    kai.track(fin + 12, f1, z, step=4, ease=4)
+    C.memo["rd07_frames"] = dict(click=opens, open=opens + 1, steps=[round(t, 1) for t in ups], door=fd,
+                                 inside=fin, turned=turned, click_shut=shut, shut=shut + 1, walk_end=in_end,
+                                 zombie_stop=zend)
     st.use(s, kai, steve, z)
     st.hero(s, "steve", steve)
     st.hero(s, "zombie", z)
@@ -193,12 +274,12 @@ def rd09_torch(st, s, C, nar):
     steve = C.actor("steve", "rd")
     # already walking on frame 1 and already in the frame (x about 80 %): RD09_D0 along crammys_walk_out (from
     # its start, (0.3, 19.6), he was at x 190 %, out of the frame for the first 15 frames: the technical review)
-    pts = _along([tuple(p) for p in C.v.paths["crammys_walk_out"]], RD09_D0)
+    pts = _along([C.stand(p) for p in RD09_WALK], RD09_D0)
     steve.place(f0, pts[0], CC.yaw_to(pts[0], pts[1]))
     steve.walk(f0, pts, ramp=(False, True))
     st.use(s, steve)
     st.hero(s, "steve", steve)
-    C.cam(s, "set:b09", focus=steve.head, handheld=0.004)
+    C.cam(s, None, focus=steve.head, handheld=0.004, **RD09_CAM)
     C.lights(s, "night")
 
 

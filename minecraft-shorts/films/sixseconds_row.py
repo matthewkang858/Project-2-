@@ -3,45 +3,55 @@ shot) and the six-second stare at the end: beats 2, 5, 21, 22, 23 (shots rw02_in
 rw22_six, rw23_nothing), sky "wastes". One function per shot; the contract is in films/sixseconds_common.py (tags
 "rw...", C.actor, C.item, C.cam, C.lights, st.use / st.hero).
 
-STATUS: SHOT by the row director (Nov 26) from the lead's stubs. Each shot's docstring has its NOW and MEASURED lines;
-the stills are out/test/rw_<shot>_<frame>[_zones].png (540x960, 16 samples), the palette checks out/test/
-sixseconds_pal_<shot>_<frame>.png, the motion out/test/sixseconds_row_motion.mp4 (270x480, 6 samples, every frame).
+STATUS: SHOT by the row director (Nov 26) from the lead's stubs, then the FIX PASS after the review (Nov 26): brother
+2 turned 30 degrees to the lens (his ingot read as a brown stick), the brute moved off the step for the stare (his
+golden axe was buried in it), the game's arm bob through the stare and on the brothers' sword arms, the game's body
+follow at the end of rw23 (BROTHER2_TURN, BRUTE_STARE, _arm_bob, BODY_FOLLOW). Each shot's docstring has its NOW and
+MEASURED lines; the stills are out/test/rw_<shot>_<frame>[_zones].png (540x960, 16 samples), the palette checks
+out/test/sixseconds_pal_<shot>_<frame>.png, the motion out/test/sixseconds_row_motion.mp4 (270x480, 6 samples, every
+frame).
 THE SEQUENCE NOW
-  rw02  the ingot row frame (shared, unchanged): the brothers frozen over their ingots, the focus on the near
-        brother's ingot (the only one the frame shows broad: brother 2's lies edge-on along his hand); the brute's soft
-        shoulder at the right edge, alive (weight shift, arm bob: his eyes stay at x 121 %, off the frame)
+  rw02  the ingot row frame (shared, unchanged): the brothers frozen over their ingots, sword arms bobbing; brother 2
+        (the far one, sharp on "My brothers") shows his face and a gold ingot at his snout; the focus pulls to the
+        near brother's ingot on "one ingot"; the brute's soft shoulder at the right edge, alive (weight shift, arm
+        bob: his eyes stay at x 121 %, off the frame)
   rw05  from the boots' height, a slow creep along the floor: the three at the gold, backs to us; from "so my" they
         turn round a beat apart (body and head together, 14 frames), faces tipped down into the lens 345-355, and turn
         back from "family" two frames apart, done by 371
-  rw21  the ingot row frame again, the brute between them, head down (ears only for six seconds); the focus opens on
-        the near brother as beat 2 left it and pulls back to the brute on "I'm staring"
+  rw21  the ingot row frame again, the brute between them, head down (ears and arm bob only for six seconds), his
+        golden axe in his hand; the focus opens on the near brother as beat 2 left it and pulls back to the brute on
+        "I'm staring"
   rw22  from above on his line of sight, 28 mm, a level push: the ingot turning sharp in the middle, broad side on
         "Six" and again at the end of the stare (1494), his face soft above it
-  rw23  the reverse angle on his line to the gateway at eye height, 2.7 blocks off: his head comes up from the ingot
-        and round into the lens on "Nothing" (18 frames), held to the black; the gold wall soft at the left, brother 2
-        a soft head-down sliver and his sword's hilt at the right edge
+  rw23  a reverse angle 2.5 blocks from him at eye height: his head comes up from the ingot and round into the lens on
+        "Nothing" (18 frames); 12 frames later his body comes round under it (the game's), held to the black; his
+        golden axe at his side, brother 2 a soft sliver and his sword's hilt at the right edge
 TOOLS: tools/sixseconds_row_probe.py (the row director's own: frame boxes of every part and held item for any
-  camera, the step ingot's angle to the lens frame by frame, the head angles of the cast frame by frame).
+  camera, the step ingot's angle to the lens frame by frame, the head angles of the cast frame by frame, what of the
+  cast is inside the gold step frame by frame).
 
 THE PLACE (engine/nether.py HOME, films/sixseconds_set.py beats 2 and 21-23): the GOLD WALL, 21 gold blocks in the
 east wall's inner face (x 9, y 9..15, z 0..2), basalt-framed, the one-block blackstone STEP in front of it (x 8,
 y 9..15, top z 1), two lanterns over the step (group home_gold). The brothers at "brother_1" (7.0, 13.2) and
 "brother_2" (6.3, 10.8), the brute at "brute_gold" (7.6, 10.0), all facing north-east (yaw 2.356, the gold
-diagonally); his ingot on the step at "step_ingot" (8.16, 11.71, 1.0): in front of his chest, 17 degrees left of
-straight ahead, 1.8 away, head pitch 21 (a brute cannot look below 40, nor turn his head more than 75). The
-layout exists for rw22 (the only camera spot beyond the ingot on his line of sight) and rw23 (his head reaches the
-gateway's mouth at 65 of 75 degrees). For rw05 the three piglins of the gate frame stand at PLACES gold_1..3
-(7.3, 9.6), (6.3, 11.2), (7.3, 12.8) facing east, as in gt03 / pt05.
+diagonally); his ingot on the step at "step_ingot" (8.16, 11.71, 1.0). For rw05 the three piglins of the gate frame
+stand at PLACES gold_1..3 (7.3, 9.6), (6.3, 11.2), (7.3, 12.8) facing east, as in gt03 / pt05.
+FIX PASS OVERRIDES (in this file; the places are shared by this sequence only; reported as common requests):
+  brother 2 stands on brother_2 turned BROTHER2_TURN (30 degrees, to yaw 165) in rw02, rw21 and rw23 alike; the
+  brute stares from _brute_gold(C) = brute_gold + (-0.25, +0.1) = (7.35, 10.1) facing yaw 172 (BRUTE_STARE) in rw21,
+  rw22 and rw23: his ingot 1.8 in front of him, 19 degrees right of straight ahead, head pitch 24 (a brute cannot
+  look below 40, nor turn his head more than 75); the axe 0.1 block clear of the step's face. INGOT_CLOSE and
+  REVERSE are re-made around him.
 SHARED (films/sixseconds_common.py): CAMS["ingot_row"] in rw02 and rw21 EXACTLY (the frame returns: "the ingot row
   frame"; its focus is free); PLACES brother_1 / brother_2 / brute_gold / step_ingot / brute_turned / gateway_mouth;
   PLACES gold_1..3 and boot_mark (rw05: pt05's runner stands on boot_mark, his boots are what they look at; the
   runner himself is not in rw05: the lens is the boots' point of view). Not shared (this file's own constants):
   FAMILY (rw05), INGOT_CLOSE (rw22), REVERSE (rw23; the stand-in of a failed row shot is CAMS["ingot_row"]); the
   film-local fill "rw_nothing" (rw23 only).
-THE WORLD'S RULES that bite here: floor whole (no C.pit); the brute 0.7 block or more from either brother; the
-  brothers admire with the ingot in the LEFT hand, golden sword in the right (C.admire); the brute keeps the golden
-  axe in his hand; piglins' heads within 75 degrees of yaw and 40 of pitch from their bodies (rw05 turns the
-  bodies).
+THE WORLD'S RULES that bite here: floor whole (no C.pit); the brute 0.7 block or more from either brother (1.26 from
+  brother 2 at _brute_gold); the brothers admire with the ingot in the LEFT hand, golden sword in the right
+  (C.admire); the brute keeps the golden axe in his hand (and out of the step); piglins' heads within 75 degrees of
+  yaw and 40 of pitch from their bodies (rw05 turns the bodies).
 THE SIX SECONDS: rw21 (58 frames) + rw22 (86) = 144 frames exactly from the first frame of rw21 (1358) to the cut into
   rw23 (1502) (films/sixseconds.py asserts it): the stare starts on rw21's first frame and the ingot turns through
   all three shots. ONE ingot entity (C.memo["rw_ingot"]) turns without a break from rw21 to the end; its spin is
@@ -83,22 +93,21 @@ FAMILY_BACK, FAMILY_BACK_FRAMES = (1, 3, 5), 12
 # (a level push steepens the view: the gap between snout and ingot opens as it goes; the stub's 0.1 block along the
 # aim changed his head by 1 % of the frame in 86 frames, not seen)
 # (FIX PASS: the brute stands 0.25 block west and 0.1 north of brute_gold, BRUTE_STARE below; the whole rig is
-# turned 8.56 degrees about the step ingot with his line of sight: before, pos (8.6, 13.25, 2.15), target (8.05, 11.3, 1.2), pos1 (8.559,
-# 13.106, 2.15))
+# turned 8.56 degrees about the step ingot with his line of sight: before, pos (8.6, 13.25, 2.15), target (8.05,
+# 11.3, 1.2), pos1 (8.559, 13.106, 2.15))
 INGOT_CLOSE = dict(pos=(8.824, 13.167, 2.15), target=(7.99, 11.321, 1.2), pos1=(8.762, 13.031, 2.15), lens=28.0,
                    fstop=2.8)
 INGOT_BROADSIDE = 2     # rw22: the step ingot shows the lens its broad side this many frames after "Six"
-# rw23: beat 23's reverse angle (the story's fallback): ON the line from the brute to the gateway's mouth (what he
-# turns to), 2.7 blocks from him, at his eye height. Brother 1 (the lead's REVERSE had him 2.5 blocks from the lens,
-# a big soft shape over the left third) is 0.6 block BEHIND this lens; from eye height brother 2's golden sword passes
-# under the brute's waist into the lower right corner instead of across his chest (the lead's floor-level lens put it
-# at y 50-62 %, across him); brother 2 is a soft head-down sliver at the right edge, the gold wall soft at the left.
-# 28 mm: his face about 175-185 px; a slow LINEAR push in (with ease-out the 2-second hold stood still: 0.22-0.27 grey
-# levels a frame on the preview) and a handheld of 0.008. He lifts his head from the ingot straight into the lens.
-# (FIX PASS: re-made for BRUTE_STARE: 2.5 blocks from him at the same height, now 5 degrees east of north from him,
-# 13 east of his line to the gateway (on that line, with the brute moved, brother 2's turned head filled the right
-# third of the frame, x 65-100 %, over the brute's ear: tools.sixseconds_row_probe / a scratch search of bearings
-# and distances); before, pos (6.68, 12.54, 1.72), pos1 (6.73, 12.41, 1.71), target (7.6, 10.0, 1.5))
+# rw23: beat 23's reverse angle (the story's fallback), at his eye height: first ON the line from the brute to the
+# gateway's mouth, 2.7 blocks from him (brother 1 behind the lens; from eye height brother 2's golden sword passes
+# under the brute's waist into the lower right corner, where the lead's floor-level lens put it across his chest).
+# FIX PASS: re-made for BRUTE_STARE: 2.5 blocks from him at a bearing 5 degrees east of north, 13 east of his line to
+# the gateway (on that line, with the brute moved and brother 2 turned, brother 2's head filled the right third of
+# the frame, x 65-100 %, over the brute's ear; a scratch search of bearings and distances with the boxes of both
+# brothers): brother 1 still wholly behind the lens, brother 2 a sliver at the right edge, his sword's hilt in the
+# lower right corner. 28 mm: his face 188-198 px; a slow LINEAR push in (with ease-out the 2-second hold stood still:
+# 0.22-0.27 grey levels a frame on the preview) and a handheld of 0.008. He lifts his head from the ingot straight
+# into the lens. Before the fix pass: pos (6.68, 12.54, 1.72), pos1 (6.73, 12.41, 1.71), target (7.6, 10.0, 1.5)
 REVERSE = dict(pos=(7.132, 12.590, 1.72), target=(7.35, 10.1, 1.5), lens=28.0, fstop=2.8,
                pos1=(7.144, 12.452, 1.71), target1=(7.35, 10.1, 1.5))
 NOTHING_HANDHELD = 0.008
@@ -129,8 +138,9 @@ BROTHER2_TURN = math.radians(30.0)
 BRUTE_STARE = dict(shift=(-0.25, 0.1), yaw=math.radians(172.0))
 
 # the ingot row frame (CAMS["ingot_row"], shared: only its focus is free) moves by its handheld alone, 0.004 block,
-# measured 0.2-0.3 grey levels a frame on the previews (The Hello's measure of a frozen picture): the focus carries
-# the life of rw02 and rw21. (frames after the shot's first frame where the pull starts, its length in frames)
+# measured 0.2-0.3 grey levels a frame on the previews (The Hello's measure of a frozen picture; with the game's arm
+# bob on the sword arms and the brute's, fix pass: medians 0.29 in rw02, 0.26 in rw21): the focus carries the life
+# of rw02 and rw21. (frames after the shot's first frame where the pull starts, its length in frames)
 RACK_02 = (6, 32)       # rw02: brother 2's face -> the near brother's ingot, 104 -> 136 (sharp on "ingot" 138)
 RACK_21 = (4, 24)       # rw21: the near ingot (as rw02 ended) -> the brute, 1362 -> 1386 ("I'm staring" 1375-1392)
 
@@ -213,22 +223,29 @@ def rw02_ingots(st, s, C, nar):
     SHARED: CAMS["ingot_row"] exactly; PLACES brother_1 / brother_2, brute_turned.
     NOW: CAMS["ingot_row"] unchanged (36 mm f/2.2 from (5.0, 17.0, 1.65), its own handheld 0.004, the seed from the
       shot's name); the brothers on brother_1 / brother_2 in the admire pose for the whole shot (C.admire: ingot in the
-      left hand, sword in the right, ears flopping); the brute on brute_turned facing west, ALIVE (C.stand idle, seed
-      2: weight shift, arm bob, glances): his soft shoulder and the side of his head at the right edge.
-      98        the focus on brother 2's face (the far one, his face to us: "My brothers"), the near brother big and
-                soft at the left
+      left hand, sword in the right, ears flopping; the sword arm bobbing as the game's, _arm_bob), brother 2 turned
+      BROTHER2_TURN (30 degrees toward the lens: fix pass); the brute on brute_turned facing west, ALIVE (C.stand
+      idle, seed 2: weight shift, arm bob, glances): his soft shoulder and the side of his head at the right edge.
+      98        the focus on brother 2's face (the far one, his face and his gold ingot to us: "My brothers"), the near
+                brother big and soft at the left
       104-136   a slow pull (RACK_02, 32 frames) to the near brother's ingot: sharp on "one ingot" (131-138) and held
-                to the cut. Brother 2's ingot lies edge-on along his hand from this lens (a gold line): the near
-                one is the only ingot the frame shows broad.
+                to the cut (it sits at the frame's left edge: the shared lens; see the result's common request)
       Hero: brother 1. Light: C.lights home.
-    MEASURED (tools.sixseconds_geo rw02_ingots:98 / :138, --track brute_rw:98-178:6; tools.sixseconds_row_probe boxes
-      rw02_ingots:138; stills out/test/rw_rw02_ingots_100.png, _138_zones.png; tools.sixseconds_palette 138):
-      brother 1 head x 3.9-41.4 %, y 36.8-54.9 %, face 142 px, 73 degrees off the lens, his ingot x -7..14 %, y
-      53-62 % (cut by the frame's left edge: the shared camera; see the result's common request); brother 2 head
-      x 60.7-88.4 %, face 97 px, 57 degrees off; the brute's eyes at x 121.1-121.9 % on every 6th frame (never in the
-      frame), his head box from x 84 %. palette 138: hero piglin x 8-40 %, y 37-54 %, 99 % in the safe area; gold hue
-      44 s 0.81; piglin skin hue 22 s 0.58. Preview (270x480, 6 samples): 0.14-0.49 grey levels a frame (median
-      0.27): the shared frame's handheld 0.004 is all the camera gives; the pull and the ears carry the life.
+    THE REVIEW (fix pass): brother 2 on brother_2's own yaw held his ingot exactly edge-on to this lens (89 degrees
+      off its broad side: a brown stick at his snout) with his face 61 degrees off: on "My brothers" and on beat 21's
+      "staring at an ingot" the frame had no readable ingot. Turned 30 degrees (the same in rw21 and rw23): 67
+      degrees off, a gold bar at his snout, his face 38 off, still bowed to it.
+    MEASURED (tools.sixseconds_geo rw02_ingots:100 / :138; tools.sixseconds_row_probe boxes / step rw02_ingots;
+      the review's scratch probe of the held items' planes; stills out/test/rw_rw02_ingots_100.png, _138_zones.png;
+      tools.sixseconds_palette 138): brother 1 head x 3.9-41.4 %, y 36.8-54.9 %, face 142 px, 73 degrees off the
+      lens, his ingot x -4..11 %, y 53-62 % (cut by the frame's left edge); brother 2 head x 62.6-91.7 %, face 97 px,
+      27 degrees off (it was 57), his ingot x 65-78 %, y 51-57 %, 67 degrees off its broad side (it was 89);
+      the brute's eyes at x 121 % (never in the frame), his head box from x 83 %. Brother 1's sword tip touches the
+      step's face by 0.01 block at 130-146 (the bob; behind him from this lens). palette 138: hero piglin x 8-40 %,
+      y 37-54 %, 99 % in the safe area; gold hue 44 s 0.81; piglin skin hue 22 s 0.59. Preview (270x480, 6
+      samples): 0.16-0.49 grey levels a frame (median 0.29;
+      0.27 before the sword arms bobbed): the shared frame's handheld 0.004 is all the camera gives; the pull, the
+      ears and the arm bob carry the life (see the result's common request).
     NEIGHBOURS: before, gt01_landing; after, gt03_guard (the gate frame).
     """
     f0 = s.frame_start
@@ -280,7 +297,9 @@ def rw05_family(st, s, C, nar):
       (0.0-1.1 degrees) 338-355 (rw3), 340-357 (rw4), 344-360 (xbow); on 350 heads x 50-81 % (gold_1, 105 px),
       x 12-38 % (gold_2, 84 px), x 29-48 % (gold_3, 63 px, beside gold_2's shoulder, its eyes clear), y 36-54 %;
       on 322 / 376 they face the gold (95-176 degrees off). palette 350: hero piglin x 55-76 %, y 36-46 %, 100 %
-      inside the safe area; gold hue 45 s 0.80; piglin skin s 0.61 (limit 0.62). Their legs stand in the caption
+      inside the safe area; gold hue 45 s 0.80; piglin skin s 0.61 (limit 0.62). KNOWN (the review; the shared place
+      gold_1, also pt05's: reported, not changed here): piglin_rw3's golden sword tip, facing east on gold_1, is 0.27
+      block inside the step at 322-328 and 365-378 (tools.sixseconds_row_probe step). Their legs stand in the caption
       band (soft; nothing essential there). The lanterns and the gold wall read at the right, the corridor lava at
       the left edge. Preview: the turns smooth with the shutter's blur (frames 329-343 looked at one by one).
     NEIGHBOURS: before, pt05_boots (the boots stopped, the brothers soft at the gold beyond); after, pt06_dig (the
@@ -330,20 +349,30 @@ def rw21_stare(st, s, C, nar):
     KNOWN (the set builder, searched): from this frame his ingot is HIDDEN behind brother 1: no camera spot in the
       courtyard holds the brute, both brothers AND his ingot apart. Accepted: beat 22 reveals it. The near brother
       must not cover the brute's face.
-    NOW: CAMS["ingot_row"] unchanged; the brothers admiring as in rw02; the brute on brute_gold facing NE, his head on
-      the step ingot from the first frame with no ease and NO idle (ears only: the stare); the ingot is
-      C.memo["rw_ingot"] (one entity turning from here to the end, phased for rw22).
+    NOW: CAMS["ingot_row"] unchanged; the brothers admiring as in rw02 (brother 2 turned, sword arms bobbing); the
+      brute (_stare) on _brute_gold (brute_gold 0.25 west, 0.1 north) facing yaw 172, his head on the step ingot from
+      the first frame with no ease and NO idle glance (ears and the game's arm bob only: the stare), the golden axe in
+      his hand clear of the step; the ingot is C.memo["rw_ingot"] (one entity turning from here to the end, phased
+      for rw22).
       1358      the frame as rw02 left it: the focus on the near brother's ingot, the brute soft between them
       1362-1386 a slow pull (RACK_21, 24 frames) back to the brute's head: sharp on "I'm staring" and held
-      Hero: the brute. (Under 1.5 blocks apart: brother 2's feet are 1.53 from his.)
-    MEASURED (tools.sixseconds_geo rw21_stare:1360 / :1399; tools.sixseconds_row_probe boxes rw21_stare:1399; stills
-      out/test/rw_rw21_stare_1360.png (the near brother sharp), _1399.png (the brute sharp); tools.sixseconds_palette
-      1399): brute eyes x 51 %, y 45 %, head x 38-61 %, y 42-51 %, face 80 px, 38.5 degrees off the lens, pitched 24
-      down: he reads as looking down at the step; nothing in front of his eyes; brother 1 head x 3.9-41.4 %, brother 2
-      x 60.7-88.4 %; the step ingot (box x 11-26 %, y 47-53 %) behind brother 1's arm and body (as the set builder
-      found). palette 1399: brute x 2.91 the blackstone, hero 100 % in the safe area (x 40-59 %, y 42-50 %), gold hue
-      44, piglin skin s 0.59. Preview: 0.13-0.36 grey levels a frame (the shared frame's handheld and the ears; the
-      pull is the visible move).
+      Hero: the brute. (1.26 blocks from brother 2's feet.)
+    THE REVIEW (fix pass): on brute_gold (0.4 block from the step's face, facing NE) 577 of the golden axe's 712
+      vertices were INSIDE the step on every frame 1358-1578: he held no axe. A grid of shifts and yaws (axe and
+      right arm against the step, his head angle to the ingot), then rw21's and rw23's boxes, chose BRUTE_STARE; the
+      review's 0.45 west put brother 2's head over his in this frame.
+    MEASURED (tools.sixseconds_geo rw21_stare:1360 / :1399; tools.sixseconds_row_probe boxes / step
+      rw21_stare:1358-1415:6; stills out/test/rw_rw21_stare_1360.png (the near brother sharp), _1399_zones.png (the
+      brute sharp); tools.sixseconds_palette 1399): brute eyes x 56 %, y 45 %, head x 42-66 %, y 41-51 %, face 83 px,
+      45.5 degrees off the lens, pitched 24 down: he reads as looking down at the step; nothing in front of his eyes;
+      his golden axe x 37-49 %, y 56-64 %, none of the brute inside the step (brother 1's sword tip touches its face,
+      0.00-0.03 block, 1376-1412, behind him from this lens); brother 1 head x 3.9-41.4 %; brother 2 head x 62.6-91.7
+      % (it touches the brute's left ear, x 63-66 %, his face clear), his ingot x 65-78 %; the step ingot (box x
+      16-21 %, y 47-53 %) behind brother 1's arm and body (as the set builder found). palette 1399: brute x 3.01 the
+      blackstone, hero 100 % in the safe area (x 44-63 %, y 42-50 %), gold hue 45, piglin skin s 0.59. Preview:
+      0.18-0.40 grey levels a frame (median 0.26; the hold after
+      the pull 0.18-0.29, median 0.23; 0.22 / 0.20 before the arm bob): the shared frame's handheld, the ears and the
+      arm bob; the pull is the visible move.
     NEIGHBOURS: before, pt20_likes (the older world's pit: everyone likes gold); after, rw22_six.
     """
     b1, _b2 = _brothers(st, s, C)
@@ -373,12 +402,15 @@ def rw22_six(st, s, C, nar):
       "Six" 1418      the ingot's broad face toward the lens
       "seconds" 1426 .. 1501   the silence: nothing changes but the turning ingot and the push
     NOW: INGOT_CLOSE, 28 mm f/2.8 on his line of sight beyond the ingot at z 2.15 (0.36 over his eyes), aimed at
-      (8.05, 11.3, 1.2), a LEVEL linear push of 0.15 block along his line (the view steepens: the gap between snout
-      and ingot opens as it goes); focus on the middle of the bobbing sprite (step_ingot + 0.3). The brute on
-      brute_gold, head on the ingot, no idle (ears only). The ingot's spin phased (_ingot, INGOT_BROADSIDE): broad
-      side to the lens 1416-1428 ("Six seconds"), edge-on at 1458, broad again 1494-1501, the last frames of the
-      stare. Heroes: the brute and the ingot. f/2.8 (the stub's f/2: his face 15 px soft at 540 wide; now about 7:
-      the eyes, snout and tusks read, the ingot is the sharp thing).
+      (7.99, 11.32, 1.2), a LEVEL linear push of 0.15 block along his line (the view steepens: the gap between snout
+      and ingot opens as it goes); focus on the middle of the bobbing sprite (step_ingot + 0.3). The brute (_stare)
+      on _brute_gold, head on the ingot, no idle glance (ears and arm bob only); the fix pass turned the whole rig
+      8.56 degrees about the ingot with his line of sight (he stands 0.25 west, 0.1 north of brute_gold: the axe), his
+      eyes as far from the ingot as before, so the picture is the same; his golden axe hangs behind the ingot (x
+      36-45 %, y 42-59 %: "nothing else in the picture"), no longer a forearm ending at the step. The ingot's spin
+      phased (_ingot, INGOT_BROADSIDE): broad side to the lens 1416-1428 ("Six seconds"), edge-on at 1458, broad
+      again 1494-1501, the last frames of the stare. Heroes: the brute and the ingot. f/2.8 (the stub's f/2: his face
+      15 px soft at 540 wide; now about 7: the eyes, snout and tusks read, the ingot is the sharp thing).
       The stub (32 mm, the stub's own spin phase) had the ingot 73 degrees off its broad side on "Six" (nearly
       edge-on: tools.sixseconds_row_probe ingot) and its lower edge at y 64-68 % (in the caption band under "Six"),
       his scalp at y 9-13 %.
@@ -392,14 +424,15 @@ def rw22_six(st, s, C, nar):
       stub takes z 2.15 on the line ("the ingot in the middle, his face just above it"; he reads as looking DOWN at
       it), 32 mm so his scalp stays under the top icons' edge and the ingot above the caption band. It is no longer
       "from below eye height" (0.36 above his eyes): the director may take v2 (eye height, the ingot a little left).
-    MEASURED (tools.sixseconds_row_probe ingot rw22_six:1416-1501:6; tools.sixseconds_geo rw22_six:1418 / :1501;
-      stills out/test/rw_rw22_six_1420_zones.png, _1494.png; tools.sixseconds_palette 1420): the ingot 4.7-9.6
-      degrees off its broad side 1416-1422, 19 at 1428, 89 (edge-on) at 1458, 3 at 1494; its box x 28-74 %, y 45-60 %
-      on "Six" (above the caption band), y 45-63 % at 1500 (its lower edge on the band's top only after the words);
-      his eyes x 54 %, y 23 % (21 % at 1501), head x 32-75 %, y 16-35 % (13-33 % at 1501), face 145 -> 152 px over the
-      push, 1 degree off the lens, pitched 24 down. palette 1420: brute x 3.10 the blackstone; hero brute x 38-67 %,
-      y 16-34 %, hero ingot x 31-69 %, y 46-60 %, both 100 % in the safe area. Preview: 0.43-0.74 grey levels a
-      frame (the push and the spin).
+    MEASURED (tools.sixseconds_row_probe ingot rw22_six:1416-1501:6, boxes rw22_six:1420, step rw22_six:1416-1501:6;
+      tools.sixseconds_geo rw22_six:1420 / :1501; stills out/test/rw_rw22_six_1420_zones.png, _1494.png;
+      tools.sixseconds_palette 1420): the ingot 4.7-9.6 degrees off its broad side 1416-1422, 19 at 1428, 89
+      (edge-on) at 1458, 3 at 1494; its box x 30-70 %, y 44-60 % on "Six" (above the caption band), y 45-62.5 % at
+      1500 (its lower edge on the band's top only after the words); his eyes x 54 %, y 23 % (21 % at 1501), head x
+      32-75 %, y 16-35 % (13-33 % at 1501), face 145 -> 152 px over the push, 1 degree off the lens, pitched 24 down;
+      nothing of him inside the step. palette 1420: brute x 3.24 the blackstone; hero brute x 38-67 %, y 16-34 %,
+      hero ingot x 31-69 %, y 46-60 %, both 100 % in the safe area. Preview: 0.49-0.78 grey levels a frame (median
+      0.68: the push and the spin).
     NEIGHBOURS: before, rw21_stare; after, rw23_nothing.
     """
     ingot = _ingot(st, s, C)
@@ -446,27 +479,44 @@ def rw23_nothing(st, s, C, nar):
       38 into the lens. The price: "the brothers heads-down either side of him" is now brother 2 alone, a soft sliver
       at the right edge (brother 1 is behind the lens), and the ingot stays out of the frame (as from every camera
       near the gateway line).
-    NOW: REVERSE, 28 mm f/2.8 at (6.68, 12.54, 1.72) aimed at (7.6, 10.0, 1.5), a slow LINEAR push of 0.14 block to
-      (6.73, 12.41, 1.71) and a handheld of 0.008 (with ease-out and 0.004 the 2-second hold measured 0.22-0.27 grey
-      levels a frame on the preview: frozen; now 0.33-0.6); focus on his head; the film-local fill "rw_nothing"
-      (NOTHING_FILL: 60 W, shadowless, near-neutral, beside the lens, this shot only).
-      1502      his head still down at the ingot (the stare continues; off screen to the left, by the gold wall)
+    THE FIX PASS (the review): the brute moved for the stare (BRUTE_STARE: his axe was buried in the step) and
+      brother 2 turned 30 degrees (rw02); on the old line with the old distance brother 2's turned head then filled
+      the right third of the frame (x 65-100 %) over the brute's ear. A scratch search of bearings from him (-19 to
+      0) and distances (2.3-2.7), boxes of brother 1 (nothing of him in front of the lens) and brother 2 (head and
+      sword), chose 2.5 blocks at a bearing 5 degrees east of north, 13 east of his line to the gateway's mouth (the
+      reverse angle still reads as him looking back at the gateway; he turns 32 degrees into the lens instead of 38).
+      The review's body follow is taken: the game's BodyRotationControl turns a standing mob's body under a head
+      held still for 10 ticks (the story's "his body still to the gold" gives way; here it is 13 degrees).
+    NOW: REVERSE, 28 mm f/2.8 at (7.13, 12.59, 1.72) aimed at (7.35, 10.1, 1.5), a slow LINEAR push of 0.14 block to
+      (7.14, 12.45, 1.71) and a handheld of 0.008 (with ease-out and 0.004 the 2-second hold measured 0.22-0.27 grey
+      levels a frame on the preview: frozen); focus on his head; the film-local fill "rw_nothing" (NOTHING_FILL:
+      60 W, shadowless, near-neutral, beside the lens, this shot only). The brute (_stare) on _brute_gold, yaw 172,
+      his arms bobbing.
+      1502      his head still down at the ingot (the stare continues; off screen to the left, by the step)
       1504-1522 "Nothing": up from the ingot and round into the lens over 18 frames (look_at, eased: pitch -24 -> -2,
-                yaw 38 degrees), aimed at where the lens is on 1522
-      1522-1570 held: nothing moves but the push, the handheld and the ears; 1571-1578 the encoder's plain black
-      Brothers: _brothers (admiring) as in rw21; brother 1 behind the lens, brother 2 a soft head-down sliver at the
-      right edge with his sword's hilt in the lower right corner. The step ingot turns on, out of the frame (left).
-      Hero: the brute.
-    MEASURED (tools.sixseconds_geo rw23_nothing:1502 / :1522 / :1570; tools.sixseconds_row_probe boxes
-      rw23_nothing:1502-1570:34; stills out/test/rw_rw23_nothing_1503.png, _1514_zones.png, _1540_zones.png,
-      _1545_zones.png; tools.sixseconds_palette 1540 and 1545): 1502 eyes x 50 %, y 42 %, face 174 px, 38 degrees off
-      the lens, pitched 24 down; 1522 face 178 px, 0.1 degrees off, pitched 1.6 down; 1570 183 px, 0.0 off; head x
-      22-79 % with the ears, y 34-51 %; nothing in front of his eyes. Brother 2's head x 81-226 % (only its edge in
-      the frame), his sword x 40-123 %, y 70-104 % (below the caption band but for its tip). The brute's body runs
-      from y 49 % to the frame's bottom: his tunic and armband sit behind the caption "Nothing" (1504-1521). palette
-      1545: brute x 3.54 the blackstone, hero x 33-69 %, y 35-51 %, 100 % in the safe area, gold hue 45 s 0.81, piglin
-      skin s 0.59 (s 0.63 without the fill: FAIL at the 0.62 limit, palette 1540 before the fill). Preview: the lift
-      1504-1522 smooth, no snap (frames 1504-1525 looked at every third).
+                yaw 32 degrees), aimed at where the lens is on 1522
+      1534-1546 his head held still 12 frames (10 ticks): his body comes round under it over 12 frames (yaw 172 ->
+                185, turn() with the head eased back to centre: the face stays on the lens), his golden axe at his
+                right side (x 7-32 %, y 65-94 %: lower left, soft)
+      1546-1570 held: nothing moves but the push, the handheld, the ears and the arm bob; 1571-1578 the encoder's
+                plain black
+      Brothers: _brothers (admiring) as in rw21; brother 1 behind the lens, brother 2 a soft sliver (shoulder and
+      arm) at the right edge with his sword's hilt in the lower right corner. The step ingot turns on, out of the
+      frame (left). Hero: the brute.
+    MEASURED (tools.sixseconds_geo rw23_nothing:1502 / :1522 / :1534 / :1546 / :1570; tools.sixseconds_row_probe
+      heads rw23_nothing:1502-1578:4, boxes rw23_nothing:1502 / :1570, step rw23_nothing:1502-1578:4; stills
+      out/test/rw_rw23_nothing_1503.png, _1514.png, _1545_zones.png, _1560.png; tools.sixseconds_palette 1545):
+      1502 eyes x 50 %, y 41 %, face 188 px, 38 degrees off the lens, pitched 24 down; 1522 face 191 px, 0.2 degrees
+      off, pitched 1.7 down; 1534-1578 0.0-0.2 off while the body turns (yaw 172 at 1534, 175 at 1538, 182 at 1542,
+      185 from 1546); 1570 198 px; head x 19-81 % with the ears, y 32-51 %; nothing in front of his eyes. Nothing of
+      him inside the step on any frame (it was 577 of the axe's 712 vertices). Brother 1: no vertex in front of the
+      lens. Brother 2: x 82-100 % (head from x 87 %), his sword x 82-99 %, y 72-131 % (under the caption band). The
+      brute's body runs from y 49 % to the frame's bottom: his tunic and armband sit behind the caption "Nothing"
+      (1504-1521). palette 1545: brute x 3.60 the blackstone, hero x 31-70 %, y 33-51 %, 100 % in the safe area,
+      piglin skin s 0.58 (no gold patch large enough for the gold check: the gold wall is out of this frame now).
+      Preview: 0.49-1.75 grey levels a frame (median 0.69), the hold after the body
+      follow 0.49-0.74 (median 0.58); the lift 1504-1522 and the body follow 1534-1546 smooth, no snap (preview frames
+      1500-1525 every third, 1530-1546 every second, 1556, 1570 looked at).
     NEIGHBOURS: before, rw22_six; after: the end (the Reel loops to gt01).
     """
     f0, f1 = s.frame_start, s.frame_end

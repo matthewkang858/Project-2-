@@ -14,7 +14,8 @@ frame-% squared:
     vis     the puff seen inside x 8-82 % (y 14-60 %) and not hidden behind the brute (what reads as "a puff")
     spill   the puff at x > 82 % (outside the safe area for faces and hero props; information only)
     hidden  the puff where a phone hides it: x > 95 % (the side crop) or x > 84 % below y 45 % (the icon column)
-    brute   the puff IN FRONT of the brute over his silhouette box (head x 33-67 / y 19-31, body x 31-69 / y 30-47,
+    brute   the puff IN FRONT of the brute over his silhouette box (head x 32-69 / y 18-33: the head turned 24
+            degrees as on the cut's first picture frames, geo x 32.3-68.1 / y 19.1-32.3; body x 31-69 / y 30-47,
             legs x 40-60 / y 46-60): white on his face and armband
     drops   the puff over the golden boots (x 11-29 / y 49-58) or the extra drop (x 59-76 / y 48-59)
     gold    (treasure) the puff over the gold-block pile (x 68-100 / y 23-48)
@@ -35,7 +36,7 @@ WORLDS = {"bridge": ((400.5, 16.5, 0.0), "fl16_bridge"),
           "treasure": ((-396.0, 0.8, 0.0), "fl16_treasure"),
           "home": ((4.5, 14.5, 0.0), "fl16_home")}
 REGIONS = {
-    "brute": [((33, 67), (19, 31)), ((31, 69), (30, 47)), ((40, 60), (46, 60))],
+    "brute": [((32, 69), (18, 33)), ((31, 69), (30, 47)), ((40, 60), (46, 60))],
     "drops": [((11, 29), (49, 58)), ((59, 76), (48, 59))],
     "gold": [((68, 100), (23, 48))],
 }

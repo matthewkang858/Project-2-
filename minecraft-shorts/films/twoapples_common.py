@@ -437,6 +437,51 @@ class TwoApples:
             self.st.see_through(s, cut)
         return c
 
+    def cam_keys(self, s, name, keys, focus=None, handheld=0.006, seed=None, see=None, **over):
+        """A camera whose move from the spec's pos / target to its pos1 / target1 follows `keys` = [(frame, u), ...]
+        (u = 0 the start, 1 the end; frames inside the shot, u never decreasing): a smooth monotone curve through
+        them (Fritsch-Carlson: no overshoot, the speed continuous), flat before the first key and after the last.
+        tu07's ride: at speed on frame 1, dad's window on "dad", settled by "room". The aim blends with the same u
+        (engine.shots bakes position and aim from one curve, as U.hold_then_move re-times it). Returns the spec."""
+        c = dict(self.camera_spec(name), **over)
+        if "pos1" not in c and "target1" not in c:
+            raise KeyError("cam_keys: camera %r for %s has no move (pos1 / target1)" % (name, s.name))
+        ks = sorted((float(f), float(u)) for f, u in keys)
+        xs, ys = [k[0] for k in ks], [k[1] for k in ks]
+        n = len(ks)
+        d = [(ys[i + 1] - ys[i]) / max(1e-9, xs[i + 1] - xs[i]) for i in range(n - 1)]
+        m = [d[0]] + [0.0 if d[i - 1] * d[i] <= 0 else (d[i - 1] + d[i]) / 2.0 for i in range(1, n - 1)] + [d[-1]]
+        for i in range(n - 1):                           # Fritsch-Carlson: keep it monotone
+            if abs(d[i]) < 1e-12:
+                m[i] = m[i + 1] = 0.0
+                continue
+            a, b = m[i] / d[i], m[i + 1] / d[i]
+            r = a * a + b * b
+            if r > 9.0:
+                t = 3.0 / math.sqrt(r)
+                m[i], m[i + 1] = t * a * d[i], t * b * d[i]
+
+        def u(frame):
+            if frame <= xs[0]:
+                return ys[0]
+            if frame >= xs[-1]:
+                return ys[-1]
+            i = max(j for j in range(n - 1) if xs[j] <= frame)
+            h = xs[i + 1] - xs[i]
+            t = (frame - xs[i]) / h
+            h00, h10 = 2 * t ** 3 - 3 * t ** 2 + 1, t ** 3 - 2 * t ** 2 + t
+            h01, h11 = -2 * t ** 3 + 3 * t ** 2, t ** 3 - t ** 2
+            return min(1.0, max(0.0, h00 * ys[i] + h10 * h * m[i] + h01 * ys[i + 1] + h11 * h * m[i + 1]))
+        s.lens(c["lens"], c.get("fstop", 2.8))
+        s._u = u                                         # an instance attribute: Shot._bake reads self._u(frame)
+        s.move(c["pos"], c["target"], c.get("pos1", c["pos"]), c.get("target1", c["target"]), ease="linear")
+        s.focus(focus if focus is not None else c["target"])
+        if handheld:
+            s.handheld(handheld, seed=sum(ord(ch) for ch in s.name) % 89 if seed is None else seed)
+        for cut in (c.get("see", ()) if see is None else see):
+            self.st.see_through(s, cut)
+        return c
+
     def rack(self, s, target, frame, frames=12):
         """Pull the focus of shot s to `target` (a Character's head / an object / a point) starting ON `frame`, over
         `frames` frames (Shot.focus takes film seconds: this converts). Call after C.cam."""
@@ -561,6 +606,47 @@ class TwoApples:
             if getattr(ob, "type", None) == "MESH" and "stamp_every_frame" not in ob.data:
                 ob.data["stamp_every_frame"] = 1.0
                 ob.data.keyframe_insert('["stamp_every_frame"]', frame=1)
+
+    @staticmethod
+    def held(player, hand="right", frame=None):
+        """The object of the item a Player holds in `hand` on `frame` (default: the current frame), for st.hero
+        (cu14: the golden apple itself, not his arm; = engine.players Player.item(hand, frame); Player.hold(...)
+        returns the same object when it is made). frame=None: the item he holds last."""
+        return player.item(hand, frame)
+
+    @staticmethod
+    def under_ceiling(c, frame_start, frame_end, ceiling=F + 3.0, margin=0.01):
+        """Keep a character's head under a ceiling from frame_start to frame_end: its root's height keys are clamped
+        so that the top of its head meshes stays `margin` under `ceiling` (default the aisle's, F + 3). U.jump_loop
+        keys the open-air jump (1.25): under the hall's 3-high ceiling the game stops the hitbox at 1.2 and the
+        model's head would still poke 0.12-0.17 into the stone (cu16, measured by the technical check). Returns the
+        number of keys clamped."""
+        import bpy
+        from engine import shots as SH
+        scene = bpy.context.scene
+        fc = next((f for f in SH.fcurves_of(c.root) if f.data_path == "location" and f.array_index == 2), None)
+        if fc is None:
+            return 0
+        keys = [k for k in fc.keyframe_points if frame_start - 1e-6 <= k.co[0] <= frame_end + 1e-6]
+        if not keys:
+            return 0
+        top = max(keys, key=lambda k: k.co[1])
+        cur = scene.frame_current
+        scene.frame_set(int(round(top.co[0])))
+        head_top = max((ob.matrix_world @ Vector(co)).z for ob in [c.head] + list(c.head.children_recursive)
+                       if ob.type == "MESH" for co in ob.bound_box)
+        offset = head_top - c.root.matrix_world.translation.z
+        scene.frame_set(cur)
+        zmax = ceiling - margin - offset
+        n = 0
+        for k in keys:
+            if k.co[1] > zmax:
+                k.co[1] = zmax
+                n += 1
+            k.handle_left[1] = min(k.handle_left[1], zmax)
+            k.handle_right[1] = min(k.handle_right[1], zmax)
+        fc.update()
+        return n
 
     # ------------------------------------------------------------------ dad's wall (THE WALL PLAN only)
     def wall_is_open(self, frame):
