@@ -9,6 +9,9 @@
         its box in the frame and the brute's head box, frame by frame
     $BPY -m tools.sixseconds_row_probe heads rw05_family:322-378:2
         each cast member's yaw, head yaw / pitch relative to the body and degrees off the lens, frame by frame
+    $BPY -m tools.sixseconds_row_probe step rw21_stare:1358-1415:8
+        how many mesh vertices of each cast member's parts and held items are INSIDE the gold wall's blackstone step
+        (x 8..9, y 9..16, z 0..1) and how far the deepest one reaches into it, frame by frame (the brute's golden axe)
 Prefix with `nice -n 12 timeout 290`.
 """
 import math
@@ -34,7 +37,7 @@ def main(argv):
     """See the module docstring."""
     import argparse
     ap = argparse.ArgumentParser(prog="tools.sixseconds_row_probe")
-    ap.add_argument("mode", choices=("boxes", "ingot", "heads"))
+    ap.add_argument("mode", choices=("boxes", "ingot", "heads", "step"))
     ap.add_argument("query", help="SHOT:FRAME or SHOT:A-B[:STEP]")
     ap.add_argument("--cam", help="pos>target>lens: a candidate camera instead of the shot's")
     ap.add_argument("--obs", help="object name prefixes")
@@ -128,6 +131,27 @@ def main(argv):
             hb = box([o for o in bpy.data.objects if o.name.startswith("brute_rw_head")])
             print("  %4d  ingot %5.1f deg off broadside  box %s   brute head %s   cam (%.3f, %.3f, %.3f)" % (
                 f, ang, fmt(box(it.copies)), fmt(hb), cp.x, cp.y, cp.z))
+    elif args.mode == "step":
+        def inside(v):
+            return 8.0 < v.x < 9.0 and 9.0 < v.y < 16.0 and 0.0 < v.z < 1.0
+
+        for f in frames:
+            scene.frame_set(f)
+            dg = bpy.context.evaluated_depsgraph_get()
+            row = []
+            for n in cast:
+                for ob in sorted(bpy.data.objects, key=lambda o: o.name):
+                    if ob.type != "MESH" or ob.hide_render or not ob.name.startswith(n + "_"):
+                        continue
+                    ev = ob.evaluated_get(dg)
+                    me = ev.to_mesh()
+                    vs = [ob.matrix_world @ v.co for v in me.vertices]
+                    ev.to_mesh_clear()
+                    hit = [v for v in vs if inside(v)]
+                    if hit:
+                        deep = max(min(v.x - 8.0, 1.0 - v.z) for v in hit)
+                        row.append("%s %d/%d (%.2f in)" % (ob.name, len(hit), len(vs), deep))
+            print("  %4d  %s" % (f, " | ".join(row) if row else "nothing inside the step"))
     else:
         for f in frames:
             scene.frame_set(f)

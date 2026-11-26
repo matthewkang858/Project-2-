@@ -5,6 +5,7 @@
     $BPY -m tools.legday_road_probe where NAME F[,F...]              # a character's feet, yaw and eyes at frames
     $BPY -m tools.legday_road_probe runners                          # rd16: runners' feet, speed and the arrows
     $BPY -m tools.legday_road_probe steve                            # rd21: steve_rd2 feet / head yaw-pitch per 3 f
+    $BPY -m tools.legday_road_probe items F[,F...]                   # rd19's drops: where they lie, their spin
 Prefix with `nice -n 12 timeout 290`. The road director's own scouting tool (films/legday_road.py).
 """
 import math
@@ -81,6 +82,14 @@ def main(argv):
             hp = math.degrees(c.head.rotation_euler[0])
             print("%d feet (%.2f, %.2f, %.2f) body yaw %.1f head yaw %.1f pitch %.1f" % (
                 f, p.x, p.y, p.z, math.degrees(c.yaw_at(f)), hy, hp))
+    elif cmd == "items":
+        for it in C.memo.get("rd_drops") or []:
+            for f in (int(t) for t in argv[1].split(",")):
+                scene.frame_set(f)
+                p = it.pos_at(f)
+                w = it.root.matrix_world.translation
+                print("%s %d: pos_at (%.2f, %.2f, %.2f) world (%.2f, %.2f, %.2f) spin %.1f deg" % (
+                    it.name, f, p.x, p.y, p.z, w.x, w.y, w.z, math.degrees(it.spinner.rotation_euler[2]) % 360))
     else:
         print(__doc__)
         return 2

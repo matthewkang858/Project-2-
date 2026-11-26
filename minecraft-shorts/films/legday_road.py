@@ -70,9 +70,11 @@ from films import legday_common as LC
 # the five read as five (the 85 mm from 28 blocks stacked them into one shape), a slow creep back and a pan with them
 RD15_CAM = dict(pos=(5.8, 59.4, 3.0), target=(1.2, 75.2, 3.55), pos1=(6.0, 58.6, 2.95), target1=(1.05, 73.6, 3.4),
                 lens=40.0, fstop=2.8)
-# beat 16: low on the east half of the road ahead of the runners (the wall and its stair on the right), 28 mm,
-# tracking back as they come (at speed on the first frame, slowing)
-RD16_CAM = dict(pos=(2.2, 43.3, 0.28), target=(1.2, 33.5, 1.0), pos1=(2.4, 45.2, 0.3), target1=(1.3, 35.0, 1.05),
+# beat 16: a low TRACKING shot (the story's): 28 mm at 0.3 on the road's east half, 9 blocks in front of Steve on
+# the first frame and retreating 6.8 blocks north with them (ease_out: 6 blocks/s on 945, slowing), so that he holds
+# 8-9 blocks away while they sprint (faces about 40 px: the punches read) and closes to 6 only as they stop; the wall
+# and its stair on the right. (The first version crept back 1.9 blocks from 43.3: the three were specks until 975.)
+RD16_CAM = dict(pos=(2.3, 38.6, 0.3), target=(1.3, 29.0, 1.1), pos1=(2.4, 45.4, 0.3), target1=(1.4, 36.0, 1.05),
                 lens=28.0, fstop=2.8)
 # beat 19: LOCKED (the story: only the tiniest handheld), 14 mm f/5.6 at knee height (0.15) on the road right beside
 # the strip (x 1.9, 0.9 east of the anvils' cells), 2.4 blocks short of where the captain dies, looking north along
@@ -187,8 +189,9 @@ def rd16_punch(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b16_run[_zones].png): low on the east verge ahead of the runners
       (the stair ramp on the right), 32 mm: the runners coming at the lens, three arrows stuck in the road in front of
       them (y 62 %: the top of the caption band); Kai overlapped Steve (x 64 / 66 %): stagger them more sideways.
-    NOW: RD16_CAM, 28 mm f/2.8 low (0.28) on the road's east half, tracking back 1.9 blocks north (ease_out: at speed
-      on 945, slowing), the wall and the stair on the right, a village house on the left. Kai (x 3.1), Steve (2.0)
+    NOW: RD16_CAM, a low tracking shot: 28 mm f/2.8 at 0.3 on the road's east half, 9 blocks in front of Steve on
+      945 and retreating 6.8 blocks north with them (ease_out: at speed on 945, slowing as they stop), the wall and
+      the stair on the right, a village house on the left. Kai (x 3.1), Steve (2.0)
       and Zuri (0.55) sprint north at the game's 5.61 blocks/s from 945 (placed at speed, ramp in False), staggered
       1.1 sideways and 1.1 / 2.1 back. Steve's attack swings (the game has no raised-fist pose: a player who wants to
       punch clicks) on 950, 959, 968 and ON "punch" 976; Kai swings once on 977. On "them": an arrow thuds into the
@@ -443,7 +446,9 @@ def rd21_still(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd2")
-    efe = C.narrator("rd")
+    # the narrator's torch in his LEFT hand: facing Steve (south) his left side is the lens's side, so the glowing
+    # torch stands against the sky instead of behind his body
+    efe = C.narrator("rd", hand="left")
     b = C.P("steve_among_anvils")                 # (1.45, 46.9): 2.35 short of the banner; z 0 (the World has the
     b = (b[0], b[1], 0.0)                         # landed anvils on the strip, not here: x 1.45 is the road beside it)
     still, cheat = C.at(s, "still"), C.at(s, "cheating")
@@ -466,6 +471,10 @@ def rd21_still(st, s, C, nar):
     steve.face(cheat + 1, stair, ease=9)
     steve.look_at(cheat + 1, stair, ease=9)
     efe.track(f0 + 1, f1, steve, step=4, ease=4)
+    # from the road he can only be small (18 blocks up, under the end of the plank row): he reads by moving. When
+    # Steve looks up he swings his torch hand at him (a player's arm swing: the game's "use"), and again on "redstone"
+    efe.attack(still + 3, hand="left")
+    efe.attack(C.at(s, "redstone") + 1, hand="left")
     items = _drops(st, s, C, "rd21")
     st.use(s, steve, efe)
     C.cam(s, None, focus=steve.head, **RD21_CAM)

@@ -24,7 +24,120 @@ MOM'S HEAD IS ON THE ZOMBIE IN EVERY FRAME (C.on_zombie / towers.panic with the 
 TAGS TAKEN (twins): mom_ce, zombie_ce (every shot), cleric_ce, librarian_ce (ce08, ce23), narrator_ce (ce23). New: ce2..
 PREVIEWS through render.py: --samples 6 (PREVIEW_SAMPLES["cell"]).
 """
+import math
+
+from engine import shots as SH
+from engine import towers
 from films import twentyminutes_common as TC
+
+# ---------------------------------------------------------------------------------------------------------------
+# cameras of this sequence (the contract: CAMS "window" / "window_08" are the cell's; each redefined ONCE below as
+# WINDOW / WINDOW_08, used unchanged by the one shot that uses it; ONE lens position for both: TC.CAMS["window"]
+# ["pos"], 0.13 from the zombie's right arm, lens and stop unchanged)
+# ---------------------------------------------------------------------------------------------------------------
+
+
+# beat 6: a keyed pan (bearing clockwise from north, pitch) from one fixed lens, the aim keyed through monotone
+# cubics (_aim_empty): slow on the bed and Mom through "He gave her a bed", the pan past Mom on "and a", slow on the
+# zombie in its window from "zombie" to the cut
+CE06_POS = (-20.5, 17.45, 11.3)
+CE06_AIM = ((339, 4.0, -12.0), (360, 8.5, -11.0), (382, 47.0, -3.0), (411, 51.0, -2.5))
+CE06_LENS = (22.0, 2.8)
+CE06_MOM = (-19.5, 22.35, 10.0)          # beside the red bed at its pillow end (bed2's space: free before gr21)
+
+# beat 7: the long lens from outside the back glass (tower_pod_north hidden), north-north-west of the pod so the line
+# to the arms passes west of the plug; a slow linear push of 0.5 block
+CE07_CAM = dict(pos=(-21.9, 33.0, 11.6), target=(-19.83, 19.15, 11.5), pos1=(-21.82, 32.5, 11.6),
+                target1=(-19.83, 19.15, 11.5), lens=60.0, fstop=2.8, ease="linear")
+CE07_MOM = (-20.5, 19.25, 10.0)          # 'mom' 0.25 south: her look east is square to the lens (a true profile)
+
+# beat 23: the narrator's head comes round from the back glass (where it was in gp22, watching the player break the
+# step) to the zombie: from 69 degrees to his left (the head's reach is 70) in SNAP frames, about the game's head speed
+# (LookControl: 10 degrees a tick = 8.3 a frame)
+NARRATOR_FROM = (-18.9, 23.2, 11.5)
+SNAP = 8
+
+
+def _pchip(xs, ys, x):
+    """Monotone cubic (Fritsch-Carlson) through (xs, ys) at x: no overshoot between keys; the end slopes are the end
+    segments' own, so a path keyed this way is already moving on its first frame (films/legday_pens.py)."""
+    n = len(xs)
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    h = [xs[i + 1] - xs[i] for i in range(n - 1)]
+    d = [(ys[i + 1] - ys[i]) / h[i] for i in range(n - 1)]
+    m = [d[0]] + [0.0] * (n - 2) + [d[-1]]
+    for i in range(1, n - 1):
+        if d[i - 1] * d[i] > 0:
+            w1, w2 = 2 * h[i] + h[i - 1], h[i] + 2 * h[i - 1]
+            m[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i])
+    i = max(j for j in range(n - 1) if xs[j] <= x)
+    t = (x - xs[i]) / h[i]
+    t2, t3 = t * t, t * t * t
+    return ((2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1]
+            + (t3 - t2) * h[i] * m[i + 1])
+
+
+def _toward(pos, bearing, pitch, dist=4.0):
+    """The point `dist` blocks from `pos` at a compass bearing (degrees clockwise from north) and pitch (up +)."""
+    b, p = math.radians(bearing), math.radians(pitch)
+    return (pos[0] + dist * math.cos(p) * math.sin(b), pos[1] + dist * math.cos(p) * math.cos(b),
+            pos[2] + dist * math.sin(p))
+
+
+def _aim_empty(s, what, pos, keys, dist=4.0):
+    """An empty "ce_<what>_<shot>" keyed on every frame of shot s (and one past its end): the aim of a camera at
+    `pos` turning through keys = [(frame, bearing, pitch)] (degrees; monotone cubics in angle, so the pan's speed is
+    what the keys say). Never rendered; engine.shots follows an object target."""
+    import bpy
+    ob = bpy.data.objects.new("ce_%s_%s" % (what, s.name), None)
+    s.film.collection.objects.link(ob)
+    fr = [k[0] for k in keys]
+    for f in range(s.frame_start, s.frame_end + 2):
+        b = _pchip(fr, [k[1] for k in keys], f)
+        p = _pchip(fr, [k[2] for k in keys], f)
+        ob.location = _toward(pos, b, p, dist)
+        ob.keyframe_insert("location", frame=f)
+    SH._linearize(ob)
+    ob.hide_render = True
+    return ob
+
+
+def _bearing_pitch(pos, target):
+    """(compass bearing clockwise from north, pitch up) in degrees of the line from pos to target, and its length."""
+    dx, dy, dz = (target[i] - pos[i] for i in range(3))
+    flat = math.hypot(dx, dy)
+    return math.degrees(math.atan2(dx, dy)), math.degrees(math.atan2(dz, flat)), math.sqrt(flat * flat + dz * dz)
+
+
+def _to_lens(eye, target, cam_pos, degrees):
+    """`target` turned about `eye` by up to `degrees` toward the camera (twentyminutes_common.to_lens for a look from a
+    point: the zombie's eyes, before it is placed in the shot)."""
+    d = (target[0] - eye[0], target[1] - eye[1])
+    a0 = math.atan2(d[1], d[0])
+    a1 = math.atan2(cam_pos[1] - eye[1], cam_pos[0] - eye[0])
+    da = (a1 - a0 + math.pi) % (2.0 * math.pi) - math.pi
+    a = a0 + math.copysign(min(abs(da), math.radians(degrees)), da)
+    flat = math.hypot(*d)
+    return (eye[0] + flat * math.cos(a), eye[1] + flat * math.sin(a), target[2])
+
+
+def _turned(cam, degrees):
+    """cam's target turned `degrees` about the lens (+ = clockwise seen from above: to the frame's right)."""
+    b, p, d = _bearing_pitch(cam["pos"], cam["target"])
+    return _toward(cam["pos"], b + degrees, p, d)
+
+
+# beat 8: the set's b08w aim (CAMS "window_08"), turned 1.0 degree to the left (south) on the first frame and drifting
+# on to 2.4 degrees, linear: Mom's hat comes in from the safe area's edge (box x 8-37 % with the stub's aim), the
+# librarian's head stays clear of the icon column
+WINDOW_08 = dict(TC.CAMS["window_08"], target=_turned(TC.CAMS["window_08"], -1.0),
+                 target1=_turned(TC.CAMS["window_08"], -2.4), ease="linear")
+# beat 23 (+ the start of 24): the lead's re-aimed CAMS "window" on the first frame, drifting 1.2 degrees to the left
+# (south), linear, through the hold on "Apparently that"
+WINDOW = dict(TC.CAMS["window"], target1=_turned(TC.CAMS["window"], -1.2), ease="linear")
 
 
 def ce06_bed(st, s, C, nar):
@@ -58,15 +171,20 @@ def ce06_bed(st, s, C, nar):
       bed, racked to the zombie on "zombie"; Mom on bed_beside, head on the zombie; the zombie, arms forward. Hero: the
       zombie.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     mom = C.actor("mom", "ce")
-    C.put(mom, f0, "bed_beside")
-    C.on_zombie(mom, f0, until=s.frame_end)
-    z = C.zombie(s, "ce", look=mom)
+    C.put(mom, f0, CE06_MOM, toward=C.zombie_eye)
+    C.on_zombie(mom, f0, until=f1)
+    # the zombie stares at Mom, its look cheated 25 degrees toward the lens (at Mom itself its face is 94 degrees off
+    # the lens: a blank green side; she is out of the frame by the time it is in)
+    z = C.zombie(s, "ce", look=_to_lens(C.zombie_eye, mom.eye_point(f0), CE06_POS, 25.0))
     st.use(s, mom)
-    C.cam(s, "set:b06", focus=C.fm.beds["mom"]["pos"])
-    C.rack(s, z, C.at(s, "zombie"), frames=16)
-    st.hero(s, "zombie", z)              # (Mom is out of this pan's frame nearly all the time: the technical review)
+    st.see_through(s, "tower_pod_south")            # the lens stands in the front glass
+    aim = _aim_empty(s, "aim", CE06_POS, CE06_AIM)
+    C.cam(s, None, pos=CE06_POS, target=aim, lens=CE06_LENS[0], fstop=CE06_LENS[1],
+          focus=C.fm.beds["mom"]["pos"])
+    C.rack(s, z, C.at(s, "and"), frames=10)
+    st.hero(s, "zombie", z)
     C.lights(s, "tower")
 
 
@@ -94,14 +212,16 @@ def ce07_reach(st, s, C, nar):
     NOW (stub = the set's stage_b07): camera "set:b07" (45 mm), focus on Mom; Mom on 'mom', head on the zombie; the
       zombie aggro (raised arms); the north wall seen through. Heroes: Mom.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     mom = C.actor("mom", "ce")
-    C.put(mom, f0, "mom")
-    C.on_zombie(mom, f0, until=s.frame_end)
-    C.zombie(s, "ce", aggro=True, look=mom)
+    C.put(mom, f0, CE07_MOM, toward=C.zombie_eye)
+    C.on_zombie(mom, f0, until=f1)
+    towers.panic(mom, f0, f1, C.zombie_eye, seed=TC.PANIC_SEED, amount=0.6, turns=False)    # a held tremble
+    C.check_look(mom, f0, C.zombie_eye, until=f1, what="the zombie")
+    C.zombie(s, "ce", aggro=False, look=mom)
     st.use(s, mom)
     st.see_through(s, "tower_pod_north")
-    C.cam(s, "set:b07", focus=mom.head)
+    C.cam(s, None, focus=mom.head, **CE07_CAM)
     st.hero(s, "mom", mom)
     C.lights(s, "tower")
 
@@ -140,7 +260,7 @@ def ce08_scared(st, s, C, nar):
     """
     who = C.pod(s, "ce", TC.THREE, panic=True)
     C.zombie(s, "ce", aggro=False, look=who["mom"])
-    C.cam(s, "window_08", focus=who["cleric"].head)
+    C.cam(s, None, focus=who["cleric"].head, **WINDOW_08)
     st.hero(s, "mom", who["mom"])
     C.lights(s, "tower")
 
@@ -181,9 +301,21 @@ def ce23_afraid(st, s, C, nar):
     NOW (stub): CAMS "window", focus on the narrator; FOUR trembling (C.pod(..., panic=True): Mom and the narrator
       with PANIC_SEED); the zombie, arms forward. (The head snap is not staged yet.) Heroes: the narrator, Mom.
     """
-    who = C.pod(s, "ce", TC.FOUR, panic=True)
+    f0, f1 = s.frame_start, s.frame_end
+    # FOUR unchanged (places, PANIC_SEEDS): C.pod for the three, the narrator by hand with the same place, facing and
+    # seed, so that his head can come round to the zombie from where it was in gp22
+    who = C.pod(s, "ce", [w for w in TC.FOUR if w[0] != "narrator"], panic=True)
+    narr = C.actor("narrator", "ce")
+    p = C.P(dict(TC.FOUR)["narrator"])
+    narr.place(f0, p, TC.yaw_to(p, C.zombie_eye))
+    narr.look_at(f0, NARRATOR_FROM, ease=0)        # still on the back glass (gp22: watching the player)
+    towers.panic(narr, f0, f1, C.zombie_eye, seed=TC.PANIC_SEEDS["narrator"], look=False)
+    narr.track(f0, f1, C.zombie_eye, step=2, ease=SNAP)
+    C.check_look(narr, f0 + SNAP, C.zombie_eye, until=f1, what="the zombie")
+    st.use(s, narr)
+    who["narrator"] = narr
     C.zombie(s, "ce", aggro=False, look=who["mom"])
-    C.cam(s, "window", focus=who["narrator"].head)
-    st.hero(s, "narrator", who["narrator"])
+    C.cam(s, None, focus=narr.head, **WINDOW)
+    st.hero(s, "narrator", narr)
     st.hero(s, "mom", who["mom"])
     C.lights(s, "tower")

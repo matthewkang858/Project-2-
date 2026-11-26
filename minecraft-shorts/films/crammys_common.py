@@ -18,6 +18,10 @@
     $BPY -m tools.crammys_shots render ...           stills of single shots (see its docstring): THE scouting tool
     $BPY -m tools.crammys_geo --sky S SHOT:F         where every head lands in the frame, face size, facing, blockers
     $BPY -m tools.crammys_palette --sky S F          tools/palette_check on one frame at final quality
+    $BPY -m tools.crammys_probe track SHOT A-B:N     where the cast IS frame by frame: world position, eyes / chest /
+                                                     knees in the frame and seen or hidden, held items, stuck arrows
+    $BPY -m tools.crammys_probe memo | hands | notes  event frames the stubs leave in C.memo; what each hand holds and
+                                                     renders; the jukebox's note frames (no render; one build)
     $BPY -m render crammys --still S [--zones]       one frame through render.py (each sky is one build)
     $BPY -m films.crammys_set [b13 ...]              the set's self-test and its own proof stills
     $BPY -m tools.check_music_zones [gold|night]     engine/music's zone + occlusion check of ITS staging (no render)
@@ -88,16 +92,25 @@ LESSONS THAT EACH COST A RE-RENDER (The Hello, Leg Day; read them before the fir
   - A small thing is seen only if it is in focus (the discs, the arrows, the totem, a note particle).
   - A step of less than 7 frames is a hop that stops dead (Character.walk is linear): use a low speed; two
     figures 0.2 block apart are one two-headed shape: stagger by 0.7 block.
-  - Held items are keyed per shot (C.hold(p, item, s)); a hold without frame is for the whole film.
+  - Held items are keyed per shot (C.hold(p, item, s)); a hold without frame is for the whole film. C.hold's END is
+    keyed when your shot function returns (build() calls C.close_holds), so a toot, a draw, an insert or a second
+    hold in that hand after C.hold works as the engine documents it (the first skeleton keyed it at once: jb20's disc
+    stayed in Steve's hand after the insert, Noor's gd01 horn reappeared from frame 86 to the end).
+  - A players walk's end frame is the end of the game's FRICTION SLIDE (about 10 frames after the key is let go):
+    to the eye he stops about 5 frames earlier. C.walk_lead(f0, arrive) places a walker (at speed on frame 1) so that
+    he stops on a word; C.walk_frames(distance, f0) gives the stop frame of a walk.
+  - A camera move that starts ON A WORD: C.cam(..., timing=C.timing_hold_move(a, b, f0=s.frame_start, creep=0.03))
+    (held or creeping until a, the move a -> b 'smooth', held after b): fn24's pull back from "Best".
   - Particles live on across cuts (notes, the poof): the film calls C.time_jump at every change of sequence; inside
     a sequence a shot that jumps in time calls it itself before emitting its own.
   - A cut is only as good as the frames on both sides: look at the last frame of the shot before yours.
   - Lit stone next to a lantern sits on the palette limit: no lamp above LIGHTS (tools/crammys_palette).
 
 SHARED (decided once, used by two shots or two sequences)
-  CAMS["lane"]       rd07_chased and rd17_run_back, EXACTLY (position, aim, lens, f-stop; handheld 0.004 in both):
-                     "the same camera as the zombie chase" (beat 17), engine/music's 'lane' (16 mm from Kai's
-                     doorstep). The road sequence's alone; ONE constant for both shots.
+  CAMS["lane"]       rd07_chased and rd17_run_back, EXACTLY (position, aim, move, lens, f-stop; the road file's
+                     LANE_FOCUS and handheld 0.004 in both): "the same camera as the zombie chase" (beat 17). 16 mm
+                     from Kai's doorstep RAISED to z 3.1 (engine/music's 'lane' was at z 1.7: Kai's column hid the
+                     chase; the story check). The road sequence's alone; ONE constant for both shots.
   THE ARROWS         beats 13 and 14 put two arrows in Steve (md13_shot: the skeleton shoots them with C.shoot_steve,
                      ARROW_HITS below: the chest, then the right shoulder, BOTH ALIGNED with their flight: the
                      shafts stick out toward his FRONT RIGHT, where the skeleton stood); from md15 to the end EVERY
@@ -121,7 +134,9 @@ SHARED (decided once, used by two shots or two sequences)
                      post has none (gd01-gd04). If gd05 is a stand-in, build() places it on gd05's 0.9.
   THE DOOR           house_e (the narrator's) opens and shuts in rd07 only (v.door_open('house_e', f[, open=False]));
                      shut for the rest of the film.
-  PLACES             every anchor of the set by name (C.P("ring_kai"), C.yaw("ring_kai")): the bandstand's (music: zuri,
+  PLACES             the lead's own: zombie_stop (-2.85, 15.5: the foot of house_e's stairs; the set's B07_STOP was
+                     inside them) and kai_lane (2.05, 16.85: Kai in the gap between his column and his post); and
+                     every anchor of the set by name (C.P("ring_kai"), C.yaw("ring_kai")): the bandstand's (music: zuri,
                      kai, sunny, noor, alex_post, steve_front, line_1..5, three_*, ring_*, steve_jukebox, ...), the
                      lane's (lane_kai) and the meadow's (crammys_set MEADOW_ANCHORS without the prefix: middle,
                      creeper_line, skeleton_line, steve_shot, creeper_turn, ...). THE NIGHT STAGE LAYOUT (jb19 to fn24):
@@ -192,11 +207,12 @@ def _set_cam(beat, **over):
 
 
 CAMS = {
-    # rd07_chased and rd17_run_back, EXACTLY: engine/music's 'lane' camera, 16 mm f/2.8 from Kai's doorstep looking
-    # west across the exit road at the narrator's door (house_e): Kai's head soft at the right in rd07, his lantern
-    # whole at x 90 %, his gold / note column at the left edge. KNOWN LIMIT (the set builder, measured): the frame
-    # sees the road only north of y 14.4 and the column hides it south of y 15.9: a runner coming up from the square
-    # shows for about half a second before the door (crammys_set_b07_chased*.png).
+    # rd07_chased and rd17_run_back, EXACTLY: 16 mm f/2.8 from Kai's doorstep looking west down the lane at the
+    # narrator's door (house_e), RAISED to z 3.1 over Kai's gold / note column (engine/music's 'lane' camera was at
+    # z 1.7: the column hid the road between y 14.4 and 15.9, so in the first stub Steve and the zombie were never
+    # seen running: the story check). From here a runner on the WEST side of the road (x -1.5) is seen eyes and chest
+    # from x 5 % to the door (x 50 %); Kai's head sits low (x 58-85 %, y 62-82 %: in the caption band; the back of
+    # his head), his lantern at the right edge, the column at the left (films/crammys_road.py: THE LANE CAMERA).
     "lane": dict(pos=(3.84, 16.5, 3.1), target=(-4.5, 15.3, 0.8), pos1=(3.84, 16.42, 3.06),
                  target1=(-4.5, 15.25, 0.8), lens=16.0, fstop=2.8),
     # the stand-ins of a failed shot (films/crammys.py STAND_IN), one per place
@@ -295,7 +311,11 @@ class Crammys:
     C.arrows(steve, s)       the two arrows of beats 13-14 in this Steve from shot s on (beat 15 onward)
     C.disc_drop(feet, frame, until, tag, face)   disc 11 dropped by the dying creeper (md15; md16 uses the same one)
     C.totem(s)               the totem turning on the pedestal in shot s
-    C.insert_frame() / C.song(s)    the frame disc 11 goes in (jb20 "one") / the jukebox's notes in shot s after it
+    C.insert_frame() / C.song(s[, end])   the frame disc 11 goes in (jb20 "one") / the jukebox's notes in shot s
+                             after it (none born in the shot's last 7 frames: a note would float into the next shot)
+    C.walk_frames / C.walk_lead     a players walk's stop frame / where to start one to stop on a frame
+    C.timing_hold_move(a, b)  a camera clock for C.cam(..., timing=): held, the move a -> b, held
+    C.close_holds()          (the film calls it after each shot function: the ends of that shot's C.hold calls)
     C.lights(s, key)         the torch levels ("gold" / "night") through Band.lights (the placed lantern included)
     C.fill / C.kicker        film-local lights for the shots named (name starts with your prefix)
     C.shots, C.memo          every Shot of the film by name; a dict for handing things from one shot function to a
@@ -549,8 +569,13 @@ class Crammys:
     @classmethod
     def walk_lead(cls, frame, arrive, speed=None, ramp=(False, True)):
         """The distance a player walking from `frame` (at speed on it: ramp=(False, True)) covers when he stops ON
-        `arrive`: where to place him on frame 1 so that he arrives on a word (md12: on "middle")."""
-        lo, hi = 0.05, 40.0
+        `arrive`: where to place him on frame 1 so that he arrives on a word (md12: on "middle"). The stop frame
+        is the END OF THE GAME'S FRICTION SLIDE (about 8 ticks = 10 frames after the walk key is let go, the speed
+        halving each tick): to the eye he has stopped about 5 frames earlier. An `arrive` sooner than the shortest
+        walk (one step at speed and the slide: about 0.45 block, 11 frames) gives that shortest walk."""
+        speed_t = (players.WALK_SPEED if speed is None else float(speed)) / 20.0
+        g = players.GROUND_FRICTION
+        lo, hi = speed_t * (1.0 + g / (1.0 - g)), 40.0          # one step at speed + the slide (the shortest walk)
         for _ in range(40):
             mid = 0.5 * (lo + hi)
             if cls.walk_frames(mid, frame, speed, ramp) <= arrive:

@@ -1,8 +1,8 @@
 """The Crammys, sequence MEADOW: the night meadow north of the exit gate. Beats 10-16 (shots md10_creeper,
 md11_skeleton, md12_middle, md13_shot (beats 13 AND 14: one take), md15_kill, md16_disc), sky "night". One function
 per shot; the contract is in films/crammys_common.py (tags "md...", C.actor, C.cam, C.lights, C.shoot_steve, C.arrows,
-C.disc_drop, st.use / st.hero). STUB by the lead director: every shot builds and renders; its staging is the
-engine/hostiles recipe ("THE CRAMMYS, beat by beat" in its docstring) as the set builder staged it on this set
+C.disc_drop, st.use / st.hero). STUB by the lead director (the md12, md13 and md15 cues corrected after the
+two checks of the plan): every shot builds and renders; its staging is the engine/hostiles recipe ("THE CRAMMYS, beat by beat" in its docstring) as the set builder staged it on this set
 (films/crammys_set.py stage_b10 .. stage_b16), filmed by the set builder's cameras (CAMERAS b10-b16). Make it a film.
 
 THE PLACE (films/crammys_set.py night_meadow): flat grass (z 0) north of the gate to y 50, plants cleared on
@@ -29,7 +29,11 @@ GAME TRUTH: knockback=0.1 (or max_back) on every arrow near other characters (ch
 five or more: the story's compression); a skeleton's kill gives NO experience orbs; the creeper dies tipped over,
 still swollen, then the poof (hostiles die). Arrows are 0.045 block thin: they read from 3-4 blocks.
 TAGS TAKEN: steve_md (md10, md12, md13, md15, md16), creeper_md (md10, md12, md13, md15), skeleton_md (md11, md12,
-md13, md15). A twin for a pre-roll: C.actor("steve", "md2") ...
+md13), skeleton_md2 (md15: its first draw starts 14 frames before md15, inside md13's frames: a twin). A twin for a
+pre-roll: C.actor("steve", "md3") ...
+MEASURE BEFORE YOU RENDER: `$BPY -m tools.crammys_probe memo` prints the event frames the stubs leave (md12_stop,
+md13_frames, md15_frames, md_kill); `... track md13_shot 844-930:4` where everybody is and whether the lens sees
+them, the stuck arrows' fletching included.
 """
 
 import math
@@ -125,18 +129,29 @@ def md12_middle(st, s, C, nar):
     us, stops on the exact centre of the line, looks left, looks right. The creeper starts toward him.
     Cast: Steve, creeper, skeleton. Effects: drawn bow, symmetrical three-figure line against the sky, two head turns.
 
-    MUST BE SEEN, ON WHICH WORD
+    MUST BE SEEN, ON WHICH WORD (the cue as corrected after the story check: the first one asked for a walk in "from
+    the bottom of the frame" AND a stop on "stood", 6 frames into the shot: both cannot fit)
       frame 1          the low wide side view: creeper on the left, skeleton on the right WITH ITS BOW DRAWN, both
-                       against the sky; Steve already walking in from the bottom of the frame, his back to us
-      "stood"          he stops on the exact centre of the line
-      "middle"         he looks left (the creeper), then right (the skeleton)
-      the last second  the creeper starts toward him
+                       against the sky; Steve ALREADY WALKING up the line, his back to us, a few blocks short of the
+                       centre (the game's walk, at speed on frame 1)
+      "stood" .. "middle"   he arrives and STOPS ON THE EXACT CENTRE on "middle" (818: the end of his friction slide;
+                       to the eye he has stopped about 5 frames before)
+      after "middle"   he looks LEFT (the creeper: 820-827), then RIGHT (the skeleton: 829-836)
+      the last second  the creeper starts toward him (834)
     NEIGHBOURS: before, md11_skeleton; after, md13_shot (medium on Steve from the skeleton's side).
+    THE STAGING: C.walk_lead(f0, "middle") places him on the line steve_enter -> middle so that the players walk
+      (4.32 b/s, ramp in off) ends ON "middle": 3.4 blocks short of the centre on frame 1, about 12 blocks from the
+      lens. The first stub walked him 5 blocks at 2.2 b/s from frame 1: y 35.4 on "stood", 36.8 on "middle", 39.0 on
+      the last frame: he never reached the centre, the looks and the creeper fell after the cut (the story check).
+      "From the bottom of the frame" would need the camera to travel with him; the stub's b12 camera drifts 0.35
+      block (the director may push in with him instead: keep md15's axis, both look north from the south).
     MEASURED (crammys_set_b12_middle_zones.png, 24 mm f/5.6 from (5.0, 27.0, 0.45)): creeper 21 %, Steve 50 % (his
       back), skeleton 79 % with its bow drawn, all against the sky above a clean horizon (two village oaks taken out
-      for it). A wide: the figures are 12 % of the frame high.
+      for it). A wide: the figures are 12 % of the frame high. Probe (memo md12_stop): his slide ends on 818. The
+      lead's still at 826 (out/test/crammys_scout_md12_middle_826_zones.png): looking left.
     NOTE: the creeper's fuse starts within 3 blocks (FUSE_RANGE): it starts toward him here but must not swell
-      before md15 (the story: it swells in beat 15).
+      before md15 (the story: it swells in beat 15). The head alone turns 70 degrees: "left" and "right" read as
+      profiles from behind (the line is 90 degrees off his facing).
     """
     f0, f1 = s.frame_start, s.frame_end
     cr = C.actor("creeper", "md")
@@ -187,33 +202,40 @@ def md13_shot(st, s, C, nar):
     continuous render with the previous beat.
 
     ONE TAKE FOR BEATS 13 AND 14 ("The same shot, held without a cut"; the story's timing fallback says so too).
-    MUST BE SEEN, ON WHICH WORD
+    MUST BE SEEN, ON WHICH WORD (the cue as corrected after the story check: the second hit on "again" (907) left 23
+    frames for the 12-frame flash, the look down AND the look up: the look up ended on 932, after the cut)
       frame 1          medium on Steve, three-quarter front from the skeleton's side, the creeper soft behind him;
-                       something already moving (the skeleton's draw is off-screen beside the lens: the camera)
-      "shot" (b13)     the first arrow flicks in from beside the lens and sticks in his CHEST (C.shoot_steve(sk,
-                       steve, f, 0): ARROW_HITS[0], aligned with its flight), red hurt flash, he rocks back half a step
-                       (knockback 0.1); he does not move away
-      "again" (b14)    a second jolt and flash, the second arrow in his RIGHT SHOULDER (C.shoot_steve(..., 1):
-                       ARROW_HITS[1], aligned too)
-      after "again"    he looks down at the two arrows, then up; the creeper now right behind his shoulder
+                       something already moving (the skeleton's draw is off-screen beside the lens: the camera drift)
+      "shot" (b13, 861)   the first arrow flicks in from beside the lens and sticks in his CHEST (C.shoot_steve(sk,
+                       steve, f, 0): ARROW_HITS[0], aligned with its flight; it lands on 862), red hurt flash, he rocks
+                       back half a step (knockback 0.1); he does not move away
+      "shot" (b14, 896)   a second jolt and flash, the second arrow in his RIGHT SHOULDER (C.shoot_steve(..., 1):
+                       ARROW_HITS[1], aligned too; lands on 896); the flash to 908 ("again" 907 inside it)
+      909-917          he looks down at the two arrows ...
+      919-927          ... then up (done 3 frames before the cut); the creeper right behind his shoulder (there by 907)
     SHARED: THE ARROWS (C.shoot_steve: ARROW_HITS, ARROW_SCALE; keep skeleton_line / steve_shot / yaw 135 when they land:
       the later twins' arrows are computed from that staging). Places: steve_shot, skeleton_line,
       creeper_behind_from -> creeper_behind_to.
     NEIGHBOURS: before, md12_middle (the wide); after, md15_kill (the side view tighter: Steve on his last step round
       the creeper: a cut on action).
-    MEASURED (crammys_set_b13_shot.png / b14_again, 45 mm f/2.8 from (8.19, 41.16, 1.05), 1.2 blocks north of the
-      skeleton): Steve's face three-quarter at x 56 %, y 42 %, the chest arrow's fletching on his upper chest (aligned:
-      unaligned it sat over his mouth), the creeper soft at the right edge. In b14 the UNALIGNED shoulder arrow's shaft
-      crossed his right eye from this lens; the lead's scout of this stub confirmed it (out/test/crammys_scout_md13_
-      shot_915_zones.png: shaft and fletching across his face) and made ARROW_HITS[1] aligned too: on 921 both
-      fletchings are clear crosses on his chest and shoulder and his face is free (crammys_scout_aligned_md13_shot_921
-      _zones.png: face x 40-75 %, y 33-52 %; the creeper's head at the right edge, x 86 %: outside the safe area, soft
-      background). 915 is still inside the second red flash (12 frames).
+    MEASURED (probe memo md13_frames: hit1 862, hit2 896, down 917, up 927). The set builder's stills
+      (crammys_set_b13_shot.png / b14_again, 45 mm f/2.8 from (8.19, 41.16, 1.05), 1.2 blocks north of the
+      skeleton): Steve's face three-quarter at x 56 %, y 42 %, the chest arrow's fletching on his upper chest, the
+      creeper soft at the right edge. The UNALIGNED shoulder arrow's shaft crossed his face from this lens
+      (out/test/crammys_scout_md13_shot_915_zones.png): ARROW_HITS[1] is aligned too; with both aligned his face is
+      free (crammys_scout_aligned_md13_shot_921_zones.png: face x 40-75 %, y 33-52 %; the creeper's head at x 86 %,
+      outside the safe area, soft background). The lead's still of the corrected cue at 922
+      (out/test/crammys_scout_md13_shot_922_zones.png): both fletchings clear crosses, his head on the way up (motion
+      blur). EACH ARROW PUSHES HIM 0.3 BLOCK WEST (knockback 0.1 through hostiles.hit: x 5.00 -> 4.71 on 870 -> 4.40 on
+      910; his "half step back"), toward the creeper and across the frame: his eyes go from x 50 % to 63 %, his head
+      to x 46-88 % after the second hit, past the safe area's right edge (82 %); the creeper ends 0.58 block from him
+      (3.90, 40.30), its head at x 86 %. Re-aim (target to the west) or start him further east, keeping steve_shot as
+      the spot where the arrows land (their direction is computed in his own frame: a move is fine, a turn is not).
       The set builder measured Steve's trousers at min channel 14 here (palette limit 12): a cool moon fill
       (C.fill("md_moon", ..., color=CS.MOON_KEY_COLOR)) if they go under, never a brighter lamp.
-    TIMING (hostiles): sk.shoot(f, ...) draws from f and looses on `release` (default f + 24); the arrow sticks 2-3
-      frames later; the second draw may start one frame after the first release (16 frames is the shortest draw
-      that reaches pulling_1). The stub: the first lands on "shot", the second on "again".
+    TIMING (hostiles): sk.shoot(f, ...) draws from f and looses on `release`; the arrow sticks 1-3 frames later (3.2
+      blocks); the first draw is 16 frames (bow at pulling_1 on the loose: the skeleton is beside the lens, out of
+      the frame), the second 32 (pulling_2). Do not key skeleton_md or steve_md after 930 here: md15 re-places them.
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "md")
@@ -255,25 +277,31 @@ def md15_kill(st, s, C, nar):
     apart, each with a red flash, creeper tips over, smoke puff, no arrows left sticking in the creeper, skeleton lowers
     bow.
 
-    MUST BE SEEN, ON WHICH WORD
-      frame 1          the side view from md12, tighter, CUT ON ACTION: Steve on his last step round the creeper (the
-                       line is now Steve, creeper, skeleton); the creeper turns after him and starts to swell
-      "Then" .. "shot" the first arrow hits it in the back: red flash (the line is spoken as the first arrow lands)
-      about 20 frames later   the second arrow, red flash, it tips over (still swollen) and is gone in a puff of
-                       smoke; NO arrows left sticking in the creeper (only players show stuck arrows)
-      after "creeper"  far right, the skeleton lowers its bow; THE DISC drops at the creeper's feet on the killing
-                       blow (C.disc_drop: one item for md15 and md16)
+    MUST BE SEEN, ON WHICH WORD (the cue as corrected after the story check: the first hit had landed on frame 3,
+    before the turn and the swell the story puts first)
+      931-940          CUT ON ACTION: Steve on his last step round the creeper (the game's walk, at speed on frame 1:
+                       the line is now Steve, creeper, skeleton); the creeper turns after him (932-938) and starts to
+                       swell (934: it would explode on 969)
+      "shot" (941)     the first arrow hits it in the back (lands 940): red flash
+      "creeper" + 8 (960)   the KILLING arrow (20 frames later): red flash, it tips over (still swollen) and is gone
+                       in a puff of smoke 24 frames later (984: hostiles' die, 11 frames before the cut; the smoke lives
+                       on into md16); THE DISC drops at its feet on 960 (C.disc_drop: one item for md15 and md16); NO
+                       arrows left sticking in the creeper (only players show stuck arrows); no experience orbs
+      972 on           far right, the skeleton lowers its bow
     SHARED: THE ARROWS in Steve (steve_md carries them since md13; a new twin needs C.arrows); THE DISC (C.disc_drop ONCE,
       here; C.memo["md_disc"] for md16). Places: creeper_turn, crammys_round path, skeleton_close.
+    THE SKELETON IS A TWIN, skeleton_md2 (placed at skeleton_close on 917, its first draw from there): skeleton_md is
+      in md13 and a draw keyed from 907 on it (the first stub) was a pre-roll inside md13 (the technical check measured
+      a third draw there). Steve's look is keyed on 933 (the first stub keyed it on 929, inside md13).
     NEIGHBOURS: before, md13_shot; after, md16_disc (ground level: the smoke thins, the disc turns).
-    MEASURED (crammys_set_b15_creeper_shot.png, 24 mm f/4 from (4.75, 31.0, 0.45)): Steve 30 %, the creeper swelling
-      42 %, the skeleton drawing 78 % (it stands at skeleton_close, 1.3 blocks nearer than in md12: the three fit a
-      24 mm frame). A wide: figures small. Steve ends 1.8 blocks from the creeper; two arrows at knockback 0.1 push it
-      about 0.6 toward him (hostiles' numbers, not measured on this staging).
+    MEASURED (probe memo md15_frames: hit1 940, kill 960, fuse 934; the explosion would come on 969). The set
+      builder's still (crammys_set_b15_creeper_shot.png, 24 mm f/4 from (4.75, 31.0, 0.45)): Steve 30 %, the creeper
+      swelling 42 %, the skeleton drawing 78 % (skeleton_close is 1.3 blocks nearer than in md12: the three fit a
+      24 mm frame). A wide: figures small. The lead's still at 962 (out/test/crammys_scout_md15_kill_962_zones.png).
     RISKS (story): "the switch from Steve in the middle to the creeper in the middle must read": keep md12 and md15 on
       one side-on axis (both cameras look north from the south). "two hits may look cheap": the fallbacks are a third
       arrow, or the creeper already flashing red from a hit on the first frame. The fuse is 35 frames: the kill must
-      land before it ends (hostiles: shoot(f0 - 24, ...) is loosed ON f0, the second release= 20 frames later).
+      land before it ends. The shot is 2.71 s, not the story's "about three and a half": the cuts are fixed.
     """
     f0, f1 = s.frame_start, s.frame_end
     cr = C.actor("creeper", "md")
@@ -326,8 +354,12 @@ def md16_disc(st, s, C, nar):
     NEIGHBOURS: before, md15_kill; after, rd17_run_back (the lane: he runs to the stage with the disc in his hand).
     MEASURED (crammys_set_b16_disc.png, 40 mm f/2.8 from (2.39, 38.3, 0.3), 2.6 blocks from the disc): the disc a
       black shape against the haze (50, 42 %); Steve's legs and arrows walk in at the right; the ground camera shows
-      more of him than his feet. The set builder's disc landed at disc_rest (3.79, 40.5) from creeper_turn (seed 5):
-      if the creeper dies elsewhere, re-aim on the item's rest_pos (the stub does).
+      more of him than his feet. The set builder's disc landed at disc_rest (3.79, 40.5) from creeper_turn (seed 5);
+      with md15's corrected cue the creeper dies on 960 at (4.10, 40.22) (two knockbacks) and THE DISC RESTS AT
+      (3.49, 40.53), landed 971, still from 977 (the lead's probe): the stub re-aims on the item's rest_pos. Steve
+      walks in from steve_disc_from (6.32, 40.01) to steve_disc (4.30, 41.30): 1.12 from the disc at the end (outside
+      the pick-up reach). CONTINUITY CHEAT: md15 leaves him at (2.6, 39.9), west of the creeper; here he comes from the
+      east (the right of this lens). Keep it or bring him from the left (the director's call).
     GAME TRUTH: a player collects an item within about one block: steve_disc is 0.95 from disc_rest: the pick-up
       (item.pick_up(f): the disc jumps into him) is the story's own fallback ("let the item jump into Steve as a
       pickup after one turn, before its face catches the light"); either pick it up on camera or stop him farther.

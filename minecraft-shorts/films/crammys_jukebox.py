@@ -2,7 +2,8 @@
 nobody asks about, the walk to the jukebox and disc eleven going in. Beats 8, 18, 19, 20 (shots jb08_eject,
 jb18_nobody_asked, jb19_to_jukebox, jb20_eleven), sky "night". One function per shot; the contract is in
 films/crammys_common.py (tags "jb...", C.actor, C.cam, C.lights, C.hold, C.present, C.arrows, C.totem, st.use /
-st.hero). STUB by the lead director: every shot builds and renders; its staging is engine/music's worked example
+st.hero). STUB by the lead director (jb08's notes, jb18's walk and C.hold's end corrected after the two checks of
+the plan): every shot builds and renders; its staging is engine/music's worked example
 (tools/music_proof.py shot_b8, shot_b18, shot_b19, shot_b20) through the C helpers, filmed by the set builder's
 cameras (films/crammys_set.py CAMERAS b08, b18-b20 = engine/music's). Make it a film.
 
@@ -25,6 +26,8 @@ CONTINUITY CHEATS (the story's own, kept; engine/music documents them): Sunny an
 (three_*) and in the half circle beyond the jukebox in jb19 (ring_*): cut on his walk; Alex steps aside to ring_alex
 in jb19 and stands at alex_beside in jb20, then at ring_alex again from fn22.
 TAGS TAKEN: steve_jb, alex_jb, zuri_jb, kai_jb, sunny_jb, noor_jb (placed on each shot's first frame).
+MEASURE BEFORE YOU RENDER: `$BPY -m tools.crammys_probe hands --who steve_jb --frames 1240,1249,1250` (what each hand
+holds and whether it renders), `... notes --span 540-1300` (the jukebox's note frames), `... memo` (jb18_stop).
 """
 import math
 
@@ -32,7 +35,8 @@ from films import crammys_common as CC
 
 CS = CC.CS
 
-JB18_STOP_AFTER = 3         # jb18: Steve stops this many frames after "Nobody" appears
+JB18_STOP_AFTER = 10        # jb18: Steve's friction slide ends this many frames after "Nobody" appears
+#                             (to the eye he stops about 5 frames earlier: C.walk_lead)
 
 
 def _up(p, dz):
@@ -52,7 +56,8 @@ def jb08_eject(st, s, C, nar):
     pull.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1          night, lanterns lit, the party begun: the jukebox playing (its notes rising: the cat disc),
+      frame 1          night, lanterns lit, the party begun: the jukebox playing (a note of the cat disc rising: the
+                       stub's play(f0 - 2) puts one on 563, alive 563-570; the next, 587, is cancelled by the eject),
                        high over Steve's shoulder at the foot of the stage, the jukebox's top (the slot) in view
       "creeper drops"  Alex pops the disc out (Jukebox.eject: the swing, the notes stop, the disc tossed up): the disc
                        item turning in the air above the jukebox in the lantern light
@@ -112,12 +117,18 @@ def jb18_nobody_asked(st, s, C, nar):
       bandstand_wing_to_three.
     NEIGHBOURS: before, rd17_run_back (the lane); after, jb19_to_jukebox (from behind him: he walks on to the jukebox).
     MEASURED (crammys_set_b18_nobody_asked.png, music b18, 40 mm f/3.2): Sunny 23 %, Steve 47 % with both arrows plain
-      in the lantern light, Noor 72 % (y 46 %). This shot is 46 frames: the walk the camera sees is the path from its
-      point 2 (music); the turn there and back must fit after he stops. The lead's scout with the ALIGNED arrows
+      in the lantern light, Noor 72 % (y 46 %). THE WALK (corrected after the technical check: the first stub walked
+      3.0 blocks at 1.6 b/s in this 46-frame shot and never stopped): already walking on frame 1 on the path's last
+      leg ((-4.7, -1.95) -> three_steve, toward the lens), the game's walk at speed, placed by C.walk_lead so that his
+      friction slide ends on 1115 ("Nobody" + 10; to the eye he stops about 1110; memo jb18_stop); Sunny's head to the
+      arrows on 1119 ("asked" 1118) and back on 1131; Noor never turns. The lead's still at 1120
+      (out/test/crammys_scout_jb18_nobody_asked_1120_zones.png): Sunny 13 %, Steve 47 %, Noor 72 %, the two
+      fletchings pointing left at Sunny (x 20-35 %, y 47-55 %) in front of his chest. The lead's scout with the ALIGNED arrows
       (out/test/crammys_scout_aligned_jb18_nobody_asked_1135_zones.png; geo: Sunny 22 %, Steve 47 %, Noor 72 %, faces
       81-90 px): the arrows now stick out to his front right, toward Sunny: the chest arrow's shaft shows beside
-      Sunny's raised arm, half hidden by it, the shoulder one hardly: turn Steve a little to his left, or stand Sunny
-      back, so the two fletchings stand clear.
+      Sunny's raised arm, half hidden by it, the shoulder one hardly: turn Steve a little to his left (his body
+      toward the lens's left: the arrows then point more at the lens), or stand Sunny back, so the two fletchings stand
+      clear.
     """
     f0, f1 = s.frame_start, s.frame_end
     jt = C.P("jukebox_top_target")
@@ -127,8 +138,9 @@ def jb18_nobody_asked(st, s, C, nar):
     C.put(no, f0, "three_noor")
     no.look_at(f0, jt, ease=0)
     # already walking on frame 1 (the game's walk, at speed) on the last leg of bandstand_wing_to_three, placed so
-    # that he stops on "Nobody" + 3 (C.walk_lead): the first stub walked the path from its point 2 (3.0 blocks at
-    # 1.6 b/s = 45 frames of a 46-frame shot) and never stopped (the technical review)
+    # that his slide to a halt ends on "Nobody" + 10 (C.walk_lead; to the eye he stops on about "Nobody" + 5): the
+    # first stub walked the path from its point 2 (3.0 blocks at 1.6 b/s = 45 frames of a 46-frame shot) and never
+    # stopped (the technical review)
     sp = C.P("three_steve")
     back = C.v.paths["bandstand_wing_to_three"][-2]
     arrive = C.at(s, "Nobody") + JB18_STOP_AFTER
@@ -221,8 +233,12 @@ def jb20_eleven(st, s, C, nar):
                        Alex's hand holds out her whole green disc (cat) for contrast
       "broken" .. "one"   he lowers the broken one ...
       "one"            ... INTO THE JUKEBOX ON THIS WORD (THE INSERT: C.insert_frame(); Jukebox.insert(f, player=steve,
-                       disc="music_disc_11", camera=s, until=s.frame_end + 1)): the swing, the disc gone one tick later,
-                       THE FIRST NOTE one tick after the click, rising before the cut
+                       disc="music_disc_11", camera=s, until=s.frame_end + 1)): the swing on 1248, the disc gone from
+                       his hand on 1250 (the probe: visible to 1249, hidden from 1250), THE FIRST NOTE born on 1250,
+                       rising until 1257, before the cut (1264)
+    C.HOLD AND THE INSERT: C.hold keys the hand's end when this function returns, so the insert's own hand change
+      (Player.hold(None, frame=1250)) stands. In the first skeleton C.hold keyed the end (1265) at once and the
+      players rig then ignored the insert: disc eleven stayed in his hand to the cut (the technical check).
     SHARED: THE INSERT (this shot alone; THE SONG after it is C.song's in fn21-fn24), THE DISC, THE CAT DISC (Alex),
       THE ARROWS. Places: steve_jukebox, alex_beside.
     NEIGHBOURS: before, jb19_to_jukebox; after, fn21_running (the jukebox sharp in the foreground, notes drifting up).

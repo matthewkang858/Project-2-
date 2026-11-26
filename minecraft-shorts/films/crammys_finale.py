@@ -1,8 +1,9 @@
 """The Crammys, sequence FINALE: the bandstand at night while disc eleven plays: the song, nobody moved, Kai, Best
 Vocals. Beats 21-24 (shots fn21_running, fn22_nobody_moved, fn23_kai, fn24_vocals), sky "night". One function per
 shot; the contract is in films/crammys_common.py (tags "fn...", C.actor, C.cam, C.lights, C.hold, C.present, C.clap,
-C.arrows, C.song, C.totem, st.use / st.hero). STUB by the lead director: every shot builds and renders; its staging
-is engine/music's worked example (tools/music_proof.py shot_b21 .. shot_b24) through the C helpers, filmed by the set
+C.arrows, C.song, C.totem, st.use / st.hero). STUB by the lead director (fn24's camera and totem, fn21 / fn22's note
+frames corrected after the two checks of the plan): every shot builds and renders; its staging is engine/music's worked
+example (tools/music_proof.py shot_b21 .. shot_b24) through the C helpers, filmed by the set
 builder's cameras (films/crammys_set.py CAMERAS b21-b24 = engine/music's). Make it a film.
 
 THE PLACE (engine/music.py bandstand; films/crammys_common.py "Coordinates"): THE NIGHT STAGE LAYOUT, the same spots
@@ -65,8 +66,11 @@ def fn21_running(st, s, C, nar):
     running feet and panting under the line, not the game's recording.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1          the jukebox sharp in the foreground (its slot from above), a note already drifting up (the
-                       first note of jb20's insert lives on across the cut), the push already moving
+      frame 1          the jukebox sharp in the foreground (its slot from above), THE PUSH ALREADY MOVING (C.cam's
+                       ease_out: the movement on frame 1). No note is in the air on frame 1: the insert's first note
+                       (born 1250) is gone by 1257 and the film ends every particle at the change of sequence; THE
+                       SONG's first note here rises on 1274 (then 1298, 1322: tools.crammys_probe notes). (Corrected
+                       after the technical check: the first docstring promised a note on frame 1.)
       "running away"   the slow push past it to Steve standing stiff beside it, the two arrows in him
       "breathing hard" his head turns slowly from the jukebox to the others
     SHARED: THE SONG (C.song), THE ARROWS. Places: steve_jukebox, ring_kai (his look).
@@ -102,8 +106,11 @@ def fn22_nobody_moved(st, s, C, nar):
 
     MUST BE SEEN, ON WHICH WORD
       frame 1 .. end   THE FILM'S ONE LOCKED-OFF FRONTAL WIDE of the whole stage: six players completely still, all
-                       facing the jukebox; the only movement the notes rising (C.song) and the lantern glow; the moon
-                       over the bandstand. Hold about a second after "moved" (the shot runs on 1.0 s after the voice).
+                       facing the jukebox; the only movement the notes rising (C.song: notes on 1346 and 1370; the one
+                       on 1394 is left out, since a note born in the last 7 frames of a shot would float on into fn23
+                       facing this camera (the technical check); C.song does that for every shot) and the lantern
+                       glow; the moon over the bandstand. Hold about a second after "moved" (the shot runs on 1.0 s
+                       after the voice).
     SHARED: THE SONG, THE ARROWS, THE NIGHT STAGE LAYOUT, THE TOTEM on the pedestal.
     NEIGHBOURS: before, fn21_running; after, fn23_kai (along the row of faces).
     MEASURED (crammys_set_b22_nobody_moved.png, music b22, 24 mm f/5.6 from (-20.5, -0.3, 3.6)): the six faces at
@@ -167,8 +174,8 @@ def fn23_kai(st, s, C, nar):
 
 def fn24_vocals(st, s, C, nar):
     """BEAT 24  "I won Best Vocals."   frames 1474-1562 (89 f, 3.71 s), sky night.
-    Words: I 1476, won 1480, Best 1486, Vocals 1494. The voice ends on 1509; the shot runs on 53 frames after it (2.21
-    s).
+    Words: I 1476, won 1480, Best 1486, Vocals 1494. The voice ends on 1509; the shot runs on 53 frames after it: 47
+    frames of picture (1510-1556 = 1.96 s), then the 6 black frames 1557-1562 (END_BLACK).
 
     STORY (beat 24): Medium on Steve centre stage, facing the lens, his arm straight out so the totem of undying faces
     the camera, the two arrows still sticking out of him. The gold pedestal in the bottom of the frame is empty. Slow
@@ -178,26 +185,35 @@ def fn24_vocals(st, s, C, nar):
     pedestal, arrows stuck in the player, crouch applause by five players, jukebox note particles, slow pull back, hold
     after the last word.
 
-    MUST BE SEEN, ON WHICH WORD
-      frame 1          medium on Steve centre stage facing the lens, his arm straight out so THE TOTEM faces the
-                       camera (C.hold + C.present), the two arrows still in him, the EMPTY gold pedestal at the bottom
-                       of the frame (no C.totem in this shot)
-      "Best Vocals"    the slow pull back reveals the five others crouching up and down fast (C.clap: the players'
-                       applause), notes and lantern bloom
-      the last 1.5 s   hold on Steve standing perfectly still; the last 6 frames are black (END_BLACK, the encoder's)
+    MUST BE SEEN, ON WHICH WORD (the cue as corrected after the story check: with C.cam's ease_out the pull back was
+    25 % done on "Best" and 40 % on "Vocals", Steve at x 64-69 % and the totem small by the last word)
+      frame 1 .. "Best"   medium on Steve centre stage facing the lens, his arm straight out so THE TOTEM faces the
+                       camera BESIDE (not over) his face (C.hold + C.present aimed FN24_TOTEM_AIM off the lens), the two
+                       arrows still in him, the EMPTY gold pedestal big in the bottom of the frame (no C.totem here);
+                       the camera HOLDS (a 3 % creep) through "I won Best"
+      "Best" (1486) .. 1538   the slow pull back FROM REST (C.timing_hold_move: 'smooth' from 1484 to FN24_SETTLE =
+                       1538) reveals the five others crouching up and down fast (C.clap from "Best", staggered 2
+                       frames each; the players' applause), notes (1490, 1514, 1538) and lantern bloom
+      1538 .. 1556     settled: Steve standing perfectly still among the five (1.5 s after "Vocals" ends on 1509 and
+                       the voice; the picture runs 47 frames = 1.96 s after "Vocals", then 1557-1562 black: END_BLACK)
     SHARED: THE TOTEM (in his hand: the pedestal empty), THE SONG, THE ARROWS, THE NIGHT STAGE LAYOUT.
     NEIGHBOURS: before, fn23_kai; after, none (the Reel loops to gd01).
-    MEASURED (crammys_set_b24_vocals*.png, music b24, 40 mm f/2.8 pulling back to (-19.5, 0.3, 4.6)): the totem at
-      x 41 %, y 47 % (17 % wide) with the empty pedestal below on the first frame; at the end of the pull back all six
-      heads at x 11-80 % (Steve at 80 %, on the edge), y 47-49 %. From the front the row of note blocks hides the
-      clappers below the chest: the claps read as heads and shoulders bobbing. The lead's scout of this stub
-      (out/test/crammys_scout_fn24_vocals_1480_zones.png): THE TOTEM COVERS HALF HIS FACE (present() aims the arm
-      from the shoulder straight at the lens, so the item sits between his eyes and the camera): aim it lower or to
-      his side; the empty gold pedestal fills the bottom third; Alex at the left edge. Geo at 1555: all six heads
-      x 10-79 %, y 47-48 % (Steve 79 %, next to the icon column), faces 36-40 px.
+    THE CAMERA (FN24_CAM): ONE 32 mm lens for the medium and the wide (the engine has no zoom): from (-10.1, -0.45,
+      2.75), 4.5 blocks from Steve, back and up to (-19.5, 0.3, 4.6), aimed at (-5.5, 1.4, 2.3) at the end. The set
+      builder's b24 (40 mm, ending aimed at y 1.8) left the six heads at x 11-80 %, Steve on the Reels icon column;
+      at 40 mm no aim fits all six inside the safe area (geo at 1550).
+    MEASURED (tools.crammys_probe track fn24_vocals; out/test/crammys_scout_fn24_vocals_1480 / _1494_zones.png):
+      1474  Steve's eyes x 50 %, y 47 %; THE TOTEM x 27-43 %, y 43-54 % (17 % of the frame wide), face-on, beside his
+            face (his right hand: the frame's left); both fletchings beside it; the pedestal's gold block filling the
+            bottom third; Alex's shoulder at the left edge
+      1494  "Vocals": the pull back begun (camera 15 % of the way): Steve x 56 %, the totem x 37-51 % (13 % wide),
+            Zuri in at the left, a note rising
+      1520  Noor in at the left edge; 1538 settled: Noor 14, Sunny 24, Zuri 34, Kai 42, Alex 51, Steve 69 % (eyes
+            y 47-49 %), faces 28-33 px; the totem x 62-67 % (5 % wide) at his side
     RISKS (story): "Crouch applause may puzzle non-players" (fallback: two players jumping; keep the totem inside the
       safe area so the win reads on its own); "held flat items turn edge-on if the arm drops or the camera moves to
-      the side": check the totem at phone size along the whole pull back.
+      the side": the arm stays aimed at FN24_TOTEM_AIM (about 15 degrees off the end camera); check the totem at phone
+      size along the whole pull back.
     """
     f0, f1 = s.frame_start, s.frame_end
     cam = FN24_CAM

@@ -1,7 +1,8 @@
 """The Crammys, sequence GOLD: the bandstand on the village square in golden light, before the party. Beats 1-6
 (shots gd01_everyone, gd02_zuri, gd03_kai, gd04_sunny, gd05_trophy, gd06_line), sky "gold". One function per shot;
 the contract is in films/crammys_common.py (tags "gd...", C.actor, C.cam, C.lights, C.hold, C.present, st.use /
-st.hero). STUB by the lead director: every shot below builds and renders; its staging is engine/music's worked
+st.hero). STUB by the lead director (gd06's totem and C.hold's end corrected after the two checks of the plan):
+every shot below builds and renders; its staging is engine/music's worked
 example (tools/music_proof.py shot_b1 .. shot_b6) through the C helpers, filmed by the set builder's cameras
 (films/crammys_set.py CAMERAS b01-b06). Make it a film: the words, the timing, the faces, the cuts.
 
@@ -62,6 +63,10 @@ def gd01_everyone(st, s, C, nar):
       golden totem between Noor's and Sunny's faces and the gold block on his hair are plain at phone size.
     RISKS (story): "Wool is guitar and gold is bells cannot be seen": the block under each note block is big enough in
       gd02 / gd03; here it is the joke's set-up (nothing near Steve).
+    NOOR'S HORN: C.hold(noor, "goat_horn", s) then no.toot(...): C.hold keys the hand's end when this function returns,
+      after the toot (the probe: the carried horn on 1-7, the tooting model 8-85, nothing from 86). In the first
+      skeleton the end was keyed before the toot, and the toot's model switch re-showed the carried horn from 86 to the
+      film's end (in gd06 it sat on her gd06 horn: the technical check).
     """
     f0, f1 = s.frame_start, s.frame_end
     bd = C.bd
@@ -187,6 +192,10 @@ def gd04_sunny(st, s, C, nar):
     MEASURED (crammys_set_b04_sunny_zones.png, music b4, 28 mm static wide): Zuri 14 %, Kai 31 %, Sunny 72 % (y 45 %);
       Sunny's note 77, 48 %; Steve below the stage looking at the ground at about 75 %, beside the pedestal. A wide:
       the faces are small; the synchronised turn is what must read.
+      SHARED: THE TOTEM on the pedestal (C.totem: the stub calls it) is in this frame: geo at 300 puts it at x 62 %,
+      y 46 %, the pedestal's gold block top at x 62 %, y 49 %, beside Steve's head (eyes x 77 %, y 53 %, 57 px):
+      the same golden-totem-beside-Steve's-head tangent as gd01 (the technical check: "totem at about 61 %, 45 %
+      beside his head"). Solve it with Steve's spot or the camera; the pedestal and the totem stay.
     RISK (story): non-players may not know a pumpkin makes a didgeridoo: the line carries it; a sound is the fallback.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -270,7 +279,10 @@ def gd06_line(st, s, C, nar):
                              Zuri a note block, Noor the goat horn, Alex the green music disc (cat), Sunny his pumpkin
       "never have anything"  the dolly stops on Steve at the end of the line, his EMPTY hand held out low, his head
                              down at it (the head alone pitches at most 35 degrees: the hand is held out to be seen)
-    SHARED: THE CAT DISC (Alex holds music_disc_cat). Places: line_1 .. line_5 (line_5 = Steve).
+    SHARED: THE CAT DISC (Alex holds music_disc_cat). THE TOTEM on the pedestal (C.totem: the pedestal is in this
+      frame early in the dolly: geo, the totem at x 75 %, y 27 % on 438 and 35 %, 25 % on 451, out of the frame by
+      470; the first stub left it out and the big soft gold block stood empty behind Alex's cat disc, one shot after
+      gd05 opened on the totem turning there: the technical check). Places: line_1 .. line_5 (line_5 = Steve).
     NEIGHBOURS: before, gd05_trophy; after, rd07_chased: THE HARD CUT TO NIGHT. The last frames here are the last gold
       frames of the film (the lead compared them side by side with rd07's first: films/crammys.py SKIES).
     MEASURED (crammys_set_b06_line*.png, music b6): the acts held at x 28-34 %, each item 33-41 % of the frame wide;

@@ -1,32 +1,46 @@
 """The Crammys, sequence ROAD: the village road at night. Beats 7, 9, 17 (shots rd07_chased, rd09_torch,
 rd17_run_back), sky "night". One function per shot; the contract is in films/crammys_common.py (tags "rd...",
-C.actor, C.cam, C.lights, C.hold, C.arrows, st.use / st.hero). STUB by the lead director: every shot builds and
-renders; rd07 / rd17 are engine/music's 'lane' staging (tools/music_proof shot_lane / shot_lane17) plus the zombie
-(films/crammys_set.py stage_b07), rd09 the set builder's stage_b09. Make it a film.
+C.actor, C.cam, C.lights, C.hold, C.arrows, st.use / st.hero). STUB by the lead director, RE-STAGED after the two
+checks of the plan: every shot builds and renders; rd07 and rd17 run on the WEST side of the road through the
+RAISED lane camera (see THE LANE), rd09 is the set builder's stage_b09 with Steve in frame on frame 1. Make it a film.
 
-THE PLACE: the exit road runs north from the square (x -1..1). THE LANE (beats 7, 17): Kai's doorstep in front of
-house_f (east side, door (4.5, 16.5)): his gold block + note block column at (1, 15), his lantern on a post at
-(1, 17); across the road the narrator's door, house_e (-4.5, 15.5), facing east, its cobblestone step at (-4, 15).
-Paths: C.v.paths["lane_home"] (up the road from the square and in at house_e's door: beat 7), "lane_to_square" (down
-the road from the north toward the square: beat 17). Kai's spot: C.P("lane_kai") (2.35, 16.85, facing west).
+THE PLACE: the exit road runs north from the square (x -1..1, a dirt path). THE LANE (beats 7, 17): Kai's doorstep
+in front of house_f (its west wall x 4, door (4, 16)): his gold block + note block column at (1, 15) (blocks z 0-2),
+his lantern on a fence post at (1, 17); across the road the narrator's house_e, its oak door at (-5, 15) (block
+x -5..-4, z 1-3, facing east; shut, its panel lies at the block's WEST face, x -5.0 .. -4.81), the cobblestone stairs
+before it at (-4, 15), poppy planters at (-4, 14) and (-4, 16). Kai stands at C.P("kai_lane") (2.05, 16.85), in the
+gap between his column and his post, facing west (C.yaw("lane_kai")).
+THE LANE CAMERA (CAMS["lane"], films/crammys_common.py: SHARED by rd07 and rd17, EXACTLY): 16 mm f/2.8 from Kai's
+doorstep RAISED to z 3.1 (3.84, 16.5, 3.1) looking down the lane at the door, a slow drift. Why raised: engine/music's
+lane camera (z 1.7) saw the road only between Kai's column and y 14.4: in the first stub the column hid Steve through
+"chased" and "home" and the zombie through 546 (the story check: Steve clear only on 550-552, from behind). From z 3.1
+it looks over the column: a figure on the WEST side of the road (x -1.5) is seen eyes and chest from x 5 % (y 12.2)
+to the door (x 50 %), knees hidden behind the note block from y 13 to 15 (tools.crammys_geo spots). The cost: Kai's
+head sits LOW, x 58-85 %, y 62-82 % (eyes 73-76 %, y 72 %): in the caption band (a soft foreground shape, the back of
+his head; it reads by its turn, the caption word sits over its left edge); his lantern at the right edge (x 88-100 %,
+y 47-58 %); the column at the left (x 5-48 %, y 52-90 %); house_e's door at x 52 %, y 37-50 %, the starry sky above
+its roof (the top 13 %). Kai's back of head shows the kai skin's red hair clip (not a face).
 THE EXIT GATE (beat 9): the two plains lamp posts at (-3, 24) and (3, 24): the last torches; north of them the night
 meadow. Path C.v.paths["crammys_walk_out"] (0.3, 19.6) -> ... -> (5.0, 35.6) (beat 9 and on to the creeper).
 THE SKY "night": the moon due EAST, low (az 0, el 21): the lane camera looks west with the moon behind it
 (house_e's front moonlit); the gate camera looks north, the moon at its right. C.lights(s, "night") (x 1.3).
 SHARED: CAMS["lane"] in rd07 AND rd17, EXACTLY (the story: "the same camera as the zombie chase"): ONE camera
-(C.cam(s, "lane", focus=LANE_FOCUS, handheld=LANE_HANDHELD)) for both, the same handheld (0.004). THE DOOR: house_e opens and shuts in rd07 only. THE DISC and THE
-ARROWS in rd17 (C.hold(steve, "music_disc_11", s); C.arrows(steve, s)).
+(C.cam(s, "lane", focus=LANE_FOCUS, handheld=LANE_HANDHELD)) for both, the same focus and handheld (0.004). THE DOOR:
+house_e opens and shuts in rd07 only. THE DISC and THE ARROWS in rd17 (C.hold(steve, "music_disc_11", s);
+C.arrows(steve, s)).
 TAGS TAKEN: steve_rd (rd07, rd09, rd17: never in two consecutive shots of the film), kai_rd, zombie_rd.
+MEASURE BEFORE YOU RENDER: `$BPY -m tools.crammys_probe track rd07_chased 509-564:3` (where everybody is, frame by
+frame, in the frame and seen or hidden; the door's angle; the arrows' fletching in rd17), `... memo` (the event
+frames the stubs leave in C.memo: rd07_frames).
 """
 import math
 
 from films import crammys_common as CC
 
-# rd07 and rd17 film through the SHARED camera C.cam(s, "lane", ...) (films/crammys_common.py CAMS["lane"] = engine/music
-# 'lane', 16 mm f/2.8 from Kai's doorstep), with ONE focus and ONE handheld for both
+# rd07 and rd17 film through the SHARED camera C.cam(s, "lane", ...) (films/crammys_common.py CAMS["lane"]: 16 mm f/2.8
+# from Kai's doorstep, raised to z 3.1), with ONE focus and ONE handheld for both
 LANE_FOCUS = (-1.5, 15.2, 1.3)          # the west side of the road where Steve runs (Kai's head soft in front)
 LANE_HANDHELD = 0.004
-B07_ARRIVE = CC.CS.B07_ARRIVE           # the set builder's: the zombie reaches the door step 54 frames into the shot
 
 
 RD17_RUN = ((-1.3, 24.0), (-1.4, 18.5), (-1.5, 15.7), (-1.6, 13.0), (-1.4, 9.0), (-1.0, 6.5))   # rd17: back down
@@ -73,33 +87,41 @@ def rd07_chased(st, s, C, nar):
     and note block on Kai's doorstep, lamp post as key light, player sprint.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1          THE HARD CUT FROM GOLD TO MOONLIT BLUE (the story's risk: "the first night frame must be clearly
-                       moonlit blue"): the night sky over house_e's roof, Kai's lantern, his gold block and note block,
-                       the back of his head soft in the foreground; something already moving (Steve or the camera)
-      "chased"         Steve sprinting across the lane to his door, the zombie behind him with its arms out
-      "home"           Kai's head turning to follow him
-      "every night"    the door shuts in the zombie's face (before the last 3 frames of the shot)
-    SHARED: CAMS["lane"] EXACTLY (rd17 repeats it); THE DOOR (house_e: v.door_open here only).
+      frame 1          THE HARD CUT FROM GOLD TO MOONLIT BLUE ("the first night frame must be clearly moonlit blue"):
+                       the starry sky over house_e's roof, Kai's lantern, his column, the back of his head soft in the
+                       foreground, ALREADY TURNING toward the road (the camera drifting too)
+      "chased"         Steve sprinting up the lane toward his door, the zombie behind him with its arms out
+      "home"           Steve at his door step; Kai's head following him
+      "every night"    the door shuts in the zombie's face: shut by "night", the zombie walking up to it
+    SHARED: CAMS["lane"] EXACTLY (rd17 repeats it: position, aim, move, lens, focus LANE_FOCUS, handheld); THE DOOR
+      (house_e: v.door_open here only). Places: kai_lane, zombie_stop (the foot of the stairs, (-2.85, 15.5)).
     NEIGHBOURS: before, gd06_line (the last gold frame: Steve's empty hand); after, jb08_eject (the party at night).
-    MEASURED (the set builder, out/test/crammys_set_b07_chased*.png, music 'lane' + stage_b07): Kai's back of head at
-      x 74 %, y 52 %, his lantern at 90 %. KNOWN LIMIT: the frame sees the road only north of y 14.4 and Kai's gold /
-      note column at (1, 15) hides it south of y 15.9: Steve appears about 1.5 blocks before his door, so the sprint
-      across the lane is about HALF A SECOND on screen, and the zombie (2.33 blocks/s) can be two blocks behind him,
-      not four (four behind, it would still be hidden by the column when he goes in): B07_ARRIVE = 54 frames after
-      the shot's start it reaches the step on the frame the door has shut. This shot is about 56 frames: the door
-      shuts and the zombie arrives in its last frames: re-time so the door is shut at least 3 frames before the cut.
-      A different lane camera would need Kai's column moved (an engine/music set change: not available).
-    THE LEAD'S SCOUT (out/test/crammys_scout_rd07_chased_509_zones.png, and side by side with gd06's last frame:
-      crammys_scout_cut_gd06_rd07.png): the first night frame reads as night at once (mean luma 59 against 106, the sky
-      band rgb (63, 75, 144) against (174, 167, 177)): the starry blue sky over house_e's moonlit roof, its door torch,
-      Kai's lantern burning at the right, the back of Kai's head dark in the foreground, the gold block and note block
-      at the left. BUT NOTHING MOVES ON FRAME 509 except the handheld: Steve and the zombie are both still out of view
-      (behind the column / off the frame) and the lane camera has no move: give the shot motion on its first frame
-      (Kai's head already turning, a slow drift of the camera, Steve already in view).
-    FALLBACKS (story): "Night shots on a dark lane: Steve and the zombie can sink into the background": the lamp post
-      as key on the lens side and Kai's lantern in the foreground (here: Kai's lantern beside the lens); keep the
-      background no brighter than the subject. An optional kicker on the back of Kai's head:
-      C.kicker("rd_kai", s, C.P("lane_kicker_target"), 40) (music: documented, never rendered).
+    THE STAGING (re-staged after the checks; the first stub played the chase backwards: the zombie started 3.6 blocks
+      AHEAD of Steve and he overtook it at 539 behind Kai's column, the door opened only on 561-566 and shut inside
+      jb08, he went through it shut). Now: Steve sprints (5.61 b/s, at speed on frame 1) up the WEST side of the road
+      (RD07_RUN, at the frame's left edge on frame 1), the stairs, straight through his door (opened by his
+      right-click RD07_OPEN_LEAD = 6 frames before he reaches it: a door opens at once in the game; the engine swings
+      it over 5 frames), inside he turns and right-clicks it shut once he is past its panel; the zombie (2.33 b/s,
+      arms out from frame 1) follows 0.45 block behind him on the same way and FALLS BACK (the game's speeds: a
+      sprinting player outruns a zombie), then walks on up to the foot of the stairs. Kai's head tracks Steve, then
+      turns to the zombie at the shut door. This is the only order that is true to the game: a zombie that reached the
+      door as it shut would have had to be AHEAD of Steve when both were in view.
+    MEASURED (tools.crammys_probe track rd07_chased; memo rd07_frames):
+      509  Kai's head turning (eyes x 73 %, y 72 %); Steve just beyond the left edge (eyes x -4 %), the zombie behind
+      512  Steve in the frame (eyes x 5 %, y 49 %, chest seen over the column)
+      519  the zombie in the frame (x 2 %), arms out; 2.2 blocks behind Steve
+      522  "chased": Steve x 35 %, the zombie x 6 %, both eyes and chest seen
+      529  his right-click: the door opens 529-534 (90 degrees on 534); 530 "home": Steve at the foot of the stairs,
+           x 50 %; the zombie x 16 %
+      536  his feet at the threshold (x -3.9); 542 inside, past the panel (x -5.35)
+      543  the door starts to shut; SHUT ON 548 ("night" 547: 9 degrees); the zombie at x 38 %, 2 blocks off
+      561  the zombie at the foot of the stairs (zombie_stop), standing at the shut door, arms out, to the cut (564)
+      Stills (540x960, 16 spp, zones): out/test/crammys_scout_lane_rd07_chased_509 / _522 / _530 / _547_zones.png.
+      Steve's and the zombie's faces are 36-43 px (a 16 mm wide: figures about 9 % of the frame high).
+    FALLBACKS (story): "Night shots on a dark lane: Steve and the zombie can sink into the background": they run in
+      front of house_e's moonlit front (warm door torch above them); keep the background no brighter than them. An
+      optional kicker on the back of Kai's head: C.kicker("rd_kai", s, C.P("lane_kicker_target"), 40) (music:
+      documented, never rendered). The story's "four blocks behind": 2.2 on "chased", 3.4 on "home" (it falls back).
     """
     f0, f1 = s.frame_start, s.frame_end
     kai = C.actor("kai", "rd")
@@ -118,9 +140,8 @@ def rd07_chased(st, s, C, nar):
     steve.attack(fd - RD07_OPEN_LEAD, "right")                 # the right-click that opens it ...
     C.v.door_open("house_e", fd - RD07_OPEN_LEAD)              # ... open over 5 frames, before he reaches it
     shut = fin + 1
-    steve.face(in_end, (C.P("zombie_stop")[0], 15.5, 1.6), ease=4)     # inside: he turns round (hidden by then)
-    steve.attack(shut, "right")                                # ... and the right-click that shuts it
-    C.v.door_open("house_e", shut, open=False)                 # shut 5 frames later
+    steve.attack(shut, "right")                                # inside, the right-click that shuts it (in the dark
+    C.v.door_open("house_e", shut, open=False)                 # of the doorway); shut 5 frames later
     # the zombie, arms out, BEHIND him on the same way at the game's 2.33 blocks/s (he sprints at 5.61: it falls
     # back), walking on up to the foot of his door step after the door has shut
     zp = [p for p in path if p[2] < 0.5] + [C.P("zombie_stop")]
@@ -131,7 +152,7 @@ def rd07_chased(st, s, C, nar):
     zend = z.walk(f0, zrun)
     # Kai's head follows Steve (on frame 1 it is already turning toward him, down the road to the south) and then
     # the zombie at the shut door
-    kai.look_at(f0, C.to_lens(kai, f0, steve.eye_point(f0 + 6), CC.CAMS["lane"]["pos"], 0.0), ease=0)
+    kai.look_at(f0, steve.eye_point(f0 + 6), ease=0)
     kai.track(f0 + 1, fin, steve, step=3, ease=5)
     kai.look_at(fin + 3, z, ease=8)
     C.memo["rd07_frames"] = dict(door=fd, inside=fin, shut=shut, walk_end=in_end, zombie_stop=zend)
@@ -153,7 +174,8 @@ def rd09_torch(st, s, C, nar):
     Cast: Steve. Effects: last lamp post with torches, warm pool of torch light against moonlight.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1          Steve already walking (pre-rolled if needed: steve_rd is not in jb08, the shot before)
+      frame 1          Steve already walking, already in the frame (the stub: RD09_D0 = 2.6 blocks along
+                       crammys_walk_out, ramp in off: at walking speed on frame 1)
       "walked out"     from behind and low: Steve passing the last lamp post, its torches big beside the lens, the
                        warm light sliding off his back, hands empty (no sword)
       "last torch"     he goes on into the blue meadow, getting small against a clean horizon; the camera stays at
@@ -163,7 +185,9 @@ def rd09_torch(st, s, C, nar):
       after, md10_creeper (the meadow).
     MEASURED (crammys_set_b09_torch*.png, 20 mm f/4 from (-1.5, 18.8, 0.55)): the west lamp post with its torches big
       at the left (x 8-17 %); Steve walking away past it from x 80 % (f18) to 56 % (f44), small against a clean
-      horizon; the road warm, the meadow blue, the skeleton's oak at the right.
+      horizon; the road warm, the meadow blue, the skeleton's oak at the right. The technical check: from the path's
+      start (0.3, 19.6) he was at x 190 % on 655 and first in the frame about 670 (nothing moving for 0.6 s): the
+      stub now starts him 2.6 blocks along it (the lead's still out/test/crammys_scout_rd09_torch_656_zones.png).
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd")
@@ -190,24 +214,30 @@ def rd17_run_back(st, s, C, nar):
     lane, camera reused from beat seven.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1          the lane EXACTLY as in rd07 (CAMS["lane"]), now EMPTY of Kai: only his lantern, gold block
-                       and note block; something already moving
-      "ran to the stage"   Steve sprinting the other way, right to left, toward the lantern glow of the square, the
-                       disc in his hand (it may be edge-on here, the story allows it)
-      "arrows still in me"  the TWO ARROWS plain on him (C.arrows: the same two as md13's); in focus as he passes
-    SHARED: CAMS["lane"] EXACTLY (the same focus and handheld as rd07); THE DISC (C.hold(steve, "music_disc_11", s));
-      THE ARROWS (C.arrows(steve, s)).
+      frame 1          the lane EXACTLY as in rd07 (CAMS["lane"], the same drift), now EMPTY of Kai: only his lantern,
+                       gold block and note block, the door shut (the story's "now empty" is this shot's first picture)
+      "ran to the stage"   Steve comes in from the right, sprinting right to left toward the lantern glow of the
+                       square, the disc in his hand (edge-on allowed)
+      "arrows still in me"  the TWO ARROWS plain on him (C.arrows: the same two as md13's) as he crosses the frame
+    SHARED: CAMS["lane"] EXACTLY (the same focus LANE_FOCUS and handheld as rd07); THE DISC (C.hold(steve,
+      "music_disc_11", s)); THE ARROWS (C.arrows(steve, s)).
     NEIGHBOURS: before, md16_disc (ground level in the meadow: his feet stop at the disc); after, jb18_nobody_asked.
-    MEASURED (crammys_set_b17_run_back_zones.png): Steve sprinting right to left past the doorstep with the disc,
-      mid-frame and motion-blurred. The run across the visible road is short (see rd07's KNOWN LIMIT). The lead's
-      scout of the first stub (he started on frame 1 at the path's first point): on "arrows" (1067) he was already
-      behind Kai's column, one leg showing (out/test/crammys_pal_rd17_run_back_1067.png; palette passes: trousers min
-      channel 25). The stub now starts him up the road so that he crosses y RD17_MID_Y on "arrows" (tools.crammys_geo:
-      his eyes at x 88 % on 1060, 50 % on 1067 "arrows", 9 % on 1075, then behind the note block: on screen about 16
-      frames). The arrows stick out to his front RIGHT (toward the far side from this lens when he runs south):
-      from here they show as shafts ahead of his chest, at best.
+    THE STAGING (re-staged with the raised lane camera): back down the WEST side of the road (RD17_RUN, x -1.5: in view
+      over Kai's column), sprinting at speed from beyond the right edge, timed to be RD17_EARLY = 0.7 block short of
+      mid-frame on "arrows" (x 60 %). The aligned arrows stick out to his FRONT RIGHT (toward where the skeleton
+      stood): running south past an east lens they show while he comes in from the right and hide behind his head
+      once he is past the middle.
+    MEASURED (tools.crammys_probe track rd17_run_back; 'arrow' rows = the fletching end, 'ok' = the lens sees it):
+      1037-1056 the empty lane (the camera's drift is the only movement: the story's "now empty")
+      1057  Steve in at the right (eyes x 85 %), behind the lantern post until about 1057
+      1058-1069  BOTH FLETCHINGS SEEN (12 frames, 0.5 s), x 75 -> 50 %, y 48-52 %; Steve's eyes x 81 -> 52 %
+      1067  "arrows": eyes x 60 %, y 51 %, face 58 px; the fletchings at x 57 / 54 %
+      1070-1073  the shoulder arrow hidden behind his head, the chest arrow from 1072; 1083 he is out at the left
+      (the first stub's run on x 0.4 was behind Kai's column on "arrows": out/test/crammys_pal_rd17_run_back_1067.png)
+      Still: out/test/crammys_scout_rd17_run_back_1064_zones.png.
     RISKS (story): "Kai said it sounded just like me coming home" only works if this camera is identical to rd07's:
-      it is the same constant. "Arrows stuck in Steve are thin at phone size": he passes 3-5 blocks from the lens.
+      it is the same constant. "Arrows stuck in Steve are thin at phone size": he passes 4-6 blocks from a 16 mm lens:
+      the fletching crosses are about 10-15 px; sharp (LANE_FOCUS is on his way, (-1.5, 15.2, 1.3)).
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd")

@@ -52,7 +52,12 @@ TAGS TAKEN: piglin_rw1, piglin_rw2 (rw02, rw21, rw23: the brothers), piglin_rw3 
   (rw05: the three of the gate frame), brute_rw (rw02, rw21-rw23), gold_ingot_rw (rw21-rw23); fill rw_nothing.
 PREVIEW samples of this sequence: 6.
 """
+import math
+
 from mathutils import Vector
+
+from engine import characters as ch
+from engine import piglins
 
 # rw05: the brothers' look at the golden boots, from the boots' height: a lens on the floor 1.8 block east of the
 # boot mark (from the mark itself gold_2 and gold_3 stand on one line and gold_1 falls outside x 82 %: the lead's geo)
@@ -77,7 +82,10 @@ FAMILY_BACK, FAMILY_BACK_FRAMES = (1, 3, 5), 12
 # and "seconds", and his scalp at y 9-13 %) aimed 0.05 lower; a slow linear push of 0.15 block, LEVEL along his line
 # (a level push steepens the view: the gap between snout and ingot opens as it goes; the stub's 0.1 block along the
 # aim changed his head by 1 % of the frame in 86 frames, not seen)
-INGOT_CLOSE = dict(pos=(8.6, 13.25, 2.15), target=(8.05, 11.3, 1.2), pos1=(8.559, 13.106, 2.15), lens=28.0,
+# (FIX PASS: the brute stands 0.25 block west and 0.1 north of brute_gold, BRUTE_STARE below; the whole rig is
+# turned 8.56 degrees about the step ingot with his line of sight: before, pos (8.6, 13.25, 2.15), target (8.05, 11.3, 1.2), pos1 (8.559,
+# 13.106, 2.15))
+INGOT_CLOSE = dict(pos=(8.824, 13.167, 2.15), target=(7.99, 11.321, 1.2), pos1=(8.762, 13.031, 2.15), lens=28.0,
                    fstop=2.8)
 INGOT_BROADSIDE = 2     # rw22: the step ingot shows the lens its broad side this many frames after "Six"
 # rw23: beat 23's reverse angle (the story's fallback): ON the line from the brute to the gateway's mouth (what he
@@ -87,13 +95,38 @@ INGOT_BROADSIDE = 2     # rw22: the step ingot shows the lens its broad side thi
 # at y 50-62 %, across him); brother 2 is a soft head-down sliver at the right edge, the gold wall soft at the left.
 # 28 mm: his face about 175-185 px; a slow LINEAR push in (with ease-out the 2-second hold stood still: 0.22-0.27 grey
 # levels a frame on the preview) and a handheld of 0.008. He lifts his head from the ingot straight into the lens.
-REVERSE = dict(pos=(6.68, 12.54, 1.72), target=(7.6, 10.0, 1.5), lens=28.0, fstop=2.8,
-               pos1=(6.73, 12.41, 1.71), target1=(7.6, 10.0, 1.5))
+# (FIX PASS: re-made for BRUTE_STARE: 2.5 blocks from him at the same height, now 5 degrees east of north from him,
+# 13 east of his line to the gateway (on that line, with the brute moved, brother 2's turned head filled the right
+# third of the frame, x 65-100 %, over the brute's ear: tools.sixseconds_row_probe / a scratch search of bearings
+# and distances); before, pos (6.68, 12.54, 1.72), pos1 (6.73, 12.41, 1.71), target (7.6, 10.0, 1.5))
+REVERSE = dict(pos=(7.132, 12.590, 1.72), target=(7.35, 10.1, 1.5), lens=28.0, fstop=2.8,
+               pos1=(7.144, 12.452, 1.71), target1=(7.35, 10.1, 1.5))
 NOTHING_HANDHELD = 0.008
 NOTHING_LIFT = 18       # rw23: frames of the head lift and turn from the ingot into the lens, from "Nothing"
+# rw23: the game's BodyRotationControl after the lift (Mob.getBodyRotationControl, clientTick while standing): once
+# the head has held still for 10 ticks (12 frames) the body comes round under it over the next 10 (12 frames), the
+# head keeping its world direction (the face stays on the lens)
+BODY_FOLLOW = (12, 12)
 # rw23: a film-local shadowless near-neutral fill beside the lens (C.fill, this shot only): under the gold wall's
-# lanterns alone brother 2's skin at the right edge measured s 0.63 (nether.check_still's limit 0.62)
-NOTHING_FILL = dict(pos=(6.35, 12.25, 2.0), watts=60.0, color=(1.0, 0.98, 0.96))
+# lanterns alone brother 2's skin at the right edge measured s 0.63 (nether.check_still's limit 0.62). Moved with
+# the lens in the fix pass, the same offset from it (before (6.35, 12.25, 2.0))
+NOTHING_FILL = dict(pos=(6.739, 12.395, 2.0), watts=60.0, color=(1.0, 0.98, 0.96))
+
+# THE FIX PASS (the review, Nov 26), two in-file overrides of SHARED places that only this sequence uses (reported in
+# the result's common_requests; if the lead moves the places themselves, set these to zero):
+# brother 2 (six_brother_2, yaw NE) turned 30 degrees toward the ingot-row lens in rw02, rw21 and rw23 alike: from the
+#   shared camera his ingot was exactly edge-on (89 degrees off its broad side: a brown stick at his snout) and his
+#   face 61 degrees off the lens; turned, his ingot is 67 degrees off (a gold bar at his snout) and his face 38 off
+BROTHER2_TURN = math.radians(30.0)
+# the brute for the stare (rw21-rw23) on brute_gold (7.6, 10.0) yaw NE, 0.4 block from the step's face: his golden
+# axe was 577 of its 712 vertices INSIDE the blackstone step on every frame 1358-1578 (0.43 block deep: no axe in
+# his hand in rw21, a forearm ending at the step in rw22, no axe in the last image). 0.25 block west and 0.1 north,
+# facing 8 degrees east of north (yaw 172: his ingot 19 degrees right of straight ahead instead of 27 left) leaves
+# none of it inside, 0.1 block clear (a grid of shifts and yaws, then tools.sixseconds_row_probe step on every
+# shot); his eyes are as far from the ingot as before (1.8), so rw22's rig only turns with his line of sight; in
+# rw21 his head moves 4 % of the frame toward brother 2 (west alone, 0.45 block, put brother 2's head over his:
+# the review's test). 1.26 from brother 2's feet (the rule: 0.7)
+BRUTE_STARE = dict(shift=(-0.25, 0.1), yaw=math.radians(172.0))
 
 # the ingot row frame (CAMS["ingot_row"], shared: only its focus is free) moves by its handheld alone, 0.004 block,
 # measured 0.2-0.3 grey levels a frame on the previews (The Hello's measure of a frozen picture): the focus carries
@@ -102,14 +135,47 @@ RACK_02 = (6, 32)       # rw02: brother 2's face -> the near brother's ingot, 10
 RACK_21 = (4, 24)       # rw21: the near ingot (as rw02 ended) -> the brute, 1362 -> 1386 ("I'm staring" 1375-1392)
 
 
+def _arm_bob(c, f0, f1, arms=("r", "l")):
+    """The game's idle arm bob (HumanoidModel.setupAnim -> AnimationUtils.bobModelPart: zRot +-0.05 rad with
+    cos(age * 0.09), xRot +-0.05 with sin(age * 0.067), mirrored on the left arm) from f0 to f1 on the given arms,
+    phased by the entity's own age (Piglin.age): it runs on unbroken across the cuts of one entity. For the stare
+    (C.stand idle=False drops the head glances AND the bob, which the game never stops) and for the admiring
+    brothers' sword arm (the admire pose owns only the left arm)."""
+    for side in arms:
+        arm, sgn = (c.arm_r, 1.0) if side == "r" else (c.arm_l, -1.0)
+        bz, bx = ch._val(arm, ch._ROT, 1, f0), ch._val(arm, ch._ROT, 0, f0)
+        fr = list(range(f0, f1, 3)) + [f1]
+        ch._segment(arm, ch._ROT, 1, [(f, bz + sgn * piglins.BOB_Z * math.cos(c.age(f) * piglins.BOB_Z_RATE))
+                                      for f in fr], "BEZIER")
+        ch._segment(arm, ch._ROT, 0, [(f, bx + sgn * piglins.BOB_X * math.sin(c.age(f) * piglins.BOB_X_RATE))
+                                      for f in fr], "BEZIER")
+
+
 def _brothers(st, s, C):
-    """The two brothers on their places, admiring (ingot in the left hand at the snout) through the whole shot."""
+    """The two brothers on their places, admiring (ingot in the left hand at the snout) through the whole shot, the
+    sword arm bobbing as the game's does; brother 2 turned BROTHER2_TURN toward the ingot-row lens (fix pass)."""
     b1, b2 = C.actor("piglin", "rw1"), C.actor("piglin", "rw2")
-    for b, place in ((b1, "brother_1"), (b2, "brother_2")):
-        C.put(b, s.frame_start, place)
+    for b, place, turn in ((b1, "brother_1", 0.0), (b2, "brother_2", BROTHER2_TURN)):
+        C.put(b, s.frame_start, place, yaw=C.yaw(place) + turn)
         C.admire(s, b)
+        _arm_bob(b, s.frame_start, s.frame_end + 1, arms=("r",))
     st.use(s, b1, b2)
     return b1, b2
+
+
+def _brute_gold(C):
+    """Where the brute stands for the stare: brute_gold moved by BRUTE_STARE["shift"] (fix pass: the axe)."""
+    p = C.P("brute_gold")
+    return (p[0] + BRUTE_STARE["shift"][0], p[1] + BRUTE_STARE["shift"][1], p[2])
+
+
+def _stare(st, s, C):
+    """The brute at the gold for the stare (rw21-rw23): on _brute_gold, facing BRUTE_STARE["yaw"], his head on the
+    step ingot from the first frame with no ease and no idle glance (ears only), his arms bobbing as the game's do."""
+    brute = C.actor("brute", "rw")
+    C.stand(s, brute, _brute_gold(C), look="step_ingot", yaw=BRUTE_STARE["yaw"], idle=False)
+    _arm_bob(brute, s.frame_start, s.frame_end + 1)
+    return brute
 
 
 def _ingot(st, s, C):
@@ -282,8 +348,7 @@ def rw21_stare(st, s, C, nar):
     """
     b1, _b2 = _brothers(st, s, C)
     _ingot(st, s, C)
-    brute = C.actor("brute", "rw")
-    C.stand(s, brute, "brute_gold", look="step_ingot", idle=False)     # the stare: ears only, for six seconds
+    brute = _stare(st, s, C)                                           # the stare: ears and arm bob, six seconds
     C.cam(s, "ingot_row", focus=b1.item_point(s.frame_start + 2, "off"))   # beat 2's frame as it ended: the near
     C.rack(s, brute.head, s.frame_start + RACK_21[0], frames=RACK_21[1])   # ingot sharp; slowly back to him by
     #                                                                       "staring"
@@ -338,8 +403,7 @@ def rw22_six(st, s, C, nar):
     NEIGHBOURS: before, rw21_stare; after, rw23_nothing.
     """
     ingot = _ingot(st, s, C)
-    brute = C.actor("brute", "rw")
-    C.stand(s, brute, "brute_gold", look="step_ingot", idle=False)
+    brute = _stare(st, s, C)
     target = Vector(C.P("step_ingot")) + Vector((0.0, 0.0, 0.3))     # the middle of the bobbing sprite
     C.cam(s, None, focus=target, ease="linear", **INGOT_CLOSE)
     st.hero(s, "brute", brute)
@@ -408,12 +472,19 @@ def rw23_nothing(st, s, C, nar):
     f0, f1 = s.frame_start, s.frame_end
     _brothers(st, s, C)
     _ingot(st, s, C)
-    brute = C.actor("brute", "rw")
-    C.stand(s, brute, "brute_gold", look="step_ingot", idle=False)    # 1502: the stare's last frame goes on
+    brute = _stare(st, s, C)                          # 1502: the stare's last frame goes on
+
+    def lens_at(f):
+        return Vector(REVERSE["pos"]).lerp(Vector(REVERSE["pos1"]), min(1.0, (f - f0) / float(f1 + 1 - f0)))
+
     lift = C.at(s, "Nothing")
     end = lift + NOTHING_LIFT
-    lens = Vector(REVERSE["pos"]).lerp(Vector(REVERSE["pos1"]), min(1.0, (end - f0) / float(f1 + 1 - f0)))
-    brute.look_at(lift, lens, ease=NOTHING_LIFT)      # "Nothing": up from the ingot and round, into the lens; held
+    brute.look_at(lift, lens_at(end), ease=NOTHING_LIFT)    # "Nothing": up from the ingot and round, into the lens
+    follow = end + BODY_FOLLOW[0]                           # the head still 10 ticks: the body comes round under it
+    lens = lens_at(follow + BODY_FOLLOW[1])
+    here = Vector(_brute_gold(C))
+    brute.turn(follow, math.atan2(lens.x - here.x, -(lens.y - here.y)), ease=BODY_FOLLOW[1])
+    brute.look_at(follow, lens, ease=BODY_FOLLOW[1])        # ... the head easing back to centre: still on the lens
     C.cam(s, None, focus=brute.head, handheld=NOTHING_HANDHELD, ease="linear", **REVERSE)
     C.fill("rw_nothing", NOTHING_FILL["pos"], NOTHING_FILL["watts"], [s], color=NOTHING_FILL["color"])
     st.hero(s, "brute", brute)

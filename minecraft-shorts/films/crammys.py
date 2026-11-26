@@ -44,8 +44,8 @@ shaped as a storyteller's (0.35 s default): longer after the opening line, the S
 cut to night), each meadow line (each is a picture that needs time: the creeper's step, the walk into the middle),
 1.4 s after "Then it shot the creeper." (the fuse, the second arrow, the tip-over and the poof play in the silence),
 after "Nobody asked." (the deadpan), 1.15 s after "Nobody moved." (the story: hold a full second after the words),
-0.8 s before the last line, and 2.2 s of tail (the hold on Steve: 1.8 s of picture after "Vocals", then the 6 black
-frames). Spoken length 48.4 s; with the pauses 65.08 s = 1562 frames, inside the 58-66 s asked. Delivered audio: 30 of
+0.8 s before the last line, and 2.2 s of tail after the last line's timing (the voice ends on 1509; the picture
+holds 47 frames = 1.96 s after "Vocals", 1510-1556, then the 6 black frames 1557-1562). Spoken length 48.4 s; with the pauses 65.08 s = 1562 frames, inside the 58-66 s asked. Delivered audio: 30 of
 30 words after a silence within one frame of the clearly audible voice; 0 words estimated; -19.0 LUFS mono. Nobody
 has listened to it (no audio playback here). HOW IT WAS SPOKEN: tools/narrate.py's one pass did not fit the 300 s
 command limit on this shared machine (its 24 sentences took 280 s to synthesise before any word was timed), so
@@ -59,8 +59,8 @@ the story asks ("The same shot, held without a cut"). No cut inside a sentence; 
 first word of its sentence (Sentence.cut).
 THE CUT TO NIGHT: gd06_line -> rd07_chased is a hard cut from gold to moonlit blue on "I just get chased home every
 night." (no dip: the story asks for a hard cut; the words "every night" cover it).
-THE END: the last image holds 1.8 s after "Vocals" (the story: 1.5 s), then the last 6 frames are black (END_BLACK);
-the Reel loops to frame 1.
+THE END: the last image holds 47 frames = 1.96 s after "Vocals" ends (1510-1556; the story: 1.5 s), then the last 6
+frames are black (END_BLACK, 1557-1562); the Reel loops to frame 1.
 
 GUARDED BUILD: each sequence file is imported, and each shot function called, inside a guard (see STRICT below):
 a broken file or shot prints "[crammys] !!! ..." and gets a stand-in; CRAMMYS_STRICT=1 makes every error fatal.
@@ -113,7 +113,7 @@ STAND_IN = {"gold": "gold_wide", "road": "gate", "meadow": "meadow_line", "jukeb
 
 NARRATION = {
     "voice": "am_michael", "speed": 1.0,
-    "tail": 2.2,                                     # 1.8 s of picture after "Vocals", then END_BLACK
+    "tail": 2.2,                                     # 1.96 s of picture after "Vocals" (1510-1556), then END_BLACK
     "say": {"Zuri": "Zoo-ree"},                      # the voice read /zjuri/; the caption keeps "Zuri"
     "lines": [
         {"text": "In this town, everyone is musical except me.", "id": "b01", "pause": 0.45},           # the premise
