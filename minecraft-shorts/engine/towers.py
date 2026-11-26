@@ -221,7 +221,8 @@ WHAT THE GAME DOES (read from the 26.x client jar; no game file or code is copie
                   stained glass, leaves, conduit, ice, frosted ice, TNT, glowstone, beacon, sea lantern, tinted
                   glass) and that holds air or a fluid; IronGolem.checkSpawnObstruction: the block below can be stood
                   on, that cell (checked with an EMPTY fluid: water at the feet is fine) and the two above it valid
-                  empty spawn blocks (no full block, no fluid). The golem is simply there on the next tick: no particles.
+                  empty spawn blocks (no full block, no fluid). The golem is simply there on the next tick: no
+                  particles.
                   So nothing spawns in the 2-high pod (the roof is the third cell) or on its glass roof. The farm as
                   built ALSO lets the game put golems on the zombie cell's slab roof, on the upper dirt steps, on the
                   slot's end walls (they fall into the slot) and on the collection column's top under the platform
@@ -300,8 +301,9 @@ SELF-TEST
                                                 about 10 s); exit code 1 if one fails
     $BPY -m engine.towers stills NAME ...       proof stills out/test/towers_<name>.png (tools/towers_proof.py, 20-40 s
                                                 each, at most 4-5 per call): square square_wide foot push pod_out pod_in
-                                                cell_side platform two_shot back gap bounce lineup slide hopper grow high
-                                                stairs; square_dusk pod_out_dusk pod_in_dusk cell_side_dusk (dusk sky)
+                                                cell_side platform two_shot back gap bounce lineup slide hopper grow
+                                                high stairs; under the dusk sky: square_dusk pod_out_dusk
+                                                pod_in_dusk cell_side_dusk
     $BPY -m tools.check_towers_stamp            frame fingerprints follow the spawn, slide, items, cracks, the second
                                                 bed and the swap, in any order; run twice: the digests must match
 """
@@ -318,7 +320,7 @@ TICK = FPS / 20.0                    # film frames per game tick
 # ---- numbers from the game (Java Edition 26.x client classes and data files, named next to each) -------------------
 GOLEM_SPAWN_TRIES = 10               # Villager.spawnGolemIfNeeded -> SpawnUtil.trySpawnMob(IRON_GOLEM, MOB_SUMMONED,
 GOLEM_SPAWN_XZ = 8                   #   level, villager.blockPosition(), 10, 8, 6, Strategy.LEGACY_IRON_GOLEM, false):
-GOLEM_SPAWN_Y = 6                    #   10 tries, x and z +-8 around the villager, each column scanned from y+6 down to y-6
+GOLEM_SPAWN_Y = 6                    #   10 tries, x and z +-8 around the villager, each column scanned y+6 .. y-6
 GOLEM_SPAWN_VILLAGERS = 3            # VillagerPanicTrigger.tick: every 100 game ticks spawnGolemIfNeeded(level, t, 3):
 GOLEM_SPAWN_EVERY_TICKS = 100        #   at least 3 villagers in the box inflated by 10 that want a golem
 GOLEM_SPAWN_BOX = 10.0
@@ -335,7 +337,7 @@ GOLEM_LOOT = (("iron_ingot", 3, 5), ("poppy", 0, 2))      # loot_table/entities/
 GOLEM_SIZE = (1.4, 2.7)              # EntityType.IRON_GOLEM
 GOLEM_HEALTH = 100.0                 # IronGolem.createAttributes MAX_HEALTH
 LAVA_DAMAGE = 4.0                    # Entity.lavaHurt: hurtServer(lava, 4.0)
-HURT_COOLDOWN_TICKS = 10             # LivingEntity: a second hit only lands 10 ticks after the first (invulnerableTime 20)
+HURT_COOLDOWN_TICKS = 10             # LivingEntity: a hit only lands 10 ticks after the last (invulnerableTime 20)
 LAVA_DEATH_TICKS = int(math.ceil(GOLEM_HEALTH / LAVA_DAMAGE) - 1) * HURT_COOLDOWN_TICKS   # 240 ticks = 12 s in lava
 JUMP = 0.42                          # LivingEntity.jumpFromGround (Attributes.JUMP_STRENGTH default)
 GRAVITY = 0.08                       # LivingEntity default gravity
@@ -1069,7 +1071,8 @@ def bounce(c, frame, bed, jumps=1, place=True, ceiling=None):
     """A baby villager jumping on a bed (JumpOnBed: babies do this by themselves): it stands on the mattress
     (place=True puts it on the bed's middle ON `frame`, facing the pillow's left), jumps 0.42 up, and each landing
     on the bed throws it back up at 0.75 of the speed (bounceRestitution 0.75) until the bounce dies; 5 ticks
-    later the next of `jumps` jumps (the game: 3 to 6; ONE jump already shows three bounces, 1.85 s). bed = a Village.beds entry, a fixtures Bed or a point on
+    later the next of `jumps` jumps (the game: 3 to 6; ONE jump already shows three bounces, 1.85 s).
+    bed = a Village.beds entry, a fixtures Bed or a point on
     the mattress. ceiling = the z of the block over it (the pod's glass roof: Farm.bounce passes it). Returns
     the frame it stands still again."""
     if isinstance(bed, dict):
@@ -1112,7 +1115,8 @@ SNEAK = 1.295                        # blocks/s, a sneaking player's walk (engin
 
 def push_route(total, gap0=1.5, mode="tap", release=0.45, rest_ticks=3, max_ticks=4000):
     """The per-tick distances along a route of `total` blocks of a player pushing a villager ahead of him with the
-    game's entity push (Entity.push, see push()). mode="tap": he walks (4.317 blocks/s input) into her back and lets go of the
+    game's entity push (Entity.push, see push()). mode="tap": he walks (4.317 blocks/s input) into her back and lets
+    go of the
     key when their centres are `release` apart (held on, he would walk through her: the push weakens as the boxes
     overlap), both slide to a stop, he waits `rest_ticks` and walks on: she goes in surges of 0.7-1.1 blocks,
     about 0.9 blocks/s over all (the step-by-step way players move villagers). mode="sneak": he sneaks into her
@@ -1270,7 +1274,8 @@ def cameras(L):
         "back": cam((X + 8.5, Y + 21.0, g + 3.6), (X + 5.6, Y + 4.5, g + 5.2), 24, 4.0, "13: the back, locked tall"),
         "gap": cam((X + 4.85, Y + 2.25, F + 0.42), (X + 4.5, Y + 5.0, F + 0.62), 22, 4.0,
                    "15, 20: inside at floor level, the gap in the middle"),
-        "bounce": cam((X + 4.6, Y + 3.1, F + 1.15), (X + 2.5, Y + 3.6, F + 1.0), 24, 4.0, "18: the red bed from the east"),
+        "bounce": cam((X + 4.6, Y + 3.1, F + 1.15), (X + 2.5, Y + 3.6, F + 1.0), 24, 4.0,
+                      "18: the red bed from the east"),
         "cell_side": cam((X + 4.88, Y + 2.55, F + 1.2), (X + 0.4, Y + 1.75, F + 1.45), 22, 4.0,
                          "8, 23, 24: beside the zombie cell across the pod: the backed three, the platform behind "
                          "the far glass (the zombie's arms reach only 0.35 into the pod: they are behind this lens)"),
@@ -1421,7 +1426,6 @@ def _check():
     f = 20
     fm.golem_spawn(g_, f, look=A["pod_target"])
     r = fm.golem_slide(g_, f + 30)
-    vis = [not any(ob.hide_render for ob in g_.objects() if ob.type == "MESH") for ob in [None]]
 
     def shown(c, frame):
         scene.frame_set(frame)
@@ -1434,7 +1438,6 @@ def _check():
     fm.golem_spawn(g_, f2)
     ok("the same golem appears again for the next spawn (one model for every golem)",
        not shown(g_, f2 - 1) and shown(g_, f2))
-    del vis
     z = undead.make_zombie("t_zombie")
     fm.zombie_in_cell(z, 1, aggro=True)
     zp = z.pos_at(5)

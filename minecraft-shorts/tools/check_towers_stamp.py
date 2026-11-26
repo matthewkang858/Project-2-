@@ -33,7 +33,7 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     built = tp.build(scene, res=(720, 1280), samples=24, threads=4)   # final settings: motion blur on
-    film, h, fm = built["film"], built["h"], built["farm"]
+    film, h = built["film"], built["h"]
     shots = {s.name: s for s in film.shots}
     fp = stamp.Fingerprinter(scene, film)
 

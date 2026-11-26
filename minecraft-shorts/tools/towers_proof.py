@@ -24,7 +24,8 @@ STRIP_RES = (270, 480)
 # shot name -> (seconds, frames to render as offsets into the shot (one = a still, several = a strip))
 SHOTS = [
     ("square", 1.0, [12]), ("square_wide", 1.0, [12]), ("foot", 1.0, [12]), ("push", 6.0, None), ("pod_out", 1.0, [12]),
-    ("pod_in", 1.0, [12]), ("cell_side", 2.0, [36]), ("platform", 1.5, [20]), ("two_shot", 1.0, [12]), ("back", 1.0, [12]), ("gap", 1.0, [12]),
+    ("pod_in", 1.0, [12]), ("cell_side", 2.0, [36]), ("platform", 1.5, [20]), ("two_shot", 1.0, [12]),
+    ("back", 1.0, [12]), ("gap", 1.0, [12]),
     ("bounce", 4.0, None), ("lineup", 1.0, [12]), ("slide", 6.0, None), ("hopper", 5.0, None),
     ("grow", 2.0, None), ("high", 2.0, [30]), ("stairs", 3.0, None),
 ]
@@ -126,12 +127,12 @@ def shot_pod_out(st, s, fm, h):
     st.use(s, mom, z, *cast)
     cam = fm.cameras["pod_out"]
     _cam(s, cam, focus=mom.head)
-    pillow = fm.beds["white_2"]["head"]
     mp = fm.A["bed_side"]
     pts = [mom, (mp[0], mp[1], mp[2] + 0.5), fm.zombie_eye]
     for key in ("white_1", "white_2", "mom"):
         bd = fm.beds[key]
-        pts += [(bd["head"][0], bd["head"][1], bd["head"][2] + 0.3), (bd["foot"][0], bd["foot"][1], bd["foot"][2] + 0.3)]
+        pts += [(bd["head"][0], bd["head"][1], bd["head"][2] + 0.3),
+                (bd["foot"][0], bd["foot"][1], bd["foot"][2] + 0.3)]
     fm.see_through(st, s, cam, points=pts)
     st.hero(s, "mom", mom)
     st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
