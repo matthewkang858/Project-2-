@@ -23,12 +23,13 @@ STRIP_RES = (270, 480)
 
 # shot name -> (seconds, frames to render as offsets into the shot (one = a still, several = a strip))
 SHOTS = [
-    ("square", 1.0, [12]), ("foot", 1.0, [12]), ("push", 6.0, None), ("pod_out", 1.0, [12]),
-    ("pod_in", 1.0, [12]), ("two_shot", 1.0, [12]), ("back", 1.0, [12]), ("gap", 1.0, [12]),
+    ("square", 1.0, [12]), ("square_wide", 1.0, [12]), ("foot", 1.0, [12]), ("push", 6.0, None), ("pod_out", 1.0, [12]),
+    ("pod_in", 1.0, [12]), ("cell_side", 2.0, [36]), ("platform", 1.5, [20]), ("two_shot", 1.0, [12]), ("back", 1.0, [12]), ("gap", 1.0, [12]),
     ("bounce", 4.0, None), ("lineup", 1.0, [12]), ("slide", 6.0, None), ("hopper", 5.0, None),
-    ("high", 2.0, [30]), ("stairs", 3.0, None),
+    ("grow", 2.0, None), ("high", 2.0, [30]), ("stairs", 3.0, None),
 ]
-DUSK_SHOTS = {"square_dusk": "square", "pod_out_dusk": "pod_out", "pod_in_dusk": "pod_in"}
+DUSK_SHOTS = {"square_dusk": "square_wide", "pod_out_dusk": "pod_out", "pod_in_dusk": "pod_in",
+              "cell_side_dusk": "cell_side"}
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -82,6 +83,17 @@ def shot_square(st, s, fm, h):
     st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
 
 
+def shot_square_wide(st, s, fm, h):
+    """The establishing wide from the plaza: the well and the bell in front, the tower above the roofs."""
+    f0 = s.frame_start
+    mom = st.actor("mom", "farmer")
+    mom.place(f0, fm.A["mom_glass"], fm.yaw["mom_glass"])
+    mom.look_at(f0, fm.zombie_eye, ease=0)
+    st.use(s, mom)
+    _cam(s, fm.cameras["square_wide"])
+    st.lights(s, scale=1.0)
+
+
 def shot_foot(st, s, fm, h):
     """Beat 5: the baby at the front of the stone base, full figure, head up."""
     f0 = s.frame_start
@@ -114,7 +126,13 @@ def shot_pod_out(st, s, fm, h):
     st.use(s, mom, z, *cast)
     cam = fm.cameras["pod_out"]
     _cam(s, cam, focus=mom.head)
-    fm.see_through(st, s, cam, n=2)
+    pillow = fm.beds["white_2"]["head"]
+    mp = fm.A["bed_side"]
+    pts = [mom, (mp[0], mp[1], mp[2] + 0.5), fm.zombie_eye]
+    for key in ("white_1", "white_2", "mom"):
+        bd = fm.beds[key]
+        pts += [(bd["head"][0], bd["head"][1], bd["head"][2] + 0.3), (bd["foot"][0], bd["foot"][1], bd["foot"][2] + 0.3)]
+    fm.see_through(st, s, cam, points=pts)
     st.hero(s, "mom", mom)
     st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
 
@@ -125,6 +143,52 @@ def shot_pod_in(st, s, fm, h):
     cast = _pod_cast(st, fm, s, f0, panic=True)
     _cam(s, fm.cameras["pod_in"], focus=cast[0].head)
     st.hero(s, "mom", cast[0])
+    st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
+
+
+def shot_cell_side(st, s, fm, h, camera="cell_side"):
+    """Beats 8 / 23 / 24: from beside the zombie cell, the three backed against the far glass, trembling, heads on
+    the zombie; through the glass a golem appears on the platform (beat 24)."""
+    from engine import mobs, towers, undead
+
+    f0 = s.frame_start
+    cast = []
+    for i, (n, prof) in enumerate((("mom", "farmer"), ("cleric", "cleric"), ("librarian", "librarian"))):
+        c = st.actor(n, prof)
+        c.place(f0, fm.A["back_%d" % (i + 1)], fm.yaw["back_%d" % (i + 1)])
+        towers.panic(c, f0, s.frame_end, fm.zombie_eye, seed=11 if n == "mom" else 20 + i)
+        cast.append(c)
+    z = st.cast.get("zombie") or undead.add_zombie(st, "zombie")
+    fm.zombie_in_cell(z, f0, aggro=True, look=cast[0])
+    g = st.cast.get("golem")
+    if g is None:
+        g = st.cast["golem"] = mobs.make_iron_golem("golem")
+    fm.golem_spawn(g, f0 + 12, pos=(fm.A["golem_spawn"][0] - 0.3, fm.A["golem_spawn"][1] + 1.6, fm.L["F"]),
+                   yaw=math.radians(-60.0), look=fm.A["pod_target"], look_after=4)
+    st.use(s, z, g, *cast)
+    st.hero(s, "mom", cast[0])
+    _cam(s, fm.cameras[camera], focus=cast[1].head)
+    st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
+
+
+def shot_platform(st, s, fm, h):
+    """Beat 9: low on the platform, a golem appears out of nothing and turns its head to the pod."""
+    from engine import mobs
+
+    f0 = s.frame_start
+    g = st.cast.get("golem")
+    if g is None:
+        g = st.cast["golem"] = mobs.make_iron_golem("golem")
+    fm.golem_spawn(g, f0 + 4, yaw=math.radians(-150.0), look=fm.A["pod_target"], look_after=4)
+    cast = []
+    for i, (n, prof) in enumerate((("mom", "farmer"), ("cleric", "cleric"), ("librarian", "librarian"))):
+        c = st.actor(n, prof)
+        c.place(f0, fm.A["back_%d" % (i + 1)], fm.yaw["back_%d" % (i + 1)])
+        c.look_at(f0, fm.zombie_eye, ease=0)
+        cast.append(c)
+    st.use(s, g, *cast)
+    st.hero(s, "golem", g)
+    _cam(s, fm.cameras["platform"], focus=g.head)
     st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
 
 
@@ -202,10 +266,13 @@ def shot_hopper(st, s, fm, h):
         st.cast[it.name] = it
         lying.append(it)
     cam = fm.cameras["hopper"]
-    fm.strew(lying, f0, s.frame_end + 1, seed=3, face=cam["pos"])
+    cx, cy = fm.L["chest"][0] + 0.5, fm.L["chest"][1] + 0.5
+    spots = [(cx - 0.55, cy + 1.75), (cx + 0.7, cy + 2.15), (cx - 0.1, cy + 2.6), (cx + 1.15, cy + 1.6),
+             (cx - 1.05, cy + 2.35)]
+    fm.strew(lying, f0, s.frame_end + 1, seed=3, spots=spots, face=cam["pos"])
     steve = players.add_player(st, "steve", "steve")
     steve.hold("iron_ingot")
-    steve.place(f0, fm.A["chest_front"], fm.yaw["chest_front"] + 0.7)
+    steve.place(f0, fm.A["chest_aside"], fm.yaw["chest_aside"])
     st.use(s, steve, *(items + lying))
     h["hopper"] = plans
     _cam(s, cam, focus=fm.A["hopper_target"])
@@ -261,7 +328,7 @@ def shot_gap(st, s, fm, h):
     cl = st.actor("cleric", "cleric")
     cl.place(f0, fm.A["gap_side"], fm.yaw["gap_side"])
     baby = st.actor("baby", "none", child=True)
-    baby.place(f0, (fm.A["gap_in"][0], fm.A["gap_in"][1] - 0.2, fm.A["gap_in"][2]), 0.0)
+    baby.place(f0, (fm.A["gap_in"][0] + 0.1, fm.A["gap_in"][1] + 0.75, fm.A["gap_in"][2]), 0.0)
     st.use(s, cl, baby)
     _cam(s, fm.cameras["gap"], focus=fm.A["gap_target"])
     st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
@@ -273,7 +340,7 @@ def shot_bounce(st, s, fm, h):
 
     f0 = s.frame_start
     baby = st.actor("baby", "none", child=True)
-    e = towers.bounce(baby, f0 + 2, fm.beds["mom"], jumps=2)
+    e = fm.bounce(baby, f0 + 2, "mom", jumps=1)
     h["bounce"] = (f0 + 2, e)
     mom = st.actor("mom", "farmer")
     mom.place(f0, fm.A["bed_side"], fm.yaw["bed_side"])
@@ -292,11 +359,32 @@ def shot_push(st, s, fm, h):
     mom = st.actor("mom", "farmer")
     route = fm.set["push_route"]
     r = towers.push(steve, mom, f0 + 2, route)
-    mom.look_at(f0 + 2, (route[0][0] + 0.0, route[0][1] - 4.0, 1.6), ease=0)
+    mom.look_at(f0 + 2, (route[0][0] - 1.0, route[0][1] + 4.0, 1.6), ease=0)
     h["push"] = r
     st.use(s, steve, mom)
     _cam(s, fm.cameras["push"], focus=mom.head)
     st.lights(s, scale=1.0)
+
+
+def shot_grow(st, s, fm, h):
+    """Beats 16 / 18: the locked side view at the front glass; the baby at Mom's folded arms snaps to the grown
+    narrator (unemployed, plain brown robe) in one frame. Mom's head stays on the zombie."""
+    from engine import towers
+
+    f0 = s.frame_start
+    mom = st.actor("mom", "farmer")
+    mom.place(f0, fm.A["mom_glass"], fm.yaw["mom_glass"])
+    mom.look_at(f0, fm.zombie_eye, ease=0)
+    baby = st.actor("baby", "none", child=True)
+    baby.place(f0, fm.A["baby_glass"], fm.yaw["baby_glass"])
+    baby.look_at(f0, fm.zombie_eye, ease=0)
+    adult = st.actor("narrator", "none")
+    f = f0 + 24
+    towers.grow_up(baby, adult, f, look=fm.zombie_eye)
+    h["grow"] = f
+    st.use(s, mom, baby, adult)
+    _cam(s, fm.cameras["grow"], focus=mom.head)
+    st.lights(s, scale=1.0, groups={fm.set["lights"][0]: 1.0, fm.set["lights"][1]: 1.0})
 
 
 BUILDERS = {name: globals()["shot_" + name] for name, _secs, _offs in SHOTS}
@@ -341,13 +429,17 @@ def _strip_offsets(name, s, h):
         m = h["stairs"]
         a, z = m["start"], m["frame"]
         return [a - 1 - f0, a + (z - a) // 3 - f0, a + 2 * (z - a) // 3 - f0, z - 1 - f0, z + 3 - f0]
+    if name == "grow":
+        f = h["grow"]
+        return [f - 1 - f0, f - f0]
     if name == "bounce":
         a, e = h["bounce"]
-        return [a - f0, a + 7 - f0, a + 13 - f0, a + 20 - f0, a + 45 - f0, e - f0]
+        return [a - f0 + k for k in (0, 3, 6, 10, 14)] + [min(e, s.frame_end) - f0]
     if name == "push":
         r = h["push"]
         e = r["end"]
-        return [2, 14, 26, 38, 50, min(e - f0, 140)]
+        n = min(e, s.frame_end) - f0
+        return [2] + [int(2 + (n - 2) * k / 5.0) for k in range(1, 6)]
     return [12]
 
 

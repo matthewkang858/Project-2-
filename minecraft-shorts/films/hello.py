@@ -35,6 +35,26 @@ a broken file or shot prints "[hello] !!! ..." and gets a stand-in; HELLO_STRICT
 THE SHOT LENGTHS: every shot is 1.25 to 4.25 s except dg15_b (0.88 s, "he is one house"): the middle one of the
 three jump cuts of beat 15, which quicken on purpose; the cuts sit on word boundaries ("he", "closer").
 THE END: the last image holds 2.0 s after the last word, then the last 6 frames are black (END_BLACK).
+
+THE LEAD'S PASS (after the five sequences were shot and reviewed; the narration and the cuts untouched)
+  Skies:  "dawn" is the DUSK preset at elevation 4 with the clouds moved (me07 / me08: a pink sunrise over the wood
+          with the last stars; the 'golden' dawn read as beat 6's afternoon). "night" has its moon in the north-east
+          behind house_a (azimuth 35, was 176): the west front is in moonshadow, its two door torches light the door;
+          with the moon in the west the door at night read as a warm sunlit porch (luma 100-114 against 78 for the
+          other night shots; now 76-85). The interior is unchanged by it (in03@160 80.0 -> 80.1).
+  Shared (films/hello_common.py, its docstring has the details): CAMS "door_front" 40 mm with the starry sky over
+          the roof (dn02, dn18), LIGHTS "night_door" door torches x 1 (was x 2), CAMS "beside" raised to z 1.9 (dn19:
+          the zombie's fist clear of his head), PLACES "watch_mid" (8.5, 1.5) (dg15_b: 28 / 45 / 78 px), the stub
+          places and cameras taken out (every other camera is its shot's own: C.cam(s, None, **CAM)), "watch_square",
+          "gate_child", "window_chair" set to the values the shots use, C.held_item, me07's f/2.0 accepted.
+  Decided and left: the child in dg04 / dg22 stays the soft pink block (a nose cheat tested: out of the frame or
+          no nose: hello_common CAMS "two_shot"); dn02's sword in the caption band once he faces out (a prop under
+          the caption, his head clear); sq01 without the background adults (the square director's reasons); the
+          farmer of sq09 (walking toward us south of the well) standing north of it in sq10 (a new sentence and a
+          new angle across the well: a jump in time, not a mistake a viewer can place; changing sq09's lane would
+          re-open the watcher's gap measured there).
+  Cuts between sequences: checked on the sequences' own preview frames, side by side (scratchpad of the lead's
+          pass; the list is in its report); nothing jumps that the story does not ask for.
 """
 import importlib
 import os
@@ -132,14 +152,23 @@ SKIES = {
     # preset's haze the forest wall 35 blocks away is dark brown, without it the gaps between the trunks are black
     # (engine/sets.py, measured). Every proof still of hello_set was made under exactly this sky.
     "meadow": dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm", haze=0.0),
-    # "He came back at sunrise without it" (7, 8): the same meadow after the dip, the sun low behind the wood (still
-    # no haze: the wall stays black). One night has passed: the light must not be beat 6's afternoon (story risk;
-    # its night insert cannot be had with fixed cuts). Rendered: out/test/hello_scout_dawn_me07_return_470.png (the
-    # glow on the tree line, the road in soft shade) against hello_scout_meadow_me07_return_470.png (afternoon).
-    "dawn": dict(preset="golden", az=75.0, el=9.0, bloom=1.0, grade="warm", haze=0.0),
-    # night at the door and in the house (2, 3, 16-19): the look-dev night, the moon in the west over the plaza,
-    # so the house front has a cool fill under the warm key of its two door torches.
-    "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool"),
+    # "He came back at sunrise without it" (7, 8): the same meadow after the dip, the sun just up behind the wood
+    # (still no haze: the wall stays black). One night has passed: the light must not be beat 6's afternoon (story
+    # risk; its night insert cannot be had with fixed cuts). The DUSK preset at elevation 4 with the clouds moved:
+    # a pink horizon over the wood, an indigo top with the last stars, pink clouds in new places. The first dawn
+    # ('golden', elevation 9) was the same blue afternoon with every cloud in the same place, only the foreground
+    # 20 % darker (both reviews of the meadow; out/test/hello_meadow_final_me07_return_470.png against
+    # hello_meadow_final_me06_leave_395.png). Rendered: out/test/hello_lead_me07_return_470.png, _me08_nohello_505.png
+    # (the lead's pass); palette_check passes on 460 and 505; the watcher's 8 px face stays an even smudge.
+    "dawn": dict(preset="dusk", az=75.0, el=4.0, bloom=1.0, grade="warm", haze=0.0, cloud_offset=(9, -6)),
+    # night at the door and in the house (2, 3, 16-19): the look-dev night preset with the moon in the NORTH-EAST,
+    # behind house_a (azimuth 35, the preset's own side): the west front, its door and its window are in the moon's
+    # shadow, lit by the two door torches (warm pools on the wall) and the cool sky, and the starry sky stands over
+    # the roof. With the look-dev moon in the west (azimuth 176) the moon lit that front head-on and the door at
+    # night read as a warm sunlit porch (mean luma 100-114 against 78 for the night interior; both reviews of the
+    # door at night); now 76-85 (out/test/hello_lead_dn*_zones.png). The room inside is unchanged (in03@160 80.0 ->
+    # 80.1); the window of beat 17 is darker around the child's lit face.
+    "night": dict(preset="night", az=35.0, el=21.0, bloom=1.3, grade="cool"),
 }
 
 # The shot plan: (shot = the function's name, beat, sequence file, sky, where it starts). A start is a sentence

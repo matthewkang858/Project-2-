@@ -17,25 +17,23 @@ THE PLACE (engine/sets.py hello_set, built into the village: read its docstring,
 THE SKIES: "meadow" = the look-dev golden sun (azimuth 62: north-east, behind the wood; elevation 27) with NO haze,
   so the gaps between the trunks are black (with the village's haze the wall is dark brown). Every proof still of
   hello_set was made under exactly this sky. Keep the wood behind the subjects.
-  "dawn" (me07, me08: "He came back at sunrise"): the same, the sun low behind the wood (azimuth 75, elevation 9),
-  no haze: the glow sits on the tree line, the road is in soft shade, the wall stays black. After the dip it is
-  plainly another light than beat 6's afternoon (out/test/hello_scout_dawn_me07_return_470.png against
-  hello_scout_meadow_me07_return_470.png; hello_scout_dawn_me08_nohello_520.png). The story's risk "if it still
-  feels like the same afternoon" is answered by the sky, since its night insert cannot be had (fixed cuts).
-  REVIEW (last pass): side by side with me06 it still reads as the same afternoon (the same blue sky, every cloud in
-  the same place, only the foreground ~20 % darker). The sky is the lead's (films/hello.py SKIES): requested there,
-  tested in memory with tools/hello_meadow_dawn_test.py: dict(preset="dusk", az=75.0, el=4.0, bloom=1.0,
-  grade="warm", haze=0.0, cloud_offset=(9, -6)) gives a pink horizon over the wood, an indigo top with the last
-  stars and moved, pink clouds; palette_check passes on 460 and 505; the watcher's face stays an even dark smudge
-  (out/test/check_hello_meadow_dawn_dusk4_460/470/505.png). Nothing in this file depends on which dawn it is.
+  "dawn" (me07, me08: "He came back at sunrise"): since the lead's pass dict(preset="dusk", az=75.0, el=4.0,
+  bloom=1.0, grade="warm", haze=0.0, cloud_offset=(9, -6)) (this sequence's request, tested with
+  tools/hello_meadow_dawn_test.py): a pink horizon over the wood, an indigo top with the last stars, the clouds pink
+  and in new places, the wall still black; looking west (me08) a deep blue sky with pink clouds over the village,
+  its lanterns lit. The first dawn ('golden', elevation 9) read as beat 6's afternoon side by side with me06 (the
+  same blue sky, every cloud in the same place: both reviews). Stills: out/test/hello_lead_me07_return_470_zones.png,
+  hello_lead_me08_nohello_505_zones.png; palette_check passes on 460 and 505 (lead's pass). The story's risk "if it
+  still feels like the same afternoon" is answered by the sky, since its night insert cannot be had (fixed cuts).
 TAGS TAKEN (twins): child_me (me06, me07, me12, me13: placed on each shot's first frame, never pre-rolled),
   child_me2 (me08: pre-rolled from frame 475, i.e. INSIDE me07: never use it in me07), child_me3 (me14: pre-rolled
   from 782), watcher_me (me07, me08, me13), steve_diamond_me (me06: pre-rolled from 287). A new twin: me4, me5 ...
 THIS SEQUENCE'S OWN PLACES AND CAMERAS are the constants below (GATE_CHILD, STEVE_IN, ME08_CAM, ME12_*, ME13_*,
   ME14_*); the only shared camera is CAMS "gate" (me06 = me07: position, aim, lens and handheld unchanged; me07
-  opens it to f/2.0, ME07_FSTOP). hello_common's PLACES "gate_child" and
-  "road_stop": "road_stop" is used as it is (me08); "gate_child" is replaced by GATE_CHILD (it was dead centre on
-  the road's axis, the child a brown box from behind): the same block in me06 and me07.
+  opens it to f/2.0, ME07_FSTOP: accepted by the lead and noted at CAMS "gate"). hello_common's PLACES "gate_child"
+  (since the lead's pass (0.1, 25.9), this file's spot: GATE_CHILD reads it; the stub's (0.15, 26.6) was dead centre
+  on the road's axis, the child a brown box from behind) and "road_stop" (me08). me08's camera is its own:
+  C.cam(s, None, **ME08_CAM).
 LOOKS: _cheat keeps a villager that watches something beyond itself turned at most MAX_OFF (65) degrees from the
   lens (rendered: at 100-118 degrees the nose hides behind the head and the child is a brown box; at 78 only a 2 px
   nose and part of one eye; at 65 the nose stands out and both eyes show, and the look still points at what it
@@ -56,7 +54,7 @@ from films import hello_common as HC
 # the child's block at the gate, beats 6 and 7 (the same in both): left of the road's axis, so that Steve walks past
 # it on its right and the lens sees it in three-quarter (hello_common's "gate_child", (0.15, 26.6), is dead centre:
 # the child was a brown box from behind)
-GATE_CHILD = (0.1, 25.9)
+GATE_CHILD = HC.PLACES["gate_child"]        # (0.1, 25.9): the shared place since the lead's pass
 # Steve's walk in beat 6: from the village, past the lens's right shoulder and the child, onto the road's axis and
 # up the meadow road (road_to_forest's own nodes from y 35 on: they follow the terrain)
 STEVE_IN = ((1.55, 19.6), (1.5, 23.0), (1.3, 26.5), (0.9, 29.5), (0.6, 32.5))
@@ -249,11 +247,13 @@ def me07_return(st, s, C, nar):
       the picture back), and from 440 to 454 ("sunrise" 442) it lifts and turns up the road to him, cheated to
       MAX_OFF (nose in profile, both eyes); then it keeps peering at him, the head rising about 7 degrees and turning
       4 more to the cut (456-482: the tail is not a freeze frame). Hero: the child.
-    MEASURED (tools.hello_geo; stills out/test/hello_meadow_final_me07_return_432/470[_zones].png): him x 50 %,
+    MEASURED (tools.hello_geo; stills out/test/hello_meadow_final_me07_return_432/470[_zones].png under the first
+      dawn, out/test/hello_lead_me07_return_470_zones.png under the dusk-preset dawn of the lead's pass): him x 50 %,
       y 52 %, face 8 px, 35 blocks: at f/2.0 an even skin-coloured smudge (brightest face pixel rgb(132,98,87) against
       a face mean of (92,71,62); at f/4 the eye whites were two dots of (169,145,143)); bare teal arms, bare head and
       blue legs read; the child's eyes x 25 %, y 56 %, 39 degrees off the lens at 426 (head down), 65 at 454, 69 at
-      484. palette_check me07_return@460 passes everything (hero child 100 % inside).
+      484. palette_check me07_return@460 (lead's pass, new dawn) passes everything (robe hue 7, skin s 0.44, plants
+      0.87 of the grass, hero child x 15-34 %, y 50-59 %, 100 % inside).
     """
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "me")
@@ -310,10 +310,12 @@ def me08_nohello(st, s, C, nar):
       on road_stop at 493 ("didn't" 490), its head goes up to his face (491-497) and nods twice on "crouch" (497-511);
       then holds, head up, to 540. Nothing comes back. The village beyond in the low sun, the child in the wood's
       shade. Hero: the child.
-    MEASURED (tools.hello_geo; stills out/test/hello_meadow_final_me08_nohello_487/505[_zones].png): the child's eyes
-      x 50-56 %, y 53-55 %, head y 48-58 %, face 33-43 px, 10-14 degrees off the lens; his head x -71..18 %, y -4..41 %
-      (the edge of the frame), 138-142 degrees off his nose: never his face. palette_check me08_nohello@505 passes
-      everything (hero child 100 % inside; steve shirt hue 179).
+    MEASURED (tools.hello_geo; stills out/test/hello_meadow_final_me08_nohello_487/505[_zones].png, and under the
+      lead's dusk-preset dawn out/test/hello_lead_me08_nohello_505_zones.png): the child's eyes x 50-56 %, y 53-55 %,
+      head y 48-58 %, face 33-43 px, 10-14 degrees off the lens; his head x -71..18 %, y -4..41 % (the edge of the
+      frame), 138-142 degrees off his nose: never his face. palette_check me08_nohello@505 (new dawn) passes
+      everything (stone G/R 0.94, skin rgb(72,47,39) s 0.46: darker in the wood's shade, its face and eyes still read;
+      steve shirt hue 181, pants min channel 15; hero child x 41-59 %, y 48-57 %, 100 % inside).
     """
     f0, f1 = s.frame_start, s.frame_end
     him = C.watcher(s, "me", place=C.A["forest_gap"], yaw=0.0)
@@ -329,9 +331,7 @@ def me08_nohello(st, s, C, nar):
     C.hello_nod(kid, C.at(s, "crouch"))                   # ... and nods twice on "crouch": nothing comes back
     him.look_at(f0, kid, ease=0)                          # his head on the child (only his head: dead still)
     st.use(s, kid)
-    C.cam(s, "gate", pos=ME08_CAM["pos"], target=ME08_CAM["target"], pos1=ME08_CAM["pos1"],
-          target1=ME08_CAM["target1"], lens=ME08_CAM["lens"], fstop=ME08_CAM["fstop"], focus=kid.head,
-          handheld=0.006)
+    C.cam(s, None, focus=kid.head, handheld=0.006, **ME08_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near=C.A["forest_gap"], radius=12.0)
 

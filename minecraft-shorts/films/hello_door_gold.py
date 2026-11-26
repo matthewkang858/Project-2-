@@ -7,8 +7,8 @@ THE PLACE (house_a's west front, hello_common's docstring): door cell (10, -8), 
   x 9.5..10 at z 1.0, low half x 9..9.5 at z 0.5), wall torches either side at head height; north of the door one
   block of wall and the corner log: the house's north-west corner is at (10, -5).
   PLACES: "watch_door" (8.9, -5.4) = his spot, facing HC.WATCH_YAW (toward "watch_face" (9.75, -7.2): the door);
-  "hello_child" (9.25, -6.41) = the child at his feet, between him and the door; "step", "step_child", "door_in",
-  "run_off", "watch_far" (8.3, 11.5), "watch_mid" (8.4, 5.2).
+  "hello_child" (9.25, -6.41) = the child at his feet, between him and the door; "step", "step_child",
+  "watch_far" (8.3, 11.5), "watch_mid" (8.5, 1.5) (moved by the lead from (8.4, 5.2): see dg15_b).
 THE SKY: "gold" = sun at azimuth 215 (west-south-west), elevation 24: it lights the west front of the house and
   the plaza before it. He faces the door, so in the doorstep two-shot the sun is behind him and his face is in
   his own shade: C.doorstep_fill(s) is the film-local shadowless fill on his face, the SAME light at the SAME
@@ -60,8 +60,9 @@ TWO_SHOT_SEED = 7          # the handheld of dg04 and dg22: the same seed, so th
 TWO_SHOT_HANDHELD = 0.012  # ... and the same sway (blocks): a slow float of a few pixels. At 0.004 the 2 s hold on
 #                            the white eyes (1460-1544) changed by only 0.2-0.7 grey levels a frame: a frozen picture
 
-# beat 15: ONE locked frame for the three jump cuts (CAMS "house_fronts" moved: lower and half a block further
-# back, so the eaves of house_a sit in the top UI strip instead of across the top right)
+# beat 15: ONE locked frame for the three jump cuts (the stub's CAMS "house_fronts" moved: lower and half a block
+# further back, so the eaves of house_a sit in the top UI strip instead of across the top right; the stub camera is
+# gone from hello_common, FRONTS is this shot's own: C.cam(s, None, ...))
 FRONTS = dict(pos=(8.75, -15.0, 1.6), target=(9.7, 4.0, 1.4), lens=55.0, fstop=2.8)
 FRONTS_SEED = 15
 # ... with ONE slow linear push over the whole beat (915 -> 998), keyed by the film's frame so the three jump cuts
@@ -242,7 +243,7 @@ def dg05_nod(st, s, C, nar):
     kid.look_at(end - 2, None, ease=4)                # head level again, then away along the plaza
     kid.walk(end + 1, [here] + [C.stand(p) for p in NOD_RUN], run=True)
     st.use(s, steve, kid)
-    C.cam(s, "two_shot", focus=kid.head, handheld=0.006, **NOD_CAM)
+    C.cam(s, None, focus=kid.head, handheld=0.006, **NOD_CAM)
     C.fill("dg_nod", NOD_FILL["pos"], NOD_FILL["watts"], [s])
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
@@ -270,7 +271,7 @@ def _fronts(st, s, C, place, turns):
     def push(f):                                      # where the beat's one push is on film frame f
         k = (f - a) / float(b - a)
         return tuple(u + (v - u) * k for u, v in zip(p0, p1))
-    C.cam(s, "house_fronts", focus=kid.head, seed=FRONTS_SEED, handheld=0.002, ease="linear",
+    C.cam(s, None, focus=kid.head, seed=FRONTS_SEED, handheld=0.002, ease="linear",
           **dict(FRONTS, pos=push(f0), pos1=push(s.frame_end + 1), target1=FRONTS["target"]))
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
@@ -295,13 +296,15 @@ def dg15_a(st, s, C, nar):
       Him: C.watcher on watch_far / watch_mid / watch_door, facing east-north-east (the house fronts): 106-108 degrees
       off the lens in all three, the right side of his head toward us (hair and skin, no eyes): "same pose".
     MEASURED (tools.hello_geo at 920 / 936 / 955 / 980; renders out/test/hello_dg_dg15_a_920_zones.png, _936_zones.png,
-      _dg15_b_955_zones.png, _dg15_c_980_zones.png): the child's eyes x 70 %, y 47 % (head x 58-82 %, y 40-51 %, face
-      95-98 px, growing with the push), 12 degrees off the lens AWAY, 70 LOOK; nothing in front of it. Him: eyes x 32 % /
-      32 % / 41 %, y 48-49 %, face 28 / 37 / 78 px, distance 26.5 / 20.1 / 9.4, clear of every block, soft (focus on
-      the child at 7.7). He grows in place rather than wanders; the far -> mid step is the small one (the SHARED places
-      are 6.3 blocks apart along the lens axis: watch_mid at (8.5, 1.5) would give about 45 px, asked of the lead), the
-      corner the big one. palette_check dg15_a@936, dg15_b@955 and dg15_c@980, all with the push: every check passes
-      (hero child x 62-81 %, y 40-50 %, 100 % in the safe area; at 980 his shirt hue 174, trousers min channel 44).
+      _dg15_c_980_zones.png; dg15_b since the lead's pass: out/test/hello_lead_dg15_b_955_zones.png): the child's eyes
+      x 70 %, y 47 % (head x 58-82 %, y 40-51 %, face 48-49 px, a baby's width: hello_geo measured 95-98 before the
+      lead's pass, an adult's), 12 degrees off the lens AWAY, 70 LOOK; nothing in front of it. Him: eyes x 32 % / 32 % /
+      41 %, y 48-49 %, face 28 / 45 / 78 px, distance 26.4 / 16.4 / 9.4, clear of every block, soft (focus on the
+      child at 7.7). He grows in place rather than wanders, in three even steps (watch_mid was (8.4, 5.2), 20.1 blocks
+      out: 28 -> 37 px in front of the same house front, the jump read as a glitch; the lead moved it to (8.5, 1.5),
+      beside the cobblestone of house_b). palette_check dg15_a@936, dg15_b@955 and dg15_c@980, all with the push:
+      every check passes (hero child x 62-81 %, y 40-50 %, 100 % in the safe area; at 980 his shirt hue 174, trousers
+      min channel 44).
 
     STORY (all of beat 15, "Every time I look, he is one house closer."): Late gold at the child's door. The baby
     villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands
@@ -326,11 +329,12 @@ def dg15_b(st, s, C, nar):
     Words: he 949, is 951, one 954, house 961. (See dg15_a for the beat, the frame and the measurements.)
     NOW: him at "watch_mid" (the next house), the same profile; the child's face to us on the cut (947), its head turns
       to him by 953, and away again from "house" 961 (by 967): he jumps while it looks away.
-    MEASURED: him eyes x 32 %, y 48 %, face 37 px, 106 degrees off; the child as in dg15_a; palette_check dg15_b@955
-      (with the push) passes everything. Render: out/test/hello_dg_dg15_b_955_zones.png. The far -> mid jump is the
-      weak one (28 -> 37 px, in front of the same house front): PLACES["watch_mid"] at (8.5, 1.5), asked of the lead,
-      gives about 46 px beside the cobblestone house (reviewer's render, no code change here: _fronts reads the place
-      by name); only this shot would need rendering again.
+    MEASURED (the lead's pass: PLACES["watch_mid"] moved from (8.4, 5.2) to (8.5, 1.5); this file unchanged, _fronts
+      reads the place by name): him eyes x 32 %, y 48 %, face 45 px (was 37), 16.4 blocks, 106 degrees off: the right
+      side of his head, no eyes, soft, beside the cobblestone corner of house_b instead of in front of the same house
+      front as in dg15_a: 28 / 45 / 78 px over the three jumps. Render: out/test/hello_lead_dg15_b_955_zones.png;
+      palette_check dg15_b@955 (lead's pass) passes everything (stone G/R 0.93, planks s 0.52, robe hue 16, skin
+      s 0.48, hero child x 62-81 %, y 40-50 %, 100 % inside); preview 270x480_9spp 947-967 re-rendered.
     """
     f0 = s.frame_start
     _fronts(st, s, C, "watch_mid", [(f0, AWAY, 0), (f0 + 1, LOOK, 5), (C.at(s, "house"), AWAY, 6)])
@@ -442,7 +446,7 @@ def dg20_walkup(st, s, C, nar):
     kid.look_at(end, him, ease=8)                     # the head tipped all the way back
     C.hello_nod(kid, max(end + 10, C.at(s, "hello")))
     st.use(s, kid, flesh)
-    C.cam(s, "two_shot", focus=step, handheld=0.006, **WALK_CAM)
+    C.cam(s, None, focus=step, handheld=0.006, **WALK_CAM)
     s.focus(kid.head, at_s=(opens + 6 - 1) / 24.0, rack_s=0.4)   # from the spinning flesh to the child coming out
     st.hero(s, "flesh", flesh.sprite)
     st.hero(s, "child", kid)
@@ -496,7 +500,7 @@ def dg21_crouch(st, s, C, nar):
     flesh = C.item("rotten_flesh", "dg")              # still spinning on the step (placed in dg20; its age goes on,
     flesh.animate(f0, f1 + 1)                         # so the spin and bob run on over the cut), soft, top right
     st.use(s, kid, flesh)
-    C.cam(s, "two_shot", focus=kid.head, handheld=0.004, **CROUCH_CAM)
+    C.cam(s, None, focus=kid.head, handheld=0.004, **CROUCH_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near="door", radius=16.0)
 

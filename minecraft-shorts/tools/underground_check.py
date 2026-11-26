@@ -1,0 +1,169 @@
+"""Numeric self-test of engine/underground.py (no rendering): `$BPY -m engine.underground` (about 20 s).
+
+Checks the light model against the game's own formula, the flood fill, the set built into the village (edit
+problems, validate, cells left for the piston door, cutaways, the light levels where the beats are staged), and the
+mechanics (push, bed bounce, jump loop, hands at the slot, the swap behind the well). Exit code 1 if one fails.
+"""
+import math
+import sys
+
+import numpy as np
+
+BAD = []
+
+
+def ok(label, cond, detail=""):
+    print("[ug check] %-4s %s%s" % ("ok" if cond else "FAIL", label, (" (" + detail + ")") if detail else ""), flush=True)
+    if not cond:
+        BAD.append(label)
+
+
+def light_model():
+    from engine import underground as U
+
+    # lightmap.fsh by hand at block 15 / sky 0, default Brightness: c = 0.0392 + 1 * 1.0 * 1.4 (white end of the mix)
+    c = U.lightmap_rgb(15, 0)
+    ok("block 15: full white (clamped)", all(abs(x - 1.0) < 1e-6 for x in c), "%s" % (tuple(round(x, 3) for x in c),))
+    dark = U.lightmap_rgb(0, 0)
+    a = 10 / 255.0
+    ng = 1 - (1 - a) ** 4
+    want = (a + ng) / 2
+    ok("block 0 sky 0 = the overworld's ambient #0a0a0a through notGamma at Brightness 0.5 (%.3f)" % want,
+       all(abs(x - want) < 1e-6 for x in dark), "%.4f" % dark[0])
+    m7 = U.lightmap_rgb(7, 0)
+    ok("block 7 is warm (the game: G < R, B < G)", m7[1] < m7[0] and m7[2] < m7[1], "%s" % (tuple(round(x, 3) for x in m7),))
+    lv = [max(U.lightmap_rgb(b, 0)) for b in range(16)]
+    ok("brightness rises with the block level", all(b > a_ for a_, b in zip(lv, lv[1:])),
+       " ".join("%.2f" % x for x in lv))
+    moody = U.lightmap_rgb(7, 0, gamma=0.0)
+    ok("Brightness 'Moody' (gamma 0) is darker", max(moody) < max(m7), "%.3f < %.3f" % (max(moody), max(m7)))
+    ok("dusk sky factor from timeline/day.json at tick 12480 = 0.508", abs(U.DUSK_SKY_FACTOR - 0.5082) < 1e-3,
+       "%.4f" % U.DUSK_SKY_FACTOR)
+    D, E = U.face_light(0, 15)
+    ok("open sky, no torch: no dimming, no emission", D == 1.0 and max(E) == 0.0)
+    D, E = U.face_light(12, 0)
+    gr = E[1] / E[0]
+    ok("film tint keeps lit stone off magenta: E G/R >= 0.93 at levels 6..14",
+       all(U.face_light(b, 0)[1][1] / U.face_light(b, 0)[1][0] >= 0.93 for b in range(6, 15)), "level 12: %.3f" % gr)
+    # flood fill: a torch 14 in a corridor
+    op = np.zeros((20, 3, 3), dtype=bool)
+    op[:, 0, :] = op[:, 2, :] = True
+    op[:, :, 0] = op[:, :, 2] = True
+    op[10, 1, 1] = True                                       # a wall across the corridor at x 10
+    src = np.zeros_like(op, dtype=np.int16)
+    src[2, 1, 1] = 14
+    lvl = U.flood(op, src)
+    ok("flood fill: minus one per block (BlockLightEngine)", [int(lvl[x, 1, 1]) for x in range(2, 9)] ==
+       [14, 13, 12, 11, 10, 9, 8], "%s" % [int(lvl[x, 1, 1]) for x in range(0, 12)])
+    ok("flood fill: stopped by an opaque block", int(lvl[11, 1, 1]) == 0 and int(lvl[10, 1, 1]) == 0)
+
+
+def the_set():
+    from engine import quick
+    from engine import underground as U
+
+    scene = quick.reset()
+    quick.setup(scene)
+    v, ug = U.build_village(scene, seed=1)
+    ok("built without edit problems", not v.edit_problems, "%s" % v.edit_problems)
+    ok("Village.validate() is clean", not v.validate(), "%s" % v.validate()[:3])
+    w = v.world
+    ok("the piston door's cells are empty in the World", all(w.get(*c) is None for c in U.door_cells()))
+    ok("door, lever built (engine.redstone kit)", ug.door is not None and ug.lever is not None and len(ug.door.blocks) == 2)
+    for name in U.CUTAWAYS:
+        ok("cutaway %s registered with objects" % name, bool(v.cutaways.get(name)))
+    e = ug.env
+    lv = {n: e.levels(p) for n, p in (("dad", (14, -14, U.F + 1)), ("box", (U.BOX[0], U.BOX[1], U.F)),
+                                      ("west", (-7, -11, U.F + 1)), ("stairs", (4, -11, U.F + 1)),
+                                      ("rim", (4, 1, 0)), ("corner", (17, -16, U.F)))}
+    print("[ug check]      levels (block, sky): %s" % lv)
+    ok("dad's cell is torch-lit (block >= 10)", lv["dad"][0] >= 10)
+    ok("the aisle falls off to the west (block <= 2 at x -7)", lv["west"][0] <= 2)
+    ok("the box inside is baked sealed (open doorway stays dark: <= dad - 3)", lv["box"][0] <= lv["dad"][0] - 3)
+    ok("the rim of the mouth gets block light from below", lv["rim"][0] >= 8 and lv["rim"][1] == 15)
+    bright = e.brightness_at((14.5, -13.5, U.F + 1.5)), e.brightness_at((-7.5, -11.5, U.F + 1.5))
+    ok("brightness dad's cell %.2f vs the dark end %.2f (x3 or more)" % bright, bright[0] >= 3 * bright[1])
+    mats = sum(1 for ob in v.objects for m in ob.data.materials if m is not None and "|ug" in m.name)
+    ok("baked faces carry their emission (%d meshes)" % mats, mats > 50)
+    for n in ("ug_lip", "ug_stair_foot", "ug_cell_dad", "ug_box", "ug_corner", "ug_lever_stand"):
+        ok("anchor %s" % n, n in v.anchors)
+    hole = set(ug.res["hole"])
+    crossing = []
+    for name, pts in v.paths.items():
+        if name.startswith("ug_"):
+            continue
+        for a, b in zip(pts[:-1], pts[1:]):
+            for i in range(41):
+                x = a[0] + (b[0] - a[0]) * i / 40.0
+                y = a[1] + (b[1] - a[1]) * i / 40.0
+                if (int(math.floor(x)), int(math.floor(y))) in hole:
+                    crossing.append(name)
+                    break
+    ok("no village path crosses the stair's opening", not crossing, "%s" % sorted(set(crossing)))
+    for name in U.CAMERAS:
+        ok("camera %s has pos, target, lens" % name, all(k in U.CAMERAS[name] for k in ("pos", "target", "lens")))
+    return v, ug
+
+
+def mechanics(v, ug):
+    from engine import characters, players, undead
+    from engine import underground as U
+
+    dad = characters.make_villager("t_dad", "librarian")
+    steve = players.make_player("t_steve")
+    path = list(v.paths["ug_push"]) + [(5.0, -2.0, 0.0)]
+    r = U.push(steve, dad, 10, path, v.world)
+    ok("push: dad drops down the first step (z -0.5)", r["drops"] and abs(r["villager"][-1][1] + 0.5) < 1e-6,
+       "drops %s, end z %.3f" % (r["drops"], r["villager"][-1][1]))
+    ok("push: nudged along at 0.7..1.4 blocks/s", 0.7 <= r["speed"] <= 1.4, "%.2f" % r["speed"])
+    gaps = [vv[0] - pp for vv, pp in zip(r["villager"], r["player"])]
+    ok("push: the player never passes him (gap > 0)", min(gaps) > 0.0, "min gap %.3f" % min(gaps))
+    ok("push: the player stops on the square", max(r["player"]) < 4.9, "%.2f" % max(r["player"]))
+    dad2 = characters.make_villager("t_dad2", "librarian")
+    steve2 = players.make_player("t_steve2")
+    r2 = U.push(steve2, dad2, 10, path, v.world, taps=None, max_ticks=60, steps_down=9)
+    gaps2 = [vv[0] - pp for vv, pp in zip(r2["villager"], r2["player"])]
+    ok("held walk key: the player walks THROUGH him (the game's push is weakest at full overlap)",
+       min(gaps2) < -0.6, "min gap %.2f" % min(gaps2))
+    kid = characters.make_villager("t_kid", "farmer", child=True)
+    bb = U.bed_bounce(kid, 10, v.beds[U.BED]["foot"], jumps=4)
+    ok("bed: 4 full jumps of 1.252 then the bed's bounce dies out",
+       bb["peaks"][:4] == [1.252] * 4 and all(b < a for a, b in zip(bb["peaks"][4:], bb["peaks"][5:])),
+       "%s" % bb["peaks"])
+    ok("bed: jump period 12 ticks (14.4 frames)", all(abs((b - a) - 14.4) <= 1.0 for a, b in
+                                                     zip(bb["landings"][:4], bb["landings"][1:4])), "%s" % bb["landings"])
+    st = players.make_player("t_jumper")
+    st.place(100, (8.5, -11.0, U.F), 0.0)
+    jl = U.jump_loop(st, 100, 160)
+    ok("jump loop: take-offs every 14-15 frames", all(14 <= b - a <= 15 for a, b in zip(jl, jl[1:])), "%s" % jl)
+    z = max(st.pos_at(f).z for f in range(100, 116))
+    ok("jump loop: 1.25 high", abs(z - U.F - 1.25) < 0.02, "%.3f" % (z - U.F))
+    zv = undead.make_zombie_villager("t_kzv", baby=True)
+    h = U.hands_in_slot(zv, 20)
+    ok("hands: fingertips in the pane of the bars", h["pane"][0] <= h["tip_x"] <= h["pane"][1], "%s" % h)
+    ok("hands: his back inside the box", h["body_back"] >= U.SLOT[0] - 1.0 - 1e-6)
+    # the swap behind the well: a child running round the well's south side, filmed from the south-west
+    child = characters.make_villager("t_child", "none", child=True)
+    adult = characters.make_villager("t_adult", "none")
+    route = [(-5.5, -4.6, -0.0625), (-1.0, -4.9, -0.0625), (3.2, -4.4, -0.0625), (3.6, 0.0, -0.0625),
+             (3.4, 4.0, -0.0625)]
+    child.place(200, route[0], 0.0)
+    end = child.walk(200, route, speed=4.4, run=True)
+    cam = U.CAMERAS["b20_well"]["pos"]
+    try:
+        sw = U.swap_hidden(child, adult, cam, 200, end, v.world, then=[(3.4, 6.5, -0.0625)], speed=1.6)
+        ok("swap: found a hidden run behind the well (frame %d, hidden %s)" % (sw["frame"], sw["hidden"]), True)
+    except ValueError as e:
+        ok("swap: found a hidden run behind the well", False, str(e))
+
+
+def main():
+    light_model()
+    v, ug = the_set()
+    mechanics(v, ug)
+    print("[ug check] %s" % ("all passed" if not BAD else "%d FAILED: %s" % (len(BAD), BAD)))
+    return 1 if BAD else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

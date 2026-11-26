@@ -24,22 +24,25 @@ SKIES = {
 WALL_BLOCK = "stone_bricks"
 STAIR_BLOCK = "stone_brick_stairs"
 WALL_X = (-4, -2)                 # the wall's three columns (x cells); its road face is the plane x = -1.0
-WALL_Y = (27, 58)                 # its south and north end cells (32 blocks long)
+WALL_Y = (27, 59)                 # its south and north end cells (33 blocks long)
 TOP_Z = 17                        # the top course (pistons, the blocks under the dust); the walkway is z 18
 WALK_Z = TOP_Z + 1.0              # the wall top a character stands on
 STAIR_X, STAIR_Y0, STEPS = -1, 27, 18     # step k = (x -1, y 27 + k, z k), facing north, solid under it
 ROW_Y = tuple(range(46, 58))      # the twelve sticky pistons: (-2, y, 17), facing east, y 46 (south) .. 57 (north)
 PISTON_X, HEAD_X, PLANK_X = -2, -1, 0     # piston, its head, the plank on its arm (extended); retracted: plank x -1
 DUST_X = -3                       # the line of dust on the wall top (on the blocks behind the pistons), z 18
-DUST_Y = tuple(range(45, 58))     # 13 cells: the first one beside the lever's pier, then one behind every piston
-PIER = (-4, 45, 18)               # the block on the wall top the lever stands on (handle 1.3 above the walkway)
-LEVER = (-4, 45, 19)              # the floor lever (facing east): it powers the pier, the pier the first dust
+DUST_Y = tuple(range(46, 59))     # 13 cells: one behind every piston (46..57), the last (58) beside the lever's pier
+PIER = (-3, 59, 18)               # the block at the NORTH end of the wall top the lever stands on, in line with the
+#                                   dust (handle 1.3 above the walkway); from there the road beyond the wall's end is
+#                                   in view, where the patrol comes from (beat 18)
+LEVER = (-3, 59, 19)              # the floor lever (facing east): it powers the pier, the pier the dust beside it
 STRIP_X, STRIP_Y = (-1, 1), (45, 57)      # cobblestone paving at the wall's foot under the shelf (top z 0)
 ANVIL_Z = TOP_Z + 1               # the anvils stand on the planks: cells (0, y, 18); they land in (0, y, 0)
 WALL_LANTERNS = [(-2, 31, 18), (-2, 35, 18), (-2, 39, 18), (-2, 43, 18),          # front edge over the stair
-                 (-4, 44, 18),                                                    # beside the lever: the face key
+                 (-4, 59, 18),                                                    # beside the lever: the face key
                  (-4, 49, 18), (-4, 53, 18), (-4, 57, 18)]                        # back edge over the shelf
-FOOT_LANTERNS = [(2, 27, 1), (2, 37, 1)]  # on cobblestone-wall posts on the east verge (road light at dusk)
+LONE_OAK = (3, 81)                # a small oak on the meadow's horizon up the road, behind the patrol (beat 15)
+FOOT_LANTERNS = []                # (none on the road: a post on the verge stood in the money shot's view)
 
 # ------------------------------------------------------------------------------------------------------------------
 # THE PENS (beats 4-6, 17), west of the exit road between house_e and the wall
@@ -51,10 +54,12 @@ COW_PEN = dict(box=(-14, 20, -7, 26), gates=[(-11, 20)], name="cow_pen")
 # THE SQUARE (beats 1-3, 7-10)
 # ------------------------------------------------------------------------------------------------------------------
 STONE_ROW = [(5, y, 0) for y in range(-16, -8)]          # eight stone blocks on the grass south-east of the plaza
-BENCH_BOX = (-9, 4, -3, 6)                               # the smooth-stone floor of the open-air bench (NW corner)
-BENCH = dict(torch=(-8, 5, 0), dust=[(-7, 5, 0), (-6, 5, 0)], repeater=(-5, 5, 0), block=(-4, 5, 0),
-             lamp=(-4, 5, 1), piston=(-3, 5, 0), piston_facing="east")
-COLUMN = dict(piston=(-4, 9, 0), pier=(-5, 9, 0), lever=(-5, 9, 1), lever_facing="west", blocks=12)
+BENCH_BOX = (-7, 4, -5, 8)                               # the smooth-stone floor of the open-air bench (NW corner)
+# a line north -> south: the torch's spot at its head, two dust, a repeater, the stone block with the lamp on it,
+# the piston east of that block (the repeater powers the block, the block the lamp above it and the piston)
+BENCH = dict(torch=(-6, 8, 0), dust=[(-6, 7, 0), (-6, 6, 0)], repeater=(-6, 5, 0), repeater_toward="south",
+             block=(-6, 4, 0), lamp=(-6, 4, 1), piston=(-5, 4, 0), piston_facing="east")
+COLUMN = dict(piston=(-4, 9, 0), pier=(-4, 10, 0), lever=(-4, 10, 1), lever_facing="north", blocks=12)
 
 
 def _box_cells(x0, y0, x1, y1):
@@ -175,6 +180,10 @@ def square(b):
     w.set(px, py, pz, "stone")
     for c in ((cx, cy), (px, py)):
         b.reserved.add(c)
+    # the oak south of the row (trunk at (4, -21)) stands where the cameras of beats 2 and 3 look along the row
+    tree = b.tree_at(4, -21, radius=1.5)
+    if tree is not None:
+        sets.remove_tree(b, tree)
     # the stone row: cells cleared (the blocks are engine.breaking Breakables, drawn after the build)
     for x, y, z in STONE_ROW:
         _clear_column(b, x, y, z, z + 2)
@@ -194,6 +203,11 @@ def legday_set(b):
     res = dict(wall=anvil_wall(b), pens=pens(b), square=square(b))
     _anchors(b)
     _paths(b)
+    res["lone_oak"] = sets.plant_oak(b, LONE_OAK[0], LONE_OAK[1], b.rng_for("legday lone oak"), height=5)
+    for c in CAMERAS.values():                                     # no tuft between a low camera and its subject
+        if c["pos"][2] < 3.0 and b.ground(c["pos"][0], c["pos"][1]) is not None:
+            sets.clear_view(b, c["pos"], c.get("target1", c["target"]), 2.4)
+            sets.clear_view(b, c["pos"], c["target"], 2.4)
     res["cameras"] = {k: dict(v) for k, v in CAMERAS.items()}
     b.v.sets["legday"] = res
     return res
@@ -208,7 +222,11 @@ def build_set(scene):
 # anchors and paths (registered on the Village; 2D = on the ground there, 3D = exactly there)
 # ------------------------------------------------------------------------------------------------------------------
 def _yaw(facing):
-    """Yaw of a character facing a compass direction (characters face -Y at yaw 0)."""
+    """Yaw of a character facing a compass direction (characters face -Y at yaw 0); also the four diagonals."""
+    if facing in ("northeast", "northwest", "southeast", "southwest"):
+        dx = 1.0 if "east" in facing else -1.0
+        dy = 1.0 if "north" in facing else -1.0
+        return math.atan2(dx, -dy)
     return village.yaw_of(facing)
 
 
@@ -220,38 +238,40 @@ def _row_cell(i):
 ANCHORS = {
     # ---- the square: beat 1 (the squats in front of the well, facing south; the narrator far back by his bench)
     "squat_steve": ((-0.55, -5.55), "south"), "squat_zuri": ((-1.75, -6.45), "south"),
-    "squat_ari": ((0.75, -6.35), "south"), "narrator_far": ((-6.4, 3.1), "south"),
+    "squat_ari": ((0.75, -6.35), "south"), "narrator_far": ((-6.0, 3.2), "south"),
     # ---- beats 2-3: Steve punching the stone row (he stands west of it, facing east, the camera at its south end)
     "mine_1": ((4.22, -15.5), "east"), "mine_2": ((4.22, -14.5), "east"),
     "pickaxe_target": ((1.25, -14.5), None),                    # the dropped iron pickaxe: 3 blocks behind his back
     # ---- beats 7-8: the bench (the narrator south of it facing north; the two-shot in front of the lamp, facing south)
-    "bench_narrator": ((-7.1, 3.62), "north"),
-    "arms_narrator": ((-3.98, 4.15), "south"), "arms_steve": ((-3.02, 4.15), "south"),
+    "bench_narrator": ((-7.3, 6.6), "east"),
+    "arms_narrator": ((-5.98, 3.15), "south"), "arms_steve": ((-5.02, 3.15), "south"),
     # ---- beats 9-10: the column (Steve at its south foot looking down at the piston; the narrator east of the pier)
-    "column_steve": ((-3.5, 8.2), "north"), "column_narrator": ((-5.95, 9.3), "east"),
-    "column_walk_end": ((-4.4, 2.6), None),                     # beat 10: where Steve's walk to the well ends
+    "column_steve": ((-5.25, 9.45), "east"), "column_narrator": ((-2.95, 11.25), "southwest"),
+    "column_walk_end": ((-2.8, 5.4), None),                     # beat 10: where Steve's walk to the well ends
     # ---- the pens (pen_set adds chicken_pen_center / _gate, cow_pen_center / _gate)
-    "kai_chickens": ((-19.6, 22.6), "south"), "zuri_cow": ((-11.6, 22.4), "south"),
-    "cow_milk_target": ((-10.2, 23.1), None),                   # where the milked cow stands (beats 4-6)
+    "kai_chickens": ((-19.6, 22.6), "south"), "zuri_cow": ((-11.3, 22.5), "south"),
+    "cow_milk_target": ((-10.0, 23.3), None),                   # where the milked cow stands (beats 4-6)
     "narrator_fence": ((-10.55, 19.35), "north"),               # outside the cow pen's south fence (beat 6)
-    "hide_1": ((-10.9, 21.8), "east"), "hide_2": ((-10.6, 22.9), "east"), "hide_3": ((-10.9, 24.0), "east"),
-    "hide_4": ((-11.9, 23.4), "east"),                          # beat 17: behind the cows, heads toward the road
-    "hide_cow_1_target": ((-8.7, 21.9), None), "hide_cow_2_target": ((-8.6, 23.4), None),
-    "hide_cow_3_target": ((-8.7, 24.9), None),
-    "arrow_post_target": ((-6.5, 20.5), None),                  # the cow pen's south-east corner post (x -7, y 20)
+    "hide_1": ((-10.3, 21.9), "east"), "hide_2": ((-10.45, 23.3), "east"), "hide_3": ((-10.3, 24.75), "east"),
+    "hide_4": ((-11.45, 23.95), "east"),                        # beat 17: behind the cows, heads toward the road
+    "hide_cow_1_target": ((-8.7, 21.65), None), "hide_cow_2_target": ((-8.7, 23.3), None),
+    "hide_cow_3_target": ((-8.7, 24.95), None),                 # three cows end to end along the east fence
+    "arrow_post_target": ((-6.55, 22.45), None),                # the east fence post (x -7, y 22), its road face
     # ---- the wall: road, stair, top
     "stair_foot": ((-0.5, 26.3), "north"),
     "stair_top": ((-0.5, 44.75, WALK_Z), "west"),               # the back half of the top step: as high as the walkway
     "wall_top_south": ((-1.5, 44.6, WALK_Z), "north"),
-    "lever_narrator": ((-2.88, 45.28, WALK_Z), "west"),         # redstone Lever.stand() of the lever (checked later)
-    "place_12th": ((-2.55, 46.45, WALK_Z), "east"),             # beat 13: he sets the 12th piston into (-2, 46, 17)
-    "set_anvil_12th": ((-1.5, 45.45, WALK_Z), "east"),          # beat 14 / 24: Steve sets the 12th anvil on plank 0
-    "wall_top_north": ((-2.5, 57.4, WALK_Z), "south"),
-    "wall_top_lever_cam": ((-2.45, 44.15, WALK_Z + 0.22), None),   # (a camera spot: beat 14, on the walkway)
+    "lever_narrator": ((-1.7, 59.28, WALK_Z), "west"),          # redstone Lever.stand() of the lever (checked later)
+    "place_12th": ((-2.55, 57.55, WALK_Z), "east"),             # beat 13: he sets the 12th piston into (-2, 57, 17)
+    "set_anvil_12th": ((-1.5, 58.5, WALK_Z), "southeast"),      # beat 14 / 24: Steve sets the 12th anvil on plank 12
+    "wall_top_north": ((-2.5, 58.4, WALK_Z), "south"),
+    "wall_top_lever_cam": ((-2.45, 58.75, WALK_Z + 0.22), None),   # (a camera spot: beat 14, on the walkway)
     # ---- the road under the shelf and beyond
     "road_shelf_south": ((0.5, 44.0), "north"), "road_shelf_north": ((0.5, 58.6), "south"),
     "runners_stop": ((0.55, 39.2), "north"),                    # beat 16: the three stop dead here (Steve)
     "steve_among_anvils": ((1.45, 48.15), "north"),             # beat 21: 2 blocks short of the drops
+    "narrator_edge": ((-1.25, 58.6, WALK_Z), "southeast"),      # beat 21: at the front edge by the lever, looking
+    #                                                             down (0.7 further back the edge hides him from below)
     "banner_spot_target": ((1.5, 50.7), None), "bottle_spot_target": ((1.5, 51.5), None),
     "patrol_far": ((0.5, 82.0), "south"),
 }
@@ -281,6 +301,7 @@ def _paths(b):
     b.path("wall_top", [(-1.5, 44.6, WALK_Z), (-1.5, 57.4, WALK_Z)])
     b.path("wall_top_dust", [(-2.5, 44.6, WALK_Z), (-2.5, 57.4, WALK_Z)])
     sets.ground_path(b, "patrol_road", [(0.5, 84.0), (0.5, 66.0), (0.5, 58.6), (0.5, 40.0)])
+    sets.clear_view(b, (0.5, 84.0), (0.5, 56.0), 1.6)            # the patrol's legs in the meadow grass
     sets.ground_path(b, "run_out", [(0.6, 18.0), (0.6, 26.0), (0.55, 40.0)])
 
 
@@ -336,7 +357,7 @@ def make_parts(v, armed_from=1):
     torch = k.torch(B["torch"], name="bench_torch")
     P["bench"] = dict(torch=torch,
                       wire=k.wire(B["dust"], source=B["torch"], name="bench_dust"),
-                      repeater=k.repeater(B["repeater"], "east", delay=1, name="bench_repeater"),
+                      repeater=k.repeater(B["repeater"], B["repeater_toward"], delay=1, name="bench_repeater"),
                       lamp=k.lamp(B["lamp"], name="bench_lamp"),
                       piston=k.piston(B["piston"], B["piston_facing"], name="bench_piston"))
     cx, cy, cz = COLUMN["piston"]
@@ -347,4 +368,767 @@ def make_parts(v, armed_from=1):
     return P
 
 
-CAMERAS = {}
+# ------------------------------------------------------------------------------------------------------------------
+# A SUGGESTED CAMERA FOR EVERY BEAT: dict(pos, target, lens, fstop[, pos1, target1: a move], sky, still = the
+# proof still out/test/legday_set_<beat>_<what>.png). Each was rendered at 540x960 / 16 samples under its sky with
+# stand-ins placed as the beat says (stage_<beat> below) and looked at; the notes say what was measured.
+# ------------------------------------------------------------------------------------------------------------------
+CAMERAS = {
+    "b01": dict(pos=(-0.55, -12.6, 0.32), target=(-0.5, -5.6, 0.75), lens=22.0, fstop=2.8, sky="gold",
+                what="squats"),
+    "b02": dict(pos=(6.1, -20.4, 0.8), target=(4.98, -15.53, 0.8), lens=32.0, fstop=2.4, sky="gold",
+                what="punch"),
+    "b03": dict(pos=(1.6, -23.6, 1.3), target=(3.47, -14.8, 0.7), lens=28.0, fstop=3.2, sky="gold",
+                what="row"),
+    "b04": dict(pos=(-21.0, 18.3, 1.25), target=(-20.2, 23.0, 1.0), pos1=(-11.8, 18.3, 1.25),
+                target1=(-11.0, 23.0, 1.0), lens=32.0, fstop=2.8, sky="gold", what="pens", seconds=3.6),
+    "b05": dict(pos=(-10.2, 17.6, 1.45), target=(-10.81, 22.46, 1.35), lens=50.0, fstop=2.4, sky="gold",
+                what="milk"),
+    "b06": dict(pos=(-9.9, 18.3, 0.95), target=(-10.9, 22.7, 1.2), lens=40.0, fstop=2.4, sky="gold",
+                what="fence"),
+    "b07": dict(pos=(-2.4, 9.6, 1.3), target=(-6.15, 6.29, 0.8), lens=20.0, fstop=2.4, sky="gold",
+                what="bench"),
+    "b08": dict(pos=(-5.52, -0.7, 1.12), target=(-5.52, 3.15, 1.12), lens=50.0, fstop=2.8, sky="gold",
+                what="arms"),
+    "b09": dict(pos=(-1.3, 5.9, 0.4), target=(-4.5, 9.4, 0.95), pos1=(-1.3, 5.9, 0.4), target1=(-3.8, 9.4, 12.0),
+                lens=18.0, fstop=4.0, sky="gold", what="column"),
+    "b10": dict(pos=(-1.7, 3.2, 0.45), target=(-3.86, 7.71, 2.47), lens=16.0, fstop=4.0, sky="gold",
+                what="cheating"),
+    "b11": dict(pos=(6.0, 25.0, 0.8), target=(-0.94, 42.2, 8.3), lens=28.0, fstop=4.0, sky="gold",
+                what="climb"),
+    "b12": dict(pos=(-0.15, 33.25, 6.65), target=(-0.5, 30.0, 4.2), lens=24.0, fstop=2.4, sky="gold", what="legs"),
+    "b13": dict(pos=(0.6, 63.0, 20.0), target=(-2.7, 52.6, 16.4), lens=24.0, fstop=4.0, sky="gold",
+                what="twelfth"),
+    "b14": dict(pos=(-2.45, 58.75, 18.22), target=(-2.5, 50.0, 18.05), lens=24.0, fstop=2.8, sky="gold",
+                what="dust"),
+    "b15": dict(pos=(5.0, 44.0, 3.9), target=(1.45, 80.8, 4.25), lens=85.0, fstop=2.8, sky="gold",
+                what="patrol"),
+    "b16": dict(pos=(3.0, 42.8, 0.45), target=(0.9, 33.0, 1.3), lens=32.0, fstop=2.8, sky="gold",
+                what="run"),
+    "b17": dict(pos=(-4.2, 21.8, 1.1), target=(-10.5, 23.4, 1.35), lens=32.0, fstop=2.8, sky="gold",
+                what="cows"),
+    "b18": dict(pos=(-3.6, 56.9, 20.3), target=(-1.99, 61.84, 17.3), lens=28.0, fstop=2.0, sky="gold",
+                what="lever"),
+    "b19": dict(pos=(3.2, 31.5, 0.45), target=(1.5, 41.1, 2.53), lens=14.0, fstop=5.6, sky="gold",
+                what="drop"),
+    "b20": dict(pos=(3.6, 45.0, 0.6), target=(1.5, 51.1, 0.3), pos1=(2.9, 47.4, 0.5), target1=(1.5, 51.1, 0.3),
+                lens=35.0, fstop=2.8, sky="gold", what="drops"),
+    "b21": dict(pos=(4.2, 45.6, 0.3), target=(1.16, 49.94, 3.12), lens=16.0, fstop=4.0, sky="gold",
+                what="cheating"),
+    "b22": dict(pos=(6.0, 25.0, 0.8), target=(-0.94, 42.2, 8.3), lens=28.0, fstop=4.0, sky="dusk",
+                what="climb"),
+    "b23": dict(pos=(-0.15, 33.25, 6.65), target=(-0.5, 30.0, 4.2), lens=24.0, fstop=2.4, sky="dusk", what="legs"),
+    "b24": dict(pos=(1.6, 48.0, 19.9), target=(-1.2, 58.6, 19.0), lens=35.0, fstop=2.8, sky="dusk",
+                what="reloading"),
+}
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# scouting: one fresh build per still (build 1-3 s; a 540x960 16-sample still 30-90 s on the shared machine)
+# ------------------------------------------------------------------------------------------------------------------
+TEST_DIR = os.path.join(ROOT, "out", "test")
+
+
+class Scout:
+    """One scene: the set, its parts, a Stage with SKIES (sky = the active one), a Film. For stills only."""
+
+    def __init__(self, sky="gold", res=(540, 960), samples=16, threads=2):
+        import bpy
+        from engine import look, shots
+        from films import lookdev as L
+        self.bpy = bpy
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        self.scene = bpy.context.scene
+        look.setup_render(self.scene, res=res, samples=samples, threads=threads)
+        self.v = build_set(self.scene)
+        self.film = shots.Film(self.scene, fps=24)
+        self.st = L.Stage(self.scene, self.film, self.v, skies=SKIES, sky=sky)
+        self.P = make_parts(self.v)
+        self.sky = sky
+        for a in self.P.anvils + self.P.anvils_dusk:         # the two anvil sets: each only where it is used
+            self.st.cast[a.name] = a
+
+    def render(self, frame, name, zones=True):
+        """Render `frame` to out/test/<name>.png (+ _zones.png). Returns the path."""
+        from PIL import Image
+        from engine import post
+        os.makedirs(TEST_DIR, exist_ok=True)
+        path = os.path.join(TEST_DIR, name + ".png")
+        self.film.goto(frame)
+        self.scene.render.filepath = path[:-4] + "_part"
+        self.scene.render.use_file_extension = True
+        t = time.time()
+        self.bpy.ops.render.render(write_still=True)
+        os.replace(path[:-4] + "_part.png", path)
+        if zones:
+            with Image.open(path) as im:
+                post.draw_zones(im.convert("RGB")).save(path[:-4] + "_zones.png")
+        print("[legday_set] %s (frame %d, sky %s) %.1f s" % (path, frame, self.sky, time.time() - t), flush=True)
+        return path
+
+
+def view(name, pos, target, lens=24.0, fstop=8.0, sky="gold", res=(540, 960), samples=16):
+    """A plain view of the set with every part in its armed state (no cast): out/test/legday_set_view_<name>.png."""
+    sc = Scout(sky, res=res, samples=samples)
+    s = sc.st.shot("view", 0.5)
+    s.lens(lens, fstop)
+    s.move(pos, target)
+    s.focus(target)
+    sc.st.use(s, *sc.P.anvils)
+    sc.st.lights(s, scale=1.0 if sky == "gold" else 1.6)
+    sc.st.finish()
+    return sc.render(s.frame_start + 2, "legday_set_view_" + name, zones=False)
+
+
+def _vec(text):
+    return tuple(float(c) for c in text.split(","))
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# the proof stills: one function per beat stages stand-ins as the beat's picture says (static poses, the parts in
+# the state of that moment) on a shot of its own; returns (frame to render, {label: point that must be in frame})
+# ------------------------------------------------------------------------------------------------------------------
+def _cam(s, beat, focus=None, **over):
+    """Put CAMERAS[beat] on shot s (a move when it has pos1: linear, at speed from frame 1). Returns the spec."""
+    c = dict(CAMERAS[beat], **over)
+    s.lens(c["lens"], c["fstop"])
+    if "pos1" in c:
+        s.move(c["pos"], c["target"], c["pos1"], c.get("target1", c["target"]), ease="linear")
+    else:
+        s.move(c["pos"], c["target"])
+    s.focus(focus if focus is not None else c["target"])
+    return c
+
+
+def _player(sc, name, skin, anchor=None, frame=None, pos=None, yaw=None, slim=None):
+    """A stand-in player (engine.players) put on an anchor (or pos / yaw) on `frame`, in the scout's shot."""
+    from engine import players
+    kw = {} if slim is None else dict(slim=slim)
+    p = players.add_player(sc.st, name, skin, **kw)
+    if anchor is not None:
+        pos = sc.v.anchors[anchor]
+        yaw = sc.v.yaws.get(anchor, 0.0) if yaw is None else yaw
+    p.place(frame, pos, yaw or 0.0)
+    sc.st.use(sc.shot, p)
+    return p
+
+
+def _head(p, frame):
+    return tuple(p.eye_point(frame))
+
+
+def _efe(sc, anchor=None, frame=None, pos=None, yaw=None, torch=True, watts=None):
+    """The narrator (Efe, slim arms) with his redstone torch in the right hand."""
+    p = _player(sc, "efe", "efe", anchor, frame, pos, yaw, slim=True)
+    if torch:
+        redstone.hold_torch(p, "right", watts=watts or redstone.HELD_TORCH_WATTS)
+    return p
+
+
+def _yaw_to(a, b):
+    return village.yaw_to(a, b)
+
+
+def stage_b01(sc, s):
+    """Squats at the well: Steve, Zuri, Ari facing the lens with anvils (sneak down), Kai jumping behind, the narrator
+    far back by his bench with the glowing torch."""
+    f0, st = s.frame_start, sc.st
+    pp = [_player(sc, n, n, "squat_" + n, f0) for n in ("steve", "zuri", "ari")]
+    for p in pp:
+        fixtures.hold_anvil(p)
+        p.sneak(f0 + 2, True)
+    lap = [(1.3, -5.3, -0.06), (2.9, -3.0, -0.06), (3.6, 0.4, -0.06), (2.4, 3.6, -0.06)]
+    kai = _player(sc, "kai", "kai", None, f0, pos=lap[0], yaw=_yaw_to(lap[0], lap[1]))
+    kai.sprint_jump(f0, lap, ramp=(False, False))
+    efe = _efe(sc, "narrator_far", f0)
+    _cam(s, "b01", focus=pp[0].head)
+    st.lights(s, scale=1.0, near=(0.0, -3.0, 1.0), radius=14.0)
+    f = f0 + 6
+    return f, {"steve face": _head(pp[0], f), "zuri face": _head(pp[1], f), "ari face": _head(pp[2], f),
+               "steve anvil": tuple(pp[0].item_point("right", f)), "efe (far)": _head(efe, f)}
+
+
+def stage_b02(sc, s):
+    """Steve punching the nearest stone of the row, cracks half way (breaking.mine), seen along the row."""
+    f0, st, P = s.frame_start, sc.st, sc.P
+    steve = _player(sc, "steve", "steve", "mine_1", f0)
+    blk = P.stones[0]
+    st.cast[blk.name] = blk
+    for b in P.stones:
+        st.cast[b.name] = b
+        st.use(s, b)
+    steve.look_at(f0, blk.center, ease=0)
+    r = breaking.mine(steve, blk, f0 - 20, duration=48, camera=s, drop=None)
+    sc.memo["mine"] = r
+    _cam(s, "b02", focus=steve.head)
+    st.lights(s, scale=1.0, near=(5.0, -14.0, 1.0), radius=10.0)
+    f = f0 + 8
+    return f, {"steve face": _head(steve, f), "stone (cracked)": tuple(blk.center)}
+
+
+def stage_b03(sc, s):
+    """The pull-back: the first stone gone (bare grass), Steve at the second one, the iron pickaxe turning 3 blocks
+    behind his back, the row of seven waiting."""
+    from engine import mobs
+    f0, st, P = s.frame_start, sc.st, sc.P
+    steve = _player(sc, "steve", "steve", "mine_2", f0)
+    for b in P.stones:
+        st.cast[b.name] = b
+        st.use(s, b)
+    P.stones[0].remove(f0)
+    steve.look_at(f0, P.stones[1].center, ease=0)
+    breaking.mine(steve, P.stones[1], f0 - 6, duration=48, camera=s, drop=None)
+    pick = mobs.make_dropped_item("iron_pickaxe", name="pickaxe")
+    st.cast[pick.name] = pick
+    st.use(s, pick)
+    pick.place(f0, sc.v.anchors["pickaxe_target"])
+    pick.animate(f0, s.frame_end + 1)
+    _cam(s, "b03", focus=steve.head)
+    st.lights(s, scale=1.0, near=(4.0, -13.0, 1.0), radius=10.0)
+    f = f0 + 10
+    pk = sc.v.anchors["pickaxe_target"]
+    return f, {"steve face": _head(steve, f), "pickaxe": (pk[0], pk[1], pk[2] + 0.3),
+               "bare grass": (5.5, -15.5, 0.0), "row end": (5.5, -8.5, 1.0)}
+
+
+def stage_b04(sc, s):
+    """The track along the pens: Kai eating a cooked chicken among four hens (start), Zuri drinking milk beside a
+    cow (end of the move)."""
+    f0, st = s.frame_start, sc.st
+    kai = _player(sc, "kai", "kai", "kai_chickens", f0, yaw=_yaw_to(sc.v.anchors["kai_chickens"], (-18.2, 21.5)))
+    kai.hold("cooked_chicken")
+    kai.eat(f0 + 2, f0 + 30)
+    zuri = _player(sc, "zuri", "zuri", "zuri_cow", f0, yaw=_yaw_to(sc.v.anchors["zuri_cow"], (-9.9, 21.3)))
+    zuri.hold("milk_bucket")
+    zuri.drink(f0 + 2, f0 + 30)
+    hens = []
+    for i, (x, y) in enumerate(((-21.2, 23.6), (-20.6, 21.5), (-18.6, 23.4), (-19.0, 24.6))):
+        h = animals.add_chicken(st, "hen_%d" % i)
+        h.place(f0, (x, y, 0.0), _yaw_to((x, y), (-19.6, 22.6)))
+        h.look_at(f0, kai.eye_point(f0), ease=0)
+        st.use(s, h)
+        hens.append(h)
+    cows = []
+    for i, (x, y, tx, ty) in enumerate(((-10.2, 23.1, -10.0, 19.0), (-8.6, 24.4, -9.5, 20.0))):
+        c = animals.add_cow(st, "cow_%d" % i)
+        c.place(f0, (x, y, 0.0), _yaw_to((x, y), (tx, ty)))
+        st.use(s, c)
+        cows.append(c)
+    _cam(s, "b04", focus=kai.head)
+    st.lights(s, scale=1.0, near=(-15.0, 22.0, 1.0), radius=10.0)
+    fa, fb = f0 + 3, s.frame_end - 2
+    return [(fa, "a"), (fb, "b")], {"kai face": _head(kai, fa), "hen": tuple(hens[1].eye_point(fa)),
+                                    "chicken (food)": tuple(kai.item_point("right", fa)),
+                                    "zuri face (end)": _head(zuri, fb), "cow (end)": tuple(cows[0].eye_point(fb))}
+
+
+def _cow_pen_cast(sc, s, f0, zuri_anchor="zuri_cow", drink=True):
+    st = sc.st
+    zuri = _player(sc, "zuri", "zuri", zuri_anchor, f0, yaw=_yaw_to(sc.v.anchors[zuri_anchor], (-9.7, 20.6)))
+    zuri.hold("milk_bucket")
+    if drink:
+        zuri.drink(f0 + 2, f0 + 30)
+    cow = animals.add_cow(st, "cow_0")
+    cp = sc.v.anchors["cow_milk_target"]
+    cow.place(f0, cp, _yaw_to(cp, (-11.0, 20.5)))
+    st.use(s, cow)
+    return zuri, cow
+
+
+def stage_b05(sc, s):
+    """Portrait of Zuri and one cow, both cheated toward the lens: she lowers the bucket (empty), taps the cow."""
+    f0, st = s.frame_start, sc.st
+    zuri, cow = _cow_pen_cast(sc, s, f0, drink=False)
+    zuri.hold("bucket")
+    cam = CAMERAS["b05"]["pos"]
+    cow.look_at(f0, cam, ease=0)
+    zuri.look_at(f0, cow.eye_point(f0), ease=0)
+    _cam(s, "b05", focus=zuri.head)
+    st.lights(s, scale=1.0, near=(-11.0, 22.0, 1.0), radius=8.0)
+    f = f0 + 8
+    return f, {"zuri face": _head(zuri, f), "cow face": tuple(cow.eye_point(f)), "bucket":
+               tuple(zuri.item_point("right", f))}
+
+
+def stage_b06(sc, s):
+    """Over the narrator's shoulder at the cow pen fence: his thin arm and the torch's glow in the foreground, Zuri
+    drinking with the cow beyond."""
+    f0, st = s.frame_start, sc.st
+    zuri, cow = _cow_pen_cast(sc, s, f0)
+    cow.look_at(f0, CAMERAS["b06"]["pos"], ease=0)
+    efe = _efe(sc, "narrator_fence", f0)
+    efe.look_at(f0, zuri.eye_point(f0), ease=0)
+    _cam(s, "b06", focus=zuri.head)
+    st.lights(s, scale=1.0, near=(-11.0, 21.0, 1.0), radius=8.0)
+    f = f0 + 12
+    return f, {"zuri face": _head(zuri, f), "efe torch": tuple(efe.item_point("right", f)),
+               "cow face": tuple(cow.eye_point(f))}
+
+
+def stage_b07(sc, s):
+    """The bench: the narrator has planted his torch; the dust, the repeater, the lamp lit, the piston out."""
+    f0, st, B = s.frame_start, sc.st, sc.P.bench
+    efe = _efe(sc, "bench_narrator", f0, torch=False)
+    efe.look_at(f0, (-5.5, 8.4, 0.2), ease=0)
+    t = B["torch"].plant(f0 + 2, player=efe)
+    redstone.signal(t, B["wire"], B["repeater"], (B["lamp"], B["piston"]))
+    efe.look_at(f0 + 10, B["lamp"].center, ease=4)
+    _cam(s, "b07", focus=efe.head)
+    st.lights(s, scale=1.0, near=(-6.0, 5.0, 1.0), radius=8.0)
+    f = f0 + 16
+    return f, {"efe face": _head(efe, f), "lamp": tuple(B["lamp"].center), "torch": (-5.5, 8.5, 0.4),
+               "repeater": (-5.5, 5.5, 0.1)}
+
+
+def _bench_lit(sc, f):
+    B = sc.P.bench
+    B["torch"].plant(f)
+    redstone.signal(float(f), B["wire"], B["repeater"], (B["lamp"], B["piston"]))
+
+
+def stage_b08(sc, s):
+    """Frontal two-shot against the lit lamp: the narrator's slim near arm beside Steve's wide one."""
+    f0, st = s.frame_start, sc.st
+    _bench_lit(sc, f0 - 20)
+    efe = _efe(sc, "arms_narrator", f0, torch=False)
+    redstone.hold_torch(efe, "right")
+    steve = _player(sc, "steve", "steve", "arms_steve", f0)
+    efe.look_at(f0, (-5.38, 2.9, 1.0), ease=0)
+    steve.look_at(f0, (-5.65, 2.9, 0.95), ease=0)
+    _cam(s, "b08", focus=(-5.52, 3.15, 1.1))
+    st.lights(s, scale=1.0, near=(-3.5, 4.0, 1.0), radius=8.0)
+    f = f0 + 8
+    return f, {"efe arm (slim)": (-5.64, 3.15, 1.1), "steve arm": (-5.40, 3.15, 1.1),
+               "efe face": _head(efe, f), "steve face": _head(steve, f)}
+
+
+def stage_b09(sc, s):
+    """The column: Steve at its foot looking down at the piston; the narrator flips the lever north of it; the twelve
+    iron blocks rise one block (the still is the moment after)."""
+    f0, st, C = s.frame_start, sc.st, sc.P.column
+    steve = _player(sc, "steve", "steve", "column_steve", f0)
+    efe = _efe(sc, "column_narrator", f0)
+    steve.look_at(f0, (-3.5, 9.5, 0.6), ease=0)
+    t = redstone.flip_by(efe, C["lever"], f0 + 4, look=False)
+    C["piston"].power(t)
+    steve.look_at(f0 + 8, (-3.5, 9.5, 9.0), ease=10)
+    _cam(s, "b09", focus=steve.head)
+    st.lights(s, scale=1.0, near=(-4.0, 9.0, 1.0), radius=10.0)
+    f = f0 + 14
+    return [(f0 + 2, "a"), (s.frame_end - 2, "b")], {"steve face": _head(steve, f), "column top": (-3.5, 9.5, 14.0), "piston": (-3.5, 9.5, 0.5),
+               "lever": (-3.5, 10.5, 1.3)}
+
+
+def stage_b10(sc, s):
+    """'That's cheating': the column up against the sky; Steve walks away toward the well, his head in profile
+    toward the lens; the narrator small at the lever."""
+    f0, st, C = s.frame_start, sc.st, sc.P.column
+    C["lever"].set(f0 - 30, True)
+    C["piston"].power(f0 - 30)
+    a, e = (-4.6, 8.0, 0.0), sc.v.anchors["column_walk_end"]
+    steve = _player(sc, "steve", "steve", None, f0, pos=a, yaw=_yaw_to(a, e))
+    steve.walk(f0, [a, e], ramp=(False, True))
+    steve.look_at(f0, CAMERAS["b10"]["pos"], ease=0)
+    efe = _efe(sc, "column_narrator", f0)
+    efe.look_at(f0, steve.eye_point(f0 + 10), ease=0)
+    _cam(s, "b10", focus=steve.head)
+    st.lights(s, scale=1.0, near=(-4.0, 6.0, 1.0), radius=10.0)
+    f = f0 + 12
+    return f, {"steve face": _head(steve, f), "efe face": _head(efe, f), "column top": (-3.5, 9.5, 15.0)}
+
+
+def _climbers(sc, s, f0, anvils=True, steps=(3, 5, 7, 9), names=("steve", "kai", "zuri", "ari")):
+    out = []
+    for n, k in zip(names, steps):
+        y = STAIR_Y0 + k + 0.75
+        p = _player(sc, n, n, None, f0, pos=(STAIR_X + 0.5, y, stair_z(y)), yaw=_yaw("north"))
+        if anvils:
+            fixtures.hold_anvil(p)
+        out.append(p)
+    return out
+
+
+def _use_anvils(sc, s, which="anvils", only=None):
+    """Show the anvils of the set `which` on shot s: all, or the indices in `only` (0 = the south one)."""
+    for i, a in enumerate(sc.P[which]):
+        if only is None or i in only:
+            sc.st.use(s, a)
+
+
+def stage_b11(sc, s, dusk=False):
+    """Low angle from the road: the wall, the long stair, four climbers with anvils, eight anvils on the shelf."""
+    f0, st = s.frame_start, sc.st
+    cl = _climbers(sc, s, f0)
+    for p in cl:
+        y = p.pos_at(f0)[1]
+        p.walk(f0, [(-0.5, y, stair_z(y)), (-0.5, y + 1.0, stair_z(y + 1.0))], speed=1.2)
+    _use_anvils(sc, s, "anvils_dusk" if dusk else "anvils", only=range(4, 12))
+    heroes = {}
+    if dusk:
+        efe = _efe(sc, "lever_narrator", f0, watts=redstone.HELD_TORCH_KEY_WATTS)
+        heroes["efe (lever)"] = _head(efe, f0 + 8)
+    _cam(s, "b22" if dusk else "b11")
+    st.lights(s, scale=1.0 if not dusk else 1.6, groups={"legday_wall": 1.0 if not dusk else 2.0},
+              near=(-1.0, 40.0, 8.0), radius=26.0)
+    f = f0 + 8
+    heroes.update({"climber %d" % (i + 1): _head(p, f) for i, p in enumerate(cl)})
+    heroes["shelf far end"] = (0.5, 57.5, 18.5)
+    heroes["shelf near end"] = (0.5, 46.5, 18.5)
+    return f, heroes
+
+
+def stage_b12(sc, s, dusk=False):
+    """Close on the stair, ground level: Steve's legs pump up past the lens, Kai right behind (anvils in hand)."""
+    f0, st = s.frame_start, sc.st
+    cl = _climbers(sc, s, f0, steps=(4.2, 2.4), names=("steve", "kai"))
+    for p in cl:
+        y = p.pos_at(f0)[1]
+        pts = [(-0.5, y, stair_z(y))]
+        for k in range(1, 5):
+            pts.append((-0.5, y + 0.5 * k, stair_z(y + 0.5 * k)))
+        p.walk(f0, pts, speed=1.3)
+    _cam(s, "b23" if dusk else "b12", focus=(-0.5, 31.4, 5.0))
+    st.lights(s, scale=1.0 if not dusk else 1.6, groups={"legday_wall": 1.0 if not dusk else 2.0},
+              near=(-1.0, 33.0, 6.0), radius=16.0)
+    f = f0 + 6
+    return f, {"steve legs": tuple(cl[0].pos_at(f)), "kai legs": tuple(cl[1].pos_at(f)),
+               "steve anvil": tuple(cl[0].item_point("right", f))}
+
+
+def stage_b13(sc, s):
+    """From just outside the wall top's south end, back along the row: eleven pistons out with planks and anvils;
+    the narrator sets the twelfth (the south gap), its arm out at once."""
+    f0, st, P = s.frame_start, sc.st, sc.P
+    efe = _efe(sc, "place_12th", f0, torch=False)
+    p12 = P.row.pistons[11]
+    p12.place(f0 + 6, player=efe)
+    P.row.blocks[11].show(1, False)
+    _use_anvils(sc, s, only=range(0, 11))
+    efe.look_at(f0, (-1.5, 57.5, 17.5), ease=0)
+    _cam(s, "b13", focus=efe.head)
+    st.lights(s, scale=1.0, near=(-1.0, 52.0, 18.0), radius=12.0)
+    f = f0 + 7
+    return f, {"efe face": _head(efe, f), "12th piston": (-1.0, 57.5, 17.5), "row far": (0.5, 46.5, 18.5)}
+
+
+def stage_b14(sc, s):
+    """Ground level on the wall top by the lever, the lit dust leading away: Steve's feet step over it, anvil in
+    hand; the narrator soft beyond."""
+    f0, st = s.frame_start, sc.st
+    a, e = (-2.55, 53.6, WALK_Z), (-2.3, 56.9, WALK_Z)
+    steve = _player(sc, "steve", "steve", None, f0, pos=a, yaw=_yaw("north"))
+    fixtures.hold_anvil(steve)
+    steve.walk(f0, [a, e], ramp=(False, True))
+    efe = _efe(sc, None, f0, pos=(-3.45, 47.2, WALK_Z), yaw=_yaw("north"))
+    _use_anvils(sc, s, only=range(0, 11))
+    _cam(s, "b14", focus=(-2.45, 55.6, 18.4))
+    st.lights(s, scale=1.0, near=(-2.5, 52.0, 18.0), radius=12.0)
+    f = f0 + 8
+    return f, {"steve feet": tuple(steve.pos_at(f)), "dust near": (-2.5, 57.5, 18.05), "efe face": _head(efe, f),
+               "lever": (-2.5, 59.5, 19.4)}
+
+
+def _patrol(sc, s, frame, path=None, gait="vanilla"):
+    from engine import illagers
+    pat = illagers.add_patrol(sc.st, 5)
+    illagers.march(pat, path or sc.v.paths["patrol_road"], frame, gait=gait)
+    for p in pat:
+        sc.st.use(s, p)
+    return pat
+
+
+def stage_b15(sc, s):
+    """Long lens up the road to the meadow: the patrol walks toward the lens, the captain in front with the banner."""
+    f0, st = s.frame_start, sc.st
+    road = [p for p in sc.v.paths["patrol_road"] if p[1] <= 76.0]
+    road = [(0.5, 76.0, 2.0)] + road
+    pat = _patrol(sc, s, f0, road)
+    _cam(s, "b15", focus=pat[0].head)
+    st.lights(s, scale=1.0, near=(0.5, 60.0, 1.0), radius=12.0)
+    f = f0 + 8
+    return f, {"captain": _head(pat[0], f), "banner top": tuple(pat[0].banner_top(f)) if hasattr(pat[0], "banner_top")
+               else _head(pat[0], f), "last": _head(pat[-1], f)}
+
+
+def stage_b16(sc, s):
+    """Low track from the verge: Steve sprints up the road at the lens, fist up, Kai and Zuri staggered behind; three
+    arrows stuck in the road in front of them."""
+    from engine import hostiles
+    f0, st = s.frame_start, sc.st
+    runs = [("steve", (1.0, 34.6), (1.0, 39.0)), ("kai", (0.4, 33.0), (0.4, 37.4)),
+            ("zuri", (1.75, 32.3), (1.75, 36.7))]
+    pp = []
+    for n, a, b in runs:
+        p = _player(sc, n, n, None, f0, pos=(a[0], a[1], -0.06), yaw=_yaw("north"))
+        p.walk(f0, [(a[0], a[1], -0.06), (b[0], b[1], -0.06)], sprint=True, ramp=(False, True))
+        pp.append(p)
+    pp[0].attack(f0 + 4)
+    arrows = []
+    for i, (x, y) in enumerate(((0.35, 37.8), (0.95, 38.3), (-0.05, 38.6))):
+        ob = hostiles.stick((x, y, 0.0), (0.05, -0.55, -0.83), f0 + 4 + i)
+        arrows.append(ob)
+    _cam(s, "b16", focus=pp[0].head)
+    st.lights(s, scale=1.0, near=(0.5, 36.0, 1.0), radius=12.0)
+    f = f0 + 8
+    return f, {"steve face": _head(pp[0], f), "kai face": _head(pp[1], f), "zuri face": _head(pp[2], f),
+               "arrows": (0.4, 38.2, 0.2)}
+
+
+def stage_b17(sc, s):
+    """Through the cow pen fence: four players crouched behind three cows, heads toward the road (east), arrows in
+    the corner post, the nearest cow looking at the lens."""
+    from engine import hostiles
+    f0, st = s.frame_start, sc.st
+    cam = CAMERAS["b17"]["pos"]
+    pp = []
+    for i, n in enumerate(("steve", "kai", "zuri", "ari")):
+        p = _player(sc, n, n, "hide_%d" % (i + 1), f0)
+        p.look_at(f0, (0.5, sc.v.anchors["hide_%d" % (i + 1)][1] + 3.0, 1.5), ease=0)
+        pp.append(p)
+    cows = []
+    for i in range(3):
+        cp = sc.v.anchors["hide_cow_%d_target" % (i + 1)]
+        c = animals.add_cow(st, "cow_%d" % i)
+        c.place(f0, cp, _yaw("north"))
+        st.use(s, c)
+        cows.append(c)
+    cows[0].look_at(f0, cam, ease=0)
+    post = sc.v.anchors["arrow_post_target"]
+    hostiles.stick((post[0], post[1] - 0.05, 0.92), (-0.97, 0.06, -0.22), f0 - 30)
+    hostiles.stick((post[0], post[1] + 0.1, 0.72), (-0.97, -0.08, -0.2), f0 + 6)
+    _cam(s, "b17", focus=pp[0].head)
+    st.lights(s, scale=1.0, near=(-10.0, 22.0, 1.0), radius=10.0)
+    f = f0 + 8
+    return f, dict({"%s face" % n: _head(p, f) for n, p in zip(("steve", "kai", "zuri", "ari"), pp)},
+                   **{"post arrows": (-6.3, 22.45, 0.85), "near cow": tuple(cows[0].eye_point(f))})
+
+
+def stage_b18(sc, s):
+    """Close on the lever on the wall top: the narrator flips it, the whole dust line dark in one frame; far below on
+    the open road, short of the shelf, the captain's banner (soft)."""
+    f0, st, P = s.frame_start, sc.st, sc.P
+    efe = _efe(sc, "lever_narrator", f0, torch=False)
+    t = redstone.flip_by(efe, P.lever, f0 + 4, look=True)
+    P.wire.unpower(t)
+    road = [(0.5, 81.0, 3.0), (0.5, 78.7, 3.0), (0.5, 78.1, 2.0), (0.5, 74.0, 2.0)]
+    pat = _patrol(sc, s, f0, road)
+    _use_anvils(sc, s)
+    _cam(s, "b18", focus=P.lever.hand_point(f0))
+    st.lights(s, scale=1.0, near=(-3.0, 46.0, 18.0), radius=10.0)
+    f = f0 + 9
+    return f, {"lever": tuple(P.lever.hand_point(f)), "efe hand": tuple(efe.item_point("right", f)),
+               "captain banner": _head(pat[0], f), "dust": (-2.5, 48.5, 18.05)}
+
+
+def stage_b19(sc, s, phase="fall"):
+    """The money shot: the patrol in a clean file on the strip under the shelf, the pistons snap back, the anvils
+    drop (phase 'fall': mid-fall; 'hit': the landing frame)."""
+    from engine import illagers
+    f0, st, P = s.frame_start, sc.st, sc.P
+    t_flip = f0 + 6
+    land_y = 47.0                                                 # the captain's feet on the landing frame
+    drop_frames = fixtures.fall_track(18.0)
+    path = [(0.5, 66.0, 1.0), (0.5, 58.6, 1.0), (0.5, 57.7, 1.0), (0.5, 57.1, 0.0), (0.5, 40.0, 0.0)]
+    pat = illagers.add_patrol(st, 5)
+    for p in pat:
+        st.use(s, p)
+    # start the march so the captain is at land_y on the landing frame (release on t_flip, landing ~41 frames later)
+    sc.memo["patrol"] = pat
+    probe = fixtures.release(P.anvils, t_flip, world=sc.v)
+    land = probe[0]["frame_land"]
+    walked = (land - f0) / 24.0 * illagers.PATROL_SPEED
+    start_y = land_y + walked
+    path = [(0.5, start_y + 9.0, 0.0 if start_y + 9.0 < 57.1 else 1.0)] if False else None
+    road = [(0.5, start_y, 0.0), (0.5, 40.0, 0.0)]
+    illagers.march(pat, road, f0, gait="vanilla")
+    P.row.retract(t_flip)
+    P.wire.unpower(t_flip)
+    P.lever.set(t_flip, False)
+    _use_anvils(sc, s)
+    hits = fixtures.strikes(probe, {p.name: tuple(p.pos_at(land)) for p in pat})
+    res = illagers.crush_patrol(pat, probe, camera=s, stage=st, knockback=False, village=sc.v,
+                                spots=[sc.v.anchors["bottle_spot_target"], sc.v.anchors["banner_spot_target"]],
+                                face=CAMERAS["b19"]["pos"])
+    sc.memo["crush"] = (probe, hits, res, land, start_y)
+    _cam(s, "b19")
+    st.lights(s, scale=1.0, near=(0.0, 50.0, 4.0), radius=14.0)
+    f = (t_flip + 22) if phase == "fall" else land
+    return f, {"captain": _head(pat[0], f), "last": _head(pat[-1], f), "anvil 1": (0.5, 46.5, 10.0),
+               "anvil 12": (0.5, 57.5, 10.0)}
+
+
+def stage_b20(sc, s):
+    """The road after: twelve anvils standing on the cobblestones (most chipped), the banner and the bottle turning
+    side by side between them."""
+    from engine import illagers
+    f0, st, P = s.frame_start, sc.st, sc.P
+    P.row.retract(f0 - 80)
+    P.wire.unpower(f0 - 80)
+    P.lever.set(f0 - 80, False)
+    drops = fixtures.release(P.anvils, f0 - 80, world=sc.v, chip=8, seed=3)
+    _use_anvils(sc, s)
+    ban = illagers.add_dropped_banner(st, shot=s)
+    bot = illagers.add_dropped_bottle(st, shot=s)
+    cam = CAMERAS["b20"]["pos"]
+    for it, a in ((ban, "banner_spot_target"), (bot, "bottle_spot_target")):
+        it.place(f0, sc.v.anchors[a])
+        if hasattr(it, "face"):
+            it.face(f0, cam)
+        it.animate(f0, s.frame_end + 1)
+    _cam(s, "b20")
+    st.lights(s, scale=1.0, near=(1.0, 51.0, 1.0), radius=10.0)
+    f = f0 + 6
+    return f, {"banner": tuple(sc.v.anchors["banner_spot_target"]), "bottle": tuple(sc.v.anchors["bottle_spot_target"])}
+
+
+def stage_b21(sc, s):
+    """Tall frame from the road: Steve among the anvils in front, the narrator high on the wall top by the lever."""
+    from engine import illagers
+    f0, st, P = s.frame_start, sc.st, sc.P
+    P.row.retract(f0 - 120)
+    P.wire.unpower(f0 - 120)
+    P.lever.set(f0 - 120, False)
+    fixtures.release(P.anvils, f0 - 120, world=sc.v, chip=8, seed=3)
+    _use_anvils(sc, s)
+    ban = illagers.add_dropped_banner(st, shot=s)
+    bot = illagers.add_dropped_bottle(st, shot=s)
+    for it, a in ((ban, "banner_spot_target"), (bot, "bottle_spot_target")):
+        it.place(f0, sc.v.anchors[a])
+        it.animate(f0, s.frame_end + 1)
+    steve = _player(sc, "steve", "steve", "steve_among_anvils", f0)
+    efe = _efe(sc, "narrator_edge", f0)
+    steve.look_at(f0, efe.eye_point(f0), ease=0)
+    efe.look_at(f0, steve.eye_point(f0), ease=0)
+    _cam(s, "b21", focus=steve.head)
+    st.lights(s, scale=1.0, near=(0.0, 47.0, 6.0), radius=16.0)
+    f = f0 + 6
+    return f, {"steve face": _head(steve, f), "efe (wall top)": _head(efe, f), "banner": sc.v.anchors["banner_spot_target"]}
+
+
+def stage_b22(sc, s):
+    """b11 at dusk: the same frame, lanterns on, the narrator waiting by the lever, eight anvils back on the shelf."""
+    return stage_b11(sc, s, dusk=True)
+
+
+def stage_b23(sc, s):
+    """b12 at dusk: the same set-up in lantern light."""
+    return stage_b12(sc, s, dusk=True)
+
+
+def stage_b24(sc, s):
+    """Wall top at last light, along the armed row: Steve sets the twelfth anvil (south end); the narrator by the
+    lever, the redstone torch his key, his free arm lifted to the lever."""
+    f0, st, P = s.frame_start, sc.st, sc.P
+    efe = _efe(sc, "lever_narrator", f0, watts=redstone.HELD_TORCH_KEY_WATTS)
+    efe.look_at(f0, (0.5, 50.0, 17.0), ease=0)
+    efe.raise_arm(f0 + 2, angle=60.0, side="l")
+    steve = _player(sc, "steve", "steve", "set_anvil_12th", f0)
+    fixtures.hold_anvil(steve)
+    steve.look_at(f0, (0.5, 57.5, 18.2), ease=0)
+    _use_anvils(sc, s, "anvils_dusk", only=range(0, 11))
+    _cam(s, "b24", focus=efe.head)
+    st.lights(s, scale=1.6, groups={"legday_wall": 2.0}, near=(-2.0, 50.0, 18.0), radius=14.0)
+    f = f0 + 8
+    return f, {"efe face": _head(efe, f), "steve face": _head(steve, f), "anvil row": (0.5, 52.5, 18.5),
+               "last plank": (0.5, 57.5, 17.9)}
+
+
+STAGES = {b: globals()["stage_" + b] for b in CAMERAS}
+
+
+def ray_block(world, a, b, step=0.05, skip_end=0.35):
+    """The first World block a straight line from a to b passes through (cell, block id), or None. Plants, torches
+    and other non-solid blocks are ignored; the last `skip_end` blocks before b are not tested (b's own body)."""
+    ax, ay, az = (float(c) for c in a)
+    bx, by, bz = (float(c) for c in b)
+    d = math.dist((ax, ay, az), (bx, by, bz))
+    n = max(1, int(d / step))
+    seen = set()
+    for i in range(1, n):
+        t = i / float(n)
+        if (1.0 - t) * d < skip_end:
+            break
+        c = (int(math.floor(ax + (bx - ax) * t)), int(math.floor(ay + (by - ay) * t)), int(math.floor(az + (bz - az) * t)))
+        if c in seen:
+            continue
+        seen.add(c)
+        if world.is_solid(*c):
+            bid = world.block_id(*c)
+            if bid.endswith(("_fence", "_fence_gate", "lantern", "_wall")):
+                continue                                    # (thin: posts, rails, lanterns do not hide a face)
+            if (bid.endswith("_stairs") or bid.endswith("_slab")) and az + (bz - az) * t > c[2] + 0.5:
+                continue                                    # (the upper half of a stair or slab: not tested)
+            return c, bid
+    return None
+
+
+def project(scene, cam, point):
+    """(x %, y % from the top) of a world point in the camera's frame, and whether it is in front of the lens."""
+    from bpy_extras.object_utils import world_to_camera_view
+    from mathutils import Vector
+    co = world_to_camera_view(scene, cam, Vector(point))
+    return 100.0 * co.x, 100.0 * (1.0 - co.y), co.z > 0.0
+
+
+def still(beat, sky=None, res=(540, 960), samples=16, name=None, dry=False, **kw):
+    """Build the set, stage beat `beat` (b01 .. b24) under its sky and render its proof still
+    out/test/legday_set_<beat>_<what>.png (+ _zones.png). Prints where each hero point lands in the frame."""
+    spec = CAMERAS[beat]
+    sc = Scout(sky or spec["sky"], res=res, samples=samples)
+    sc.memo = {}
+    s = sc.st.shot(beat, spec.get("seconds", 3.0), sky=sky or spec["sky"])
+    sc.shot = s
+    f, heroes = STAGES[beat](sc, s, **kw)
+    sc.st.finish()
+    frames = f if isinstance(f, list) else [(f, "")]
+    out = name or "legday_set_%s_%s" % (beat, spec["what"])
+    path = None
+    for fr, tag in frames:
+        sc.film.goto(fr)
+        cam = sc.scene.camera
+        cp = tuple(cam.matrix_world.translation)
+        cell = tuple(int(math.floor(c)) for c in cp)
+        if sc.v.world.is_solid(*cell):
+            print("[legday_set]   !!! the camera of %s is inside %s at %s" % (beat, sc.v.world.block_id(*cell), cell))
+        path = None if dry else sc.render(fr, out + ("_" + tag if tag else ""))
+        if dry:
+            print("[legday_set] %s staged (frame %d, sky %s): not rendered (--dry)" % (beat, fr, sc.sky))
+        for label, p in heroes.items():
+            x, y, front = project(sc.scene, cam, p)
+            blocked = ray_block(sc.v.world, cam.matrix_world.translation, p)
+            flag = "" if (8 <= x <= 82 and 14 <= y <= 60 and front) else "   (outside the safe area)"
+            if blocked:
+                flag += "   (hidden by %s at %s)" % (blocked[1], blocked[0])
+            print("[legday_set]   %-18s x %5.1f %%  y %5.1f %%%s" % (label, x, y, flag))
+    if "crush" in sc.memo:
+        probe, hits, res_, land, start_y = sc.memo["crush"]
+        print("[legday_set]   anvils land on frame %d (fall %.1f, damage %s); patrol start y %.2f; struck: %s"
+              % (land, probe[0]["height"], probe[0]["damage"], start_y, sorted(hits)))
+        print("[legday_set]   crushed: %s" % {k: (round(v["damage"], 1), v["lethal"]) for k, v in res_.items()})
+    return path
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if args and args[0] == "still":
+        # still b01 [b02 ...] [--res WxH] [--samples N]: the proof stills of these beats (2-3 per call)
+        res, samples, beats, dry = (540, 960), 16, [], False
+        it = iter(args[1:])
+        for a in it:
+            if a == "--dry":
+                dry = True
+            elif a == "--res":
+                res = tuple(int(c) for c in next(it).split("x"))
+            elif a == "--samples":
+                samples = int(next(it))
+            else:
+                beats.append(a)
+        for b in beats:
+            still(b, res=res, samples=samples, dry=dry)
+    if args and args[0] == "view":
+        # view NAME x,y,z tx,ty,tz LENS [FSTOP] [SKY] [WxH] [SAMPLES]
+        a = args[1:]
+        res = tuple(int(c) for c in a[6].split("x")) if len(a) > 6 else (540, 960)
+        view(a[0], _vec(a[1]), _vec(a[2]), float(a[3]), float(a[4]) if len(a) > 4 else 8.0,
+             a[5] if len(a) > 5 else "gold", res, int(a[7]) if len(a) > 7 else 16)
+

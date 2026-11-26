@@ -11,8 +11,10 @@ THE WATCHER (beats 9, 10, 11): C.actor("watcher", "sq") is Steve's plain skin, n
   His face must never be readable here: far and out of focus with the face under about ten pixels at 540x960
   (an 85 mm lens at 19 blocks still gives a 58-pixel face: blur it hard or take him further up the road), or seen
   from behind / cropped at the hip (beat 11). If his eye whites read as dots, take him further away.
-  AS SHOT: he stands at SQ_WATCH (1.5, 14.0) in all three shots, facing south (this file's own spot instead of
-  PLACES["watch_square"] (0.5, 9.6), which no other sequence uses; why: the comment at SQ_WATCH). Beat 9: face
+  AS SHOT: he stands at SQ_WATCH = PLACES["watch_square"] (1.5, 14.0) in all three shots, facing south (this
+  file's own spot first; the lead made it the shared place, the stub's (0.5, 9.6) is gone: the comment at
+  SQ_WATCH). The cameras are this file's own constants (C.cam(s, None, **SQxx_CAM): the stub CAMS "guard",
+  "grownups" and "hip" are gone; CAMS "square_long" is sq09's start, the square's stand-in). Beat 9: face
   25 px, beat 10: 33 px, each under a blur 0.7-0.8 as wide as the face (focus never on him, f/0.95-1.2); beat
   11: from behind, his head above the frame. Rule of thumb used: blur / face width = lens * (D - focus) /
   (140 * fstop * focus) for Shot.lens's f-stop (DOF_FSTOP_SCALE 0.28), D = his distance; keep it near 1 (at
@@ -49,7 +51,8 @@ SQ01_CAM = dict(pos=(2.18, -13.55, 0.8), target=(-1.07, -5.58, 0.6), lens=60.0, 
 # front of the gate's west lamp post in beat 9 (its lantern on his head) and 22 blocks from that lens, where a
 # rendered face of 27 px with the focus on a villager 11 blocks out still showed two white eye patches. Here he is
 # 26.6 blocks from the beat 9 lens with the gate's two lanterns either side of him (x 33 / 74 %).
-SQ_WATCH = (1.5, 14.0)
+SQ_WATCH = HC.PLACES["watch_square"]        # (1.5, 14.0): the shared place since the lead's pass (it was this
+#                                           file's own spot, PLACES held the stub's (0.5, 9.6))
 
 # ---- beat 9 (sq09): long lens from the south-east corner of the square, past the well's east side, up the road.
 # The aim is 0.4 block east of him (he stands at x 42-51 % of the frame), and the farmer walks a lane 1.7 blocks
@@ -101,13 +104,9 @@ SQ11_KID_LOOK = (9.0, 5.0, 0.7)             # its head turned away east-south-ea
 
 def _wheat_farmer(C):
     """The farmer of beats 9 and 10 (one instance, twin "sq9"), with wheat on his crossed arms: the game draws a
-    villager's held item there (Character.hold of props.make_item, as the lead's beat 9 notes say; C.item makes a
-    dropped item on the ground, not a held one). st.use shows and hides the wheat with him (541-672)."""
-    ada = C.actor("farmer", "sq9")
-    if ada.held is None:
-        from engine import props
-        ada.hold(props.make_item("wheat", C.v.collection))
-    return ada
+    villager's held item there (C.held_item: Character.hold of props.make_item; C.item makes a dropped item on the
+    ground, not a held one). st.use shows and hides the wheat with him (541-672)."""
+    return C.held_item(C.actor("farmer", "sq9"), "wheat")
 
 
 def _look_dir(c, frame, cam_pos, right, up, dist=3.0):
@@ -137,7 +136,7 @@ def sq01_guard(st, s, C, nar):
       "player" 32     Steve's face clearly readable (it is the hook: the player, the protector), the sword in hand
       "protect" 49    the child looking up at him (head tipped back, cheated toward the lens: C.to_lens)
       the whole shot  both faces in the upper half of the frame (y 14-60 %), the adults soft behind them
-    SHARED: none with other sequences. PLACES "guard", "guard_child"; CAMS "guard" (a start: change it freely).
+    SHARED: none with other sequences. PLACES "guard" (the torches' near point); the camera is SQ01_CAM.
       Cast: C.actor("steve_iron", "sq"), C.actor("child", "sq"), C.actor("farmer", "sq"), C.actor("librarian", "sq").
     NEIGHBOURS: the film's first shot; after it dn02_fight (night, the zombie at the child's door). Hard cut.
     NOTES: a villager's head turned more than about 26 degrees from the lens is a blank box; the child is half his
@@ -189,7 +188,7 @@ def sq01_guard(st, s, C, nar):
     steve.look_at(f0 - 12, SQ01_SCAN, ease=44)
     steve.look_at(f0 + 32, SQ01_SCAN, ease=f1 + 1 - (f0 + 32))
     st.use(s, steve, kid)
-    C.cam(s, "guard", focus=steve.head, handheld=0.006, **cam)
+    C.cam(s, None, focus=steve.head, handheld=0.006, **cam)
     # "protect" (49): the focus pulls from his face to the child looking up at him
     s.focus(kid.head, at_s=s.film.seconds(C.at(s, "protect") - 5), rack_s=0.4)
     st.hero(s, "steve", steve)
@@ -213,10 +212,10 @@ def sq09_watches(st, s, C, nar):
                       none of them is in the shot before)
       "stands" 558    him, small and still at the mouth of the road, in a gap between the moving villagers
       "watches" 579   still there, nobody looking at him
-    SHARED: PLACES "watch_square" (also beats 10 and 11: the same spot all three shots). CAMS "square_long" (a
-      start). Cast: C.actor("watcher", "sq"), C.actor("farmer", "sq"), C.actor("librarian", "sq"),
-      C.actor("kid", "sq_a"), C.actor("kid", "sq_b"). Wheat: villagers hold an object with Character.hold(obj)
-      (props.make_item("wheat", C.v.collection)); a held flat item lies along the hand (edge-on from the side).
+    SHARED: PLACES "watch_square" (also beats 10 and 11: the same spot all three shots). The camera is SQ09_CAM
+      (CAMS "square_long" = its start, the stand-in). Cast: C.actor("watcher", "sq"), C.actor("farmer", "sq9"),
+      C.actor("librarian", "sq"), C.actor("kid", "sq_a"), C.actor("kid", "sq_b"). Wheat: C.held_item(farmer,
+      "wheat") (Character.hold of props.make_item); a held flat item lies along the hand (edge-on from the side).
     NEIGHBOURS: before, me08_nohello (the meadow: the child's hello unanswered); after, sq10_grownups (the same
       square, the same watcher, from the well). Hard cuts.
     RISKS (story): "His face before the reveal": two white eye pixels can show as bright dots even at distance and
@@ -267,7 +266,7 @@ def sq09_watches(st, s, C, nar):
         c.track(f0 - lead, f1 + 1, SQ09_KID_LOOK, step=3, ease=1)
     st.use(s, ada, bo, k1, k2)
     cam = SQ09_CAM
-    C.cam(s, "square_long", focus=bo.head, handheld=0.004, ease="linear", **cam)
+    C.cam(s, None, focus=bo.head, handheld=0.004, ease="linear", **cam)
     # the focus stays on the villagers: the librarian, then (once she has passed) the farmer's lane, on the fixed
     # point where his walk ends (never on him: on the farmer's head it reached 10 blocks, too near the watcher's)
     s.focus(SQ09_FOCUS, at_s=s.film.seconds(f0 + 8), rack_s=0.5)
@@ -292,9 +291,9 @@ def sq10_grownups(st, s, C, nar):
       "players" 625 .. "stand" 634    the child looks from one to the other
       "still" 641 .. the end          the child's head turned past them toward the road and HELD to the last frame
                       (cheated about 21 degrees toward the lens: C.to_lens), him small and still in the gap
-    SHARED: PLACES "watch_square" (the same spot as beats 9 and 11), "grownups", "grownups_child" (a start: the
-      camera, the adults and the child must line up on him: from watch_square through the middle of the two adults
-      the line reaches CAMS "grownups" (6.6, 0.5), where a low camera can stand). Cast: C.actor("farmer", "sq"),
+    SHARED: PLACES "watch_square" (the same spot as beats 9 and 11); the camera (SQ10_CAM), the adults and the
+      child are this file's (the stub's PLACES "grownups" / "grownups_child" and CAMS "grownups" are gone): they
+      line up on him, from watch_square through the middle of the two adults. Cast: C.actor("farmer", "sq9"),
       C.actor("toolsmith", "sq"), C.actor("child", "sq"), C.actor("watcher", "sq").
     NEIGHBOURS: before, sq09_watches; after, sq11_stare (the child alone on the road, staring at him). Hard cuts.
     RISKS (story): the line is a thought with no action: keep him visible in the gap between the two adults and hold
@@ -358,7 +357,7 @@ def sq10_grownups(st, s, C, nar):
     kid.look_at(C.at(s, "still") - 2, at_him, ease=9)
     kid.look_at(C.at(s, "still") + 7, at_him, ease=f1 + 1 - (C.at(s, "still") + 7))
     st.use(s, ada, tom, kid)
-    C.cam(s, "grownups", focus=kid.head, handheld=0.006, **cam)
+    C.cam(s, None, focus=kid.head, handheld=0.006, **cam)
     st.hero(s, "child", kid)
     st.hero(s, "farmer", ada)
     C.lights(s, "gold", near=(3.6, 5.6, 0.0), radius=16.0)
@@ -378,7 +377,8 @@ def sq11_stare(st, s, C, nar):
       frame 673       the push in under way, the two children already running behind
       "watch" 679 .. "back" 691    the child's face, head tipped all the way up (HEAD_PITCH_MAX 35 degrees), sharp
       the whole shot  his hip and still hand soft at the foreground edge; nothing of his face (cropped at the hip)
-    SHARED: PLACES "watch_square" (he stands where he stood in beats 9 and 10), "stare_child". Cast:
+    SHARED: PLACES "watch_square" (he stands where he stood in beats 9 and 10); the child's place SQ11_CHILD and
+      the camera SQ11_CAM are this file's. Cast:
       C.actor("child", "sq"), C.actor("watcher", "sq"), C.actor("kid", "sq_a"), C.actor("kid", "sq_b").
     NEIGHBOURS: before, sq10_grownups (the same child, the same watcher: placed on f0, nothing keyed before);
       after, me12_floating (the meadow, the floating oak). Hard cuts.
@@ -427,7 +427,7 @@ def sq11_stare(st, s, C, nar):
     k1.walk(f0 - SQ11_KID_LEAD, [C.stand(p) for p in SQ11_KID_A], speed=2.4, run=True)
     k1.track(f0 - SQ11_KID_LEAD, f1 + 1, SQ11_KID_LOOK, step=3, ease=1)
     st.use(s, kid, k1)
-    C.cam(s, "hip", focus=kid.head, handheld=0.005, **cam)
+    C.cam(s, None, focus=kid.head, handheld=0.005, **cam)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near=C.stand(SQ_WATCH), radius=16.0)
     # the sun is behind the child (it faces him, north-north-west): its face, in the shade of its own head, came out

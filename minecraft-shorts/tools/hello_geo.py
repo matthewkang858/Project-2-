@@ -7,7 +7,9 @@ which way it faces the lens, and what (if anything) stands between the lens and 
                                                        # visibility of knees / chest / eyes of a figure standing there
     $BPY -m tools.hello_geo --sky night in17_window:1060 --pts "3.4,-6.7,1.6"          # any 3D points
 Columns: x / y in % of the frame (y from the top, as the Reels zones), the head's box (top..bottom), the face width
-in pixels at 540x960, `off` = degrees between the body's nose direction and the lens (0 = facing it, 90 = profile,
+in pixels at 540x960 (a baby villager's face is a quarter block wide, an adult's half a block: until the lead's pass
+every face was measured as an adult's, so the CHILD face sizes in the sequence docstrings written before it are
+twice the true width), `off` = degrees between the body's nose direction and the lens (0 = facing it, 90 = profile,
 180 = from behind), `blocked` = the first rendered object on the line from the lens to the eyes (None = clear).
 Nothing is written. Prefix with `nice -n 5 timeout 290`.
 """
@@ -110,8 +112,11 @@ def main(argv):
             xl = min(b[0] for b in box) if box else float("nan")
             xr = max(b[0] for b in box) if box else float("nan")
             d = eye - cp
+            # half the face's width: an adult's (villager or player) head is 8 game pixels = 0.5 block wide, a baby
+            # villager's half that (Character.child); the first version measured every face as an adult's
+            half = 0.125 if getattr(c, "child", False) else 0.25
             side = d.cross(Vector((0, 0, 1)))
-            side = side.normalized() * 0.25 if side.length > 1e-6 else Vector((0.25, 0, 0))
+            side = side.normalized() * half if side.length > 1e-6 else Vector((half, 0, 0))
             a, b = proj(cam, eye - side), proj(cam, eye + side)
             face = abs(a[0] - b[0]) / 100.0 * 540
             yaw = c.root.matrix_world.to_euler().z

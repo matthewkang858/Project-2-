@@ -1,7 +1,8 @@
 """The Hello: tools/palette_check on single frames at final quality (540x960, 16 samples), one build of one sky.
 
     $BPY -m tools.hello_palette --sky gold 195 226            # renders out/test/hello_pal_<shot>_<frame>.png and
-                                                             # prints palette_check's report (heroes = st.hero's)
+                                                             # prints palette_check's report (heroes = st.hero's,
+                                                             # with their hurt twins: a zombie in its red flash counts)
 Every frame given must be filmed under the sky named (render.py's rule). Prefix with `nice -n 5 timeout 290`.
 """
 import argparse
@@ -11,6 +12,17 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
+
+
+def _with_hurt(heroes):
+    """st.hero's heroes plus each part's red hurt twin (engine/undead.py draws a hurt mob with '<part>_hurt' twin
+    meshes during the flash): tools/palette_check (frozen) looks for the heroes' own object names only, and called a
+    zombie in its red flash 'not visible' (dn02 94-105)."""
+    out = []
+    for label, obs in heroes:
+        names = [getattr(o, "name", o) for o in obs]
+        out.append((label, names + [n + "_hurt" for n in names]))
+    return out
 
 
 def main(argv):
@@ -30,7 +42,7 @@ def main(argv):
         path = os.path.join(ROOT, "out", "test", "hello_pal_%s_%d.png" % (shot.name, f))
         ses.render_frame(f, path)
         rec = palette_check.probe(ses.scene)
-        rep = palette_check.evaluate(rec, path, heroes=st.heroes.get(shot.name, ()))
+        rep = palette_check.evaluate(rec, path, heroes=_with_hurt(st.heroes.get(shot.name, ())))
         palette_check.print_report("%s@%d" % (shot.name, f), rep)
         bad += 1 if rep["failed"] else 0
     return 1 if bad else 0

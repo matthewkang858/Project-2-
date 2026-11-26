@@ -23,7 +23,9 @@ THE BED CAMERA of beats 3 and 16 (BED_CAM, ONE constant used by both shots, with
   Steve's head x 62-75 %, y 52-61 %, face 64 px (eyes y 55 %); a quarter of the frame width between the heads; the
   pane about x 42-64 %, y 10-25 % (sky through its middle and top: ray casts --through; its lowest row shows the
   canopy of a tree east of the house). At 210 (end of the push): child 17-35 %, Steve 63-77 %, faces 61 / 67 px.
-THE SKIES: "night" (moon in the west, azimuth 176, elevation 21) and, from the word "ended" in beat 3, "gold"
+THE SKIES: "night" (since the lead's pass the moon in the north-east behind the house, azimuth 35, elevation 21;
+  it was in the west, azimuth 176: inside the room nothing changed, in03@160 mean luma 80.0 -> 80.1, the pane still
+  purple night with stars) and, from the word "ended" in beat 3, "gold"
   (sun azimuth 215, elevation 24). The film calls st.sky_change; the shot keys the light on both sides:
   C.lights(s, "night_room", **room) and, from the change, C.lights(s, "gold_room", at=change, **room) (the SAME
   near / radius: Stage.lights at= sets every light again) + C.morning(s, change) (hello_common.MORNING: a warm
@@ -31,7 +33,8 @@ THE SKIES: "night" (moon in the west, azimuth 176, elevation 21) and, from the w
   MEASURED at the snap with BED_CAM (mean luminance of 540x960 stills, 181 night against 195 gold,
   out/test/hello_in_t5_in03_bed_181.png / _195.png): the pane 84 -> 156 (x1.85), walls 117 -> 183 (x1.56), floor
   72 -> 140 (x1.93), the child's bed 127 -> 188 (x1.48), the red bed 92 -> 116 (x1.26), whole frame 80 -> 142
-  (x1.77). palette_check in03@160 (night), in03@195 (gold), in16@1020 pass every check they make.
+  (x1.77). palette_check in03@160 (night), in03@195 (gold), in16@1020 pass every check they make (night ones
+  re-run under the lead's moon: stone G/R 0.97, planks s 0.48 / 0.49, heroes 100 % inside).
 LIGHT: house_a's torches and its room fill are one group ("house_a"): raise them only together (LIGHTS
   "night_room"); lit cobblestone and villager skin are at the palette limit in there (CONTRACT.md). Film-local
   lights: C.fill("in_<name>", ...) (the name must start with "in"): only "in_pane" (beat 17).
@@ -46,8 +49,9 @@ from films import hello_common as HC
 PANE_FILL = dict(pos=(11.05, -10.85, 2.95), watts=260.0, color=(1.0, 0.88, 0.72))    # in17: on the child's face
 # beat 17: the child stands on the HIGH back half of the chair under the pane (oak stairs facing east: x 11.5..12,
 # top z 2.0), at the north side of the chair, so the camera from the south-west sees it centred in the pane. On
-# the seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16, 0.16 above the sill: only the eyes showed.
-KID_WINDOW = (11.75, -10.15, 2.0)
+# the seat ((11.25, -10.5, 1.5), the first PLACES "window_chair") its eyes are at z 2.16, 0.16 above the sill:
+# only the eyes showed.
+KID_WINDOW = HC.PLACES["window_chair"]     # (11.75, -10.15, 2.0): the shared place since the lead's pass
 
 # THE BED CAMERA of beats 3 and 16 (one constant, both shots): inside the room, high at the west end of the bed
 # wing, a little toward Steve's side, looking east down the two beds to their pillows: the red bed and Steve at the
@@ -202,34 +206,41 @@ def in17_window(st, s, C, nar):
     picture also keeps his progression: the corner (15c), under the window (17), beside the door (19).
 
     WHAT IT NOW DOES (WINDOW_CAM): low on the plaza behind his right shoulder, below his eyes (z 1.1), 30 mm f/2.0,
-    looking up at the house front: the starry night sky and the moon's glow over the roof fill the top third; the
+    looking up at the house front: the starry night sky over the roof fills the top third; the
     lit pane below the eaves with the CHILD'S WHOLE FACE in it (brow, eyes, nose, crossed arms below), looking out
     and down at him; his head (from behind, tipped up at the pane: Player.watch from the first frame) beside the
     pane at the same height, his teal shoulder and arm big and soft in the lower left; his body dead still. A slow
     push in (ease_out: at speed on frame 1047, 0.54 block over the shot) with the handheld on top. Nothing else
     moves: the two of them look at each other through "nights" 1051 .. "night" 1073 and the 0.9 s after it.
     THE CHILD STANDS ON THE CHAIR'S BACK (KID_WINDOW (11.75, -10.15, 2.0), the high east half of the oak stairs,
-      top z 2.0), not on its seat: on the seat (PLACES "window_chair", z 1.5) its eyes are at z 2.16 (the PLACES
-      comment says 2.3), 0.16 above the sill, and from any camera outside only the eyes and the top of the nose
-      showed (the plan's still). On the back its eyes are at z 2.66, in the middle of the pane. It stands at the
-      north side of the chair so that the camera, south-west of the pane, sees it centred in the opening.
-    WHY LOW: the night reads at once (stars: the house front itself is moonlit and warm like dusk), he stands under
+      top z 2.0; PLACES "window_chair" since the lead's pass), not on its seat: on the seat (11.25, -10.5, 1.5) its
+      eyes are at z 2.16 (the first PLACES comment said 2.3), 0.16 above the sill, and from any camera outside only
+      the eyes and the top of the nose showed (the plan's still). On the back its eyes are at z 2.66, in the middle
+      of the pane. It stands at the north side of the chair so that the camera, south-west of the pane, sees it
+      centred in the opening.
+    WHY LOW: the night reads at once (stars over the roof; since the lead's pass the moon is behind the house and the
+      front is in its shadow: the lit pane and the child's face are the brightest warm patch), he stands under
       the window as a figure (head, shoulder, arm), and the lens sees his head from behind and below: his face is
       never seen (153-157 degrees off the lens).
     SHARED: PLACES "watch_window" (7.3, -10.95), unchanged, facing the pane; the night light of the room
-      ("night_room": the torch-lit room seen through the pane). CAMS "window_out" is replaced by WINDOW_CAM (it is
-      this shot's only). Cast: C.actor("child", "in") (in in16 before: placed again on 1047: lie_down / place are
-      cuts), C.actor("watcher", "in") via C.watcher. Film-local light PANE_FILL ("in_pane", 260 W, torch colour) in
-      the room between the glass and the child's face: without it the face is a dark brown shape; at 120 W it was a
-      muddy mauve no brighter than the logs around the pane (face rgb 75,59,65 against 66,55,57); at 260 W it is
+      ("night_room": the torch-lit room seen through the pane). WINDOW_CAM is this shot's own camera
+      (C.cam(s, None, **WINDOW_CAM); the stub CAMS "window_out" is gone). Cast: C.actor("child", "in") (in in16
+      before: placed again on 1047: lie_down / place are cuts), C.actor("watcher", "in") via C.watcher.
+      Film-local light PANE_FILL ("in_pane", 260 W, torch colour) in the room between the glass and the child's
+      face: without it the face is a dark brown shape; at 120 W it was a muddy mauve no brighter than the logs
+      around the pane (face rgb 75,59,65 against 66,55,57); at 260 W it is
       about 1.3x the logs (face rgb 99,76,75 against 74,61,59 and 78,65,60 at 1065) and the green eyes read.
-    MEASURED (hello_geo): at 1047 the child's eyes x 54 %, y 56 %, head x 48-60 %, y 52-58 %, face 53 px, 9 degrees
-      off the lens; his head x -1..32 %, y 51-66 %, 157 degrees off; at 1100: child head x 48-60 %, y 52-59 %, face
-      57 px; his head x -14..28 %, y 50-69 % (the caption band crosses his head and the wall: a big soft foreground
-      shape). palette_check in17@1065 (PANE_FILL 260 W): stone G/R 1.01, planks s 0.32, the child's skin s 0.32,
-      Steve shirt hue 189, his trousers min channel 37, hero child x 49-59 %, y 53-58 %, 100 % inside the safe area;
-      in17@1100: G/R 1.02, planks s 0.33, skin s 0.33, shirt hue 189, trousers 36, hero child 100 % inside.
-      Still: out/test/hello_in_final_in17_window_1065_zones.png.
+    MEASURED (hello_geo; its face column measured every face as an adult's until the lead's pass: the child's face
+      sizes here are twice its true 27-29 px): at 1047 the child's eyes x 54 %, y 56 %, head x 48-60 %, y 52-58 %,
+      face 53 px, 9 degrees off the lens; his head x -1..32 %, y 51-66 %, 157 degrees off; at 1100: child head x 48-60
+      %, y 52-59 %, face 57 px; his head x -14..28 %, y 50-69 % (the caption band crosses his head and the wall: a big
+      soft foreground shape). palette_check in17@1065 (PANE_FILL 260 W): stone G/R 1.01, planks s 0.32, the child's
+      skin s 0.32, Steve shirt hue 189, his trousers min channel 37, hero child x 49-59 %, y 53-58 %, 100 % inside the
+      safe area; in17@1100: G/R 1.02, planks s 0.33, skin s 0.33, shirt hue 189, trousers 36, hero child 100 % inside.
+      Still: out/test/hello_in_final_in17_window_1065_zones.png. UNDER THE LEAD'S MOON (north-east, behind the house):
+      palette_check in17@1065 stone G/R 1.00, planks s 0.20, the child's skin rgb(115,83,78) s 0.32, shirt hue 191,
+      trousers min channel 13 (limit 12: his legs are in the moon's shadow), hero child 100 % inside; whole frame luma
+      59 (was 79). Still: out/test/hello_lead_in17_window_1065_zones.png.
     NEIGHBOURS: before, in16_empty; after, dn18_knock (outside: the zombie at the door, the same night). Hard cuts.
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -242,6 +253,6 @@ def in17_window(st, s, C, nar):
     # the child's face is turned away from the room's torch (11, -8, 3): a small warm film-local light inside the
     # pane, in front of its face, stands in for the torch light the game would show on it (shadowless, invisible)
     C.fill("in_pane", PANE_FILL["pos"], PANE_FILL["watts"], [s], color=PANE_FILL["color"])
-    C.cam(s, "window_out", focus=kid.head, handheld=0.004, **WINDOW_CAM)
+    C.cam(s, None, focus=kid.head, handheld=0.004, **WINDOW_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "night_room", near=C.A["house_a_center"], radius=14.0)

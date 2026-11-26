@@ -51,9 +51,16 @@ OCCLUDING = ("dirt_path", "farmland")  # not full cubes, but useShapeForLightOcc
                                        # light of the sky does not go down through the plaza's path blocks
 
 # ---- film choices (NOT the game; see NOT THE GAME in the docstring)
-WARMTH = 0.5                           # the block-light tint used: halfway from white to #FFD88C (the palette rule)
+WARMTH = 0.4                           # the block-light tint used: 40 % of the way from white to #FFD88C (palette)
 EMIT = 1.0                             # baked light drawn as emission x this (1 = the game's brightness exactly)
-DOOR_KEEPS_DARK = True                 # the zombie box is baked as sealed: the open doorway stays black
+DOOR_KEEPS_DARK = True                 # the doorway is baked as the box behind it: the open doorway stays black
+BOX_SEALED = True                      # the slot's bars count as opaque in the bake: the box is black inside (the
+                                       # game: bars pass light, the box would be about 6 levels under the corner)
+POINT_COLOR = (1.0, 0.92, 0.80)        # the set's torch / lantern point lights: the game's block light near its
+                                       # source (lightmap level 13: (1, 0.92, 0.78)), paler than the village's
+                                       # props.TORCH_COLOR (1, 0.88, 0.72), which pushes villager skin over 0.52
+FILL_SHARE = 0.30                      # the hall's weak cool shadowless fill (group ug_hall, Stage.lights(inside=
+                                       # "ug_hall")): this share of the hall torches' watts, as the village's rooms
 
 # =====================================================================================================================
 # THE SET (Blender cells; ground z = 0; the hall floor's walking surface is z = F)
@@ -78,6 +85,8 @@ BOX = (14, BOX_Y)                      # the zombie box: one cell behind dad's, 
 SLOT = (15, BOX_Y, F)                  # its only opening: iron bars at floor level in its east wall
 DOOR = [(14, BACK_Y, F), (14, BACK_Y, F + 1)]       # dad's back wall: two stone blocks on sticky pistons ...
 DOOR_SIDE = "west"                     # ... that slide sideways (west) into the back wall behind the 2-wide pier
+DAD_OFFSET = -0.18                     # dad stands toward the west side of his cell (his box 0.6 wide in a 1-wide
+                                       # cell): a strip of the doorway shows beside his robe from the east
 LEVER = (15, -12, F + 1)               # a wall lever on the north face of the end pier (15, -13, F + 1)
 ROCK = (-11, -19, F - 2, 20, 3, -2)    # the solid earth around all of it (x0, y0, z0, x1, y1, z1)
 HOUSE = "house_a"                      # dad's house (the roomiest vanilla house: two beds, torches, windows)
@@ -95,7 +104,8 @@ LIGHTS = [
     ((9, -11, F + 1), "wall_torch", {"facing": "south"}, "ug_hall"),             # facing the farmer / fletcher
     ((14, -11, F + 1), "wall_torch", {"facing": "south"}, "ug_dad"),             # facing dad's cell
     ((10, -12, F + 2), "lantern", {"hanging": "true"}, "ug_hall"),               # the one hanging lantern
-    ((17, -13, F + 1), "wall_torch", {"facing": "west"}, "ug_corner"),           # the back corner
+    ((17, -16, F), "torch", {}, "ug_corner"),                                    # on the floor of the back corner:
+                                                                                 # its light goes in through the slot
 ]
 LIGHT_GROUPS = ("ug_mouth", "ug_stairs", "ug_foot", "ug_hall", "ug_dad", "ug_corner")
 
@@ -219,9 +229,10 @@ class BlockLight(sets.Environment):
         self._used = {}             # material key -> its (D, E) signature
         self._relit_cache = {}
         self._normals = {}
+        self.cut, self.block_cut = set(), {}
 
     # ---- the bake
-    def bake(self, box, emitters, owned, opaque_extra=()):
+    def bake(self, box, emitters, owned, opaque_extra=(), cut=()):
         """Compute sky and block light in the box (x0, y0, z0, x1, y1, z1) of cells: `emitters` {cell: level},
         `owned` the cells whose faces will be relit, `opaque_extra` cells that count as opaque although nothing is
         in the World there (the piston door, closed). Returns (cells with block light, cells darker than sky 15)."""
@@ -251,6 +262,20 @@ class BlockLight(sets.Environment):
         for (x, y, z), lv in emitters.items():
             src[x - x0, y - y0, z - z0] = max(int(lv), src[x - x0, y - y0, z - z0])
         blk = flood(opaque, src)
+        # the same block light with the cutaway cells taken out: what a face that only a cutaway reveals shows
+        self.block_cut = {}
+        self.cut = set(cut)
+        if self.cut:
+            op2 = opaque.copy()
+            for (x, y, z) in self.cut:
+                if x0 <= x <= x1 and y0 <= y <= y1 and z0 <= z <= z1:
+                    op2[x - x0, y - y0, z - z0] = False
+            blk2 = flood(op2, src)
+            for (x, y, z) in self.cut:
+                if x0 <= x <= x1 and y0 <= y <= y1 and z0 <= z <= z1:
+                    lv = int(blk2[x - x0, y - y0, z - z0])
+                    if lv > 0:
+                        self.block_cut[(x, y, z)] = lv
         self.sky.clear()
         self.block.clear()
         self.solid = set()
@@ -274,6 +299,8 @@ class BlockLight(sets.Environment):
         cell = tuple(cell)
         if cell in self.keep:
             return self.keep[cell]
+        if cell in self.cut:                               # only seen when the cutaway is see-through / removed
+            return self.block_cut.get(cell, 0), 0
         if cell not in self.solid:
             return self.block.get(cell, 0), self.sky.get(cell, 15)
         best = None
@@ -415,7 +442,7 @@ def env(b):
     e.__class__ = BlockLight                                       # keep its sky bake and biome columns
     for name, val in (("sky", {}), ("block", {}), ("solid", set()), ("owned", set()), ("keep", {}),
                       ("warmth", WARMTH), ("emit", EMIT), ("registry", {}), ("_used", {}), ("_relit_cache", {}),
-                      ("_normals", {})):
+                      ("_normals", {}), ("cut", set()), ("block_cut", {})):
         setattr(e, name, val)
     return e
 
@@ -533,8 +560,9 @@ def _hole():
 
 CUTAWAYS = {
     # name: cells (solid ones only are kept); see_through for the camera, remove for the light too
-    "ug_ceiling": lambda: _cells_of(6, BOX_Y - 1, F + 3, LEG_X[1], LANDING_Y, ROCK[5]),
+    "ug_ceiling": lambda: _cells_of(AISLE_X[0] - 1, BOX_Y - 1, F + 3, LEG_X[1] + 1, LANDING_Y, ROCK[5]),
     "ug_end_wall": lambda: _cells_of(END_X, BACK_Y, F, END_X, CELL_Y, F + 2),
+    "ug_end_pier": lambda: _cells_of(END_X, FRONT_Y, F, END_X, FRONT_Y, F + 2),       # (holds the lever)
     "ug_box_side": lambda: [(SLOT[0], SLOT[1], F + 1), (SLOT[0], SLOT[1], F + 2)],
     "ug_slot": lambda: [SLOT],
 }
@@ -610,7 +638,9 @@ def underground_set(b, name="underground", bed=BED, bed_color="red", rim=True):
     for x, y in hole:
         owned.add((x, y, -1))
     emitters = {cell: LIGHT_EMISSION[bid] for cell, bid, _p, _g in LIGHTS}
-    nb, ns = e.bake((x0, y0, z0, x1, y1, 4), emitters, owned, opaque_extra=door_cells())
+    extra = list(door_cells()) + ([SLOT] if BOX_SEALED else [])
+    cut_cells = [c for cells in CUTAWAYS.values() for c in cells() if c in w.blocks]
+    nb, ns = e.bake((x0, y0, z0, x1, y1, 4), emitters, owned, opaque_extra=extra, cut=cut_cells)
     box_light = e.levels((BOX[0], BOX[1], F))
     if DOOR_KEEPS_DARK:
         for c in DOOR:
@@ -660,7 +690,8 @@ def _register(b, name):
     anchor("ug_stair_top", (mx, 0.75, 0.0), yaw_of("south"))
     anchor("ug_stair_foot", (mx, LANDING_Y + 0.45, float(F)), yaw_of("south"))  # where the steps meet the hall
     for n, x in CELL_X.items():
-        anchor("ug_cell_%s" % n, (x + 0.5, FRONT_Y - 0.30, float(F)), yaw_of("north"))
+        off = DAD_OFFSET if n == "dad" else 0.0
+        anchor("ug_cell_%s" % n, (x + 0.5 + off, FRONT_Y - 0.30, float(F)), yaw_of("north"))
         anchor("ug_cell_%s_station" % n, (x + 0.5, FRONT_Y + 0.5, F + 0.5))
         anchor("ug_aisle_%s" % n, (x + 0.5, AISLE_Y[0] + 0.85, float(F)), yaw_of("south"))   # in front of the cell
     anchor("ug_lever_target", (LEVER[0] + 0.5, LEVER[1] + 0.3, LEVER[2] + 0.45))
@@ -871,14 +902,42 @@ def finish(v, name="underground"):
     lever = k.lever(LEVER, "wall", facing="north", powered=False, name="ug_lever")
     box = e.levels((BOX[0], BOX[1], F))
     for i, blk in enumerate(door.blocks):
-        z = DOOR[i][2]
-        front = e.levels((DOOR[i][0], DOOR[i][1] + 1, z))
-        relight_object(blk.object, e, levels=lambda d, front=front: front if d == "north" else box)
+        c = DOOR[i]
+
+        def lv(d, c=c):
+            if d == "south":
+                return box
+            o = mc.DIR_BLENDER[d]
+            return e.levels((c[0] + o[0], c[1] + o[1], c[2] + o[2]))
+        relight_object(blk.object, e, levels=lv)
     for ob in lever.objects:
         relight_object(ob, e, cell=LEVER)
+    for g in LIGHT_GROUPS:
+        for ob in v.lights.get(g, []):
+            if ob.get("mc_light") != "fill":
+                ob.data.color = POINT_COLOR
+    _fill(v)
     ug = UndergroundSet(v, res, k, door, lever)
     res["set"] = ug
     return ug
+
+
+def _fill(v):
+    """The hall's weak, cool, shadowless fill near its ceiling, in light group ug_hall (on only for a shot whose
+    Stage.lights says inside="ug_hall"; it passes through walls, so never for the box shots)."""
+    from . import props
+
+    if any(ob.get("mc_light") == "fill" for ob in v.lights.get("ug_hall", [])):
+        return
+    watts = sum(ob["base_energy"] for g in ("ug_hall", "ug_dad", "ug_foot", "ug_corner") for ob in v.lights.get(g, []))
+    ob = props.make_light("fill", v.collection)
+    ob.location = (12.5, AISLE_Y[0] - 0.4, F + 2.6)
+    ob.data.energy *= FILL_SHARE * watts / props.LIGHT_ENERGY["fill"]
+    ob["base_energy"] = ob.data.energy
+    ob["group"] = "ug_hall"
+    ob.name = "light_ug_hall_fill"
+    v.lights.setdefault("ug_hall", []).append(ob)
+    v.lantern_lights.append(ob)
 
 
 def build_village(scene, seed=1, bed_colors=None, edit=None, **kw):
@@ -900,7 +959,78 @@ def cameras():
     return {k: dict(v) for k, v in CAMERAS.items()}
 
 
-CAMERAS = {}
+def cheat(target, head, camera, k=0.35):
+    """A look target turned part of the way toward the lens (a child in profile that looks at something beyond
+    itself shows a blank cheek: films/poppy_day.py _to_lens): k = 0 the target itself, 1 the camera."""
+    t, h, c = Vector(target), Vector(head), Vector(camera)
+    d0 = t - h
+    d1 = (c - h).normalized() * d0.length
+    return tuple(h + d0.lerp(d1, k))
+
+
+# name -> dict(pos, target, lens, fstop, beat, note): the framings of the proof stills (each rendered and looked at:
+# out/test/underground_<still>.png). A start, not a rule.
+CAMERAS = {
+    "b01_mouth": dict(beat=1, still="mouth", pos=(9.2, -1.0, 0.9), target=(5.0, -0.5, 0.35), lens=30.0, fstop=3.2,
+                      note="child's eye height east of the mouth, Steve in profile going down, the well and the "
+                           "sunset behind"),
+    "b02_lip": dict(beat=2, still="lip", pos=(5.75, -0.85, 0.82), target=(4.85, 1.42, 0.72), lens=50.0, fstop=2.0,
+                    note="over the hole, three-quarter front on the child at the lip; repeated by b24_box"),
+    "b03_push": dict(beat=3, still="push", pos=(8.9, 2.4, 0.45), target=(5.0, 2.0, 0.95), lens=28.0, fstop=3.2,
+                     kid=(7.55, 1.45, -0.0625), note="side-on and low, the child's head soft in the corner"),
+    "b04_bed": dict(beat=4, still="bed", pos=(17.25, -10.3, 1.78), target=(19.6, -9.4, 2.65), lens=24.0, fstop=2.6,
+                    note="beside the foot of the red bed, low; the bed fills the bottom third"),
+    "b05_bed_wide": dict(beat=5, still="bed_wide", pos=(11.4, -8.7, 2.25), target=(18.6, -9.6, 2.0), lens=30.0,
+                         fstop=3.2, note="by the door, locked off: he stands on the bed facing it"),
+    "b06_stairwell": dict(beat=6, still="stairwell", pos=(5.0, -0.7, 1.45), target=(5.0, -7.5, -5.6), lens=26.0,
+                          fstop=4.0, note="high behind at the top of the flight"),
+    "b07_down": dict(beat=7, still="down", pos=(13.35, -13.9, -2.3), target=(14.6, -14.1, -9.6), lens=26.0,
+                     fstop=4.0, pos0=(6.35, -13.9, -2.3), target0=(7.6, -14.1, -9.6),
+                     note="the ceiling off (st.see_through 'ug_ceiling'), steeply down along the row; slide east "
+                          "to dad"),
+    "b08_slot": dict(beat=8, still="slot", pos=(17.75, -14.55, -9.78), target=(15.5, -15.5, -9.72),
+                     lens=35.0, fstop=2.0, note="the back corner on the floor; Steve's boots pass, the slot soft"),
+    "b09_lever": dict(beat=9, still="lever", pos=(16.35, -10.45, -8.3), target=(14.9, -13.0, -8.75), lens=40.0,
+                      fstop=2.0, note="close on the lever, dad and the back wall past it"),
+    "b10_cell_side": dict(beat=10, still="cell_open", pos=(15.25, -10.3, -9.35), target=(14.3, -14.6, -8.8),
+                          lens=28.0, fstop=2.8, note="low and a little to one side: the black doorway beside his robe"),
+    "b11_portrait": dict(beat=11, still="portrait", pos=(15.05, -11.25, -8.3), target=(14.32, -13.25, -8.55),
+                         lens=40.0, fstop=2.0, note="tight three-quarter portrait from the aisle, east of his axis"),
+    "b13_counter": dict(beat=13, still="counter", pos=(17.35, -12.4, -8.45), target=(14.7, -12.35, -8.55), lens=24.0,
+                        fstop=2.8, note="side-on along the counter from the east, through the see-through end pier "
+                                        "('ug_end_pier'; register the lever with the Stage and leave it out of the shot):"
+                                        " Steve right, zombie dad left behind the lectern"),
+    "b14_apple": dict(beat=14, still="apple", pos=(15.3, -10.7, -8.35), target="apple", lens=70.0, fstop=1.8,
+                      note="at Steve's right shoulder, close on the golden apple in his raised hand (target = "
+                           "steve.item_point('right', f)), the green face soft behind"),
+    "b15_drift": dict(beat=15, still="drift", pos=(14.78, -11.5, -9.0), target=(14.75, -15.0, -9.6), lens=32.0,
+                      fstop=2.4, pos0=(14.9, -10.5, -8.75), note="drift past his shoulder toward the black doorway"),
+    "b17_ots": dict(beat=17, still="ots", pos=(14.0, -10.35, -8.05), target=(14.32, -13.3, -8.55), lens=35.0,
+                    fstop=2.8, note="over Steve's shoulder at the counter: the emerald up, the book coming"),
+    "b18_portrait": dict(beat=18, still="follow", pos=(13.75, -11.0, -8.4), target=(14.32, -13.3, -8.5), lens=50.0,
+                         fstop=2.0, note="portrait of dad from the north-west, his head following Steve up the aisle (west) to its "
+                              "stop, toward the lens"),
+    "b23_kill": dict(beat=23, still="kill", pos=(8.3, -11.75, -9.0), target=(4.6, -10.9, -9.0), lens=24.0, fstop=2.8,
+                     note="the stair foot wider: one swing, the zombie tips over by the steps"),
+    "b12_cell": dict(beat=12, still="cell", pos=(14.5, -10.25, -8.75), target=(14.5, -14.0, -9.0), lens=26.0,
+                     fstop=3.2, note="frontal, symmetrical, the whole cell; also beats 10-11 a little to one side"),
+    "b16_aisle": dict(beat=16, still="aisle", pos=(17.4, -11.15, -8.5), target=(2.0, -11.6, -9.0), lens=26.0,
+                      fstop=4.0, note="wide down the aisle from the back corner: the cells on the left, the aisle "
+                                      "falling off into the dark beyond the stair foot"),
+    "b19_endwall": dict(beat=19, still="endwall", pos=(17.35, -14.25, -9.05), target=(14.5, -13.75, -8.55), lens=32.0,
+                        fstop=2.4, note="through the see-through end wall ('ug_end_wall'), lower than his face: his "
+                                        "profile (he gazes west, up the aisle), the piston wall's seam to the left"),
+    "b19_alt": dict(beat=19, still="endwall_alt", pos=(13.95, -10.55, -9.05), target=(14.6, -13.8, -8.6), lens=32.0,
+                    fstop=2.4, note="from the aisle west of the cell, low: his face turned up the aisle toward the "
+                                    "lens, the piston wall beside his back"),
+    "b20_well": dict(beat=20, still="well", pos=(-6.5, -9.0, 0.9), target=(1.5, -0.5, 0.8), lens=30.0, fstop=4.0,
+                     note="the square at dusk: the well, the glowing mouth beside it"),
+    "b22_foot": dict(beat=22, still="foot", pos=(7.4, -11.9, -9.25), target=(4.4, -10.3, -9.05), lens=24.0,
+                     fstop=2.8, note="the stair foot, the child three-quarter front, the dark aisle behind"),
+    "b24_box": dict(beat=24, still="box", pos=(16.9, -15.55, -9.33), target=(14.5, -15.45, -9.4), lens=35.0,
+                    fstop=2.0, note="inside the box through its see-through side ('ug_box_side', 'ug_slot', "
+                                    "'ug_end_wall' for the pan to dad)"),
+}
 
 
 # =====================================================================================================================
@@ -1137,58 +1267,45 @@ def bed_bounce(child, frame, spot, jumps=4, settle=True):
     """A baby villager jumping on a bed, as JumpOnBed plays it: `jumps` (the game: 3 to 6) full jumps of
     JUMP_POWER 0.42 (1.25 blocks up, 12 ticks), each starting the tick after the last landing (the brain asks again
     while it stands on the bed; noJumpDelay 10 has run out), then with settle=True the bed's own bounce
-    (restitution 0.75) dying out: 0.67, 0.33, 0.12 blocks ... `spot` = (x, y, z) on the mattress (z = its top,
-    9/16 above the bed's floor: the Village bed anchors). The child is placed on `frame`; legs do not move (the game
-    draws no walk animation for a vertical move). Returns dict(end, landings, peaks, track)."""
+    (restitution 0.75) dying out. `spot` = (x, y, z) on the mattress (z = its top, 9/16 above the bed's floor: the
+    Village bed anchors). The child is placed on `frame` facing the way it faces there; its legs do not move (the
+    game draws no walk animation for a vertical move). Returns dict(end, landings, peaks, track)."""
     from . import characters as ch
 
     f0 = int(round(frame))
     base = float(spot[2])
-    z, vy = base, 0.0
+    z, vy, on_ground, left = base, 0.0, True, int(jumps)
     track, landings, peaks = [z], [], []
-    left = int(jumps)
-    t = 0
-    ground = True
     top = base
-    while t < 400:
-        if ground and left > 0:
+    for t in range(400):
+        if on_ground and left > 0:                           # JumpOnBed: jump while on the bed surface
             vy = max(JUMP_POWER, vy)
             left -= 1
-            ground = False
-            top = base
-        z_prev = z
-        z_new = z + vy
-        if not ground and z_new <= base and vy < 0:
-            frac = (base - z_prev) / vy if vy != 0 else 0.0
-            if -vy > GRAVITY:
-                vy = (frac * GRAVITY - vy) * (1.0 + frac * (VERTICAL_DRAG - 1.0)) * BED_RESTITUTION
-                if not settle and left <= 0:
-                    vy = 0.0
+        if vy > 0 or not on_ground:
+            z_new = z + vy
+            if vy < 0 and z_new <= base:                     # lands: Entity.restituteMovementAfterCollisions
+                frac = (base - z) / vy
+                vy = ((frac * GRAVITY - vy) * (1.0 + frac * (VERTICAL_DRAG - 1.0)) * BED_RESTITUTION
+                      if -vy > GRAVITY and (settle or left > 0) else 0.0)
+                z, on_ground = base, True
+                landings.append(t)
+                peaks.append(round(top - base, 3))
+                top = base
             else:
-                vy = 0.0
-            z = base
-            ground = True
-            landings.append(t)
-            peaks.append(top - base)
-            vy = (vy - GRAVITY) * VERTICAL_DRAG if vy > 0 else 0.0
-            if vy <= 0:
-                vy = 0.0
-            elif left <= 0:
-                ground = False                              # the bounce: up again with what is left
-        else:
-            z = z_new
-            top = max(top, z)
-            vy = (vy - GRAVITY) * VERTICAL_DRAG
+                z, on_ground = z_new, False
+                top = max(top, z)
+        vy = (vy - GRAVITY) * VERTICAL_DRAG                  # LivingEntity.travel: gravity, then drag
+        if on_ground and vy < 0:
+            vy = 0.0
         track.append(z)
-        t += 1
-        if left <= 0 and ground and vy == 0.0 and t > 2:
+        if left <= 0 and on_ground and vy == 0.0 and t > 0:
             break
     yaw = child.yaw_at(f0)
     child.place(f0, (spot[0], spot[1], base), yaw)
     ch._segment(child.root, "location", 2, [(f0 + k * TICK, zz, "LINEAR") for k, zz in enumerate(track)],
                 "LINEAR")
-    return dict(end=int(math.ceil(f0 + (len(track) - 1) * TICK)), landings=[int(math.ceil(f0 + l * TICK)) for l in
-                landings], peaks=[round(p, 3) for p in peaks], track=track)
+    return dict(end=int(math.ceil(f0 + (len(track) - 1) * TICK)),
+                landings=[int(math.ceil(f0 + x * TICK)) for x in landings], peaks=peaks, track=track)
 
 
 def jump_loop(player, frame_start, frame_end):
@@ -1293,3 +1410,24 @@ def hands_in_slot(zv, frame, slot=SLOT, lateral=0.0):
     body_back = x - undead.BABY_SIZE[0] / 2.0
     zv.place(frame, (x, y, float(sz)), yaw)
     return dict(x=x, reach=reach, tip_x=x + reach, body_back=body_back, pane=(pane_x - 1 / 16.0, pane_x + 1 / 16.0))
+
+
+# =====================================================================================================================
+# self-test
+# =====================================================================================================================
+
+def _selftest(names):
+    """No names: numeric checks (no rendering). Names: proof stills (tools/underground_proof.py)."""
+    if names and names != ["check"]:
+        from tools import underground_proof
+
+        return underground_proof.main(names)
+    from tools import underground_check
+
+    return underground_check.main()
+
+
+if __name__ == "__main__":
+    import sys
+
+    sys.exit(_selftest(sys.argv[1:]))

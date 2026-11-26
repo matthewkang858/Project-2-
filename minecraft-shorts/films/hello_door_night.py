@@ -11,14 +11,16 @@ THE PLACE (house_a's west front, seen from the plaza; hello_common's docstring h
   C.P("step") = where the zombie stands; C.P("watch_door") = (8.9, -5.4): the watcher, two blocks along the wall
   from the zombie, at the corner of the house, facing HC.WATCH_YAW (toward the door). C.watcher(s, "dn") puts him
   there. He stands on exactly this spot, facing exactly this way, in dg15_c and dg20 to dg22.
-THE CAMERA of beats 2 and 18 is CAMS["door_front"], exactly, in both (47 mm from (4.4, -10.4, 0.75), 27 degrees off
-  the door's axis on the side of its free edge: the cracks and the shudder show past the zombie; straight on, the
-  zombie hides them: engine/breaking.py, "THE ZOMBIE HIDES THE CRACKS"). Frame left = north. Beat 19 cuts to
-  CAMS["beside"] (from the north-west: both backs): see dn19_beside.
-THE LIGHT: C.lights(s, "night_door"): every torch at the look-dev night level 1.3, both door torches x 2 as the
-  key; the moon stands in the west behind the camera and gives the wall a cool fill. Scouted:
-  out/test/hello_scout_door_night*.png. Do not raise the torches further without tools/palette_check (lit
-  cobblestone beside them is at the palette limit).
+THE CAMERA of beats 2 and 18 is CAMS["door_front"], exactly, in both (since the lead's pass: 40 mm from (4.0,
+  -11.2, 0.75) aimed at (10.0, -7.2, 1.9), on the side of the door's free edge: the cracks and the shudder show past
+  the zombie; straight on, the zombie hides them: engine/breaking.py, "THE ZOMBIE HIDES THE CRACKS"; a band of the
+  starry sky over the roof). Frame left = north. Beat 19 cuts to CAMS["beside"] (from the north-west, raised to z 1.9
+  looking down at z 1.5 since the lead's pass: both backs): see dn19_beside.
+THE LIGHT (the lead's pass): the sky "night" has the moon in the NORTH-EAST, behind the house (azimuth 35): the
+  front is in its shadow and the two door torches light the door; C.lights(s, "night_door") = every torch at the
+  look-dev night level 1.3, the door torches at it too (they were x 2 as the key while the moon in the west lit the
+  front head-on: the door read as a warm sunlit porch, luma 100-114; now 76-85, as the night interior). Do not raise
+  the torches without tools/palette_check (lit cobblestone beside them is at the palette limit).
 THE KNOCKING: engine.breaking.bang_on_door(zombie, C.door, f0, f1, **KNOCK, world=C.v, camera=s, glow=0.2),
   called in film order; dn19 continues dn18's with place=False and phase=r["phase"] (breaking notes). Particles
   need camera=s; at night crumbs need glow=0.2 to read. A swing must already be under way on the first frame of
@@ -169,18 +171,25 @@ def dn02_fight(st, s, C, nar):
               step for one frame (HOLD: 94 is a sharp, red zombie with its arms up, on the word), then goes north
               along the wall at a sprint hit's knock-back (KNOCKBACK 1.75, the game's value), stopped under the
               eaves (undead's hop would put its head 0.9 block into them), dropping off the step; it starts on 95
-              (sharp in its first half), a smear on 96-97 (head x 2-27 % on 96), its head off the left edge from
-              98, out of frame entirely from 99, at rest on the grass past the house's corner at (9.7, -3.32) from
-              110, never seen again. No death. (With the wider door_front the lead may adopt, its whole body is
-              out from 103: tools/hello_door_night_raised.py probe; 1.25 would leave it lying at the left edge.)
+              (sharp in its first half), a smear on 96-97, its head at the left edge on 99 (x -4..13 %), its whole
+              body out of the frame from 103 (the lead's door_front: tools/hello_door_night_raised.py probe; with
+              KNOCKBACK 1.25 it would lie at the left edge), at rest on the grass past the house's corner at (9.7,
+              -3.32) from 110, never seen again. No death.
       102-112 his head follows it to the left; 113 ("knocked") .. 123 he turns to face out over the plaza (OUT,
               29 deg off the lens): planted before the door, the iron sword in his right hand at the frame's left;
               130 ("door" + 2) a small head turn to the left, after it; held to 144.
       camera  door_front exactly, handheld 0.008; focus on the door, racked to Steve's head from "that" (108).
-    MEASURED (tools/hello_door_night_probe, render): zombie head x 19-44 %, y 17-31 % until the blow; Steve's
-      head x 42-77 %, y 35-51 % from 84 to the end (from behind 150 deg while he swings; 36-38 deg off the lens
-      when faced out, 72 deg after the head turn); palette_check dn02@90 passes (stone G/R 0.99, heroes 100 %).
-      The sword lies across the caption band (y 60-72 %, x 5-35 %) once he faces out: the caption sits on it.
+      light   the lead's pass: the moon behind the house (SKIES "night", azimuth 35), the door torches at the night
+              level (LIGHTS "night_door" door 1.0, was 2.0), the 40 mm door_front with the starry sky over the roof.
+    MEASURED (the lead's pass, tools.hello_geo with the new door_front; preview 270x480_6spp re-rendered 72-144): the
+      zombie's head x 36-55 %, y 31-41 % (eyes y 37 %) until the blow; Steve's head x 98-127 % on "fought" 76 (his
+      body comes in at the right edge), 66-92 % on 80, x 50-72 %, y 45-56 % from 94 to the end (159 deg off the
+      lens on the blow: his back; 44 deg when faced out on 130, 82 after the head turn on 144). palette_check
+      dn02@90: stone G/R 0.97, planks s 0.29, zombie x 37-55 % and steve x 51-73 %, both 100 % in the safe area
+      (tools/hello_palette now also counts the zombie's red hurt twins: the false "zombie not visible" on 94-105 is
+      gone). Mean luma 82-85 (was 104-114). Stills: out/test/hello_lead_dn02_fight_94_zones.png, _130_zones.png.
+      The sword he holds once he faces out still lies in the caption band (y 64-70 %, x 12-45 % on 130): his hand
+      is at that height in this framing; the lead accepted it (the caption sits on a prop, his head is clear).
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
@@ -247,10 +256,14 @@ def dn18_knock(st, s, C, nar):
               9 from 1161 ("until" 1162), reset 1165-1166, stage 0 from 1167: the blow on 1169 hits a clean door
               (stage 5 at the cut). The rhythm and the cracks go on in dn19 (C.memo["dn_bang"]).
       camera  door_front exactly as dn02 (handheld 0.008), focus on the door. Nobody else: the right third (the
-              cobblestone wall and the south torch, where Steve came in) stays empty.
+              cobblestone wall and the south torch, where Steve came in) stays empty. The lead's pass: the 40 mm
+              door_front with the starry sky over the roof, the moon behind the house, door torches x 1.
     MEASURED (tools/hello_door_night_probe, render): the zombie's head x 19-44 %, y 17-31 % the whole shot; the
       door at x 33-60 %; nothing at x > 62 % but the wall and its torch. palette_check dn18@1150 passes (stone
-      G/R 0.99, hero 100 % inside).
+      G/R 0.99, hero 100 % inside). THE LEAD'S PASS (tools.hello_geo, the new door_front): the zombie's head x
+      36-55 %, y 31-41 % (eyes y 37 %) the whole shot, the starry sky in the top-left corner; palette_check
+      dn18@1150: stone G/R 0.96, planks s 0.30, zombie 100 % in the safe area; mean luma about 83 (was 110), the
+      same night as in17 before it. Still: out/test/hello_lead_dn18_knock_1163_zones.png.
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
@@ -316,20 +329,19 @@ def dn19_beside(st, s, C, nar):
               the rhythm over the cut: swings 1196, 1212, 1228, 1244, blows 1201, 1217, 1233, 1249; cracks stage 5
               on 1193 (as on 1192), 9 on 1207, reset 1211-1212, climbing to 9 on 1253, clean again on 1257. It
               never turns to him.
-      camera  CAMS "beside" unchanged, its drift with ease_out (at speed on 1193); focus on him (his back sharp,
-              the zombie soft) the whole shot: a sharp fist meeting the corner of his soft head would read as a
-              blow on him. If the lead raises CAMS "beside" as asked (z >= BESIDE_RAISED_Z), the focus racks to
-              the zombie on "watched" (1221, 0.6 s) by itself: tested in memory with z 1.9 / target z 1.5 and the
-              motion review's start (tools/hello_door_night_raised.py): the fist ends clear above his head on 1217,
-              1233 and 1249, the zombie sharp from 1233.
-    MEASURED (tools.hello_geo, tools/hello_door_night_probe, render): his head x -30..10 % on 1193 (a sliver of
-      his hair and his teal shoulder are at the left edge on the first frame: the shared camera and place give
-      that), -23..16 % on "stood", -14..24 % on "beside", 2..39 % on "watched", 13..47 % (y 33-50 %) from 1240;
-      143-165 deg off his nose throughout: the back of his head, no eye. The zombie's head x 44-78 %, y 14-30 %
-      (148-162 deg off the lens, never toward him); a gap of 5 % or more between the two heads. The north torch
-      flame stays clear above his head; the south one sits at the soft zombie's right shoulder (x 77-82 %) from
-      about 1215. palette_check dn19@1222 passes (stone G/R 1.00, his shirt hue 183, zombie 100 % / him 84 %
-      inside the safe area).
+      camera  CAMS "beside", RAISED by the lead (z 1.9 looking down at z 1.5, the start moved to (4.8, -4.05):
+              this sequence's request), its drift of 2.2 blocks with ease_out (at speed on 1193); focus on his back,
+              racked to the zombie on "watched" (1221, 0.6 s: CAMS "beside" z >= BESIDE_RAISED_Z): the thing he
+              watches is sharp, and the fist ends clear above his head on every blow (1217, 1233, 1249).
+    MEASURED (the lead's pass: tools.hello_geo with the raised CAMS "beside"; preview 270x480_6spp re-rendered
+      1193-1257): his head x -54..-13 % on 1193 (out of the frame on the cut), -44..-3 % on "stood" 1198,
+      -30..10 % on "beside" 1205 (his hair and shoulder come in), -5..33 % on "watched" 1222 (still cut by the left
+      edge: the drift is arriving), 6..42 % on 1233, 13..48 % (y 42-59 %) on 1249 and in the hold; 133-165 deg off
+      his nose: the back of his head, no eye. The zombie's head x 34-57 % on the cut, 51-77 %, y 15-28 % from
+      "watched" (148-169 deg off the lens, never toward him); the fist ends above his head on the blows.
+      palette_check dn19@1222: stone G/R 0.97, his shirt hue 181, trousers min channel 31, zombie 100 % / him 75 %
+      inside the safe area (his head at the left edge on that frame). Mean luma 76-79 (was 98). Stills:
+      out/test/hello_lead_dn19_beside_1198_zones.png, _1222_zones.png, _1249_zones.png.
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")

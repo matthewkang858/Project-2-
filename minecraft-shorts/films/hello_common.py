@@ -14,6 +14,26 @@
     $BPY -m tools.hello_palette --sky S F     tools/palette_check on one frame at final quality
     $BPY -m render hello --still S [--zones]  one frame through render.py (each sky is one build)
 
+THE LEAD'S PASS (Nov 26, after the five sequences were shot and reviewed; every change re-shot and looked at):
+    CAMS["door_front"]   40 mm from (4.0, -11.2, 0.75) aimed at (10.0, -7.2, 1.9) (was 47 mm from (4.4, -10.4, 0.75)
+                         at (10.0, -7.6, 1.5)): a band of starry sky over the roof in dn02 / dn18
+    LIGHTS["night_door"] door torches x 1 (was x 2), with films/hello.py SKIES "night" moved behind the house
+                         (moon azimuth 35): the door at night is night, not a warm porch (luma 76-85, was 100-114)
+    CAMS["beside"]       raised to z 1.9 looking down at z 1.5, start (4.8, -4.05): dn19's zombie fist ends clear
+                         above his head, his shoulder is out of the frame on the cut, the focus racks to the zombie
+    PLACES["watch_mid"]  (8.5, 1.5) (was (8.4, 5.2)): dg15's jumps grow his face 28 / 45 / 78 px (was 28 / 37 / 78)
+    PLACES               "watch_square" (1.5, 14.0), "gate_child" (0.1, 25.9), "window_chair" (11.75, -10.15, 2.0):
+                         the values the shots use (the sequence files read them); the unused stub places are gone
+    CAMS                 the stub cameras guard, grownups, hip, house_fronts, window_out are gone: a shot's own
+                         camera is C.cam(s, None, **CAM); "bed" = the interior's BED_CAM and "square_long" = sq09's
+                         start (the stand-ins of films/hello.py STAND_IN); "gate" notes me07's f/2.0 (accepted)
+    C.held_item(c, id)   an item a villager holds (the square's wheat); ROLES lost the unused "steve_bed"
+    tools/hello_geo.py   a baby villager's face is measured at its own width (half an adult's: the child face sizes
+                         in docstrings written before this pass are twice the true width unless they say otherwise)
+    tools/hello_palette.py  counts a hero's red hurt twins (a zombie in its red flash is visible)
+  Tested and NOT adopted: a cheat of PLACES["hello_child"] / CAMS["two_shot"] showing the child's nose in dg04 / dg22
+  (see the comment at CAMS["two_shot"]).
+
 A sequence file exposes ONE FUNCTION PER SHOT, named like the shot:  def dn02_fight(st, s, C, nar)
     st   films.lookdev.Stage (st.use / st.hero / st.lights / st.see_through / st.remove / st.key; st.v = the Village)
     s    the engine.shots.Shot (s.frame_start .. s.frame_end inclusive; s.lens / move / follow / focus / handheld)
@@ -42,7 +62,8 @@ THE SEQUENCE CONTRACT (what a sequence director may and must do)
         frame, clear of the caption band y 62-72 %) and its torch levels (C.lights once per shot; beat 3 a second
         time with at=);
         take characters only through C.actor(role, tag) with a tag that starts with HIS prefix (sq, dn, in, dg,
-        me), and items through C.item(item_id, tag): no other sequence can then disturb his keys;
+        me), dropped items through C.item(item_id, tag) and items a villager holds through C.held_item(c, item_id):
+        no other sequence can then disturb his keys;
         key each character in frame order; place() everybody on the first frame of a shot before any look_at();
         key nobody before a shot starts unless that instance is NOT in the shot before (pre-roll: use a twin);
         use the shared places and cameras where the plan names them (SHARED below), unchanged;
@@ -62,19 +83,25 @@ THE SEQUENCE CONTRACT (what a sequence director may and must do)
   If a shared place or camera is wrong for his shot, he says so in his result; he does not move it.
 
 SHARED (decided once, used by two shots or two sequences)
-  CAMS["door_front"]  beats 2 and 18, exactly (zombie at the door, night)            door_night
-  CAMS["beside"]      beat 19: their two backs from the north-west, drifting left     door_night
+  CAMS["door_front"]  beats 2 and 18, exactly (zombie at the door, night; since the lead's pass 40 mm with a band
+                      of starry sky over the roof)                                   door_night
+  CAMS["beside"]      beat 19: their two backs from the north-west, drifting left (raised to z 1.9 in the lead's
+                      pass: the zombie's fist ends clear above his head)            door_night
   CAMS["two_shot"]    beats 4 and 22, exactly, with C.doorstep_fill(s) in both       door_gold
-  the bed camera      beats 3 and 16 identical to each other: CAMS["bed"] is the start; both shots are the
-                      interior director's, so he may replace it by one constant of his file used in both
-  CAMS["gate"]        beats 6 and 7, exactly (hello_set's gate camera, 22 mm)        meadow
+  the bed camera      beats 3 and 16 identical to each other: hello_interior.BED_CAM, one constant used in both
+                      (CAMS["bed"] holds the same values for the stand-in of a failed interior shot)
+  CAMS["gate"]        beats 6 and 7 (hello_set's gate camera, 22 mm): position, aim, lens, handheld exactly; me07
+                      at f/2.0 instead of f/4 (the watcher's 8 px face soft; the dip hides it)   meadow
+  Every other camera is a constant of its sequence file, given whole to C.cam(s, None, **CAM).
   PLACES["watch_door"] + WATCH_YAW: where the watcher stands by the door and which way he faces (the door): beats
                       19, 20, 21, 22; Steve stands exactly there, facing the same way, in beat 4 (so beat 22 can
                       repeat beat 4's picture). Beat 15c (the third jump: the corner of the child's own house)
                       uses the PLACE but he faces the house fronts there (in profile to its camera: no face)
   PLACES["watch_far"], ["watch_mid"], ["watch_door"], ["watch_window"]: his road toward the child's door, one
                       step per scene: beyond the next house (15a), the next house (15b), the corner of the child's
-                      house (15c), under its window (17), beside the door (19-22)
+                      house (15c), under its window (17), beside the door (19-22). Before them: the far end of the
+                      meadow road (C.A["forest_gap"], 7, 8), the mouth of the exit road (PLACES["watch_square"],
+                      9-11), among the bare oaks (13)
   PLACES["hello_child"]  the child at his feet: beats 4, 5 (start), 20 (end), 21, 22
   PLACES["step"]      the zombie's place on the step (breaking.stand_point): beats 2, 18, 19; the rotten flesh
                       lies there in beat 20
@@ -172,13 +199,9 @@ def build_set(scene):
 PLACES = {
     # ---- the child's door (house_a, west front)
     "door": (10.0, -7.5, 2.0),            # middle of the door's outer face (focus / look target)
-    "door_in": (11.9, -7.5, 1.0),         # just inside the door, on the floor (the child starts beat 20 here)
     "step": (9.7, -7.5, 1.0),             # on the step's high half, against the door: the zombie's place
     #                                       (breaking.stand_point(house_a)); the rotten flesh lies here in beat 20
     "step_child": (9.72, -7.28, 1.0),     # the child on the step's high half (beat 15); its low half is z 0.5
-    "step_foot": (8.55, -7.5),            # on the path at the foot of the step
-    "fight_from": (8.9, -10.6),           # beat 2: Steve comes in from here (frame right) ...
-    "fight_to": (9.05, -8.35),            # ... and ends here, planted in front of the door
     "watch_door": (8.9, -5.4),            # THE WATCHER'S PLACE BY THE DOOR, facing WATCH_YAW: two blocks along the
     #                                       wall north of the step (2.2 from the zombie's place), 1.1 out from the
     #                                       wall, at the corner of the child's own house. Beats 15c, 19, 20, 21, 22;
@@ -189,14 +212,18 @@ PLACES = {
     #                                       arm clear of it), CAMS "beside" (beat 19) 15-40 degrees off his back.
     "hello_child": (9.25, -6.41),         # the child at his feet for the hello (beats 4, 5, 20 end, 21, 22): a
     #                                       block in front of him toward the door, right of the two-shot's line
-    "run_off": (4.6, -3.2),               # beat 5: the child runs off along the plaza toward here
-    # ---- "one house closer" (beat 15): the three places, far to near, seen north along the house fronts from CAMS
-    #      "house_fronts": they lie almost on one line toward the lens (x 45 / 42 / 40 % of the frame), so he does
-    #      not wander across the picture, he grows: face 31 / 44 / 140 px wide (all three in profile)
+    # ---- "one house closer" (beat 15): the three places, far to near, seen north along the house fronts from
+    #      hello_door_gold.FRONTS: they lie almost on one line toward the lens (eyes x 32 / 32 / 41 % of the
+    #      frame), so he does not wander across the picture, he grows: face 28 / 45 / 78 px wide at 540x960, the
+    #      right side of his head (106-108 degrees off the lens: no eyes) in all three (tools.hello_geo)
     "watch_far": (8.3, 11.5),             # beyond the next house (house_b), in front of house_f's south-east corner
     #                                       (the log at (8, 12)). Was (8.3, 14.6): that is INSIDE house_f's east wall
     #                                       and the camera saw no figure (ray to his eyes: oak log at 21.9 blocks)
-    "watch_mid": (8.4, 5.2),              # at the next house: in front of house_b
+    "watch_mid": (8.5, 1.5),              # at the next house, beside the cobblestone of house_b's front: 16.4 blocks
+    #                                       from the lens. Was (8.4, 5.2), 20.1 blocks: 6.3 blocks along the lens
+    #                                       axis from watch_far, his face grew only 28 -> 37 px in front of the same
+    #                                       house front and the first jump read as a render glitch (both reviews of
+    #                                       door_gold). Rendered: out/test/hello_lead_dg15_b_955_zones.png
     #   (the third is "watch_door")
     # ---- beat 17, the story's fallback (seen from OUTSIDE, over his shoulder, the child's face in the pane)
     "watch_window": (7.3, -10.95),        # on the plaza 2.7 blocks out from the west wall, in front of the one
@@ -205,39 +232,54 @@ PLACES = {
     #                                       (The plaza place of the first plan, (3.4, -6.7), was below the sill line
     #                                       of every inside camera: the pane is 2 blocks above the plaza.)
     "window": (10.5, -10.5, 2.5),         # middle of the one glass pane of the west wall (x 10, y -11..-10, z 2..3)
-    "window_chair": (11.25, -10.5, 1.5),  # the child on the SEAT of the chair right under the pane (_edit, 3.: the
-    #                                       stairs face east, the seat is their west half, z 1.5): its eyes at
-    #                                       z 2.3 in the middle of the pane, 0.75 block behind the glass
+    "window_chair": (11.75, -10.15, 2.0),  # beat 17: the child standing on the chair's HIGH BACK half under the
+    #                                       pane (_edit, 3.: oak stairs facing east, the back is the east half, top
+    #                                       z 2.0), at the chair's north side so the camera south-west of the pane
+    #                                       sees it centred in the opening: its eyes at z 2.66, mid-pane. On the
+    #                                       SEAT (11.25, -10.5, 1.5), the first value, the eyes were at z 2.16 (the
+    #                                       comment said 2.3), 0.16 above the sill: from outside only the eyes showed
     # ---- the square (beats 1, 9, 10, 11)
     "guard": (-1.2, -6.3),                # beat 1: Steve on guard south of the bell, looking down the south street
-    "guard_child": (-0.45, -6.0),         # ... the child at his leg
-    "watch_square": (0.5, 9.6),           # beats 9, 10, 11: the watcher at the mouth of the exit road, facing south
-    "grownups": ((4.0, 3.0), (5.3, 3.8)),     # beat 10: the farmer and the toolsmith, facing each other, north-east
-    #                                       of the well (which fills x -2..2, y -2..2 with its roof posts)
-    "grownups_child": (5.3, 2.1),         # ... the child in front of them, left of the line to the gap, 2.5 blocks
-    #                                       from the lens (nearer, its head was in the caption band at the frame edge)
-    "stare_child": (0.5, 6.4),            # beat 11: the child alone in the middle of the path, staring up at him
+    "watch_square": (1.5, 14.0),          # beats 9, 10, 11: the watcher on the exit road between the first two houses
+    #                                       (house_e west, house_f east), 2.5 blocks out from house_f's front, facing
+    #                                       south. Was (0.5, 9.6): the gate's west lantern sat on his head in sq09 and
+    #                                       22 blocks from that lens his face showed two white eye patches
     # ---- the meadow (beats 6, 7, 8, 12, 13, 14): hello_set's anchors are in C.A (forest_gap, floating_oak_under,
     #      bare_oaks_among, pyramid_beside, ...); these are the film's own
-    "gate_child": (0.15, 26.6),           # beats 6, 7: the child on the last full path block (sets proof still)
+    "gate_child": (0.1, 25.9),            # beats 6, 7: the child's block at the gate, left of the road's axis, so
+    #                                       Steve walks past it on its right and the lens sees it in three-quarter
+    #                                       (was (0.15, 26.6), dead centre on the axis: a brown box from behind)
     "road_stop": (0.5, 54.6),             # beat 8: the child stops here, three blocks short of him at forest_gap
 }
+# (Taken out in the lead's pass, used by no shot: door_in, step_foot, fight_from, fight_to, run_off, guard_child,
+#  grownups, grownups_child, stare_child. The sequence files keep their own staging constants for those.)
 WATCH_YAW = L.yaw_to(PLACES["watch_door"], PLACES["watch_face"])     # his body's yaw at watch_door
 
 # ----------------------------------------------------------------------------------------------------------------
 # cameras: name -> dict(pos, target, lens, fstop[, pos1, target1]); C.cam(s, name) puts one on a shot
 # ----------------------------------------------------------------------------------------------------------------
 CAMS = {
-    # beats 2 and 18 (EXACTLY the same): low from the plaza, the door with about a block of wall either side, seen
-    # 27 degrees off its axis from the side of its free edge, so that the cracks and the shudder show past the
-    # zombie (engine.breaking DOOR_CAM["side"], its proof stills breaking_zombie_film_s*.png). Frame left = north.
-    "door_front": dict(pos=(4.4, -10.4, 0.75), target=(10.0, -7.6, 1.5), lens=47.0, fstop=4.0),
+    # beats 2 and 18 (EXACTLY the same): low from the plaza, the door with a block of wall either side, seen from
+    # the side of its free edge (the cracks and the shudder show past the zombie: engine.breaking DOOR_CAM["side"]),
+    # 40 mm from 7.2 blocks, aimed a little higher than the first camera so that a band of the NIGHT SKY with its
+    # stars stands over the roof (frame left = north). The first camera (47 mm from (4.4, -10.4, 0.75) aimed at
+    # (10.0, -7.6, 1.5)) showed no sky at all: with the moon in the west the door read as a warm sunlit porch, and
+    # the cut in17 -> dn18 jumped from a starry night to it (both reviews of the door at night). Measured
+    # (door_night director, tools.hello_door_night_raised): Steve enters on "fought" (head x 97-126 % on 76), the
+    # zombie's head x 36-55 %, y 31-41 % at the door, its whole body out of frame from 103 after the blow
+    # (KNOCKBACK 1.75); the sword Steve holds after 120 is lower in the frame.
+    "door_front": dict(pos=(4.0, -11.2, 0.75), target=(10.0, -7.2, 1.9), lens=40.0, fstop=4.0),
     # beat 19 (the story's fallback, after the cut from beat 18: "a wider shot ... with both of them from behind"):
-    # from the north-west of the plaza, the zombie centred at the door and him just outside the left edge; the
-    # camera drifts a block and a half to the left and he comes into the frame: their two backs, the torches on
-    # the wall in front of them (him 15 degrees off his back at the end, the zombie 56)
-    "beside": dict(pos=(5.3, -3.5, 1.15), target=(9.7, -7.5, 1.4), lens=47.0, fstop=3.2,
-                   pos1=(6.31, -2.39, 1.15), target1=(9.3, -6.45, 1.4)),
+    # from the north-west of the plaza, the zombie at the door and him just outside the left edge; the camera
+    # drifts about 2.2 blocks to the left (ease_out: at speed on the first frame) and he comes into the frame: their
+    # two backs, the torches on the wall in front of them. RAISED to z 1.9 looking down at z 1.5 (it was 1.15 ->
+    # 1.4, the zombie's raised forearm came down on the crown of his head on every blow, three times, the last in
+    # the silent hold: both reviews), with the start turned so his shoulder comes in after the first frame. Then
+    # the fist ends clear above his head on 1217, 1233 and 1249 (his head y 42-59 %, the zombie's 15-28 % on
+    # 1249), and dn19 racks the focus to the zombie on "watched" (hello_door_night.BESIDE_RAISED_Z). Do not use
+    # z 1.75: his head then sits at y 49-66 %, in the caption band.
+    "beside": dict(pos=(4.8, -4.05, 1.9), target=(9.9, -8.03, 1.5), lens=47.0, fstop=3.2,
+                   pos1=(6.31, -2.39, 1.9), target1=(9.3, -6.45, 1.5)),
     # beats 4 and 22 (EXACTLY the same, nothing moves but the handheld): beside the doorstep (the door behind the
     # lens's right shoulder), at the child's height, 3 blocks south of him looking north up at his face; the child
     # soft in the lower right foreground, the house front at the right edge. Chosen so that no lamp post stands
@@ -248,51 +290,42 @@ CAMS = {
     #   (out/test/hello_scout_twoshot_dg04_hello_226.png, _dg22_eyes_1480.png and their _zones.png)
     # The target was z 1.2 at first: the crouched chin then sat IN the caption band (eyes 56 %), and the words
     # "blue" and "eyes" were drawn on his chin under the white eyes.
+    # THE CHILD IN IT is a soft pink block at the lower right, 148 degrees off the lens (the story asks for its
+    # nose). Tested by the lead, NOT adopted: the camera, the child and him lie on one line, so any hello_child that
+    # turns the child toward profile (e.g. (9.55, -6.6): 129 degrees; (9.7, -6.45): 118) puts it out of the frame
+    # (eyes x 122-143 %: tools.hello_geo) and turns his face 30-39 degrees off the lens (now 21: the white eyes);
+    # a look cheated 50 degrees toward the lens in both shots showed no nose either (the lens is above and behind
+    # the tipped-back head) and pushed the head further out at the right edge (scratchpad lead_cheat50_*.png).
     "two_shot": dict(pos=(8.8, -8.4, 1.35), target=(8.9, -5.4, 1.0), lens=40.0, fstop=2.4),
-    # beat 15 (a start: the door_gold director owns it): locked, 60 mm, from the plaza just west of house_a's south-west
-    # corner (out from under its eaves), looking north along the house fronts past the child on the step: its head
-    # x 58-82 %, y 46-58 %, the two door torches above it (y 23-28 %); his three places nearly on one line behind it
-    # (eyes x about 28 / 28 / 37 %, y 46 / 47 / 54 %), every one clear of every block (ray casts at knees, chest and
-    # eyes). (The first camera, 9.25, -9.9, had the child at x 107 % and the far place inside a wall.)
-    "house_fronts": dict(pos=(8.85, -14.6, 2.2), target=(9.8, 4.0, 1.3), lens=60.0, fstop=2.4),
-    # beats 3 and 16 (the interior director keeps them identical; see the contract): from outside the south wall
-    # of the bed wing (st.see_through(s, "house_a_south"): invisible to the camera, it still keeps the light out),
-    # 2.5 blocks south of it, 32 mm, across both beds to the north window. Projected: the child's head on the far
-    # pillow x 50-63 %, y 46-54 %; Steve's head on the red pillow x 62-80 %, y 49-59 % (nothing between: the night
-    # stand that hid it is taken out by _edit); the north window x 12-31 %, y 36-43 %; the wall torch between the
-    # pillows above them (x 50 %, y 40 %). The first camera (18.15, -14.75, 2.55) had his head behind the night
-    # stand's plate and at x 80-94 % (palette_check: hero 10 % inside the safe area).
-    "bed": dict(pos=(18.0, -16.5, 2.75), target=(19.4, -9.0, 1.6), lens=32.0, fstop=3.2),
-    # beat 17, the story's fallback: OUTSIDE on the plaza, low, south-west of the pane, behind him: his dark back
-    # and shoulder in the left foreground (soft), the child's face through the torch-lit pane at the centre (the
-    # line from the lens through the pane reaches the child's eyes: ray cast, glass only); a very slow push in
-    "window_out": dict(pos=(3.4, -12.5, 2.5), target=(10.6, -10.6, 2.25), lens=58.0, fstop=2.4,
-                       pos1=(3.6, -12.45, 2.5), target1=(10.6, -10.6, 2.25)),
-    # beats 6 and 7 (the same frame): hello_set's gate camera, 22 mm (the figure at the gap is 30 px at 540x960)
+    # beats 3 and 16 (the interior's BED_CAM, one constant used by both shots there; here for the stand-in of a
+    # failed interior shot, films/hello.py STAND_IN): inside the room, high at the west end of the bed wing, 21 mm,
+    # looking east down both beds to the pillows and the gable pane above them
+    "bed": dict(pos=(15.5, -11.95, 3.75), target=(19.6, -10.65, 2.15), lens=21.0, fstop=2.8),
+    # beats 6 and 7 (the same frame): hello_set's gate camera, 22 mm (the figure at the gap is 30 px at 540x960).
+    # me07 opens it to f/2.0 (hello_meadow.ME07_FSTOP; me06 is at f/4): position, aim, lens and handheld are the
+    # same; the dip to black between them hides the change of depth of field, and at f/4 the watcher's 8 px face
+    # 35 blocks off showed two pale eye whites (accepted by the lead)
     "gate": dict(pos=(0.9, 22.6, 0.75), target=(0.5, 57.6, 2.5975), lens=22.0, fstop=4.0),
-    # beat 1: Steve and the child at the bell from the south-east, child height, a slow push in
-    "guard": dict(pos=(1.75, -9.1, 0.8), target=(-1.0, -6.2, 1.25), lens=40.0, fstop=2.6,
-                  pos1=(1.5, -8.85, 0.82), target1=(-1.0, -6.2, 1.28)),
-    # beat 9: long lens from the south-east corner of the square up to the mouth of the exit road, east of the
-    # well (a line from the south side of the square straight up the road goes through it)
-    "square_long": dict(pos=(5.5, -8.5, 1.35), target=(0.5, 9.6, 1.5), lens=85.0, fstop=2.0),
-    # beat 10: low, north-east of the well, on the line from watch_square through the gap between the adults.
-    # Projected at 645: him in the gap x 55 %, eyes y 49 % (was 64 %: in the caption band); the two adults' eyes
-    # y 39 % (the farmer's head x -4..43 %, the toolsmith's 70..98 %: the square director brings them in a little).
-    "grownups": dict(pos=(7.0, 0.0, 0.9), target=(4.4, 3.6, 0.8), lens=35.0, fstop=2.6,
-                     pos1=(6.88, 0.14, 0.9), target1=(4.4, 3.6, 0.8)),
-    # beat 11: 2 blocks behind him and just west of his right hip (his right is west): the line to the child passes
-    # 0.17 block beside his body, so his hip and hand fill the left quarter of the frame, soft
-    "hip": dict(pos=(-0.3, 11.6, 1.0), target=(0.55, 6.4, 0.8), lens=66.0, fstop=2.6,
-                pos1=(-0.27, 11.3, 1.0), target1=(0.55, 6.4, 0.82)),
+    # the square's stand-in camera (films/hello.py STAND_IN): sq09's as shot (hello_square.SQ09_CAM's start), from
+    # the square's south-east corner past the well's east side up the exit road to watch_square
+    "square_long": dict(pos=(5.5, -12.3, 1.3), target=(1.9, 14.0, 1.2), lens=50.0, fstop=1.2),
 }
+# Every other shot has its OWN camera, a constant of its sequence file passed whole to C.cam(s, None, ...):
+# sq01 SQ01_CAM, sq09 SQ09_CAM, sq10 SQ10_CAM, sq11 SQ11_CAM, dg05 NOD_CAM, dg15 FRONTS (+ FRONTS_PUSH), dg20
+# WALK_CAM, dg21 CROUCH_CAM, in03 / in16 BED_CAM (= "bed" above), in17 WINDOW_CAM, me08 ME08_CAM, and me12-14 the
+# set's cameras ("set:floating", "set:bare", "set:pyramid") with their own values. (The stub cameras "guard",
+# "grownups", "hip", "house_fronts" and "window_out" were taken out in the lead's pass: no shot used their values.)
 
 # torch levels (C.lights(s, key)); every one looked at on stills. Near the palette limit: do not raise them without
 # tools/palette_check (CONTRACT.md: lit cobblestone next to a torch is at the G/R limit).
 LIGHTS = {
     "gold": dict(scale=1.0),                                   # daylight: torches at their own level
-    "night_door": dict(scale=1.3, door=2.0),                   # look-dev night level; BOTH door torches x 2: the key
-    #                                                            (palette_check passes: stone G/R 0.98-0.99)
+    "night_door": dict(scale=1.3, door=1.0),                   # look-dev night level, the door torches at it too.
+    #                                                            They were x 2 as the key while the moon lit the
+    #                                                            front head-on: the porch read as daylight (luma
+    #                                                            100-114). With the moon behind the house (SKIES
+    #                                                            "night", azimuth 35) the two torches alone light
+    #                                                            the door: luma 76-85, as the night interior (78)
     "night_room": dict(scale=1.2, groups={"house_a": 1.3}, inside="house_a"),   # the room at night: its torches
     #                                                            and its fill together (never one alone)
     "gold_room": dict(scale=1.0, groups={"house_a": 0.35}, inside="house_a"),   # the same room once the night
@@ -310,8 +343,8 @@ EYE_GLOW = 1.5                         # emission of the white eyes in beat 22 (
 #                                        for dusk and night; in golden light 1.5 is "faintly glowing")
 
 # role -> how Hello.actor builds it
-ROLES = ("child", "kid", "farmer", "librarian", "toolsmith", "steve_iron", "steve_bed", "steve_diamond", "watcher",
-         "watcher_eyes", "zombie")
+ROLES = ("child", "kid", "farmer", "librarian", "toolsmith", "steve_iron", "steve_diamond", "watcher", "watcher_eyes",
+         "zombie")         # ("steve_bed", plain Steve for beat 3, was taken out: in03 has him in iron, no sword)
 
 
 def yaw_to(src, dst):
@@ -351,6 +384,7 @@ class Hello:
     C.cam(s, name, ...)   one of CAMS (or of hello_set's cameras, "set:floating") on a shot
     C.actor(role, tag)    a cast member, built once per tag: roles in ROLES, tag starts with the sequence prefix
     C.item(id, tag)       a dropped item (rotten flesh), registered like a cast member
+    C.held_item(c, id)    an item a villager holds on its crossed arms (the farmer's wheat in beats 9 and 10)
     C.watcher(s, tag, frame=None, place="watch_door", yaw=WATCH_YAW)   the plain watcher put on his place, still
     C.door, C.door_torches    house_a's door prop and its two torch lights (split by breaking.door_torches)
     C.shots, C.memo       every Shot of the film by name; a dict for handing things from one shot function to a
@@ -386,18 +420,25 @@ class Hello:
         return self.stand(PLACES[name])
 
     def camera_spec(self, name):
-        """CAMS[name], or hello_set's camera "set:<name>" (gate, side, inside, deep, floating, bare, pyramid)."""
+        """CAMS[name], hello_set's camera "set:<name>" (gate, side, inside, deep, floating, bare, pyramid), or {}
+        for None (a shot's own camera, given whole to C.cam as keywords)."""
+        if name is None:
+            return {}
         if name.startswith("set:"):
             return dict(self.set["cameras"][name[4:]])
         return dict(CAMS[name])
 
     def cam(self, s, name, focus=None, handheld=0.008, seed=None, move=True, ease="ease_out", **over):
-        """Put a shared camera on shot s: lens, position / aim (with its move when it has one and move=True),
-        focus (default: its target) and a gentle handheld. over = entries to replace (lens=, pos=, pos1= ...).
-        ease: of the move; default 'ease_out' = AT SPEED ON THE FIRST FRAME, slowing to the last (engine.shots'
-        own default 'smooth' starts from rest: a 0.35-block push over 71 frames moved 0.03 block in the first half
-        second, a still). 'linear' for a constant drift. Returns the spec used."""
+        """Put a camera on shot s: lens, position / aim (with its move when it has one and move=True), focus
+        (default: its target) and a gentle handheld. name = one of CAMS (a shared camera), "set:<name>", or None:
+        the shot's OWN camera, a constant of its sequence file given whole as keywords (pos, target, lens[, fstop,
+        pos1, target1]: C.cam(s, None, focus=kid.head, **SQ11_CAM)). over = entries to replace or give (lens=,
+        pos=, pos1= ...). ease: of the move; default 'ease_out' = AT SPEED ON THE FIRST FRAME, slowing to the last
+        (engine.shots' own default 'smooth' starts from rest: a 0.35-block push over 71 frames moved 0.03 block in
+        the first half second, a still). 'linear' for a constant drift. Returns the spec used."""
         c = dict(self.camera_spec(name), **over)
+        if "pos" not in c or "target" not in c or "lens" not in c:
+            raise KeyError("camera %r for %s needs pos, target and lens" % (name, s.name))
         s.lens(c["lens"], c.get("fstop", 2.8))
         if move and "pos1" in c:
             s.move(c["pos"], c["target"], c["pos1"], c.get("target1", c["target"]), ease=ease)
@@ -416,8 +457,6 @@ class Hello:
                kid            the same model: the other children of the square
                farmer / librarian / toolsmith     the adults of the square (plains, level 1)
                steve_iron     Steve, iron chestplate, leggings and boots, no helmet, iron sword   (beats 1 to 5)
-               steve_bed      plain Steve, no armor, empty hands: asleep in the red bed           (beat 3)
-                              (in iron armor he read as a grey block on the bed: hello_scout_night_in03_bed_160)
                steve_diamond  Steve, full enchanted diamond armor, diamond sword                  (beat 6)
                watcher        Steve's own skin, no armor, empty hands, built dead still (no idle, no arm sway,
                               arms straight): every shot before the last
@@ -446,8 +485,6 @@ class Hello:
             c = players.add_player(st, name, "steve")
             players.equip(c, chestplate="iron", leggings="iron", boots="iron")
             c.hold("iron_sword")
-        elif role == "steve_bed":
-            c = players.add_player(st, name, "steve")             # no armor: in iron he is a grey block on the bed
         elif role == "steve_diamond":
             c = players.add_player(st, name, "steve")
             players.equip(c, "diamond", enchanted=True)
@@ -490,6 +527,16 @@ class Hello:
         if it is None:
             it = self.st.cast[name] = mobs.make_dropped_item(item_id, name=name)
         return it
+
+    def held_item(self, c, item_id):
+        """Give VILLAGER c an item to hold on its crossed arms, as the game draws it (Character.hold of the item made
+        from the game's texture by props.make_item); once per character: a second call keeps the first item. (A
+        player holds by item id, Player.hold("iron_sword"): C.actor's roles do that.)
+        C.item makes a DROPPED item (on the ground, spinning), not a held one. st.use shows and hides the held item
+        with its holder. (Before the lead's pass the square's farmer did this by hand: props.make_item + hold.)"""
+        if getattr(c, "held", None) is None:
+            c.hold(props.make_item(item_id, self.v.collection))
+        return c
 
     def put(self, c, frame, place, toward=None, yaw=None):
         """place() a character on a named place (or a point), facing `toward` (a place name or a point) or `yaw`.
