@@ -33,7 +33,7 @@ THE PLACE (films/legday_set.py, its docstring "THE SQUARE"; anchors C.A[...], fa
 THE SKY: "gold" (films/legday.py SKIES): the sun due EAST at 27 degrees: faces turned east or south are lit; a
   camera looking north or south has it 90 degrees off its axis. The anvil wall's south end is a grey slab beyond the
   houses in every northward view from the square (b02, b10): it is the set, keep it soft.
-TAGS (twins): the stubs use steve_sq (sq01, with the anvil), steve_sq2 (sq02: pre-rolled, mining from frame 16),
+TAGS (twins): the stubs use steve_sq (sq01, with the anvil), steve_sq2 (sq02: pre-rolled, mining from frame -50),
   steve_sq3 (sq08 pre-rolled 8 frames, sq09, sq10: empty-handed; a held item stays on its instance),
   zuri_sq, ari_sq, kai_sq (sq01), efe_sq (the narrator with his torch: sq01, sq07, sq08, sq09, sq10), pickaxe
   iron_pickaxe_sq. A new twin: sq3, sq4 ...
@@ -42,7 +42,7 @@ PREVIEW samples for render.py previews: 5 (legday_common.PREVIEW_SAMPLES).
 """
 import math
 
-from engine import breaking, fixtures, redstone
+from engine import breaking, fx, redstone
 from films import legday_common as LC
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -59,11 +59,30 @@ SQ09_CAM = LC._set_cam("b09")                                             # a ti
 SQ10_CAM = dict(LC._set_cam("b10"), pos1=(-1.85, 3.5, 0.45))
 KAI_LAP = [(1.3, -5.3, -0.06), (2.9, -3.0, -0.06), (3.6, 0.4, -0.06), (2.4, 3.6, -0.06)]
 MINE_BREAK = "drops"          # the first stone bursts on this word (sq02): "It DROPS nothing"
-MINE_FRAMES = 114             # click -> break of the first stone (the game's 180 compressed): half cracked at 73
+MINE_FRAMES = breaking.break_frames("stone")   # click -> break of stone by hand: THE GAME'S 180 frames (7.5 s; the
+#                               review: the first stub compressed it to 114, and punching stone being slow is the joke
+#                               of the beat). The click is on frame -50 (a pre-roll before the film: the stone row is
+#                               in no earlier frame); on frame 73 the cracks are at stage 6 of 10
 
 
 def _stone(C, i):
     return C.stones[i]
+
+
+def _begin_mining(player, block, f0, f_end):
+    """A block only BEGUN: the player clicks it on f0 and holds the button to f_end (the game's crack stages for
+    block and hand, the mining arm), then lets go off-screen: the cracks clear on f_end + 1 and the block stays (a
+    block nobody breaks inside the shot is never keyed broken outside it)."""
+    track = breaking.progress_track(block.block_id, "hand")
+    cur = None
+    for f in range(int(f0), int(f_end) + 1):
+        done = min(int((f - f0) / breaking.TICK + 1e-6) + 1, len(track) - 1)
+        stage = -1 if done < 1 else min(9, int(track[done - 1] * 10.0))
+        if stage != cur:
+            block.crack(f, stage)
+            cur = stage
+    block.crack(int(f_end) + 1, -1)
+    return fx.mining_swings(player, f0, f_end)
 
 
 def sq01_squats(st, s, C, nar):
@@ -97,6 +116,8 @@ def sq01_squats(st, s, C, nar):
       54 %; the narrator small at x 12 % (further right the well hides him); Kai mid-jump at the right. THE LEAD:
       the lower half of that frame is empty dirt path (the camera at z 0.32 looking level from 7 blocks): fill it,
       lower the trio in the frame or come closer; the bell lamps stand behind the squatters' heads (tangents).
+      THE LEAD'S SCOUT of the stub: out/test/legday_scout_sq01_squats_36[_zones].png (the same: faces y 38-42 %,
+      the anvils at y 48 %, the lower 45 % empty path).
     NOW (stub): SQ01_CAM (b01 + a slow push), squats every 12 frames (down 6), Kai sprint-jumping the lap from
       frame 1 (at speed), the narrator still at narrator_far with the torch. Heroes: Steve, Zuri, Ari.
     """
@@ -105,7 +126,7 @@ def sq01_squats(st, s, C, nar):
     for role in ("steve", "zuri", "ari"):
         p = C.actor(role, "sq")
         C.put(p, f0, "squat_" + role)
-        fixtures.hold_anvil(p)
+        C.carry_anvil(p)                                 # the morning: whole anvils
         trio.append(p)
     for p in trio:
         p.look_at(f0, SQ01_CAM["pos"], ease=0)
@@ -144,12 +165,15 @@ def sq02_reps(st, s, C, nar):
     a turning dropped item three blocks from Steve, repeated punch-mining arm swing.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 73        Steve already punching (a twin pre-rolled: steve_sq2 clicks on frame 16), the cracks half way
+      frame 73        Steve already punching (a twin pre-rolled: steve_sq2 clicks on frame -50, the game's 180
+                      frames before the burst), the cracks past half way (stage 6 of 10)
       "fists" 107     his bare fist and the cracks, in profile, lit (he faces east: the sun)
       "drops" 130     the stone BURSTS (breaking.mine: the break frame); crumbs; NOTHING drops (stone by hand drops
                       nothing: breaking.drops('stone', 'hand') is None)
       "nothing" 140 .. ~152    the empty, bare grass where it stood, held (half a second)
-      "he counts" 160 Steve steps one block north (mine_2) and starts punching stone 2 (no step under 7 frames)
+      "he counts" 160 Steve steps one block north (mine_2) and starts punching stone 2 (no step under 7 frames): it
+                      is only BEGUN (stage 1 by 204: the game's clock); it never breaks (_begin_mining: its cracks
+                      clear on 205, off-screen, where he lets go). The first stub broke it on 284, inside pn04
       "one rep" 181-196   the pull-back has revealed the row (about eight stones: seven left) and the iron pickaxe
                       turning on the grass three blocks behind his back, in focus with him, never touched
     SHARED: none. Anchors mine_1, mine_2 (facing east), pickaxe_target (1.25, -14.5).
@@ -164,9 +188,9 @@ def sq02_reps(st, s, C, nar):
       (bare grass), Steve at stone 2, the pickaxe 3 blocks behind him on the path, the row a low line ("not 8
       separate blocks").
     NOW (stub): SQ02_CAM, a linear drift from b02's spot back to b03's over the take; steve_sq2 mines stone 1 from
-      frame 16 (MINE_FRAMES 114: half cracked on 73, the burst on "drops" 130), looks down at the spot (138-150),
-      walks to mine_2 (153-168, slow) and mines stone 2 from 170; the iron pickaxe turning at pickaxe_target. Hero:
-      Steve.
+      frame -50 (the game's 180 frames: stage 6 on 73, the burst on "drops" 130), looks down at the spot (138-150),
+      walks to mine_2 (153-168, slow) and begins stone 2 from 170 (cracks and swings to 204, never broken); the iron
+      pickaxe turning at pickaxe_target. Hero: Steve.
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "sq2")
@@ -184,7 +208,7 @@ def sq02_reps(st, s, C, nar):
     step = burst + 23
     steve.walk(step, [a, b], speed=1.4)
     steve.look_at(step + 2, _stone(C, 1).center, ease=8)
-    breaking.mine(steve, _stone(C, 1), step + 17, duration=MINE_FRAMES, camera=s)
+    _begin_mining(steve, _stone(C, 1), step + 17, f1)
     pick = C.item("iron_pickaxe", "sq")
     pick.place(f0, C.P("pickaxe_target"))
     pick.animate(f0, f1 + 1)
@@ -249,7 +273,10 @@ def sq08_arms(st, s, C, nar):
     a plain backdrop, slim and wide arms hanging side by side, seen from the front.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 431       Steve already stepping in (a pre-roll of steve_sq is allowed: he is not in sq07), the lamp lit
+      frame 431       Steve already stepping in (a pre-roll of steve_sq3, the empty-handed twin, is allowed: he is
+                      not in sq07; steve_sq holds sq01's anvil), the lamp lit
+      by "arms" 438   BOTH BODIES SQUARE TO THE LENS (yaw within 20 degrees: tools.legday_state checks it): a player's
+                      body turns along his walk, so a sideways step-in ends side-on unless he turns to the front
       "arms" 438 .. "four" 500   the two NEAR arms side by side in the middle of the frame, frontal, same height, each
                       at least an eighth of the frame wide (68 px at 540): THREE pixels next to FOUR; check the still
                       at 360x640 (the story's risk)
@@ -262,9 +289,24 @@ def sq08_arms(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b08_arms[_zones].png): frontal 50 mm from 3.85 blocks: the slim
       (3 px) and wide (4 px) near arms side by side, each about 14-18 % of the frame wide (computed, not measured on
       pixels); the lit lamp between the heads behind; heads at x 20 / 82 % (Steve's at the safe area's edge).
+      THE REVIEW (story, measured on pixels): in the FIRST stub Steve's body ended side-on (65 degrees off the lens:
+      the walk turned it west and nothing turned it back), so his near arm showed about 30 px against the
+      narrator's 66-75: the viewer saw the narrator with the WIDER arm, the opposite of the line. The set's b08
+      (both square to the lens) reads right: about 67 px against 88. Fixed in the stub (the step-in ends with a
+      turn to the front, done by 436); THE GATE before you hand in, on a 360x640 still between "arms" and "four":
+      Steve's near arm at least 4/3 the width of the narrator's, each at least 1/8 of the frame.
+      THE TORCH (technical review): the narrator's far (right) hand and its torch run off the left edge (x 0). The
+      two cannot both be had at the arms' depth: the arm rule wants a frame at most 1.5 blocks wide there, the
+      torch hand (x -6.33) to Steve's far arm (x -4.65) is 1.7. Priority: the arms (the line); the torch's red glow
+      at the left edge must read, or turn him a little so the torch comes forward.
       Measure the arm widths on pixels (tools.legday_geo --pts at the arms' edges, or the still) before you hand in.
-    NOW (stub): SQ08_CAM (b08 + a slow push), efe_sq with the torch, Steve (steve_sq3) steps in from 0.8 east over the first
-      12 frames (pre-rolled 8 frames), heads as the set builder posed them, tilting on "three" / "four". Heroes: both.
+      THE LEAD'S SCOUT of the stub (out/test/legday_scout_sq08_arms_470[_zones].png; tools.legday_geo sq08_arms:470
+      --pts="-5.62,3.15,1.1;-5.40,3.15,1.1"): the narrator's eyes x 19 %, Steve's x 84 % (OUTSIDE the safe area
+      82 %), faces 183 px; the slim near arm at x 43.5 %, the wide one at x 58.3 %, both at y 51 % (the hands reach
+      into the caption band): come in so both heads are inside, or crop to the arms (the story's fallback).
+    NOW (stub): SQ08_CAM (b08 + a slow push), efe_sq with the torch, Steve (steve_sq3) steps in from 0.8 east
+      (pre-rolled from 411, arriving about 431) and turns square to the lens (done by 436), heads as the set
+      builder posed them, tilting on "three" / "four". Heroes: both.
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.narrator("sq")
@@ -272,10 +314,14 @@ def sq08_arms(st, s, C, nar):
     steve = C.actor("steve", "sq3")
     b = C.P("arms_steve")
     a = (b[0] + 0.8, b[1] + 0.25, b[2])
-    steve.place(f0 - 8, a, C.yaw("arms_steve"))
-    steve.walk(f0 - 8, [a, b], speed=1.2)
+    front = C.yaw("arms_steve")                          # south: the lens
+    steve.place(f0 - 20, a, LC.yaw_to(a, b))
+    steve.look_at(f0 - 20, (b[0] - 1.0, b[1] - 1.5, 1.5), ease=0)
+    arrive = steve.walk(f0 - 20, [a, b], speed=1.6)
+    square = steve.turn(arrive, front, ease=5)           # square to the lens before "arms"
+    assert square < C.at(s, "arms"), "sq08: Steve must be square to the lens before 'arms' (%d)" % square
     efe.look_at(f0, (-5.6, 1.0, 1.2), ease=0)
-    steve.look_at(f0 + 12, (-5.6, 1.0, 1.25), ease=0)
+    steve.look_at(arrive, (-5.6, 1.0, 1.25), ease=5)
     steve.look_at(C.at(s, "three") - 2, (-5.38, 2.9, 1.0), ease=8)
     efe.look_at(C.at(s, "four") - 4, (-5.65, 2.9, 0.95), ease=8)
     st.use(s, efe, steve)

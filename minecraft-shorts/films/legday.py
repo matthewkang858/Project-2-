@@ -1,4 +1,4 @@
-"""Leg Day: 65.29 narrated seconds (1567 frames), 24 sentences, 23 shots, two skies. Told by the town's one redstoner.
+"""Leg Day: 65.50 narrated seconds (1572 frames), 24 sentences, 23 shots, two skies. Told by the town's one redstoner.
 
     "In this town, everyone wants to get ripped. ... They call it leg day. I call it reloading."
                  (stories/redstoner.json: the story, the picture of every beat, the risks and their fallbacks;
@@ -29,19 +29,26 @@ films/legday_common.py; the set itself: films/legday_set.py):
     $BPY -m tools.legday_shots tiles --sky gold; ... --sky dusk; ... sheet       # one tile per shot
     $BPY -m tools.legday_geo --sky gold sq08_arms:470    # heads, face pixels, angle to the lens, what blocks them
     $BPY -m tools.legday_palette --sky gold 1215         # tools/palette_check on one frame at final quality
+    $BPY -m tools.legday_state [--sky dusk]              # the anvil wall's world state checked on a build
     $BPY -m render legday --still 12.0 --zones           # one frame through render.py
     $BPY -m render legday --frames rd19_drop --res 270x480 --samples 10 --threads 2    # one shot as a preview
                                                          #   (each sequence its own sample count: _common)
     $BPY -m render legday --frames all --max-seconds 240 # FINAL frames: this film's final quality is 540x960 at
                                                          #   16 samples (set in build(); never pass --res/--samples)
 
-THE VOICE IS COMMITTED (am_michael, speed 1.0; the last line "I call it reloading." at 0.9, the storyteller's
-slower ending, as in The Hello). Changing a word, a pause, the voice or a speed below makes narration/legday.json
-stale (build stops) and, once spoken again, moves every cut after it: do not, unless the orchestrator says so.
-Spoken twice by the lead: 65.83 s with the first pauses; then the pauses shaped (the two "They call it leg day."
-shots made the same length, 45 frames each: the second is an exact repeat of the first; the story's turns kept
-longer: before "But I'm a redstoner", after "He said that's cheating", "Nobody asked why", the drop, and before
-dusk), 65.29 s = 1567 frames, inside the 58-66 s asked. No word of the script was cut (165 words: the story's trim
+THE VOICE IS COMMITTED (am_michael, speed 1.0; "That left a banner and a bottle." and the last line "I call it
+reloading." at 0.9). Changing a word, a pause, the voice or a speed below makes narration/legday.json stale (build
+stops) and, once spoken again, moves every cut after it: do not, unless the orchestrator says so.
+Spoken four times by the lead: 65.83 s with the first pauses; then the pauses shaped (the two "They call it leg
+day." shots made the same length, 45 frames each: the second is an exact repeat of the first; the story's turns
+kept longer: before "But I'm a redstoner", after "He said that's cheating", "Nobody asked why", the drop, and before
+dusk), 65.29 s; then, after the story review, (1) "That left a banner and a bottle." slowed to 0.9: measured in
+SYLLABLES it was the fastest line of the film (5.4 a second against a median of 4.1), on the hardest picture (the
+small bottle); the review's other candidates, the two "They call it leg day." (4.26 WORDS a second, the fastest by
+words), are 4.2 syllables a second, the film's median (five monosyllables): kept at 1.0, (2) b22's pause 0.365 (from
+0.35) so that b23 starts on b12's sub-frame phase (0.92 against 0.88 of a frame): the words of cl23 now fall on the
+same shot frames as cl12's (+2 +7 +13 +16 +22; they were a frame early from "call" on). 65.50 s = 1572 frames, inside
+the 58-66 s asked. Nobody has listened to it (no audio playback here): the pace was judged by measurement. No word of the script was cut (165 words: the story's trim
 order, "even" and then "But", was not needed). Pronunciation checked with --phonemes: "redstoner" goes through the
 narrator's built-in respelling "red-stoner"; everything else (Pillagers, crossbows, protein, anvils, reloading,
 redstone, pixels) is said right as written: no "say" entry. The recogniser hears "cow" 105 ms later than the
@@ -107,7 +114,7 @@ def _import(seq):
 STAND_IN = {"square": "square_wide", "pens": "pens_wide", "climb": "climb", "top": "top_row", "road": "road_shelf"}
 
 # The narration: stories/redstoner.json word for word, one entry per sentence (165 words). Pauses are after the
-# sentence, voice to voice; default 0.35 s. Spoken length 51.5 s; with these pauses the film is 65.29 s = 1567 frames.
+# sentence, voice to voice; default 0.35 s. Spoken length 51.7 s; with these pauses the film is 65.50 s = 1572 frames.
 NARRATION = {
     "voice": "am_michael", "speed": 1.0,
     "tail": 2.0,                                    # the last image holds 1.75 s after the last word, then the last
@@ -132,9 +139,11 @@ NARRATION = {
         {"text": "Pillagers have crossbows, so everyone hid behind the cows.", "id": "b17", "pause": 0.5},
         {"text": "I flipped one lever.", "id": "b18", "pause": 0.45},
         {"text": "Twelve pistons pulled back, and twelve anvils fell on the road.", "id": "b19", "pause": 0.8},
-        {"text": "That left a banner and a bottle.", "id": "b20", "pause": 0.5},
+        # slowed after review: by syllables the fastest line (5.4/s at 1.0), on the smallest picture (the bottle)
+        {"text": "That left a banner and a bottle.", "id": "b20", "pause": 0.5, "speed": 0.9},
         {"text": "Steve still says redstone is cheating.", "id": "b21", "pause": 0.7},   # the day passes (dip)
-        {"text": "But they carried all twelve back up before dark.", "id": "b22"},
+        {"text": "But they carried all twelve back up before dark.", "id": "b22", "pause": 0.365},   # b23 on b12's
+        #                                                 sub-frame phase: its words on the same shot frames as b12's
         {"text": "They call it leg day.", "id": "b23", "pause": 0.7},               # = b12; before the last line
         # the last line a tenth slower: the storyteller slows down for the ending (at 1.0 it went by in 1.11 s,
         # 3.6 words a second, faster than the film's 3.2)
@@ -160,9 +169,9 @@ SKIES = {
     # road (az 185, el 5): the road face in shadow, lit by its lanterns (LIGHTS "dusk": 1.4, the look-dev dusk level,
     # never more: lit stone beside a lantern is on the palette limit), an indigo sky with the first stars and pink
     # clouds over the wall top. COMPARED SIDE BY SIDE with gold on the shared frame (cl11 / cl22: the set builder's
-    # out/test/legday_set_b11_climb.png against legday_set_b22_climb.png, and the lead's scout stills
-    # out/test/legday_scout_climb_gold.png / _dusk.png): blue afternoon against indigo with stars, nobody can take
-    # one for the other. KNOWN AND ACCEPTED: tools/palette_check's rule "stone not magenta" (G >= 0.92 R) fails on
+    # out/test/legday_set_b11_climb.png against legday_set_b22_climb.png, and the lead's scout stills of the stubs
+    # out/test/legday_scout_cl11_climb_704.png / legday_scout_cl22_dusk_1404.png, the same frame of the shot):
+    # blue afternoon against indigo with stars, nobody can take one for the other. KNOWN AND ACCEPTED: tools/palette_check's rule "stone not magenta" (G >= 0.92 R) fails on
     # the wall top at dusk (tp24: G/R 0.90, rgb(123,111,105), with the lanterns OFF 0.87): it is the warm dusk sky
     # on the stone, B under G, not magenta; the rule cannot tell warm from magenta (engine/fixtures' notes, the set
     # builder's report). Do not "fix" it by boosting lanterns.
@@ -200,8 +209,8 @@ SHOTS = [
 ]
 BEATS = {"sq02_reps": (2, 3)}                  # a shot that carries more than one beat (default: its own beat)
 SKY_CHANGE = {}                                # no sky changes inside a shot
-DIPS = {"cl22_dusk": dict(out=3, hold=1, back=3)}    # the day passes: black on the cut and one frame more (1369,
-#                                                      1370), fading out from 1366, back by 1373 ("But" is on 1371:
+DIPS = {"cl22_dusk": dict(out=3, hold=1, back=3)}    # the day passes: black on the cut and one frame more (1373,
+#                                                      1374), fading out from 1370, back by 1377 ("But" is on 1375:
 #                                                      its caption is drawn over the dip at full strength)
 END_BLACK = 6      # the story's "then cut to black": the last 6 frames (0.25 s) are black (an encoder dip with no
 #                    way back), after a hold of 1.75 s on the narrator at the lever; the Reel then loops to frame 1
@@ -212,10 +221,10 @@ END_BLACK = 6      # the story's "then cut to black": the last 6 frames (0.25 s)
 # (index 0 = the south plank, nearest the stair; 11 = the north one beside the lever, "the twelfth").
 #   "eight"        day set on planks 3..10: before and during the morning climb (cl11: 8 up, 4 in hands; the
 #                  twelfth piston is not there yet: the narrator sets it in tp13)
-#   "eleven"       day set on planks 0..10 (tp13; tp14 until Steve sets the twelfth: C.appear(s, C.P.anvils[11], f))
+#   "eleven"       day set on planks 0..10 (tp13; tp14 until Steve sets the twelfth: C.appear(s, C.anvils[11], f))
 #   "twelve"       all twelve of the day set: armed (rd15-tp18), falling (rd19), on the road (rd20, rd21)
 #   "dusk_eight"   dusk set on planks 3..10 (cl22, cl23: "eight anvils already back in place")
-#   "dusk_eleven"  dusk set on planks 0..10 (tp24 until Steve sets the twelfth: C.appear(s, C.P.anvils_dusk[11], f))
+#   "dusk_eleven"  dusk set on planks 0..10 (tp24 until Steve sets the twelfth: C.appear(s, C.anvils_dusk[11], f))
 SHELF = {
     "sq01_squats": "eight", "sq02_reps": "eight", "pn04_farms": "eight", "pn05_milk": "eight",
     "pn06_told": "eight", "sq07_bench": "eight", "sq08_arms": "eight", "sq09_lifts": "eight",
@@ -225,9 +234,9 @@ SHELF = {
     "cl22_dusk": "dusk_eight", "cl23_legday": "dusk_eight", "tp24_reloading": "dusk_eleven",
 }
 # THE RE-ARM (the lead's, keyed by build() just before cl22_dusk's function): the twelve sticky pistons push their
-# planks out again starting half a frame before cl22's first frame (the move takes 2.4 frames: [1368.5, 1370.9],
-# entirely inside the dip's two black frames 1369-1370; frame 1368, at a third of the picture, still shows them in),
-# the lever is on and the dust lit again from 1369. See legday_common.LegDay.rearm.
+# planks out again starting half a frame before cl22's first frame (the move takes 2.4 frames: [1372.5, 1374.9],
+# entirely inside the dip's two black frames 1373-1374; frame 1372, at a third of the picture, still shows them in),
+# the lever is on and the dust lit again from 1373. See legday_common.LegDay.rearm.
 REARM = "cl22_dusk"
 
 

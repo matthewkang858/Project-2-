@@ -26,6 +26,7 @@ LIGHT: C.lights(s, "gold", near=<place>, radius=16) (daylight: the torches at th
   beat 11 adds the film-local fill "sq_stare" (palette-checked).
 MOTION CHECK: tools/hello_square_motion.py (mp4 of the square's preview frames, contact strips of frames).
 """
+from engine import characters as CH
 from films import hello_common as HC
 
 # ---- beat 1 (sq01): Steve on guard south of the bell, the child BEHIND his left leg looking up at him; a low
@@ -70,6 +71,13 @@ SQ09_KID_A = ((8.0, -4.85), (-4.0, -4.85))     # the two children run right to l
 SQ09_KID_B = ((8.0, -4.2), (-4.0, -4.2))       # blocks out (their heads below his feet in the frame), 0.65 apart
 SQ09_KID_LEADS = (22, 14)                      # pre-roll frames: kid B has passed under him before "stands" (558)
 SQ09_KID_LOOK = (-6.0, -12.0, 0.7)             # where the running children glance: toward the lens's side
+# the farmer walks straight at the lens: with his head along the walk both green eyes were on the lens from 571 to
+# the cut, the sharpest face in the frame right over "watches us", so he read as the "he" who watches (review of the
+# whole-film preview). His head is turned to frame left, toward the well and the children running past it, cheated
+# to SQ09_FARMER_OFF degrees from the lens and a little down: brow, one eye and the nose in profile for the whole
+# walk; the watcher is the only figure that faces the camera
+SQ09_FARMER_OFF = 65.0                         # degrees from the lens toward frame RIGHT (negative: frame left)
+SQ09_FARMER_DOWN = -8.0                        # degrees above level (negative: down, at the well's rim)
 
 
 # ---- beat 10 (sq10): low (0.72, the child's eyes) from just north-east of the well, on the line from him through
@@ -118,6 +126,23 @@ def _look_dir(c, frame, cam_pos, right, up, dist=3.0):
     eye = c.eye_point(frame)
     a = math.atan2(cam_pos[1] - eye.y, cam_pos[0] - eye.x) + math.radians(right)
     return (eye.x + dist * math.cos(a), eye.y + dist * math.sin(a), eye.z + dist * math.tan(math.radians(up)))
+
+
+def _aside(c, f0, f1, cam_pos, right, up, step=3):
+    """Keep c's head turned `right` degrees from the lens toward frame right (negative: frame left) and `up` above
+    level from f0 to f1 while it walks (_look_dir re-aimed every `step` frames, smooth; already turned on f0)."""
+    yk, pk = [], []
+    f = int(f0)
+    while True:
+        yaw, pitch = c._aim(_look_dir(c, f, cam_pos, right, up), f)
+        yk.append((f, yaw))
+        pk.append((f, -pitch))
+        if f >= f1:
+            break
+        f = min(int(f1), f + step)
+    CH._segment(c.head, "rotation_euler", 2, yk, "BEZIER")
+    CH._segment(c.head, "rotation_euler", 0, pk, "BEZIER")
+    return f1
 
 
 def sq01_guard(st, s, C, nar):
@@ -264,6 +289,9 @@ def sq09_watches(st, s, C, nar):
     # profile, never at the camera); looking straight ahead they were 86-110 degrees off it, two blank pink cubes
     for c, lead in ((k1, lead_a), (k2, lead_b)):
         c.track(f0 - lead, f1 + 1, SQ09_KID_LOOK, step=3, ease=1)
+    # the farmer's head off the lens to frame left (the well, the running children) for his whole walk: never a
+    # stare into the lens on "watches us" (his keys end on 604: sq10 keys him from 605)
+    _aside(ada, f0 - 40, f1, SQ09_CAM["pos"], SQ09_FARMER_OFF, SQ09_FARMER_DOWN)
     st.use(s, ada, bo, k1, k2)
     cam = SQ09_CAM
     C.cam(s, None, focus=bo.head, handheld=0.004, ease="linear", **cam)

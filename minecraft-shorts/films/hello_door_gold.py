@@ -252,6 +252,9 @@ def dg05_nod(st, s, C, nar):
 AWAY, LOOK = (12.0, -8.0), (-70.0, 3.0)      # beat 15: the child's head (yaw from its body, pitch): to the lens
 #                                             side and a little down (its face), and turned to its right as far as a
 #                                             head goes (screen left, where he stands: its nose in profile)
+TURN = 9     # frames of each of those 82-degree head turns: the game's LookControl turns a mob's head at most 10
+#              degrees a tick (8.3 a frame at 24 fps), so about 9-10 frames; at 5-6 frames (the first version) the
+#              turns were 15-19 degrees a frame, a snap (review of the whole-film preview)
 
 
 def _fronts(st, s, C, place, turns):
@@ -321,7 +324,8 @@ def dg15_a(st, s, C, nar):
       profile toward screen left keeps its face readable all the time.
     """
     f0 = s.frame_start
-    _fronts(st, s, C, "watch_far", [(f0, AWAY, 0), (C.at(s, "time") + 2, LOOK, 6), (C.at(s, "look") + 4, AWAY, 6)])
+    _fronts(st, s, C, "watch_far", [(f0, AWAY, 0), (C.at(s, "time") + 1, LOOK, TURN),
+                                    (C.at(s, "look") + 1, AWAY, TURN)])
 
 
 def dg15_b(st, s, C, nar):
@@ -337,7 +341,7 @@ def dg15_b(st, s, C, nar):
       s 0.48, hero child x 62-81 %, y 40-50 %, 100 % inside); preview 270x480_9spp 947-967 re-rendered.
     """
     f0 = s.frame_start
-    _fronts(st, s, C, "watch_mid", [(f0, AWAY, 0), (f0 + 1, LOOK, 5), (C.at(s, "house"), AWAY, 6)])
+    _fronts(st, s, C, "watch_mid", [(f0, AWAY, 0), (f0, LOOK, TURN), (s.frame_end - TURN, AWAY, TURN)])
 
 
 def dg15_c(st, s, C, nar):
@@ -351,7 +355,7 @@ def dg15_c(st, s, C, nar):
       shirt hue 174, trousers min channel 44). Render: out/test/hello_dg_dg15_c_980_zones.png.
     """
     f0 = s.frame_start
-    _fronts(st, s, C, "watch_door", [(f0, AWAY, 0), (f0 + 1, LOOK, 5)])
+    _fronts(st, s, C, "watch_door", [(f0, AWAY, 0), (f0, LOOK, TURN)])
 
 
 def dg20_walkup(st, s, C, nar):

@@ -4,7 +4,7 @@
     films/sixseconds_common.py  THIS FILE: the set, the places, the cameras, the cast, the helpers, the contract
     films/sixseconds_set.py     the bastion sets (engine/nether.py) + this film's anchors and camera suggestions
     films/sixseconds_gate.py    gt01 gt03 gt04 gt17 gt18 gt19   the guard, the gate frame, the corridor  (one
-    films/sixseconds_row.py     rw02 rw21 rw22 rw23             the gold wall: the ingot row, the stare   director
+    films/sixseconds_row.py     rw02 rw05 rw21 rw22 rw23        the gold wall: ingot row, family, stare   director
     films/sixseconds_pit.py     pt05-pt10 pt20                  the boots, the trap, the axe, the smoke   per file)
     films/sixseconds_bridge.py  br11-br15                       the second bastion's bridge and pillar
     films/sixseconds_flash.py   fl16_bridge fl16_treasure fl16_home   the three flash cuts of beat 16
@@ -16,6 +16,13 @@
     $BPY -m tools.sixseconds_palette --sky S F    nether.check_still on one frame at final quality (gold, brute vs
                                                   blackstone, piglin skin, Steve's clothes, heroes in the safe area)
     $BPY -m render sixseconds --still S [--zones] one frame through render.py (each sky is one build)
+
+THE LEAD'S REVIEW PASS (two independent checks, Nov 26): beat 5 is two shots (pt05_boots in the pit sequence,
+rw05_family in the row sequence); the pause after "ended" is 0.5 s (the voice re-spoken: every frame after 655 moved
+by 7, the film is 1578 frames); CAMS["reverse"] is no longer shared (rw23's own); the pillar shots share one brute
+place (pillar_brute) and its ingots; the flash cuts' boots / puff / extra drop moved (films/sixseconds_set.py
+FLASH_OFFSETS); ENGINE SIDE DOORS and the runner's hand are in the contract, and build() checks for unregistered
+dropped items. Each sequence file's docstring says what changed in it and why.
 
 A sequence file exposes ONE FUNCTION PER SHOT, named like the shot:  def pt09_axe(st, s, C, nar)
     st   engine.nether.Stage (films.lookdev.Stage: st.use / st.hero / st.lights / st.key; st.v = the Bastion)
@@ -39,14 +46,24 @@ THE SEQUENCE CONTRACT (what a sequence director may and must do)
   MAY   edit his own file only: the bodies of its shot functions, its docstrings, private helpers and constants.
         Make further twins of the shared cast with his own tags (C.actor("piglin", "pt4")). Add a film-local light
         with C.fill("<prefix>_<name>", ...) (the name starts with his prefix; hidden outside the shots he names).
-        Move a camera of his own shots freely, unless SHARED below names a camera or place for it.
+        Move a camera of his own shots freely, unless SHARED below names a camera or place for it. On a SHARED
+        camera the FOCUS is free (where it sits and when it racks: C.cam(s, name, focus=...) then C.rack(s, target,
+        frame, frames)); its position, aim, lens, f-stop, handheld amount and seed are not.
   MUST  keep every shot function's name and signature;
         give every shot a camera (C.cam: lens, move, focus, handheld; nothing is ever dead still: something already
         moving on its first frame), its cast (st.use: everybody else is hidden), what it is about (st.hero, inside
         x 8-82 %, y 14-60 % of the frame, clear of the caption band y 62-72 %; the golden boots: C.boots_of(runner))
         and its lantern levels (C.lights once per shot);
-        take characters only through C.actor(role, tag) and dropped items only through C.item(item_id, tag), with a
-        tag that starts with HIS prefix (gt, rw, pt, br, fl): no other sequence can then disturb his keys;
+        take characters only through C.actor(role, tag) and dropped items only through C.item(item_id, tag) /
+        C.rest(...), with a tag that starts with HIS prefix (gt, rw, pt, br, fl): no other sequence can then disturb
+        his keys. ENGINE SIDE DOORS (the technical check: an item an engine call makes by itself is not in st.cast,
+        so Stage.finish never hides it and it lies in every later shot of that set): pass C.item(...) objects, never
+        an item id, to piglins.barter; call breaking.mine / dig / break_block with drop=None (the block's own drop
+        is not in the story); if an engine call still returns an item, register it (C.adopt(s, item)). build()
+        checks: an unregistered dropped item prints "!!!" (and stops the strict build);
+        set what the runner holds on the FIRST frame of every shot he is in (runner.hold("iron_pickaxe" |
+        "gold_ingot", frame=f0)): a hold lasts until it is changed, so a gold ingot given in one shot is still in
+        his hand in every later shot of the same instance;
         key each character in frame order; place() everybody on the first frame of a shot before any look_at();
         call look_at(f0, ..., ease=0) BEFORE idle() (Character.idle puts a head key on its first frame);
         key nobody before a shot starts unless that instance is NOT in the shot before (pre-roll: use a twin);
@@ -75,7 +92,9 @@ THE WORLD'S RULES (the story's continuity; C.pit and C.pillar enforce the first 
   * THE BRUTE is absent from gt19 and pt20 (the older version of the world, from before brutes: NO_BRUTE_SHOTS);
     the side of pt20's frame where he walked in in pt09 stays empty.
   * THE RUNNER wears golden boots in every shot he is in (C.actor("runner", ...) puts them on), and holds the iron
-    pickaxe unless a shot gives him a gold ingot (Player.hold("gold_ingot", frame=...)).
+    pickaxe unless a shot gives him a gold ingot (Player.hold("gold_ingot", frame=...)); every shot sets his hand
+    on its first frame (a hold lasts until changed: the technical check found the stub's runner_pt still holding
+    pt07's ingot in pt08, pt09 and pt20). He has ONE pickaxe; pt10 drops it.
   * Every ordinary piglin holds a golden sword (role "piglin") or a crossbow ("piglin_xbow"); the brute alone has the
     golden axe; he stands 0.7 block or more from any brother in every shot (the story's risk: he must read as a
     different kind at a glance).
@@ -88,16 +107,24 @@ SHARED (decided once, used by two shots or two sequences; every camera was rende
 films/sixseconds.py docstring for the stills)
   CAMS["gate"]        THE GATE FRAME: gt03, gt18, gt19 EXACTLY (position, aim, lens, f-stop, handheld amount AND
                       seed: the drift is a function of the frame, so gt18 -> gt19 drifts on across the match cut).
-                      The story's 4th use (beat 23) is replaced by its own fallback (rw23, CAMS["reverse"]).
+                      The story's 4th use (beat 23) is replaced by its own fallback (rw23's own camera REVERSE in
+                      films/sixseconds_row.py: one shot uses it, so it is NOT shared; the row director may move it).
   CAMS["ingot_row"]   THE INGOT ROW FRAME: rw02 and rw21 exactly                                    row
   CAMS["pit"]         THE PIT CAMERA: pt06 and pt20 exactly                                         pit
   CAMS["boot"], CAMS["bridge_boot"]   THE BOOT FRAMING: pt05 (home) and br11 (bridge) are one framing on two sets:
                       the boots land where BOOT_FRAME says in both (measured on renders of the stub film; see
-                      there): the same box to 1 % of the frame                                   pit, bridge
-  CAMS["flash_bridge"], ["flash_treasure"], ["flash_home"]: one offset from the brute in all three (fl16_*)
+                      there): the same box to 1 % of the frame; the boots come to rest a beat BEFORE "boots" is
+                      said and hold still to the cut (pt05 300-321, br11 about 716-740)          pit, bridge
+  CAMS["flash_bridge"], ["flash_treasure"], ["flash_home"]: one offset from the brute in all three (fl16_*), with
+                      the set's six_flash_puff / _boots / _extra_<set> (films/sixseconds_set.py FLASH_OFFSETS)
   PLACES["gold_1".."gold_3"]  the three piglins at the gold in the gate frame and the corridor: gt03, gt17, gt18,
-                      gt19 (and pt05's piglins at the gold turn from there); IDENTICAL on both sides of gt18 -> gt19
+                      gt19, pt05 (soft, backs to the boots) and rw05 (they turn from there to the boots);
+                      IDENTICAL on both sides of gt18 -> gt19, and of pt05 -> rw05
   PLACES["brother_1"], ["brother_2"], ["brute_gold"], ["step_ingot"]: the gold row of beats 2 and 21-23     row
+  PLACES["boot_mark"]  where the runner stops in pt05 and still stands in rw05 (runner_pt -> runner_rw: the same
+                      spot and yaw on both sides of the cut) and digs in pt06                     pit, row
+  PLACES["pillar_brute"], ["six_bridge_ingot_1".."3"]: the brute at the pillar and the ingots he ignores, the same
+                      in br13, br14 and br15 (films/sixseconds_set.py PILLAR_BRUTE_SHIFT, PILLAR_INGOTS)   bridge
   PLACES["landing"], ["gateway"]: the brute on guard (gt03, gt04) and in the gateway (gt17, gt18)            gate
   PLACES["boot_mark"], ["rim_w"], ["strike"]: the runner's skid, his place at the rim, the brute's     pit
   The skies (films/sixseconds.py SKIES), the light recipes LIGHTS, the lead's fill KEY_LANDING (gt01).
@@ -107,7 +134,8 @@ every floor z 0; the pit floor z -2; the landing top z 4; the gold step's top z 
 (nether.yaw_to(src, dst)). HOME at the origin: courtyard x 0..8, y -2..17; gateway x 3..5 in the north wall (y 18..
 20), the corridor y 21..32 with the lava wall at y 33; guard stair x 0..1, y 6..9, landing x 0..2, y 10..17; gold
 wall x 9, y 9..15 with the step x 8; pit cells x 4..5, y 6..7. BRIDGE at (400, 0, 0): deck x -1..1 (world 399..401),
-y -8..44; the netherrack pillar at (400, 19). TREASURE corner at (-400, 0, 0).
+y -8..44; the netherrack pillar at (400, 19); the brute at its foot stands at pillar_brute (401.0, 18.25). TREASURE
+corner at (-400, 0, 0).
 """
 
 from mathutils import Vector
@@ -171,7 +199,10 @@ PLACES = {
     "bridge_boot_mark": "bridge_boot_mark",   # (400.5, 6.5): the skid (br11)
     "bridge_player": "bridge_player",      # (400.5, 10.6) facing north (br12)
     "bridge_brute": "bridge_brute",        # (400.5, 16.5) facing south under his lantern (br12)
-    "pillar_foot": "bridge_pillar_foot",   # (400.5, 18.25) facing the pillar (br13-br15)
+    "pillar_foot": "bridge_pillar_foot",   # (400.5, 18.25) facing the pillar: NOT the brute's place (see below)
+    "pillar_brute": "six_pillar_brute",    # (401.0, 18.25) facing north: the brute at the pillar in br13, br14, br15
+    #                                        (0.5 east of the foot: from bridge_top the pillar's top block cut his face
+    #                                        at the foot); his ignored ingots six_bridge_ingot_1..3 lie on his east side
     "pillar_top": "bridge_pillar_top",     # (400.5, 19.5, 3) the runner crouched on the pillar (br13, br15)
     # ---- the flash cuts (flash): the brute's place in each world; the puff, the boots, the extra drop beside him
     "flash_bridge": "bridge_flash", "flash_treasure": "treasure_flash", "flash_home": "home_flash",
@@ -214,10 +245,7 @@ CAMS = {
     # the stand-ins of a failed shot (films/sixseconds.py STAND_IN) that are not shared above: the set's suggestions
     "landing": dict(pos=(0.4, 17.4, 5.8), target=(6.0, 13.6, 3.4), lens=26.0, fstop=2.8, pos1=(0.62, 17.25, 5.76)),
     "bridge_shoulder": dict(pos=(401.15, 8.7, 1.95), target=(400.5, 16.5, 1.35), lens=50.0, fstop=2.6),
-    # beat 23: the story's own fallback (films/sixseconds_set.py six_gate_reverse), reverse angle from the gateway's
-    # west jamb, floor level: the empty blackstone under the caption, the brute at the gold lifting his face toward
-    # the lens (the gate frame cannot give "a clean profile against the glow": the gateway lies behind him)
-    "reverse": dict(pos=(3.5, 17.5, 0.45), target=(7.2, 10.4, 1.3), lens=36.0, fstop=2.8),
+    # (beat 23's reverse angle is rw23's own camera: films/sixseconds_row.py REVERSE; one shot uses it)
 }
 # THE BOOT FRAMING: the box of the golden boots in % of the frame, measured on the stub film by the lead after the
 # restart (tools.sixseconds_geo --boots; stills out/test/sixseconds_scout_boots_pt05_boots_318.png and
@@ -226,6 +254,10 @@ CAMS = {
 # x 27.7-69.5, y 42.5-58.5. Keep the runner's skid ON boot_mark / bridge_boot_mark, entering from the frame's LEFT
 # edge in both (the stubs do), and the boots inside this box (the set builder's br11 suggestion, 45 mm aimed at
 # x 400.65, had them at x 17-56 %: CAMS["bridge_boot"] is that camera turned to match).
+# The technical check found pt05's piglins hidden behind the runner's arms: from a lens at boot height, 3.8 blocks
+# from a runner facing (or backing) it, his torso and arms cover x 17-83 % at the height the piglins' heads have
+# (y 16-32 %), wherever they stand. Decided once by the lead: the boot framing stays as measured (both shots), and
+# the brothers' look at the boots is its own shot, rw05_family (beat 5 is two shots, cut on "so").
 BOOT_FRAME = dict(x=(27.0, 71.0), y=(42.0, 59.0))
 
 # lantern levels (C.lights(s, key)): Stage.lights(scale, groups, **bas.lights_for(set)); every one looked at on
@@ -281,9 +313,14 @@ class Six:
     C.P(name), C.yaw(name)     a place of PLACES (or any anchor) as a 3D point; its yaw (a standing place)
     C.cam(s, name, ...)        one of CAMS, "set:<camera>" (the set's suggestions) or None + a spec, on a shot
     C.actor(role, tag)         a cast member, built once per tag: roles in ROLES, tag starts with the sequence prefix
-    C.item(id, tag)            a dropped item (resting, bobbing, spinning), registered like a cast member
+    C.item(id, tag, count=1)   a dropped item (resting, bobbing, spinning), registered like a cast member; count = the
+                               stack it draws (a barter's gravel: one entity of 8-16)
+    C.rest(s, id, tag, place, frame=, count=, face=, face_at=)   an item lying on a place for the rest of shot s; face=
+                               a camera position: its spin phased so a flat item shows it its broad side on face_at
+    C.adopt(s, item)           register an item an engine call made by itself (see ENGINE SIDE DOORS)
+    C.rack(s, target, frame, frames=12)   a rack focus by frame (free on SHARED cameras too)
     C.boots_of(runner)         the runner's golden boots (armor objects: st.hero of a boot shot)
-    C.put / C.admire / C.puff / C.pit / C.pillar / C.lights / C.fill / C.key_landing / C.time_jump / C.at
+    C.put / C.stand / C.admire / C.puff / C.pit / C.pillar / C.lights / C.fill / C.key_landing / C.time_jump / C.at
     C.shots, C.memo            every Shot of the film by name; a dict for handing things from one shot function to a
                                later one of the SAME sequence (key prefixed with it: C.memo["pt_pearl"])
     """
@@ -390,25 +427,60 @@ class Six:
         """The golden boots (armor objects) of a runner made by C.actor: what st.hero names in a boot shot."""
         return list(self._boots[runner.name])
 
-    def item(self, item_id, tag):
+    def item(self, item_id, tag, count=1):
         """A dropped item of engine.mobs (gold_ingot, ender_pearl, gravel, golden_boots, iron_pickaxe ...),
         registered with the Stage like a cast member: it = C.item("gravel", "pt3"); it.place(f0, C.P("...")) (it
         rests there, bobbing and turning) or piglins.barter / throw_item / launch (it flies); it.animate(f0, f1 + 1);
-        st.use(s, it). One tag = one item entity; give each item of a shot its own tag."""
+        st.use(s, it). One tag = one item entity; give each item of a shot its own tag. count = the stack size the
+        item entity draws (the game: 1 copy, 2 from 2, 3 from 6 ...; a barter's gravel is ONE entity of 8-16)."""
         if tag[:2] not in SEQUENCES:
             raise KeyError("tag %r must start with a sequence prefix: %s" % (tag, ", ".join(SEQUENCES)))
-        return piglins.add_item(self.st, item_id, name="%s_%s" % (item_id, tag))
+        name = "%s_%s" % (item_id, tag)
+        it = self.st.cast.get(name)
+        if it is None:
+            it = piglins.add_item(self.st, item_id, name=name, count=int(count))
+        return it
 
-    def rest(self, s, item_id, tag, place, frame=None):
+    def adopt(self, s, item):
+        """Register an item that an engine call made by itself (a barter given an id, a block's drop) with the Stage
+        and put it in shot s, so that Stage.finish hides it outside the shots that use it. Returns it."""
+        if item is not None:
+            self.st.cast[item.name] = item
+            self.st.use(s, item)
+        return item
+
+    def rack(self, s, target, frame, frames=12):
+        """A rack focus on shot s: from `frame` the focus pulls to `target` (a point, an object, a Character's head)
+        over `frames` frames. Call C.cam(s, ..., focus=<the first target>) first; free on SHARED cameras too."""
+        s.focus(target, at_s=(int(frame) - 1) / float(FPS), rack_s=max(1, int(frames)) / float(FPS))
+        return s
+
+    def rest(self, s, item_id, tag, place, frame=None, count=1, face=None, face_at=None):
         """A dropped item lying (bobbing, turning) on `place` for the rest of shot s, from `frame` (default: its first
-        frame), in the shot (st.use). Returns it."""
-        it = self.item(item_id, tag)
+        frame), in the shot (st.use). Returns it. face = a point (a camera position): the item's spin is phased so
+        that a FLAT item (an ingot, the golden boots, a pearl) shows that point its broad side on frame `face_at`
+        (default: the first frame); a spinning flat item is edge-on twice a turn (the story check: the flash cuts'
+        golden boots, rw22's ingot)."""
+        it = self.item(item_id, tag, count=count)
         f = s.frame_start if frame is None else int(frame)
         p = self.P(place)
         it.place(f, p)
-        it.animate(f, s.frame_end + 1)
+        it.animate(f, s.frame_end + 1, phase=None if face is None else self.broadside(it, face, f if face_at is None
+                                                                                       else face_at))
         self.st.use(s, it)
         return it
+
+    @staticmethod
+    def broadside(it, toward, frame):
+        """The spin phase that turns a resting flat item's broad side to the point `toward` on `frame` (pass it to
+        it.animate(..., phase=...)). The sprite lies in its spinner's X-Z plane (engine.mobs), so its face points
+        along the spinner's +-Y."""
+        import math
+        from engine import mobs
+        rest = it.rest_pos
+        dx, dy = float(toward[0]) - rest.x, float(toward[1]) - rest.y
+        want = math.atan2(-dx, dy)
+        return want - (float(frame) - it.born_at(frame)) / mobs.TICK / mobs.ITEM_SPIN_TICKS
 
     def put(self, c, frame, place, toward=None, yaw=None):
         """place() a character on a named place (or a point), facing `toward` (a place name or a point), `yaw`, or
@@ -549,3 +621,24 @@ def project(cam, point):
     """Where a point lands in a 9:16 frame for a camera spec (u, v in 0..1 from the top left; None behind it):
     engine.nether.project."""
     return nether.project(cam["pos"], cam["target"], cam["lens"], point)
+
+
+def unregistered_items(st):
+    """Every dropped item (engine.mobs.make_dropped_item: an Empty "<name>_root" with a child "<name>_spin") in the
+    scene that is not in st.cast (Stage.finish hides only the cast outside its shots, so such an item lies in every
+    later shot of its set): [names]. Found by the objects themselves, not by Python references (an engine call's
+    result that nobody kept is gone from Python but its objects stay). build() calls it after st.finish() (the
+    technical check: pt06's breaking.mine(drop='auto') left a blackstone drop in the pit from 389 to the film's end)."""
+    import bpy
+    known = set()
+    for c in st.cast.values():
+        root = getattr(c, "root", None)
+        if root is not None and hasattr(c, "spinner"):
+            known.add(root.name)
+    out = []
+    for ob in bpy.data.objects:
+        if ob.type != "EMPTY" or not ob.name.endswith("_root") or ob.name in known:
+            continue
+        if any(ch.name == ob.name[:-5] + "_spin" for ch in ob.children):
+            out.append(ob.name[:-5])
+    return sorted(out)

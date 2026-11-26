@@ -1,4 +1,4 @@
-"""Six Seconds: 65.46 narrated seconds (1571 frames), 23 sentences, 25 shots, two skies. Told by a piglin brute.
+"""Six Seconds: 65.75 narrated seconds (1578 frames), 23 sentences, 26 shots, two skies. Told by a piglin brute.
 
     "In this bastion, I'm the only one who doesn't like gold. ... So today I'm staring at an ingot. Six seconds.
      Nothing."     (stories/piglin.json: the story, the picture of every beat, the risks and their fallbacks)
@@ -8,7 +8,8 @@ The pictures are made by five sequence files, one location (or one device) each,
 contract, the set, the places, the shared cameras, the cast and the helpers: films/sixseconds_common.py):
 
     films/sixseconds_gate.py    gt01 gt03 gt04 gt17 gt18 gt19     the guard landing, THE GATE FRAME, the corridor
-    films/sixseconds_row.py     rw02 rw21 rw22 rw23               the gold wall: the ingot row, the six-second stare
+    films/sixseconds_row.py     rw02 rw05 rw21 rw22 rw23          the gold wall: the ingot row, the brothers' look at
+                                                                  the boots (beat 5's 2nd shot), the six-second stare
     films/sixseconds_pit.py     pt05 pt06 pt07 pt08 pt09 pt10 pt20    the boots, the pit, the barter, the axe, smoke
     films/sixseconds_bridge.py  br11 br12 br13 br14 br15          the second bastion: the bridge and the pillar
     films/sixseconds_flash.py   fl16_bridge fl16_treasure fl16_home   "a full stack of worlds": three flash cuts
@@ -29,47 +30,75 @@ contract, the set, the places, the shared cameras, the cast and the helpers: fil
 
 THE VOICE IS COMMITTED (am_michael, speed 1.0; the last three lines at 0.9, as The Hello's ending). Changing a word,
 a pause, the voice or a speed below makes narration/sixseconds.json stale (build stops) and, once spoken again,
-moves every cut after it: do not, unless the orchestrator says so. Spoken three times by the lead: 66.79 s with
+moves every cut after it: do not, unless the orchestrator says so. Spoken four times by the lead: 66.79 s with
 the first pauses; then the pauses shortened (the story's holds kept: "Mostly gravel", the hold after "didn't come",
 "Six seconds", "Nothing") and the ending slowed, 65.25 s; then the pause after "Six seconds." tuned so that
 THE SIX-SECOND STARE is exact: rw21 + rw22 = 144 frames from the first frame of "So today I'm staring at an ingot"
-to the cut into "Nothing" (the story's timing device; asserted in timeline()). 65.46 s, inside the 58-66 s asked;
-no word of the script was cut. Pronunciation checked (--phonemes): nothing respelled (bastion, ingot, ender, zero
-are said right).
+to the cut into "Nothing" (the story's timing device; asserted in timeline()), 65.46 s; then (the lead's review
+pass, on the story check) the pause after "the whole world ended." opened from 0.2 to 0.5 s: with 0.2 the voice ran
+"ended. New world" together across the reset. The voice is synthesised sentence by sentence (deterministic), so no
+word changed: every word after "ended" moved 7 frames (16 of them 8), every cut after it 7, and the stare is still
+144. 65.75 s = 1578 frames, inside the 58-66 s asked; no word of the script was cut. Pronunciation checked
+(--phonemes): nothing respelled (bastion, ingot, ender, zero, gravel, version are said right).
 
 GUARDED BUILD: each sequence file is imported, and each shot function called, inside a guard (see STRICT below):
 a broken file or shot prints "[sixseconds] !!! ..." and gets a stand-in; SIXSECONDS_STRICT=1 makes errors fatal.
 
 THE EDIT (the story's devices, designed into the plan below)
-  * THE RESET: on "ended" (pt10) the picture SNAPS to black and stays black to the cut into br11, 13 frames
-    (0.54 s), with the caption "ended" held on the black (RESETS). br11 comes up out of black, cut 2 frames before
-    "New". The flash cuts of beat 16 are snaps too (SNAPS: 2 black frames at the start of fl16_treasure and
-    fl16_home): each world that ends goes to black.
+  * THE RESET: on "ended" (pt10, 655) the picture SNAPS to black and stays black to the cut into br11, 13 frames
+    (655-667, 0.54 s), with the caption "ended" held on the black (RESETS). Then the voice rests (0.5 s after
+    "ended") and br11's empty bridge comes up out of black on 668, IN THE SILENCE, 9 frames before "New" (677):
+    br11 starts 7 frames before its sentence's own cut, so the new world is seen before it is named. The flash cuts
+    of beat 16 are snaps too (SNAPS: 2 black frames at the start of fl16_treasure and fl16_home): each world that
+    ends goes to black.
+  * BEAT 5 IS TWO SHOTS, cut on "so" (322): pt05_boots (the boot framing: "He wore golden boots,") and rw05_family
+    (the brothers turn from the gold to the boots, from the boots' height: "so my brothers thought he was family").
+    The story's rack focus inside the boot framing has no picture: from that lens the runner's torso and arms cover
+    the piglins' heads wherever they stand (the technical check; measured).
   * THE FLASH CUTS: fl16_bridge starts 10 frames BEFORE "I" (8 before the sentence's own cut, in the silence after
     "can't": the first world is seen before it is named), fl16_treasure on "full", fl16_home on "worlds": 22 / 19 /
     33 frames (0.92 / 0.79 / 1.38 s; the snaps leave 17 and 31 frames of picture), the last one longer because it
     is home and it settles into "I started waiting at the gate". These three are the only shots under 1.2 s: the
     story's device ("three flash cuts of about a second each"). No shot is longer than 5 s (the longest, gt19, 4.58 s).
-  * THE SIX-SECOND STARE: rw21 (58 frames) + rw22 (86) = 144 frames exactly; "Six seconds." is spoken in the first
-    second of rw22, then 2.5 s of silence; the cut into rw23 lands 2 frames before "Nothing".
-  * THE END: "Nothing." is held 2.0 s, then a PLAIN cut to black for the last 8 frames (END_BLACK; no caption on
-    it: not the snap that meant a reset, this world does not end); the Reel then loops to frame 1.
+  * THE SIX-SECOND STARE: rw21 (58 frames) + rw22 (86) = 144 frames exactly (1358-1501); "Six seconds." is spoken in
+    the first second of rw22, then 2.5 s of silence; the cut into rw23 (1502) lands 2 frames before "Nothing".
+  * THE END: "Nothing." is held 2.0 s, then a PLAIN cut to black for the last 8 frames (1571-1578, END_BLACK; no
+    caption on it: not the snap that meant a reset, this world does not end); the Reel then loops to frame 1.
   * RE-USED FRAMES (films/sixseconds_common.py CAMS): the gate frame gt03 / gt18 / gt19 (the 18 -> 19 cut is the
-    pixel match cut: only the brute is gone; the story's fourth use, beat 23, is replaced by the story's own
-    fallback, the reverse angle: the gate frame cannot give a face turning to the gateway behind him); the boot
-    framing pt05 / br11 (BOOT_FRAME); the ingot row rw02 / rw21; the pit camera pt06 / pt20.
+    pixel match cut: only the brute is gone, and the runner is a small figure in the corridor on its first frame:
+    gt19's docstring; the story's fourth use, beat 23, is replaced by the story's own fallback, the reverse angle:
+    the gate frame cannot give a face turning to the gateway behind him); the boot framing pt05 / br11
+    (BOOT_FRAME); the ingot row rw02 / rw21; the pit camera pt06 / pt20.
 
 THE LEAD'S PASS AFTER THE MACHINE RESTART (Nov 26; the earlier lead was cut off mid-job, its work checked here):
   kept: the narration (--check: current; --phonemes: nothing to respell), the plan, the two skies, the five sequences
   and their stubs, the common module, tools/sixseconds_shots.py and _timeline.py (both strict builds clean, the
   caption check passes, the encoder's black checked against Stage.dip's own ramps). Added: tools/sixseconds_geo.py
   and tools/sixseconds_palette.py (named in the docstrings but missing). Fixed in the stubs on renders: gt19's runner
-  started inside the brute's silhouette on the match cut (now RUN_PAST_START on the corridor's east side); br15's
-  brute had his face cut in half by the pillar (now BR15_BRUTE, 0.5 east). Measured and written into the stubs for
+  started inside the brute's silhouette on the match cut (then RUN_PAST_START on the corridor's east side; in the
+  review pass RUN_PAST); br15's brute had his face cut in half by the pillar (then BR15_BRUTE, 0.5 east; in the review
+  pass the place of all three pillar shots, six_pillar_brute). Measured and written into the stubs for
   their directors: gt01's push takes the brute's ear out of the frame; pt05's piglins hidden behind the runner's
   arms; pt09 / pt10's pit piglins in the caption band; br13's runner under the top icons; rw22's ingot on the top
   edge of the caption band. Verified on renders: the boot framing (pt05 = br11), the match cut (gt18 -> gt19), the
   flash lock (fl16 x 3). The scouting stills: out/test/sixseconds_scout_*.png (each named in its shot's docstring).
+
+THE LEAD'S REVIEW PASS (two independent checks of the plan: story 6.5, technical 7; every finding confirmed or
+  refuted on the stub film by geo, probes or stills before it was fixed; the details are in the sequence files):
+  the pause after "ended" 0.5 s and br11 out of black in the silence; beat 5 split (pt05_boots + rw05_family);
+  the flash cuts' golden boots out from under the puff and phased broad side to the lens; the pillar shots' brute
+  on one place with his ingots on his visible side and br15's camera aimed lower; rw23's camera no longer shared,
+  moved onto the brute's line to the gateway (face 69 -> 122 px); br11's run re-timed (legs in on "bastion", the
+  boots still before "same boots") with the focus far on the empty bridge, racked to the boots; gt04's run made
+  to fit (sprint-jump, nearer start, passing the lens's side); gt19's path off home_run_past (it ran through
+  piglin_gt2) and its exit by "before"; gt18 / gt19's piglins placed once over the match cut (their ears jumped);
+  pt06's mine with drop=None (an unregistered blackstone drop lay in the pit to the film's end) and a build()
+  check for unregistered dropped items; rw22's camera (the ingot no longer across his snout); the pearl one entity
+  over pt07 / pt08; pt08's gravel as the game throws it; pt09's blow on "axe" with the cut in the air; the runner's
+  hand set on every shot's first frame. Not fixed (the directors' measured problems, in their docstrings): gt01's
+  ear, pt09 / pt10's pit piglins in the caption band, br12 x 1.52, br13's runner under the top icons, br14's
+  ingots on the caption band's edge, br15's runner at the top right instead of the lower foreground, rw23's
+  brother-2 sword across the brute's chest.
 
 THE SKIES (two; each costs one more build, about 2 s, per render command that has work in it)
   "wastes"  nether_wastes: the dark red haze of the home bastion, of "the older version of the world" (gt19, pt20:
@@ -89,8 +118,9 @@ THE SKIES (two; each costs one more build, about 2 s, per render command that ha
             sixseconds_scout_sky_b16b_treasure_flash_warped_forest.png against sixseconds_set_b16b_treasure_flash.png):
             the same picture, nothing of the fog reaches that enclosed frame, so no third sky.
             Its cost, measured (tools.sixseconds_palette --sky soul): the teal fill lifts the blackstone, so the
-            brute's separation drops: br12 x 1.52 (1.74 under nether_wastes), fl16_bridge x 1.57, br15 x 2.82: all
-            pass the 1.5 rule, br12 at the limit (its docstring says what to do).
+            brute's separation drops: br12 x 1.52 (1.74 under nether_wastes), fl16_bridge x 1.56, br15 x 3.25 (its
+            new camera): all pass the 1.5 rule, br12 and fl16_bridge at the limit (their docstrings say what to do).
+            Sky segments of the film: 1-667 wastes, 668-1020 soul, 1021-1578 wastes.
 """
 import importlib
 import os
@@ -140,7 +170,7 @@ FLASH_STAND_IN = {"fl16_bridge": ("flash_bridge", "bridge"), "fl16_treasure": ("
                   "fl16_home": ("flash_home", "home")}
 
 # The narration: stories/piglin.json word for word, one entry per sentence (164 words). Pauses are after the
-# sentence, voice to voice (default 0.35 s). Spoken: 49.2 s; with these pauses the film is 65.46 s = 1571 frames.
+# sentence, voice to voice (default 0.35 s). Spoken: 49.2 s; with these pauses the film is 65.75 s = 1578 frames.
 NARRATION = {
     "voice": "am_michael", "speed": 1.0,
     "tail": 2.35,                                   # "Nothing." held 2.0 s, then the last 8 frames black (END_BLACK)
@@ -154,8 +184,10 @@ NARRATION = {
         {"text": "He threw gold, and they threw back ender pearls.", "id": "b07", "pause": 0.35},
         {"text": "Mostly gravel.", "id": "b08", "pause": 0.9},                         # a full beat on the pile
         {"text": "I hit him with my axe.", "id": "b09", "pause": 0.25},                # cut on the knock-back
-        # "ended": the snap to black + 0.2 s = 13 black frames with the caption held, then "New world" out of black
-        {"text": "He turned into smoke, and the whole world ended.", "id": "b10", "pause": 0.2},
+        # "ended": the snap to black ON the word, 13 black frames with the caption held; the empty bridge comes up out
+        # of black in the silence, 9 frames before "New" (br11 starts 7 frames before its sentence's cut): the 0.5 s
+        # is the storyteller's beat after the end of a world (the story check: 0.2 s ran "ended. New world" together)
+        {"text": "He turned into smoke, and the whole world ended.", "id": "b10", "pause": 0.5},
         {"text": "New world, different bastion, same boots.", "id": "b11", "pause": 0.45},
         {"text": "Every world has a bastion, and every bastion has me.", "id": "b12", "pause": 0.4},
         {"text": "He hid on a pillar and threw gold at me.", "id": "b13", "pause": 0.35},
@@ -190,13 +222,14 @@ SHOTS = [
     ("rw02_ingots", 2, "row", "wastes", "b02"),
     ("gt03_guard", 3, "gate", "wastes", "b03"),           # THE GATE FRAME (1st)
     ("gt04_runin", 4, "gate", "wastes", "b04"),
-    ("pt05_boots", 5, "pit", "wastes", "b05"),            # THE BOOT FRAMING (1st)
+    ("pt05_boots", 5, "pit", "wastes", "b05"),            # THE BOOT FRAMING (1st): "He wore golden boots,"
+    ("rw05_family", 5, "row", "wastes", ("b05", "so")),   # the brothers turn from the gold to the boots: "so my ..."
     ("pt06_dig", 6, "pit", "wastes", "b06"),              # THE PIT CAMERA (1st); the pit is dug from here ...
     ("pt07_pearl", 7, "pit", "wastes", "b07"),
     ("pt08_gravel", 8, "pit", "wastes", "b08"),
     ("pt09_axe", 9, "pit", "wastes", "b09"),
     ("pt10_smoke", 10, "pit", "wastes", "b10"),           # ... to here; RESET: black from "ended" to the cut
-    ("br11_boots", 11, "bridge", "soul", "b11"),          # THE BOOT FRAMING (2nd), out of black
+    ("br11_boots", 11, "bridge", "soul", ("b11", -7)),    # THE BOOT FRAMING (2nd), out of black, 9 f before "New"
     ("br12_blocks", 12, "bridge", "soul", "b12"),
     ("br13_pillar", 13, "bridge", "soul", "b13"),
     ("br14_zero", 14, "bridge", "soul", "b14"),
@@ -321,6 +354,15 @@ def build(scene, sky=None):
             a, b = r.black
             st.dip(a, out=0, hold=b - a + 1, back=0)
     st.finish()
+    # every dropped item an engine call made by itself must be in the cast (else it lies in every later shot)
+    stray = SC.unregistered_items(st)
+    if stray:
+        msg = "[sixseconds] !!! %d dropped item(s) not registered with the Stage (C.item / C.adopt): %s" % (
+            len(stray), ", ".join(stray))
+        if STRICT:
+            raise RuntimeError(msg)
+        BROKEN["items"] = msg
+        print(msg, file=sys.stderr)
 
     # 6. this film's final quality (a measured study): 540x960 at 16 samples, upscaled to 1080x1920 at encode
     scene.render.resolution_x, scene.render.resolution_y = SC.FINAL_RES

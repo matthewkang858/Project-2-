@@ -15,30 +15,38 @@ THE PLACE (films/legday_set.py, "THE ANVIL WALL"): the exit road (dirt path x -1
   captain, with the banner on his head, 25.5: health 24: all five die). North of y 57 the road is the meadow (z 1
   from y 58, 2 from y 71-72, 3 from y 78): the path C.v.paths["patrol_road"] (0.5, 84 -> 40) has its hops. A lone
   oak LONE_OAK (3, 81) on the meadow's horizon up the road (beat 15). Anchors: road_shelf_south (0.5, 44),
-  road_shelf_north (0.5, 58.6), runners_stop (0.55, 39.2), steve_among_anvils (1.45, 48.15), banner_spot_target (1.5,
-  50.7), bottle_spot_target (1.5, 51.5) (illagers.drops' spots, outside the anvil cells), patrol_far (0.5, 82); the
-  path run_out (0.6, 18 -> 40). The road between the stair and the east verge is only x 0..3 wide.
-THE PATROL (engine.illagers): C.patrol(tag) = [captain (the ominous banner on his head), 2..5], crossbows held;
-  illagers.march(pat, path, frame, gait="vanilla") (wide and long-lens shots: the game's short swing) walks the file
-  2.0 apart at the leader's 1.911 blocks/s; the followers start "carried on straight behind the path's first point":
-  pre-roll the march (a twin of its own, not in the shot before) so all five are on the real road when the shot
-  starts. A dying pillager tips over to ITS OWN LEFT: walking south, that is EAST, toward a camera on the road's east
-  side (rd19's): the illagers builder's measurement. Damage x 0.75 while the banner is on: a fall of 17 or more kills
-  the captain (the shelf's 18 does).
-THE WORLD STATE IN YOUR HANDS (legday_common "THE WORLD STATE"): rd19 retracts the row and releases the day set
-  (C.row.retract(f); fixtures.release(C.anvils, f, world=C.v)); the anvils then lie on the road through rd21 (the
-  release's keys carry on; the lead's SHELF "twelve" shows them). The lever and the dust were switched off in tp18
-  (not yours); the re-arm before dusk is the lead's.
+  road_shelf_north (0.5, 58.6), runners_stop (0.55, 39.2), patrol_far (0.5, 82); the path run_out (0.6, 18 -> 40).
+  THE DROPS AND STEVE (SHARED, the lead's: one name = one point, C.P(name) = C.A[set anchor]): banner_spot (1.45,
+  49.25) and bottle_spot (1.45, 50.05), 1.0 block east of the captain's feet on the landing frame (within the game's
+  1.35-block toss; crush_patrol spots=[C.P("bottle_spot"), C.P("banner_spot")]); steve_among_anvils (1.45, 46.9),
+  2.35 blocks short of the banner (a player collects an item within about one block: keep him 2 or more away the
+  WHOLE shot, tools.legday_state measures his real position). The road between the stair and the east verge is
+  only x 0..3 wide.
+THE PATROL (engine.illagers): C.patrol(tag) = [captain (the ominous banner on his head), 2..5], crossbows held. EVERY
+  patrol of this sequence is C.march_patrol(tag): THE PATROL CLOCK (legday_common), one march on the whole
+  patrol_road (0.5, 84 -> 40, with its hops) from one frame (about 745) for rd15, tp18 and rd19 alike, so that the
+  captain's feet are at y 49.6 when the anvils land (1210): rd15 903 -> 73.5, 944 -> 70.2; rd19 1142 -> 55.0, "back"
+  1169 -> 52.9, 1210 -> 49.9 (all five on the strip: crushed). Do not march a patrol any other way (tp18 shows the
+  same clock from the wall top). The file walks 2.0 apart at the leader's 1.911 blocks/s, gait "vanilla" (the
+  game's short swing, for wide and long-lens shots). A dying pillager tips over to ITS OWN LEFT: walking south, that
+  is EAST, toward a camera on the road's east side (rd19's): the illagers builder's measurement. Damage x 0.75 while
+  the banner is on: a fall of 17 or more kills the captain (the shelf's 18 does).
+THE WORLD STATE IN YOUR HANDS (legday_common "THE WORLD STATE"): rd19 retracts the row and releases the day set ON
+  C.release_frame() ("back" 1169: FIXED, the patrol clock hangs on it): C.row.retract(f); fixtures.release(C.anvils,
+  f, world=C.v, chip=list(LC.CHIPPED)) (the frozen draw: 10 of 12 chip; the dusk set carried back up is chipped the
+  same way); the anvils then lie on the road through rd21 (the release's keys carry on; the lead's SHELF "twelve"
+  shows them). The lever and the dust were switched off in tp18 (not yours); the re-arm before dusk is the lead's.
+  THE WORLD REMEMBERS THE LANDED ANVILS for the whole film (fixtures.release writes them into the World, which has no
+  time): on the strip x 0..1, y 46..57 do not use C.stand() (it gives z 1, on an anvil, in every shot once rd19 has
+  been built): give z 0.0 (the cobblestone) explicitly.
 THE SKY: "gold", the sun due EAST: the patrol walking south and the runners going north are lit on their east
   halves; cameras looking north or south along the road have the sun 90 degrees off their axis.
-TAGS (twins): patrol_rd15_1..5 (rd15), patrol_rd19_1..5 (rd19: pre-rolled from about 700), steve / kai / zuri _rd
+TAGS (twins): patrol_rd15_1..5 (rd15), patrol_rd19_1..5 (rd19), both on the patrol clock; steve / kai / zuri _rd
   (rd16), steve_rd2 (rd21), efe_rd (rd21, his torch); the banner and the bottle: crush_patrol's drops in rd19,
   handed on to rd20 / rd21 through C.memo["rd_drops"].
 LIGHT: C.lights(s, "gold", near=<point>, radius=12..16).
 PREVIEW samples for render.py previews: 10 (legday_common.PREVIEW_SAMPLES).
 """
-import math
-
 from engine import fixtures, illagers
 from films import legday_common as LC
 
@@ -52,27 +60,12 @@ RD20_CAM = dict(pos=(3.7, 45.3, 0.6), target=(1.45, 49.65, 0.3), pos1=(2.75, 47.
                 lens=35.0, fstop=2.8)            # a push in to the banner and the bottle (the set's b20, re-aimed on the
 #                                                  lead's drop spots: PLACES banner_spot / bottle_spot)
 RD21_CAM = dict(LC._set_cam("b21"), pos1=(4.1, 45.75, 0.3))
-RETRACT_ON = "back"           # rd19: the row snaps back on this word ("pulled BACK", 1169); the anvils land 41
-#                               frames later, on "fell" (1209-1210)
-CAPTAIN_LAND_Y = 49.6         # the captain's feet on the landing frame (LC.LAND_WINDOW: 45.71 .. 50.29): the last
-#                               of the five at 57.6, under anvil 12; the drops (PLACES banner_spot / bottle_spot) land
-#                               1.0 block east of him: inside the game's 1.35-block toss
+# the release word ("back" 1169) and the captain's landing y (49.6) are the LEAD'S: legday_common RELEASE /
+# CAPTAIN_LAND_Y (the patrol clock of rd15, tp18 and rd19 hangs on them): C.release_frame(), C.land_frame()
 RUNNERS = (("steve", (1.0, 29.2), (1.0, 39.2)), ("kai", (2.3, 27.7), (2.3, 37.7)),
            ("zuri", (0.35, 26.7), (0.35, 36.7)))          # (role, from, to): staggered 1.3 sideways, 1.5-2.5 back
 ARROWS_16 = ((0.35, 41.0), (1.15, 41.4), (2.0, 40.8))     # three arrows into the road in front of the runners
 ARROW_DOWN = (0.05, -0.55, -0.83)                         # from the patrol to the north, down into the road
-
-
-def _arc_to_y(path, y):
-    """Arc length along a polyline (3D points, monotonic in y going south) from its start to the point at `y`."""
-    total = 0.0
-    for a, b in zip(path, path[1:]):
-        if b[1] <= y <= a[1] or a[1] <= y <= b[1]:
-            if abs(b[1] - a[1]) > 1e-9:
-                t = (a[1] - y) / (a[1] - b[1])
-                return total + t * math.dist(a, b)
-        total += math.dist(a, b)
-    raise ValueError("y %.2f is not on the path" % y)
 
 
 def rd15_pillagers(st, s, C, nar):
@@ -86,7 +79,8 @@ def rd15_pillagers(st, s, C, nar):
     captain's head, pillager walk cycle.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 903       the file already walking (march pre-rolled: patrol_rd15 is in no shot before)
+      frame 903       the file already walking (C.march_patrol: on the patrol clock since about 745; the captain's
+                      feet at y 73.5 on 903, 70.2 on 944; the last follower 8 blocks behind him, on the real road)
       "pillagers" 913 the five in single file, crossbows, the CAPTAIN in front with the banner over his head (the
                       banner must read: it is the drop of beat 20)
       the horizon     clean, the lone oak (3, 81) behind them
@@ -98,13 +92,14 @@ def rd15_pillagers(st, s, C, nar):
       [_zones].png): 85 mm from 3.9 above the strip, over the meadow's 1-block rises (from ground level they read as
       dirt bands): the file staggered, the captain's banner, the lone oak, a clean horizon, faces lit from the east.
       FALLBACK CHOSEN by the set: the camera 3.9 high, not "ground-level".
-    NOW (stub): RD15_CAM (+ a creep), the patrol marching south from y 76 (pre-rolled 12 frames), gait vanilla. Hero:
-      the captain.
+      THE REVIEW (technical): the first stub marched from y 76 with only 12 frames of pre-roll: three followers walked
+      a full block INSIDE the meadow's rise (z 2 in grass, the ground z 3 at y 78), hidden by the captain in the 85 mm
+      frame. Fixed by the patrol clock (the whole road, its hops, from about 745); tools.legday_state now checks
+      every body against the World (no character inside a solid block in its shots).
+    NOW (stub): RD15_CAM (+ a creep), C.march_patrol("rd15") (the clock). Hero: the captain.
     """
     f0, f1 = s.frame_start, s.frame_end
-    road = [(0.5, 76.0, 2.0)] + [p for p in C.v.paths["patrol_road"] if p[1] <= 76.0]
-    pat = C.patrol("rd15")
-    illagers.march(pat, road, f0 - 12, gait="vanilla")
+    pat = C.march_patrol("rd15")
     st.use(s, *pat)
     C.cam(s, None, focus=pat[0].head, **RD15_CAM)
     st.hero(s, "captain", pat[0])
@@ -190,20 +185,25 @@ def rd19_drop(st, s, C, nar):
       of the shelf, 16 mm, looking along the wall's foot: a clean file on the strip (faces 50-55 %), the far anvils
       mid-fall in frame, the near ones entering from above, the pillagers' shadows on the face. All five struck, all
       lethal (captain 25.5). The march window: the captain's feet at y 45.71 .. 50.29 (x 0.5) on the landing frame.
-    NOW (stub): RD19_CAM locked (handheld 0.002), patrol_rd19 marching on patrol_road, pre-rolled so that the captain
-      is at y 49.6 on the landing frame; the row retracts and the anvils are released on "back" (1169); crush_patrol
-      kills all five on their anvils' landing frames (knockback False: they tip over in place), the bottle and the
-      banner dropped on their spots (C.memo["rd_drops"]). Heroes: the captain, the file.
+      THE LEAD (the stub, measured by tools.legday_state): the anvils land on 1210 ("fell" 1209), all five crushed,
+      the captain's feet at y 49.86, the drops within the toss; out/test/legday_scout_rd19_drop_1206[_zones].png
+      (4 frames before the impact): the twelve anvils a motion-blurred line falling along the face over the file;
+      the file small at the centre-right (x 50-60 %, y 47-60 %).
+    THE CHIPS: release(..., chip=list(LC.CHIPPED)): the frozen draw (10 of 12 chip, 3 and 4 stay whole); the dusk
+      set that "came back up" is chipped the same way (legday_common THE CHIPPED ANVILS). Do not change it.
+    NOW (stub): RD19_CAM locked (handheld 0.002), C.march_patrol("rd19") (the clock: the captain at y 55.0 on 1142,
+      49.9 on the landing frame); the row retracts and the anvils are released on C.release_frame() ("back" 1169);
+      crush_patrol kills all five on their anvils' landing frames (knockback False: they tip over in place), the
+      bottle and the banner dropped on their spots (C.memo["rd_drops"]). Heroes: the captain, the file.
     """
     f0, f1 = s.frame_start, s.frame_end
-    f_back = C.at(s, RETRACT_ON)
+    f_back = C.release_frame()
     C.row.retract(f_back)
-    drops = fixtures.release(C.anvils, f_back, world=C.v, chip="game", seed=3)
+    drops = fixtures.release(C.anvils, f_back, world=C.v, chip=list(LC.CHIPPED))
     land = int(drops[0]["frame_land"])
-    road = list(C.v.paths["patrol_road"])
-    start = land - int(round(_arc_to_y(road, CAPTAIN_LAND_Y) / illagers.PATROL_SPEED * 24.0))
-    pat = C.patrol("rd19")
-    illagers.march(pat, road, start, gait="vanilla")
+    C.memo["rd_falls"] = drops                    # (tools.legday_state reads which anvils chipped)
+    pat = C.march_patrol("rd19")
+    start = C.patrol_clock()["start"]
     cam = RD19_CAM["pos"]
     res = illagers.crush_patrol(pat, drops, camera=s, stage=st, knockback=False, village=C.v,
                                 spots=[C.P("bottle_spot"), C.P("banner_spot")], face=cam)
@@ -231,8 +231,9 @@ def _drops(st, s, C, tag):
 
 
 def rd20_banner(st, s, C, nar):
-    """BEAT 20  "That left a banner and a bottle."   frames 1250-1301 (52 f, 2.17 s), sky gold.
-    Words: That 1252, left 1256, a 1262, banner 1264, and 1276, a 1280, bottle 1281.
+    """BEAT 20  "That left a banner and a bottle."   frames 1250-1306 (57 f, 2.38 s), sky gold.
+    Words: That 1252, left 1257, a 1263, banner 1265, and 1279, a 1282, bottle 1284. (Spoken at 0.9: the review
+    measured it the fastest line of the film, 5.4 syllables a second, on the hardest picture: the bottle.)
 
     STORY: About 2.5 s. The smoke thins over a silent road: twelve anvils stand in a line on the cobblestones, most
     of them chipped, and between two of them the ominous banner and one ominous bottle turn slowly side by side as
@@ -242,8 +243,8 @@ def rd20_banner(st, s, C, nar):
 
     MUST BE SEEN, ON WHICH WORD
       frame 1250      the last of the smoke thinning (rd19's poofs: no time jump), the anvils on the strip, moving in
-      "banner" 1264   the ominous banner turning, readable
-      "bottle" 1281 .. 1301   the push ends with the banner and the bottle TOGETHER filling the middle third of the
+      "banner" 1265   the ominous banner turning, readable
+      "bottle" 1284 .. 1306   the push ends with the banner and the bottle TOGETHER filling the middle third of the
                       frame (the bottle must be recognised: "a small thing is seen only if it is what is in focus")
       no crossbows, no other drops (plain pillagers killed by an anvil drop nothing: illagers does it)
     SHARED: banner_spot / bottle_spot (rd19's drops: C.memo["rd_drops"]).
@@ -254,8 +255,11 @@ def rd20_banner(st, s, C, nar):
       only the picture can carry it now).
     MEASURED (the set builder, out/test/legday_set_b20_drops_a / _b[_zones].png): the push in, 35 mm: _a the twelve
       anvils on the cobblestones, _b the banner and the bottle side by side filling the middle; palette passes.
-    NOW (stub): RD20_CAM (the push, ease_out), rd19's drops on their spots (or a fresh pair). Heroes: the banner and
-      the bottle.
+    THE LEAD'S SCOUT of the stub (out/test/legday_scout_rd20_banner_1297[_zones].png, the push's end; made before
+      the line was slowed: the shot now ends on 1306): the banner and the bottle side by side filling the middle
+      (x 25-75 %, y 33-55 %), the chipped anvils behind them: it reads.
+    NOW (stub): RD20_CAM (the set's b20 re-aimed on the lead's drop spots, the push ease_out), rd19's drops (or a
+      fresh pair). Heroes: the banner and the bottle.
     """
     items = _drops(st, s, C, "rd20")
     C.cam(s, None, focus=(1.45, 49.65, 0.3), **RD20_CAM)
@@ -264,9 +268,9 @@ def rd20_banner(st, s, C, nar):
 
 
 def rd21_still(st, s, C, nar):
-    """BEAT 21  "Steve still says redstone is cheating."   frames 1302-1368 (67 f, 2.79 s), sky gold.
-    Words: Steve 1304, still 1313, says 1319, redstone 1325, is 1337, cheating 1340. The pause after it (0.7 s) and
-    the DIP to black into cl22 (fading out from 1366: nothing important on 1366-1368) carry the day to dusk.
+    """BEAT 21  "Steve still says redstone is cheating."   frames 1307-1372 (66 f, 2.75 s), sky gold.
+    Words: Steve 1309, still 1317, says 1324, redstone 1330, is 1341, cheating 1345. The pause after it (0.7 s) and
+    the DIP to black into cl22 (fading out from 1370: nothing important on 1370-1372) carry the day to dusk.
 
     STORY: About 2.2 s. Tall frame from the road: Steve walks out and stops among the anvils in the foreground, two
     blocks short of the banner and bottle so he does not collect them. High above him on the wall top, small against
@@ -276,10 +280,10 @@ def rd21_still(st, s, C, nar):
     dropped items at the frame edge, out of his reach; redstone torch held and glowing; lever.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1302      Steve walking out among the anvils (a twin, pre-rolled if he must be moving)
-      "still" 1313 .. "says" 1319   he stops at steve_among_anvils (two blocks short of the drops) and looks UP at the
+      frame 1307      Steve walking out among the anvils (a twin, pre-rolled if he must be moving)
+      "still" 1317 .. "says" 1324   he stops at steve_among_anvils (two blocks short of the drops) and looks UP at the
                       narrator high on the wall top (narrator_edge: at the front edge, so he is seen from below)
-      "cheating" 1340 he turns his head away, to the anvils and then to the stairs: the same turn as sq10's "He said
+      "cheating" 1345 he turns his head away, to the anvils and then to the stairs: the same turn as sq10's "He said
                       that's cheating" (the story's rhyme)
       the drops       at the frame's edge, out of his reach
     SHARED: steve_among_anvils, narrator_edge, banner_spot / bottle_spot (rd19's drops).
@@ -294,7 +298,11 @@ def rd21_still(st, s, C, nar):
       the anvils, up the face: Steve looking up (face 56 %), the wall face, the narrator TINY at the top's NE corner;
       the drops below the frame. THE LEAD: in that still Steve is seen from behind (his face away, up the wall): his
       look up and his head turning away must show his face (cheat the camera round to his side, C.to_lens).
-    NOW (stub): RD21_CAM (+ a drift), steve_rd2 walking out from 1302 to steve_among_anvils, looking up at efe_rd
+      tools.legday_geo rd21_still:1330 on the stub (before the narration's last change; now about frame 1335):
+      Steve's eyes x 7 % (the left edge), 130 degrees off the lens (from behind), face 84 px; the narrator's face
+      10 px at x 64 %, y 31 % (a figure, as the story says "small against the sky", but no face).
+      THE WORLD: the landed anvils are in the World (z 1 on the strip from C.stand): Steve's z is given (0.0).
+    NOW (stub): RD21_CAM (+ a drift), steve_rd2 walking out from 1307 to steve_among_anvils, looking up at efe_rd
       (with his torch at narrator_edge) from "still", turning away on "cheating"; the drops on their spots. Heroes:
       Steve.
     """

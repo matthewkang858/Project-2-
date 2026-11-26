@@ -37,18 +37,21 @@ SHOTS = [
     ("b19", "night", 2.0, 20), ("b20", "night", 2.0, 16), ("b21", "night", 2.0, 20), ("b22", "night", 2.0, 20),
     ("b23", "night", 2.0, 20), ("b24", "night", 2.0, 20), ("wide_night", "night", 1.5, 12),
     ("jukebox", "night", 4.0, None), ("discs_drop", "night", 1.5, 20), ("doorstep", "night", 1.0, 8),
-    ("clap", "night", 1.5, None),
+    ("clap", "night", 1.5, None), ("discs_hero", "night", 1.0, 8), ("meadow_disc", "night", 4.0, None),
 ]
 SKY_OF = {name: sky for name, sky, _s, _o in SHOTS}
 # proof name -> the shots it is made of (several = a sheet of tiles)
 PROOFS = {
     "wide_gold": ["wide_gold"], "wide_night": ["wide_night"], "notes": ["notes_zuri", "notes_kai", "notes_sunny"],
-    "jukebox": ["jukebox"], "discs": ["b20", "discs_drop"], "totem": ["totem"], "held": ["held"], "horn": ["horn"],
+    "jukebox": ["jukebox"], "discs": ["b20", "discs_drop", "discs_hero"], "meadow_disc": ["meadow_disc"], "totem": ["totem"], "held": ["held"], "horn": ["horn"],
     "doorstep": ["doorstep"], "clap": ["clap"],
     "cams_gold": ["b1", "b2", "b3", "b4", "b5", "b6"],
     "cams_night": ["lane", "b8", "lane17", "b18", "b19", "b20", "b21", "b22", "b23", "b24"],
 }
-SHEETS = ("notes", "discs", "totem", "jukebox", "clap", "cams_gold", "cams_night")
+# the last frames of the moving cameras (the first frames are in cams_gold / cams_night)
+ENDS = {"ends_gold": ["b1", "b5", "b6"], "ends_night": ["b21", "b24"]}
+PROOFS.update(ENDS)
+SHEETS = ("ends_gold", "ends_night", "notes", "discs", "totem", "jukebox", "clap", "cams_gold", "cams_night", "meadow_disc")
 
 
 def _cam(s, cam, focus=None, moving=False):
@@ -111,7 +114,7 @@ def shot_b1(st, s, bd, h):
     no.toot(f0, s.frame_end)
     st.use(s, steve, *cast)
     st.hero(s, "steve", steve)
-    _cam(s, bd.cameras["b1"], focus=steve.head)
+    _cam(s, bd.cameras["b1"], focus=steve.head, moving=True)
     bd.lights(st, s, scale=1.0)
 
 
@@ -125,7 +128,7 @@ def shot_b2(st, s, bd, h):
     steve.place(f0, bd.A["steve_foot"], bd.yaw["steve_foot"])
     st.use(s, z, steve)
     st.hero(s, "zuri", z)
-    _cam(s, bd.cameras["b2"])
+    _cam(s, bd.cameras["b2"], moving=True)
     bd.lights(st, s, scale=1.0)
 
 
@@ -202,7 +205,7 @@ def shot_b6(st, s, bd, h):
     sp = bd.A["line_5"]
     steve.look_at(f0, (sp[0] - 0.5, sp[1] + 0.1, sp[2] + 0.9), ease=0)
     st.use(s, steve, *cast)
-    _cam(s, cam, focus=cast[0].item())
+    _cam(s, cam, focus=cast[0].item(), moving=True)
     bd.lights(st, s, scale=1.0)
 
 
@@ -267,16 +270,16 @@ def shot_totem(st, s, bd, h):
 
 
 def shot_held(st, s, bd, h):
-    """Proof: block items held as the game draws them (gold block, pumpkin, note block, white wool), no gesture."""
+    """Proof: block items held as the game draws them (gold block, pumpkin, note block), no gesture."""
     from engine import music
 
     f0 = s.frame_start
     cam = bd.cameras["held"]
     cast = []
-    for i, (w, item) in enumerate((("kai", "gold_block"), ("sunny", "pumpkin"), ("zuri", "note_block"),
-                                   ("alex", "white_wool")), 1):
+    for (w, item), y in zip((("kai", "gold_block"), ("sunny", "pumpkin"), ("zuri", "note_block")), (1.9, 1.05, 0.2)):
         p = _p(st, w, f0=f0)
-        p.place(f0, bd.A["line_%d" % i], bd.yaw["line_%d" % i])
+        spot = (-10.2, y, bd.A["line_1"][2])
+        p.place(f0, spot, -math.pi / 2.0 - 0.25)
         music.hold(p, item, frame=f0)
         p.look_at(f0, cam["pos"], ease=0)
         cast.append(p)
@@ -348,11 +351,12 @@ def shot_doorstep(st, s, bd, h):
 def shot_b8(st, s, bd, h):
     """Beat 8: over Steve's shoulder, Alex pops the disc out of the playing jukebox; it turns above it."""
     f0 = s.frame_start
-    cast = _band(st, bd, s, f0, who=("zuri", "kai", "alex"), spots={"zuri": "flank_n2", "kai": "flank_n3"})
+    cast = _band(st, bd, s, f0, who=("zuri", "kai", "alex"),
+                 spots={"zuri": "flank_n2", "kai": "flank_n3", "alex": "alex_eject"})
     a = cast[2]
     a.look_at(f0, bd.A["jukebox_top_target"], ease=0)
     steve = _p(st, "steve", f0=f0)
-    steve.place(f0, bd.A["steve_foot"], bd.yaw["steve_foot"])
+    steve.place(f0, bd.A["steve_watch"], bd.yaw["steve_watch"])
     steve.look_at(f0, bd.A["jukebox_top_target"], ease=0)
     bd.jukebox.play(f0 - 30, f0 + 10, disc="music_disc_cat", camera=s)
     item = bd.jukebox.eject(f0 + 12, player=a, disc="music_disc_cat", camera=s, until=s.frame_end + 1)
@@ -367,7 +371,7 @@ def shot_b8(st, s, bd, h):
 def shot_jukebox(st, s, bd, h):
     """Proof: the jukebox playing (notes every 24 frames) and Alex ejecting the disc: 4 tiles."""
     f0 = s.frame_start
-    (a,) = _band(st, bd, s, f0, who=("alex",))
+    (a,) = _band(st, bd, s, f0, who=("alex",), spots={"alex": "alex_eject"})
     a.look_at(f0, bd.A["jukebox_top_target"], ease=0)
     notes = bd.jukebox.play(f0, f0 + 60, disc="music_disc_cat", camera=s)
     fe = f0 + 56
@@ -389,7 +393,7 @@ def shot_discs_drop(st, s, bd, h):
     f0 = s.frame_start
     cam = bd.cameras["discs_drop"]
     d11 = mobs.make_dropped_item("music_disc_11", name="proof_disc_11")
-    d11.place(f0, (bd.A["jukebox_target"][0] - 1.5, bd.A["jukebox_target"][1] + 0.0, 1.0))
+    d11.place(f0, bd.pedestal_top)                       # on the gold pedestal (the totem's place)
     d11.face(f0 + 20, cam["pos"])
     d11.animate(f0, s.frame_end + 1)
     cat = mobs.make_dropped_item("music_disc_cat", name="proof_disc_cat")
@@ -401,6 +405,43 @@ def shot_discs_drop(st, s, bd, h):
     st.use(s, d11, cat)
     _cam(s, cam)
     bd.lights(st, s, scale=NIGHT_TORCHES)
+
+
+def shot_discs_hero(st, s, bd, h):
+    """Proof: disc 11 and cat as close-up hero props (music.hero_item), upright, faces to the lens, in front of the
+    jukebox in the lantern light."""
+    from engine import music
+
+    f0 = s.frame_start
+    cam = bd.cameras["discs_hero"]
+    for k, (disc, dy) in enumerate((("music_disc_11", -0.2), ("music_disc_cat", 0.25))):
+        ob = music.hero_item(disc, collection=bd.collection)
+        ob.name = "proof_hero_%s" % disc
+        ob.location = (-7.75, 0.5 + dy * 1.3, 2.32 + 0.06 * k)
+        ob.rotation_euler = (0.0, 0.0, math.atan2(cam["pos"][0] - ob.location[0], -(cam["pos"][1] - ob.location[1])))
+        ob.scale = (0.36, 0.36, 0.36)
+        h.setdefault("hero_obs", []).append(ob)
+    _cam(s, cam)
+    bd.lights(st, s, scale=NIGHT_TORCHES)
+
+
+def shot_meadow_disc(st, s, bd, h):
+    """Proof (beat 16): the disc a skeleton-killed creeper drops (music.creeper_disc), on the moonlit meadow, from
+    ground level: dropped ON the killing blow, landing, turning and bobbing."""
+    from engine import music
+
+    f0 = s.frame_start
+    feet = (0.7, 36.4, bd.v.ground(0.7, 36.4))
+    d = music.creeper_disc(feet, f0 + 4, disc="music_disc_11", seed=5, world=bd.v, until=s.frame_end + 1,
+                           name="proof_creeper_disc", face=bd.cameras["meadow_disc"]["pos"])
+    st.cast[d.name] = d
+    st.use(s, d)
+    cam = dict(bd.cameras["meadow_disc"])
+    rest = tuple(d.rest_pos)
+    cam.update(target=(rest[0], rest[1], rest[2] + 0.2), focus=(rest[0], rest[1], rest[2] + 0.25))
+    _cam(s, cam)                                         # aimed where it comes to rest (DroppedItem.rest_pos)
+    bd.lights(st, s, scale=NIGHT_TORCHES)
+    h["meadow_disc"] = [5, 10, d.land_frame - f0 + 2, d.land_frame - f0 + 30]
 
 
 def shot_b18(st, s, bd, h):
@@ -526,7 +567,7 @@ def shot_b24(st, s, bd, h):
     bd.jukebox.play(f0 - 10, s.frame_end + 1, disc="music_disc_11", camera=s)
     st.use(s, steve, *cast)
     st.hero(s, "totem", steve.item())
-    _cam(s, cam, focus=steve.item())
+    _cam(s, cam, focus=steve.item(), moving=True)
     bd.lights(st, s, scale=NIGHT_TORCHES)
 
 
@@ -576,6 +617,10 @@ def build(scene, sky="gold", res=(540, 960), samples=16, threads=2, only=None):
         BUILDERS[name](st, s, bd, h)
         offs = [off] if off is not None else h[name]
         frames[name] = [s.frame_start + o for o in offs]
+    for ob in h.get("hero_obs", []):                     # the hero props are seen in their own shot only
+        hs = [x for x in film.shots if x.name == "discs_hero"][0]
+        for f, hide in ((film.frame_start, True), (hs.frame_start, False), (hs.frame_end + 1, True)):
+            st.key(ob, "hide_render", f, hide)
     st.finish()
     return dict(film=film, stage=st, village=v, band=bd, frames=frames, h=h)
 
@@ -630,7 +675,10 @@ def render(names, sky):
     for name in names:
         path = os.path.join(OUT, "music_%s%s.png" % (name, tag))
         t = time.time()
-        tiles = [(sh, f) for sh in PROOFS[name] for f in built["frames"][sh]]
+        if name in ENDS:
+            tiles = [(sh, [x for x in film.shots if x.name == sh][0].frame_end) for sh in PROOFS[name]]
+        else:
+            tiles = [(sh, f) for sh in PROOFS[name] for f in built["frames"][sh]]
         heroes = [ob for _l, obs in built["stage"].heroes.get(tiles[0][0], []) for ob in obs]
         if name not in SHEETS:
             sh, f = tiles[0]

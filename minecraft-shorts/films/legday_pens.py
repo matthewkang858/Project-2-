@@ -17,6 +17,11 @@ THE PLACE (films/legday_set.py, "THE PENS"; engine.animals pen_set): west of the
   clear of tufts (beat 4's track rides there) and so is the strip between the cow pen and the road.
   A fence is 1.0 high as drawn: a cow looks over it, hens need the lens above the top rail (animals' notes). The
   players face EAST (the road and the sun) in all four: their faces are lit.
+THE MILK LOOP IS ONE CLOCK (the review): a drink takes the game's 32 ticks = 38 frames (players.drink's default),
+  the empty bucket is used on the cow at once after, and the full one goes straight up again: pn04 drink 265-303
+  (the bucket empties on 303, inside pn05), "fill" 323 the tap, 325-363 the next drink (at her face on "up" 334,
+  still drinking over the cut into pn06), 368 the next tap, from 370 the next drink. The first stubs ended drinks
+  after 7-34 frames and tapped while a drink was running. Keep it on this clock (DRINK, DRINK_ENDS).
 THE SKY: "gold" (sun due east, 27 degrees). In b04-b06 the camera looks north at the pens: the sun 90 degrees off
   its axis; in pn17 the camera on the road side looks west: the sun behind it (front light: the set builder's note).
 ANIMALS (engine.animals): cow 1.56 tall (back 1.375), chicken 0.94; walk / wander(animals, f0, f1, area) / look_at
@@ -43,7 +48,14 @@ PN06_CAM = dict(LC._set_cam("b06"), pos1=(-9.5, 18.35, 1.2))
 PN17_CAM = dict(LC._set_cam("b17"), pos1=(-4.45, 21.85, 1.1))
 HENS = ((-21.2, 23.6), (-20.6, 21.5), (-18.6, 23.4), (-19.0, 24.6))
 COWS_04 = ((-10.2, 23.1, -10.0, 19.0), (-8.6, 24.4, -9.5, 20.0))     # (x, y, facing toward x, y)
-ARROW_DIR = (-0.97, 0.06, -0.22)          # an arrow from the road (east) into the east fence post
+ARROW_DIR = (-0.55, -0.78, -0.30)         # the way the arrows flew: from up the road to the NORTH-EAST (where the
+ARROW_DIR_2 = (-0.62, -0.72, -0.31)       # patrol is) into the east fence post: the shafts stand 60-70 degrees off
+#                                           the lens axis and read as arrows (the first stub's flew from due east,
+#                                           straight at the lens: two white X shapes, the fletching end-on)
+DRINK = 38                                # frames of one drink: the game's 32 ticks (players.drink's default)
+DRINK_ENDS = 303                          # the milk loop ON THE GAME'S CLOCK across pn04 -> pn05 -> pn06: the drink
+#                                           begun in pn04 (265) empties the bucket on 303; tap on "fill" 323, drink
+#                                           325-363, tap 368, drink from 370
 
 
 def pn04_farms(st, s, C, nar):
@@ -82,7 +94,7 @@ def pn04_farms(st, s, C, nar):
     zuri = C.actor("zuri", "pn")
     C.put(zuri, f0, "zuri_cow", toward=(-9.9, 21.3))
     zuri.hold("milk_bucket")
-    zuri.drink(C.at(s, "protein") - 8, f1 - 3)
+    zuri.drink(DRINK_ENDS - DRINK)                # 265: the game's 38 frames, ending in pn05 (on its clock)
     hens = []
     for i, (x, y) in enumerate(HENS):
         h = C.hen("pn4h%d" % i)
@@ -126,10 +138,13 @@ def pn05_milk(st, s, C, nar):
       one who is actually being fed." A flat item lies along the hand: edge-on from the side, readable from behind or
       above (CONTRACT).
     MEASURED (the set builder, out/test/legday_set_b05_milk[_zones].png): Zuri and the cow both toward the lens over
-      the fence, 50 mm; the bucket sits low (y 65 %, in the caption band): raise it or the camera.
-    NOW (stub): PN05_CAM (+ a slow push), zuri_pn2 drinking the milk bucket (hand_item) to 307, the empty bucket from
-      309, tapping the cow on "fill" (animals.milk), drinking again from "up"; the cow's head to the lens from
-      "you". Heroes: Zuri, the cow.
+      the fence, 50 mm; the bucket sits low (y 65 %, in the caption band): raise it or the camera. THE LEAD'S SCOUT
+      of the stub (out/test/legday_scout_pn05_milk_324[_zones].png, on "fill"): the tap reads (the bucket blurred
+      in the swing at the centre), Zuri's face y 35-48 %; the cow's head at the right edge (x 82-90 %): reframe.
+    NOW (stub): PN05_CAM (+ a slow push), zuri_pn2 ending pn04's drink (the milk bucket, hand_item) on 303, the empty
+      bucket lowered from 303, tapping the cow on "fill" 323 (animals.milk), drinking again 325-363 (the game's 38
+      frames: at her face on "up" 334, still drinking at the cut); the cow's head to the lens from "you". Heroes:
+      Zuri, the cow.
     """
     f0, f1 = s.frame_start, s.frame_end
     zuri = C.actor("zuri", "pn2")
@@ -138,11 +153,12 @@ def pn05_milk(st, s, C, nar):
     cp = C.P("cow_milk_target")
     cow.place(f0, cp, LC.yaw_to(cp, (-11.0, 20.5)))
     zuri.look_at(f0, cow.eye_point(f0), ease=0)
-    empty = C.at(s, "doesn't")
+    empty = DRINK_ENDS                            # 303: pn04's drink ends (the game's clock): the bucket is empty
     animals.hand_item(zuri, "milk_bucket", f0, empty)
-    zuri.drink(f0, empty - 3)
-    animals.milk(zuri, C.at(s, "fill"), empty, f1 + 1)
-    zuri.drink(C.at(s, "up") - 2, f1 - 2)
+    zuri.drink(f0, empty - 4)
+    fill = C.at(s, "fill")
+    animals.milk(zuri, fill, empty, f1 + 1)
+    zuri.drink(fill + 2)                          # 325-363: straight back up, at her face on "up" 334
     cow.look_at(f0, zuri.eye_point(f0), ease=0)
     cow.look_at(C.at(s, "you"), PN05_CAM["pos"], ease=8)
     st.use(s, zuri, cow)
@@ -174,8 +190,8 @@ def pn06_told(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b06_fence[_zones].png): over his right shoulder, 32 mm, his torch's
       glow soft in the foreground (y 68 %), Zuri drinking at the centre, the cow looking at the lens.
     NOW (stub): PN06_CAM (+ a drift), efe_pn with the torch at narrator_fence watching Zuri, turning on "them" and
-      walking off west out of the frame; zuri_pn3 taps the cow on "haven't" and drinks; the cow at the lens. Heroes:
-      Zuri.
+      walking off west out of the frame; zuri_pn3 ends pn05's drink on 363 (the game's clock), taps the cow on 368
+      and drinks again from 370; the cow at the lens. Heroes: Zuri.
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.narrator("pn")
@@ -187,8 +203,11 @@ def pn06_told(st, s, C, nar):
     cow.place(f0, cp, LC.yaw_to(cp, (-11.0, 20.5)))
     cow.look_at(f0, PN06_CAM["pos"], ease=0)
     zuri.look_at(f0, cow.eye_point(f0), ease=0)
-    animals.milk(zuri, C.at(s, "haven't"), f0, f1 + 1)
-    zuri.drink(C.at(s, "told") + 2, f1 - 2)
+    ends = C.T["pn05_milk"].at("fill") + 2 + DRINK            # 363: pn05's drink ends (the game's clock)
+    animals.hand_item(zuri, "milk_bucket", f0, ends)
+    zuri.drink(f0, ends - 4)
+    animals.milk(zuri, ends + 5, ends, f1 + 1)                # 368: the tap
+    zuri.drink(ends + 7)
     efe.look_at(f0, zuri.eye_point(f0), ease=0)
     turn = C.at(s, "them")
     efe.look_at(turn, (-14.0, 14.0, 1.5), ease=6)
@@ -230,6 +249,11 @@ def pn17_cows(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b17_cows[_zones].png): from the road side through the east fence,
       1.1 high, 32 mm: heads above the cows' backs, the near cow at the lens, two arrows in the post (y 64 %: in the
       caption band); Zuri at x 82 % (the edge); front light (the sun behind the lens).
+      THE REVIEW (technical): the arrows flew from due east, straight at this camera (12-15 degrees off its axis):
+      only their fletching showed, two white X shapes on the post. Now they come from up the road to the NORTH-EAST
+      (ARROW_DIR: where the patrol is; the wall stands between the pens and the patrol on the road, so they are the
+      volley of the charge, rd16's arrows' sisters): the shafts stand 60-70 degrees off the lens axis. Confirm on a
+      540x960 still that they read as arrows, and keep both above y 62 %.
     NOW (stub): PN17_CAM (+ a drift), the four standing at hide_1..4 looking east, three cows end to end at
       hide_cow_1..3_target facing north, the near one looking at the lens; one arrow stuck from frame 997, the second
       arriving on "hid" (1061). Heroes: the four.
@@ -254,7 +278,7 @@ def pn17_cows(st, s, C, nar):
         c.idle(f0, f1, seed=i + 3)
     post = C.P("arrow_post_target")
     C.stuck_arrow(s, (post[0], post[1] - 0.05, 0.92), ARROW_DIR)
-    C.stuck_arrow(s, (post[0], post[1] + 0.1, 0.72), (-0.97, -0.08, -0.2), frame=C.at(s, "hid"))
+    C.stuck_arrow(s, (post[0], post[1] + 0.1, 0.72), ARROW_DIR_2, frame=C.at(s, "hid"))
     st.use(s, *four, *cows)
     C.cam(s, None, focus=four[0].head, **PN17_CAM)
     st.hero(s, "hiding", *four)

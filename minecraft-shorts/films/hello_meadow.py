@@ -59,7 +59,19 @@ GATE_CHILD = HC.PLACES["gate_child"]        # (0.1, 25.9): the shared place sinc
 # up the meadow road (road_to_forest's own nodes from y 35 on: they follow the terrain)
 STEVE_IN = ((1.55, 19.6), (1.5, 23.0), (1.3, 26.5), (0.9, 29.5), (0.6, 32.5))
 STEVE_PRE = 32                   # he starts this many frames before beat 6 (in no shot before: a pre-roll is allowed)
-ME07_FSTOP = 2.0                 # beat 7's depth of field on the gate camera (beat 6 keeps its f/4): the watcher soft
+ME07_FSTOP = 2.0                 # beat 7's depth of field (beat 6's gate camera keeps its f/4): the watcher soft
+# beat 7's OWN camera (the review of the whole-film preview): from the gate camera's position, behind the dip to
+# black, a 30 mm lens (the gate's 22 mm left him 30 px tall at 540x960, 3 % of the frame: on a phone the road read as
+# empty) aimed 2.5 blocks west of him and a little lower (the child whole at the left, its chin over the caption
+# band), and a slow linear push of ME07_PUSH blocks along the aim with a pan that keeps the child where it is (the
+# locked gate camera was a still photograph after the dip: 0.07-0.21 grey levels from frame to frame)
+ME07_PUSH = 0.3
+_G = HC.CAMS["gate"]["pos"]
+_T0, _T1 = (-2.0, 57.6, 1.6), (-3.1, 57.6, 1.0)
+_D = math.dist(_G, _T0)
+ME07_CAM = dict(pos=_G, target=_T0, pos1=tuple(g + ME07_PUSH * (t - g) / _D for g, t in zip(_G, _T0)), target1=_T1,
+                lens=30.0, fstop=ME07_FSTOP)
+ME07_HANDHELD = 0.012            # as dg22's hold (TWO_SHOT_HANDHELD): a slow float of a few pixels, never still
 # beat 8: in the forest gap behind his right shoulder (he faces the village, so his right is west), a little below
 # his shoulder, 28 mm tilted 4 degrees down: his teal shoulder and the back of his head soft at the left edge, the
 # child down the road in the middle of the frame; a slow push
@@ -273,9 +285,9 @@ def me07_return(st, s, C, nar):
     e = him.eye_point(f1)
     kid.look_at(lift + 2, _cheat(kid, f1, (e.x, e.y, e.z + 3.5), cam, max_off=MAX_OFF + 4.0), ease=f1 - lift - 4)
     st.use(s, kid)
-    # the gate camera exactly (position, aim, lens, handheld), but at f/2.0: at f/4 his 8 px face showed two pale eye
-    # whites 35 blocks off; at f/2.0 it is an even smudge (the frame is the same; the dip hides the change)
-    C.cam(s, "gate", focus=kid.head, handheld=0.004, fstop=ME07_FSTOP)
+    # its own camera (ME07_CAM): the gate camera's place, 30 mm, a slow linear push with a pan, the handheld of
+    # dg22's hold; f/2.0 (at f/4 his face 35 blocks off showed two pale eye whites; at f/2.0 it is an even smudge)
+    C.cam(s, None, focus=kid.head, handheld=ME07_HANDHELD, ease="linear", **ME07_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "gold", near=C.A["exit_gate"], radius=12.0)
 

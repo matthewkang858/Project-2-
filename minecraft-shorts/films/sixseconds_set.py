@@ -127,9 +127,14 @@ ANCHORS ADDED (bas.anchors, yaw in bas.yaws where it is a standing place)
     six_brute_turned (4.97, 15.4) facing west; six_step_ingot (8.16, 11.71, 1.0); six_gateway_mouth (4.5, 18.6, 1.8);
     six_pit_lure (5.4, 7.3, -2); six_pearl_rest = six_pearl_pile (3.85, 6.55); six_gravel_1..7 round home_rim_w
     (3.6, 7.0), all on the floor west of the pit's edge (x <= 3.85); six_drop_boots (2.9, 7.6), _pickaxe (3.3,
-    8.1), _gravel (2.6, 8.0), _pearl (3.8, 7.9); six_bridge_ingot_1..3 at bridge_pillar_foot + (0.45, -0.3),
-    (-0.3, -0.45), (0.25, -0.75); six_flash_puff_<set> = <set>_flash + (1.2, -0.2), _boots_ + (0.7, 0.1),
-    _extra_ + (-0.65, 0) for set in home, bridge, treasure.
+    8.1), _gravel (2.6, 8.0), _pearl (3.8, 7.9); six_pillar_brute = bridge_pillar_foot + PILLAR_BRUTE_SHIFT (0.5, 0)
+    = (401.0, 18.25) facing north (the brute at the pillar in beats 13-15); six_bridge_ingot_1..3 = six_pillar_brute +
+    PILLAR_INGOTS (0.75, -0.1), (0.6, -0.4), (0.45, -0.65) (on his east side: seen from the east cameras of beats 13 /
+    14 and from beat 15's high camera); six_flash_puff_<set> = <set>_flash + FLASH_OFFSETS puff (0.95, 0.3), _boots_
+    (-0.85, -0.35), _extra_ (0.55, -0.15) for set in home, bridge, treasure (the boots on the brute's left, clear of
+    the puff). The lead director's review pass moved these three groups (the first spots: the ingots south of the
+    foot, behind his body; the boots at (0.7, 0.1) under the puff at (1.2, -0.2)); the beat stills below were made
+    with the first ones.
     Items are dropped items (piglins.add_item): an item's spot is where it RESTS (pass it as an explicit floor
     point to piglins.barter(lob=True, toward=...) and throw_item: toward=<the runner> at the rim rests over the
     open pit, an engine.piglins issue noted by the nether module).
@@ -185,6 +190,13 @@ KEY_COLOR = (1.0, 0.95, 0.88)
 FILLS = {"six_key_landing": ((1.45, 17.15, 6.35), 160.0)}      # beat 1: the brute's key (x 1.23 -> 2.41)
 
 
+# beats 13-15: the brute's place at the pillar = bridge_pillar_foot + this; the ingots he ignores = that place + these
+PILLAR_BRUTE_SHIFT = (0.5, 0.0)
+PILLAR_INGOTS = ((0.75, -0.1), (0.6, -0.4), (0.45, -0.65))
+# beat 16: the puff, the golden boots and the extra drop beside the brute's flash place (the same in every world)
+FLASH_OFFSETS = {"puff": (0.95, 0.3), "boots": (-0.85, -0.35), "extra": (0.55, -0.15)}
+
+
 def _yaw(direction):
     """Yaw of a character facing a compass direction ('north' ...) or an (dx, dy) vector."""
     return nether._yaw(direction)
@@ -234,16 +246,23 @@ def _anchors(bas):
     drops = {"boots": (-0.7, 0.6), "pickaxe": (-0.3, 1.1), "gravel": (-1.0, 1.0), "pearl": (0.2, 0.9)}
     for k, d in drops.items():                                  # beat 10: what the runner drops
         put("six_drop_%s" % k, _add(rim, d))
-    # the bridge (beats 14, 15): ingots at the brute's feet at the pillar
+    # the bridge (beats 13-15): the brute's place at the pillar and the ingots he ignores. The lead's review pass:
+    # he stands 0.5 EAST of bridge_pillar_foot in all three pillar shots (from bridge_top the pillar's top block cut
+    # his face in half at the foot), and his ingots lie on his EAST side, between him and the deck's open edge (the
+    # first spots, south of the foot, were behind his body from both the east and the high north-east camera)
     foot = A["bridge_pillar_foot"]
-    for k, d in enumerate(((0.45, -0.3), (-0.3, -0.45), (0.25, -0.75)), 1):
-        put("six_bridge_ingot_%d" % k, _add(foot, d))
-    # beat 16: the same three spots in every flash cut
+    pb = _add(foot, PILLAR_BRUTE_SHIFT)
+    put("six_pillar_brute", pb, Y["bridge_pillar_foot"])
+    for k, d in enumerate(PILLAR_INGOTS, 1):
+        put("six_bridge_ingot_%d" % k, _add(pb, d))
+    # beat 16: the same three spots in every flash cut (each flash camera looks north at him: +x is frame right).
+    # The lead's review pass: the golden boots on the LEFT of him, the puff behind his right side, the extra drop in
+    # front of the puff (the first spots put the boots under the puff: hidden in two of the three cuts)
     for s in ("home", "bridge", "treasure"):
         f = A["%s_flash" % s]
-        put("six_flash_puff_%s" % s, _add(f, (1.2, -0.2)))
-        put("six_flash_boots_%s" % s, _add(f, (0.7, 0.1)))
-        put("six_flash_extra_%s" % s, _add(f, (-0.65, 0.0)))
+        put("six_flash_puff_%s" % s, _add(f, FLASH_OFFSETS["puff"]))
+        put("six_flash_boots_%s" % s, _add(f, FLASH_OFFSETS["boots"]))
+        put("six_flash_extra_%s" % s, _add(f, FLASH_OFFSETS["extra"]))
     return out
 
 
@@ -363,13 +382,13 @@ BEATS = [
          hero="brute"),
     dict(key="b13_bridge_pillar", beat=13, cam="bridge_pillar", sky="bridge", set="bridge", pillar=True,
          cast=[("steve_crouch", "bridge_pillar_top", None, {}),
-               ("brute", "bridge_pillar_foot", "bridge_pillar_top_target", {})], hero="brute"),
+               ("brute", "six_pillar_brute", "bridge_pillar_top_target", {})], hero="brute"),
     dict(key="b14_bridge_profile", beat=14, cam="bridge_profile", sky="bridge", set="bridge", pillar=True,
-         cast=[("brute", "bridge_pillar_foot", "bridge_pillar_top_target", {}),
+         cast=[("brute", "six_pillar_brute", "bridge_pillar_top_target", {}),
                ("item:gold_ingot", "six_bridge_ingot_1", None, {}), ("item:gold_ingot", "six_bridge_ingot_2", None, {})],
          hero="brute"),
     dict(key="b15_bridge_top", beat=15, cam="bridge_top", sky="bridge", set="bridge", pillar=True,
-         cast=[("steve_crouch", "bridge_pillar_top", None, {}), ("brute", "bridge_pillar_foot", (400.5, 19.6, 4.6), {})] +
+         cast=[("steve_crouch", "bridge_pillar_top", None, {}), ("brute", "six_pillar_brute", (400.5, 19.6, 4.6), {})] +
               [("item:gold_ingot", "six_bridge_ingot_%d" % k, None, {}) for k in (1, 2, 3)], hero="brute"),
     dict(key="b16a_bridge_flash", beat=16, cam="six_flash_bridge", sky="bridge", set="bridge",
          cast=[("brute", "bridge_flash", None, {}), ("poof", "six_flash_puff_bridge", None, {}),

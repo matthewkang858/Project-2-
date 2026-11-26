@@ -103,7 +103,31 @@ def the_set():
     ok("no village path crosses the stair's opening", not crossing, "%s" % sorted(set(crossing)))
     for name in U.CAMERAS:
         ok("camera %s has pos, target, lens" % name, all(k in U.CAMERAS[name] for k in ("pos", "target", "lens")))
+    # sight lines: nothing in the World (cutaway cells are not in it) between a camera and the faces it is for
+    A = v.anchors
+    face = {n: (A["ug_cell_%s" % n][0], A["ug_cell_%s" % n][1] + 0.27, U.F + 1.65) for n in U.CELL_X}
+    face["dad_mid"] = (A["ug_cell_dad_mid"][0], A["ug_cell_dad_mid"][1] + 0.27, U.F + 1.65)
+    cases = [("b16_aisle", n) for n in U.CELL_X] + [("b12_cell", "dad"), ("b11_portrait", "dad"),
+                                                    ("b10_cell_side", "dad"), ("b18_portrait", "dad_mid"),
+                                                    ("b17_ots", "dad"), ("b07_down", "dad")]
+    for cam, who in cases:
+        blk = sight(w, U.CAMERAS[cam]["pos"], face[who])
+        ok("sight %s -> %s's face is clear" % (cam, who), blk is None, "blocked at %s" % (blk,))
+    blk = sight(w, U.CAMERAS["b07_down"]["pos0"], face["farmer"])
+    ok("sight b07_down (start) -> the farmer's face is clear", blk is None, "blocked at %s" % (blk,))
     return v, ug
+
+
+def sight(world, a, b, step=0.02):
+    """The first opaque full cube on the segment a -> b (None: clear)."""
+    a, b = np.array(a, dtype=float), np.array(b, dtype=float)
+    n = max(2, int(np.linalg.norm(b - a) / step))
+    for i in range(1, n):
+        q = a + (b - a) * (i / n)
+        c = tuple(int(math.floor(x)) for x in q)
+        if world.is_solid(*c) and world.is_full_cube(*c):
+            return c
+    return None
 
 
 def mechanics(v, ug):

@@ -7,7 +7,14 @@ march window), the drops within the game's 1.35-block toss of the captain's feet
 pick-up reach, the planks out / in / out again (armed, after rd19's retraction, after the lead's re-arm inside the
 dip), the twelfth piston invisible before tp13, its plank hidden until it is set, the twelfth anvils (day and dusk)
 appearing ON their frames and staying, the dust power (15 by the lever) and the lever's state across the film, the
-shelf per shot (which anvils each shot shows). Prefix with `nice -n 15 timeout 290`.
+shelf per shot (which anvils each shot shows); THE CHIPPED ANVILS (the landed day set = CHIPPED = the dusk set's
+chipped_anvils; every anvil in hand whole in the morning, chipped at dusk); THE PATROL CLOCK (every patrol twin at
+rd19's twin's place on the same frames; the captain's feet at the key frames printed); Steve in rd21 two blocks or
+more from the drops' REAL positions over the whole shot; no character inside a solid block in its shots (every 3
+frames; the landed anvils' cells count as empty before the landing); the story's hard numbers: the arms two-shot
+frontal (sq08: both bodies within 20 degrees of the lens from "arms" to "four"), the leg-day legs (swing 50 degrees
+or more, a stair step every 7 frames or more), cl22 = cl11 and cl23 = cl12 frame for frame. Prefix with
+`nice -n 15 timeout 290`.
 """
 import math
 import os
@@ -122,8 +129,126 @@ def main(argv):
         check(lev == want, "dust by the lever at power %d on frame %d: %s" % (lev, f, why))
     for f, want in ((lever_flip - 2, True), (lever_flip + 3, False), (r22 + 2, True)):
         check(C.lever.state_at(f) == want, "lever %s on frame %d" % ("on" if want else "off", f))
+    # 7. THE CHIPPED ANVILS: the day set lands chipped as CHIPPED; the dusk set and every anvil carried at dusk too
+    falls = C.memo.get("rd_falls") or []
+    got = tuple(i for i, d in enumerate(falls) if d.get("chipped"))
+    check(got == tuple(LC.CHIPPED), "rd19: the anvils that chip on landing %s = CHIPPED %s" % (got, tuple(LC.CHIPPED)))
+    dusk_ids = tuple(i for i, a in enumerate(C.anvils_dusk) if a.block_id == "chipped_anvil")
+    check(dusk_ids == tuple(LC.CHIPPED), "the dusk set's chipped_anvils %s = CHIPPED" % (dusk_ids,))
+    held = []
+    for r in T.values():
+        for name in sorted(st.in_shot.get(r.name, ())):
+            c = st.cast[name]
+            if hasattr(c, "holding_at"):
+                it = c.holding_at("right", r.frame_start + 1)
+                if it and it.endswith("anvil"):
+                    held.append((r.name, name, it, r.sky))
+    wrong = [h for h in held if (h[2] == "anvil") != (h[3] == "gold")]
+    check(held and not wrong, "anvils in hand: whole in the morning, chipped at dusk (%d hands%s)"
+          % (len(held), ("; WRONG " + ", ".join("%s %s %s" % h[:3] for h in wrong)) if wrong else ""))
+    # 8. THE PATROL CLOCK: every patrol twin at the same place on the same frame, in the shots that show it
+    clock = C.patrol_clock()
+    twins = sorted({n.rsplit("_", 1)[0] for n in st.cast if n.startswith("patrol_") and n.endswith("_1")})
+    shots_of = {tw: [r for r in T.values() if tw + "_1" in st.in_shot.get(r.name, ())] for tw in twins}
+    for tw in twins:
+        for r in shots_of[tw]:
+            dev = 0.0
+            for f in range(r.frame_start, r.frame_end + 1, 4):
+                for k in range(1, 6):
+                    ref = st.cast["patrol_rd19_%d" % k].pos_at(f) if f < clock["land"] else None
+                    if ref is not None:
+                        dev = max(dev, (st.cast["%s_%d" % (tw, k)].pos_at(f) - ref).length)
+            check(dev < 0.02, "the patrol clock: %s in %s within %.3f block of rd19's twin on the same frames"
+                  % (tw, r.name, dev))
+    cap = st.cast.get("patrol_rd19_1")
+    if cap is not None:
+        print("[legday_state] the captain's feet on the clock (march from %d): %s" % (clock["start"], ", ".join(
+            "%d y %.1f" % (f, cap.pos_at(f).y) for f in (903, 944, 1103, T["tp18_lever"].at("flipped"), 1142,
+                                                          C.release_frame(), clock["land"]))))
+    # 9. Steve in rd21 out of the drops' reach, measured on the real positions over the whole shot
+    r21, items = T["rd21_still"], C.memo.get("rd_drops") or []
+    steve = st.cast.get("steve_rd2")
+    if steve is not None and items:
+        near = min(math.dist(tuple(steve.pos_at(f))[:2], tuple(_where(scene, it, f))[:2])
+                   for f in range(r21.frame_start, r21.frame_end + 1, 2) for it in items)
+        check(near >= 2.0, "rd21: steve_rd2 stays %.2f blocks or more from the banner and the bottle (2 or more)" % near)
+    # 10. no body inside a solid block, in its own shots (the landed anvils' cells count as empty before the landing)
+    W, land = C.v.world, clock["land"]
+    strip = {(0, y, 0) for y in range(46, 58)}
+    inside = {}
+    for r in sorted(T.values(), key=lambda r: r.frame_start):
+        for f in range(r.frame_start, r.frame_end + 1, 3):
+            scene.frame_set(f)
+            for name in st.in_shot.get(r.name, ()):
+                c = st.cast[name]
+                root = getattr(c, "root", None)
+                if root is None or not hasattr(c, "eye_point") or name.startswith(("cow_", "hen_")):
+                    continue
+                if root.hide_render:                              # dead and gone (a pillager after its poof)
+                    continue
+                if crush and name in crush["struck"] and f >= land:   # crushed: the body lies under its anvil (the
+                    continue                                          # game draws the dying mob through the block)
+                p = root.matrix_world.translation
+                for h in (0.15, 0.9, 1.5):
+                    q = (p.x, p.y, p.z + h)
+                    cell = tuple(int(math.floor(v)) for v in q)
+                    if cell in strip and f < land:
+                        continue
+                    if LS._solid_at(W, *q):
+                        inside.setdefault((r.name, name, W.block_id(*cell)), []).append(f)
+                        break
+    for (shot, name, bid), fs in sorted(inside.items()):
+        check(False, "%s: %s inside %s on frames %d-%d" % (shot, name, bid, fs[0], fs[-1]))
+    check(not inside, "no character inside a solid block in its shots (sampled every 3 frames)")
+    # 11. the story's hard numbers: the arms two-shot frontal (sq08), the leg-day legs (cl11 / cl12 / cl22 / cl23)
+    r8 = T["sq08_arms"]
+    cam8 = C.shots["sq08_arms"]
+    for name in ("efe_sq", "steve_sq3"):
+        c = st.cast[name]
+        worst = 0.0
+        for f in range(r8.at("arms"), r8.at("four") + 1, 2):
+            scene.frame_set(f)
+            cp = scene.camera.matrix_world.translation
+            pp = c.pos_at(f)
+            to_cam = math.atan2(cp.x - pp.x, -(cp.y - pp.y))
+            d = math.degrees(abs((c.yaw_at(f) - to_cam + math.pi) % (2 * math.pi) - math.pi))
+            worst = max(worst, d)
+        check(worst <= 20.0, "sq08: %s's body within %.0f degrees of facing the lens from 'arms' to 'four' (20 at "
+              "most: frontal, never side-on)" % (name, worst))
+    del cam8
+    for shot, who in (("cl11_climb", "steve_cl"), ("cl12_legday", "steve_cl2"), ("cl22_dusk", "steve_cl3"),
+                      ("cl23_legday", "steve_cl4")):
+        r, c = T[shot], st.cast[who]
+        swing = []
+        for f in range(r.frame_start + 6, r.frame_end + 1):
+            scene.frame_set(f)
+            swing.append(abs(math.degrees(c.parts["leg_r"].rotation_euler[0])))
+        p0, p1 = c.pos_at(r.frame_start), c.pos_at(r.frame_end)
+        per_step = (r.frame_end - r.frame_start) / max(abs(p1.y - p0.y), 1e-6)
+        check(max(swing) >= 50.0 and per_step >= 7.0, "%s: %s's legs swing up to %.0f degrees (50 or more), a stair "
+              "step every %.1f frames (7 or more)" % (shot, who, max(swing), per_step))
+    for a_, b_, n in (("cl11_climb", "cl22_dusk", 70), ("cl12_legday", "cl23_legday", 45)):
+        ra, rb = T[a_], T[b_]
+        dev = 0.0
+        for k in range(0, n):
+            for role in ("steve", "kai"):
+                ta = [nm for nm in st.in_shot.get(a_, ()) if nm.startswith(role + "_cl")][0]
+                tb = [nm for nm in st.in_shot.get(b_, ()) if nm.startswith(role + "_cl")][0]
+                scene.frame_set(ra.frame_start + k)
+                pa = st.cast[ta].root.matrix_world.translation.copy()
+                scene.frame_set(rb.frame_start + k)
+                pb = st.cast[tb].root.matrix_world.translation.copy()
+                dev = max(dev, (pa - pb).length)
+        check(dev < 1e-3, "%s repeats %s frame for frame over %d frames (largest difference %.4f block)"
+              % (b_, a_, n, dev))
     print("[legday_state] %d failure(s)" % len(bad))
     return 1 if bad else 0
+
+
+def _where(scene, it, f):
+    """World position of a dropped item's root at frame f."""
+    scene.frame_set(f)
+    return it.root.matrix_world.translation.copy()
 
 
 def _ranges(ix):

@@ -1,35 +1,50 @@
 """Six Seconds, sequence FLASH: "I ended a full stack of worlds." Three flash cuts with a snap to black between them,
 one per world: beat 16 (shots fl16_bridge, fl16_treasure, fl16_home). Skies: fl16_bridge "soul" (the bridge's world:
 teal), fl16_treasure and fl16_home "wastes". One function per shot; the contract is in films/sixseconds_common.py
-(tags "fl...", C.actor, C.item, C.cam, C.lights, C.puff, st.use / st.hero).
+(tags "fl...", C.actor, C.item, C.rest, C.cam, C.lights, C.puff, st.use / st.hero).
 
 STATUS: STUBS by the lead director: the three cuts staged as the set builder scouted them (brute, puff, boots, an
-extra drop); the docstrings say what they must become. Everything may be rewritten except what SHARED names.
+extra drop), the drops moved and phased in the lead's review pass; the docstrings say what they must become.
+Everything may be rewritten except what SHARED names.
 
 THE DEVICE (story): "Three flash cuts of about a second each with a snap to black between them. The brute is locked
 in the same spot of the frame every time, a white puff beside him and a pair of golden boots spinning as a dropped
 item at his feet. Only the bastion behind him changes: the bridge, then a treasure corner with a chest and a pile of
 gold blocks, then the home gateway (floor whole, no pit)." Different extra drops in each cut: gravel, ender pearl,
 iron pickaxe.
-  THE CUTS (films/sixseconds.py): fl16_bridge 992-1013 (22 f) starts 10 frames before "I" (in the silence after
-  "can't": the first world is seen before it is named); fl16_treasure 1014-1032 (19 f) on "full"; fl16_home
-  1033-1065 (33 f) on "worlds", then the line's pause. THE SNAPS: the encoder shows black on 1014-1015 and 1033-1034
+  THE CUTS (films/sixseconds.py): fl16_bridge 999-1020 (22 f) starts 10 frames before "I" (in the silence after
+  "can't": the first world is seen before it is named); fl16_treasure 1021-1039 (19 f) on "full"; fl16_home
+  1040-1072 (33 f) on "worlds", then the line's pause. THE SNAPS: the encoder shows black on 1021-1022 and 1040-1041
   (the first two frames of the 2nd and 3rd cut: SNAPS); the caption of "full" / "worlds" is drawn on the black.
-  Words: I 1002, ended 1005, a 1012 | full 1014, stack 1021, of 1030 | worlds 1033 (ends 1046).
+  Words: I 1009, ended 1012, a 1019 | full 1021, stack 1028, of 1037 | worlds 1040 (ends 1053).
 SHARED (films/sixseconds_common.py): CAMS["flash_bridge"], ["flash_treasure"], ["flash_home"]: one offset from the
   brute in all three (5 blocks in front at 1.45, aimed 0.5 above his feet, 35 mm f/2.8): he is LOCKED in the same
-  spot of the frame (measured x 38-62 %, y 20-30 % in all three). Use them exactly, no move (a tiny handheld).
-  PLACES "flash_bridge" / "flash_treasure" / "flash_home" (his place in each world, facing the lens), and the set's
-  six_flash_puff_<set> (+1.2, -0.2 from him), six_flash_boots_<set> (+0.7, +0.1), six_flash_extra_<set> (-0.65, 0).
+  spot of the frame. Use them exactly, no move (a tiny handheld; the focus is free). PLACES "flash_bridge" /
+  "flash_treasure" / "flash_home" (his place in each world, facing the lens), and the set's six_flash_puff_<set>,
+  six_flash_boots_<set>, six_flash_extra_<set> (films/sixseconds_set.py FLASH_OFFSETS, the same in every world:
+  each flash camera looks north at him, +x is frame right): puff (+0.95, +0.3), boots (-0.85, -0.35), extra drop
+  (+0.55, -0.15).
+THE LEAD'S REVIEW PASS (the story check, confirmed on the stills: out/test/sixseconds_scout_fl16_bridge_1006.png,
+  _treasure_1020.png, _home_1040.png of the first stub): the golden boots, which say "the same runner died in every
+  world", lay at (+0.7, +0.1), UNDER the puff (+1.2, -0.2) in two of the three cuts (a gold sliver behind white
+  blocks; in the treasure cut not seen at all). Moved: the boots to his LEFT, the extra drop and the puff to his
+  right (the puff a little behind). And a flat item spinning on the ground is EDGE-ON twice a turn (the boots were a
+  thin gold sliver on 1023-1027): the stub phases the boots and the extra drop with C.rest(..., face=<the lens>,
+  face_at=first picture frame + 3) so they show the lens their broad side on the cut's first picture frames (they
+  turn about 40 degrees over a cut; the boots read as boots on every frame looked at). Stills after the pass:
+  out/test/sixseconds_scout_fl16_bridge_1002_zones.png, _fl16_treasure_1025.png, _fl16_home_1045.png (boots clear at
+  the bottom left, x about 18-28 %, y 55-60 %; the extra drop at the right edge of the puff).
+  STILL OPEN: the puff stands at x 75-100 % (its particles rise and spread; part of it outside x 82 %) and in the
+  treasure cut it covers the right part of the gold pile (the pile still reads as gold above and left of it): a
+  later puff start (f0 - 4) or a smaller burst is the director's call; keep the boots clear of it.
 THE WORLD'S RULES that bite here: fl16_home's floor is WHOLE (no pit); the runner is only a puff (C.puff from a frame
   BEFORE the shot: the puffs already in the air on its first frame) and his drops; NO netherrack pillar in
   fl16_bridge (the lead tried it: from this camera its top block sits right on the brute's head; C.pillar refuses
   it); the brute's axe low or coming to rest.
-THE LOCK, MEASURED by the lead on the stub (tools.sixseconds_geo fl16_bridge:1002 --sky soul, fl16_treasure:1024,
-  fl16_home:1050; stills out/test/sixseconds_scout_fl16_bridge_1006.png, _fl16_treasure_1020.png, _fl16_home_1040.png):
-  his head x 32.9-67.2 / 31.7-68.2 / 31.9-67.9 %, y 19.4-30.6 % in all three, face 120 px, straight at the lens: the
-  same spot of the frame to a pixel. The puff stands at the right edge (x 70-100 %): keep it inside x 82 % where it
-  must read. No pillar on his head (it is absent outside br13-br15).
+THE LOCK, MEASURED by the lead (tools.sixseconds_geo; stills above): his head x 32.4-67.7 %, y 19.4-30.6 % in all
+  three, face 120 px, straight at the lens (0 degrees): the same spot of the frame to a pixel. Palette
+  (tools.sixseconds_palette after the pass): fl16_bridge (soul) brute x 1.56 the blackstone (rule 1.5: AT the
+  limit: do not darken him), fl16_treasure x 3.10, gold hue 45, fl16_home x 1.71; hero 100 % inside the safe area.
 RISK (story): "three cuts must read as many worlds": the bridge world is teal (sky "soul"), the treasure corner is
   gold and enclosed, home is red with the gateway's glow. Fallback: "four cuts of twenty frames each".
 TAGS TAKEN by the stubs: brute_fl (all three), golden_boots_fl1..3, gravel_fl1, ender_pearl_fl2, iron_pickaxe_fl3.
@@ -48,8 +63,11 @@ def _flash(st, s, C, n):
     brute = C.actor("brute", "fl")
     C.stand(s, brute, "flash_%s" % world, idle=False)
     C.puff(s, "six_flash_puff_%s" % world, s.frame_start - 8, seed=16 + n)
-    C.rest(s, "golden_boots", "fl%d" % n, "six_flash_boots_%s" % world)
-    C.rest(s, extra, "fl%d" % n, "six_flash_extra_%s" % world)
+    first = C.black(s)[1] + 1 if C.black(s) else s.frame_start       # the first frame with a picture
+    lens = C.camera_spec(cam)["pos"]
+    # the boots show the lens their broad side on the cut's first picture frames (edge-on they are a gold sliver)
+    C.rest(s, "golden_boots", "fl%d" % n, "six_flash_boots_%s" % world, face=lens, face_at=first + 3)
+    C.rest(s, extra, "fl%d" % n, "six_flash_extra_%s" % world, face=lens, face_at=first + 3)
     C.cam(s, cam, focus=brute.head, handheld=0.003)
     st.hero(s, "brute", brute)
     C.lights(s, light)
@@ -57,46 +75,46 @@ def _flash(st, s, C, n):
 
 
 def fl16_bridge(st, s, C, nar):
-    """BEAT 16, FLASH 1 of 3: the bridge (its world: teal fog).   frames 992-1013 (22 f, 0.92 s), sky soul.
-    Words: I 1002, ended 1005, a 1012.
+    """BEAT 16, FLASH 1 of 3: the bridge (its world: teal fog).   frames 999-1020 (22 f, 0.92 s), sky soul.
+    Words: I 1009, ended 1012, a 1019 (running on into "full" on 1021).
 
-    MUST BE SEEN: on 992 the brute in his locked spot on the bridge, the teal void behind him, a puff beside him
-    rising, the golden boots and a gravel spinning at his feet.
-    NOW (stub): CAMS["flash_bridge"], the brute at flash_bridge, the puff from 984, the boots, gravel; no pillar.
-    MEASURED (out/test/sixseconds_set_b16a_bridge_flash.png under nether_wastes; under this film's sky the lead's
-    out/test/sixseconds_scout_flash_bridge.png): brute x 38-62 %, y 20-30 %, 1.65 x the blackstone (rule 1.5: near
-    the limit); the drops above the caption band.
-    UNDER THIS FILM'S SKY (the lead: tools.sixseconds_palette --sky soul 1006): brute x 1.57 the blackstone (rule
-      1.5: near the limit), hero x 40-62 %, y 20-30 %, 100 % inside: passes; re-measure after any change of light.
+    MUST BE SEEN: on 999 the brute in his locked spot on the bridge, the teal void behind him, a puff beside him
+    rising (at his right), the golden boots (at his left, broad side to the lens) and a gravel at his feet.
+    NOW (stub): CAMS["flash_bridge"], the brute at flash_bridge, the puff from 991, the boots and the gravel phased to
+    the lens; no pillar.
+    MEASURED after the review pass (out/test/sixseconds_scout_fl16_bridge_1002_zones.png; tools.sixseconds_palette
+      --sky soul 1002): brute x 1.56 the blackstone (rule 1.5: AT the limit), hero x 40-62 %, y 20-30 %, 100 %
+      inside; the boots read at the bottom left; re-measure after any change of light.
     NEIGHBOURS: before, br15_wait (the same world: the runner on the pillar); after, fl16_treasure (snap to black).
     """
     _flash(st, s, C, 1)
 
 
 def fl16_treasure(st, s, C, nar):
-    """BEAT 16, FLASH 2 of 3: the treasure corner of a third bastion.   frames 1014-1032 (19 f, 0.79 s; black on
-    1014-1015), sky wastes. Words: full 1014, stack 1021, of 1030.
+    """BEAT 16, FLASH 2 of 3: the treasure corner of a third bastion.   frames 1021-1039 (19 f, 0.79 s; black on
+    1021-1022), sky wastes. Words: full 1021, stack 1028, of 1037.
 
-    MUST BE SEEN: on 1016 (the first frame after the snap) the brute in the SAME spot of the frame, a chest at the
+    MUST BE SEEN: on 1023 (the first frame after the snap) the brute in the SAME spot of the frame, a chest at the
     left, a pile of gold blocks at the right, a puff, the golden boots and an ender pearl at his feet.
-    NOW (stub): CAMS["flash_treasure"], the brute at flash_treasure, the puff from 1006, boots, pearl.
-    MEASURED (out/test/sixseconds_set_b16b_treasure_flash.png): brute in the same frame position, 3.08 x; chest left,
-    gold pile right.
+    NOW (stub): CAMS["flash_treasure"], the brute at flash_treasure, the puff from 1013, boots and pearl phased.
+    MEASURED after the review pass (out/test/sixseconds_scout_fl16_treasure_1023.png / _1025.png / _1027.png): the
+      boots broad side at the bottom left (in front of the chest), the pearl at his right half under the puff's
+      edge; brute x 3.10, gold hue 45; the puff covers the right part of the gold pile (see the module docstring).
     NEIGHBOURS: before, fl16_bridge; after, fl16_home (snap to black).
     """
     _flash(st, s, C, 2)
 
 
 def fl16_home(st, s, C, nar):
-    """BEAT 16, FLASH 3 of 3: home, the gateway behind him (floor whole, no pit).   frames 1033-1065 (33 f, 1.38 s;
-    black on 1033-1034), sky wastes. Word: worlds 1033 (ends 1046), then the line's pause.
+    """BEAT 16, FLASH 3 of 3: home, the gateway behind him (floor whole, no pit).   frames 1040-1072 (33 f, 1.38 s;
+    black on 1040-1041), sky wastes. Word: worlds 1040 (ends 1053), then the line's pause.
 
-    MUST BE SEEN: on 1035 the brute in the SAME spot of the frame with the gateway and its glow behind him, a puff,
+    MUST BE SEEN: on 1042 the brute in the SAME spot of the frame with the gateway and its glow behind him, a puff,
     the golden boots and the iron pickaxe at his feet; the floor whole. The longest of the three: it settles into
     gt17 ("I started waiting at the gate": the corridor camera looking at this gateway from outside).
-    NOW (stub): CAMS["flash_home"], the brute at flash_home, the puff from 1025, boots, pickaxe.
-    MEASURED (out/test/sixseconds_set_b16c_home_flash.png): brute in the same frame position, 1.74 x; the gateway's
-    glow behind him.
+    NOW (stub): CAMS["flash_home"], the brute at flash_home, the puff from 1032, boots and pickaxe phased.
+    MEASURED after the review pass (out/test/sixseconds_scout_fl16_home_1042.png / _1045.png / _1046.png): the boots
+      broad side at the bottom left, the pickaxe at his right under the puff's edge; brute x 1.71.
     NEIGHBOURS: before, fl16_treasure; after, gt17_waits.
     """
     _flash(st, s, C, 3)

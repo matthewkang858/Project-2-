@@ -19,20 +19,35 @@ game's half-step heights (front half k + 0.5, back half k + 1). WALKING UP: Play
 speed along the 3D line, so half-step nodes either float the feet between treads (the set's paths "stair_climb" /
 "stair_ramp": up to a quarter or half block) or stall at every riser. The stubs walk the straight ramp (slope 1,
 within a quarter block of every tread) and key the root's delta_location z per frame to put the feet exactly ON the
-treads (_on_treads: a half-block pop in one frame at each riser, as the game steps up). Keep it or do better. Anchors stair_foot (-0.5, 26.3), stair_top (-0.5, 44.75, 18), wall_top_south.
+treads (_on_treads: a half-block pop in one frame at each riser, as the game steps up). Keep it or do better.
+Anchors stair_foot (-0.5, 26.3), stair_top (-0.5, 44.75, 18), wall_top_south.
 The shelf: planks at (0, 46..57, 17) two blocks out from the face, anvils on them at (0, y, 18): the lead's SHELF
 puts eight of the day set (planks 3..10) on it in cl11 / cl12 and eight of the DUSK set in cl22 / cl23 (do not st.use
 anvils). The face lanterns hang at (-1, 31, 9) (-1, 37, 14) (-1, 49, 11) (-1, 55, 11) (group legday_wall).
 THE SKIES: cl11 / cl12 "gold" (the face lit by the sun in the east); cl22 / cl23 "dusk" (the sun down in the west,
   behind the wall: the face lit by its lanterns at 1.4, an indigo sky with the first stars). The cut INTO cl22 dips
-  to black (films/legday.py DIPS: black on 1369 and 1370, back by 1373); the lead re-arms the row inside the black
-  (the planks are OUT again from 1371: C.rearm). Nothing important on 1366-1372.
+  to black (films/legday.py DIPS: black on 1373 and 1374, back by 1377); the lead re-arms the row inside the black
+  (the planks are OUT again from 1375: C.rearm). Nothing important on 1370-1376.
+THE PACE (after review): the story bounds the climb: "a step shorter than seven frames hops: use a slow climb". The
+  first stub read "slow" as a quarter of a walk (0.84 blocks/s, a step every 29 frames, legs +-19 degrees: the legs
+  of "leg day" barely moved). Now CLIMB_PACE = 3.0 blocks/s HORIZONTAL = a step every 8 frames (the story's
+  minimum is 7; a vanilla walk is 5.6), walked along the straight ramp at 3.0 x 1.414 = 4.24 blocks/s. The legs then
+  swing about +-68 degrees, a full walk (engine.players measures the limb speed along the 3D ramp; the game uses the
+  horizontal speed, which would give about +-50: the engine's is the bigger, more readable "pumping"). Keep every
+  step at 7 frames or more, and keep the legs moving like a walk.
+THE REPEATS (after review): each walk is planned over a FIXED length (CLIMB_FRAMES / LEGS_FRAMES, not the shot's)
+  and at speed at both ends (ramp (False, False): nobody slows down for the cut), so cl22's first 70 frames are
+  cl11's frame for frame and cl23 is cl12. The narration was re-spoken so that the words of cl23 fall on the same
+  shot frames as cl12's (They +2, call +7, it +13, leg +16, day +22 in BOTH): key a word-synced action from cl12's
+  offsets (C.T["cl12_legday"].at("leg") - C.T["cl12_legday"].frame_start) and apply the same offset in cl23.
+THE ANVILS IN HAND: whole in the morning (C.carry_anvil(p)), CHIPPED at dusk (C.carry_anvil(p, dusk=True)): the
+  dusk anvils are the same ones that fell (legday_common THE CHIPPED ANVILS); the shelf's dusk set is chipped too.
 TAGS (twins): steve / kai / zuri / ari _cl (cl11), _cl2 (cl12), _cl3 (cl22), _cl4 (cl23): each holds an anvil
-  (fixtures.hold_anvil), placed on its shot's first frame (no pre-roll).
+  (C.carry_anvil), placed on its shot's first frame (no pre-roll).
 LIGHT: C.lights(s, "gold" | "dusk", near=(-1.0, 40.0, 8.0), radius=26.0) (the stair's lanterns and the face's).
 PREVIEW samples for render.py previews: 7 (legday_common.PREVIEW_SAMPLES).
 """
-from engine import fixtures, shots
+from engine import shots
 from films import legday_common as LC
 from films import legday_set as LS
 
@@ -41,11 +56,15 @@ from films import legday_set as LS
 # ---------------------------------------------------------------------------------------------------------------
 CLIMB_SEED = 31               # the handheld seed of CAMS "climb" in cl11 AND cl22 (the same drift in both)
 LEGS_SEED = 47                # the handheld seed of CAMS "legs" in cl12 AND cl23
-CLIMBERS = (("steve", 3.75), ("kai", 5.75), ("zuri", 7.75), ("ari", 9.75))   # (role, step: y = 27 + step) at the
-#                                                                             shot's first frame, staggered by 2
-CLIMB_SPEED = 1.2             # blocks / s along the stair (slow: no step shorter than seven frames)
-LEGGERS = (("steve", 4.1), ("kai", 2.5))       # cl12 / cl23: Steve first past the lens, Kai right behind
-LEGS_SPEED = 1.3
+CLIMB_PACE = 3.0              # blocks / s HORIZONTAL up the stair: one step every 8 frames (the story: never under
+#                               7); walked along the slope-1 ramp at CLIMB_PACE * sqrt(2) (legs about +-68 degrees)
+CLIMBERS = (("steve", 4.0), ("kai", 5.3), ("zuri", 6.6), ("ari", 7.9))   # (role, step: y = 27 + step) on the
+#                                                       shot's first frame, 1.3 apart: Ari reaches step 17.4 (of 17.7)
+#                                                       on CLIMB_FRAMES, nobody tops out inside cl22's 73 frames
+CLIMB_FRAMES = 76             # the length every climb walk is planned for (>= cl22's 73): cl11 = cl22's first 70
+LEGGERS = (("steve", 1.6), ("kai", 0.1))       # cl12 / cl23: Steve climbs past the lens (the camera stands beside step
+#                                                3.6: he is level with it on "leg", +16), Kai 1.5 steps behind him
+LEGS_FRAMES = 48              # the length of the legs walk (>= 45)
 
 
 def _ramp_z(y):
@@ -71,20 +90,24 @@ def _on_treads(p, f0, f1):
                 kp.interpolation = "CONSTANT"
 
 
-def _climbers(C, s, tag, cast, speed):
-    """Players of `cast` [(role, step)] placed on the stair at their steps on s's first frame, an anvil in hand,
-    climbing at `speed` (blocks / s along the ramp) to the shot's end (at speed on frame 1), their feet on the
-    treads (_on_treads). Returns them."""
+def _climbers(C, s, tag, cast, frames, dusk):
+    """Players of `cast` [(role, step)] placed on the stair at their steps on s's first frame, an anvil in hand
+    (chipped at dusk: C.carry_anvil), climbing at CLIMB_PACE (horizontal) over a walk planned for `frames` frames
+    (a constant: the gold shot and its dusk repeat get the same walk), at speed on both ends, their feet on the
+    treads (_on_treads) for the shot's frames. Returns them."""
     f0, f1 = s.frame_start, s.frame_end
+    top = LS.STAIR_Y0 + LS.STEPS - 0.3
     out = []
     for role, step in cast:
         p = C.actor(role, tag)
         y0 = LS.STAIR_Y0 + step
-        y1 = min(LS.STAIR_Y0 + LS.STEPS - 0.3, y0 + speed / 1.4142 * (f1 - f0 + 1) / 24.0)
+        y1 = y0 + CLIMB_PACE * frames / 24.0
+        if y1 > top:
+            raise ValueError("%s_%s would top out (step %.1f): lower his start" % (role, tag, y1 - LS.STAIR_Y0))
         a, b = (-0.5, y0, _ramp_z(y0)), (-0.5, y1, _ramp_z(y1))
         p.place(f0, a, LC.yaw_to(a, b))
-        fixtures.hold_anvil(p)
-        p.walk(f0, [a, b], speed=speed, ramp=(False, True))
+        C.carry_anvil(p, dusk=dusk)
+        p.walk(f0, [a, b], speed=CLIMB_PACE * 2 ** 0.5, ramp=(False, False))
         _on_treads(p, f0, f1)
         out.append(p)
     return out
@@ -92,7 +115,7 @@ def _climbers(C, s, tag, cast, speed):
 
 def _climb(st, s, C, tag, sky):
     """cl11 and cl22: CAMS "climb", the four climbers, the lights of the sky."""
-    cl = _climbers(C, s, tag, CLIMBERS, CLIMB_SPEED)
+    cl = _climbers(C, s, tag, CLIMBERS, CLIMB_FRAMES, dusk=(sky == "dusk"))
     st.use(s, *cl)
     C.cam(s, "climb", seed=CLIMB_SEED, handheld=0.004)
     st.hero(s, "climbers", *cl)
@@ -102,7 +125,7 @@ def _climb(st, s, C, tag, sky):
 
 def _legs(st, s, C, tag, sky):
     """cl12 and cl23: CAMS "legs", Steve and Kai climbing past the lens."""
-    cl = _climbers(C, s, tag, LEGGERS, LEGS_SPEED)
+    cl = _climbers(C, s, tag, LEGGERS, LEGS_FRAMES, dusk=(sky == "dusk"))
     st.use(s, *cl)
     C.cam(s, "legs", seed=LEGS_SEED, focus=(-0.5, 31.6, 5.3), handheld=0.004)
     st.hero(s, "legs", *cl)
@@ -126,7 +149,8 @@ def cl11_climb(st, s, C, nar):
       "wall" 723      the whole height of the wall, the stair, the shelf hanging out over the road against the sky
       the shelf       EIGHT anvils on it (the lead's SHELF "eight": planks 3..10; the 12th piston at the north end is
                       not there yet: the narrator sets it in tp13); 8 up + 4 carried = 12
-    SHARED: CAMS "climb" (= cl22_dusk exactly; handheld seed CLIMB_SEED), CLIMBERS / CLIMB_SPEED (= cl22).
+    SHARED: CAMS "climb" (= cl22_dusk exactly; handheld seed CLIMB_SEED), CLIMBERS / CLIMB_PACE / CLIMB_FRAMES (=
+      cl22).
     NEIGHBOURS: before, sq10_cheating (the square); after, cl12_legday (on the stair, their legs).
     RISKS (story): "A wall 18 blocks high throws a long shadow at golden hour and is hard to hold in one frame with the
       road. Build it so its road face looks at the sun and shoot the wall shots tall and low." (done: the face looks
@@ -137,10 +161,15 @@ def cl11_climb(st, s, C, nar):
       the road south-east (b11, 28 mm): the face, the stair, four climbers, the face lanterns all read; THE SHELF'S
       ANVILS SHOW ONLY AS A SLIVER over the planks from below. From across the road (b11e, 18 mm): the anvils read,
       the climbers small at the left edge. The lead's scouting of the choice: see films/legday_common.py CAMS
-      "climb" and out/test/legday_scout_climb_*.png. If you need another camera for this shot, it changes cl22
-      too: say so in your result (a shared camera).
-    NOW (stub): CAMS "climb" (b11), the four on steps 3.75 / 5.75 / 7.75 / 9.75 climbing at 1.2 blocks/s. Hero: the
-      climbers.
+      "climb". THE LEAD'S SCOUT (the stubs, 540x960, 16 samples): out/test/legday_scout_cl11_climb_704.png and
+      legday_scout_cl22_dusk_1404.png (the same frame + 35 under both skies: they read as two times of day);
+      a middle camera from (11.0, 28.0, 0.9), 24 mm (legday_scout_climbvar_cl11_climb_704_v0.png) made the climbers
+      smaller, still hid the anvils behind their planks and put meadow tufts in the lens: not adopted. In the stub
+      In the first stub Steve (step 3.75, walking at a quarter pace) was cut by the left edge on 704. If you need
+      another camera for this shot, it changes cl22 too: say so in your result (a shared camera).
+    THE PACE (the review): a step every 8 frames (CLIMB_PACE 3.0), not 29: see the module docstring.
+    NOW (stub): CAMS "climb" (b11), the four from steps 4.0 / 5.3 / 6.6 / 7.9 climbing a step every 8 frames
+      (anvils whole: the morning). Hero: the climbers.
     """
     _climb(st, s, C, "cl", "gold")
 
@@ -161,21 +190,24 @@ def cl12_legday(st, s, C, nar):
       "leg" 755 .. "day" 761   his legs pumping up the steps past the lens, the anvil in his hand; Kai's legs right
                       behind him
       the steps       the game's half steps (stair_z): the feet land on the treads, never in the air or in the stone
-    SHARED: CAMS "legs" (= cl23 exactly; handheld seed LEGS_SEED), LEGGERS / LEGS_SPEED (= cl23).
+    SHARED: CAMS "legs" (= cl23 exactly; handheld seed LEGS_SEED), LEGGERS / CLIMB_PACE / LEGS_FRAMES (= cl23). Key
+      any word-synced action by its offset in THIS shot and apply the same offset in cl23 (identical: +2 +7 +13 +16
+      +22).
     NEIGHBOURS: before, cl11_climb; after, tp13_sticky (the wall top).
     MEASURED (the set builder, out/test/legday_set_b12_legs[_zones].png): beside the stair's open east edge at knee
       height, 24 mm: Steve's legs and anvil climbing past the lens; Kai below, out of frame at that instant (he must
       come in: start him nearer).
-    NOW (stub): CAMS "legs", Steve from step 4.1 and Kai from 2.5 climbing at 1.3 blocks/s. Hero: the legs.
+    NOW (stub): CAMS "legs", Steve from step 1.6 (level with the lens on "leg") and Kai from 0.1, a step every 8
+      frames. Hero: the legs.
     """
     _legs(st, s, C, "cl2", "gold")
 
 
 def cl22_dusk(st, s, C, nar):
-    """BEAT 22  "But they carried all twelve back up before dark."   frames 1369-1441 (73 f, 3.04 s), sky DUSK.
-    Words: But 1371, they 1373, carried 1377, all 1387, twelve 1395, back 1406, up 1412, before 1416, dark 1424.
-    THE DIP: black on 1369 and 1370 (fading out over rd21's 1366-1368), back by 1373 (DIPS); the lead's C.rearm puts
-    the twelve planks out again inside the black (they are out from 1371) and the dust lit.
+    """BEAT 22  "But they carried all twelve back up before dark."   frames 1373-1445 (73 f, 3.04 s), sky DUSK.
+    Words: But 1375, they 1378, carried 1381, all 1392, twelve 1399, back 1410, up 1417, before 1421, dark 1429.
+    THE DIP: black on 1373 and 1374 (fading out over rd21's 1370-1372), back by 1377 (DIPS); the lead's C.rearm puts
+    the twelve planks out again inside the black (they are out from 1375) and the dust lit.
 
     STORY: About 3.0 s. The low angle of the first wall shot, now at dusk, orange into purple, lanterns glowing along
     the wall: the four climb the stairs in a staggered line, an anvil in every hand. On top the narrator waits by the
@@ -185,11 +217,14 @@ def cl22_dusk(st, s, C, nar):
     blocks on the planks, sticky pistons extended with planks, lit redstone dust line, lanterns as light, dusk sky.
 
     MUST BE SEEN, ON WHICH WORD
-      1373 on         (the picture is back) THE SAME FRAME AS cl11 under the dusk sky, the face lanterns glowing
-      "carried" 1377 .. "twelve" 1395   the four climbing with anvils, as in cl11
-      "dark" 1424     the planks out with eight anvils of the DUSK set on them (SHELF "dusk_eight"), the indigo sky
+      1377 on         (the picture is back) THE SAME FRAME AS cl11 under the dusk sky, the face lanterns glowing
+      "carried" 1381 .. "twelve" 1399   the four climbing with anvils (CHIPPED: the same anvils that fell), as in cl11
+      "dark" 1429     the planks out with eight anvils of the DUSK set on them (SHELF "dusk_eight"; chipped as they
+                      landed: CHIPPED), the indigo sky
       the road        empty: the day set that fell is NOT shown (the lead's SHELF; never the anvils picked up)
-    SHARED: CAMS "climb" exactly as cl11 (seed CLIMB_SEED), CLIMBERS / CLIMB_SPEED exactly as cl11.
+    SHARED: CAMS "climb" exactly as cl11 (seed CLIMB_SEED), CLIMBERS / CLIMB_PACE / CLIMB_FRAMES exactly as cl11
+      (the first 70 frames are cl11's, frame for frame; the review found the first stub 0.01 block and a tread pop
+      one frame apart, because the walk was planned over the shot's own length: fixed).
     NEIGHBOURS: before, rd21_still (gold, the road after the drop: a dip to black between); after, cl23_legday.
     RISKS (story): "The second They call it leg day must be recognised as the same shot as the first ... Fallback if
       the dusk module is dropped: keep the golden sky" (not needed: the dusk sky is in this film's SKIES).
@@ -198,14 +233,14 @@ def cl22_dusk(st, s, C, nar):
       edge, the lever at the wall top's north end): the story's "on top the narrator waits by the lever" is carried by
       tp24 (the lever at dusk); the shared camera stays. (He could stand at the wall top's front edge to be seen, but
       that is not "by the lever".)
-    NOW (stub): _climb exactly as cl11 under the dusk lights (1.4). Hero: the climbers.
+    NOW (stub): _climb exactly as cl11 under the dusk lights (1.4), the anvils in hand chipped. Hero: the climbers.
     """
     _climb(st, s, C, "cl3", "dusk")
 
 
 def cl23_legday(st, s, C, nar):
-    """BEAT 23  "They call it leg day."   frames 1442-1486 (45 f, 1.88 s), sky DUSK.
-    Words: They 1444, call 1448, it 1454, leg 1457, day 1463. The pause after it (0.7 s) comes before the last line.
+    """BEAT 23  "They call it leg day."   frames 1446-1490 (45 f, 1.88 s), sky DUSK.
+    Words: They 1448, call 1453, it 1459, leg 1462, day 1468. The pause after it (0.7 s) comes before the last line.
 
     STORY: About 2.0 s. Exactly the set-up of the first They call it leg day, same lens, height and step count, now in
     lantern light: the same legs pump up the same steps past the lens, Steve's first and Kai's right behind, an anvil
@@ -213,11 +248,12 @@ def cl23_legday(st, s, C, nar):
     Cast: Steve, Kai. Effects: two anvils as held items, stone stairs, lantern light.
 
     MUST BE SEEN, ON WHICH WORD: as cl12, frame for frame (the same 45 frames, the same word frames relative to the
-      shot: They +2, call +6, it +12, leg +15, day +21), in lantern light.
-    SHARED: CAMS "legs" exactly as cl12 (seed LEGS_SEED), LEGGERS / LEGS_SPEED exactly as cl12.
+      shot: They +2, call +7, it +13, leg +16, day +22, in both since the narration was re-spoken in review: the
+      first take had cl23's words one frame earlier from "call" on), in lantern light, the anvils chipped.
+    SHARED: CAMS "legs" exactly as cl12 (seed LEGS_SEED), LEGGERS / CLIMB_PACE / LEGS_FRAMES exactly as cl12.
     NEIGHBOURS: before, cl22_dusk; after, tp24_reloading (the wall top at last light: the film's last shot).
     MEASURED (the set builder, out/test/legday_set_b23_legs[_zones].png): the same set-up in lantern light; palette
       passes.
-    NOW (stub): _legs exactly as cl12 under the dusk lights. Hero: the legs.
+    NOW (stub): _legs exactly as cl12 under the dusk lights, the anvils chipped. Hero: the legs.
     """
     _legs(st, s, C, "cl4", "dusk")

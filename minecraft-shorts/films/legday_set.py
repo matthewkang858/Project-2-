@@ -72,7 +72,9 @@ WHERE EVERY BEAT IS FILMED (Blender blocks: +X east, +Y north, +Z up; ground z 0
                    Lever on -> pier strongly powered -> dust power 15 at y 59 .. 2 at y 46 (bright at the lever, dull at
                    the far end) -> each dust powers the block under it -> the piston beside that block. Lever off ->
                    the whole line dark in one frame, the twelve retract on the same tick, the sticky heads pull the
-                   planks one block in: t = P.lever.flip(f); redstone.unsignal(t, P.wire, P.row).
+                   planks one block in: t = P.lever.flip(f); redstone.unsignal(t, P.wire, P.row) (the set's own
+                   proof. IN THE FILM it is split over the cut, see films/legday_common.py THE WORLD STATE: tp18
+                   keys the lever and the dust only, rd19 keys the row's retraction; never both in one shot).
                    WHY THE NORTH END: from there the road beyond the wall's end, where the patrol comes from, is in
                    view (beat 18); two blocks of wall top between the last plank and the lever keep a figure there
                    visible from the road (beat 21: further south the retracted planks hide him from below).
@@ -107,7 +109,8 @@ THE PARTS (make_parts(v) -> Parts, a dict; register what a shot shows with the S
   release in beat 19 = fixtures.release(P.anvils, f_retract, world=v): ANVILS LAND 41 frames after the release (2.4
   hang + 33 ticks); illagers.crush_patrol(patrol, drops, camera=s, stage=st, knockback=False, village=v, spots=
   [bottle_spot, banner_spot]) kills all five when the captain's feet are at y 45.71..50.29 (x 0.5) on the landing
-  frame (march_window(); b19 used 47.0: march start y 50.74 on the shot's first frame with the release on frame +6).
+  frame (march_window(); b19 uses 49.6, the film's: the drops then land within the game's toss of his feet).
+  SUPERSEDED IN THE FILM by films/legday_common.py (THE WORLD STATE, the patrol clock C.march_patrol, PLACES).
   Before beat 22 the row must be out again (row.extend(f) takes 2.4 frames: key it between beats).
 
 ANCHORS (v.anchors[name] = (x, y, z); v.yaws[name] = the facing; 2D entries were put on the ground)
@@ -127,8 +130,9 @@ ANCHORS (v.anchors[name] = (x, y, z); v.yaws[name] = the facing; 2D entries were
              wall_top_north (-2.5,59.4,18); wall_top_lever_cam (camera spot, beat 14); plank_1..12_target (0.5, y+0.5,
              18) where each anvil stands; land_1..12_target (0.5, y+0.5, 0) where it lands
     road     road_shelf_south (0.5,44); road_shelf_north (0.5,58.6); runners_stop (0.55,39.2); steve_among_anvils
-             (1.45,48.15) (2+ blocks short of the drops); banner_spot_target (1.5,50.7), bottle_spot_target (1.5,51.5)
-             (drops() spots, outside the anvil cells); patrol_far (0.5,82)
+             (1.45,46.9) (2.35 blocks short of the banner); banner_spot_target (1.45,49.25), bottle_spot_target
+             (1.45,50.05) (crush_patrol spots, outside the anvil cells, within 1.35 of a captain dying at y 49.6:
+             the lead's, after review); patrol_far (0.5,82)
   PATHS: stair_climb, stair_ramp, wall_top (x -1.5, over the pistons), wall_top_dust (x -2.5, on the dust),
          patrol_road (0.5, 84 -> 40, with the meadow's hops at y 78, 71, 57), run_out (0.6, 18 -> 40); the village's
          own (square_loop, exit_road ...) are unchanged.
@@ -494,10 +498,14 @@ ANCHORS = {
     # ---- the road under the shelf and beyond
     "road_shelf_south": ((0.5, 44.0), "north"), "road_shelf_north": ((0.5, 58.6), "south"),
     "runners_stop": ((0.55, 39.2), "north"),                    # beat 16: the three stop dead here (Steve)
-    "steve_among_anvils": ((1.45, 48.15), "north"),             # beat 21: 2 blocks short of the drops
+    "steve_among_anvils": ((1.45, 46.9), "north"),              # beat 21: 2.35 blocks short of the banner (the
+    #                                                             lead's, after review: was (1.45, 48.15), 1.1 from
+    #                                                             the banner's real spot, inside pick-up reach)
     "narrator_edge": ((-1.25, 60.5, WALK_Z), "southeast"),      # beat 21: at the front edge by the lever, looking
     #                                                             down (0.7 further back the edge hides him from below)
-    "banner_spot_target": ((1.5, 50.7), None), "bottle_spot_target": ((1.5, 51.5), None),
+    # the drops of rd19 (the lead's, measured): 1.0 block east of the captain's feet at y 49.6 on the landing frame,
+    # inside the game's 1.35-block toss (were (1.5, 50.7) / (1.5, 51.5): 3.6 / 4.4 blocks from a captain at y 47)
+    "banner_spot_target": ((1.45, 49.25), None), "bottle_spot_target": ((1.45, 50.05), None),
     "patrol_far": ((0.5, 82.0), "south"),
 }
 
@@ -543,19 +551,22 @@ class Parts(dict):
             raise AttributeError(k)
 
 
-def make_parts(v, armed_from=1):
+def make_parts(v, armed_from=1, dusk_chipped=()):
     """Build every moving part of the set, after build_village, in its ARMED state (the state of most beats):
     lever on, the wall's dust lit from frame `armed_from`, the twelve sticky pistons out with their planks, twelve
     anvils on the planks; the bench dark (its torch not yet planted: plant() it), the column down, the stone row
     whole. Returns Parts:
       kit                       engine.redstone kit of the Village
       row                       PistonRow: 12 sticky pistons (-2, 46..57, 17) facing east, .blocks = their planks
-                                (index 0 = the south one, beside the lever: "the twelfth", placed in beat 13)
-      wire / lever              the wall's dust (-3, 45..57, 18) (power 15 beside the pier .. 3 at the north end)
-                                and the floor lever on the pier (-4, 45, 19), facing east
+                                (index 0 = the south one; index 11 = the north one, beside the lever: "the twelfth",
+                                placed in beat 13)
+      wire / lever              the wall's dust (-3, 46..59, 18) (power 15 by the pier at the north end .. 2 at the
+                                south end) and the floor lever on the pier (-3, 60, 19), facing east
+                                (docstring corrected by the lead: it described an earlier layout)
       anvils, anvils_dusk       12 fixtures.Block anvils on the planks (0, 46..57, 18), facing east (gaps between
                                 them along the row); the dusk set is a twin in the same cells for beats 22-24 (the
-                                first set lies on the road after beat 19): show each in its own shots
+                                first set lies on the road after beat 19): show each in its own shots. dusk_chipped =
+                                the indices of the dusk set built as chipped_anvil (the ones that chipped in the fall)
       stones                    8 engine.breaking Breakables (5, -16..-9, 0): STONE_ROW (index 0 = the south one)
       bench                     dict(torch, wire, repeater, lamp, piston): engine.redstone parts of beat 7
       column                    dict(piston (up), blocks (12 iron), lever (on the pier, facing east))
@@ -573,7 +584,10 @@ def make_parts(v, armed_from=1):
     P["wire"].power(armed_from, source=PIER)
     P["anvils"] = [fixtures.block(v, "anvil", (PLANK_X, y, ANVIL_Z), {"facing": "east"}, name="anvil_%d" % (i + 1))
                    for i, y in enumerate(ROW_Y)]
-    P["anvils_dusk"] = [fixtures.block(v, "anvil", (PLANK_X, y, ANVIL_Z), {"facing": "east"},
+    # the dusk set is the SAME anvils carried back up (beats 22-24): the ones that chipped when they fell in beat 19
+    # are chipped_anvil (dusk_chipped = their indices: legday_common CHIPPED, the film's frozen draw)
+    P["anvils_dusk"] = [fixtures.block(v, "chipped_anvil" if i in set(dusk_chipped) else "anvil",
+                                       (PLANK_X, y, ANVIL_Z), {"facing": "east"},
                                        name="anvil_dusk_%d" % (i + 1)) for i, y in enumerate(ROW_Y)]
     # ---- the square
     P["stones"] = [_br.place_block(v.collection, "stone", c, world=v, name="stone_row_%d" % (i + 1))
@@ -1155,7 +1169,8 @@ def stage_b19(sc, s, phase="fall"):
     from engine import illagers
     f0, st, P = s.frame_start, sc.st, sc.P
     t_flip = f0 + 6
-    land_y = 47.0                                                 # the captain's feet on the landing frame
+    land_y = 49.6                                                 # the captain's feet on the landing frame (the
+    #                                                               film's: legday_common CAPTAIN_LAND_Y)
     drop_frames = fixtures.fall_track(18.0)
     path = [(0.5, 66.0, 1.0), (0.5, 58.6, 1.0), (0.5, 57.7, 1.0), (0.5, 57.1, 0.0), (0.5, 40.0, 0.0)]
     pat = illagers.add_patrol(st, 5)

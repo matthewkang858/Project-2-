@@ -39,7 +39,7 @@ TAGS (twins): efe_tp (tp13: the piston and the plank), efe_tp2 (tp14, soft, his 
 LIGHT: C.lights(s, "gold" | "dusk", near=(-2.0, 52.0, 18.0), radius=12..14).
 PREVIEW samples for render.py previews: 9 (legday_common.PREVIEW_SAMPLES).
 """
-from engine import fixtures, illagers, redstone
+from engine import redstone
 from films import legday_common as LC
 from films import legday_set as LS
 
@@ -48,10 +48,16 @@ from films import legday_set as LS
 # ---------------------------------------------------------------------------------------------------------------
 TP13_CAM = dict(LC._set_cam("b13"), pos1=(0.75, 62.6, 19.9))
 TP14_CAM = dict(LC._set_cam("b14"), pos1=(-2.45, 59.6, 18.22))
-TP18_CAM = dict(LC._set_cam("b18"), pos1=(-3.55, 58.05, 20.25))
-TP24_CAM = dict(LC._set_cam("b24"), pos1=(1.5, 48.9, 19.85))
-TP18_PATROL = [(0.5, 81.0, 3.0), (0.5, 78.7, 3.0), (0.5, 78.1, 2.0), (0.5, 74.0, 2.0)]    # far up the meadow road
-#                                                       (the set builder's b18: about 20 blocks north of the lever)
+# tp18: hanging out past the wall top's NORTH-EAST corner, looking back down at the lever and the corner of the wall:
+# the only camera family (scouted, out/test/legday_tp18var*) that sees the lever AND the file on the road at the
+# wall's foot on "flipped" (THE PATROL CLOCK: from any camera over the wall top the wall itself hides it)
+TP18_CAM = dict(pos=(-0.4, 62.4, 20.8), target=(-2.4, 59.4, 15.0), pos1=(-0.55, 62.2, 20.7),
+                target1=(-2.4, 59.3, 15.0), lens=20.0, fstop=5.6)
+TP18_CAM_LEVER = dict(LC._set_cam("b18"), pos1=(-3.55, 58.05, 20.25))   # the set's b18: the lever big, NO patrol
+# tp24: from the EAST, over the road, looking back WNW and down at the row: every anvil of the re-armed row reads as
+# standing on its plank, receding to the narrator at the lever (out/test/legday_scout_tp24_*): the row is the hero
+TP24_CAM = dict(pos=(5.6, 52.8, 20.5), target=(-1.5, 58.5, 17.6), pos1=(5.15, 53.35, 20.4),
+                target1=(-1.55, 58.6, 17.7), lens=28.0, fstop=4.0)
 
 
 def _hold(p, item, frame=None):
@@ -151,7 +157,7 @@ def tp14_why(st, s, C, nar):
     a = (-2.55, 53.6, LS.WALK_Z)
     e = C.P("set_anvil_12th")
     steve.place(f0, a, LC.yaw_to(a, e))
-    fixtures.hold_anvil(steve)
+    C.carry_anvil(steve)                                   # the morning: whole
     steve.walk(f0, [a, e], speed=2.2, ramp=(False, True))
     f_set = C.at(s, "why")
     steve.attack(f_set - 1)
@@ -203,11 +209,11 @@ def tp18_lever(st, s, C, nar):
     C.put(efe, f0, "lever_narrator")
     t = redstone.flip_by(efe, C.lever, C.at(s, "flipped"), look=True, reach=True)
     C.wire.unpower(t)
-    pat = C.patrol("tp18")
-    illagers.march(pat, TP18_PATROL, f0, gait="vanilla")
+    pat = C.march_patrol("tp18")                           # THE PATROL CLOCK (legday_common): never another march
     st.use(s, efe, *pat)
     C.cam(s, None, focus=C.lever.hand_point(f0), **TP18_CAM)
     st.hero(s, "lever", *C.lever.objects)          # (a property of the kit parts)
+    st.hero(s, "the file", *pat[2:])
     C.lights(s, "gold", near=(-3.0, 56.0, 18.0), radius=10.0)
 
 
@@ -243,28 +249,33 @@ def tp24_reloading(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b24_reloading[_zones].png): above the road south-east of the lever,
       35 mm: the armed row (dusk set) receding to Steve setting the twelfth and the narrator at the lever with his
       arm up, the dusk sky behind. palette_check fails "stone not magenta" at G/R 0.90: the warm dusk sky on the
-      wall top, not the lanterns (0.87 with them off): ACCEPTED (films/legday.py SKIES).
+      wall top, not the lanterns (0.87 with them off): ACCEPTED (films/legday.py SKIES). THE LEAD'S SCOUT of the stub
+      (out/test/legday_scout_tp24_reloading_1530[_zones].png): the narrator at the lever with his arm up to it,
+      small (head y 38-44 %), the pink-indigo sky, Steve half out at the left edge walking off; the armed row
+      fills the lower third (under the caption: fine).
     NOW (stub): TP24_CAM (+ a slow push), efe_tp4 at lever_narrator, his torch at LS.B24_TORCH_WATTS (the key),
       looking out over the row; his left arm up to the lever from "reloading" (raise_arm); steve_tp2 sets the dusk
       twelfth anvil on "call" (1493) and walks off south over the dust. Heroes: the narrator.
     """
     f0, f1 = s.frame_start, s.frame_end
-    efe = C.narrator("tp4", watts=LS.B24_TORCH_WATTS)
-    C.put(efe, f0, "lever_narrator")
-    efe.look_at(f0, (0.5, 50.0, 17.0), ease=0)
-    efe.raise_arm(C.at(s, "reloading"), angle=60.0, side="l")
+    efe = C.narrator("tp4", watts=LS.B24_TORCH_WATTS, hand="left")    # the torch on the camera's side: his key
+    p = C.P("lever_narrator")
+    C.put(efe, f0, "lever_narrator", toward=(p[0] - 1.0, p[1] - 1.0))   # south-west: the lever at his front right
+    efe.look_at(f0, (0.5, 52.0, 18.5), ease=0)                           # out over the row (and the road below)
+    efe.raise_arm(C.at(s, "reloading"), angle=60.0, side="r")           # his free (right) arm to the lever
     steve = C.actor("steve", "tp2")
     a = C.P("set_anvil_12th")
     steve.place(f0, a, C.yaw("set_anvil_12th"))
-    fixtures.hold_anvil(steve)
+    C.carry_anvil(steve, dusk=True, index=11)              # the twelfth, carried back up: chipped (CHIPPED)
     steve.look_at(f0, (0.5, 57.5, 18.2), ease=0)
     f_set = C.at(s, "call")
     steve.attack(f_set - 1)
     C.appear(s, C.anvils_dusk[11], f_set)
     steve.hold(None, frame=f_set)
-    away = (-2.5, 52.0, LS.WALK_Z)
-    steve.walk(f_set + 8, [a, away], speed=2.2)
+    away = (-2.5, 50.0, LS.WALK_Z)
+    steve.walk(f_set + 8, [a, away], speed=3.0)                         # off to the left of the frame by ~1530
     st.use(s, efe, steve)
     C.cam(s, None, focus=efe.head, **TP24_CAM)
+    st.hero(s, "row", *[an.objects()[0] for an in C.anvils_dusk[6:11]])  # THE PAYOFF: the re-armed row first
     st.hero(s, "narrator", efe)
     C.lights(s, "dusk", near=(-2.0, 52.0, 18.0), radius=14.0)

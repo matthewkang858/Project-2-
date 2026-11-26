@@ -14,6 +14,8 @@
     $BPY -m tools.legday_shots render ...           stills of single shots (see its docstring): THE scouting tool
     $BPY -m tools.legday_geo --sky S SHOT:F          where every head lands in the frame, face size, facing, blockers
     $BPY -m tools.legday_palette --sky S F           tools/palette_check on one frame at final quality
+    $BPY -m tools.legday_state [--sky S]             THE WORLD STATE checked on a build (crush, drops, planks, the
+                                                     twelfth piston and anvils, shelf per shot, dust, lever)
     $BPY -m render legday --still S [--zones]        one frame through render.py (each sky is one build)
     $BPY -m films.legday_set [b19 ...]               the set's self-test and its own proof stills
 
@@ -84,16 +86,39 @@ object each for the whole film, so every key on them is placed ONCE, by the one 
   tp18_lever        (top) the narrator flips the lever OFF: t = C.lever.flip(f) (or redstone.flip_by(efe, C.lever,
                     f, ...)); C.wire.unpower(t) (the whole line dark in one frame). NOT the row (see rd19)
   rd19_drop         (road) the overlapping action of the edit: the row snaps back IN THIS SHOT (the lever was seen
-                    in tp18; the row is not in tp18's frame and the lever is not in rd19's): C.row.retract(f);
-                    drops = fixtures.release(C.anvils, f, world=C.v); illagers.crush_patrol(...). The anvils land
-                    41 frames after the release. RECOMMENDED f = "back" (1169): they land on "fell" (1209-1210)
-  rd20 / rd21       (road) the day set lies on the road (the release's keys carry on); the banner and the bottle
-  REARM             (films/legday.py, before cl22_dusk) C.rearm(1369): the row extends at 1368.5 (inside the dip's
-                    black frames 1369-1370), the lever on and the dust lit from 1369
+                    in tp18; the row is not in tp18's frame and the lever is not in rd19's): f = C.release_frame()
+                    (FIXED: "back" 1169, RELEASE below); C.row.retract(f); drops = fixtures.release(C.anvils, f,
+                    world=C.v, chip=list(CHIPPED)); illagers.crush_patrol(...). The anvils land 41 frames after the
+                    release: C.land_frame() = 1210 ("fell" 1209)
+  rd20 / rd21       (road) the day set lies on the road (the release's keys carry on); the banner and the bottle.
+                    NOTE: fixtures.release writes the landed anvils into the World (cells (0, 46..57, 0)), which has
+                    no time: after rd19's function has run, C.stand() / v.ground() on the strip x 0..1, y 46..57 gives
+                    z 1 (on an anvil) in EVERY shot, and a World-based check sees anvils there before 1210 too. On the
+                    strip give z explicitly (0.0: the cobblestone) and treat those cells as empty before the landing
+  REARM             (films/legday.py, before cl22_dusk) C.rearm(1373): the row extends at 1372.5 (inside the dip's
+                    black frames 1373-1374), the lever on and the dust lit from 1373
   tp24_reloading    (top) Steve sets the twelfth anvil of the dusk set: C.appear(s, C.anvils_dusk[11], f_set); the
                     narrator's free arm lifts to the lever (no flip)
   The anvils on the shelf per shot are the lead's (films/legday.py SHELF, applied by build() through C.shelf).
-  The square's parts (C.bench, C.column, C.stones) are the square director's alone (sq02, sq07-sq10).
+  The square's parts (C.bench, C.column, C.stones) are the square director's alone (sq02, sq07-sq10). One pre-roll
+  is planned: sq02 clicks stone 1 on frame -50 (the game's 180 frames for stone by hand; the stone row is in no
+  frame before sq02); stone 2 is only begun in sq02, never broken (its cracks clear on 205, off-screen).
+
+THE CHIPPED ANVILS (frozen: CHIPPED below). The day set chips as it lands in rd19: release(..., chip=list(CHIPPED))
+  (the draw "game" with seed 3, frozen as indices: 10 of 12 chip; 3 and 4 stay whole). The dusk set is the SAME
+  anvils carried back up: anvils_dusk[i] is built as chipped_anvil for i in CHIPPED. What the climbers carry at dusk
+  (planks 0, 1, 2 and the twelfth: all in CHIPPED) is chipped too: C.carry_anvil(p, dusk=True) (stage 1); in the
+  morning (cl11, cl12, tp14, sq01) every anvil is whole: C.carry_anvil(p) (stage 0). tools.legday_state checks it.
+
+THE PATROL CLOCK (one timetable for every shot that shows the patrol: rd15, tp18, rd19). C.march_patrol(tag) marches
+  a twin of the patrol on the WHOLE road C.v.paths["patrol_road"] (0.5, 84 -> 40, with the meadow's hops) from ONE
+  frame, C.patrol_clock()["start"] (about 745), so that the captain's feet are at CAPTAIN_LAND_Y (49.6) when the
+  anvils land (C.land_frame(), 1210): the same pillagers at the same place on the same frame in every shot. Where
+  the captain is (feet y, from the clock, measured on the build): rd15 903 -> 73.5, 944 -> 70.2; tp18 1103 -> 57.6
+  (just short of the shelf's north end, plank 12 is y 57-58), "flipped" 1108 -> 57.4, its followers at 59.4,
+  61.4, 63.4, 65.4: past the wall's north end (y 60), on the open road); rd19 1142 -> 55.0, "back" 1169 -> 52.9,
+  landing 1210 -> 49.9. Time runs straight through the cuts tp18 -> rd19 (an overlapping action, never compressed):
+  the lever goes off on 1108 and the row answers on 1169 in the edit. Do not march a patrol any other way.
 
 SHARED (decided once, used by two shots or two sequences)
   CAMS["climb"]   cl11_climb and cl22_dusk, EXACTLY (position, aim, lens, f-stop, handheld seed): the second is the
@@ -104,7 +129,8 @@ SHARED (decided once, used by two shots or two sequences)
                   twelfth anvil), "narrator_edge" (rd21: seen from the road, at the wall top's front edge by the
                   lever), "steve_among_anvils" (rd21), "banner_spot" / "bottle_spot" (rd19's drops: rd20, rd21:
                   the lead's, within the game's toss of the captain's feet; NOT the set's *_spot_target anchors)
-  The skies (films/legday.py SKIES), the light recipes LIGHTS, the shelf states SHELF.
+  The skies (films/legday.py SKIES), the light recipes LIGHTS, the shelf states SHELF, THE PATROL CLOCK
+  (C.march_patrol), the release word RELEASE ("back"), CHIPPED (C.carry_anvil).
   Every other camera is a constant of its sequence file, given whole to C.cam(s, None, **CAM) (the set builder's
   suggestion for each beat is C.cam(s, "set:b05"): a start, measured on stills, never final).
 
@@ -157,17 +183,27 @@ PLACES = {
     # cobblestone beside the anvils' cells (x 1), side by side along the road. The set's own anchors
     # banner_spot_target (1.5, 50.7) / bottle_spot_target (1.5, 51.5) were 3.6 and 4.4 blocks from a captain at
     # y 47 (the set builder's march), out of any toss.
-    "banner_spot": (1.45, 49.25),             # rd19's drops (illagers spots=[bottle, banner]); rd20, rd21
-    "bottle_spot": (1.45, 50.05),
-    "steve_among_anvils": (1.45, 46.9),       # rd21: among the anvils, 2.35 blocks short of the banner (a player
-    #                                           collects an item within about one block of his box: never closer
-    #                                           than 2); the set's anchor (1.45, 48.15) was two short of ITS spots
+    # ONE NAME = ONE POINT: these three are the set's anchors (films/legday_set.py ANCHORS, moved there by the lead
+    # after review), so C.P(name), C.A[...] and C.yaw(name) agree.
+    "banner_spot": "banner_spot_target",      # (1.45, 49.25) rd19's drops (illagers spots=[bottle, banner]); rd20/21
+    "bottle_spot": "bottle_spot_target",      # (1.45, 50.05)
+    "steve_among_anvils": "steve_among_anvils",   # (1.45, 46.9) rd21: among the anvils, 2.35 blocks short of the
+    #                                           banner (a player collects an item within about one block of his box:
+    #                                           never closer than 2)
     "runners_stop": "runners_stop",           # rd16: where the three stop dead (Steve)
 }
 LAND_WINDOW = LS.march_window()       # (lowest, highest) y of the captain's feet (x 0.5, walking south) on the anvils'
 #                                       landing frame for all five to be struck: (45.71, 50.29); the stub uses 49.6
 #                                       (the drops then land within the game's toss of his feet: PLACES)
 LAND_AFTER = 41                       # frames from fixtures.release(...) to the anvils' landing (fall of 18)
+RELEASE = ("rd19_drop", "back")       # the row snaps back and the anvils are released on this word (1169): they
+#                                       land on "fell" (1210). FIXED: the patrol clock of three sequences hangs on it
+CAPTAIN_LAND_Y = 49.6                 # the captain's feet on the landing frame (the patrol clock aims at it; the
+#                                       walk's start from rest puts him at 49.86: inside LAND_WINDOW, the drops within
+#                                       the game's 1.35 toss)
+PATROL_GAIT = "vanilla"               # illagers.march gait of every patrol twin (wide and long-lens shots)
+CHIPPED = (0, 1, 2, 5, 6, 7, 8, 9, 10, 11)    # the anvils that chip as they land in rd19 (fixtures.release chip=
+#                                               "game", seed 3, frozen); the dusk set's chipped_anvils
 
 # ----------------------------------------------------------------------------------------------------------------
 # cameras: name -> dict(pos, target, lens, fstop[, pos1, target1]); C.cam(s, name) puts one on a shot
@@ -184,6 +220,11 @@ CAMS = {
     # the wall, 28 mm: the lit face, the stair with the four climbers and their anvils, the hanging face lanterns,
     # the shelf's planks against the sky (the anvils on them show only as a sliver from below: the set builder's
     # b11; out/test/legday_set_b11_climb.png / _b22_climb.png). The lead's scouting: see the climb docstring.
+    # THE LEAD'S SCOUTING (the open choice of the set builder: b11, climbers big, against b11e from across the road,
+    # anvils readable, climbers small): a middle camera (11.0, 28.0, 0.9) -> (-0.5, 40.5, 9.0), 24 mm made the
+    # climbers smaller and still hid the anvils behind their planks, with meadow tufts in the lens
+    # (out/test/legday_scout_climbvar_cl11_climb_704_v0.png). KEPT b11: the climbers and their anvils carry "they
+    # carry twelve anvils up the wall"; the anvils standing ON their planks are shown in tp13 (the wall top).
     "climb": _set_cam("b11"),
     # cl12_legday and cl23_legday (EXACTLY the same): beside the stair's open east edge at knee height, 24 mm: the
     # legs pump up the steps past the lens (out/test/legday_set_b12_legs.png / _b23_legs.png)
@@ -219,6 +260,18 @@ SLIM = {"efe": True}
 def yaw_to(src, dst):
     """Yaw that makes a character at src (facing -Y at yaw 0) face dst."""
     return L.yaw_to(src, dst)
+
+
+def arc_to_y(path, y):
+    """Arc length along a polyline (3D points, monotonic in y) from its start to the point where it crosses `y`."""
+    total = 0.0
+    for a, b in zip(path, path[1:]):
+        if b[1] <= y <= a[1] or a[1] <= y <= b[1]:
+            if abs(b[1] - a[1]) > 1e-9:
+                t = (a[1] - y) / (a[1] - b[1])
+                return total + t * math.dist(a, b)
+        total += math.dist(a, b)
+    raise ValueError("y %.2f is not on the path" % y)
 
 
 class ShotInfo:
@@ -262,6 +315,9 @@ class LegDay:
     C.cow(tag) / C.hen(tag)  a cow / a chicken
     C.item(id, tag)          a dropped item (the iron pickaxe of sq02), registered like a cast member
     C.stuck_arrow(s, ...)    an arrow stuck in a block for shot s only
+    C.march_patrol(tag)      a patrol twin marching on THE PATROL CLOCK (rd15, tp18, rd19); C.patrol_clock()
+    C.release_frame() / C.land_frame()   1169 / 1210: the row's retraction and the anvils' landing (rd19)
+    C.carry_anvil(p, dusk=False)          an anvil in hand: whole in the morning, chipped at dusk (CHIPPED)
     C.shelf(s, state)        (the lead's, from build()) the anvils on the shelf in shot s
     C.appear(s, thing, f)    a registered thing (an anvil) that appears ON frame f inside shot s and stays
     C.rearm(f)               (the lead's, from build()) the row out, the lever on, the dust lit again
@@ -278,8 +334,9 @@ class LegDay:
         self.shots = {}            # shot name -> engine.shots.Shot (filled by films/legday.py before any shot function)
         self.memo = {}             # what one shot function leaves for a later one of ITS OWN sequence
         self._fills = {}
+        self._clock = None
         # the set's moving parts, ARMED (lever on, dust lit from frame 1, pistons out with planks, anvils on them)
-        P = self.parts = LS.make_parts(self.v, armed_from=1)
+        P = self.parts = LS.make_parts(self.v, armed_from=1, dusk_chipped=CHIPPED)
         self.kit, self.row, self.wire, self.lever = P.kit, P.row, P.wire, P.lever
         self.anvils, self.anvils_dusk = P.anvils, P.anvils_dusk
         self.stones, self.bench, self.column = P.stones, P.bench, P.column
@@ -321,6 +378,42 @@ class LegDay:
         self.lever.set(f, True)
         self.wire.power(f, source=LS.PIER)
         return f
+
+    # ------------------------------------------------------------------ the patrol clock and the drop (the lead's)
+    def release_frame(self):
+        """The frame the row snaps back and the day set is released in rd19 (RELEASE: "back", 1169)."""
+        return int(self.T[RELEASE[0]].at(RELEASE[1]))
+
+    def land_frame(self):
+        """The frame the anvils land on the road (release + LAND_AFTER: 1210, "fell")."""
+        return self.release_frame() + LAND_AFTER
+
+    def patrol_clock(self):
+        """THE PATROL CLOCK: dict(road = the whole patrol_road, start = the one frame every patrol twin starts
+        marching on, land = the landing frame). The captain's feet are at CAPTAIN_LAND_Y on the landing frame."""
+        if self._clock is None:
+            road = [tuple(p) for p in self.v.paths["patrol_road"]]
+            land = self.land_frame()
+            start = land - int(round(arc_to_y(road, CAPTAIN_LAND_Y) / illagers.PATROL_SPEED * FPS))
+            self._clock = dict(road=road, start=start, land=land)
+        return self._clock
+
+    def march_patrol(self, tag):
+        """A twin of the patrol (C.patrol(tag): [captain, 2..5]) marching on THE PATROL CLOCK: the whole road from
+        patrol_clock()["start"], in a clean file 2.0 apart, gait PATROL_GAIT. Every shot that shows the patrol
+        (rd15, tp18, rd19) takes its own twin this way, so they are at the same place on the same frame. Returns
+        the patrol (st.use(s, *pat) is yours)."""
+        pat = self.patrol(tag)
+        clk = self.patrol_clock()
+        illagers.march(pat, clk["road"], clk["start"], gait=PATROL_GAIT)
+        return pat
+
+    def carry_anvil(self, p, dusk=False, index=None, frame=None):
+        """An anvil in p's right hand (fixtures.hold_anvil): in the morning whole (stage 0); at dusk (dusk=True) the
+        SAME anvils carried back up after the fall: chipped (stage 1) when `index` (the plank it goes to) is in
+        CHIPPED, and index None = one of the four carried at dusk (planks 0, 1, 2, 11: all chipped)."""
+        chipped = dusk and (index is None or int(index) in CHIPPED)
+        return fixtures.hold_anvil(p, stage=1 if chipped else 0, frame=frame)
 
     # ------------------------------------------------------------------ places and cameras
     def stand(self, p):
@@ -403,14 +496,15 @@ class LegDay:
             c = players.add_player(self.st, name, ROLES[role], slim=SLIM.get(role, False))
         return c
 
-    def narrator(self, tag, torch=True, watts=None):
+    def narrator(self, tag, torch=True, watts=None, hand="right"):
         """The narrator (C.actor("efe", tag)) with his glowing redstone torch in the RIGHT hand (redstone.hold_torch:
         a small point light at its head, on while the item is shown; watts default HELD_TORCH_WATTS 30, at dusk as
-        the key on his face LS.B24_TORCH_WATTS 120). torch=False: empty-handed (a twin of his own: once a tag has
-        the torch it keeps it)."""
+        the key on his face LS.B24_TORCH_WATTS 120). hand="left": in the left hand (tp24: the torch on the camera's
+        side, the right arm free for the lever). torch=False: empty-handed (a twin of his own: once a tag has the
+        torch it keeps it)."""
         p = self.actor("efe", tag)
         if torch and getattr(p, "_legday_torch", None) is None:
-            p._legday_torch = redstone.hold_torch(p, "right", watts=watts or redstone.HELD_TORCH_WATTS)
+            p._legday_torch = redstone.hold_torch(p, hand, watts=watts or redstone.HELD_TORCH_WATTS)
         return p
 
     def patrol(self, tag, count=5):
@@ -544,4 +638,4 @@ class LegDay:
 
 # re-exported for the sequence files (one import line): from films.legday_common import LS, fixtures, ...
 __all__ = ["LS", "fixtures", "illagers", "animals", "hostiles", "redstone", "players", "mobs", "LegDay", "CAMS",
-           "PLACES", "LIGHTS", "SHELF", "yaw_to"]
+           "PLACES", "LIGHTS", "SHELF", "CHIPPED", "RELEASE", "CAPTAIN_LAND_Y", "yaw_to", "arc_to_y"]

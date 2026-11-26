@@ -347,15 +347,21 @@ def shot_slot_boots(st, s, ug):
     shot_slot(st, s, ug, hands=True, boots=True)
 
 
-def shot_box(st, s, ug):
+def shot_box(st, s, ug, opened=False):
     """Beat 24: inside the box through its see-through side wall, the baby zombie villager lit by the strip of
-    torchlight from the slot."""
+    torchlight from the slot (opened=True: the wall in front of him has pulled aside, dad's cell light falls in)."""
     A = st.v.anchors
     f0 = s.frame_start
+    if opened:
+        r = ug.open_wall(f0 - 8)
+        U.bounce(st, s, U.DOORWAY_GLOW, energy=U.DOORWAY_WATTS, color=U.POINT_COLOR, start=max(f0, r["open"]),
+                 kind="torch")
+    else:
+        _shut(ug, f0 - 6)
     zv = undead.add_zombie_villager(st, "kid_zv_" + SHOT["name"], "none", baby=True)
     zv.place(f0, A["ug_box"], st.v.yaws["ug_box"])
     cam = U.CAMERAS["b24_box"]
-    zv.look_at(f0, cam["pos"], ease=0)
+    zv.look_at(f0, U.cheat(A["ug_door_target"], up(A["ug_box"], 0.8), cam["pos"], 0.7), ease=0)   # 3/4 to us
     dad = _actor(st, "cell_dad", "librarian", level=2)
     dad.place(f0, A["ug_cell_dad"], st.v.yaws["ug_cell_dad"])
     st.use(s, zv, dad)
@@ -363,7 +369,12 @@ def shot_box(st, s, ug):
         st.see_through(s, c)
     _cam(s, "b24_box", focus=zv.head)
     st.hero(s, "baby", zv)
-    _under(st, s, ug, groups={"ug_corner": 2.0})
+    # the open wall lets dad's torch in (the game: the box re-lit to ~level 10 within a tick): its light steps up
+    _under(st, s, ug, groups={"ug_corner": 2.0}, extra=[((14.5, -10.6, U.F + 1.9), 2.5)] if opened else ())
+
+
+def shot_box_open(st, s, ug):
+    shot_box(st, s, ug, opened=True)
 
 
 def shot_foot(st, s, ug):
@@ -526,6 +537,7 @@ BUILDERS = {
     "lever": ("under", shot_lever), "aisle": ("under", shot_aisle), "endwall": ("under", shot_endwall), "endwall_alt": ("under", shot_endwall_alt),
     "slot": ("under", shot_slot), "slot_hands": ("under", shot_slot_hands),
     "slot_boots": ("under", shot_slot_boots), "box": ("under", shot_box),
+    "box_open": ("under", shot_box_open),
     "foot": ("under", shot_foot), "falloff": ("under", shot_falloff), "portrait": ("under", shot_portrait),
     "counter": ("under", shot_counter), "apple": ("under", shot_apple), "drift": ("under", shot_drift),
     "ots": ("under", shot_ots), "follow": ("under", shot_follow), "kill": ("under", shot_kill),
@@ -559,7 +571,8 @@ def build(scene, sky=None):
 def still_frame(film, name):
     shot = next(s for s in film.shots if s.name == name)
     if name == "push":
-        return shot.frame_start + 62
+        r = getattr(shot, "ug", None)                       # dad at the lip, 10 frames before he drops
+        return (r["drops"][0] - 10) if r and r["drops"] else shot.frame_start + 50
     if name == "bed":
         return shot.frame_start + 10
     if name == "down":

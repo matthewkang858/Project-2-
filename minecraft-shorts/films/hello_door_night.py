@@ -42,6 +42,9 @@ KNOCK = dict(attempt=44, every=16, half="both", along=-0.3, shudder=8, crumbs=3)
 #                                                       notes), plus a few wood crumbs per blow (story: "wood crumbs")
 DN02_LEAD = 4          # beat 2: the zombie's pre-rolled swing starts 4 frames before the shot (under way on 72)
 DN02_PHASE = 0.3       # beat 2: cracks at stage 3 on the first frame, stage 7 when Steve's blow ends the attempt
+DN02_HANDHELD = 0.02   # beat 2's sway on door_front (C.cam's default 0.008 is sub-pixel 7 blocks from the door: once
+#                        the zombie was gone, 103-113 and 124-132 changed by 0.1-0.25 grey levels a frame, a paused
+#                        picture; review of the whole-film preview). dn18 keeps the default: its zombie never stops
 DN18_LEAD = 1          # beat 18: the swing starts on 1100: blows then land on 1105, 1121, 1137 ("knocked" 1138),
 #                        1153 ("door"), 1169 ("sunrise" 1170), 1185, and go on in beat 19 (1201, 1217, 1233, 1249)
 DN18_PHASE = 0.591     # beat 18: cracks at stage 5 on 1101; reset 1119-1120 (between two blows: a reset ON a blow
@@ -214,7 +217,7 @@ def dn02_fight(st, s, C, nar):
         "dn02 steve walk %d-%d, blow %d, zombie at rest %d, faced out %d; knocks %s hits %s stages %s" % (
             STEVE_GO, e, blow, rest, out, r["knocks"], r["hits"], r["stages"]))
     st.use(s, z, steve)
-    C.cam(s, "door_front", focus=C.P("door"))
+    C.cam(s, "door_front", focus=C.P("door"), handheld=DN02_HANDHELD)
     s.focus(steve.head, at_s=(C.at(s, "that") - 1) / 24.0, rack_s=0.5)
     st.hero(s, "zombie", z)
     st.hero(s, "steve", steve)

@@ -67,6 +67,8 @@ CHILD_TURN = math.radians(35.0)     # the child's head turned toward Steve's pil
 # starry sky over the roof, his head beside the lit pane, a slow push in (ease_out: at speed on the first frame)
 WINDOW_CAM = dict(pos=(4.8, -12.6, 1.1), target=(10.0, -10.6, 2.7), lens=30.0, fstop=2.0,
                   pos1=(5.3, -12.42, 1.2), target1=(10.0, -10.6, 2.7))
+WINDOW_EASE = "linear"   # the push at one speed to the cut: with ease_out it came to a full stop, and 1088-1100 changed
+#                          by only 0.08-0.22 grey levels a frame (the whole-film preview): a paused picture before dn18
 
 
 def _beds(C):
@@ -253,6 +255,6 @@ def in17_window(st, s, C, nar):
     # the child's face is turned away from the room's torch (11, -8, 3): a small warm film-local light inside the
     # pane, in front of its face, stands in for the torch light the game would show on it (shadowless, invisible)
     C.fill("in_pane", PANE_FILL["pos"], PANE_FILL["watts"], [s], color=PANE_FILL["color"])
-    C.cam(s, None, focus=kid.head, handheld=0.004, **WINDOW_CAM)
+    C.cam(s, None, focus=kid.head, handheld=0.004, ease=WINDOW_EASE, **WINDOW_CAM)
     st.hero(s, "child", kid)
     C.lights(s, "night_room", near=C.A["house_a_center"], radius=14.0)
