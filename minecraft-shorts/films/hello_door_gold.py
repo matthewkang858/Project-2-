@@ -53,10 +53,12 @@ TOOLS: tools/hello_door_gold_probe.py (door crack and swing keys; variants of a 
 """
 import math
 
-from engine import breaking, characters
+from engine import breaking, characters, shots
 from films import hello_common as HC
 
 TWO_SHOT_SEED = 7          # the handheld of dg04 and dg22: the same seed, so the two frames match
+TWO_SHOT_HANDHELD = 0.012  # ... and the same sway (blocks): a slow float of a few pixels. At 0.004 the 2 s hold on
+#                            the white eyes (1460-1544) changed by only 0.2-0.7 grey levels a frame: a frozen picture
 
 # beat 15: ONE locked frame for the three jump cuts (CAMS "house_fronts" moved: lower and half a block further
 # back, so the eaves of house_a sit in the top UI strip instead of across the top right)
@@ -128,7 +130,7 @@ def _step_down(c, f_from, f_to, drops):
 
 def _two_shot(s, C):
     """The camera of beats 4 and 22, exactly, with its fill (call it in both)."""
-    C.cam(s, "two_shot", seed=TWO_SHOT_SEED, handheld=0.004)
+    C.cam(s, "two_shot", seed=TWO_SHOT_SEED, handheld=TWO_SHOT_HANDHELD)
     C.doorstep_fill(s)
 
 
@@ -412,9 +414,19 @@ def dg20_walkup(st, s, C, nar):
                                            (9.25, -6.6), here[:2])]
     end = kid.walk(opens + 1, route, speed=2.1)
     _step_down(kid, opens + 1, end, [(0, 9.35, 0.5), (1, -6.85, here[2])])
+    kid.track(opens + 8, end, him, step=1, ease=6)    # its head on him from the doorway: the route's short zig-zag
+    #                                                   round the flesh turns only the body (the head flicked 56
+    #                                                   degrees to the lens and back over 1284-1289 otherwise)
     shut = next(f for f in range(opens + 1, end) if kid.pos_at(f).x < 9.8)
     C.v.door_open("house_a", shut, open=False, frames=1)     # a villager shuts the door it came through once it is
     #                                                          out of the doorway (InteractWithDoor)
+    for d in C.v._door_sets["house_a"]:               # a door has no swing in the game: hold each state to the next
+        for fc in shots.fcurves_of(d):                # key (LINEAR, the half-open swing was in the motion blur of
+            if fc.data_path == "rotation_euler" and fc.array_index == 2:      # 1268 and 1290: a ghosted panel)
+                for k in fc.keyframe_points:
+                    if opens <= k.co.x <= shut + 1:
+                        k.interpolation = "CONSTANT"
+                fc.update()
     kid.look_at(end, him, ease=8)                     # the head tipped all the way back
     C.hello_nod(kid, max(end + 10, C.at(s, "hello")))
     st.use(s, kid, flesh)

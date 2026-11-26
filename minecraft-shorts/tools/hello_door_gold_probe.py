@@ -34,13 +34,22 @@ def cmd_door(args):
     C = ses.result["context"]
     for f in (1250, 1257, 1258, 1266, 1268, 1274, 1300):
         print("[dg_probe] door crack stage at %d: %d" % (f, breaking.stage_at(C.door, f)))
+    from engine import shots
+    scene = ses.scene
     for d in C.v._door_sets["house_a"]:
-        ad = d.animation_data
-        if ad and ad.action:
-            for fc in getattr(ad.action, "fcurves", []):
-                if fc.data_path == "rotation_euler":
-                    keys = [(round(k.co.x, 2), round(k.co.y, 3)) for k in fc.keyframe_points if 1240 <= k.co.x <= 1360]
-                    print("[dg_probe] %s rotation[%d] keys 1240-1360: %s" % (d.name, fc.array_index, keys))
+        for fc in shots.fcurves_of(d):
+            if fc.data_path == "rotation_euler":
+                keys = [(round(k.co.x, 2), round(k.co.y, 3), k.interpolation) for k in fc.keyframe_points
+                        if 1240 <= k.co.x <= 1360]
+                print("[dg_probe] %s rotation[%d] keys 1240-1360: %s" % (d.name, fc.array_index, keys))
+        vals = []
+        for f in (1267.0, 1268.0, 1268.25, 1268.5, 1269.0, 1289.0, 1290.0, 1290.25, 1290.5, 1291.0, 1292.0):
+            scene.frame_set(int(f), subframe=f - int(f))
+            vals.append("%.2f:%.0f" % (f, math.degrees(d.rotation_euler[2] - d["closed_yaw"])))
+        print("[dg_probe] %s open angle by frame: %s" % (d.name, " ".join(vals)))
+    if args.exec:
+        S = {s.name: s for s in ses.film.shots}
+        exec(args.exec, dict(C=C, st=ses.result["stage"], S=S, scene=scene, math=math))
     return 0
 
 
