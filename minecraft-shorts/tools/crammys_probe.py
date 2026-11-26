@@ -9,6 +9,8 @@ hold and what is visible, and the house_e door. For timing a staging against the
     $BPY -m tools.crammys_probe hands [--sky night] [--who steve_jb,noor_gd] [--frames 1240,1250,1265]
         every held item of every player (or --who): its span, its variants' on/off steps and whether it renders on
         the frames given (hide_render evaluated; the player's own visibility included).
+    $BPY -m tools.crammys_probe memo [--sky night]
+        the event frames the shot functions left in C.memo (rd07's door, md12's stop, md13's hits, md15's kill ...)
     $BPY -m tools.crammys_probe notes [--sky night] [--span 1201-1562]
         the frames the jukebox's notes are born on (THE SONG and every play) and which shot each lands in.
 Nothing is written. Prefix with `nice -n 15 timeout 290`.
@@ -162,10 +164,19 @@ def cmd_notes(args, ses):
     return 0
 
 
+def cmd_memo(args, ses):
+    """What the shot functions left in C.memo (frames of their events), one line each."""
+    C = ses.result["context"]
+    for k in sorted(C.memo):
+        v = C.memo[k]
+        print("%-14s %s" % (k, v if isinstance(v, (int, float, dict, tuple, list, str)) else repr(v)))
+    return 0
+
+
 def main(argv):
     import argparse
     ap = argparse.ArgumentParser(prog="tools.crammys_probe")
-    ap.add_argument("cmd", choices=("track", "hands", "notes"))
+    ap.add_argument("cmd", choices=("track", "hands", "notes", "memo"))
     ap.add_argument("shot", nargs="?")
     ap.add_argument("frames", nargs="?")
     ap.add_argument("--sky", default="night")
@@ -178,7 +189,7 @@ def main(argv):
         args.frames = args.hand_frames
     import render
     ses = render.Session("crammys", sky=args.sky)
-    return {"track": cmd_track, "hands": cmd_hands, "notes": cmd_notes}[args.cmd](args, ses)
+    return {"track": cmd_track, "hands": cmd_hands, "notes": cmd_notes, "memo": cmd_memo}[args.cmd](args, ses)
 
 
 if __name__ == "__main__":
