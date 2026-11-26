@@ -23,8 +23,8 @@ THE TWO-SHOT (CAMS["two_shot"], 40 mm f/2.4 from (8.8, -8.4, 1.35) aimed at (8.9
   (Aimed at z 1.2 at first, the crouched chin was IN the caption band: "blue" and "eyes" drawn on his chin.)
   palette_check dg22@1480: every check passes (hero watcher x 33-77 %, y 32-56 %, 100 % inside the safe area).
 THE TWO SHOTS THAT MUST MATCH: dg04_hello and dg22_eyes use CAMS["two_shot"] EXACTLY through _two_shot() (no
-  override; the same handheld seed TWO_SHOT_SEED in both, since C.cam would otherwise derive it from the shot
-  name), the same fill, the same light levels, Steve in dg04 and the watcher in dg22 on "watch_door" facing
+  override; the same handheld seed TWO_SHOT_SEED and sway TWO_SHOT_HANDHELD 0.012 in both, since C.cam would
+  otherwise derive the seed from the shot name), the same fill, the same light levels, Steve in dg04 and the watcher in dg22 on "watch_door" facing
   WATCH_YAW, the child on "hello_child". The roofline behind his head is what makes the crouch read: keep it.
 HIS FACE: never readable before dg22, measured (tools.hello_geo, renders): dg15 the right side of his head, 106-108
   degrees off the lens, soft, face 28 / 37 / 78 px; dg20 his head never in the frame (cut by the top at the
@@ -37,11 +37,11 @@ THE SEQUENCE NOW (each shot's docstring has its NOW and MEASURED lines):
   dg15  one frame (FRONTS) with one slow push over all three jumps: the child faces the lens, its head turns to him
         (profile) and back; he jumps from house to house while it looks away
   dg20  low behind his right hip: the flesh spinning on the step, the door snaps open, the child walks out past the
-        flesh, the door shuts behind it, it drops down both halves of the step, walks to his feet, looks up, nods
-        on "hello"; his head never in the frame
+        flesh with its head on him, the door snaps shut behind it, it drops down both halves of the step, walks to
+        his feet, looks up, nods on "hello"; his head never in the frame
   dg21  behind his right shoulder: the slow crouch from "crouched", his head coming down into the frame from the
         top left, the flesh still spinning on the step, the silence
-  dg22  the two-shot again: the white eyes, a small settle of his head on the cut, the hold
+  dg22  the two-shot again: the white eyes, a small settle of his head on the cut, the hold (the handheld floats it)
   Screen direction: dg04, dg20, dg21 and dg22 film from the same side of the line him-child (the child looks up to
   the LEFT at him); dg05 is from the other side (from his right side the sword covers the child's face), with
   the child's look cheated toward the lens.
@@ -151,8 +151,9 @@ def dg04_hello(st, s, C, nar):
       standing eyes x 50 %, y 29 % projected (rendered about y 36 %), face 180 px, 21 degrees off his nose (frontal);
       crouched eyes y 43 % projected (rendered about y 52 %), chin clear of the caption band. The child's head x 56-100 %,
       y 52-96 %, 148 degrees off (from behind; a nose cheat of 30-50 degrees showed no nose: not used). The sword lies
-      across the caption band (y 55-70 %) standing and points down crouched. palette_check dg04@226: every check
-      passes (hero steve x 33-78 %, y 17-43 %, 100 % in the safe area). Motion: out/test/hello_door_gold_motion.mp4.
+      across the caption band (y 55-70 %) standing and points down crouched. With the handheld at 0.012 (for dg22's
+      hold; the same in both) the crouched head box ends at y 57.5 % (236-251): clear. palette_check dg04@226: every
+      check passes (hero steve x 33-78 %, y 17-42 %, 100 % in the safe area). Motion: out/test/hello_door_gold_motion.mp4.
 
     STORY: Golden morning on the plaza at the foot of the doorstep. Steve has stepped outside and stands two blocks
     from the door, facing it, no helmet. The child has come down the step and stands at his feet. Close two-shot
@@ -299,8 +300,8 @@ def dg15_a(st, s, C, nar):
       32 % / 41 %, y 48-49 %, face 28 / 37 / 78 px, distance 26.5 / 20.1 / 9.4, clear of every block, soft (focus on
       the child at 7.7). He grows in place rather than wanders; the far -> mid step is the small one (the SHARED places
       are 6.3 blocks apart along the lens axis: watch_mid at (8.5, 1.5) would give about 45 px, asked of the lead), the
-      corner the big one. palette_check dg15_a@936: every check passes (hero child x 62-81 %, y 40-50 %, 100 % in the
-      safe area); dg15_b@955 and dg15_c@980 passed before the push (his shirt hue 173, trousers not clipped).
+      corner the big one. palette_check dg15_a@936, dg15_b@955 and dg15_c@980, all with the push: every check passes
+      (hero child x 62-81 %, y 40-50 %, 100 % in the safe area; at 980 his shirt hue 174, trousers min channel 44).
 
     STORY (all of beat 15, "Every time I look, he is one house closer."): Late gold at the child's door. The baby
     villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands
@@ -326,7 +327,10 @@ def dg15_b(st, s, C, nar):
     NOW: him at "watch_mid" (the next house), the same profile; the child's face to us on the cut (947), its head turns
       to him by 953, and away again from "house" 961 (by 967): he jumps while it looks away.
     MEASURED: him eyes x 32 %, y 48 %, face 37 px, 106 degrees off; the child as in dg15_a; palette_check dg15_b@955
-      passes everything. Render: out/test/hello_dg_dg15_b_955_zones.png.
+      (with the push) passes everything. Render: out/test/hello_dg_dg15_b_955_zones.png. The far -> mid jump is the
+      weak one (28 -> 37 px, in front of the same house front): PLACES["watch_mid"] at (8.5, 1.5), asked of the lead,
+      gives about 46 px beside the cobblestone house (reviewer's render, no code change here: _fronts reads the place
+      by name); only this shot would need rendering again.
     """
     f0 = s.frame_start
     _fronts(st, s, C, "watch_mid", [(f0, AWAY, 0), (f0 + 1, LOOK, 5), (C.at(s, "house"), AWAY, 6)])
@@ -339,8 +343,8 @@ def dg15_c(st, s, C, nar):
       not WATCH_YAW; the child's face to us on the cut (968), its head turns to him by 974 ("closer") and holds there
       through the pause; nothing else moves but the handheld.
     MEASURED: him eyes x 41 %, y 49 %, face 78 px, 108 degrees off the lens: the right side of his head (no eyes);
-      soft (9.4 blocks against the focus at 7.6). palette_check dg15_c@980 passes everything (his shirt hue 173,
-      trousers min channel 44). Render: out/test/hello_dg_dg15_c_980_zones.png.
+      soft (9.4 blocks against the focus at 7.6). palette_check dg15_c@980 (with the push) passes everything (his
+      shirt hue 174, trousers min channel 44). Render: out/test/hello_dg_dg15_c_980_zones.png.
     """
     f0 = s.frame_start
     _fronts(st, s, C, "watch_door", [(f0, AWAY, 0), (f0 + 1, LOOK, 5)])
@@ -358,18 +362,25 @@ def dg20_walkup(st, s, C, nar):
       at the upper right.
       1258      the rotten flesh (C.item, on "step") already spinning (place + animate), sharp: the focus starts on it;
                 breaking.crack(door, f0, -1): whatever the night's knocking left is gone (stage 7 at 1257 otherwise)
-      1269      the door snaps open ("morning" - 2 -> - 1: one frame, as a door changes state in the game)
+      1269      the door snaps open ("morning" - 2 -> - 1, keys CONSTANT: 1268 is cleanly shut, 1269 open, no half-swing
+                in the motion blur, as a door changes state in the game)
       1269-     the child (the "dg2" twin) walks out of the door at 2.1 blocks/s (walking, not running), south of the open
                 door's panel, then across to the north side of the step's high half, past the flesh (beside it, not
-                through it); 1291 the door shuts behind it (a villager closes the door it came through once it is out
-                of the doorway: InteractWithDoor); 1294 its hitbox clears the high half and it DROPS to the low half
+                through it); its head turns to him from 1276 and stays on him (track, every frame) to his feet, so the
+                route's short zig-zag round the flesh (1284-1289) turns only its body; 1291 the door shuts behind it
+                (a villager closes the door it came through once it is out of the doorway: InteractWithDoor; CONSTANT
+                keys again: 1290 open, 1291 shut); 1294 its hitbox clears the high half and it DROPS to the low half
                 (FALL: the game's gravity, about 4 frames, walking on), 1299 the same off the low half's north edge to
                 the ground (_step_down: walk() would ramp the height along a segment, a lift into the stair), and up
                 to his feet on "hello_child" by 1304; the focus racks to its head from 1274 (0.4 s)
       1304-1312 its head tips all the way back to him; "hello" 1334: the two nods; it holds to the cut
       He is dead still (C.watcher). hero "flesh" and "child".
     MEASURED (tools.hello_door_gold_probe check; tools.hello_geo at 1262 / 1290 / 1338; renders
-      out/test/hello_dg_dg20_walkup_1262_zones.png, _1290_zones.png, _1338_zones.png): its feet never more than 0.025
+      out/test/hello_dg_dg20_walkup_1262_zones.png, _1268_zones.png, _1286_zones.png, _1290_zones.png, _1338_zones.png;
+      tools.hello_door_gold_probe door: the open angle 0 at 1268.0-1268.5, 90 at 1269-1290.5, 0 from 1291): its head's
+      world yaw -145 to -170 over 1282-1304 while its body swings -92 / -148 / -94 / 177 (head at most 68 degrees from
+      the body; without the track the head flicked 56 degrees to the lens and back in 4 frames); its face 24-44 degrees
+      off the lens from the doorstep to his feet. Its feet never more than 0.025
       below the block under them (the old route: 0.52 into the stair); its parts clear of the flesh but for the box of
       its head over the flesh's top at 1284-1288 (rendered: the flesh spins beside the child); the open door's box
       grazes its head by 0.04 inside the dark doorway (1271-1289, not visible). His head box x -57..16 %, y -27..16 %
@@ -377,7 +388,8 @@ def dg20_walkup(st, s, C, nar):
       at 1290: eyes x 59 %, y 21 %; at his feet (1338): eyes x 38 %, y 44 %, face 154 px, 45 degrees off the lens (its
       face to us), nothing in front of it; the gap between the silhouettes of the flesh and its head 31-60 px from 1303
       to the cut (18-41 px before the truck). palette_check dg20@1338: every check passes (hero flesh x 66-76 %,
-      y 25-33 %, hero child x 20-60 %, y 30-50 %, both 100 % in the safe area).
+      y 25-33 %, hero child x 20-60 %, y 30-50 %, both 100 % in the safe area); dg20@1290: every check passes (the
+      child on the step, its head up in the top strip in passing: 77 % in the safe area; the flesh 100 %).
 
     STORY: Golden morning at the same door. One piece of rotten flesh spins on the step where the zombie stood. He has
     not moved from his spot. The door opens and the baby villager comes out, down the step, walking not running,
@@ -498,13 +510,16 @@ def dg22_eyes(st, s, C, nar):
     NOW: CAMS["two_shot"] + the doorstep fill exactly (_two_shot, as dg04). watcher_eyes (white eyes, EYE_GLOW 1.5)
       already crouched on "watch_door" facing WATCH_YAW (C.crouch_held on f0), the child ("dg2") on "hello_child"
       looking up at him. On the cut his face is turned a touch above the child (0.18 block) and settles onto it over
-      12 frames (watch snap=False): the one movement of the shot besides the handheld; then nothing moves to the end.
-      focus his head; hero "watcher".
-    MEASURED (tools.hello_geo at 1480; renders out/test/hello_dg_dg22_eyes_1449_zones.png, _1472_zones.png, with
-      dg04: _dg04_hello_222_zones.png): the same camera, house front and roofline as dg04; eyes x 50 %, y 43 %
-      projected (rendered about y 48 %), face 178 px, 21 degrees off his nose; both white eyes unmistakable from the
-      cut; chin clear of the caption band. palette_check dg22@1480: every check passes (hero watcher x 33-77 %,
-      y 32-56 %, 100 % in the safe area).
+      12 frames (watch snap=False): the one movement of the shot besides the handheld; then only the handheld
+      (TWO_SHOT_HANDHELD 0.012, as dg04) floats the frame through the hold: a few pixels, never still (at 0.004 the
+      hold changed by 0.2-0.7 grey levels a frame, a frozen picture; now 0.4-1.25, median 0.9, 270x480 previews;
+      1470 against 1538: 5.0 instead of 2.0). focus his head; hero "watcher".
+    MEASURED (tools.hello_geo every 6th frame 1448-1544; renders out/test/hello_dg_dg22_eyes_1449_zones.png,
+      _1472_zones.png, _1496_zones.png, with dg04: _dg04_hello_222_zones.png): the same camera, house front and
+      roofline as dg04; eyes x 49.7-50.7 %, y 43.2-43.8 % projected over the sway (rendered about y 48 %), face 178 px,
+      21 degrees off his nose; both white eyes unmistakable from the cut; the head box's bottom at most y 56.9 %
+      (1496, the far end of the sway): the chin clear of the caption band. palette_check dg22@1496: every check passes
+      (hero watcher x 31-76 %, y 32-57 %, 100 % in the safe area).
 
     STORY: The camera of beat 4, exactly, the same roofline behind his head. His face, turned down to the child and
     the lens, fills the upper part of the frame: where the blue was, both pixels of each eye are blank white,

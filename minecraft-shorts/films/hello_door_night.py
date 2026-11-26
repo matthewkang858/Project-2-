@@ -49,7 +49,15 @@ STEVE_FROM = (8.3, -11.7)      # beat 2: Steve's run starts beyond the right edg
 STEVE_TO = (8.75, -8.4)        # ... and ends here, 1.5 blocks south-west of the zombie: turned to it (north-east)
 #                                his sword arm is on the lens's side (from fight_to, facing north, it was behind him)
 STEVE_GO = 68          # ... on this frame (pre-roll), at sprint speed, sliding to a halt
-KNOCKBACK = 1.25       # the knock-back of Steve's blow: a sprint hit's (the game adds a knockback level for one)
+KNOCKBACK = 1.75       # the knock-back of Steve's blow: a sprint hit's (the game's hurt knock-back 0.4, then the
+#                        sprint's extra level 0.5 on half of it: 0.2 + 0.5 = 0.7 = 1.75 x 0.4). It clears both the
+#                        door_front of now (out of frame from 99) and the wider candidate the lead may adopt (from 104)
+DN19_ALONG = 0.5       # dn19: on the cut the zombie moves this far along the door toward its free edge (to y -7.7,
+#                        still on the step and in front of the door, 0.2 from PLACES "step") ...
+DN19_TURN = 0.45       # ... and turns its body this far (26 deg) away from him: from CAMS "beside" its forearm no
+#                        longer comes down on his crown, and the cracked door shows between their two backs
+BESIDE_RAISED_Z = 1.5  # dn19: once CAMS "beside" stands this high (asked of the lead: z 1.9, target z 1.5) the fist
+#                        clears his head and the focus racks to the zombie on "watched"; below it, focus stays on him
 OUT = (5.5, -7.6)      # beat 2: where Steve looks out over the plaza once the zombie is gone (29 deg off the lens)
 LOOK_LEFT = (6.0, -5.0, 1.6)   # ... and the small head turn to the left (north, where the zombie went)
 
@@ -159,10 +167,12 @@ def dn02_fight(st, s, C, nar):
               arm is up (-90 deg) and the sword stands above his right shoulder; its tip shows there to 101.
       94      "zombie": undead.hurt (red flash 94-105, legs flail). The travel is _shove: the zombie holds on the
               step for one frame (HOLD: 94 is a sharp, red zombie with its arms up, on the word), then goes north
-              along the wall at a sprint hit's knock-back (KNOCKBACK 1.25), stopped under the eaves (undead's hop
-              would put its head 0.9 block into them), dropping off the step; a smear from 95, its head off the
-              left edge from 99, out of frame entirely from 101, at rest on the grass at (9.7, -4.43) on 111, never
-              seen again. No death.
+              along the wall at a sprint hit's knock-back (KNOCKBACK 1.75, the game's value), stopped under the
+              eaves (undead's hop would put its head 0.9 block into them), dropping off the step; it starts on 95
+              (sharp in its first half), a smear on 96-97 (head x 2-27 % on 96), its head off the left edge from
+              98, out of frame entirely from 99, at rest on the grass past the house's corner at (9.7, -3.32) from
+              110, never seen again. No death. (With the wider door_front the lead may adopt, its whole body is
+              out from 103: tools/hello_door_night_raised.py probe; 1.25 would leave it lying at the left edge.)
       102-112 his head follows it to the left; 113 ("knocked") .. 123 he turns to face out over the plaza (OUT,
               29 deg off the lens): planted before the door, the iron sword in his right hand at the frame's left;
               130 ("door" + 2) a small head turn to the left, after it; held to 144.
@@ -294,25 +304,39 @@ def dn19_beside(st, s, C, nar):
 
     WHAT IT DOES NOW
       him     C.watcher(s, "dn"): on watch_door facing WATCH_YAW, placed once on 1193, nothing keyed: dead still.
-      zombie  not placed again (the same spot as dn18): bang_on_door(place=False, phase from dn18) carries the
-              rhythm over the cut: swings 1196, 1212, 1228, 1244, blows 1201, 1217, 1233, 1249; cracks stage 5
+      zombie  on the cut (1193, between two swings: the last of dn18 landed on 1185) it is re-placed DN19_ALONG
+              0.5 along the door toward its free edge, (9.7, -7.2) -> (9.7, -7.7): still on the step and in front
+              of the door, 0.2 from PLACES "step"; and its body turned DN19_TURN 0.45 rad (26 deg) away from him,
+              so its arms point away from the lens. A cheat across a 70-degree change of camera: dn18's transform
+              holds through 1192.5 (the shutter of its last frame), the jump is after it. With the shared camera
+              as it is, the forearm came down onto the crown of his head on every blow and their heads stacked
+              ("behind him", not "beside it"); now the arm ends clear of his head on "it" (1217), only its fist
+              meets the top-right corner of his head on 1233 and 1249, and on "watched" (1222) the two backs stand
+              side by side with the cracked door between them. bang_on_door(place=False, phase from dn18) carries
+              the rhythm over the cut: swings 1196, 1212, 1228, 1244, blows 1201, 1217, 1233, 1249; cracks stage 5
               on 1193 (as on 1192), 9 on 1207, reset 1211-1212, climbing to 9 on 1253, clean again on 1257. It
               never turns to him.
       camera  CAMS "beside" unchanged, its drift with ease_out (at speed on 1193); focus on him (his back sharp,
-              the zombie soft) the whole shot. (A rack to the zombie on "watched" was dropped: from about 1215 the
-              shared camera puts the zombie's forearm on the crown of his head on every blow, 1216-1218,
-              1232-1234, 1248-1250; a sharp arm on his soft head read as a blow on him, a soft one behind his
-              sharp head reads a little more as behind him. The fix is the camera's: reported to the lead.)
+              the zombie soft) the whole shot: a sharp fist meeting the corner of his soft head would read as a
+              blow on him. If the lead raises CAMS "beside" as asked (z >= BESIDE_RAISED_Z), the focus racks to
+              the zombie on "watched" (1221, 0.6 s) by itself: tested in memory with z 1.9 / target z 1.5 and the
+              motion review's start (tools/hello_door_night_raised.py): the fist ends clear above his head on 1217,
+              1233 and 1249, the zombie sharp from 1233.
     MEASURED (tools.hello_geo, tools/hello_door_night_probe, render): his head x -30..10 % on 1193 (a sliver of
       his hair and his teal shoulder are at the left edge on the first frame: the shared camera and place give
       that), -23..16 % on "stood", -14..24 % on "beside", 2..39 % on "watched", 13..47 % (y 33-50 %) from 1240;
-      143-165 deg off his nose throughout: the back of his head, no eye. The zombie's head x 27-68 %, y 11-28 %
-      (99 % inside the safe area on 1245). The north torch flame stays 4 % or more clear of the zombie's head and
-      18 % above his. palette_check dn19@1245 passes (stone G/R 1.00, his shirt hue 183, heroes 99 / 100 %).
+      143-165 deg off his nose throughout: the back of his head, no eye. The zombie's head x 44-78 %, y 14-30 %
+      (148-162 deg off the lens, never toward him); a gap of 5 % or more between the two heads. The north torch
+      flame stays clear above his head; the south one sits at the soft zombie's right shoulder (x 77-82 %) from
+      about 1215. palette_check dn19@1222 passes (stone G/R 1.00, his shirt hue 183, zombie 100 % / him 84 %
+      inside the safe area).
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
     him = C.watcher(s, "dn")                   # on watch_door, facing HC.WATCH_YAW, dead still (st.use done)
+    p, yaw = z.pos_at(f0), z.yaw_at(f0)        # on the cut (between two swings): along the door to its free edge,
+    z.place(f0, (p[0], p[1] - DN19_ALONG, p[2]), yaw - DN19_TURN)   # its body turned away from him
+    z.aggro(f0, True, ease=0)
     r = C.memo.get("dn_bang", {})
     r2 = breaking.bang_on_door(z, C.door, f0, f1 + 1, phase=r.get("phase", 0.0), place=False, world=C.v, camera=s,
                                glow=0.2, **KNOCK)
@@ -321,8 +345,11 @@ def dn19_beside(st, s, C, nar):
     st.use(s, z)
     w = C.P("watch_door")
     C.cam(s, "beside", focus=(w[0], w[1], 1.5))     # on his back the whole shot (no rack to the zombie: with the
-    #   shared camera the zombie's forearm comes down onto the crown of his head on every blow; kept soft behind
-    #   his sharp head it reads a little more as "behind him" than as a blow on him; the real fix is the lead's)
+    #   shared camera its fist still meets the top-right corner of his head on 1233 and 1249; kept soft behind his
+    #   sharp head it reads as behind him, sharp it would read as a blow on him; the raised camera is the lead's)
+    if HC.CAMS["beside"]["pos"][2] >= BESIDE_RAISED_Z:     # the raised camera asked of the lead: the fist ends
+        s.focus(z.head, at_s=(C.at(s, "watched") - 1) / 24.0, rack_s=0.6)    # clear of his head: the thing he
+    #                                                          watches is sharp on "watched" (the motion review)
     st.hero(s, "zombie", z)
     st.hero(s, "watcher", him)
     C.lights(s, "night_door", near="door", radius=24.0)
