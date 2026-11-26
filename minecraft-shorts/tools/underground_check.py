@@ -33,7 +33,8 @@ def light_model():
     m7 = U.lightmap_rgb(7, 0)
     ok("block 7 is warm (the game: G < R, B < G)", m7[1] < m7[0] and m7[2] < m7[1], "%s" % (tuple(round(x, 3) for x in m7),))
     lv = [max(U.lightmap_rgb(b, 0)) for b in range(16)]
-    ok("brightness rises with the block level", all(b > a_ for a_, b in zip(lv, lv[1:])),
+    ok("brightness rises with the block level (clamped to 1 at 14-15)", all(b > a_ for a_, b in zip(lv[:15], lv[1:15]))
+       and lv[15] >= lv[14],
        " ".join("%.2f" % x for x in lv))
     moody = U.lightmap_rgb(7, 0, gamma=0.0)
     ok("Brightness 'Moody' (gamma 0) is darker", max(moody) < max(m7), "%.3f < %.3f" % (max(moody), max(m7)))
@@ -145,13 +146,12 @@ def mechanics(v, ug):
     # the swap behind the well: a child running round the well's south side, filmed from the south-west
     child = characters.make_villager("t_child", "none", child=True)
     adult = characters.make_villager("t_adult", "none")
-    route = [(-5.5, -4.6, -0.0625), (-1.0, -4.9, -0.0625), (3.2, -4.4, -0.0625), (3.6, 0.0, -0.0625),
-             (3.4, 4.0, -0.0625)]
+    route = v.paths["ug_round_well"]
     child.place(200, route[0], 0.0)
     end = child.walk(200, route, speed=4.4, run=True)
     cam = U.CAMERAS["b20_well"]["pos"]
     try:
-        sw = U.swap_hidden(child, adult, cam, 200, end, v.world, then=[(3.4, 6.5, -0.0625)], speed=1.6)
+        sw = U.swap_hidden(child, adult, cam, 200, end, v.world, then=[(3.6, 1.8, 0.0)], speed=1.6)
         ok("swap: found a hidden run behind the well (frame %d, hidden %s)" % (sw["frame"], sw["hidden"]), True)
     except ValueError as e:
         ok("swap: found a hidden run behind the well", False, str(e))

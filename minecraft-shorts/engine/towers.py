@@ -129,10 +129,10 @@ ANCHORS (Village.anchors 'tower_<short name>'; Farm.A / Farm.yaw by short name; 
     bed_side (-20.5, 20.45, 10)  beside the beds, facing the zombie
     back_1..3 (-22.58, 19.15 / 19.9 / 20.65, 10)   backed against the far (west) glass, facing the zombie
     row_1..4 (-22.5 .. -19.5, 20.4, 10) facing north: librarian, cleric, narrator, Mom (beat 21)
-    gap_in (-18.5, 22.66, 10) facing the plug (the narrator, beat 19)   gap_side (-19.0, 22.66, 10) the cleric,
-        half a block west of the opening (beat 14)   gap_target the gap's middle
+    gap_in (-18.5, 22.66, 10) facing the plug (the narrator, beat 20)   gap_side (-19.0, 22.66, 10) the cleric,
+        half a block west of the opening (beat 15)   gap_target the gap's middle
     top_step (-18.5, 24.5, 10) on the top dirt step        one_down (-19.5, 24.5, 9) one step down, facing it
-    stairs_foot (-15.4, 24.3, 0) the baby at the foot (beat 12)   stairs_target a point up the stairs
+    stairs_foot (-15.4, 24.3, 0) the baby at the foot (beat 13)   stairs_target a point up the stairs
     foot_front (-20.5, 16.45, 0) the baby at the front of the stone base (beat 5), turned 20 degrees to the east
     pod_target (-20.5, 20.5, 11) the pod's middle       hopper_target the hopper      slot_target the slot
     chest_front (-28.5, 24.55, 0) at the chest, facing it   chest_aside (-26.8, 25.2, 0)   poppies (-27.2, 25.9, 0)
@@ -153,7 +153,7 @@ a rule; sun: the look-dev golden az 62 / el 27)
     slide         from the slot's open south end a little below the rim, 20 mm: the golem slides left and drops
     hopper        frontal to the niche at the back, 30 mm      back   the back, locked tall, 24 mm (the baby tiny at
                   its foot sits at y 70 %: under the caption band by design of the story's picture)
-    gap           inside on the floor, the gap in the middle, 22 mm       bounce   the red bed from the doorway, 24 mm
+    gap           inside on the floor, the gap in the middle, 22 mm       bounce   the red bed from the east, 24 mm
     grow          the locked side view against the front glass, 24 mm  high   over Steve's shoulder, roof hidden, 22 mm
     stairs        outside north-east of the top step, 30 mm  lineup / push   the proofs' framings
 
@@ -176,7 +176,10 @@ BEATS (stories/ironfarm.json; the anchors, cameras and calls that stage each lin
      7 "can't reach her"      C["two_shot"], st.see_through(s, "tower_pod_north"); fm.zombie_in_cell(z, f, aggro=True);
                               Mom on mom, look_at(fm.zombie_eye): 1.9 blocks of air between arm tips and her face.
      8 "doesn't have to"      C["cell_side"]; Mom, cleric, librarian on back_1..3; towers.panic(c, f0, f1,
-                              fm.zombie_eye, seed=...) each; the platform behind the far glass.
+                              fm.zombie_eye, seed=...) each; the platform behind the far glass. The story's
+                              "zombie's arm a soft green shape at the frame edge" cannot be had from beside the cell:
+                              the arms reach only 0.35 into the pod and are behind any lens there (a lens inside the
+                              cell sees the zombie's back); cut to C["two_shot"] / C["pod_in"] for the arms.
      9 "an iron golem comes"  C["platform"]; fm.golem_spawn(g, f, yaw=..., look=A["pod_target"]).
     10 "every time"           the same framing, jump cut: fm.golem_spawn(g, f2) (same spot and pose), then
                               fm.golem_step(g, f2 + 12).
@@ -203,8 +206,9 @@ BEATS (stories/ironfarm.json; the anchors, cameras and calls that stage each lin
                               row_1..4; Steve on top_step, steve.watch(...) along the row and back;
                               steve.attack(f); fm.bed2.place_at(f + 2).
     22 "not afraid of the player"   inside past the narrator (near gap_in) looking north through the back glass;
-                              Steve on one_down: fm.break_top_step(steve, f, camera=s), then walks down the stairs
-                              (steve.walk over fm.set["stairs"] reversed); C["stairs"] is the outside view.
+                              Steve on one_down: fm.break_top_step(steve, f, camera=s), then goes down the stairs
+                              step by step (towers.hop(steve, f, fm.set["stairs"][k]) for k = 7, 6, ...: a hop down
+                              per step works for the player too); C["stairs"] is the outside view.
     23 "afraid of the zombie" C["cell_side"]; panic(narrator, ..., seed=k) and panic(mom, ..., seed=k): matched.
     24 "apparently that counts"   the same shot: fm.golem_spawn(g, f, pos=(-26.8, 22.1, 10), look=A["pod_target"])
                               behind the villagers (north of them in the frame, its head above theirs), golem_step,

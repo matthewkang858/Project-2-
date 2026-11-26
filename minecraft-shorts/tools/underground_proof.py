@@ -96,12 +96,12 @@ def _push_setup(st, s, ug):
     steve = _player(st, "steve")
     kid = _actor(st, "kid", "none", child=True)
     path = list(st.v.paths["ug_push"]) + [(A["ug_push_start"][0], -2.0, 0.0)]
-    r = U.push(steve, dad, f0 - 100, path, st.v.world)
+    r = U.push(steve, dad, f0, path, st.v.world)
     cam = U.CAMERAS["b03_push"]
-    dad.look_at(f0 - 100, (cam["pos"][0], cam["pos"][1] - 0.6, 1.4), ease=0)
+    dad.look_at(f0, (cam["pos"][0], cam["pos"][1] - 0.6, 1.4), ease=0)
     spot = U.CAMERAS["b03_push"]["kid"]
-    kid.place(f0 - 100, spot, yaw_to(spot, (A["ug_push_start"][0], 2.0)))
-    kid.look_at(f0 - 100, dad, ease=0)
+    kid.place(f0, spot, yaw_to(spot, (A["ug_push_start"][0], 2.0)))
+    kid.look_at(f0, dad, ease=0)
     st.use(s, dad, steve, kid)
     return r, dad, steve, kid
 
@@ -133,7 +133,7 @@ def shot_bed(st, s, ug):
     kid = _actor(st, "kid", "none", child=True)
     bed = v.beds[U.BED]
     kid.place(f0 - 2, bed["foot"], bed["yaw"] + math.pi)
-    U.bed_bounce(kid, f0 - 2, bed["foot"], jumps=6)
+    s.ug = U.bed_bounce(kid, f0 - 2, bed["foot"], jumps=6)
     kid.look_at(f0 - 2, U.CAMERAS["b04_bed"]["pos"], ease=0)
     st.use(s, kid)
     _cam(s, "b04_bed", focus=kid.head)
@@ -221,6 +221,32 @@ def shot_cell(st, s, ug, opened=False):
 
 def shot_cell_open(st, s, ug):
     shot_cell(st, s, ug, opened=True)
+
+
+def shot_cell_shut(st, s, ug):
+    """The camera of cell_open with the wall shut (the pair proves the black doorway)."""
+    A = st.v.anchors
+    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5))
+    _cam(s, "b10_cell_side", focus=cells["dad"].head)
+    st.hero(s, "dad", cells["dad"])
+    _under(st, s, ug, inside=True)
+
+
+def doorway(out_dir):
+    """Mean brightness where the two stills of the b10 camera differ (the doorway), shut and open."""
+    import numpy as np
+    from PIL import Image
+
+    a = np.asarray(Image.open(os.path.join(out_dir, "underground_cell_shut.png")).convert("L")).astype(float)
+    b = np.asarray(Image.open(os.path.join(out_dir, "underground_cell_open.png")).convert("L")).astype(float)
+    m = (a - b) > 25
+    if m.sum() < 50:
+        print("[ug doorway] too few changed pixels (%d)" % m.sum())
+        return None
+    print("[ug doorway] %d px change when the wall opens: shut mean %.0f / 255, open mean %.0f / 255 (x %.2f); the "
+          "lit wall beside it %.0f" % (m.sum(), a[m].mean(), b[m].mean(), b[m].mean() / max(1.0, a[m].mean()),
+                                       np.median(a[~m])))
+    return a[m].mean(), b[m].mean()
 
 
 def shot_lever(st, s, ug):
@@ -318,7 +344,7 @@ def shot_foot(st, s, ug):
     kid.place(f0, A["ug_stair_foot"], st.v.yaws["ug_stair_foot"])
     kid.look_at(f0, U.CAMERAS["b22_foot"]["pos"], ease=0)
     z = undead.add_zombie(st, "zombie_" + SHOT["name"])
-    zpos = (A["ug_aisle_west_end"][0] + 6.0, A["ug_aisle_west_end"][1], U.F)
+    zpos = (A["ug_stair_foot"][0] - 2.6, A["ug_aisle_west_end"][1], U.F)
     z.place(f0, zpos, yaw_to(zpos, A["ug_stair_foot"]))
     z.aggro(f0)
     st.use(s, kid, z)
@@ -365,14 +391,14 @@ def shot_counter(st, s, ug):
     _shut(ug, f0 - 6)
     zv = _zv_dad(st, s)
     steve = _player(st, "steve")
-    spot = (15.15, -11.55, U.F)
+    spot = (15.2, -11.25, U.F)
     steve.place(f0, spot, yaw_to(spot, st.v.anchors["ug_cell_dad"]))
     undead.throw_potion(steve, zv, f0 + 6, camera=s)
     st.use(s, zv, steve)
     st.see_through(s, "ug_end_pier")
     _cam(s, "b13_counter", focus=zv.head)
     st.hero(s, "zombie dad", zv)
-    _under(st, s, ug, inside=True)
+    _under(st, s, ug, inside=True, extra=[((14.5, -10.6, U.F + 1.9), 1.8)])
 
 
 def shot_apple(st, s, ug):
@@ -452,7 +478,7 @@ def shot_kill(st, s, ug):
 BUILDERS = {
     "mouth": ("dusk", shot_mouth), "lip": ("dusk", shot_lip), "push": ("dusk", shot_push), "well": ("dusk", shot_well),
     "bed": ("dusk", shot_bed), "bed_wide": ("dusk", shot_bed_wide), "stairwell": ("dusk", shot_stairwell),
-    "down": ("under", shot_down), "cell": ("under", shot_cell), "cell_open": ("under", shot_cell_open),
+    "down": ("under", shot_down), "cell": ("under", shot_cell), "cell_open": ("under", shot_cell_open), "cell_shut": ("under", shot_cell_shut),
     "lever": ("under", shot_lever), "aisle": ("under", shot_aisle), "endwall": ("under", shot_endwall), "endwall_alt": ("under", shot_endwall_alt),
     "slot": ("under", shot_slot), "slot_hands": ("under", shot_slot_hands), "box": ("under", shot_box),
     "foot": ("under", shot_foot), "falloff": ("under", shot_falloff), "portrait": ("under", shot_portrait),
@@ -484,11 +510,13 @@ def build(scene, sky=None):
 def still_frame(film, name):
     shot = next(s for s in film.shots if s.name == name)
     if name == "push":
-        return shot.frame_start + 40
+        return shot.frame_start + 62
     if name == "bed":
         return shot.frame_start + 10
     if name == "down":
         return shot.frame_end
+    if name == "mouth":
+        return shot.frame_start + 20
     return shot.frame_start + int(round(STILL_AT * film.fps))
 
 
@@ -581,6 +609,8 @@ def main(names, res=None, samples=16, threads=2):
                 print("[ug proof] %-11s frame %4d  %.1f s" % (sh, f, time.time() - t), flush=True)
             ses.configure(res, samples, threads, None)
             _contact(tiles, frames, os.path.join(out_dir, "underground_%s.png" % sh))
+    if "cell_open" in names and "cell_shut" in names:
+        doorway(out_dir)
     print("[ug proof] checks:", "all passed" if not failed else "FAILED: %s" % failed)
     return 1 if failed else 0
 
@@ -590,8 +620,8 @@ def _sheet_frames(sheet, shot, ses):
         r = getattr(shot, "ug", None)
         land = (r["drops"][0] if r and r["drops"] else shot.frame_start + 60)
         return [land - 10, land - 7, land - 5, land - 3, land - 1, land + 2]
-    f0 = shot.frame_start
-    return [f0 + k for k in (2, 6, 10, 14, 17, 20)]
+    land = shot.ug["landings"][0]
+    return [land - 7, land - 4, land - 1, land, land + 3, land + 7]
 
 
 def _contact(paths, frames, out):
