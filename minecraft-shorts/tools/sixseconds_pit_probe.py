@@ -57,8 +57,7 @@ def main(argv):
             if hasattr(c, "spinner"):                                   # a dropped item: its spinner's world point
                 ob = c.spinner
                 p = ob.matrix_world.translation.copy()
-                shown = not any(not cp.hide_render for cp in c.copies) and False or any(
-                    not cp.hide_render for cp in c.copies)
+                shown = any(not cp.hide_render for cp in c.copies)
             else:
                 p = Vector(c.pos_at(f))
                 ob = c.root

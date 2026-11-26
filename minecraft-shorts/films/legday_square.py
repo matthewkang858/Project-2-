@@ -56,7 +56,7 @@ NARRATOR_FAR = (4.6, 2.6)     # sq01: at the square's east edge beyond the well:
 SQ02_CAM = dict(pos=(6.45, -19.0, 1.25), target=(4.85, -15.45, 0.85), pos1=(3.45, -20.5, 1.8),
                 target1=(3.1, -14.2, 0.7), lens=22.0, fstop=2.8)
 SQ02_KEYS = [(73, 0.0), (128, 0.08), (152, 0.22), (184, 0.90), (205, 1.0)]
-BENCH_NARRATOR = (-7.25, 7.4)  # sq07: bench_narrator (-7.3, 6.6) moved 0.8 north, beside the head of the dust: from
+BENCH_NARRATOR = (-7.3, 6.6)   # sq07: bench_narrator (-7.3, 6.6) moved 0.8 north, beside the head of the dust: from
 #                               the south-east he stands above and left of the lamp instead of behind it
 SQ07_CAM = dict(pos=(-2.85, 3.65, 2.25), target=(-6.6, 6.55, 0.85), pos1=(-3.05, 3.9, 2.15),
                 target1=(-6.6, 6.6, 0.85), lens=20.0, fstop=2.4)
