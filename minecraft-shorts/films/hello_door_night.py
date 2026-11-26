@@ -181,7 +181,11 @@ def dn02_fight(st, s, C, nar):
       102-112 his head follows it to the left; 113 ("knocked") .. 123 he turns to face out over the plaza (OUT,
               29 deg off the lens): planted before the door, the iron sword in his right hand at the frame's left;
               130 ("door" + 2) a small head turn to the left, after it; held to 144.
-      camera  door_front exactly, handheld 0.008; focus on the door, racked to Steve's head from "that" (108).
+      camera  door_front exactly, handheld DN02_HANDHELD 0.02 (since the review of the whole-film preview: C.cam's
+              default 0.008 is sub-pixel 7 blocks off, and once the zombie had gone 103-113 and 124-132 changed by
+              only 0.1-0.25 grey levels a frame; now 0.16-0.45 and 0.30-0.49 on the preview); focus on the door,
+              racked to Steve's head from "that" (108). dn18 keeps door_front with the default 0.008: the same
+              framing, its zombie never stops.
       light   the lead's pass: the moon behind the house (SKIES "night", azimuth 35), the door torches at the night
               level (LIGHTS "night_door" door 1.0, was 2.0), the 40 mm door_front with the starry sky over the roof.
     MEASURED (the lead's pass, tools.hello_geo with the new door_front; preview 270x480_6spp re-rendered 72-144): the
@@ -193,6 +197,11 @@ def dn02_fight(st, s, C, nar):
       gone). Mean luma 82-85 (was 104-114). Stills: out/test/hello_lead_dn02_fight_94_zones.png, _130_zones.png.
       The sword he holds once he faces out still lies in the caption band (y 64-70 %, x 12-45 % on 130): his hand
       is at that height in this framing; the lead accepted it (the caption sits on a prop, his head is clear).
+      WITH DN02_HANDHELD 0.02 (review pass; stills out/test/hello_review_fix_dn02_fight_103_zones.png, _130.png at
+      540x960 / 16): the zombie is out of the frame on 103 as before; hello_palette dn02@90: stone G/R 0.97, planks
+      s 0.29, zombie x 37-55 %, Steve x 51-73 %, both 100 % inside; on 100 the zombie is at x 1-5 % (leaving, as
+      designed) and on 130 out of the picture: palette_check reports both heroes per frame, the zombie's FAIL there
+      is the knock-back doing its job.
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
@@ -258,7 +267,8 @@ def dn18_knock(st, s, C, nar):
               1170), 1185. Cracks: stage 5 on 1101, 9 on 1115, reset 1119-1120 (between blows), climbing again,
               9 from 1161 ("until" 1162), reset 1165-1166, stage 0 from 1167: the blow on 1169 hits a clean door
               (stage 5 at the cut). The rhythm and the cracks go on in dn19 (C.memo["dn_bang"]).
-      camera  door_front exactly as dn02 (handheld 0.008), focus on the door. Nobody else: the right third (the
+      camera  door_front exactly as dn02 (handheld: C.cam's default 0.008; dn02 floats more, 0.02, for its still
+              stretches), focus on the door. Nobody else: the right third (the
               cobblestone wall and the south torch, where Steve came in) stays empty. The lead's pass: the 40 mm
               door_front with the starry sky over the roof, the moon behind the house, door torches x 1.
     MEASURED (tools/hello_door_night_probe, render): the zombie's head x 19-44 %, y 17-31 % the whole shot; the

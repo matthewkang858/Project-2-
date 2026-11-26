@@ -29,8 +29,9 @@ TAGS TAKEN (twins): child_me (me06, me07, me12, me13: placed on each shot's firs
   child_me2 (me08: pre-rolled from frame 475, i.e. INSIDE me07: never use it in me07), child_me3 (me14: pre-rolled
   from 782), watcher_me (me07, me08, me13), steve_diamond_me (me06: pre-rolled from 287). A new twin: me4, me5 ...
 THIS SEQUENCE'S OWN PLACES AND CAMERAS are the constants below (GATE_CHILD, STEVE_IN, ME08_CAM, ME12_*, ME13_*,
-  ME14_*); the only shared camera is CAMS "gate" (me06 = me07: position, aim, lens and handheld unchanged; me07
-  opens it to f/2.0, ME07_FSTOP: accepted by the lead and noted at CAMS "gate"). hello_common's PLACES "gate_child"
+  ME14_*, ME07_CAM); the only shared camera is CAMS "gate" (me06; since the review of the whole-film preview me07
+  has its own ME07_CAM from the same position: 30 mm, a slow push, f/2.0: the dip hides the change). hello_common's
+  PLACES "gate_child"
   (since the lead's pass (0.1, 25.9), this file's spot: GATE_CHILD reads it; the stub's (0.15, 26.6) was dead centre
   on the road's axis, the child a brown box from behind) and "road_stop" (me08). me08's camera is its own:
   C.cam(s, None, **ME08_CAM).
@@ -38,9 +39,9 @@ LOOKS: _cheat keeps a villager that watches something beyond itself turned at mo
   lens (rendered: at 100-118 degrees the nose hides behind the head and the child is a brown box; at 78 only a 2 px
   nose and part of one eye; at 65 the nose stands out and both eyes show, and the look still points at what it
   watches; at 55 it looks at the camera's side instead); _gaze follows a moving target with such a cheated look.
-THE WATCHER (beats 7, 8, 13): C.actor("watcher", "me") = plain Steve, dead still; never his face (beat 7: 30 px tall
-  at the gap with the 22 mm gate lens; at f/4 his 8 px face showed two pale eye whites, so me07 is at f/2.0: an even
-  skin-coloured smudge).
+THE WATCHER (beats 7, 8, 13): C.actor("watcher", "me") = plain Steve, dead still; never his face (beat 7: about
+  42 px tall at the gap with ME07_CAM's 30 mm, 30 px with the 22 mm gate lens; at f/4 his face showed two pale eye
+  whites, so me07 is at f/2.0: an even skin-coloured smudge).
 LIGHT: C.lights(s, "gold", near=<point>, radius=12) (daylight; the village's torches are far away: keep them off).
 """
 import math
@@ -174,12 +175,12 @@ def me06_leave(st, s, C, nar):
                       sets notes: a figure inside the wood stays fully lit, so the shot ends before he reaches it
       the whole shot  the child on the last path block in three-quarter profile (its nose against the meadow:
                       cheat its look toward the lens, C.to_lens; never the brown box from behind)
-    SHARED: CAMS "gate" (= hello_set's gate camera), EXACTLY the same in me07_return: no move, only the handheld
-      (keep it tiny: 0.004); me07 only opens it to f/2.0 (ME07_FSTOP, see there). The child's block in both shots:
-      GATE_CHILD (replaces PLACES "gate_child").
+    SHARED: CAMS "gate" (= hello_set's gate camera): no move, only the handheld (0.004). me07_return, after the dip,
+      has its own ME07_CAM from the same position (30 mm, a slow push, f/2.0: the review of the whole-film
+      preview). The child's block in both shots: GATE_CHILD (replaces PLACES "gate_child").
       Cast: C.actor("steve_diamond", "me"), C.actor("child", "me").
-    NEIGHBOURS: before, dg05_nod (the doorstep, the child runs off); after, me07_return: the same frame after a dip
-      to black (the night that passed).
+    NEIGHBOURS: before, dg05_nod (the doorstep, the child runs off); after, me07_return: the same place from the
+      same spot, a little tighter, after a dip to black (the night that passed).
     RISKS (story): "He came back at sunrise without it": at distance diamond armor and the teal shirt are both in
       the cyan family: keep Steve near enough while the armor must read (he walks 4.3 blocks a second). The glint:
       players.equip(enchanted=True) is on (C.actor did it, and the stamp work-around).
@@ -237,35 +238,44 @@ def me07_return(st, s, C, nar):
     that passed, same camera as beat 6, focus held on the child.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 426 on    (the picture is back) the same frame as me06: the empty road, him at forest_gap
+      frame 426 on    (the picture is back) the same place as me06, a little tighter (ME07_CAM): the empty
+                      road, him at forest_gap
       "sunrise" 442   the child lifts its head toward him (a slow look_at up, held)
       "without" 457 .. "it" 467    bare arms, bare head, teal shirt: no armor, no sword
-    SHARED: CAMS "gate" exactly as in me06 (the same handheld seed is fine; f/2.0 instead of f/4, which only
-      changes the depth of field: reported to the lead). GATE_CHILD, C.A["forest_gap"]
+    SHARED: none of the camera since the review (ME07_CAM starts at CAMS "gate"'s position; me06 keeps CAMS
+      "gate" itself). GATE_CHILD, C.A["forest_gap"]
       (he stands there facing the village; yaw 0 faces south). Cast: C.actor("watcher", "me"), and the child: the
       child of me06 is in the shot before: place it on f0 (no pre-roll needed: the frame is black until 422), or a
       FRESH twin C.actor("child", "me4"). NOT "me2": me08 pre-rolls child_me2 from frame 475, inside this shot.
-    SKY: "dawn" (the module docstring): the same camera, another light.
+    SKY: "dawn" (the module docstring): the same place, another light.
     NEIGHBOURS: before, me06_leave; after, me08_nohello (the same road from the side: the child runs up to him).
     RISKS (story): the golden sky plays both evening and morning: answered by the "dawn" sky, the dip and the
       figure large enough that bare arms and a bare head show; beat 8's teal shoulder confirms it. The night insert
       the story offers is not available (the narration fixes every cut). Plain Steve skin (sets notes: his eye
       whites are two pale dots at 30 px: the white-eyed skin would be brighter).
-    NOW: CAMS "gate" exactly as me06 (the same position, aim, lens and handheld) but at f/2.0 (ME07_FSTOP; behind
-      the dip, the frame is the same), focus on the child (he is soft at 35 blocks). He stands at
-      forest_gap, yaw 0 (facing the village), dead still, nothing keyed but his place. The child on GATE_CHILD (the
-      same block as me06), its body turned back toward the gate, head down toward the ground (its face, looking
-      down, three-quarter to the lens): it waited all night. Its head drifts a little from 423 (alive as the dip lets
-      the picture back), and from 440 to 454 ("sunrise" 442) it lifts and turns up the road to him, cheated to
-      MAX_OFF (nose in profile, both eyes); then it keeps peering at him, the head rising about 7 degrees and turning
-      4 more to the cut (456-482: the tail is not a freeze frame). Hero: the child.
-    MEASURED (tools.hello_geo; stills out/test/hello_meadow_final_me07_return_432/470[_zones].png under the first
-      dawn, out/test/hello_lead_me07_return_470_zones.png under the dusk-preset dawn of the lead's pass): him x 50 %,
-      y 52 %, face 8 px, 35 blocks: at f/2.0 an even skin-coloured smudge (brightest face pixel rgb(132,98,87) against
-      a face mean of (92,71,62); at f/4 the eye whites were two dots of (169,145,143)); bare teal arms, bare head and
-      blue legs read; the child's eyes x 25 %, y 56 %, 39 degrees off the lens at 426 (head down), 65 at 454, 69 at
-      484. palette_check me07_return@460 (lead's pass, new dawn) passes everything (robe hue 7, skin s 0.44, plants
-      0.87 of the grass, hero child x 15-34 %, y 50-59 %, 100 % inside).
+    NOW (since the review of the whole-film preview): ME07_CAM, its own camera behind the dip: the gate camera's
+      position, 30 mm f/2.0 (ME07_FSTOP) aimed 2.5 blocks west of him and a little low, a slow LINEAR push of 0.3
+      block along the aim (ME07_PUSH) with a pan of 1.1 blocks west and 0.6 down at his distance that holds the child
+      in place, handheld 0.012 (ME07_HANDHELD, dg22's); focus on the child. With the gate camera exactly (22 mm,
+      locked, handheld 0.004) he was 30 px tall at 540x960, 3 % of the frame: on a phone the road read as empty on
+      "He came back"; and the frame changed by 0.07-0.21 grey levels a frame for 2.6 s, a still photograph after
+      the dip. The change of lens is hidden by the dip (black 421-422); the place is the same (the gate, the road,
+      the black wall), the frame is a little tighter. He stands at forest_gap, yaw 0 (facing the village), dead
+      still, nothing keyed but his place. The child on GATE_CHILD (the same block as me06), its body turned back
+      toward the gate, head down toward the ground (its face, looking down, three-quarter to the lens): it waited
+      all night. Its head drifts a little from 423 (alive as the dip lets the picture back), and from 440 to 454
+      ("sunrise" 442) it lifts and turns up the road to him, cheated to MAX_OFF (nose in profile, both eyes); then
+      it keeps peering at him, the head rising about 7 degrees and turning 4 more to the cut (456-482). Hero: the
+      child.
+    MEASURED (tools.hello_geo at 426 / 456 / 484; stills out/test/hello_review_fix_me07_return_426/460/484.png and
+      _484_zones.png at 540x960 / 16 samples): him eyes x 61 -> 65 %, y 50 -> 49 %, about 42 px tall (shirt and legs
+      33-34 px, was 30 px in all), face 11-12 px, 35 blocks: at f/2.0 an even smudge (crop of 460: brightest face
+      pixel value 81, no eye whites); teal shirt, bare arms, bare head and blue legs read against the black trunks;
+      the child's eyes x 27-29 %, y 55-56 %, head x 10.5-49.5 %, y 44-64 % (head down at 426: its brow's corner
+      at 64 %; 44-61 % once lifted), face 61-66 px, 39 degrees off the lens at 426, 65 at 456, 68 at 484.
+      palette_check me07_return@460 passes everything (robe hue 9, skin s 0.43, plants 0.75 of the grass, hero
+      child x 13-41 %, y 46-60 %, 100 % inside). Preview 360x640_8spp 421-484: 0.41-0.69 grey levels a frame
+      (was 0.09-0.26).
     """
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "me")

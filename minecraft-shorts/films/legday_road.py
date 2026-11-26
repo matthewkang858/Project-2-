@@ -24,8 +24,8 @@ THE PLACE (films/legday_set.py, "THE ANVIL WALL"): the exit road (dirt path x -1
   only x 0..3 wide.
 THE PATROL (engine.illagers): C.patrol(tag) = [captain (the ominous banner on his head), 2..5], crossbows held. EVERY
   patrol of this sequence is C.march_patrol(tag): THE PATROL CLOCK (legday_common), one march on the whole
-  patrol_road (0.5, 84 -> 40, with its hops) from one frame (about 745) for rd15, tp18 and rd19 alike, so that the
-  captain's feet are at y 49.6 when the anvils land (1210): rd15 903 -> 73.5, 944 -> 70.2; rd19 1142 -> 55.0, "back"
+  patrol_road (0.5, 84 -> 40, with its hops) from one frame (757) for rd15, tp18 and rd19 alike, so that the
+  captain's feet are at y 49.6 when the anvils land (1210): rd15 903 -> 72.9, 944 -> 70.2; rd19 1142 -> 55.0, "back"
   1169 -> 52.9, 1210 -> 49.9 (all five on the strip: crushed). Do not march a patrol any other way (tp18 shows the
   same clock from the wall top). The file walks 2.0 apart at the leader's 1.911 blocks/s, gait "vanilla" (the
   game's short swing, for wide and long-lens shots). A dying pillager tips over to ITS OWN LEFT: walking south, that
@@ -79,8 +79,8 @@ def rd15_pillagers(st, s, C, nar):
     captain's head, pillager walk cycle.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 903       the file already walking (C.march_patrol: on the patrol clock since about 745; the captain's
-                      feet at y 73.5 on 903, 70.2 on 944; the last follower 8 blocks behind him, on the real road)
+      frame 903       the file already walking (C.march_patrol: on the patrol clock since 757; the captain's
+                      feet at y 72.9 on 903, 70.2 on 944; the last follower 8 blocks behind him, on the real road)
       "pillagers" 913 the five in single file, crossbows, the CAPTAIN in front with the banner over his head (the
                       banner must read: it is the drop of beat 20)
       the horizon     clean, the lone oak (3, 81) behind them
@@ -94,7 +94,7 @@ def rd15_pillagers(st, s, C, nar):
       FALLBACK CHOSEN by the set: the camera 3.9 high, not "ground-level".
       THE REVIEW (technical): the first stub marched from y 76 with only 12 frames of pre-roll: three followers walked
       a full block INSIDE the meadow's rise (z 2 in grass, the ground z 3 at y 78), hidden by the captain in the 85 mm
-      frame. Fixed by the patrol clock (the whole road, its hops, from about 745); tools.legday_state now checks
+      frame. Fixed by the patrol clock (the whole road, its hops, from 757); tools.legday_state now checks
       every body against the World (no character inside a solid block in its shots).
     NOW (stub): RD15_CAM (+ a creep), C.march_patrol("rd15") (the clock). Hero: the captain.
     """

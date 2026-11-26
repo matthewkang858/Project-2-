@@ -13,7 +13,8 @@ rd19's twin's place on the same frames; the captain's feet at the key frames pri
 more from the drops' REAL positions over the whole shot; no character inside a solid block in its shots (every 3
 frames; the landed anvils' cells count as empty before the landing); the story's hard numbers: the arms two-shot
 frontal (sq08: both bodies within 20 degrees of the lens from "arms" to "four"), the leg-day legs (swing 50 degrees
-or more, a stair step every 7 frames or more), cl22 = cl11 and cl23 = cl12 frame for frame. Prefix with
+or more, a stair step every 7 frames or more), cl22 = cl11 and cl23 = cl12 frame for frame; the square's stones
+(stone 1 on the game's clock, stone 2 begun and never broken). Prefix with
 `nice -n 15 timeout 290`.
 """
 import math
@@ -239,8 +240,27 @@ def main(argv):
                 scene.frame_set(rb.frame_start + k)
                 pb = st.cast[tb].root.matrix_world.translation.copy()
                 dev = max(dev, (pa - pb).length)
-        check(dev < 1e-3, "%s repeats %s frame for frame over %d frames (largest difference %.4f block)"
-              % (b_, a_, n, dev))
+            scene.frame_set(ra.frame_start + k)
+            ca = scene.camera.matrix_world.copy()
+            la = scene.camera.data.lens
+            scene.frame_set(rb.frame_start + k)
+            cb = scene.camera.matrix_world.copy()
+            dev = max(dev, (ca.translation - cb.translation).length,
+                      max(abs(ca[i][j] - cb[i][j]) for i in range(3) for j in range(3)),
+                      abs(la - scene.camera.data.lens) / 100.0)
+        check(dev < 1e-3, "%s repeats %s frame for frame over %d frames, the camera included (largest difference "
+              "%.4f)" % (b_, a_, n, dev))
+    # 12. the square's stones: stone 1 on the game's clock (stage 6 of 10 on sq02's first frame, gone on "drops"),
+    #     stone 2 only begun in sq02 (cracked by its end, the cracks cleared on the next frame, never broken)
+    r2 = T["sq02_reps"]
+    s1, s2 = C.stones[0], C.stones[1]
+    burst = r2.at("drops")
+    check(s1.stage_at(r2.frame_start) >= 5 and s1.there_at(burst - 1) and not s1.there_at(burst),
+          "sq02: stone 1 at crack stage %d on %d (half way or more), broken ON 'drops' %d"
+          % (s1.stage_at(r2.frame_start), r2.frame_start, burst))
+    check(s2.stage_at(r2.frame_end) >= 0 and s2.stage_at(r2.frame_end + 1) == -1 and s2.there_at(T["tp24_reloading"]
+          .frame_end), "sq02: stone 2 begun (stage %d on %d), its cracks cleared on %d, never broken"
+          % (s2.stage_at(r2.frame_end), r2.frame_end, r2.frame_end + 1))
     print("[legday_state] %d failure(s)" % len(bad))
     return 1 if bad else 0
 

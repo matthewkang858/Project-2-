@@ -170,11 +170,12 @@ SKIES = {
     # never more: lit stone beside a lantern is on the palette limit), an indigo sky with the first stars and pink
     # clouds over the wall top. COMPARED SIDE BY SIDE with gold on the shared frame (cl11 / cl22: the set builder's
     # out/test/legday_set_b11_climb.png against legday_set_b22_climb.png, and the lead's scout stills of the stubs
-    # out/test/legday_scout_cl11_climb_704.png / legday_scout_cl22_dusk_1404.png, the same frame of the shot):
+    # out/test/legday_scout_cl11_climb_704.png / legday_scout_cl22_dusk_1408.png, the same frame of the shot):
     # blue afternoon against indigo with stars, nobody can take one for the other. KNOWN AND ACCEPTED: tools/palette_check's rule "stone not magenta" (G >= 0.92 R) fails on
     # the wall top at dusk (tp24: G/R 0.90, rgb(123,111,105), with the lanterns OFF 0.87): it is the warm dusk sky
     # on the stone, B under G, not magenta; the rule cannot tell warm from magenta (engine/fixtures' notes, the set
-    # builder's report). Do not "fix" it by boosting lanterns.
+    # builder's report). Do not "fix" it by boosting lanterns. (After review the stub's tp24 camera, from the east,
+    # passes it: G/R 0.95 on 1545; another frame of the wall top at dusk may fail it again: still accepted.)
     "dusk": dict(preset="dusk", az=185.0, el=5.0, bloom=1.3, grade="warm"),
 }
 

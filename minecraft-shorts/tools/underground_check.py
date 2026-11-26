@@ -115,6 +115,39 @@ def the_set():
         ok("sight %s -> %s's face is clear" % (cam, who), blk is None, "blocked at %s" % (blk,))
     blk = sight(w, U.CAMERAS["b07_down"]["pos0"], face["farmer"])
     ok("sight b07_down (start) -> the farmer's face is clear", blk is None, "blocked at %s" % (blk,))
+    # beat 9: from the b09 camera the lever's handle, dad's head and the back wall's north face beside his robe
+    c9 = U.CAMERAS["b09_lever"]["pos"]
+    for what, p in (("the lever handle", (U.LEVER[0] + 0.5, U.LEVER[1] + 0.1, U.F + 1.5)),
+                    ("dad's head", face["dad"]), ("the door's north face beside his robe",
+                                                  (U.DOOR[0][0] + 0.85, U.DOOR[0][1] + 1.02, U.F + 0.9)),
+                    ("the top of the doorway", (U.DOOR[0][0] + 0.5, U.DOOR[0][1] + 1.02, U.F + 1.9))):
+        blk = sight(w, c9, p)
+        ok("sight b09_lever -> %s is clear" % what, blk is None, "blocked at %s" % (blk,))
+    # beat 19: dad's profile from b19's start (his look 20 degrees west of north, the camera's bearing)
+    c19 = U.CAMERAS["b19_endwall"]
+    hd = (A["ug_cell_dad_mid"][0], A["ug_cell_dad_mid"][1], U.F + 1.6)
+    look = math.atan2(c19["look"][0] - hd[0], c19["look"][1] - hd[1])
+    cam = math.atan2(c19["pos0"][0] - hd[0], c19["pos0"][1] - hd[1])
+    ang = abs((math.degrees(look - cam) + 180.0) % 360.0 - 180.0)
+    ok("b19: dad's look %.0f degrees west of north, %.0f degrees off the lens (profile: 70-110)"
+       % (-math.degrees(look), ang), 70.0 <= ang <= 110.0 and -math.degrees(look) <= 21.0)
+    # the bars connected as the game connects them (IronBarsBlock.attachsTo): the window above is air
+    bars = {c: w.get(*c) for c in ((8, U.CELL_Y, U.F), (8, U.CELL_Y, U.F + 1), (14, U.FRONT_Y, U.F + 2), U.SLOT)}
+    want = {(8, U.CELL_Y, U.F): ("true", "true"), (8, U.CELL_Y, U.F + 1): ("false", "true"),
+            (14, U.FRONT_Y, U.F + 2): ("false", "true")}
+    for cell, (n, s_) in want.items():
+        st_ = bars[cell]
+        ok("bars at %s: north %s, south %s" % (cell, n, s_), st_ is not None and st_[1].get("north") == n
+           and st_[1].get("south") == s_, "%s" % (st_,))
+    # the caps: 2-high cells; the doorway meshed dark and lit
+    ok("every job cell has its cap at F + 2 (cutaway ug_caps)", len(ug.res["cut"]["ug_caps"]) == len(U.CELL_X))
+    ok("doorway dark copy shown, lit copy hidden by default", ug.doorway["dark"] and ug.doorway["lit"]
+       and all(not o.hide_render for o in ug.doorway["dark"]) and all(o.hide_render for o in ug.doorway["lit"]))
+    ok("the lit doorway is baked brighter (open: door cells %s)" % sorted(set(ug.res["open_keep"].values())),
+       min(b for b, _s in ug.res["open_keep"].values()) >= 7)
+    out = e.levels((U.SLOT[0] + 1, U.SLOT[1], U.F))
+    print("[ug check]      the game's box (bars pass light, -1 per step): about %d; baked sealed: %d"
+          % (out[0] - 2, e.levels((U.BOX[0], U.BOX[1], U.F))[0]))
     return v, ug
 
 
@@ -151,12 +184,20 @@ def mechanics(v, ug):
     ok("held walk key: the player walks THROUGH him (the game's push is weakest at full overlap)",
        min(gaps2) < -0.6, "min gap %.2f" % min(gaps2))
     kid = characters.make_villager("t_kid", "farmer", child=True)
-    bb = U.bed_bounce(kid, 10, v.beds[U.BED]["foot"], jumps=4)
-    ok("bed: 4 full jumps of 1.252 then the bed's bounce dies out",
-       bb["peaks"][:4] == [1.252] * 4 and all(b < a for a, b in zip(bb["peaks"][4:], bb["peaks"][5:])),
-       "%s" % bb["peaks"])
-    ok("bed: jump period 12 ticks (14.4 frames)", all(abs((b - a) - 14.4) <= 1.0 for a, b in
-                                                     zip(bb["landings"][:4], bb["landings"][1:4])), "%s" % bb["landings"])
+    bb = U.bed_bounce(kid, 10, v.beds[U.BED]["foot"], jumps=3)
+    ok("bed (game, 3 calls): ONE jump of 1.252, then the bed's bounces 0.56, 0.24, 0.10, 0.04",
+       len(bb["takeoffs"]) == 1 and bb["peaks"][:5] == [1.252, 0.556, 0.238, 0.104, 0.042], "%s" % bb["peaks"])
+    kid6 = characters.make_villager("t_kid6", "farmer", child=True)
+    b6 = U.bed_bounce(kid6, 10, v.beds[U.BED]["foot"], jumps=6)
+    ok("bed (game, 6 calls): two jumps 36 frames apart (the calls in the air are spent)",
+       len(b6["takeoffs"]) == 2 and b6["takeoffs"][1] - b6["takeoffs"][0] == 36, "take-offs %s" % b6["takeoffs"])
+    kidr = characters.make_villager("t_kidr", "farmer", child=True)
+    br = U.bed_bounce(kidr, 10, v.beds[U.BED]["foot"], jumps=4, mode="regular")
+    ok("bed (regular, NOT the game): 4 jumps of 1.252 every 14.4 frames",
+       br["peaks"][:4] == [1.252] * 4 and all(abs((b - a) - 14.4) <= 1.0 for a, b in
+                                              zip(br["takeoffs"], br["takeoffs"][1:])), "%s" % br["takeoffs"])
+    # beats 10-12: the blows in the capped cell, the head tracked through the b11 / b12 cameras
+    hop(v)
     st = players.make_player("t_jumper")
     st.place(100, (8.5, -11.0, U.F), 0.0)
     jl = U.jump_loop(st, 100, 160)
@@ -179,6 +220,54 @@ def mechanics(v, ug):
         ok("swap: found a hidden run behind the well (frame %d, hidden %s)" % (sw["frame"], sw["hidden"]), True)
     except ValueError as e:
         ok("swap: found a hidden run behind the well", False, str(e))
+
+
+def hop(v):
+    """Beats 10-12: dad's head through the b11_portrait and b12_cell cameras while hurt_in_cell / infect_in_cell
+    jolt him (the cap stops the hop at 0.05): it must stay inside the Reels safe area on every frame."""
+    import bpy
+    from bpy_extras.object_utils import world_to_camera_view
+    from mathutils import Vector
+
+    from engine import characters, undead
+    from engine import underground as U
+
+    A = v.anchors
+    dad = characters.make_villager("t_hdad", "librarian")
+    zv = undead.make_zombie_villager("t_hzv", "librarian")
+    dad.place(300, A["ug_cell_dad"], v.yaws["ug_cell_dad"])
+    r1 = U.hurt_in_cell(dad, 306, attacker=A["ug_door_target"])
+    r2 = U.hurt_in_cell(dad, 320, attacker=A["ug_door_target"])
+    r3 = U.infect_in_cell(dad, zv, 334, attacker=A["ug_door_target"])
+    ok("cell: each blow is a jolt of 0.05 (the cap at F + 2 stops the hop)",
+       all(abs(r["peak"] - 0.05) < 1e-3 for r in (r1, r2, r3)), "%s" % [round(r["peak"], 3) for r in (r1, r2, r3)])
+    scene = bpy.context.scene
+    scene.render.resolution_x, scene.render.resolution_y = 540, 960
+    cd = bpy.data.cameras.new("t_hopcam")
+    cam = bpy.data.objects.new("t_hopcam", cd)
+    scene.collection.objects.link(cam)
+    cd.sensor_fit, cd.sensor_width = "AUTO", 36.0
+    for name in ("b11_portrait", "b12_cell", "b10_cell_side"):
+        c = U.CAMERAS[name]
+        cam.location = c["pos"]
+        cam.rotation_euler = (Vector(c["target"]) - Vector(c["pos"])).to_track_quat("-Z", "Y").to_euler()
+        cd.lens = c["lens"]
+        ys, xs, moves = [], [], []
+        for who, f0, f1 in ((dad, 300, 334), (zv, 334, 350)):
+            seg = []
+            for f in range(f0, f1):
+                scene.frame_set(f)
+                dg = bpy.context.evaluated_depsgraph_get()
+                p = who.head.evaluated_get(dg).matrix_world.translation
+                q = world_to_camera_view(scene, cam, p)
+                xs.append(q.x * 100.0)
+                ys.append((1.0 - q.y) * 100.0)
+                seg.append(ys[-1])
+            moves.append(max(seg) - min(seg))
+        ok("%s: dad's head stays in the safe area through the blows (y %.1f..%.1f %%, x %.1f..%.1f %%; the jolts "
+           "move it %.1f %% / %.1f %% of the frame height)" % (name, min(ys), max(ys), min(xs), max(xs), *moves),
+           min(ys) >= 14 and max(ys) <= 60 and min(xs) >= 8 and max(xs) <= 82 and max(moves) < 4.0)
+    bpy.data.objects.remove(cam)
 
 
 def main():

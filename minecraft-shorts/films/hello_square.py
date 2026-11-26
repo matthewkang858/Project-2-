@@ -253,12 +253,17 @@ def sq09_watches(st, s, C, nar):
       (1.5, 14.0), facing south, 26.6 blocks out, the gate's two lanterns either side of him. Everybody is
       pre-rolled and moving on 541: the librarian crosses the foreground right to left (5.3 blocks out, sharp) and
       wipes past him by 557; the farmer (twin "sq9", wheat on his crossed arms: _wheat_farmer) walks toward us
-      down the well's east side on a lane that keeps a gap of 4.6-6.4 % of the frame between him and the watcher;
+      down the well's east side on a lane that keeps a gap of 4.6-6.4 % of the frame between him and the watcher,
+      his head turned to frame RIGHT, 65 degrees off the lens and 8 down (SQ09_FARMER_OFF / _DOWN, _aside, keyed
+      from his pre-roll to 604: brow, one eye and the nose in profile, looking away from the watcher's side of the
+      frame; since the review of the whole-film preview: with his head along the walk both green eyes were on the
+      lens from 571, the sharpest face in the frame over "watches us", and he read as the "he" who watches);
       the two children run right to left in front of the well, 7.8 blocks out (their heads below his feet in the
       frame, 0.65 apart, 8 frames apart), early enough (SQ09_KID_LEADS) that kid B has passed under him before
       "stands", glancing toward the lens's side as they run (SQ09_KID_LOOK: their faces in profile). Focus on the
       librarian, racked from 549 to SQ09_FOCUS, a fixed point 8.0 blocks out where the farmer's walk ends (he is
-      10.9 -> 8.3 blocks out: soft-sharp, sharp at the end). Nobody looks at him.
+      10.9 -> 8.3 blocks out: soft-sharp, sharp at the end). Nobody looks at him, and he is the only figure facing
+      the camera.
       HIS FACE: the first fix (focus on a farmer 11.5 blocks out, f/1.3) still rendered two white eye patches on a
       27 px face (out/test/sqA_sq09_watches_579.png): blur / face width = lens * (D - focus) / (140 * fstop *
       focus) must be near 1, so the focus stays within 8 blocks and he moved 4.4 blocks further up the road.
@@ -273,6 +278,14 @@ def sq09_watches(st, s, C, nar):
       (into the caption band: running extras, nothing essential); with the glance kid A is 62-69 and kid B 54-61
       degrees off the lens at 541-553 (brow, eye and nose in profile: out/test/sqfinal_sq09_watches_550.png,
       hello_square_strip_sq09kids.png); looking ahead they were 86-110, two blank pink cubes.
+      THE FARMER'S HEAD (review of the whole-film preview; tools.hello_geo 541-604, stills
+      out/test/hello_review_fix_sq09_watches_579_zones.png and _600.png at 540x960 / 16): 64-66 degrees off the lens
+      for the whole walk (it was 0-10: both eyes on the lens), one eye and the nose toward frame right, the big
+      side of his head to us; his box with the hat brim x 51.5-91 % (the brim's corner comes 2.7 % from the
+      watcher's head at 604, above it: the brim is at y 37-40 %, the watcher's head at 47-49 %). Turned to frame
+      LEFT (the well) his nose pointed across the frame at the watcher, 1.4 % from his head: rejected.
+      hello_palette sq09@579 passes every check (stone G/R 0.96, planks s 0.49, robe hue 16, skin s 0.46, plants
+      1.37; farmer x 62-81 %, watcher x 45-48 %, both 100 % inside). Preview 541-604 re-rendered.
     """
     f0, f1 = s.frame_start, s.frame_end
     him = C.watcher(s, "sq", place=SQ_WATCH, yaw=0.0)

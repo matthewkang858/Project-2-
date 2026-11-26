@@ -350,9 +350,10 @@ STEPS = 10                             # stone stairs at y = 0 .. -9 (step k: bl
 HEADROOM = 3                           # air above every step (the stairwell is 3 high, its ceiling steps down)
 LANDING_Y = -10                        # the landing at the foot of the stairs (floor F)
 AISLE_Y = (-12, -11)
-AISLE_X = (-8, 17)                     # the aisle runs east-west; x -8 .. 3 is its unlit west stretch
-LEG_X = (16, 17)                       # the aisle turns south past the end of the cell row ...
-LEG_Y = (-16, -13)                     # ... to the back corner beside the zombie box
+AISLE_X = (-8, 19)                     # the aisle runs east-west; x -8 .. 3 is its unlit west stretch
+LEG_X = (16, 19)                       # the aisle turns south past the end of the cell row into the back corner,
+LEG_Y = (-17, -13)                     # 4 wide and one block past the slot (beat 8: the camera on the floor at its
+                                       # east wall sees the slot square on, Steve's path 2 blocks from the lens)
 FRONT_Y, CELL_Y, BACK_Y, BOX_Y = -13, -14, -15, -16
 CELL_X = {"farmer": 7, "fletcher": 9, "cleric": 11, "dad": 14}
 JOB = {"farmer": ("composter", {"level": "0"}), "fletcher": ("fletching_table", {}),
@@ -377,6 +378,17 @@ BED = "house_a_bed_2"                  # dad's bed, dyed red
 STAIR = {"facing": "north", "half": "bottom", "shape": "straight", "waterlogged": "false"}
 BARS_NS = {"north": "true", "south": "true", "east": "false", "west": "false", "waterlogged": "false"}
 BARS_EW = {"north": "false", "south": "false", "east": "true", "west": "true", "waterlogged": "false"}
+# IronBarsBlock.attachsTo(state, sturdy): a side connects to a neighbour that is iron bars (or a wall), or whose
+# facing side is sturdy (a full face: stone, deepslate, a fletching table, a composter's full sides), unless it is one
+# of isExceptionForConnection's blocks (leaves, pumpkins, melons, shulker boxes, barrier). _connect_bars sets every
+# bars block of the layout from its real neighbours (a lectern or a brewing stand is not sturdy; air is not).
+BARS_STURDY = ("stone", "deepslate", "smooth_stone", "deepslate_bricks", "fletching_table", "composter", "dirt",
+               "grass_block")
+CELL_HEADROOM = 2                      # every cell is 2 high under a stone cap at F + 2 (the classic trading-hall cell:
+                                       # a villager 1.95 tall fits, and the cap stops the knock-back hop after 0.05;
+                                       # the caps over the four job cells are the cutaway "ug_caps", beat 7 removes
+                                       # them)
+CELL_MAX_BACK = 0.05                   # room in front of a villager at ug_cell_* before the job block stops him
 # (cell, block, props, light group): every light of the set, with its point light (village.build b.torch)
 LIGHTS = [
     ((4, -2, -1), "wall_torch", {"facing": "east"}, "ug_mouth"),     # just under the rim: the glow from below
@@ -386,9 +398,11 @@ LIGHTS = [
     ((5, LANDING_Y, F + 1), "wall_torch", {"facing": "west"}, "ug_foot"),        # the foot: beat 22's rim light
     ((9, -11, F + 1), "wall_torch", {"facing": "south"}, "ug_hall"),             # facing the farmer / fletcher
     ((14, -11, F + 1), "wall_torch", {"facing": "south"}, "ug_dad"),             # facing dad's cell
-    ((10, -12, F + 2), "lantern", {"hanging": "true"}, "ug_hall"),               # the one hanging lantern
-    ((17, -16, F), "torch", {}, "ug_corner"),                                    # on the floor of the back corner:
-                                                                                 # its light goes in through the slot
+    ((10, -11, F + 2), "lantern", {"hanging": "true"}, "ug_hall"),               # the one hanging lantern, over
+    # the aisle's north half: from b16 it hangs well right of Steve's jump (over its south half it sat on his hair)
+    ((19, -14, F + 1), "wall_torch", {"facing": "west"}, "ug_corner"),           # the back corner's one torch, on
+    # the leg's east wall 4 blocks from the slot (the story: "one torch well away from the slot so the inside stays
+    # black"); shade_face() keeps the baby's head and robe out of its light (the hands catch it)
 ]
 LIGHT_GROUPS = ("ug_mouth", "ug_stairs", "ug_foot", "ug_hall", "ug_dad", "ug_corner")
 
@@ -802,9 +816,12 @@ def layout():
         else:
             for z in range(F, F + 3):
                 put(x, FRONT_Y, z, "stone")
-        # cell row: one-block cells, iron bars between the first three, a solid pier before dad's
+        # cell row: one-block cells two high under a stone cap (CELL_HEADROOM; the caps over the job cells are the
+        # cutaway "ug_caps"), iron bars between the first three, a solid pier before dad's
         for z in range(F, F + 3):
-            if x in jobs:
+            if z >= F + CELL_HEADROOM:
+                put(x, CELL_Y, z, "stone")
+            elif x in jobs:
                 air(x, CELL_Y, z)
             elif x in (8, 10):
                 put(x, CELL_Y, z, "iron_bars", dict(BARS_NS))
@@ -828,7 +845,36 @@ def layout():
     put(SLOT[0], SLOT[1], F + 1, "stone")
     put(SLOT[0], SLOT[1], F + 2, "stone")
     air(*LEVER)                                              # (the aisle is air there anyway: the lever's cell)
+    _line_stairwell(L)
+    _connect_bars(L)
     return L
+
+
+def _line_stairwell(L):
+    """The stairwell's walls and ceiling lined in stone where the earth is dirt (the story: "stone turning to
+    deepslate"): every rock cell that touches the stairwell's air is stone down to z -6, mixed at -7, deepslate
+    below (as _rock), never dirt (the grass rim at z -1 is the village's ground and stays)."""
+    open_ = [c for c, s in L.items() if s is None and MOUTH_X[0] <= c[0] <= MOUTH_X[1] and LANDING_Y <= c[1] <= 0]
+    for (x, y, z) in open_:
+        for dx, dy, dz in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1)):
+            n = (x + dx, y + dy, z + dz)
+            s = L.get(n)
+            if s is not None and s[0] == "dirt":
+                L[n] = ("stone", None)
+
+
+def _connect_bars(L):
+    """Every iron bars block of the layout connected as the game connects it (IronBarsBlock.attachsTo): to bars on
+    that side, or to a block whose face there is sturdy (BARS_STURDY); not to air, a lectern or a brewing stand."""
+    dirs = {"north": (0, 1), "south": (0, -1), "east": (1, 0), "west": (-1, 0)}
+    for (x, y, z), s in list(L.items()):
+        if s is None or s[0] != "iron_bars":
+            continue
+        props = {"waterlogged": "false"}
+        for name, (dx, dy) in dirs.items():
+            n = L.get((x + dx, y + dy, z))
+            props[name] = "true" if n is not None and (n[0] == "iron_bars" or n[0] in BARS_STURDY) else "false"
+        L[(x, y, z)] = ("iron_bars", props)
 
 
 def _hole():
@@ -848,7 +894,17 @@ CUTAWAYS = {
     "ug_end_pier": lambda: _cells_of(END_X, FRONT_Y, F, END_X, FRONT_Y, F + 2),       # (holds the lever)
     "ug_box_side": lambda: [(SLOT[0], SLOT[1], F + 1), (SLOT[0], SLOT[1], F + 2)],
     "ug_slot": lambda: [SLOT],
+    "ug_caps": lambda: [(x, CELL_Y, F + CELL_HEADROOM) for x in sorted(CELL_X.values())],   # beat 7
 }
+# The cells whose faces look into the doorway and into the box: meshed twice by finish(), once dark (the box's
+# darkness, DOOR_KEEPS_DARK / BOX_SEALED: every aisle-side shot) and once lit as the game re-lights them when the
+# wall is open (ug.light_doorway / open_wall(relight=...): beat 24 only), so the open doorway's floor and ceiling
+# are not black under the warm light that falls on the baby
+DOORWAY_FLOOR = (DOOR[0][0], DOOR[0][1], F - 1)
+DOORWAY_TOP = (DOOR[0][0], DOOR[0][1], F + 2)
+BOX_SHELL = [(BOX[0], BOX[1], F - 1), (BOX[0], BOX[1], F + 2), (BOX[0] - 1, BOX[1], F), (BOX[0] - 1, BOX[1], F + 1),
+             (BOX[0], BOX[1] - 1, F), (BOX[0], BOX[1] - 1, F + 1)]
+RELIT_CELLS = [DOORWAY_FLOOR, DOORWAY_TOP] + BOX_SHELL
 
 
 def underground_set(b, name="underground", bed=BED, bed_color="red", rim=True):
@@ -940,13 +996,40 @@ def underground_set(b, name="underground", bed=BED, bed_color="red", rim=True):
     for got in cut.values():
         for c in got:
             del w.blocks[c]
+    # ... and the doorway's / the box's own faces, meshed twice (dark and lit) by finish()
+    relit = {}
+    for c in RELIT_CELLS:
+        sid = w.blocks.pop(c, None)
+        if sid is not None:
+            relit[c] = sid
+    # the levels of the door cells and the box once the wall is open (the game's flood fill with the door cells
+    # clear; the slot still sealed when BOX_SEALED): what the lit copy is baked with
+    open_keep = _open_levels(e)
     # 7. anchors, paths, cameras
     res = _register(b, name)
     res.update(cut=cut, rim=rim_cells, hole=sorted(hole), counts=dict(blocks=sum(1 for s in L.values() if s),
                                                                          lit_cells=nb, dark_cells=ns),
-               box_light=box_light, env=e)
+               box_light=box_light, env=e, relit=relit, open_keep=open_keep)
     b.v.sets[name] = res
     return res
+
+
+def _open_levels(e):
+    """{cell: (block, 0)} of the door cells and the box with the wall open: the bake's block light flooded on
+    through the open door cells (minus one per step, BlockLightEngine), the slot still sealed when BOX_SEALED."""
+    inside = [tuple(c) for c in DOOR] + [(BOX[0], BOX[1], F), (BOX[0], BOX[1], F + 1)]
+    lv = {c: 0 for c in inside}
+    for _ in range(6):
+        for c in inside:
+            best = 0
+            for _d, o in e._offsets:
+                n = (c[0] + o[0], c[1] + o[1], c[2] + o[2])
+                if n in lv:
+                    best = max(best, lv[n])
+                elif n not in e.solid:
+                    best = max(best, e.block.get(n, 0))
+            lv[c] = max(lv[c], best - 1)
+    return {c: (v, 0) for c, v in lv.items()}
 
 
 def _register(b, name):
@@ -981,7 +1064,9 @@ def _register(b, name):
     # for the strip of black doorway beside his robe) a head turned to its stop puts his nose into the pier
     anchor("ug_cell_dad_mid", (CELL_X["dad"] + 0.5, FRONT_Y - 0.30, float(F)), yaw_of("north"))
     anchor("ug_lever_target", (LEVER[0] + 0.5, LEVER[1] + 0.3, LEVER[2] + 0.45))
-    anchor("ug_lever_stand", (LEVER[0] + 0.25, LEVER[1] + 1.25, float(F)), yaw_of("south"))
+    # Steve flips the lever standing a block north of it, facing south (beat 9: out of the b09 frame, which looks
+    # past his right side; only his right arm swings in from the left edge across the lever)
+    anchor("ug_lever_stand", (LEVER[0] + 0.55, LEVER[1] + 1.05, float(F)), yaw_of("south"))
     anchor("ug_counter_steve", (15.0, AISLE_Y[0] + 0.3, float(F)), yaw_to((15.0, -11.7), (14.32, -13.3)))  # beat 13
     anchor("ug_door_target", (DOOR[0][0] + 0.5, DOOR[0][1] + 0.5, F + 1.0))
     anchor("ug_box", (BOX[0] + 0.5, BOX[1] + 0.5, float(F)), yaw_of("north"))    # inside the box, facing the door
@@ -994,7 +1079,7 @@ def _register(b, name):
     # beat 18: Steve walks away from dad up the aisle (under the b18 camera's line to dad: no occlusion)
     anchor("ug_follow_start", (14.5, AISLE_Y[0] + 0.6, float(F)), yaw_of("west"))
     anchor("ug_follow_end", (7.2, AISLE_Y[0] + 0.6, float(F)), yaw_of("west"))
-    anchor("ug_jump_spot", (11.3, AISLE_Y[0] + 0.65, float(F)), yaw_to((0, 0), (1, 1)))   # Steve's jump
+    anchor("ug_jump_spot", (12.3, AISLE_Y[0] + 0.65, float(F)), yaw_to((0, 0), (1, 1)))   # Steve's jump
     #                                         loop (beat 16): mid-aisle in front of the cleric, facing north-east
     # paths (with their own heights: stairs)
     down = [(mx, 4.0, gz(mx, 4.0)), (mx, 1.0, gz(mx, 1.0))]
@@ -1119,19 +1204,47 @@ class UndergroundSet:
         self.parts = [door, lever]
 
     # ---- the wall
-    def open_wall(self, frame, player=None, reach=True, look=True):
+    def open_wall(self, frame, player=None, reach=True, look=True, relight=None, repeater=0, sync="game"):
         """The lever is flipped on `frame` (by `player` if given: his swing starts on frame) and dad's back wall
         opens: the hidden inverter (a redstone torch behind the pier, 2 ticks) un-powers the sticky pistons,
-        which pull the two stone blocks west into the wall in 2 ticks. Returns dict(flip, open, open_end) frames."""
+        which pull the two stone blocks west into the wall in 2 ticks. repeater=1..4: a hidden repeater at that
+        delay before the torch (RepeaterBlock: 2 ticks per step; 4 = 8 ticks more: the wall moves 12 frames after
+        the click, time for beat 9's pan and focus pull). sync="hand": the lever moves on the frame his hand is
+        nearest its handle (redstone.flip_by; a film choice for the close-up, beat 9) instead of the tick after the
+        click. relight=(st, shot): in that shot the doorway's floor and ceiling and the box's inside are lit as the
+        game re-lights them from the frame the wall starts to move (light_doorway; beat 24, seen from the box).
+        Returns dict(flip, open, open_end, hand) frames (hand: his hand nearest the handle, with a player)."""
         from . import redstone
 
         if player is not None:
-            t = redstone.flip_by(player, self.lever, frame, look=look, reach=reach)
+            t = redstone.flip_by(player, self.lever, frame, look=look, reach=reach, sync=sync)
         else:
             t = self.lever.flip(frame)
-        t_open = redstone.at(t, redstone.TORCH_TOGGLE_TICKS)
+        t_open = redstone.at(t, redstone.TORCH_TOGGLE_TICKS + redstone.REPEATER_TICKS_PER_DELAY * int(repeater))
         end = self.door.open(t_open)
-        return dict(flip=redstone.frame_of(t), open=redstone.frame_of(t_open), open_end=redstone.frame_of(end))
+        r = dict(flip=redstone.frame_of(t), open=redstone.frame_of(t_open), open_end=redstone.frame_of(end),
+                 hand=(self.lever.reach_info or {}).get("frame") if player is not None else None)
+        if relight is not None:
+            self.light_doorway(relight[0], relight[1], r["open"])
+        return r
+
+    def light_doorway(self, st, shot, frame):
+        """In ONE shot, from `frame` (a frame inside it) to its end: the doorway's floor and ceiling and the box's
+        inside drawn with the light the game gives them once the wall is open (the door cells at dad's cell minus
+        one, the box one less), instead of the box's darkness (DOOR_KEEPS_DARK / BOX_SEALED), which every other
+        frame keeps. Object visibility (hide_render keys, in the frame's stamp). Beat 24 from inside the box; never
+        an aisle-side shot (the doorway must read black from the aisle)."""
+        f = max(int(shot.frame_start), int(math.ceil(frame)))
+        nxt = shot.frame_end + 1
+        for ob in self.doorway["lit"]:
+            st.key(ob, "hide_render", st.film.frame_start, True)
+            st.key(ob, "hide_render", f, False)
+            st.key(ob, "hide_render", nxt, True)
+        for ob in self.doorway["dark"]:
+            st.key(ob, "hide_render", st.film.frame_start, False)
+            st.key(ob, "hide_render", f, True)
+            st.key(ob, "hide_render", nxt, False)
+        return f
 
     def close_wall(self, frame, lever=True):
         """The pistons push the wall shut on `frame` (and the lever goes back first, 2 ticks earlier, if lever)."""
@@ -1146,11 +1259,15 @@ class UndergroundSet:
         """The game's brightness 0..1 at a point of the set (the lightmap of its block and sky light)."""
         return self.env.brightness_at(point)
 
-    def register(self, st):
-        """Put the door and the lever in st.cast (then st.use(shot, *ug.parts) in EVERY shot that sees them:
-        unregistered they are simply always there, which is what most films want)."""
-        for p in self.parts:
-            st.cast[p.name] = p
+    def register(self, st, door=False, lever=True):
+        """Put the lever (and with door=True the piston door too) in st.cast: a registered part is hidden in every
+        shot that does not st.use it, so then st.use(shot, ug.lever) (or *ug.parts) in every shot that sees the end
+        pier's north face, and leave it out of a shot that sees through "ug_end_pier" (it would float). The door is
+        left out by default: registered and forgotten in one hall shot, dad's back wall would open a hole into the
+        box; unregistered it is simply always there (it only moves when opened)."""
+        for p, want in ((self.door, door), (self.lever, lever)):
+            if want:
+                st.cast[p.name] = p
 
 
 def finish(v, name="underground"):
@@ -1163,7 +1280,10 @@ def finish(v, name="underground"):
     e = res["env"]
     w = v.world
     coll = v.collection
-    for cname, got in res["cut"].items():
+    relit = res.get("relit", {})
+    full = dict(relit)
+
+    def submesh(got, oname, keep=None):
         sub = _blocks.World()
         sub._states, sub._state_ids, sub._baked, sub._variants = w._states, w._state_ids, w._baked, w._variants
         sub.blocks = dict(got)
@@ -1172,14 +1292,31 @@ def finish(v, name="underground"):
             for d in mc.DIRS:
                 o = mc.DIR_BLENDER[d]
                 n = (c[0] + o[0], c[1] + o[1], c[2] + o[2])
-                if n in w.blocks and w.is_full_cube(*n):
+                if (n in w.blocks and w.is_full_cube(*n)) or (n in full and n not in got):
                     hidden.add((c, d))
         sub.hidden_sides = hidden
         inner = sub._state_at
-        sub._state_at = (lambda pos, inner=inner: e.relit(inner, pos))
-        objs = sub.build(coll, cname)
-        v.cutaways[cname] = objs
+        saved = dict(e.keep)
+        if keep:
+            e.keep.update(keep)
+        try:
+            sub._state_at = (lambda pos, inner=inner: e.relit(inner, pos))
+            objs = sub.build(coll, oname)
+        finally:
+            e.keep.clear()
+            e.keep.update(saved)
         v.face_count += sub.last_face_count
+        return objs
+
+    for cname, got in res["cut"].items():
+        v.cutaways[cname] = submesh(got, cname)
+    # the doorway's floor and ceiling and the box's inside, dark (always) and lit (ug.light_doorway, beat 24)
+    doorway = dict(dark=submesh(relit, "ug_doorway_dark") if relit else [],
+                   lit=submesh(relit, "ug_doorway_lit", keep=res.get("open_keep")) if relit else [])
+    for ob in doorway["lit"]:
+        ob.hide_render = True                                # until light_doorway() keys it on in a shot
+    for ob in doorway["dark"] + doorway["lit"]:
+        v.objects.append(ob)
     swaps = {}
     for key, er in e.registry.items():
         base = _blocks.block_material(*key)
@@ -1213,6 +1350,7 @@ def finish(v, name="underground"):
                 ob.data.color = POINT_COLOR
     _fill(v)
     ug = UndergroundSet(v, res, k, door, lever)
+    ug.doorway = doorway
     res["set"] = ug
     return ug
 
@@ -1281,6 +1419,13 @@ COUNTER_BOUNCE = (16.9, -11.5, F + 1.3)   # beat 13: east of Steve at the counte
 DOORWAY_GLOW = (14.75, -14.9, F + 1.6)    # beat 24: high in the open doorway (kind "torch"): the light of
 DOORWAY_WATTS = 60.0                      # dad's cell falling into the box (the game re-lights the
                                           # box to about level 9 within a tick of the wall opening)
+SLOT_FACE = (SLOT[0] + 0.6, SLOT[1] + 0.5, F + 0.45)   # the slot's bars seen from the leg (a focus point, beat 21)
+SLOT_STRIP = (16.55, -15.5, F + 0.3)      # beat 24: the strip of torchlight through the slot's bars, low outside it
+SLOT_STRIP_WATTS = 6.0                    # (kind "torch": a shadowed point, the bars' shadows fall on the box floor)
+# beat 8 / 21: Steve walks out of the back corner past the slot, north to the aisle, under the b08 camera's line
+STEVE_PAST = [(17.6, -16.65, float(F)), (17.6, -12.2, float(F))]
+HIDE_FACE_LOOK = (SLOT[0] - 0.6, SLOT[1] - 0.9, F - 0.6)   # beat 8: where the baby in the box looks (down, south)
+APPLE_POINT = (14.17, -11.67, F + 1.27)   # beat 14: the golden apple in Steve's right hand at ug_aisle_dad, raise_arm 55
 
 
 def cheat(target, head, camera, k=0.35):
@@ -1295,9 +1440,11 @@ def cheat(target, head, camera, k=0.35):
 # name -> dict(pos, target, lens, fstop, beat, note): the framings of the proof stills (each rendered and looked at:
 # out/test/underground_<still>.png). A start, not a rule.
 CAMERAS = {
-    "b01_mouth": dict(beat=1, still="mouth", pos=(7.5, -1.25, 0.92), target=(4.6, -0.9, -0.2), lens=24.0, fstop=3.2,
-                      note="child's eye height east of the mouth, Steve in profile going down, the well and the "
-                           "sunset behind"),
+    "b01_mouth": dict(beat=1, still="mouth", pos0=(8.6, -1.9, 0.92), target0=(5.0, 2.4, 1.0), pos=(7.7, -1.5, 0.88),
+                      target=(4.9, -1.1, -0.1), lens=28.0, fstop=3.2,
+                      note="child's eye height east of the mouth: s.move(pos0, target0, pos, target) pans left with "
+                           "Steve as he crosses in profile from the north and pushes in on the glowing hole as he "
+                           "sinks into it (the well and the sunset behind); see BEATS for his frames in the picture"),
     "b02_lip": dict(beat=2, still="lip", pos=(5.75, -0.85, 0.82), target=(4.85, 1.42, 0.52), lens=50.0, fstop=2.0,
                     note="over the hole, three-quarter front on the child at the lip; repeated by b24_box"),
     "b03_push": dict(beat=3, still="push", pos=(9.0, 1.0, 1.05), target=(5.0, 0.7, 1.0), lens=28.0, fstop=3.2,
@@ -1316,10 +1463,18 @@ CAMERAS = {
                           "the pockets (the frame's up is south), sliding east and down from the farmer's pocket "
                           "(pos0) to dad's (pos): hats in the pockets, dad looks up, the box's lid behind his cell, "
                           "the lever on the end pier"),
-    "b08_slot": dict(beat=8, still="slot", pos=(17.75, -14.55, -9.78), target=(15.5, -15.5, -9.72),
-                     lens=35.0, fstop=2.0, note="the back corner on the floor; Steve's boots pass, the slot soft"),
-    "b09_lever": dict(beat=9, still="lever", pos=(16.35, -10.45, -8.3), target=(14.9, -13.0, -8.75), lens=40.0,
-                      fstop=2.0, note="close on the lever, dad and the back wall past it"),
+    "b08_slot": dict(beat=8, still="slot_boots", pos=(19.75, -15.3, F + 0.2), target=(16.0, -15.5, F + 0.45),
+                     lens=35.0, fstop=2.0, boot=(17.6, -15.42, F + 0.12), pos1=(18.6, -15.4, F + 0.24),
+                     target1=(16.0, -15.5, F + 0.45),
+                     note="on the floor against the corner's east wall, square on to the slot 3.75 away: Steve's boots "
+                          "cross 2.15 from the lens (path U.STEVE_PAST, south to north, frame left to right), the "
+                          "slot soft 1.6 beyond them; beat 21: the same, focus on the slot (U.SLOT_FACE), push in to "
+                          "pos1 / target1"),
+    "b09_lever": dict(beat=9, still="lever", pos=(14.45, -10.3, F + 1.35), target0=(15.55, -12.0, F + 1.35),
+                      target=(14.8, -14.0, F + 0.95), lens=32.0, fstop=2.0,
+                      note="from the aisle in front of dad's window, close on the lever (Steve's arm reaches in from "
+                           "the left), then hold_then_move pans right onto the back wall past dad's shoulder while "
+                           "the focus pulls to it: the wall jerks aside, the doorway black beside his robe"),
     "b10_cell_side": dict(beat=10, still="cell_open", pos=(15.25, -10.3, -9.35), target=(14.3, -14.6, -8.8),
                           lens=28.0, fstop=2.8, note="low and a little to one side: the black doorway beside his robe"),
     "b11_portrait": dict(beat=11, still="portrait", pos=(15.05, -11.25, -8.3), target=(14.32, -13.25, -8.55),
@@ -1328,9 +1483,11 @@ CAMERAS = {
                         fstop=2.8, note="side-on along the counter from the east, through the see-through end pier "
                                         "('ug_end_pier'; register the lever with the Stage and leave it out of the shot):"
                                         " Steve right, zombie dad left behind the lectern"),
-    "b14_apple": dict(beat=14, still="apple", pos=(13.55, -10.55, -8.3), target="apple", lens=50.0, fstop=1.8,
-                      note="beside Steve's right hand (he faces south: his right is west), close on the golden apple in his raised hand (target = "
-                           "steve.item_point('right', f)), the green face soft behind"),
+    "b14_apple": dict(beat=14, still="apple", pos=(13.55, -10.55, -8.3), target=APPLE_POINT, lens=50.0, fstop=1.8,
+                      target_from="steve.item_point('right', f)",
+                      note="beside Steve's right hand (he faces south: his right is west), close on the golden apple in "
+                           "his raised hand: `target` is where it is with Steve at ug_aisle_dad and raise_arm(f, 55); "
+                           "use target_from (the apple itself) for focus and aim if he moves"),
     "b15_drift": dict(beat=15, still="drift", pos=(14.6, -11.5, -8.45), target=(14.72, -15.0, -9.1), lens=32.0,
                       fstop=2.4, pos0=(14.75, -10.5, -8.3), note="drift past his shoulder toward the black doorway"),
     "b17_ots": dict(beat=17, still="ots", pos=(14.0, -10.35, -8.05), target=(14.32, -13.3, -8.55), lens=35.0,
@@ -1351,9 +1508,12 @@ CAMERAS = {
                                       "('ug_end_pier'; the lever out of the shot): zombie dad in his window on the "
                                       "left, the cleric, fletcher and farmer in theirs, Steve jumping at "
                                       "ug_jump_spot, the aisle falling off into the dark beyond the stair foot"),
-    "b19_endwall": dict(beat=19, still="endwall", pos=(17.35, -14.25, -9.05), target=(14.5, -13.75, -8.55), lens=32.0,
-                        fstop=2.4, note="through the see-through end wall ('ug_end_wall'), lower than his face: his "
-                                        "profile (he gazes west, up the aisle), the piston wall's seam to the left"),
+    "b19_endwall": dict(beat=19, still="endwall", pos0=(16.9, -12.55, F + 0.95), target0=(14.5, -13.2, F + 1.55),
+                        pos=(16.95, -13.35, F + 0.9), target=(14.5, -14.0, F + 1.0), lens=32.0, fstop=2.4,
+                        look=(13.4, -10.3, F + 1.6),
+                        note="through the see-through end wall ('ug_end_wall') from the north-east, lower than his "
+                             "face: dad at ug_cell_dad_mid gazing up the aisle 20 degrees west of north (`look`) is "
+                             "in profile; slide (pos0 -> pos) off his face onto the piston wall behind his back"),
     "b19_alt": dict(beat=19, still="endwall_alt", pos=(13.95, -10.55, -9.05), target=(14.6, -13.8, -8.6), lens=32.0,
                     fstop=2.4, note="from the aisle west of the cell, low: his face turned up the aisle toward the "
                                     "lens, the piston wall beside his back"),
@@ -1362,8 +1522,9 @@ CAMERAS = {
     "b22_foot": dict(beat=22, still="foot", pos=(8.8, -11.95, -9.25), target=(4.3, -10.15, -9.05), lens=24.0,
                      fstop=2.8, note="the stair foot, the child three-quarter front, the dark aisle behind"),
     "b24_box": dict(beat=24, still="box", pos=(16.9, -15.55, -9.33), target=(14.5, -15.45, -9.4), lens=35.0,
-                    fstop=2.0, note="inside the box through its see-through side ('ug_box_side', 'ug_slot', "
-                                    "'ug_end_wall' for the pan to dad)"),
+                    fstop=2.0, pos1=(16.9, -15.45, -9.25), target1=(14.4, -13.75, F + 1.15),
+                    note="inside the box through its see-through side ('ug_box_side', 'ug_slot', 'ug_end_wall' for "
+                         "the pan to dad); the pan goes RIGHT (north) to pos1 / target1, dad's back and book hat"),
 }
 
 
@@ -1393,11 +1554,129 @@ JUMP_POWER = 0.42                     # LivingEntity.BASE_JUMP_POWER (Attributes
 # (f * g - vy) * lerp(f, 1, airDrag) * restitution (f = the part of the tick's move made before the hit); living
 # entities take the full 0.75 (getBlockBounciness: x 0.8 only for non-living ones). Sneaking suppresses it.
 BED_RESTITUTION = 0.75
-# JumpOnBed (the baby villager's play behaviour): MIN_JUMPS 3, MAX_JUMPS 6 (3 + nextInt(4)), COOLDOWN_BETWEEN_JUMPS
-# 5 ticks, a jump only while onBedSurface; LivingEntity.noJumpDelay 10 after every jump
+# JumpOnBed (the baby villager's play behaviour), read in the bytecode: start() sets remainingJumps = 3 +
+# nextInt(4) and the cooldown 0; tick(): while the cooldown is > 0 it only counts down (also in the air); else, if
+# onBedSurface (Mob.blockPosition() - the cell of its FEET - is a bed: the feet less than 7/16 above the mattress),
+# it calls JumpControl.jump(), remainingJumps -= 1 and the cooldown = 5. That call is a jump only if the mob is
+# onGround on that tick (LivingEntity.aiStep: jumping && onGround && noJumpDelay == 0 -> jumpFromGround, vy =
+# max(0.42, vy); a tick without jumping sets noJumpDelay 0), so the calls that fall while it is in the air are
+# spent for nothing: from rest, 3 calls give ONE jump and the bed's bounces, 6 calls give two (36 frames apart).
 BED_JUMPS = (3, 6)
 BED_JUMP_COOLDOWN = 5
 NO_JUMP_DELAY = 10
+BED_SURFACE = 1.0 - 9.0 / 16.0        # feet below this above the mattress: blockPosition is still the bed's cell
+
+
+def cell_track(strength=0.4, max_back=CELL_MAX_BACK, room=CELL_HEADROOM - 1.95, max_ticks=40):
+    """[(blocks forward, blocks up)] after each tick of a knock-back inside a capped cell: undead.knockback_track's
+    motion (LivingEntity.knockback: vy = min(0.4, -0.0784 / 2 + strength), then move, vy = (vy - 0.08) * 0.98)
+    with the cap `room` blocks above the head: Entity.move stops the rise there and restituteMovementAfterCollisions
+    sets vy to 0 for a collision above (a living entity has no bounciness), so he drops back the next tick; the job
+    block stops him `max_back` ahead. In a 2-high cell a villager (1.95) rises 0.05 for one tick: a jolt."""
+    from . import undead
+
+    vh = float(strength)
+    vy = min(0.4, undead.REST_VY / 2.0 + float(strength))
+    x = y = 0.0
+    ground = True
+    out = []
+    for _ in range(max_ticks):
+        drag = undead.GROUND_DRAG if ground else undead.AIR_DRAG
+        x += vh
+        y += vy
+        if max_back is not None and x > max_back:
+            x, vh = float(max_back), 0.0
+        if room is not None and y > room:
+            y, vy = float(room), 0.0
+        ground = False
+        if y <= 0.0:
+            y, vy, ground = 0.0, 0.0, True
+        out.append((x, y))
+        vy = (vy - undead.GRAVITY) * undead.AIR_DRAG_Y
+        vh *= drag
+        if ground and abs(vh) < 0.003:
+            break
+    return out
+
+
+def _cell_hop(c, frame, attacker, max_back, headroom, strength):
+    """Key the capped knock-back of cell_track on c's root from `frame` (the series' room ahead is shared by the
+    blows that follow while he has not been placed or walked since: c._ug_cell)."""
+    from . import characters as ch
+    from . import undead
+
+    f0 = float(frame)
+    here = c.pos_at(f0)
+    away = undead._away(c, f0, attacker)
+    ser = getattr(c, "_ug_cell", None)
+    used = 0.0
+    if ser is not None and (ser["last"] - here).length < 2e-3:
+        used = max(0.0, (here - ser["anchor"]).dot(away))
+        anchor = ser["anchor"]
+    else:
+        anchor = here.copy()
+    height = undead.body_box(c)[1]
+    track = cell_track(strength, max(0.0, max_back - used), max(0.0, headroom - height))
+    for i in range(3):
+        keys = [(f0, None, "LINEAR")]
+        for k, (back, up) in enumerate(track):
+            keys.append((f0 + (k + 1) * TICK, here[i] + away[i] * back + (up if i == 2 else 0.0), "LINEAR"))
+        ch._segment(c.root, "location", i, keys, "LINEAR")
+    last = here + away * track[-1][0] if track else here
+    c._ug_cell = dict(anchor=anchor, last=last.copy())
+    return dict(track=track, end=int(math.ceil(f0 + len(track) * TICK)),
+                peak=max((u for _b, u in track), default=0.0))
+
+
+def hurt_in_cell(character, frame, attacker=None, max_back=CELL_MAX_BACK, headroom=CELL_HEADROOM, flash=True):
+    """A blow to a villager standing in his capped cell (beats 10, 11): undead.hurt's red flash and leg kick, and
+    the knock-back as the game plays it under the cap (cell_track: up 0.05 for one tick, at most max_back toward
+    the job block): the small jolt the story asks for, the face stays in the window. A blow less than 12 frames
+    after the last one is ignored, as undead.hurt ignores it. Returns dict(end, peak, landed)."""
+    from . import undead
+
+    f0 = int(round(frame))
+    end = undead.hurt(character, f0, attacker=attacker, knockback=False, flash=flash)
+    landed = any(b["frame"] == f0 for b in undead._state(character)["blows"])
+    if not landed:
+        return dict(end=end, peak=0.0, landed=False)
+    hop = _cell_hop(character, f0, attacker, max_back, headroom, undead.KNOCKBACK if attacker is not None else 0.0)
+    return dict(end=max(end, hop["end"]), peak=hop["peak"], landed=True)
+
+
+def infect_in_cell(villager, zombie_villager, frame, attacker=None, max_back=CELL_MAX_BACK, headroom=CELL_HEADROOM):
+    """undead.infect in the capped cell (beat 12): the villager replaced on `frame` by the zombie villager, who
+    takes the killing blow's jolt under the cap (cell_track). Returns dict(end, peak)."""
+    from . import undead
+
+    f0 = int(round(frame))
+    end = undead.infect(villager, zombie_villager, f0, attacker=attacker, knockback=False)
+    ser = getattr(villager, "_ug_cell", None)
+    if ser is not None:
+        zombie_villager._ug_cell = dict(ser)
+    hop = _cell_hop(zombie_villager, f0, attacker, max_back, headroom,
+                    undead.KNOCKBACK if attacker is not None else 0.0)
+    return dict(end=max(end, hop["end"]), peak=hop["peak"])
+
+
+def hold_then_move(shot, frame_move, pos0, target0, pos1, target1, frame_end=None, ease="smooth"):
+    """A camera that HOLDS pos0 / target0 until `frame_move`, then moves to pos1 / target1 by `frame_end` (default:
+    the shot's end) and holds there: Shot.move eases over the whole shot, this re-times its curve (the Shot's own
+    _bake keys it, also when Film.finalize re-bakes; handheld() still works on top). Beat 24: hold a full second,
+    then pan with his first step. Returns the shot."""
+    from . import shots as _shots
+
+    f_m = float(frame_move)
+    f_e = float(shot.frame_end + 1 if frame_end is None else frame_end)
+    e = _shots.EASES[ease]
+
+    def u(frame, f_m=f_m, f_e=f_e):
+        if frame <= f_m:
+            return 0.0
+        return min(1.0, (frame - f_m) / max(1.0, f_e - f_m))
+    shot._u = (lambda frame, u=u, e=e: e(u(frame)))   # an instance attribute: Shot._bake reads self._u(frame)
+    shot.move(pos0, target0, pos1, target1, ease="linear")
+    return shot
 
 
 def _top_at(world, x, y, z_max):
@@ -1602,49 +1881,81 @@ def _drive_player(player, f0, positions, steps):
         player.walk(f0, [positions[0], positions[-1]], speed=max(0.3, cum[-1] / max(1e-6, len(steps) / 20.0)))
 
 
-def bed_bounce(child, frame, spot, jumps=4, settle=True):
-    """A baby villager jumping on a bed, as JumpOnBed plays it: `jumps` (the game: 3 to 6) full jumps of
-    JUMP_POWER 0.42 (1.25 blocks up, 12 ticks), each starting the tick after the last landing (the brain asks again
-    while it stands on the bed; noJumpDelay 10 has run out), then with settle=True the bed's own bounce
-    (restitution 0.75) dying out. `spot` = (x, y, z) on the mattress (z = its top, 9/16 above the bed's floor: the
-    Village bed anchors). The child is placed on `frame` facing the way it faces there; its legs do not move (the
-    game draws no walk animation for a vertical move). Returns dict(end, landings, peaks, track)."""
+def _bed_ticks(jumps, mode="game", settle=True):
+    """Per-tick heights above the mattress of a baby villager on a bed, and the take-off / landing ticks.
+    mode "game": JumpOnBed as the brain runs it (see BED_JUMPS: `jumps` calls of jump(), the ones that fall while
+    he is in the air spent for nothing; a list = that many runs of the behaviour back to back, each starting the
+    tick after the bed has settled). mode "regular" (NOT THE GAME, the earlier film choice): `jumps` full jumps,
+    each the tick after the last landing. Landings on the bed bounce (Entity.restituteMovementAfterCollisions,
+    restitution 0.75, -vy > gravity)."""
+    runs = list(jumps) if isinstance(jumps, (list, tuple)) else [int(jumps)]
+    z, vy, ground = 0.0, -GRAVITY * VERTICAL_DRAG, True
+    track, takeoffs, landings, peaks = [0.0], [], [], []
+    top, t, njd = 0.0, 0, 0
+    for n in runs:
+        left, cool, quiet = int(n), 0, 0
+        while t < 2000:
+            if njd > 0:
+                njd -= 1
+            jumping = False
+            if left > 0:
+                if mode == "game":
+                    if cool > 0:
+                        cool -= 1
+                    elif z < BED_SURFACE:                     # onBedSurface: the feet still in the bed's cell
+                        jumping, left, cool = True, left - 1, BED_JUMP_COOLDOWN
+                elif ground:
+                    jumping, left = True, left - 1
+            if jumping:
+                if ground and (njd == 0 or mode != "game"):
+                    vy = max(JUMP_POWER, vy)
+                    njd = NO_JUMP_DELAY
+                    takeoffs.append(t)
+            else:
+                njd = 0
+            z_new = z + vy
+            if vy < 0.0 and z_new <= 0.0:                    # lands on the mattress
+                frac = z / -vy
+                bounce = -vy > GRAVITY and (settle or left > 0)
+                vy = ((frac * GRAVITY - vy) * (1.0 + frac * (VERTICAL_DRAG - 1.0)) * BED_RESTITUTION
+                      if bounce else 0.0)
+                if top > 1e-3:
+                    landings.append(t)
+                    peaks.append(round(top, 3))
+                z, ground, top = 0.0, True, 0.0
+            else:
+                z, ground = z_new, False
+                top = max(top, z)
+            vy = (vy - GRAVITY) * VERTICAL_DRAG               # LivingEntity.travelInAir: gravity, then drag
+            track.append(z)
+            t += 1
+            quiet = quiet + 1 if (ground and z == 0.0 and vy < 0.0 and -vy <= GRAVITY) else 0
+            if left <= 0 and quiet >= 2:
+                break
+    return dict(track=track, takeoffs=takeoffs, landings=landings, peaks=peaks)
+
+
+def bed_bounce(child, frame, spot, jumps=6, mode="game", settle=True):
+    """A baby villager jumping on a bed. mode "game" (default): JumpOnBed as the brain plays it: `jumps` = the
+    behaviour's jump() calls (the game draws 3 to 6; the ones that fall while he is in the air are wasted, so 3
+    give one 1.25-block jump and the bed's bounces 0.56, 0.24, 0.10, 0.04; 6 give a second jump 36 frames after
+    the first); a list (6, 6, ...) runs the behaviour again right after the bed has settled (a film choice: the
+    game picks its play behaviours at random). mode "regular" (NOT THE GAME): `jumps` full jumps each the tick
+    after the last landing (every 14.4 frames), then the bounces. `spot` = (x, y, z) on the mattress (z = its
+    top: the Village bed anchors). Placed on `frame` facing the way he faces there; no leg motion (the game draws
+    no walk animation for a vertical move). Returns dict(end, takeoffs, landings, peaks, track) in frames."""
     from . import characters as ch
 
     f0 = int(round(frame))
     base = float(spot[2])
-    z, vy, on_ground, left = base, 0.0, True, int(jumps)
-    track, landings, peaks = [z], [], []
-    top = base
-    for t in range(400):
-        if on_ground and left > 0:                           # JumpOnBed: jump while on the bed surface
-            vy = max(JUMP_POWER, vy)
-            left -= 1
-        if vy > 0 or not on_ground:
-            z_new = z + vy
-            if vy < 0 and z_new <= base:                     # lands: Entity.restituteMovementAfterCollisions
-                frac = (base - z) / vy
-                vy = ((frac * GRAVITY - vy) * (1.0 + frac * (VERTICAL_DRAG - 1.0)) * BED_RESTITUTION
-                      if -vy > GRAVITY and (settle or left > 0) else 0.0)
-                z, on_ground = base, True
-                landings.append(t)
-                peaks.append(round(top - base, 3))
-                top = base
-            else:
-                z, on_ground = z_new, False
-                top = max(top, z)
-        vy = (vy - GRAVITY) * VERTICAL_DRAG                  # LivingEntity.travel: gravity, then drag
-        if on_ground and vy < 0:
-            vy = 0.0
-        track.append(z)
-        if left <= 0 and on_ground and vy == 0.0 and t > 0:
-            break
+    r = _bed_ticks(jumps, mode, settle)
     yaw = child.yaw_at(f0)
     child.place(f0, (spot[0], spot[1], base), yaw)
-    ch._segment(child.root, "location", 2, [(f0 + k * TICK, zz, "LINEAR") for k, zz in enumerate(track)],
+    ch._segment(child.root, "location", 2, [(f0 + k * TICK, base + zz, "LINEAR") for k, zz in enumerate(r["track"])],
                 "LINEAR")
-    return dict(end=int(math.ceil(f0 + (len(track) - 1) * TICK)),
-                landings=[int(math.ceil(f0 + x * TICK)) for x in landings], peaks=peaks, track=track)
+    fr = lambda ticks: [int(math.ceil(f0 + x * TICK)) for x in ticks]
+    return dict(end=int(math.ceil(f0 + (len(r["track"]) - 1) * TICK)), takeoffs=fr(r["takeoffs"]),
+                landings=fr(r["landings"]), peaks=r["peaks"], track=[base + z for z in r["track"]])
 
 
 def jump_loop(player, frame_start, frame_end):
@@ -1722,11 +2033,41 @@ def swap_hidden(child, adult, camera, frame_start, frame_end, world, then=None, 
     return dict(frame=f, hidden=(best[0], best[-1]), runs=[(r[0], r[-1]) for r in runs])
 
 
-def hands_in_slot(zv, frame, slot=SLOT, lateral=0.0):
+def shade_face(v, zv, groups=("ug_corner",)):
+    """Keep the baby zombie villager's head and robe out of the corner torch's point light (Blender light linking:
+    the light's receiver collection EXCLUDES them; his arms and hands still catch it), so in beat 8 his face never
+    reads behind the bars while the hands do. Static for the whole film (light linking is set on the light, not
+    keyed): in beat 24 the box is lit by U.SLOT_STRIP / U.DOORWAY_GLOW, which are not linked. NOT THE GAME: the game
+    draws a mob at the block light of its cell, the same from every side."""
+    keep = set()
+    for arm in (zv.arm_r, zv.arm_l):
+        if arm is not None:
+            keep.add(arm.name)
+            keep.update(o.name for o in arm.children_recursive)
+    coll = bpy.data.collections.get("ug_face_shade") or bpy.data.collections.new("ug_face_shade")
+    for ob in [zv.root] + list(zv.root.children_recursive):
+        if ob.type != "MESH" or ob.name in keep:
+            continue
+        if ob.name not in coll.objects:
+            coll.objects.link(ob)
+    for co in coll.collection_objects:
+        co.light_linking.link_state = "EXCLUDE"
+    for g in groups:
+        for light in v.lights.get(g, []):
+            if light.get("mc_light") != "fill":
+                light.light_linking.receiver_collection = coll
+    return coll
+
+
+def hands_in_slot(zv, frame, slot=SLOT, lateral=0.0, face="away"):
     """The baby zombie villager inside the box with his tiny hands resting between the iron bars of the slot: he
     stands against the bars (his box touches the pane, as the game's collision allows), facing out, arms out (the
     zombie's own -80 degrees, toed in, with their slow bob); the two 2-px hands land in the bars' two gaps (texels
-    4-6 and 9-11 of iron_bars.png) with the fingertips in the pane. Places him on `frame`; returns the hand tips."""
+    4-6 and 9-11 of iron_bars.png) with the fingertips in the pane. His big head is as far forward as his hands
+    (the face 0.22 ahead of his centre, the hands 0.29): face="away" (beat 8, the face must never read) turns it
+    down and away toward the box's back corner (look_at, the head's 75 / 40 degree stops), so the camera in the
+    leg sees the top and back of a green head and the torch from the north-east catches the hands, not the face;
+    face=None leaves him looking out. Places him on `frame`; returns the hand tips."""
     import bpy as _bpy
 
     from . import undead
@@ -1748,6 +2089,8 @@ def hands_in_slot(zv, frame, slot=SLOT, lateral=0.0):
     x = pane_x + 1.0 / 32.0 - reach                           # fingertips 0.5 px into the 2-px pane
     body_back = x - undead.BABY_SIZE[0] / 2.0
     zv.place(frame, (x, y, float(sz)), yaw)
+    if face == "away":
+        zv.look_at(frame, HIDE_FACE_LOOK, ease=0)
     return dict(x=x, reach=reach, tip_x=x + reach, body_back=body_back, pane=(pane_x - 1 / 16.0, pane_x + 1 / 16.0))
 
 

@@ -748,6 +748,7 @@ class Farm:
         self.beds = {k: v.beds["%s_bed_%s" % (self.name, k)] for k in self.L["beds"]}
         self.cameras = cameras(self.L)
         self._golem_events = []
+        self._slides = []
 
     # ---- where things are
     @property
@@ -824,25 +825,38 @@ class Farm:
         pos = self.A["golem_spawn"] if pos is None else pos
         yaw = math.radians(-135.0) if yaw is None else yaw
         frame = int(frame)
+        e0 = getattr(empty_from, "frame_start", empty_from)
         before = [e for e in self._golem_events if e[0] < frame]
+        # a slide keyed earlier whose golem drops out of sight only ON or AFTER this spawn is unfinished: the cut
+        # (empty_from) must end it, its vanish key, puff and flicker included (else the new golem would be hidden
+        # from that frame on)
+        unfinished = [sl for sl in self._slides if sl["gone"] >= frame and sl["frame"] < frame]
+        standing = bool(before) and before[-1][1] == "spawn" and not unfinished
+        if e0 is None and (standing or unfinished):
+            if unfinished:
+                sl = unfinished[0]
+                raise ValueError("golem_spawn(%d): the golem sliding from frame %d drops out of sight only on frame "
+                                 "%d; pass empty_from=<the shot> (or a frame) of the cut: the slide, its puff and "
+                                 "its flicker then end there" % (frame, sl["frame"], sl["gone"]))
+            raise ValueError("golem_spawn(%d): the golem spawned on frame %d has not slid away; pass "
+                             "empty_from=<the shot> (or a frame) where the platform is empty again"
+                             % (frame, before[-1][0]))
         if not before:
             undead.vanish(golem, None)                                      # nothing before the first spawn
-        elif before[-1][1] == "spawn" or empty_from is not None:
+        elif e0 is not None:
+            e0 = int(e0)
             last = max(e[0] for e in before)
-            e0 = getattr(empty_from, "frame_start", empty_from)
-            if e0 is None:
-                if before[-1][1] == "spawn":
-                    raise ValueError("golem_spawn(%d): the golem spawned on frame %d has not slid away; pass "
-                                     "empty_from=<the shot> (or a frame) where the platform is empty again"
-                                     % (frame, before[-1][0]))
-            else:
-                e0 = int(e0)
-                if not last < e0 <= frame:
-                    raise ValueError("golem_spawn(%d): empty_from %d must lie after the golem's last event (%d) and "
-                                     "not after the spawn" % (frame, e0, last))
-                if e0 < frame:
-                    undead.vanish(golem, e0)
-                    self._golem_events.append((e0, "gone"))
+            if not last < e0 <= frame:
+                raise ValueError("golem_spawn(%d): empty_from %d must lie after the golem's last event (%d) and "
+                                 "not after the spawn" % (frame, e0, last))
+            for sl in unfinished:                                           # the cut ends the unfinished slide
+                undead.appear(golem, sl["gone"])                            # (replaces its vanish key)
+                self._golem_events = [e for e in self._golem_events if e != (sl["gone"], "gone")]
+                sl["gone"] = sl["cut"] = e0
+            self._cut_effects(e0)
+            if e0 < frame:
+                undead.vanish(golem, e0)
+                self._golem_events.append((e0, "gone"))
         golem.place(frame, pos, yaw)
         undead.appear(golem, frame)
         self._golem_events.append((frame, "spawn"))
@@ -881,9 +895,29 @@ class Farm:
         self._golem_events.append((gone, "gone"))
         self._golem_events.sort(key=lambda e: e[0])
         r.update(drop=drop, vanish=gone)
+        self._slides.append(dict(frame=int(frame), gone=int(gone), cut=None, bursts=[], flickers=[], r=r))
         return r
 
-    def golem_death(self, golem, slide, camera=None, delay=0, seed=0, flicker=True, glow=None):
+    def _cut_effects(self, frame):
+        """A cut on `frame` (golem_spawn's empty_from): the death puffs of earlier slides stop there (particles in
+        the air at the cut are not carried into the new shot) and their lava flickers end the frame before."""
+        f = int(frame)
+        for sl in self._slides:
+            for burst in sl["bursts"]:
+                burst.stop(f)
+            keep = []
+            for a, b, at in sl["flickers"]:
+                if b >= f:
+                    self.lava._flickers = [x for x in self.lava._flickers if (x[0], x[1]) != (a, b)]
+                    if f - 1 >= a:
+                        self.lava.flicker(a, f - 1, at=at if at is not None and at < f else None)
+                        keep.append((a, f - 1, at))
+                    self.lava._relight()
+                else:
+                    keep.append((a, b, at))
+            sl["flickers"] = keep
+
+    def golem_death(self, golem, slide, camera=None, delay=0, seed=0, flicker=True, glow=None, until=None):
         """The white death puff out of the slot and the lava glow flicker for a golem that slid in: the puff
         (engine.animals.poof, 20 particles in the golem's 1.4 x 2.7 box) where its head goes under the rim, ON
         slide['gone'] + delay, rising out of the slot. delay=0 is the film's (the puff as it drops); the game's golem
@@ -898,9 +932,26 @@ class Farm:
         x, y = slide["track"][-1][1][0], slide["track"][-1][1][1]
         feet = (x, y, float(self.L["rim"]) - GOLEM_SIZE[1] + 0.6)
         glow = GOLEM_PUFF_GLOW if glow is None else float(glow)
+        rec = next((sl for sl in self._slides if sl["r"] is slide), None)
+        if rec is not None and rec["cut"] is not None:
+            raise ValueError("golem_death: this slide was cut on frame %d by a later golem_spawn(empty_from=...): "
+                             "key the death before the next spawn" % rec["cut"])
         burst = animals.poof(feet, f, camera=camera, seed=seed, village=None, size=GOLEM_SIZE, glow=glow)
+        fl = None
         if flicker:
-            self.lava.flicker(slide["edge"] or slide["frame"], f + 40, at=slide["gone"] or f)
+            fl = (int(slide["edge"] or slide["frame"]), int(f + 40), int(slide["gone"] or f))
+            if until is not None and fl[1] >= int(until):
+                fl = (fl[0], int(until) - 1, fl[2] if fl[2] < int(until) else None)
+            if fl[1] >= fl[0]:
+                self.lava.flicker(fl[0], fl[1], at=fl[2])
+            else:
+                fl = None
+        if until is not None:
+            burst.stop(int(until))
+        if rec is not None:
+            rec["bursts"].append(burst)
+            if fl is not None:
+                rec["flickers"].append(fl)
         return dict(frame=f, burst=burst)
 
     # ---- the drops at the foot

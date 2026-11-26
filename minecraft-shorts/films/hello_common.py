@@ -26,7 +26,7 @@ THE LEAD'S PASS (Nov 26, after the five sequences were shot and reviewed; every 
                          the values the shots use (the sequence files read them); the unused stub places are gone
     CAMS                 the stub cameras guard, grownups, hip, house_fronts, window_out are gone: a shot's own
                          camera is C.cam(s, None, **CAM); "bed" = the interior's BED_CAM and "square_long" = sq09's
-                         start (the stand-ins of films/hello.py STAND_IN); "gate" notes me07's f/2.0 (accepted)
+                         start (the stand-ins of films/hello.py STAND_IN); "gate" is me06's (me07: ME07_CAM)
     C.held_item(c, id)   an item a villager holds (the square's wheat); ROLES lost the unused "steve_bed"
     tools/hello_geo.py   a baby villager's face is measured at its own width (half an adult's: the child face sizes
                          in docstrings written before this pass are twice the true width unless they say otherwise)
@@ -90,8 +90,8 @@ SHARED (decided once, used by two shots or two sequences)
   CAMS["two_shot"]    beats 4 and 22, exactly, with C.doorstep_fill(s) in both       door_gold
   the bed camera      beats 3 and 16 identical to each other: hello_interior.BED_CAM, one constant used in both
                       (CAMS["bed"] holds the same values for the stand-in of a failed interior shot)
-  CAMS["gate"]        beats 6 and 7 (hello_set's gate camera, 22 mm): position, aim, lens, handheld exactly; me07
-                      at f/2.0 instead of f/4 (the watcher's 8 px face soft; the dip hides it)   meadow
+  CAMS["gate"]        beat 6 (hello_set's gate camera, 22 mm); beat 7 after the dip starts at its position with
+                      its own lens and push (hello_meadow.ME07_CAM: 30 mm f/2.0; review of the preview)   meadow
   Every other camera is a constant of its sequence file, given whole to C.cam(s, None, **CAM).
   PLACES["watch_door"] + WATCH_YAW: where the watcher stands by the door and which way he faces (the door): beats
                       19, 20, 21, 22; Steve stands exactly there, facing the same way, in beat 4 (so beat 22 can
@@ -301,10 +301,9 @@ CAMS = {
     # failed interior shot, films/hello.py STAND_IN): inside the room, high at the west end of the bed wing, 21 mm,
     # looking east down both beds to the pillows and the gable pane above them
     "bed": dict(pos=(15.5, -11.95, 3.75), target=(19.6, -10.65, 2.15), lens=21.0, fstop=2.8),
-    # beats 6 and 7 (the same frame): hello_set's gate camera, 22 mm (the figure at the gap is 30 px at 540x960).
-    # me07 opens it to f/2.0 (hello_meadow.ME07_FSTOP; me06 is at f/4): position, aim, lens and handheld are the
-    # same; the dip to black between them hides the change of depth of field, and at f/4 the watcher's 8 px face
-    # 35 blocks off showed two pale eye whites (accepted by the lead)
+    # beat 6: hello_set's gate camera, 22 mm. Beat 7 (after the dip to black) has its own camera since the review of
+    # the whole-film preview, hello_meadow.ME07_CAM: this position, 30 mm f/2.0, a slow push with a pan (with this
+    # one the watcher at the gap was 30 px tall at 540x960 and the frame stood still for 2.6 s)
     "gate": dict(pos=(0.9, 22.6, 0.75), target=(0.5, 57.6, 2.5975), lens=22.0, fstop=4.0),
     # the square's stand-in camera (films/hello.py STAND_IN): sq09's as shot (hello_square.SQ09_CAM's start), from
     # the square's south-east corner past the well's east side up the exit road to watch_square

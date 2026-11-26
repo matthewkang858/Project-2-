@@ -31,11 +31,22 @@ THE SKIES: tp13 / tp14 / tp18 "gold" (the sun due east, low: the wall top's road
   down in the west, behind the wall top's back: the narrator's face keyed by his own redstone torch at
   LS.B24_TORCH_WATTS (120 W), the redstone "a weak light in the game ... key his face with a boosted lantern beside
   the lever and let the torch be the red accent": the story's alternative, if the torch key is not enough).
-  tools/palette_check fails "stone not magenta" on the dusk wall top (G/R 0.90, warm): known and accepted
+  tools/palette_check failed "stone not magenta" on the dusk wall top from the set's b24 (G/R 0.90, warm); the stub's
+  TP24_CAM from the east passes (0.95 on 1545, the row hero 80 % inside the safe area): if yours fails, known and accepted
   (films/legday.py SKIES). Do not boost lanterns to fix it.
+THE PATROL CLOCK (legday_common, after review): the patrol of tp18 is C.march_patrol("tp18"), the same march as rd15's
+  and rd19's. On "flipped" (1108) the captain's feet are at y 57.4, just short of the shelf's north end (plank 12 is
+  y 57-58), his file behind him at 59.4 .. 65.4 on the open road past the wall's north end (y 61): THE STORY'S
+  PICTURE, "on the open road just short of the shelf". FROM ANY CAMERA OVER THE WALL TOP THE WALL ITSELF HIDES THEM
+  (measured: out/test/legday_tp18var_tp18_lever_1110_v0.png, the set's b18 view: the meadow beyond, empty). Only a
+  camera hanging out past the wall top's north-east corner (x > -1.3, y > 60.5) sees the lever and the file below in
+  one frame (out/test/legday_scout_tp18_lever_1110[_zones].png). The first stub marched a far patrol of its own 20
+  blocks up the road (23 blocks behind rd19's at the same frames): the lever was flipped with nobody near the trap.
+  The anvils in hand (C.carry_anvil): whole in tp14 (the morning), CHIPPED in tp24 (the same anvils, carried back
+  up after the fall: legday_common THE CHIPPED ANVILS; the dusk set on the shelf is chipped too).
 TAGS (twins): efe_tp (tp13: the piston and the plank), efe_tp2 (tp14, soft, his torch), efe_tp3 (tp18: empty right
-  hand for the lever), efe_tp4 (tp24: the torch as his key), steve_tp (tp14, an anvil), steve_tp2 (tp24, an anvil),
-  the far patrol patrol_tp18_1..5.
+  hand for the lever), efe_tp4 (tp24: the torch in his LEFT hand, as his key, the right arm for the lever),
+  steve_tp (tp14, a whole anvil), steve_tp2 (tp24, a chipped anvil), the patrol patrol_tp18_1..5 (the clock).
 LIGHT: C.lights(s, "gold" | "dusk", near=(-2.0, 52.0, 18.0), radius=12..14).
 PREVIEW samples for render.py previews: 9 (legday_common.PREVIEW_SAMPLES).
 """
@@ -51,13 +62,13 @@ TP14_CAM = dict(LC._set_cam("b14"), pos1=(-2.45, 59.6, 18.22))
 # tp18: hanging out past the wall top's NORTH-EAST corner, looking back down at the lever and the corner of the wall:
 # the only camera family (scouted, out/test/legday_tp18var*) that sees the lever AND the file on the road at the
 # wall's foot on "flipped" (THE PATROL CLOCK: from any camera over the wall top the wall itself hides it)
-TP18_CAM = dict(pos=(-0.4, 62.4, 20.8), target=(-2.4, 59.4, 15.0), pos1=(-0.55, 62.2, 20.7),
-                target1=(-2.4, 59.3, 15.0), lens=20.0, fstop=5.6)
+TP18_CAM = dict(pos=(-0.6, 62.0, 21.0), target=(-2.0, 59.6, 13.0), pos1=(-0.7, 61.9, 20.9),
+                target1=(-2.0, 59.55, 13.0), lens=16.0, fstop=5.6)
 TP18_CAM_LEVER = dict(LC._set_cam("b18"), pos1=(-3.55, 58.05, 20.25))   # the set's b18: the lever big, NO patrol
 # tp24: from the EAST, over the road, looking back WNW and down at the row: every anvil of the re-armed row reads as
 # standing on its plank, receding to the narrator at the lever (out/test/legday_scout_tp24_*): the row is the hero
-TP24_CAM = dict(pos=(5.6, 52.8, 20.5), target=(-1.5, 58.5, 17.6), pos1=(5.15, 53.35, 20.4),
-                target1=(-1.55, 58.6, 17.7), lens=28.0, fstop=4.0)
+TP24_CAM = dict(pos=(5.9, 50.6, 20.6), target=(-1.6, 58.2, 17.6), pos1=(5.5, 51.2, 20.5),
+                target1=(-1.6, 58.4, 17.7), lens=24.0, fstop=4.0)
 
 
 def _hold(p, item, frame=None):
@@ -189,20 +200,30 @@ def tp18_lever(st, s, C, nar):
       frame 1103      the lever big, the dust lit, the narrator's thin arm coming in
       "flipped" 1108  the lever flips (redstone.flip_by(efe, C.lever, f, ...): the game's model swap) and the WHOLE
                       dust line goes dark on that frame (C.wire.unpower(t))
-      the patrol      far below, soft, moving toward the shelf (C.patrol("tp18..."): a twin of its own)
-    SHARED: lever_narrator. THE WORLD STATE: you key the lever off and the dust dark; NOT the row: the pistons snap
-      back IN rd19 (the overlapping action of the cut: the row is not in this frame, the lever not in rd19's).
+      the patrol      ON THE CLOCK (C.march_patrol("tp18"): never another march): on "flipped" 1108 the captain at
+                      y 57.4 entering under the shelf's north end (the shelf may hide him: that is the truth), his
+                      file behind him at 59.4 .. 65.4 on the open road past the wall's north end, walking toward the
+                      trap; at 1141 the captain at 55.1
+    SHARED: lever_narrator; THE PATROL CLOCK. THE WORLD STATE: you key the lever off and the dust dark; NOT the row:
+      the pistons snap back IN rd19 (the overlapping action of the cut: the row is not in this frame, the lever not
+      in rd19's). TIME RUNS STRAIGHT THROUGH THE CUT (never compressed): the lever goes off on 1108, the patrol walks
+      on, the row answers on "back" 1169 in rd19 (the edit's overlap: rd19 replays the moment from the road).
     NEIGHBOURS: before, pn17_cows; after, rd19_drop (the money shot from the road).
-    FALLBACK CHOSEN (the set builder, measured): the lever stands at the wall top's NORTH end, so that the road beyond
-      the wall's end, where the patrol comes from, is in view; from any lever position the banner cannot be seen
-      UNDER the shelf, so the captain is seen about 20 blocks north on the meadow road, not literally "just short of
-      the shelf". At that distance the patrol is about 25 px tall at 540x960 and the banner does not read: "soft and
-      far below" as written, but not recognisable. A longer lens or a camera further out over the road's edge could
-      bring them in; the patrol's position in this shot is free (time is compressed across the cut to rd19).
-    MEASURED (the set builder, out/test/legday_set_b18_lever[_zones].png): behind the lever looking NNE and down,
-      28 mm f/5.6: the lever big, the narrator's arm in from the right, the dust, the meadow below.
+    THE REVIEW (story, the patrol clock; confirmed on the build): the first stub's patrol walked 20 blocks up the road
+      at the flip, 23 blocks behind rd19's twin on the same frames, and its docstring called the patrol's position
+      "free (time compressed across the cut)" while the plan calls the same cut an overlapping action (time
+      EXPANDED: flip 1108, retraction 1169). The trap read as fired early and saved by the edit. Now one clock.
+    THE CAMERA (measured, the lead's scouting; out/test/legday_tp18var*_tp18_lever_1110_v*.png): from the lever's
+      side of the wall top (the set's b18, TP18_CAM_LEVER) the lever is big but the wall hides the road at its foot:
+      no patrol in the frame. The stub hangs the camera out past the NORTH-EAST corner, 16 mm, looking back down
+      (TP18_CAM; out/test/legday_scout_tp18_lever_1110[_zones].png): the narrator at the lever from above and behind,
+      his arm on it, the dust line dark along the wall top, the corner of the wall dropping 18 blocks, and the file
+      on the road at its foot walking into the trap. TO FIX: the file sits at y 55-75 % (in the caption band) and is
+      small (the banner does not read at this size; "soft and far below" as written); the narrator's face is not
+      seen (the story asks for his thin arm only). Choose between the two (the lever big, or the lever and the file),
+      or find a third, but keep the clock.
     NOW (stub): TP18_CAM (+ a drift), efe_tp3 at lever_narrator (empty-handed) flips on "flipped" (1108), the dust
-      dark at once; the patrol (patrol_tp18) marching south far up the road. Hero: the lever.
+      dark at once; the patrol on the clock (patrol_tp18). Heroes: the lever, the file.
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.actor("efe", "tp3")
@@ -218,9 +239,10 @@ def tp18_lever(st, s, C, nar):
 
 
 def tp24_reloading(st, s, C, nar):
-    """BEAT 24  "I call it reloading."   frames 1487-1567 (81 f, 3.38 s), sky DUSK. The film's last shot.
-    Words: I 1489, call 1493, it 1502, reloading 1505 (spoken to 1519; its caption holds about a second). Then the
-    last image holds to 1561 and the last 6 frames (1562-1567) are black (END_BLACK): the story's cut to black.
+    """BEAT 24  "I call it reloading."   frames 1491-1572 (82 f, 3.42 s), sky DUSK. The film's last shot.
+    Words: I 1493, call 1498, it 1507, reloading 1510 (spoken to about 1524; its caption holds about a second, to
+    1536). Then the last image holds to 1566 and the last 6 frames (1567-1572) are black (END_BLACK): the story's cut
+    to black.
 
     STORY: About 3.0 s. Wall top at last light, looking along the row: Steve sets the twelfth anvil on the last plank
     and walks off without a glance. The narrator stays beside the lever, the redstone torch lighting his face, his
@@ -231,31 +253,46 @@ def tp24_reloading(st, s, C, nar):
     his face; lanterns as light.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1487      the armed row (SHELF "dusk_eleven": eleven of the DUSK set), Steve with the twelfth anvil,
-                      the narrator at the lever with his torch, the dusk sky
-      "call" 1493 .. "it" 1502   Steve sets the twelfth anvil on the last plank (C.appear(s, C.anvils_dusk[11], f))
+      frame 1491      the armed row (SHELF "dusk_eleven": eleven of the DUSK set, chipped as they landed), Steve
+                      with the twelfth anvil (chipped), the narrator at the lever with his torch, the dusk sky
+      "call" 1498 .. "it" 1507   Steve sets the twelfth anvil on the last plank (C.appear(s, C.anvils_dusk[11], f))
                       and walks off without a glance
-      "reloading" 1505 .. 1561   the narrator's free (left) arm lifts to the lever and stops there; he looks out
-                      over the armed row and the empty road below; his face lit by his torch; HOLD (1.75 s), then
-                      black from 1562
+      "reloading" 1510 .. 1566   the narrator's free arm lifts to the lever and stops there; he looks out over the
+                      armed row and the empty road below; his face lit by his torch; HOLD (1.75 s), then black
+                      from 1567
+      THE ROW IS THE HERO (the review): the anvils standing on their planks must be INSIDE y 14-60 % and clear of
+                      the caption band (y 62-72 %, where "reloading" sits 1510-1536) together with the torch-lit face
+                      at the lever: st.hero(s, "row", ...) is declared, so --zones / palette_check flag it. PRIORITY:
+                      the row first, then the narrator's face size
     SHARED: lever_narrator (= tp18), set_anvil_12th (= tp14). THE WORLD STATE: the twelfth dusk anvil (C.appear).
-      The lever is ON again (the lead's re-arm, 1369): no flip here.
+      The lever is ON again (the lead's re-arm, 1373): no flip here.
     NEIGHBOURS: before, cl23_legday (the legs at dusk); after, the end (the Reel loops to sq01).
     RISKS (story): "At dusk the narrator's face is only as bright as his practical. The redstone torch is a weak light
       in the game: key his face with a boosted lantern beside the lever and let the torch be the red accent."
       "Long caption words (... reloading) need the reduced letter size ... Check that reloading with its full stop
       fits inside the caption width and hold it a full second." (The lead: the caption system draws long words
-      smaller by itself; "reloading" is on screen 1505-1531, see tools/legday_timeline.)
+      smaller by itself; "reloading" is on screen 1510-1536, see tools/legday_timeline.)
     MEASURED (the set builder, out/test/legday_set_b24_reloading[_zones].png): above the road south-east of the lever,
       35 mm: the armed row (dusk set) receding to Steve setting the twelfth and the narrator at the lever with his
       arm up, the dusk sky behind. palette_check fails "stone not magenta" at G/R 0.90: the warm dusk sky on the
-      wall top, not the lanterns (0.87 with them off): ACCEPTED (films/legday.py SKIES). THE LEAD'S SCOUT of the stub
-      (out/test/legday_scout_tp24_reloading_1530[_zones].png): the narrator at the lever with his arm up to it,
-      small (head y 38-44 %), the pink-indigo sky, Steve half out at the left edge walking off; the armed row
-      fills the lower third (under the caption: fine).
-    NOW (stub): TP24_CAM (+ a slow push), efe_tp4 at lever_narrator, his torch at LS.B24_TORCH_WATTS (the key),
-      looking out over the row; his left arm up to the lever from "reloading" (raise_arm); steve_tp2 sets the dusk
-      twelfth anvil on "call" (1493) and walks off south over the dust. Heroes: the narrator.
+      wall top, not the lanterns (0.87 with them off): ACCEPTED (films/legday.py SKIES).
+    THE REVIEW (story, confirmed on the lead's first stub still, out/test/legday_scout_tp24_reloading_1530): the
+      set's b24 camera put the anvil row at y 52-100 % (under the caption and the Reels UI) and the road out of the
+      frame; "come closer to the narrator" would have dropped the row. THE LEAD'S SCOUTING (out/test/legday_tp24var*
+      _tp24_reloading_1535_v*.png: from the south end along the row the row hides the narrator, the anvils overlap;
+      at the anvils' height the near ones block him; from the EAST over the road, looking back WNW and down, every
+      anvil reads as standing on its plank): TP24_CAM from the east, 24 mm (out/test/legday_scout_tp24_reloading_
+      1500 / _1545[_zones].png): five chipped anvils on their planks receding to the narrator at the lever, y 43-58 %;
+      the planks in the caption band; the lanterns; the dusk sky. TO FIX: the narrator's face is 28 px (tools.
+      legday_geo tp24_reloading:1545: eyes x 63 %, y 37 %, 23 degrees off the lens): once Steve has gone the push may
+      end closer on him, as long as the last anvils stay inside y 14-60 %. The empty road below is not in this frame.
+    THE STAGING: the torch in his LEFT hand (C.narrator(..., hand="left"): toward this camera, the key on his face),
+      his body toward the south-west (the lever at his front right), his head on the row; his RIGHT arm lifts to
+      the lever on "reloading" (raise_arm side "r"). Check on stills that the hand reaches the lever.
+    NOW (stub): TP24_CAM (+ a slow push), efe_tp4 at lever_narrator facing south-west, his torch (left hand) at
+      LS.B24_TORCH_WATTS (the key), looking out over the row; his right arm up to the lever from "reloading";
+      steve_tp2 sets the dusk twelfth anvil (chipped) on "call" (1498) and walks off south over the dust (out of the
+      frame's left edge by about 1553). Heroes: the row, the narrator.
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.narrator("tp4", watts=LS.B24_TORCH_WATTS, hand="left")    # the torch on the camera's side: his key
@@ -273,9 +310,10 @@ def tp24_reloading(st, s, C, nar):
     C.appear(s, C.anvils_dusk[11], f_set)
     steve.hold(None, frame=f_set)
     away = (-2.5, 50.0, LS.WALK_Z)
-    steve.walk(f_set + 8, [a, away], speed=3.0)                         # off to the left of the frame by ~1530
+    steve.walk(f_set + 8, [a, away])                                    # walking (4.3/s): out of the frame's left
+    #                                                                     edge before the black (about 1553)
     st.use(s, efe, steve)
     C.cam(s, None, focus=efe.head, **TP24_CAM)
-    st.hero(s, "row", *[an.objects()[0] for an in C.anvils_dusk[6:11]])  # THE PAYOFF: the re-armed row first
+    st.hero(s, "row", *[an.objects()[0] for an in C.anvils_dusk[7:11]])  # THE PAYOFF: the re-armed row first
     st.hero(s, "narrator", efe)
     C.lights(s, "dusk", near=(-2.0, 52.0, 18.0), radius=14.0)

@@ -4,7 +4,9 @@
     $BPY -m tools.legday_shots build [--sky night]                    # build one sky only: timing, cast per shot
     $BPY -m tools.legday_shots render --shots sq08_arms,rd19_drop [--at 0.5] [--frame N[,M...]] [--res 540x960]
                                [--samples 16] [--zones] [--name legday_scout_x] [--dir out/test]
-                               [--move "x,y,z:tx,ty,tz[:lens]/..."] (camera variants v0, v1 ... for scouting)
+                               [--move "x,y,z:tx,ty,tz[:lens]/..."] (camera variants v0, v1 ... for scouting;
+                               a spec that starts with a minus sign must be given as --move=-3.5,...: argparse
+                               reads a bare "-3.5,..." as an option)
         renders the frame at fraction `at` of each shot (or frame N) in ONE process per sky that the shots need
         (this film has no sky change inside a shot); writes <dir>/<name or legday_shot>_<shot>[_<frame>].png
         (+ _zones.png). Shots of other skies are refused:

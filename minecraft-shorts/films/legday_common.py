@@ -60,7 +60,7 @@ THE SEQUENCE CONTRACT (what a sequence director may and must do)
         that is not a vanilla block, item, mob or particle; dropped items out of a player's pick-up reach (a
         player within about 1 block of a dropped item collects it);
         render what he changed (tools/legday_shots.py at 540x960, 16 samples) and LOOK at it; run
-        tools/legday_palette on one frame per shot (tp24 at dusk fails "stone not magenta" at G/R 0.90: known,
+        tools/legday_palette on one frame per shot (the dusk wall top may fail "stone not magenta" at G/R 0.90: known,
         accepted, see films/legday.py SKIES).
   MUST NOT  touch films/legday.py, this file, films/legday_set.py, another sequence file or anything in engine/,
         render.py, tools/ (his own new tools/legday_<seq>_*.py excepted); change the narration, the cuts, a sky or
@@ -112,19 +112,22 @@ THE CHIPPED ANVILS (frozen: CHIPPED below). The day set chips as it lands in rd1
 
 THE PATROL CLOCK (one timetable for every shot that shows the patrol: rd15, tp18, rd19). C.march_patrol(tag) marches
   a twin of the patrol on the WHOLE road C.v.paths["patrol_road"] (0.5, 84 -> 40, with the meadow's hops) from ONE
-  frame, C.patrol_clock()["start"] (about 745), so that the captain's feet are at CAPTAIN_LAND_Y (49.6) when the
+  frame, C.patrol_clock()["start"] (757), so that the captain's feet are at CAPTAIN_LAND_Y (49.6) when the
   anvils land (C.land_frame(), 1210): the same pillagers at the same place on the same frame in every shot. Where
-  the captain is (feet y, from the clock, measured on the build): rd15 903 -> 73.5, 944 -> 70.2; tp18 1103 -> 57.6
+  the captain is (feet y, from the clock, measured on the build): rd15 903 -> 72.9, 944 -> 70.2; tp18 1103 -> 57.6
   (just short of the shelf's north end, plank 12 is y 57-58), "flipped" 1108 -> 57.4, its followers at 59.4,
   61.4, 63.4, 65.4: past the wall's north end (y 60), on the open road); rd19 1142 -> 55.0, "back" 1169 -> 52.9,
   landing 1210 -> 49.9. Time runs straight through the cuts tp18 -> rd19 (an overlapping action, never compressed):
   the lever goes off on 1108 and the row answers on 1169 in the edit. Do not march a patrol any other way.
 
 SHARED (decided once, used by two shots or two sequences)
-  CAMS["climb"]   cl11_climb and cl22_dusk, EXACTLY (position, aim, lens, f-stop, handheld seed): the second is the
+  CAMS["climb"]   cl11_climb and cl22_dusk, EXACTLY (position, aim, lens, f-stop, move; NO handheld: engine.shots
+                  draws the drift from film time, so no seed repeats it 700 frames later): the second is the
                   first at dusk (the story: "the low angle of the first wall shot, now at dusk")
   CAMS["legs"]    cl12_legday and cl23_legday, EXACTLY: "same lens, height and step count" (the story); the step
-                  plan is one constant of films/legday_climb.py used by both
+                  plan is one constant of films/legday_climb.py used by both. Both pairs are the climb sequence's
+                  alone: it copies them into its own CLIMB_CAM / LEGS_CAM and may change them, ONE constant per pair
+                  (tools.legday_state checks the repeats frame for frame, cameras included)
   PLACES "lever_narrator" (tp18, tp24: the narrator at the lever), "set_anvil_12th" (tp14, tp24: Steve setting the
                   twelfth anvil), "narrator_edge" (rd21: seen from the road, at the wall top's front edge by the
                   lever), "steve_among_anvils" (rd21), "banner_spot" / "bottle_spot" (rd19's drops: rd20, rd21:
@@ -227,8 +230,11 @@ CAMS = {
     # carry twelve anvils up the wall"; the anvils standing ON their planks are shown in tp13 (the wall top).
     "climb": _set_cam("b11"),
     # cl12_legday and cl23_legday (EXACTLY the same): beside the stair's open east edge at knee height, 24 mm: the
-    # legs pump up the steps past the lens (out/test/legday_set_b12_legs.png / _b23_legs.png)
-    "legs": _set_cam("b12"),
+    # legs pump up the steps past the lens (out/test/legday_set_b12_legs.png / _b23_legs.png). After review (the
+    # climb at a step every 8 frames): the camera TRACKS UP the stair with them (linear, 2.6 blocks/s horizontal
+    # against their 3.0: they gain 0.75 block on it over the 45 frames); a fixed or tilting camera loses them out of
+    # the frame's top within a second (scouted: out/test/legday_legs_cl12_legday_*)
+    "legs": _set_cam("b12", pos1=(0.45, 35.5, 10.45), target1=(-0.5, 38.1, 10.6)),
     # stand-ins of a failed shot (films/legday.py STAND_IN), one per place
     "square_wide": _set_cam("b01"),
     "pens_wide": _set_cam("b05"),
@@ -454,8 +460,9 @@ class LegDay:
         pos1, target1]: C.cam(s, None, focus=steve.head, **SQ01_CAM)). over = entries to replace or give. ease: of
         the move; default 'ease_out' = AT SPEED ON THE FIRST FRAME, slowing to the last (engine.shots' own default
         'smooth' starts from rest: a still for the first half second). 'linear' for a constant drift / track.
-        The handheld seed is the shot name's (a SHARED camera in two shots: pass the same seed= in both, e.g.
-        seed=CLIMB_SEED, for an exact repeat). Returns the spec used."""
+        The handheld seed is the shot name's. NOTE: engine.shots draws the drift from FILM time (frame / fps), so
+        the same seed in two shots does NOT give the same drift: an exact repeat (cl11 / cl22) uses handheld=0
+        and a move (films/legday_climb.py _repeat_cam). Returns the spec used."""
         c = dict(self.camera_spec(name), **over)
         if "pos" not in c or "target" not in c or "lens" not in c:
             raise KeyError("camera %r for %s needs pos, target and lens" % (name, s.name))
@@ -485,7 +492,7 @@ class LegDay:
                C.actor("steve", "sq"), C.actor("steve", "sq2").
         Twins exist because a character that is in two consecutive shots cannot be keyed before the second one
         starts: whoever must already be moving on the first frame of a shot (pre-rolled) is a twin that is not in
-        the shot before. Held items: p.hold("cooked_chicken" | "milk_bucket" | "bucket" ...), fixtures.hold_anvil(p),
+        the shot before. Held items: p.hold("cooked_chicken" | "milk_bucket" | "bucket" ...), C.carry_anvil(p[, dusk]),
         animals.milk(p, frame, f0, f1) (the empty bucket filled with one swing)."""
         if role not in ROLES:
             raise KeyError("no role %r (roles: %s)" % (role, ", ".join(ROLES)))

@@ -29,12 +29,12 @@ STILL_AT = 0.5
 SHEET_FRAMES = 6
 
 
-def _cam(s, name, focus=None, **over):
+def _cam(s, name, focus=None, moving=False, **over):
     c = dict(U.CAMERAS[name])
     c.update(over)
     s.lens(c["lens"], c.get("fstop", 2.8))
-    if c.get("pos1"):
-        s.move(c["pos"], c["target"], c["pos1"], c.get("target1", c["target"]))
+    if moving and (c.get("pos0") or c.get("target0")):
+        s.move(c.get("pos0", c["pos"]), c.get("target0", c["target"]), c["pos"], c["target"])
     else:
         s.move(c["pos"], c["target"])
     s.focus(focus if focus is not None else c.get("focus", c["target"]))
@@ -64,17 +64,20 @@ def _actor(st, name, profession, **kw):
 
 # ---- the square at dusk ------------------------------------------------------------------------------------------
 
+MOUTH_START = (5.0, 6.5, 0.0)
+
+
 def shot_mouth(st, s, ug):
-    """Beat 1: the mouth from a child's eye height beside the well; Steve walks down into it."""
+    """Beat 1: the mouth from a child's eye height east of it; the camera pans with Steve as he crosses in profile
+    from the north and pushes in on the glowing hole as he sinks into it (still: STILL_AT["mouth"])."""
     A = st.v.anchors
     f0 = s.frame_start
     steve = _player(st, "steve")
     path = st.v.paths["ug_down"]
-    start = (path[0][0], path[0][1] + 3.0, path[0][2])
-    steve.place(f0 - 30, start, math.pi)
-    steve.walk(f0 - 30, [start] + path[:10], speed=players.WALK_SPEED)
+    steve.place(f0, MOUTH_START, math.pi)
+    s.ug = dict(end=steve.walk(f0, [MOUTH_START] + path[1:10], speed=players.WALK_SPEED), steve=steve)
     st.use(s, steve)
-    _cam(s, "b01_mouth", focus=A["ug_mouth_target"])
+    _cam(s, "b01_mouth", focus=(5.0, 0.6, 0.9), moving=True)
     st.hero(s, "steve", steve)
     st.lights(s, scale=1.3, groups={k: 1.0 for k in U.LIGHT_GROUPS}, near=A["ug_mouth_target"], radius=22.0)
 
@@ -167,9 +170,11 @@ def shot_stairwell(st, s, ug):
     f0 = s.frame_start
     kid = _actor(st, "kid", "none", child=True)
     path = v.paths["ug_down"]
-    kid.place(f0 - 18, path[1], math.pi)
-    kid.walk(f0 - 18, path[1:], speed=4.4, run=True)
-    kid.look_at(f0, U.LIGHTS[2][0], ease=0)
+    kid.place(f0, path[1], math.pi)
+    kid.walk(f0, path[1:], speed=4.4, run=True)
+    torch = (U.LIGHTS[2][0][0] + 0.1, U.LIGHTS[2][0][1] + 0.5, U.LIGHTS[2][0][2] + 0.6)   # the west wall's torch
+    kid.look_at(f0, torch, ease=0)
+    s.ug = dict(kid=kid)
     st.use(s, kid)
     _cam(s, "b06_stairwell", focus=kid.head)
     st.hero(s, "child", kid)
@@ -205,6 +210,7 @@ def shot_down(st, s, ug, start=False):
     c = U.CAMERAS["b07_down"]
     cells = _cells(st, s, look=lambda n: c["pos"] if n == "dad" else up(st.v.anchors["ug_aisle_%s" % n], 1.4))
     st.see_through(s, "ug_ceiling")
+    st.see_through(s, "ug_caps")
     s.lens(c["lens"], c["fstop"])
     s.move(c["pos0"], c["target0"], c["pos"], c["target"])
     s.focus(cells["farmer" if start else "dad"].head)
@@ -261,12 +267,23 @@ def doorway(out_dir):
 
 
 def shot_lever(st, s, ug):
-    """Beat 9: close on the lever on the end pier; past it, dad and the back wall."""
+    """Beat 9 as the docstring stages it: Steve at ug_lever_stand flips the lever (his arm from the left edge),
+    the camera holds on it, then pans right onto the back wall past dad's shoulder while the focus pulls there;
+    a hidden repeater (4) opens the wall 12 frames after the click, when the pan has arrived."""
     A = st.v.anchors
     f0 = s.frame_start
     cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5))
-    _cam(s, "b09_lever", focus=A["ug_lever_target"])
-    st.hero(s, "lever", *ug.lever.objects)
+    steve = _player(st, "steve")
+    steve.place(f0, A["ug_lever_stand"], st.v.yaws["ug_lever_stand"])
+    st.use(s, steve)
+    r = ug.open_wall(f0 + 10, player=steve, repeater=4, sync="hand")
+    c = U.CAMERAS["b09_lever"]
+    s.lens(c["lens"], c["fstop"])
+    U.hold_then_move(s, r["flip"] + 2, c["pos"], c["target0"], c["pos"], c["target"], frame_end=r["open"] - 1)
+    s.focus(A["ug_lever_target"])
+    s.focus(A["ug_door_target"], at_s=st.film.seconds(r["flip"] + 3), rack_s=0.4)
+    s.ug = r
+    st.hero(s, "dad", cells["dad"])                         # the still is the end of the pan: dad, the doorway
     _under(st, s, ug, inside=True)
 
 
@@ -282,7 +299,7 @@ def shot_aisle(st, s, ug):
     undead.effect_swirls(zv, f0 - 30, s.frame_end, effect="strength", camera=s)
     steve = _player(st, "steve")
     steve.place(f0, A["ug_jump_spot"], st.v.yaws["ug_jump_spot"])
-    U.jump_loop(steve, f0 - 6, s.frame_end)
+    s.ug = dict(takeoffs=U.jump_loop(steve, f0 - 6, s.frame_end))
     st.use(s, steve, zv)
     st.see_through(s, "ug_end_pier")
     _cam(s, "b16_aisle", focus=steve.head)
@@ -294,10 +311,11 @@ def shot_aisle(st, s, ug):
 def shot_endwall(st, s, ug):
     """Beat 19: dad's cell from the side through the see-through end wall, the piston wall behind him."""
     A = st.v.anchors
-    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else (5.0, -11.5, U.F + 1.6),
+    cam = U.CAMERAS["b19_endwall"]
+    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else cam["look"],
                    dad_at="ug_cell_dad_mid")
     st.see_through(s, "ug_end_wall")
-    _cam(s, "b19_endwall", focus=cells["dad"].head)
+    _cam(s, "b19_endwall", focus=cells["dad"].head, moving=True)
     st.hero(s, "dad", cells["dad"])
     _under(st, s, ug, inside=True)
 
@@ -320,23 +338,19 @@ def shot_slot(st, s, ug, hands=False, boots=False):
     A = st.v.anchors
     f0 = s.frame_start
     steve = _player(st, "steve")
-    a, b = (16.6, -12.4, U.F), (16.6, -16.4, U.F)
-    steve.place(f0 - 2, a, math.pi)
-    steve.walk(f0 - 2, [a, b], speed=players.WALK_SPEED)
+    path = U.STEVE_PAST
+    steve.place(f0, path[0], yaw_to(path[0], path[1]))
+    s.ug = dict(end=steve.walk(f0, path, speed=players.WALK_SPEED), steve=steve)
     st.use(s, steve)
     if hands:
         zv = undead.add_zombie_villager(st, "kid_zv_" + SHOT["name"], "none", baby=True)
         U.hands_in_slot(zv, f0)
+        U.shade_face(st.v, zv)
         st.use(s, zv)
-    if boots:
-        foot = (16.6, -14.97, U.F + 0.15)                    # where his boots cross the lens axis at f0 + 12
-        _cam(s, "b08_slot", focus=foot)
-        st.hero(s, "slot", *st.v.cutaways["ug_slot"])
-    else:
-        _cam(s, "b08_slot")
-        st.hero(s, "slot", *st.v.cutaways["ug_slot"])
-    # beat 8: the corner torch low (the inside stays black, the hands catch a little of it)
-    _under(st, s, ug, groups={"ug_corner": 0.35} if (hands or boots) else None)
+    c = U.CAMERAS["b08_slot"]
+    _cam(s, "b08_slot", focus=c["boot"] if boots else U.SLOT_FACE)
+    st.hero(s, "slot", *st.v.cutaways["ug_slot"])
+    _under(st, s, ug)
 
 
 def shot_slot_hands(st, s, ug):
@@ -353,11 +367,14 @@ def shot_box(st, s, ug, opened=False):
     A = st.v.anchors
     f0 = s.frame_start
     if opened:
-        r = ug.open_wall(f0 - 8)
-        U.bounce(st, s, U.DOORWAY_GLOW, energy=U.DOORWAY_WATTS, color=U.POINT_COLOR, start=max(f0, r["open"]),
+        r = ug.open_wall(f0 + 2, relight=(st, s))
+        U.bounce(st, s, U.DOORWAY_GLOW, energy=U.DOORWAY_WATTS, color=U.POINT_COLOR, start=r["open"],
                  kind="torch")
+        s.ug = r
     else:
         _shut(ug, f0 - 6)
+    U.bounce(st, s, U.SLOT_STRIP, energy=U.SLOT_STRIP_WATTS, color=U.POINT_COLOR, kind="torch",
+             name="ug_strip_" + s.name)
     zv = undead.add_zombie_villager(st, "kid_zv_" + SHOT["name"], "none", baby=True)
     zv.place(f0, A["ug_box"], st.v.yaws["ug_box"])
     cam = U.CAMERAS["b24_box"]
@@ -368,9 +385,17 @@ def shot_box(st, s, ug, opened=False):
     for c in ("ug_box_side", "ug_end_wall", "ug_slot"):
         st.see_through(s, c)
     _cam(s, "b24_box", focus=zv.head)
+    if opened:
+        run = r["open_end"] + 6                              # he runs: one step into the doorway, the pan with it
+        zv.look_at(run - 3, up(A["ug_cell_dad"], 1.5), ease=3)
+        zv.walk(run, [A["ug_box"], (14.6, -14.9, U.F)])
+        U.hold_then_move(s, run, cam["pos"], cam["target"], cam["pos1"], cam["target1"], frame_end=run + 16)
+        s.focus(zv.head)
+        s.focus(dad.head, at_s=st.film.seconds(run + 4), rack_s=0.5)
+        s.ug.update(run=run)
     st.hero(s, "baby", zv)
-    # the open wall lets dad's torch in (the game: the box re-lit to ~level 10 within a tick): its light steps up
-    _under(st, s, ug, groups={"ug_corner": 2.0}, extra=[((14.5, -10.6, U.F + 1.9), 2.5)] if opened else ())
+    # the open wall lets dad's torch in (the game: the box re-lit to ~level 9 within a tick): its light steps up
+    _under(st, s, ug, extra=[((14.5, -10.6, U.F + 1.9), 2.5)] if opened else ())
 
 
 def shot_box_open(st, s, ug):
@@ -415,6 +440,26 @@ def _steve_at_counter(st, s, item=None):
         steve.hold(item)
     steve.place(s.frame_start, A["ug_aisle_dad"], st.v.yaws["ug_aisle_dad"])
     return steve
+
+
+def shot_hit(st, s, ug):
+    """Beats 10-12 in one proof shot from the b11 portrait camera: two blows (hurt_in_cell, 14 frames apart) and
+    the infection (infect_in_cell): the red flash, the capped jolt (0.05 up for one tick), the swap; the attacker
+    is not rendered (the blows come from ug_door_target, behind him)."""
+    A = st.v.anchors
+    f0 = s.frame_start
+    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5))
+    dad = cells["dad"]
+    zv = undead.add_zombie_villager(st, "dad_zv_" + SHOT["name"], "librarian", level=2)
+    st.use(s, zv)
+    s.ug = dict(blows=[f0 + 6, f0 + 20], infect=f0 + 34)
+    for f in s.ug["blows"]:
+        U.hurt_in_cell(dad, f, attacker=A["ug_door_target"])
+    U.infect_in_cell(dad, zv, s.ug["infect"], attacker=A["ug_door_target"])
+    zv.aggro(s.ug["infect"], ease=0)
+    _cam(s, "b11_portrait", focus=dad.head)
+    st.hero(s, "dad", dad)
+    _under(st, s, ug, inside=True)
 
 
 def shot_portrait(st, s, ug):
@@ -541,9 +586,11 @@ BUILDERS = {
     "foot": ("under", shot_foot), "falloff": ("under", shot_falloff), "portrait": ("under", shot_portrait),
     "counter": ("under", shot_counter), "apple": ("under", shot_apple), "drift": ("under", shot_drift),
     "ots": ("under", shot_ots), "follow": ("under", shot_follow), "kill": ("under", shot_kill),
+    "hit": ("under", shot_hit),
 }
 ORDER = list(BUILDERS)
-SHEETS = {"push_sheet": "push", "bed_sheet": "bed"}
+SHEETS = {"push_sheet": "push", "bed_sheet": "bed", "lever_sheet": "lever", "box_sheet": "box_open",
+          "hit_sheet": "hit"}
 MEASURE = ("aisle", "falloff")
 WANTED = None                                           # names this process builds (None: every shot)
 
@@ -560,7 +607,9 @@ def build(scene, sky=None):
     st.shot("_lead", 1.0 / 24.0, sky=next(iter(SKIES)))
     for n in (WANTED or ORDER):
         tag, fn = BUILDERS[n]
-        secs = {"push": 6.0, "bed": 6.0, "down": 3.0, "down_start": 3.0}.get(n, 1.0)
+        secs = {"push": 6.0, "bed": 6.0, "down": 3.0, "down_start": 3.0, "mouth": 4.0, "lever": 2.5,
+                "box_open": 3.0, "hit": 2.0, "stairwell": 2.5, "slot_boots": 2.5, "slot_hands": 2.5,
+                "endwall": 2.0}.get(n, 1.0)
         s = st.shot(n, secs, sky=tag)
         SHOT["name"] = n
         fn(st, s, ug)
@@ -574,16 +623,55 @@ def still_frame(film, name):
         r = getattr(shot, "ug", None)                       # dad at the lip, 10 frames before he drops
         return (r["drops"][0] - 10) if r and r["drops"] else shot.frame_start + 50
     if name == "bed":
-        return shot.frame_start + 10
+        return shot.ug["takeoffs"][0] + 6                    # the top of his first jump
     if name == "down":
         return shot.frame_end
     if name == "down_start":
         return shot.frame_start
+    r = getattr(shot, "ug", None) or {}
     if name == "mouth":
-        return shot.frame_start + 20
-    if name in ("slot", "slot_hands"):
-        return shot.frame_start                              # Steve not yet in the view
+        return _mouth_frame(shot)
+    if name == "lever":
+        return r["open_end"] + 6                             # the wall open, the pan and the focus pull done
+    if name == "box_open":
+        return r["open_end"] + 3                             # the doorway lit, before he runs
+    if name == "stairwell":                                  # the child passing the west wall's torch
+        kid = r["kid"]
+        return min(range(shot.frame_start, shot.frame_end + 1), key=lambda f: abs(kid.pos_at(f).y + 5.6))
+    if name == "aisle":
+        return r["takeoffs"][1] + 7                          # the top of a jump (12 ticks: the peak at tick 5-6)
+    if name == "slot_boots":                                 # his boots cross the line to the slot
+        return _crossing(shot, r["steve"])
+    if name == "slot_hands":
+        return _crossing(shot, r["steve"]) + 16              # he has passed: the hands alone
+    if name == "slot":
+        return shot.frame_start                              # before he walks into the view
+    if name == "hit":
+        return r["blows"][0] - 2                             # just before the first blow (the sheet has the flash)
+    if name == "endwall":
+        return shot.frame_start
     return shot.frame_start + int(round(STILL_AT * film.fps))
+
+
+def _crossing(shot, steve):
+    """The frame on which Steve's feet are nearest the b08 camera's line to the slot."""
+    from mathutils import Vector
+
+    c = U.CAMERAS["b08_slot"]
+    a, b = Vector(c["pos"][:2]), Vector(U.SLOT_FACE[:2])
+    d = (b - a).normalized()
+
+    def off(f):
+        p = steve.pos_at(f)
+        q = Vector((p.x, p.y)) - a
+        return abs(q.x * d.y - q.y * d.x)
+    return min(range(shot.frame_start, shot.frame_end + 1), key=off)
+
+
+def _mouth_frame(shot):
+    """Beat 1's still: Steve at the lip of the stair (the first step under his feet)."""
+    steve = shot.ug["steve"]
+    return min(range(shot.frame_start, shot.frame_end + 1), key=lambda f: abs(steve.pos_at(f).y - 0.3))
 
 
 def palette(ses, name, path, heroes=()):
@@ -652,6 +740,9 @@ def main(names, res=None, samples=16, threads=2):
         ses = R.Session("_underground_proof", sky=sky)
         ses.configure(res, samples, threads, None)
         stage = ses.result["stage"]
+        for n in mine + [SHEETS[x] for x in mine_sheets]:
+            if n in WINDOWS:
+                window(ses, n, WINDOWS[n])
         for n in mine:
             t = time.time()
             path = os.path.join(out_dir, "underground_%s%s.png" % (n, os.environ.get("UG_TAG", "")))
@@ -681,13 +772,51 @@ def main(names, res=None, samples=16, threads=2):
     return 1 if failed else 0
 
 
+WINDOWS = {"mouth": "steve", "slot_boots": "steve"}       # shots whose hero's frames in the picture are printed
+
+
+def window(ses, name, who):
+    """Print the frames of a shot on which a character's head is in the picture, and in the Reels safe area
+    (x 8-82 %, y 14-60 %: tools/palette_check), through the shot's own (moving) camera."""
+    import bpy
+    from bpy_extras.object_utils import world_to_camera_view
+
+    shot = next(s for s in ses.film.shots if s.name == name)
+    c = shot.ug[who]
+    scene = ses.scene
+    seen, safe = [], []
+    for f in range(shot.frame_start, shot.frame_end + 1):
+        scene.frame_set(f)
+        dg = bpy.context.evaluated_depsgraph_get()
+        p = c.head.evaluated_get(dg).matrix_world.translation
+        q = world_to_camera_view(scene, shot.camera.evaluated_get(dg), p)
+        x, y = q.x * 100.0, (1.0 - q.y) * 100.0
+        if q.z > 0 and 0 <= x <= 100 and 0 <= y <= 100:
+            seen.append(f - shot.frame_start)
+            if 8 <= x <= 82 and 14 <= y <= 60:
+                safe.append(f - shot.frame_start)
+    span = lambda fs: "%d frames (%s)" % (len(fs), "%d..%d" % (fs[0], fs[-1]) if fs else "-")
+    print("[ug window] %-10s %s's head in the picture %s, in the safe area %s (frames from the shot's start)"
+          % (name, who, span(seen), span(safe)), flush=True)
+    return seen, safe
+
+
 def _sheet_frames(sheet, shot, ses):
+    r = getattr(shot, "ug", None) or {}
     if sheet == "push_sheet":
-        r = getattr(shot, "ug", None)
         land = (r["drops"][0] if r and r["drops"] else shot.frame_start + 60)
         return [land - 10, land - 7, land - 5, land - 3, land - 1, land + 2]
-    land = shot.ug["landings"][0]
-    return [land - 7, land - 4, land - 1, land, land + 3, land + 7]
+    if sheet == "lever_sheet":                              # hand in, click, pan, the wall moving, open, held
+        return [r["hand"] - 2, r["hand"], r["flip"] + 7, r["open"], r["open_end"] + 1, r["open_end"] + 12]
+    if sheet == "box_sheet":                                # shut, opening, lit, his step, the pan, dad's back
+        run = r["run"]
+        return [r["open"] - 6, r["open"] + 1, r["open_end"] + 3, run + 5, run + 11, run + 18]
+    if sheet == "hit_sheet":                                # before, blow 1 (top of the jolt), blow 2, the swap
+        b1, b2, inf = r["blows"][0], r["blows"][1], r["infect"]
+        return [b1 - 2, b1 + 1, b1 + 6, b2 + 1, inf + 1, inf + 8]
+    land = r["landings"][0]                                 # bed: the jump, its landing and the bounces
+    return [r["takeoffs"][0] + 3, r["takeoffs"][0] + 7, land, land + 5, land + 10, r["takeoffs"][1] + 5
+            if len(r["takeoffs"]) > 1 else land + 16]
 
 
 def _contact(paths, frames, out):

@@ -3,10 +3,19 @@
 bastion's dark red; gt19 is "the older version of the world": the SAME sky and set, block for block). One function
 per shot; the contract is in films/sixseconds_common.py (tags "gt...", C.actor, C.cam, C.lights, st.use / st.hero).
 
-STATUS: STUBS by the lead director, revised in the lead's review pass (two independent checks: gt04's run, gt18 /
-gt19's piglins over the match cut, gt19's path and exit). Each function puts the shot's camera on its place and its
-cast roughly where the story wants them (no acting beyond what a still needs); the docstrings say what the shot must
-become. Everything here may be rewritten except what SHARED below names.
+STATUS: SHOT by the gate director (Nov 26) on the lead's stubs. What each shot now does (its docstring has the NOW
+and MEASURED lines, the stills and the palette checks):
+  gt01  the hook portrait: his own camera in the landing's corner at 20 mm, a linear push straight at the brute (his
+        ear no longer leaves the frame: head x 10-54 %), the brothers re-spaced at the gold to his right
+  gt03  THE GATE FRAME: his eyes on the brothers on the cut, his head up to the gateway ON "guard" (clean profile)
+  gt04  the lead's run; the brute's head follows the runner down, then his body turns after him; the focus racks
+        from the runner to the brute once he is past the lens; a neutral fill keeps the shirt teal
+  gt17  one slow heavy step into the gateway (pre-rolled, planted by "waiting"), axe low, a slow push in
+  gt18  THE GATE FRAME: the silhouette in the gateway, the flicker, the ears (the piglins placed once for gt19 too)
+  gt19  the match cut; the runner far down the corridor's east side on the cut, through the brute's spot on
+        "version", out of the frame's LEFT edge along the landing's foot before "from"; the crossbow piglin's head
+        follows him and goes back to the gold
+MOTION: out/test/sixseconds_gate_motion.mp4 (every frame of the six shots, 270x480, 5 samples, 24 fps).
 
 THE PLACE (engine/nether.py HOME; out/test/nether_map_home.png): the courtyard x 0..8, y -2..17, floor z 0; the
 GATEWAY x 3..5 in the north wall (y 18..20), 5 high, the entrance corridor y 21..32 beyond it with lava channels and
@@ -21,25 +30,51 @@ THE WORLD'S RULES that bite here: the floor is WHOLE in every one of these shots
   from gt19 (NO_BRUTE_SHOTS); the runner wears the golden boots and holds the iron pickaxe.
 SPEEDS (players.py, for the runs of gt04 and gt19): sprint 5.61 blocks/s (0.234 a frame), sprint-jump 7.13 (0.297
   a frame; 4.28-block hops 1.25 high, ramp=False = already at speed): 42 frames hold at most 9.8 / 12.5 blocks.
-TAGS TAKEN by the stubs: brute_gt (gt01, gt03, gt04, gt17, gt18), piglin_gt1 / piglin_gt2 / piglin_xbow_gt3 (gt01,
-  gt03, gt17, gt18, gt19; C.memo["gt_gold_piglins"]), runner_gt (gt04, gt19). A new twin: gt4, gt5 ...
+TAGS TAKEN: brute_gt (gt01, gt03, gt04, gt17 (pre-rolled 8 frames: not in fl16_home), gt18), piglin_gt1 /
+  piglin_gt2 / piglin_xbow_gt3 (gt01, gt03, gt17, gt18, gt19; C.memo["gt_gold_piglins"]), runner_gt (gt04, gt19).
+  Fills: "gt_runin" (gt04). A new twin: gt4, gt5 ...
 PREVIEW samples of this sequence: 5 (films/sixseconds_common.py PREVIEW_SAMPLES).
 """
 from mathutils import Vector
 
 GOLD = ("gold_1", "gold_2", "gold_3")
+# gt01: this shot's own camera (the set's six_landing moved into the landing's north-west corner, 22 mm) and the
+# brute's own spot near the landing's north-east corner, facing the lens; he looks just past it (LANDING_LOOK)
+LANDING_CAM = dict(pos=(0.15, 17.8, 5.8), target=(6.14, 14.17, 3.6), lens=20.0, fstop=2.8,
+                   pos1=(0.456, 17.675, 5.79), target1=(6.14, 14.17, 3.6))
+LANDING_BRUTE = (2.72, 16.75, 4.0)
+LANDING_LOOK = (-0.1, 17.2, 5.6)
+LANDING_PIGS = ((7.35, 12.4, 0.0), (6.95, 11.8, 0.0), (7.35, 10.45, 0.0))  # the brothers at the gold, facing east
+# gt03: on the cut the brute looks down at his brothers at the gold (their heads), then to the gateway's mouth
+GUARD_DOWN = (6.6, 11.4, 1.7)
+# gt17: nether's corridor camera (35 mm f/2.4 from the corridor) with a slow push in; the brute's one slow, heavy step
+# from just inside the courtyard into the middle of the gateway (PLACES "gateway", facing out), pre-rolled
+WAIT_CAM = dict(pos=(3.6, 25.5, 1.55), target=(3.9, 19.0, 1.45), lens=35.0, fstop=2.4,
+                pos1=(3.66, 24.75, 1.53), target1=(3.9, 19.0, 1.45))
+WAIT_FROM = (4.5, 18.0, 0.0)
+WAIT_SPEED = 1.2              # piglins.py: "slow heavy brute: speed=1.2, swing=0.5"
+WAIT_PREROLL = 8
+WAIT_LOOK = (4.5, 26.0, 1.9)  # just past the lens's right side
 # gt04: the runner is already sprint-jumping in the corridor on 240 (ramp off: at speed), comes through the gateway
 # and passes the lens 1.0 block WEST of it (the camera is at x 4.9): he leaves the frame's left edge before the lens
 # instead of running into it (the technical check: the first stub's line ran straight at the lens).
 RUN_IN = [(4.5, 21.6, 0.0), (4.4, 18.5, 0.0), (3.9, 11.0, 0.0), (3.7, 8.0, 0.0)]
-# gt19: on the match cut the runner is a small figure on the corridor's EAST side (the gate camera sees the whole
-# corridor: nowhere to hide him), sprint-jumping already; he is in the brute's spot (4.5, 19) on "older", then runs
-# down the courtyard between the gold piglins and the pit side and out of the frame's right edge by "before" (1251),
-# so "they added me" plays over the empty gateway. The path after the spot is NOT nether's home_run_past (its leg
-# (4.5, 19) -> (6.4, 9) runs through piglin_gt2 at gold_2 (6.3, 11.2): the technical check, frames 1235-1238):
-# (5.0, 12) -> (6.9, 3.5) keeps clear of gold_1..3 and turns him out of the frame's right edge sooner; the last leg
-# runs past the gate camera's right side, 2 blocks clear of it, behind its plane.
-RUN_PAST = [(5.7, 25.5, 0.0), (4.5, 19.0, 0.0), (5.0, 12.0, 0.0), (6.9, 3.5, 0.0), (7.4, -1.0, 0.0)]
+RUN_IN_WATCH = (248, 266)     # gt04: the brute's head follows the runner from the gateway to past the lens ...
+RUN_IN_TURN = 10              # ... then his body turns after him (266-276), still before the cut's last 3 frames
+RUN_IN_RACK = 268             # the focus leaves the runner (gone past the left edge on 269-270) for the brute
+# gt04: a neutral shadowless fill east of his line and above it, so that his teal shirt keeps its hue in the warm
+# lantern and lava light (without it: hue 169 on 256, the check wants 170-196)
+RUN_IN_FILL = dict(pos=(5.8, 13.5, 2.6), watts=60.0, color=(0.95, 0.98, 1.0))
+# gt19: on the match cut the runner is a small figure far down the corridor on its EAST side (the gate camera sees
+# the whole corridor: nowhere to hide him; every figure in it lands at x 43-48 % of the frame, right of the brute's
+# former silhouette at x 33-42 %), sprint-jumping already (ramp off). He goes through the brute's spot (4.5, 19) on
+# "version" and then turns down the WEST side of the courtyard, along the landing's foot (x >= 3.25 beside it: its
+# body is solid to x 3.0), and out of the frame's LEFT edge before "from": the gold piglins are on the east side, and
+# the right edge is reached only near the lens (the stub's right exit took 49 frames from the spot, this one 38), so
+# "from before they added me" plays over the empty gateway and landing. NOT nether's home_run_past (its leg
+# (4.5, 19) -> (6.4, 9) runs through piglin_gt2 at gold_2: the technical check). He ends behind the camera's plane.
+RUN_PAST = [(5.65, 27.0, 0.0), (4.5, 19.0, 0.0), (3.55, 10.2, 0.0), (2.45, 6.0, 0.0), (2.4, -1.2, 0.0)]
+GLANCE = (1216, 1238)     # piglin_xbow_gt3 (gold_3) follows the runner with its head on these frames
 
 
 def _gold_piglins(st, s, C, look="gold_target", idle=True):
@@ -66,18 +101,21 @@ def gt01_landing(st, s, C, nar):
     MUST BE SEEN, ON WHICH WORD
       frame 1         the brute big at frame left, already in the push; the gold wall and three backs beyond
       "gold" 77       the gold wall readable as gold (hue 38-58, nether.check_still), the brothers' backs to him
-    NOW (stub): the set's camera six_landing (26 mm f/2.8 at eye level on the landing's north-west corner, a slow
-      push in to its pos1), the brute at PLACES "landing_edge" (six_landing_brute) looking at "landing_look" (just
-      past the lens), dead still (ears only); the three piglins at six_b1_pig_1..3 facing the gold; the lead's fill
-      C.key_landing(s) (his own key: x 2.41 against the blackstone, 1.23 without it). Hero: the brute.
-    MEASURED (films/sixseconds_set.py b01_landing, out/test/sixseconds_set_b01_landing_zones.png): brute x 2-49 %,
-      y 15-36 %, 92 % inside the safe area at the push's middle; piglin heads y 52-55 %; gold hue 46.
-      THE LEAD'S GEO (tools.sixseconds_geo gt01_landing:2 / :77, the stub as it is): his head x -3.4..54.5 % on frame
-      2 and x -9.9..55.6 % on "gold" (77): the push carries his far ear OUT of the left edge (face 195 -> 215 px,
-      18 degrees off the lens, eyes x 24-26 %, y 23-25 %). Fix before anything else: put him a little further from
-      the lens's left edge (or end the push earlier / aim it a little left) so his whole head stays inside x 8 % to
-      the last frame. The three piglins: heads x 54-85 %, y 50-59 %, 9.7-11.2 blocks off (backs and profiles, 72-114
-      degrees off the lens: no faces), the step ingot spot hidden behind piglin_gt1 (no ingot is in this shot).
+    NOW: this shot's own camera LANDING_CAM (the set's six_landing moved into the landing's north-west corner,
+      (0.15, 17.8, 5.8), 20 mm f/2.8 at eye level), a slow LINEAR push of 0.33 block straight at the brute (his face
+      grows 129 -> 147 px over the shot: moving on frame 1); the brute at LANDING_BRUTE (2.72, 16.75) near the
+      landing's north-east corner, facing the lens, looking just past it (LANDING_LOOK), dead still but his ears;
+      the three piglins re-spaced along the gold (LANDING_PIGS (7.35, 12.4), (6.95, 11.8), (7.35, 10.45), facing east,
+      idle) so they stand clear to the right of his body; the lead's fill C.key_landing(s). Hero: the brute.
+      THE FIX (the ear): from the stub's spot 2.4 blocks off a 26 mm lens, his head with its ears (1.0 block wide) and
+      the three piglins did not both fit inside x 8-82 %; the camera went back into the corner (2.77 blocks from him),
+      to 20 mm, and the push now runs along the line to him instead of across it (it carried him left).
+    MEASURED (tools.sixseconds_geo gt01_landing:1 / :97; still out/test/sixseconds_gate_gt01_landing_77_zones.png):
+      his head (ears included) x 14.4..52.6 % on frame 1 and x 10.3..53.7 % on 97, y 26-41 %; eyes x 33 %, y 32-33 %;
+      face 129 -> 147 px, 13 degrees off the lens. The piglins' heads x 54-77 %, y 52.5-59 % (backs and profiles,
+      83-140 degrees off), the gold wall beside his right arm and behind the piglins (x 50-80 %, y 40-55 %), the
+      golden axe at his right hand (x 15-20 %, y 52-65 %). Palette (out/test/sixseconds_pal_gt01_landing_77.png):
+      SEE THE MEASURED LINE AT THE END OF THIS DOCSTRING.
     FALLBACKS TAKEN (the set's): not the scripted LOW LONG lens (the landing is 3 blocks wide; a lower lens loses
       the piglins behind its edge: nether's note, ray-checked); the "lantern as key" is the film-local fill
       KEY_LANDING (the Bastion has no edit hook for a lantern block). Lava glow from below: only the look's
@@ -85,11 +123,11 @@ def gt01_landing(st, s, C, nar):
     NEIGHBOURS: the film's first shot; after, rw02_ingots (the ingot row, the brothers admiring).
     """
     brute = C.actor("brute", "gt")
-    C.stand(s, brute, "landing_edge", look="landing_look", idle=False)
+    C.stand(s, brute, LANDING_BRUTE, toward=LANDING_CAM["pos"], look=LANDING_LOOK, idle=False)
     pigs = [C.actor("piglin", "gt1"), C.actor("piglin", "gt2"), C.actor("piglin_xbow", "gt3")]
-    for k, p in enumerate(pigs, 1):
-        C.stand(s, p, "six_b1_pig_%d" % k, look="gold_target", seed=k)
-    C.cam(s, "set:six_landing", focus=brute.head, ease="linear")
+    for k, (p, place) in enumerate(zip(pigs, LANDING_PIGS), 1):
+        C.stand(s, p, place, yaw=C.yaw("six_b1_pig_%d" % k), look="gold_target", seed=k)
+    C.cam(s, None, focus=brute.head, ease="linear", **LANDING_CAM)
     C.key_landing(s)
     st.hero(s, "brute", brute)
     C.lights(s, "home")
@@ -113,13 +151,26 @@ def gt03_guard(st, s, C, nar):
       "guard" 204     the brute on guard, still (ears, a breath: not a statue)
     SHARED: CAMS["gate"] exactly (C.cam(s, "gate")); PLACES "landing" (+ look "landing_look_gate": the gateway's
       mouth: his head 88 degrees off the lens, a clean profile); "gold_1".."gold_3".
-    NOW (stub): exactly that; the piglins idle; the brute dead still but his ears. Hero: the brute.
-    MEASURED (engine/nether.py and out/test/sixseconds_set_b03_gate.png): brute head x 20-24 %, y 32-36 % (10 % of
-      the frame height), gold hue 43, piglin skin hue 21 s 0.60.
+    NOW: the gate frame exactly; the piglins idle (glances, arm bob, ears). The brute's one action is the beat's:
+      on the cut ("Somebody") his eyes are down on his brothers at the gold (GUARD_DOWN: his face turns toward the
+      lens, three-quarter), on "has" (196) his head turns up to the gateway's mouth and arrives ON "guard" (204): the
+      clean profile, then dead still but his ears to the cut (the brothers are busy with gold, so he watches the
+      door). Something moves on frame 1: the piglins' ears and arms, the lava's animated surface in the gateway.
+      Hero: the brute.
+    MEASURED (stills out/test/sixseconds_gate_gt03_guard_183.png (eyes down, face to the lens) and _212.png (profile);
+      preview frames 179-239): the turn reads at phone size on the 196-204 frames; brute head x 20-24 %, y 32-36 %
+      (10 % of the frame height). Palette 212 (out/test/sixseconds_pal_gt03_guard_212.png): brute x 20-24 %,
+      y 32-36 %, 100 % in the safe area, gold hue 44 s 0.79, piglin skin hue 21 s 0.59: all pass.
     NEIGHBOURS: before, rw02_ingots; after, gt04_runin (inside the gateway, the runner comes at the lens).
     """
+    f0, f1 = s.frame_start, s.frame_end
     brute = C.actor("brute", "gt")
-    C.stand(s, brute, "landing", look="landing_look_gate", idle=False)
+    C.put(brute, f0, "landing")
+    brute.look_at(f0, Vector(GUARD_DOWN), ease=0)            # on the cut: his eyes on the brothers at the gold ...
+    turn = C.at(s, "has")
+    brute.look_at(turn, Vector(C.P("landing_look_gate")), ease=C.at(s, "guard") - turn)    # ... to the gateway
+    brute.flop_ears(f0, f1 + 1)
+    st.use(s, brute)
     _gold_piglins(st, s, C)
     C.cam(s, "gate")
     st.hero(s, "brute", brute)
@@ -141,20 +192,27 @@ def gt04_runin(st, s, C, nar):
       "player" 254    he is through the gateway, coming at the lens, golden boots, pickaxe in hand
       "ran in" 263-276  he passes the lens on its LEFT side and is out of the frame by about 273 (never in the last 3
                       frames); the brute on the landing turns his whole body to follow him (Character.face on "ran")
-    NOW (stub): the set's six_inside_gate camera (24 mm f/4 on the floor inside the gateway at (4.9, 11.0, 0.3),
-      nether's inside_gate pulled back 2.2 blocks); the runner SPRINT-JUMPING from 240 (ramp=False: at speed) on
-      RUN_IN (4.5, 21.6) -> (4.4, 18.5) -> (3.9, 11.0) -> (3.7, 8.0): through the gateway and past the lens 1.0 block
-      west of it; the brute on "landing", his body turned toward the courtyard on "ran". Hero: the runner.
+    NOW: the set's six_inside_gate camera (24 mm f/4 on the floor inside the gateway at (4.9, 11.0, 0.3)); the runner
+      SPRINT-JUMPING from 240 (ramp=False: at speed) on RUN_IN (4.5, 21.6) -> (4.4, 18.5) -> (3.9, 11.0) -> (3.7, 8.0):
+      through the gateway and past the lens 1.0 block west of it, iron pickaxe in hand from 240. The brute on
+      "landing" looking at the gateway; his HEAD picks the runner up as he comes through the gateway under the landing
+      and follows him down (RUN_IN_WATCH 248-266, clamped at 40 degrees down), then his whole BODY turns after him
+      (Character.face 266-276, RUN_IN_TURN): the head leads, the body follows, as a mob's does. Focus on the runner's
+      head, then racked to the brute's head on 268-271 (RUN_IN_RACK; on the runner's head the focus went behind the
+      lens on 271-273: the whole frame a blur in the first preview). A neutral shadowless fill "gt_runin" (60 W at
+      (5.8, 13.5, 2.6), RUN_IN_FILL) keeps his teal shirt teal in the lanterns' and lava's warm light. Hero: runner.
     THE TWO CHECKS: the first stub's sprint (5.6 blocks/s from (4.5, 24)) was still 3.6 blocks short of the lens on
       the last frame, and its line ran straight at the lens (a body and an arm through the camera). The lead kept the
-      camera (from 3 blocks nearer the gateway the brute on the landing leaves the frame: 36 degrees left of the
-      lens's axis, measured on paper) and made the run fit: sprint-jump speed and a start 2.4 blocks nearer.
-    MEASURED (the lead's probe of the run; still out/test/sixseconds_scout_gt04_runin_262_zones.png): his feet at
-      y 18.3 on 250 (in the gateway on "a player"), y 17.2 on 254 ("player"), y 12.8 on 268; his body fills the
-      frame on 266-270 (mid-hop, close to the low lens) and has left the frame's left edge by 273-274; nothing of him
-      after 274. On 240 his body is at x 60-72 %, y 57-67 % (small, in the gateway's glow: his feet in the caption
-      band); on 262 he is big at the top right, mid-hop, head under the top icons. The brute on the landing is small
-      at the upper left (check his turn reads: his body turns about 80 degrees on 263-273).
+      camera (from 3 blocks nearer the gateway the brute on the landing leaves the frame) and made the run fit:
+      sprint-jump speed and a start 2.4 blocks nearer.
+    MEASURED (tools.sixseconds_geo --track runner_gt:240-281:2; preview frames 240-281 looked at one by one; still
+      out/test/sixseconds_gate_gt04_runin_256_zones.png): on 240 he is small in the gateway's glow (eyes x 66 %,
+      y 59 %, feet in the caption band), in the gateway on 248-250 ("a player" 253-254: through it, eyes y 47-53 %),
+      big at the top of the frame on 262-266 ("ran" 263), out of the left edge on 269-270 ("in" 270); 270-281 the
+      landing alone, sharp, the brute settling into his turn (his face to the lens, 8-13 degrees off, 51 px).
+      Brute: 112 degrees off the lens on 240 (looking at the gateway), 34 on 256, 1-13 after the turn.
+      Palette 248 / 256 / 262 (sixseconds_pal_gt04_runin_*.png): shirt hue 173 / 173 / 172 (170-196; 169 without the
+      fill, a FAIL), trousers min channel 12 (>= 12), the runner 100 % in the safe area: all pass.
     NEIGHBOURS: before, gt03_guard; after, pt05_boots (the boot shot: his legs sprint in and skid; the pit
       sequence's runner_pt is pre-rolled into it).
     """
@@ -166,8 +224,16 @@ def gt04_runin(st, s, C, nar):
     st.use(s, runner)
     brute = C.actor("brute", "gt")
     C.stand(s, brute, "landing", look="gateway", idle=False)
-    brute.face(C.at(s, "ran"), Vector((3.9, 11.0, 1.0)), ease=10)      # his whole body turns to follow
+    # his head picks the runner up as he comes through the gateway under the landing and follows him down (clamped
+    # at 40 degrees down: the game's limit); once the runner has passed the lens the whole body turns after him
+    a, b = RUN_IN_WATCH
+    brute.track(a, b, runner, step=2, ease=6)
+    brute.face(b, Vector(RUN_IN[-1]), ease=RUN_IN_TURN)
     C.cam(s, "set:six_inside_gate", focus=runner.head)
+    # once he is past the lens the focus is on the brute turning on the landing (on the runner's head it went to a
+    # few centimetres behind the lens on 271-273: the whole frame a blur)
+    C.rack(s, brute.head, RUN_IN_RACK, frames=3)
+    C.fill("gt_runin", RUN_IN_FILL["pos"], RUN_IN_FILL["watts"], [s], color=RUN_IN_FILL["color"])
     st.hero(s, "runner", runner)
     C.lights(s, "home")
 
@@ -188,18 +254,35 @@ def gt17_waits(st, s, C, nar):
       "waiting" 1088  planted in the middle of the gateway, axe LOW (never aggro), settled: the story's risk is
                       that this reads as an ambush; a slow, calm stance answers it
     SHARED: PLACES "gateway" (where he plants himself, facing out: yaw pi; gt18 has him there too), "gold_1".."3".
-    NOW (stub): engine/nether.py's corridor camera (35 mm f/2.4 from the corridor, no push yet), the brute standing
-      on "gateway" facing out, the piglins at the gold. Hero: the brute.
-    MEASURED (out/test/sixseconds_set_b17_corridor.png; the lead's out/test/sixseconds_scout_gt17_waits_1096.png on
-      the old timeline, 7 frames earlier): brute x 26-42 %, y 42-49 %, 4.19 x the blackstone with the corridor lava
-      as his key; the brothers soft beyond.
+    NOW: this shot's own camera WAIT_CAM (nether's corridor camera, 35 mm f/2.4 from (3.6, 25.5, 1.55) in the
+      corridor) with a slow push in of 0.75 block (ease out: at speed on 1073); the brute's ONE SLOW STEP into the
+      gateway: brute_gt is not in fl16_home (brute_fl is), so his walk is pre-rolled 8 frames: placed on 1065 at
+      WAIT_FROM (4.5, 18.0) facing out, Piglin.walk to PLACES "gateway" (4.5, 19.0) at 1.2 blocks/s with swing 0.5
+      (piglins.py's slow heavy brute, planted gait: the feet do not slide); his head on WAIT_LOOK, just past the lens's
+      right side; the axe low at his side (never aggro); ears from the end of the walk. The piglins at gold_1..3 idle,
+      soft through the gateway at the left. Hero: the brute.
+    MEASURED (tools.sixseconds_geo --track brute_gt:1066-1094:2; stills out/test/sixseconds_gate_gt17_waits_1073.png,
+      _1095_zones.png; preview frames 1073-1121): on 1073 he is mid-step at y 18.3 (0.3 block short), planted on
+      1089-1090 (y 18.99 on "waiting" 1088: the brake), then still; head x 24-49 % -> 16-48 %, y 40-50 %, eyes x
+      36 -> 32 %, face 81 -> 102 px, 7-8 degrees off the lens; the axe at x 15-20 %, y 56-66 %. Brothers: piglin_gt1
+      x 11-21 % and the crossbow piglin at the left edge (x -2..13 %), soft; piglin_gt2 hidden behind his head.
+      Palette 1095 (out/test/sixseconds_pal_gt17_waits_1095.png): brute x 23-41 %, y 41-49 %, 100 % in the safe
+      area, x 4.59 the blackstone (the corridor lava is his key): pass.
     NEIGHBOURS: before, fl16_home (the home flash: the brute at home_flash with the gateway behind him, a puff);
       after, gt18_nocome (THE GATE FRAME: he waits small in the gateway, his back to us).
     """
+    f0, f1 = s.frame_start, s.frame_end
     brute = C.actor("brute", "gt")
-    C.stand(s, brute, "gateway", look=(4.5, 26.0, 1.9), idle=False)
+    # brute_gt is not in fl16_home (brute_fl is): his one slow step is pre-rolled so that it is under way on 1073
+    pre = f0 - WAIT_PREROLL
+    C.put(brute, pre, WAIT_FROM, yaw=C.yaw("gateway"))
+    brute.look_at(pre, Vector(WAIT_LOOK), ease=0)
+    end = brute.walk(pre, [WAIT_FROM, C.P("gateway")], speed=WAIT_SPEED, swing=0.5)
+    C.memo["gt_wait_planted"] = end
+    brute.flop_ears(end, f1 + 1)
+    st.use(s, brute)
     _gold_piglins(st, s, C)
-    C.cam(s, "set:corridor", focus=brute.head)
+    C.cam(s, None, focus=brute.head, **WAIT_CAM)
     st.hero(s, "brute", brute)
     C.lights(s, "home")
 
@@ -226,9 +309,10 @@ def gt18_nocome(st, s, C, nar):
       only st.use()s them (the technical check: placing them again in gt19 restarted flop_ears, the ears jumped
       0.07 rad on the cut against 0.002-0.003 a frame before it). The camera drifts on (one seed), and the lava light
       does not jump: one bas.lava_flicker(1122, 1289) over both shots.
-    NOW (stub): the gate camera, the brute on "gateway" facing out (back to the lens), still; the piglins at the gold
-      looking at it, ears only, for both shots (C.memo["gt_gold_piglins"]); ONE bas.lava_flicker over gt18 AND gt19.
-      Hero: the brute.
+    NOW: the gate camera exactly; the brute on "gateway" facing out (back to the lens), the same pose and look as at
+      the end of gt17, still but his ears; the piglins at the gold looking at it, ears only, placed ONCE here for both
+      shots (C.memo["gt_gold_piglins"]); ONE bas.lava_flicker over gt18 AND gt19. Moves on 1122: the flicker, the
+      ears, the lava's surface, the handheld. Hero: the brute.
     MEASURED (out/test/sixseconds_set_b18_gate.png): brute x 35-40 %, y 54-55 %, 1.59 x the blackstone (rule 1.5:
       at the limit; the flicker's dark phase may drop him under it: measure the darkest frame).
       THE LEAD (old timeline, 7 frames earlier: 1166 / 1172 there = 1173 / 1179 here): the flicker runs on across
@@ -310,7 +394,15 @@ def gt19_older(st, s, C, nar):
     end = runner.sprint_jump(f0, RUN_PAST, ramp=False)
     C.memo["gt_runner_out"] = end
     st.use(s, runner)
-    st.use(s, *C.memo["gt_gold_piglins"])          # placed in gt18 for both shots: nothing re-keyed on the cut
+    pigs = C.memo["gt_gold_piglins"]               # placed in gt18 for both shots: nothing re-keyed on the cut ...
+    st.use(s, *pigs)
+    # ... but as he runs past, the crossbow piglin turns its head over its shoulder after him (piglins look at a
+    # player near them; one in gold boots is one of them), its face to the lens, and goes back to the gold before
+    # "from": the hold on the empty gateway is still again (flicker and ears). (piglin_gt2's head would turn away
+    # from the lens: its back stays to us.)
+    a, b = GLANCE
+    pigs[2].track(a, b, runner, step=2, ease=8)
+    pigs[2].look_at(b + 1, Vector(C.P("gold_target")), ease=8)
     C.cam(s, "gate")
     st.hero(s, "runner", runner)
     C.lights(s, "home")

@@ -155,7 +155,7 @@ def pn05_milk(st, s, C, nar):
     zuri.look_at(f0, cow.eye_point(f0), ease=0)
     empty = DRINK_ENDS                            # 303: pn04's drink ends (the game's clock): the bucket is empty
     animals.hand_item(zuri, "milk_bucket", f0, empty)
-    zuri.drink(f0, empty - 4)
+    zuri.drink(f0 - 6, empty - 4)                 # (pre-rolled: the bucket already AT her face on 299)
     fill = C.at(s, "fill")
     animals.milk(zuri, fill, empty, f1 + 1)
     zuri.drink(fill + 2)                          # 325-363: straight back up, at her face on "up" 334
@@ -205,7 +205,7 @@ def pn06_told(st, s, C, nar):
     zuri.look_at(f0, cow.eye_point(f0), ease=0)
     ends = C.T["pn05_milk"].at("fill") + 2 + DRINK            # 363: pn05's drink ends (the game's clock)
     animals.hand_item(zuri, "milk_bucket", f0, ends)
-    zuri.drink(f0, ends - 4)
+    zuri.drink(f0 - 6, ends - 4)                              # (pre-rolled: at her face on 349, as on 348)
     animals.milk(zuri, ends + 5, ends, f1 + 1)                # 368: the tap
     zuri.drink(ends + 7)
     efe.look_at(f0, zuri.eye_point(f0), ease=0)

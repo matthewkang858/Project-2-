@@ -293,9 +293,11 @@ def dg15_a(st, s, C, nar):
       AWAY = its head 12 degrees to its left and 8 down: its face to us (eyes, brow, nose); LOOK = 70 degrees to its
       right (as far as a head turns) and 3 up: the nose in profile pointing at him (screen left). He jumps only while
       the child looks away.
-      dg15_a  915 AWAY (its face on the cut) / "time"+2 = 926 LOOK (by 932, "I look") / "look"+4 = 940 AWAY (by 946)
-      dg15_b  947 AWAY / 948 LOOK (by 953) / "house" 961 AWAY (by 967)
-      dg15_c  968 AWAY / 969 LOOK (by 974) and hold through the pause to 997
+      Each turn takes TURN = 9 frames (since the review of the whole-film preview: the game turns a mob's head at
+      most 10 degrees a tick, 8.3 a frame; the first turns, 5-6 frames, ran at 15-19 degrees a frame, a snap):
+      dg15_a  915 AWAY (its face on the cut) / "time"+1 = 925 LOOK (by 934, "I" 932) / "look"+1 = 937 AWAY (by 946)
+      dg15_b  947 AWAY on the cut, LOOK from 947 (by 956, "one" 954) / 958 AWAY (by 967, its face on the cut)
+      dg15_c  968 AWAY on the cut, LOOK from 968 (by 977) and hold through the pause to 997
       Him: C.watcher on watch_far / watch_mid / watch_door, facing east-north-east (the house fronts): 106-108 degrees
       off the lens in all three, the right side of his head toward us (hair and skin, no eyes): "same pose".
     MEASURED (tools.hello_geo at 920 / 936 / 955 / 980; renders out/test/hello_dg_dg15_a_920_zones.png, _936_zones.png,
@@ -307,7 +309,11 @@ def dg15_a(st, s, C, nar):
       out: 28 -> 37 px in front of the same house front, the jump read as a glitch; the lead moved it to (8.5, 1.5),
       beside the cobblestone of house_b). palette_check dg15_a@936, dg15_b@955 and dg15_c@980, all with the push:
       every check passes (hero child x 62-81 %, y 40-50 %, 100 % in the safe area; at 980 his shirt hue 174, trousers
-      min channel 44).
+      min channel 44). THE 9-FRAME TURNS (review of the whole-film preview; tools.hello_geo 925-977, stills
+      out/test/hello_review_fix_dg15_a_930.png (mid-turn) and _dg15_b_956_zones.png): AWAY 12 degrees off the lens
+      on 925, 946, 947, 967, 968; LOOK 70 on 934, 956, 977; hello_palette dg15_b@956 passes every check (stone G/R
+      0.93, planks s 0.52, robe hue 16, skin s 0.48, hero child x 62-81 %, y 40-50 %, 100 % inside). Preview
+      915-997 re-rendered (frames whose picture changed).
 
     STORY (all of beat 15, "Every time I look, he is one house closer."): Late gold at the child's door. The baby
     villager, sharp in the lower foreground on the step, turns its head to look along the house fronts: he stands
@@ -332,7 +338,8 @@ def dg15_b(st, s, C, nar):
     """BEAT 15, second jump  "he is one house"   frames 947-967 (21 f, 0.88 s), sky gold.
     Words: he 949, is 951, one 954, house 961. (See dg15_a for the beat, the frame and the measurements.)
     NOW: him at "watch_mid" (the next house), the same profile; the child's face to us on the cut (947), its head turns
-      to him by 953, and away again from "house" 961 (by 967): he jumps while it looks away.
+      to him by 956 and away again from 958 (by 967, TURN frames each: the game's head speed; with 5-6 frame turns
+      it held the look 8 frames, now 2 plus the slow ends of the turns): he jumps while it looks away.
     MEASURED (the lead's pass: PLACES["watch_mid"] moved from (8.4, 5.2) to (8.5, 1.5); this file unchanged, _fronts
       reads the place by name): him eyes x 32 %, y 48 %, face 45 px (was 37), 16.4 blocks, 106 degrees off: the right
       side of his head, no eyes, soft, beside the cobblestone corner of house_b instead of in front of the same house
@@ -348,8 +355,8 @@ def dg15_c(st, s, C, nar):
     """BEAT 15, third jump  "closer."   frames 968-997 (30 f, 1.25 s), sky gold.
     Words: closer 968. The pause after it is 0.8 s (to 997): he is at our corner; hold. (See dg15_a for the beat.)
     NOW: him at "watch_door" (the corner of the child's own house: his place in beats 19-22) facing the house fronts,
-      not WATCH_YAW; the child's face to us on the cut (968), its head turns to him by 974 ("closer") and holds there
-      through the pause; nothing else moves but the handheld.
+      not WATCH_YAW; the child's face to us on the cut (968), its head turns to him by 977 (TURN frames from the cut,
+      on "closer") and holds there through the pause; nothing else moves but the handheld and the push.
     MEASURED: him eyes x 41 %, y 49 %, face 78 px, 108 degrees off the lens: the right side of his head (no eyes);
       soft (9.4 blocks against the focus at 7.6). palette_check dg15_c@980 (with the push) passes everything (his
       shirt hue 174, trousers min channel 44). Render: out/test/hello_dg_dg15_c_980_zones.png.

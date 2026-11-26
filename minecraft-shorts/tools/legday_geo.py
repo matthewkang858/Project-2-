@@ -9,7 +9,8 @@ which way it faces the lens, and what (if anything) stands between the lens and 
 Columns: x / y in % of the frame (y from the top, as the Reels zones), the head's box (top..bottom), the face width
 in pixels at 540x960 (a player's or a pillager's face is half a block wide; a baby's would be half that: there is
 none in this film), `off` = degrees between the body's nose direction and the lens (0 = facing it, 90 = profile,
-180 = from behind), `blocked` = the first rendered object on the line from the lens to the eyes (None = clear).
+180 = from behind), `blocked` = the first rendered object on the line from the lens to the eyes ("clear" = none;
+the character's own meshes are looked through: the eye point lies inside its own head).
 Animals are listed too (their eyes; face width as an adult player's: a rough size). Patrols are listed per pillager.
 Nothing is written. Prefix with `nice -n 15 timeout 290`.
 """
@@ -22,8 +23,9 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 
-def first_hit(scene, dg, a, b):
-    """Name of the first rendered (camera-visible) object between a and b, or None when the line is clear."""
+def first_hit(scene, dg, a, b, own=()):
+    """Name of the first rendered (camera-visible) object between a and b, or None when the line is clear. Objects
+    named in `own` (the measured character's own meshes: its head holds the eye point) are looked through."""
     d = b - a
     length = d.length
     d.normalize()
@@ -33,13 +35,31 @@ def first_hit(scene, dg, a, b):
         if not hit:
             return None
         orig = ob.original if hasattr(ob, "original") else ob
-        if orig.hide_render or not orig.visible_camera or "glass" in orig.name:     # (glass: looked through)
+        if (orig.hide_render or not orig.visible_camera or "glass" in orig.name      # (glass: looked through)
+                or orig.name in own):
             step = (loc - o).length + 0.01
             o = loc + d * 0.01
             gone += step
             continue
         return "%s@%.2f" % (orig.name.replace("village_block_", ""), (loc - a).length)
     return "?"
+
+
+def _own(c):
+    """Names of every object of a character (its rig parts and what hangs on them): the eye point lies inside its
+    own head, so the first version reported every face as 'blocked' by its own head (the technical review)."""
+    obs = set()
+    try:
+        for ob in (c.objects() if callable(getattr(c, "objects", None)) else c.objects):
+            obs.add(ob.name)
+            obs.update(ch.name for ch in ob.children_recursive)
+    except Exception:
+        pass
+    root = getattr(c, "root", None)
+    if root is not None:
+        obs.add(root.name)
+        obs.update(ch.name for ch in root.children_recursive)
+    return obs
 
 
 def head_box(c):
@@ -126,7 +146,7 @@ def main(argv):
             off = math.degrees(math.acos(max(-1.0, min(1.0, nose.dot(to_cam.normalized()))))) if to_cam.length else 0
             print("  %-18s eyes x %5.1f y %5.1f  head x %5.1f..%5.1f y %5.1f..%5.1f  face %4.0f px  off %5.1f  "
                   "dist %5.2f  blocked %s" % (n, x, y, xl, xr, top, bot, face, off, d.length,
-                                              first_hit(scene, dg, cp, eye)))
+                                              first_hit(scene, dg, cp, eye, own=_own(c)) or "clear"))
         for spec in (args.pts or "").split(";"):
             if not spec.strip():
                 continue

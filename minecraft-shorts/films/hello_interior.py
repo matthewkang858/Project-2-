@@ -212,8 +212,11 @@ def in17_window(st, s, C, nar):
     lit pane below the eaves with the CHILD'S WHOLE FACE in it (brow, eyes, nose, crossed arms below), looking out
     and down at him; his head (from behind, tipped up at the pane: Player.watch from the first frame) beside the
     pane at the same height, his teal shoulder and arm big and soft in the lower left; his body dead still. A slow
-    push in (ease_out: at speed on frame 1047, 0.54 block over the shot) with the handheld on top. Nothing else
-    moves: the two of them look at each other through "nights" 1051 .. "night" 1073 and the 0.9 s after it.
+    LINEAR push in (WINDOW_EASE, 0.54 block over the shot, 0.01 block a frame to the cut) with the handheld on top
+    (0.004). Nothing else moves: the two of them look at each other through "nights" 1051 .. "night" 1073 and the
+    0.9 s after it. Since the review of the whole-film preview the push is linear: with ease_out it came to a full
+    stop and 1088-1100 changed by 0.08-0.22 grey levels a frame, a paused picture before the cut (now 0.43-0.45 on
+    the preview, 1047-1060 0.45; the first and last frames are the same as before).
     THE CHILD STANDS ON THE CHAIR'S BACK (KID_WINDOW (11.75, -10.15, 2.0), the high east half of the oak stairs,
       top z 2.0; PLACES "window_chair" since the lead's pass), not on its seat: on the seat (11.25, -10.5, 1.5) its
       eyes are at z 2.16 (the first PLACES comment said 2.3), 0.16 above the sill, and from any camera outside only
@@ -242,7 +245,10 @@ def in17_window(st, s, C, nar):
       Still: out/test/hello_in_final_in17_window_1065_zones.png. UNDER THE LEAD'S MOON (north-east, behind the house):
       palette_check in17@1065 stone G/R 1.00, planks s 0.20, the child's skin rgb(115,83,78) s 0.32, shirt hue 191,
       trousers min channel 13 (limit 12: his legs are in the moon's shadow), hero child 100 % inside; whole frame luma
-      59 (was 79). Still: out/test/hello_lead_in17_window_1065_zones.png.
+      59 (was 79). Still: out/test/hello_lead_in17_window_1065_zones.png. WITH THE LINEAR PUSH (review pass):
+      out/test/hello_review_fix_in17_window_1100_zones.png; hello_palette in17@1065: trousers min channel 13, shirt
+      hue 190, G/R 1.00, hero child 100 % inside; in17@1100: trousers min channel 12 (AT the limit 12: his legs in
+      the moon's shadow), shirt hue 191, skin s 0.32, hero child x 49-59 %, y 53-58 %, 100 % inside: all pass.
     NEIGHBOURS: before, in16_empty; after, dn18_knock (outside: the zombie at the door, the same night). Hard cuts.
     """
     f0, f1 = s.frame_start, s.frame_end
