@@ -3,18 +3,20 @@
 bastion's dark red; gt19 is "the older version of the world": the SAME sky and set, block for block). One function
 per shot; the contract is in films/sixseconds_common.py (tags "gt...", C.actor, C.cam, C.lights, st.use / st.hero).
 
-STATUS: SHOT by the gate director (Nov 26) on the lead's stubs. What each shot now does (its docstring has the NOW
+STATUS: SHOT by the gate director (Nov 26) on the lead's stubs; the review's three findings fixed (gt01 f/1.6,
+gt03 the body turn, gt19 the glance). What each shot now does (its docstring has the NOW
 and MEASURED lines, the stills and the palette checks):
-  gt01  the hook portrait: his own camera in the landing's corner at 20 mm, a linear push straight at the brute (his
-        ear no longer leaves the frame: head x 10-54 %), the brothers re-spaced at the gold to his right
-  gt03  THE GATE FRAME: his eyes on the brothers on the cut, his head up to the gateway ON "guard" (clean profile)
+  gt01  the hook portrait: his own camera in the landing's corner at 20 mm f/1.6, a linear push straight at the brute
+        (his ear no longer leaves the frame: head x 10-54 %), the brothers re-spaced at the gold to his right, soft
+  gt03  THE GATE FRAME: his body and eyes on the brothers on the cut (face and belt to the lens), his head and body
+        round to the gateway ON "guard" (clean profile)
   gt04  the lead's run; the brute's head follows the runner down, then his body turns after him; the focus racks
         from the runner to the brute once he is past the lens; a neutral fill keeps the shirt teal
   gt17  one slow heavy step into the gateway (pre-rolled, planted by "waiting"), axe low, a slow push in
   gt18  THE GATE FRAME: the silhouette in the gateway, the flicker, the ears (the piglins placed once for gt19 too)
   gt19  the match cut; the runner far down the corridor's east side on the cut, through the brute's spot under
-        "older version", out of the frame's LEFT edge along the landing's foot by "before"; the crossbow piglin's head
-        follows him and goes back to the gold
+        "older version", out of the frame's LEFT edge along the landing's foot by "before"; once he has passed it the
+        crossbow piglin's head follows him over its right shoulder and goes back to the gold
 MOTION: out/test/sixseconds_gate_motion.mp4 (every frame of the six shots, 270x480, 5 samples, 24 fps).
 
 THE PLACE (engine/nether.py HOME; out/test/nether_map_home.png): the courtyard x 0..8, y -2..17, floor z 0; the
@@ -40,13 +42,14 @@ from mathutils import Vector
 GOLD = ("gold_1", "gold_2", "gold_3")
 # gt01: this shot's own camera (the set's six_landing moved into the landing's north-west corner, 20 mm) and the
 # brute's own spot near the landing's north-east corner, facing the lens; he looks just past it (LANDING_LOOK)
-LANDING_CAM = dict(pos=(0.15, 17.8, 5.8), target=(6.14, 14.17, 3.6), lens=20.0, fstop=2.8,
+LANDING_CAM = dict(pos=(0.15, 17.8, 5.8), target=(6.14, 14.17, 3.6), lens=20.0, fstop=1.6,
                    pos1=(0.456, 17.675, 5.79), target1=(6.14, 14.17, 3.6))
 LANDING_BRUTE = (2.72, 16.75, 4.0)
 LANDING_LOOK = (-0.1, 17.2, 5.6)
 LANDING_PIGS = ((7.35, 12.4, 0.0), (6.95, 11.8, 0.0), (7.35, 10.45, 0.0))  # the brothers at the gold, facing east
 # gt03: on the cut the brute looks down at his brothers at the gold (their heads), then to the gateway's mouth
 GUARD_DOWN = (6.6, 11.4, 1.7)
+BODY_LAG = 1                  # gt03: the body follows the head by a frame (the head leads, as a mob turns)
 # gt17: nether's corridor camera (35 mm f/2.4 from the corridor) with a slow push in; the brute's one slow, heavy step
 # from just inside the courtyard into the middle of the gateway (PLACES "gateway", facing out), pre-rolled
 WAIT_CAM = dict(pos=(3.6, 25.5, 1.55), target=(3.9, 19.0, 1.45), lens=35.0, fstop=2.4,
@@ -74,7 +77,9 @@ RUN_IN_FILL = dict(pos=(5.8, 13.5, 2.6), watts=60.0, color=(0.95, 0.98, 1.0))
 # 43), so "before they added me" plays over the empty gateway and landing. NOT nether's home_run_past (its leg
 # (4.5, 19) -> (6.4, 9) runs through piglin_gt2 at gold_2: the technical check). He ends behind the camera's plane.
 RUN_PAST = [(5.65, 26.4, 0.0), (4.5, 19.0, 0.0), (3.55, 10.2, 0.0), (2.45, 6.0, 0.0), (2.4, -1.2, 0.0)]
-GLANCE = (1216, 1238)     # piglin_xbow_gt3 (gold_3) follows the runner with its head on these frames
+GLANCE = (1231, 1241)     # piglin_xbow_gt3 (gold_3) follows the runner with its head on these frames: only once he
+                          # has crossed its line (y 12.8, on 1229), so the head turns over its RIGHT shoulder, its face
+                          # to the lens (from 1216 the clamped aim flipped 150 degrees in two frames, 1228-1230)
 
 
 def _gold_piglins(st, s, C, look="gold_target", idle=True):
@@ -102,7 +107,7 @@ def gt01_landing(st, s, C, nar):
       frame 1         the brute big at frame left, already in the push; the gold wall and three backs beyond
       "gold" 77       the gold wall readable as gold (hue 38-58, nether.check_still), the brothers' backs to him
     NOW: this shot's own camera LANDING_CAM (the set's six_landing moved into the landing's north-west corner,
-      (0.15, 17.8, 5.8), 20 mm f/2.8 at eye level), a slow LINEAR push of 0.33 block straight at the brute (his face
+      (0.15, 17.8, 5.8), 20 mm f/1.6 at eye level, focus on his head), a slow LINEAR push of 0.33 block straight at the brute (his face
       grows 129 -> 147 px over the shot: moving on frame 1); the brute at LANDING_BRUTE (2.72, 16.75) near the
       landing's north-east corner, facing the lens, looking just past it (LANDING_LOOK), dead still but his ears;
       the three piglins re-spaced along the gold (LANDING_PIGS (7.35, 12.4), (6.95, 11.8), (7.35, 10.45), facing east,
@@ -110,13 +115,17 @@ def gt01_landing(st, s, C, nar):
       THE FIX (the ear): from the stub's spot 2.4 blocks off a 26 mm lens, his head with its ears (1.0 block wide) and
       the three piglins did not both fit inside x 8-82 %; the camera went back into the corner (2.77 blocks from him),
       to 20 mm, and the push now runs along the line to him instead of across it (it carried him left).
+      THE APERTURE (the review): at f/2.8 the gold wall, the lantern, the piglins and the back wall were all nearly
+      sharp (the wide lens the corner forces); at f/1.6 he stays sharp (about 0.6 block deep at 2.8 blocks: face,
+      ears, belt, axe) and the brothers, the gold and the lantern go soft and glowing, as the story and the
+      reference reels have them.
     MEASURED (tools.sixseconds_geo gt01_landing:1 / :97; still out/test/sixseconds_gate_gt01_landing_77_zones.png):
       his head (ears included) x 14.4..52.6 % on frame 1 and x 10.3..53.7 % on 97, y 26-41 %; eyes x 33 %, y 32-33 %;
       face 129 -> 147 px, 13 degrees off the lens. The piglins' heads x 54-77 %, y 52.5-59 % (backs and profiles,
       83-140 degrees off), the gold wall beside his right arm and behind the piglins (x 50-80 %, y 40-55 %), the
       golden axe at his right hand (x 15-20 %, y 52-65 %). Preview frames 1-97: the push reads (1 against 97).
-      Palette 77 (out/test/sixseconds_pal_gt01_landing_77.png): brute x 19-49 %, y 27-40 %, 100 % in the safe area,
-      x 2.43 the blackstone (with KEY_LANDING), gold hue 45 s 0.80: all pass.
+      Palette 77 at f/1.6 (out/test/sixseconds_pal_gt01_landing_77.png): brute x 19-49 %, y 27-40 %, 100 % in the
+      safe area, x 2.44 the blackstone (with KEY_LANDING), gold hue 45 s 0.80 (the blurred gold holds): all pass.
     FALLBACKS TAKEN (the set's): not the scripted LOW LONG lens (the landing is 3 blocks wide; a lower lens loses
       the piglins behind its edge: nether's note, ray-checked); the "lantern as key" is the film-local fill
       KEY_LANDING (the Bastion has no edit hook for a lantern block). Lava glow from below: only the look's
@@ -152,24 +161,35 @@ def gt03_guard(st, s, C, nar):
       "guard" 204     the brute on guard, still (ears, a breath: not a statue)
     SHARED: CAMS["gate"] exactly (C.cam(s, "gate")); PLACES "landing" (+ look "landing_look_gate": the gateway's
       mouth: his head 88 degrees off the lens, a clean profile); "gold_1".."gold_3".
-    NOW: the gate frame exactly; the piglins idle (glances, arm bob, ears). The brute's one action is the beat's:
-      on the cut ("Somebody") his eyes are down on his brothers at the gold (GUARD_DOWN: his face turns toward the
-      lens, three-quarter), on "has" (196) his head turns up to the gateway's mouth and arrives ON "guard" (204): the
-      clean profile, then dead still but his ears to the cut (the brothers are busy with gold, so he watches the
-      door). Something moves on frame 1: the piglins' ears and arms, the lava's animated surface in the gateway.
-      Hero: the brute.
-    MEASURED (stills out/test/sixseconds_gate_gt03_guard_183.png (eyes down, face to the lens) and _212.png (profile);
-      preview frames 179-239): the turn reads at phone size on the 196-204 frames; brute head x 20-24 %, y 32-36 %
-      (10 % of the frame height). Palette 212 (out/test/sixseconds_pal_gt03_guard_212.png): brute x 20-24 %,
-      y 32-36 %, 100 % in the safe area, gold hue 44 s 0.79, piglin skin hue 21 s 0.59: all pass.
+    NOW: the gate frame exactly; the piglins idle (glances, arm bob, ears). The brute's one action is the beat's,
+      done with his WHOLE BODY (the review: a head turn alone on a head 20 px wide did not register at phone size):
+      on the cut ("Somebody") his body and eyes are on his brothers at the gold (C.put toward GUARD_DOWN: he faces
+      the lens three-quarter, face and gold belt lit, the gt01 brute at a glance); on "has" (196) his head turns up
+      to the gateway's mouth and his body (a frame behind: BODY_LAG) back to his post's own yaw C.yaw("landing"),
+      both arriving ON "guard" (204): the clean profile, then dead still but his ears to the cut (the brothers are
+      busy with gold, so he watches the door). The body ends on the yaw gt04 starts from: the cut into gt04 is
+      unchanged. Something moves on frame 1: the piglins' ears and arms, the lava's animated surface in the
+      gateway. Hero: the brute.
+    MEASURED (tools.sixseconds_geo gt03_guard:179..239; stills out/test/sixseconds_gate_gt03_guard_183_zones.png
+      (front: face and belt to the lens) and _212_zones.png (profile); preview frames 179-239): his head 24 degrees
+      off the lens on 179-196 (pitch -30: on his brothers), 28 on 198, 52 on 200, 79 on 202, 92 on 204 and still to
+      239 (pitch -25); head x 17-26 % -> 19-26 %, y 32-36 % (10 % of the frame height). From 204 on every frame is the
+      same picture as before the review (the preview kept them: unchanged fingerprints). Palette 183
+      (out/test/sixseconds_pal_gt03_guard_183.png): brute x 19-24 %, y 32-36 %, 100 % in the safe area, x 3.05 the
+      blackstone, gold hue 44 s 0.79, piglin skin hue 21 s 0.59; palette 212: brute x 20-24 %, 100 % in the safe
+      area, gold hue 44 s 0.79, piglin skin hue 21 s 0.59: all pass.
     NEIGHBOURS: before, rw02_ingots; after, gt04_runin (inside the gateway, the runner comes at the lens).
     """
     f0, f1 = s.frame_start, s.frame_end
     brute = C.actor("brute", "gt")
-    C.put(brute, f0, "landing")
-    brute.look_at(f0, Vector(GUARD_DOWN), ease=0)            # on the cut: his eyes on the brothers at the gold ...
-    turn = C.at(s, "has")
-    brute.look_at(turn, Vector(C.P("landing_look_gate")), ease=C.at(s, "guard") - turn)    # ... to the gateway
+    C.put(brute, f0, "landing", toward=GUARD_DOWN)           # on the cut: his body and eyes on the brothers ...
+    brute.look_at(f0, Vector(GUARD_DOWN), ease=0)
+    turn, land = C.at(s, "has"), C.at(s, "guard")
+    # ... then his whole body back to his post's own yaw (the one gt04 starts from) and his head up to the gateway's
+    # mouth, both landing ON "guard": the head leads by a frame. The body's keys go in first, so that the head's aim
+    # at "guard" is taken against the body's final yaw (Character.look_at aims at its end frame)
+    brute.turn(turn + BODY_LAG, C.yaw("landing"), ease=land - turn - BODY_LAG)
+    brute.look_at(turn, Vector(C.P("landing_look_gate")), ease=land - turn)
     brute.flop_ears(f0, f1 + 1)
     st.use(s, brute)
     _gold_piglins(st, s, C)
@@ -378,9 +398,12 @@ def gt19_older(st, s, C, nar):
       -> the brute's spot (4.5, 19) -> (3.55, 10.2) -> (2.45, 6.0) -> (2.4, -1.2), iron pickaxe in hand from 1180: on
       the cut a small figure far down the corridor's east side, through the brute's spot without slowing, then down
       the courtyard's WEST side along the landing's foot and out of the frame's LEFT edge, ending behind the camera's
-      plane. The piglins of gt18 (nothing re-keyed on the cut); from 1216 the crossbow piglin's head follows him over
-      its shoulder (its face to the lens, clamped at 75 degrees: piglins look at a player near them, and this one wears
-      gold) and is back on the gold by 1247 (GLANCE). Hero: the runner.
+      plane. The piglins of gt18 (nothing re-keyed on the cut); from 1231, once he has crossed its line, the crossbow
+      piglin's head follows him over its RIGHT shoulder (its face to the lens, clamped at 75 degrees: piglins look at a
+      player near them, and this one wears gold) and is back on the gold by 1250, before "before" (GLANCE 1231-1241).
+      THE GLANCE (the review): from 1216 it began while he was still behind the piglin's left shoulder: the head
+      went to the +75 clamp (its back to the lens) and flipped to -75 in two frames (1228-1230) when he crossed
+      y 12.8. Hero: the runner.
       WHY THE LEFT EXIT (the story check asked for the exit by about 1244, with "from before they added me" over the
       empty frame): the right edge is reached only near the lens (the gold piglins stand on that side), so the stub's
       right exit took 49 frames from the spot; the left one takes 43, which let the start move 0.9 block further down
@@ -395,9 +418,13 @@ def gt19_older(st, s, C, nar):
       sliver at the left edge on 1248-1249), during "from" (1247-1250): "before they added me" plays over the empty
       gateway and landing, 40 frames to the cut. Closest to a gold piglin: about 2.6 blocks (gold_2). The match cut (1179 against 1180, 540x960 16 samples): outside the gateway's
       column (x 25-55 %) the frames differ by a mean of 0.18 / 255 (piglins 0.23): only the brute is gone.
+      The crossbow piglin's head (tools.sixseconds_geo --who piglin_xbow_gt3 gt19_older:1216..1289): 90 degrees off
+      the lens (its profile, on the gold) to 1231, 80 on 1233, 58 on 1235, 35 on 1237, 25 on 1239-1243 (its face to
+      the lens, the runner at x 6-15 %), 58 on 1246, 81 on 1248, 90 again from 1250: at most 11-12 degrees a frame,
+      no flip (stills out/test/sixseconds_gate_gt19_older_1230_zones.png, _1240_zones.png).
       Palette 1240 (out/test/sixseconds_pal_gt19_older_1240.png, the final run: he is leaving by the left edge, the
-      crossbow piglin's face turned to him): shirt hue 173, trousers min channel 21, runner 89 % in the safe area (he is
-      on his way out), gold hue 44 s 0.79, piglin skin hue 21 s 0.57: all pass.
+      crossbow piglin's face turned to the lens): shirt hue 173, trousers min channel 21, runner 89 % in the safe area
+      (he is on his way out), gold hue 44 s 0.79, piglin skin hue 20 s 0.59: all pass.
     NEIGHBOURS: before, gt18_nocome (the match cut); after, pt20_likes (the pit camera: in that bastion, everyone
       likes gold).
     """

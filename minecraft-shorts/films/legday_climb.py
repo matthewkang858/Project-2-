@@ -7,11 +7,13 @@ STATUS: SHOT by the climb director (after the lead's stubs). The four shots are 
 repeated at dusk frame for frame:
   cl11 / cl22  CLIMB_CAM, a crane riding up with the four from the road south-east of them (24 mm, rising from 3 to
                10 blocks and backing off east while it pans to the shelf), the four staggered 1.6 steps apart in a
-               diagonal across the frame (CLIMBERS), each looking up the stair (LOOK_AHEAD), an anvil in every right
-               hand; by "wall" / "dark" the shelf with its planks and anvils has come in at the upper right.
+               diagonal across the frame (CLIMBERS), each looking up the stair (LOOK_AHEAD), each at his own point
+               of the leg cycle (the stride leads: no lockstep), an anvil in every right hand; by "wall" / "dark"
+               the shelf with its planks and anvils has come in at the upper right.
   cl12 / cl23  LEGS_CAM, low on their right side 28 degrees behind square, tracking up the stair at 92 % of their
                pace (25 mm f/2.4): Kai's legs big in their stride at the left, Steve's legs a step above and ahead,
-               the anvils in their right hands on the camera's side, the treads sliding down past them.
+               the anvils in their right hands on the camera's side, the treads sliding down past them; both at
+               full stride on "leg" and "day", Kai with his other leg forward (the stride leads of LEGGERS).
 Every shot of the sequence moves on frame 1 (the walks are at speed from the first frame, the cameras linear) and
 has no handheld (the repeats; see below). tools/legday_climb_check.py (this sequence's own: the repeats with every
 climber and the camera, legs, feet on the treads, nobody in a block or topping out) passes; tools/legday_climb_probe.py
@@ -216,7 +218,8 @@ def cl11_climb(st, s, C, nar):
     stone wall with a long stair, walking up stairs.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 669       the four already climbing (placed on 669, walking at speed from it), the camera drifting
+      frame 669       the four already climbing (walking at speed on it: their walks start 0-9 frames before), the
+                      camera moving
       "carry" 686 .. "anvils" 705   the anvils in their hands (held items: they read from the side and below)
       "wall" 723      the whole height of the wall, the stair, the shelf hanging out over the road against the sky
       the shelf       EIGHT anvils on it (the lead's SHELF "eight": planks 3..10; the 12th piston at the north end is
@@ -234,7 +237,8 @@ def cl11_climb(st, s, C, nar):
       ANVILS SHOW ONLY AS A SLIVER over the planks from below. From across the road (b11e, 18 mm): the anvils read,
       the climbers small at the left edge. The lead's scouting of the choice: see films/legday_common.py CAMS
       "climb". THE LEAD'S SCOUT (the stubs, 540x960, 16 samples): out/test/legday_scout_cl11_climb_704.png and
-      legday_scout_cl22_dusk_1408.png (the same frame + 35 under both skies: they read as two times of day; re-rendered after review: _1408);
+      legday_scout_cl22_dusk_1408.png (the same frame + 35 under both skies: they read as two times of day;
+      re-rendered after review: _1408);
       a middle camera from (11.0, 28.0, 0.9), 24 mm (legday_scout_climbvar_cl11_climb_704_v0.png) made the climbers
       smaller, still hid the anvils behind their planks and put meadow tufts in the lens: not adopted. In the stub
       In the first stub Steve (step 3.75, walking at a quarter pace) was cut by the left edge on 704. If you need
@@ -244,9 +248,20 @@ def cl11_climb(st, s, C, nar):
       backing off to (12.5, 31.5, 10) at a constant rate, its aim panning from the climbers to the shelf's south
       end; focus riding on Kai's head). Steve, Kai, Zuri, Ari from steps 3.0 / 4.6 / 6.2 / 7.8 (1.6 apart: a
       diagonal across the frame from lower left to upper right), a step every 8 frames from frame 1, each looking up
-      the stair (LOOK_AHEAD), a whole anvil in every right hand (the morning). The shelf comes in at the upper right
-      from "up" (717): eight anvils on their planks against the sky by "wall" (723). Hero: the climbers.
-      MEASURED_CL11
+      the stair (LOOK_AHEAD), each at his own point of the leg cycle (stride leads 0 / 9 / 3 / 6 frames: no
+      lockstep), a whole anvil in every right hand (the morning). The shelf comes in at the upper right from
+      "anvils" (705): eight anvils on their planks against the sky by "wall" (723). Hero: the climbers.
+      MEASURED (the climb director; tools/legday_climb_probe at 669 / 686 / 705 / 723 / 738; tools.legday_palette
+      723; renders out/test/legday_pal_cl11_climb_723[_zones].png (540x960, 16 samples), the motion
+      out/test/legday_climb_motion.mp4): the climbers 100 % inside the safe area on every frame probed (heads
+      x 15-70 % y 34-56 % on 669, x 10-48 % y 35-50 % on "wall"), faces (Steve / Kai) 42 / 34 px on 669, 35 / 29 on
+      "carry", 26 / 22 on "wall" (Zuri / Ari 20 / 18 there), nobody blocked; their anvils clear on every frame,
+      Steve's lowest at y 57-61 % on 669 (above the caption band); the shelf's first anvil enters at x 90 % on
+      "anvils" (705), x 78-92 % on "wall" (4-6 of 9 points of each anvil seen over its plank: dark blocks on the
+      planks against the sky), x 68-84 % at the end. palette_check 723: stone G/R 0.94, planks s 0.49, hero 'climbers'
+      x 12-47 %, y 36-50 %, 100 % inside: all pass. On the motion: the crane's rise and the four climbing read as
+      one move; the wall's foot with the grass on the first frames, the road and the meadow at the lower right at
+      the end. NOT DONE: the anvils on the shelf are never seen from above (tp13 does that).
     """
     _climb(st, s, C, "cl", "gold")
 
@@ -281,7 +296,17 @@ def cl12_legday(st, s, C, nar):
       side. Kai's legs big in their stride at the left, Steve's legs a step above and ahead, the lit treads and
       shaded tread fronts sliding down past them; on "leg" (755) .. "day" (761) both pairs mid-stride. Hero: the
       legs (both pairs).
-      MEASURED_CL12
+      MEASURED (the climb director; tools/legday_climb_probe every 4th frame; tools.legday_palette 755; renders
+      out/test/legday_pal_cl12_legday_755[_zones].png (540x960, 16 samples), the motion
+      out/test/legday_climb_motion.mp4): the legs hero 85-100 % inside the safe area (93-100 % from "it" 752 on,
+      100 % on "leg"; on 739-747 Kai's back foot dips to y 63-66 %, the top of the caption band), both pairs of
+      legs and both anvils seen (never blocked by a step: the legs' points probed), Steve's anvil x 64-88 %
+      y 16-32 %, Kai's x 33-63 % y 37-56 %; head boxes about 80 px (Kai) and 72 px (Steve) wide, seen from behind
+      their right shoulders (the backs and sides of their heads: a legs shot). palette_check 755: stone G/R 0.95,
+      Steve's shirt hue 177, pants min 54, hero 'legs' x 12-76 %, y 26-57 %, 100 % inside: all pass. On "leg"
+      and "day" both are at full stride (the stride leads), Kai with his other leg forward;
+      tools/legday_climb_check: swing 67 degrees, a step every 8.1 frames, feet on the treads on every frame.
+      The first stub's numbers for comparison: x 1-55 %, y 12-98 %, 23 % inside.
     """
     _legs(st, s, C, "cl2", "gold")
 
@@ -321,7 +346,15 @@ def cl22_dusk(st, s, C, nar):
       indigo sky with stars and pink clouds at the upper right, the anvils in hand CHIPPED; the shelf with eight
       chipped dusk anvils comes in at the upper right from "back" .. "up" (1410-1417) and holds through "dark" (1429).
       Hero: the climbers.
-      MEASURED_CL22
+      MEASURED (the climb director; tools.legday_palette --sky dusk 1429; renders
+      out/test/legday_pal_cl22_dusk_1429[_zones].png (540x960, 16 samples), the motion
+      out/test/legday_climb_motion.mp4): palette_check 1429 ("dark"): stone G/R 0.93, planks s 0.44, hero
+      'climbers' x 10-47 %, y 35-51 %, 100 % inside: all pass. The face lanterns over the stair glow and light the
+      climbers from above; indigo sky with stars and pink clouds at the upper right; the shelf with the dusk anvils
+      at the upper right from "back" on. tools/legday_climb_check: cl22's first 70 frames are cl11's, every
+      climber and the camera, largest difference 0.00001; cl22's last three frames (1443-1445) continue the move
+      (73 frames planned in CLIMB_FRAMES 76). The dip (1370-1376) is the encoder's: the preview frames show the
+      climb through it, nothing begins there.
     """
     _climb(st, s, C, "cl3", "dusk")
 
@@ -344,6 +377,11 @@ def cl23_legday(st, s, C, nar):
       passes.
     NOW: _legs exactly as cl12 (LEGS_CAM, LEGGERS; all 45 frames are cl12's, the camera included:
       tools/legday_climb_check) under the dusk lights (1.4), the anvils in hand CHIPPED. Hero: the legs.
-      MEASURED_CL23
+      MEASURED (the climb director; tools.legday_palette --sky dusk 1462; renders
+      out/test/legday_pal_cl23_legday_1462[_zones].png (540x960, 16 samples), the motion
+      out/test/legday_climb_motion.mp4): palette_check 1462 ("leg"): stone G/R 0.95, Steve's shirt hue 178, pants
+      min 36, hero 'legs' x 12-76 %, y 26-57 %, 100 % inside: all pass. The same poses as cl12 on the same frames
+      (tools/legday_climb_check: largest difference 0.00001, camera included), lit from above-left by the lantern
+      at (-1, 37, 14), the stone grey-blue; the anvils chipped (stage 1).
     """
     _legs(st, s, C, "cl4", "dusk")

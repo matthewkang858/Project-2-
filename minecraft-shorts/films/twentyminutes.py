@@ -1,4 +1,4 @@
-"""Twenty Minutes: NARRATED SECONDS (FRAMES frames), 24 sentences, 25 shots, one sky. Told by a baby villager who grows
+"""Twenty Minutes: 64.25 narrated seconds (1542 frames), 24 sentences, 25 shots, one sky. Told by a baby villager who grows
 up during the film (a baby villager grows up in twenty minutes: a Minecraft day).
 
     "In this village, everyone is afraid of the player. ... I'm afraid of the zombie. Apparently that counts."
@@ -33,6 +33,8 @@ itself: films/twentyminutes_set.py, built on engine/towers.py):
     $BPY -m tools.twentyminutes_shots tiles; ... sheet   # one tile per shot -> out/test/twentyminutes_shots_sheet.png
     $BPY -m tools.twentyminutes_geo ce23_afraid:1450     # heads, face pixels, angle to the lens, what blocks them
     $BPY -m tools.twentyminutes_palette 1450             # tools/palette_check on one frame at final quality
+    $BPY -m tools.twentyminutes_probe [events looks heroes cams missing]   # the BUILT film measured, no render: every
+                                                         #   event's frame, every look vs the zombie, hero boxes
     $BPY -m render twentyminutes --still 12.0 --zones    # one frame through render.py
     $BPY -m render twentyminutes --frames gm11_lava --res 270x480 --samples 7 --threads 2    # one shot as a
                                                          #   preview (each sequence its own sample count: _common)
@@ -43,13 +45,44 @@ THE VOICE IS COMMITTED (am_michael, speed 1.0; the last line "Apparently that co
 the storyteller slows down for the punchline; "lives" respelled "livs" for the voice only: the phonemiser said
 /laɪvz/, the noun; the caption keeps "lives"). Changing a word, a pause, the voice or a speed below makes
 narration/twentyminutes.json stale (build stops) and, once spoken again, moves every cut after it: do not, unless the
-orchestrator says so. VOICE_NOTES.
+orchestrator says so. Spoken twice by the lead, through tools/twentyminutes_narrate.py: tools/narrate.py's own narrate()
+with its two deterministic steps (the voice per sentence, the recogniser's second opinion per sentence) memoised on
+disk, so that it can be resumed (one uninterrupted run of tools/narrate.py took more than 300 s on this machine at load
+18-19, 8-15 s a sentence for the voice alone; `$TTS tools/narrate.py twentyminutes --check` says "current"). First
+63.83 s: the caption check failed, "the" of "at the top" on screen for ONE frame (the voice said "at the" in 0.15 s
+and engine.narration's min_frames cannot lengthen it there); so "My mom lives ..." at 0.95 (its words 2-3 frames
+each), its pause 0.5 -> 0.65 (the straw hat after the cut holds 1.75 s) and the pause after "The water pushes it into
+the lava." 0.75 -> 0.95 (the puff after the drop): 64.25 s = 1542 frames, inside the 58-66 s asked. No word was cut
+(161). Pronunciation checked with --phonemes: "lives" respelled (above); grownups, staircase, Childhood, Apparently,
+zombie, golem, poppies said right as written. The recogniser hears "fit." 115 ms later than the voice model's timing
+(narrate.py CHECK; its second opinion runs EARLY inside speech as a rule): the model's timing is used. Nobody has
+listened to it (no audio playback here): the pace was judged by measurement (3.46 words/s while speaking).
 
 GUARDED BUILD: each sequence file is imported, and each shot function called, inside a guard (see STRICT below): a
 broken file or shot prints "[twentyminutes] !!! ..." and gets a stand-in; TWENTYMINUTES_STRICT=1 makes errors fatal.
 
 THE EDIT (the story's devices, designed into the plan below)
-EDIT_NOTES
+  * ONE SHOT PER BEAT, 25 shots, 1.75 to 3.67 s each (none under 1.2 s, none over 5 s), with two exceptions:
+  * BEAT 4 IS TWO SHOTS, cut inside the line before "glass" (230): sq04_tilt (CAMS "tilt": a real, even tilt of 11.7
+    degrees from the ground by the well's wall past the baby's shoulder up to the tower, from CAMS "plaza"'s lens,
+    ending 2.5 degrees above its aim with the pod in the safe area: "My mom lives at the top of his") and sq04_hat (the
+    200 mm straw hat at the glass: "glass tower now"): the story's own fallback, Mom is a few pixels from the square.
+  * BEATS 23 AND 24: ce23_afraid (the window camera) is HELD through "Apparently that" ("Same shot, held"), and the cut
+    falls ON "counts" (1473: "that" runs into it, so the cut is on the word's own first frame) to gm24_counts on
+    CAMS "platform": the story's own fallback for the last line ("cut on that word to the low-angle platform framing
+    of line 9 with the grown narrator now among the shapes behind the glass"). The platform is empty for 10 frames,
+    then the golem appears out of nothing (1483), turns its head, steps and begins to slide; 2.3 s after the word the
+    picture goes black (END_BLACK) before it reaches the rim.
+  * THE JUMP CUT gm09 -> gm10: the identical framing (CAMS "platform", the same handheld seed), the platform EMPTY for
+    15 frames while "It comes" is spoken (592-606), a new golem on the same block ON "every" (607), its step on
+    "time".
+  * THE LOCKED FRAMING gr17 / gr19 (CAMS "grow", the same handheld seed): Mom as the height ruler; the baby becomes
+    the grown narrator in one frame ON "ended" (1178): 35 frames of the baby before it in gr19, 32 after it.
+  * THE SECOND BED: P.bed2 is in every shot from gr21_count on (BED2_FROM: build() st.use's it), never before; it
+    appears ON the frame gr21 gives C.bed2_at (the stub: 1304, on Steve's swing after "brought").
+  * THE TOP STEP: never registered with the Stage: it stands in gp13-gp20 and gp22 breaks it.
+  * NO DIP TO BLACK inside the film: one day, one light (SKIES); the twenty minutes pass in the words and the swap.
+  * THE END: "counts" is held 2.0 s, then the last 6 frames are black (1537-1542, END_BLACK); the Reel loops to frame 1.
 """
 import importlib
 import os
@@ -95,7 +128,9 @@ def _import(seq):
 
 
 # The narration: stories/ironfarm.json word for word, one entry per sentence (161 words). Pauses are after the
-# sentence, voice to voice; default 0.35 s. PAUSE_NOTES
+# sentence, voice to voice; default 0.35 s. Spoken length 46.6 s; with these pauses (15.15 s), the lead 0.3 s and the
+# tail 2.3 s the film is 64.25 s = 1542 frames. The story's risk "LENGTH" asked to open the pauses after the short
+# lines so that each shot runs about two seconds, a second after "ended" and a two-second tail: done (the comments).
 NARRATION = {
     "voice": "am_michael", "speed": 1.0,
     "tail": 2.3,                                    # the last image holds two seconds after the last word, then the

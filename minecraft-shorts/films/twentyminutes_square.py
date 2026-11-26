@@ -3,8 +3,13 @@
 the contract is in films/twentyminutes_common.py (tags "sq...", C.actor, C.cam, C.lights, st.use / st.hero).
 
 THE PLACE (films/twentyminutes_set.py, WHERE EVERY BEAT IS FILMED; engine/towers.py ANCHORS): the plaza east of the
-  well (the well x -3..2, y -3..2); CAMS "plaza" low on the path east of it at (9.3, -0.6, 0.75), 40 mm, looking
-  north-west over the well at the tower above the roofs (house_c at the left with its door, house_e at the right).
+  well (the well x -3..2, y -3..2); CAMS "plaza" low on the path east of it at (9.3, -0.6, 0.55) (the baby's eye
+  height: 0.2 lower than the set's b01, so the baby's head stays above the caption band), 40 mm, looking north-west over
+  the well at the tower above the roofs (house_c at the left with its door, house_e at the right). The plaza lamp post
+  that stood at (-7, 9), right behind the baby's head in this framing, is TAKEN OUT of this film's village
+  (films/twentyminutes_set.py LAMP_OUT; both reviews found the tangent).
+THIS SEQUENCE OWNS (the contract, amended): CAMS "plaza", "tilt", "hat" and PLACES "baby_square" (nobody else uses
+  them): you may redefine each ONCE as a constant here, used by every shot that shares it; say so in your result.
   The baby's spot PLACES "baby_square" (6.38, 1.16) = tm_baby_square, facing north-north-east (C.yaw("tm_baby_square")).
   Steve's paths: tm_steve_square (-1.0, 7.3) -> (8.3, 0.7) (at the lens, passing the baby 1.4 to its right),
   tm_steve_past (4.5, 0.64) -> (6.55, 3.1) (between the b02 lens and the baby), tower_push_square (6.5, 6.0) ->
@@ -45,14 +50,19 @@ def sq01_afraid(st, s, C, nar):
                         before the armorer reaches it, shuts one frame after the shepherd is in)
       the whole shot    the baby lower middle, above the caption band, ITS NOSE (three-quarter from behind), its head
                         tilting up as he comes; the tower a bright shape above the roofs
-    SHARED: CAMS "plaza" (= the end of sq04_tilt's move: the two frames must match), PLACES "baby_square".
+    OWNED (this sequence's): CAMS "plaza" (sq01 only now: sq04_tilt has its own move), PLACES "baby_square".
     NEIGHBOURS: first shot of the film; after, sq02_imnot (the baby's face, Steve's legs crossing).
-    MEASURED (the set builder, still _afraid at f0 + 22 / _afraid_door): the baby x 48 / y 56 %, Steve x 73 / y 41 %,
-      the armorer and the shepherd only heads and shoulders over the well's base (13 / 45, 23 / 46), the door x 10 /
-      y 44 %, the pod's front y 17 %. THE BABY'S HEAD READS AS A BLANK PINK BOX in that still (it looks ahead and up,
-      away from the lens): the story wants its nose: cheat its look toward the lens' side (C.cheat / C.to_lens: The
-      Hello's lesson, a villager's head turned far from the lens is a box). The lamp post at (-7, 9) stands under the
-      tower in the middle of the frame.
+    MEASURED (the lead, after the reviews; tools/twentyminutes_probe heroes and tools.twentyminutes_geo sq01_afraid:1 /
+      :44 / :70, lens at z 0.55): the baby's head box x 28-66 / y 36-57 % (f1), 23-65 / 35-59 (44), 20-63 / 35-60
+      (87): ABOVE the caption band (with the set's lens at 0.75 it reached y 64-66 %); its nose is 95-96 degrees off
+      the lens: in the still out/test/twentyminutes_scout_sq01_afraid_44_zones.png it READS AS A BLANK PINK BOX (the
+      story wants its nose, three-quarter from behind): cheat its look toward the lens' side (C.cheat(..., max_off=80)
+      or C.to_lens; its body is about 99 degrees from the lens, so the head alone can bring the nose to about 30:
+      C.cheat now warns when the head cannot reach); the lamp post is gone from behind its head (the set). Steve:
+      eyes 70 / 43 % on f1, 80 / 31 % on 44 (head x 71-90: into the icon column as he nears), past the lens by 70.
+      The armorer and the shepherd: on f1 BEHIND THE BABY'S HEAD (x 42 / 56 %), by 44 at the left edge (x 4 / 8 %,
+      the armorer behind the well's wall): they read only between f1 + 10 and 44; the door x 10 / y 44 %. The pod's
+      glass y 8-22 % (its roof under the top icons: background here).
     NOW (stub = the set's stage_b01): CAMS "plaza", focus on the baby; the baby on baby_square looking 2 ahead and up,
       tilting to 3.4 up from f0 + 30; Steve along tm_steve_square from f0; the two along their flee paths (the
       shepherd 5 frames later), the door open / shut on the set's offsets. Hero: the baby.
@@ -100,7 +110,9 @@ def sq02_imnot(st, s, C, nar):
     NEIGHBOURS: before, sq01_afraid (Steve coming at the lens); after, sq03_grownups (the push).
     RISKS / KNOWN: "his shadow crosses its face" cannot be had under this sun (north-north-east: his shadow falls
       south-west, away from the baby, whichever side of the lens he passes): not had, the legs are the beat.
-    MEASURED (the set builder, still _imnot at f0 + 14): the face x 50 / y 44 %.
+    MEASURED (the set builder, still _imnot at f0 + 14): the face x 50 / y 44 %. The lead's probe (heroes): the baby's
+      head box x 16-79 / y 17-58 % on f1, 11-93 / 17-61 on 109, 12-104 / 15-61 on the last frame: AS ITS HEAD FOLLOWS
+      STEVE IT RUNS OFF THE RIGHT EDGE (into the icon column from about 100): keep the head turn small or frame wider.
     NOW (stub = the set's stage_b02): camera "set:b02" (4.69, 2.57, 0.72) -> the baby, 50 mm f/2; Steve along
       tm_steve_past from f0 + 6; the baby's head on him every 4 frames. Hero: the baby.
     """
@@ -146,7 +158,9 @@ def sq03_grownups(st, s, C, nar):
       towers.push place()s both ON its frame: start it ON f0 (they are in sq02 / sq01 before: no pre-roll).
       In sq03 (on the plaza, before the pod) Mom may look where the push takes her: the story's "Mom never looks at
       me" starts with the pod.
-    MEASURED (the set builder, still _push at f0 + 40): Mom x 44 / y 43 % (hat brim and nose to the lens).
+    MEASURED (the set builder, still _push at f0 + 40): Mom x 44 / y 43 % (hat brim and nose to the lens). The lead's
+      probe (heroes): Mom's head box x 36-55 (f1), 19-42 (159), -5..29 on the last frame: SHE LEAVES BY THE LEFT EDGE
+      (the push was shortened to the shot, the set's linear pan was not): slow the pan or end it earlier.
     NOW (stub = the set's stage_b03, the push from f0): camera "set:b03" (towers' push_square, panning LINEAR along
       the plaza's north path), focus on Mom; her head turned 2 west, 2.2 north, 1.6 up every 12 frames; the baby on
       push_baby runs from f0 + 24 to 1.2 behind Steve. Hero: Mom.
@@ -199,22 +213,30 @@ def sq04_tilt(st, s, C, nar):
     visible on the tower's flank, rack focus.
 
     MUST BE SEEN, ON WHICH WORD
-      frame 1           the tilt already moving (C.cam ease "ease_out"), the baby's shoulder and the well
-      "top"             the tower above the roofs, the focus going to it (C.rack)
-      the last frame    EXACTLY CAMS "plaza"'s framing (the move ends on it: CAMS["tilt"] is built from it)
-    SHARED: CAMS "tilt" (ends on CAMS "plaza", sq01's framing), PLACES "baby_square".
+      frame 1           the tilt already moving (CAMS "tilt" is LINEAR: an even 0.27 degrees a frame), aimed down past
+                        the baby's shoulder at the ground, the well's mossy wall at the left, the tower above the frame
+      "mom" .. "lives"  the tower entering from the top as the camera tilts up
+      "at" .. "top"     the focus racks from the baby to the pod (C.rack from "at", 10 frames: sharp from 222)
+      the last frames   the pod in the upper part of the frame, inside the safe area (y about 13-27 %), sharp
+    OWNED (this sequence's): CAMS "tilt" (REDEFINED by the lead after both reviews: the set's b04 was a 5.5-degree pan
+      plus a 0.8-degree tilt, 78 % of it in the first ten frames, ending on sq01's framing), PLACES "baby_square".
     NEIGHBOURS: before, sq03_grownups; after, sq04_hat: THE CUT INSIDE THE LINE (before "glass") to the straw hat.
     FALLBACKS APPLIED (story risk "MOM AT THE TOP OF THE TOWER"): from the square she is a few pixels: the cut inside
       the line to the 200 mm straw hat (sq04_hat). The orange glow under the rim and the dirt zigzag CANNOT be seen
       from the square (the slot is behind the pod's west side, the stairs on its back): they are seen in gm09-gm11 and
-      gp13 instead (engine/towers.py NOT THE GAME; the set builder's limits).
-    MEASURED (the set builder, still _tilt_b at the end): it ends on b01's framing. TANGENT: the plaza lamp post at
-      (-7, 9) meets the top of the baby's head when it looks up at the pod (moving the baby 0.25 to the lens' right
-      would clear it, but sq01 / sq02 share its place: say so in your result if you want PLACES "baby_square" moved).
-      The baby's head from behind reads as a pink box in _tilt_b (it looks up at the pod, away from the lens).
-    NOW (stub = the set's stage_b04): CAMS "tilt" with ease_out; the baby on baby_square looking at the pod
-      (pod_target); Mom on mom_glass on the zombie (C.on_zombie); the zombie in its cell (look=Mom); the focus on the
-      baby, racked to the pod's front from "top". Hero: the baby.
+      gp13 instead (engine/towers.py NOT THE GAME; the set builder's limits). The bell (-1.5, -2.5) is 36 degrees left
+      of the tilt's start: the well only.
+    MEASURED (the lead: tools/twentyminutes_probe cams / heroes, stills out/test/twentyminutes_scout_sq04_tilt_187 /
+      _208 / _229 (+ _zones; 270x480, 8 samples; 187 and 229 rendered before the last 0.3-degree adjustments)): heading
+      / pitch 153.8 / -8.5 (187), 151.1 / -2.8 (208), 148.4 / +2.9 (229); the baby's head box x 46-84 / y 18-40 % (187:
+      upper right of the middle), 37-75 / 30-51 (208), 27-65 / 41-62 (229: its chin on the caption band's top edge,
+      soft by then); the pod's glass about y 13-27 % at the end, Mom's head x 53 / y 17-19 % (a few pixels). THE
+      BABY'S HEAD IS A BLANK PINK BOX from behind (off the lens 165 degrees: it looks at the pod, which is straight
+      down the lens' axis): over the shoulder this is the back of its head; a cheat of its look 30-40 degrees to the
+      lens' side would show an ear-side profile at the start. The lamp post is gone (the set).
+    NOW (stub): CAMS "tilt" (linear), focus on the baby, racked to the pod's front from "at" over 10 frames; the baby on
+      baby_square looking at the pod (pod_target); Mom on mom_glass on the zombie (C.on_zombie); the zombie in its cell
+      (look=Mom). Hero: the baby (the pod is a point, not an object: check it on the stills).
     """
     f0 = s.frame_start
     baby = C.actor("baby", "sq")
@@ -222,11 +244,11 @@ def sq04_tilt(st, s, C, nar):
     baby.look_at(f0, C.A["pod_target"], ease=0)
     mom = C.actor("mom", "sq")
     C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "sq", look=mom)
     st.use(s, baby, mom)
     C.cam(s, "tilt", focus=baby.head)
-    C.rack(s, TC.TS.POD_FRONT, C.at(s, "top"), frames=14)
+    C.rack(s, TC.TS.POD_FRONT, C.at(s, "at"), frames=10)     # sharp on the pod from 222: 8 frames before the cut
     st.hero(s, "baby", baby)
     C.lights(s, "square")
 
@@ -246,18 +268,21 @@ def sq04_hat(st, s, C, nar):
       "glass" .. "now"  her face and nose in profile, clear of pane lines, the far walls' frames behind her (it reads as
                         glass); her head on the ZOMBIE (sideways, not down): from here on, every frame of Mom in the
                         pod has her head on C.zombie_eye
-    SHARED: CAMS "hat" (the set's b04_long, 200 mm f/2.8 from the plaza).
+    OWNED (this sequence's): CAMS "hat" (the set's b04_long, 200 mm f/2.8 from the plaza at z 0.9: used by this shot
+      only, re-frame it as you need).
     NEIGHBOURS: before, sq04_tilt (the same line, the cut before "glass"); after, sq05_wave (the foot of the tower).
     KNOWN (the set builder): every pane between the lens and her head, face and shoulders is hidden (C.panes with n=3:
       a grazing line crosses two or three panes); the frames of the far walls stay, so it reads as glass.
-    MEASURED (still _hat at f0 + 12): Mom's face x 50 / y 51 %.
+    MEASURED (still _hat at f0 + 12): Mom's face x 50 / y 51 %. The lead's probe: her head box x 32-68 / y 41-57 % the
+      whole shot. The stub film's tile (out/test/twentyminutes_tiles/) is DOMINATED BY THE GLASS FRAMES' LINES around
+      a small hat: look at it at phone size; a tighter crop or other hidden panes may be needed.
     NOW (stub = the set's stage_b04_long): CAMS "hat", focus on Mom; Mom on mom_glass on the zombie; the zombie in its
       cell; the panes on the lines to her hidden. Hero: Mom.
     """
     f0 = s.frame_start
     mom = C.actor("mom", "sq")
     mp = C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "sq", look=mom)
     st.use(s, mom)
     c = C.cam(s, "hat", focus=mom.head, handheld=0.003)

@@ -104,10 +104,12 @@ THE CAMERAS (CAMERAS; BEAT_CAMERAS[beat] = the suggested key first). Every one w
           the lens); the baby runs in from the left edge. Still _push.
     b04   the tilt: towers 'square_start' (-> (3.0, 2.5, 0.7)) to b01's framing exactly ((-21.85, 18.65, 1.0) from z
           0.75), 40 mm: the well's east side and the baby, then the tower above the roofs over the baby's head; Mom at
-          the glass is a few pixels. Still _tilt_b (the end). TANGENT LEFT: the plaza lamp post at (-7, 9) stands
-          right behind the baby's head when it looks up at the pod (its post meets the head's top); in b01, with the
-          head tilted ahead, it stands clear above. Moving the baby 0.25 to the lens' right (tm_baby_square) would clear
-          it in both: not done (b01 / b02 would have to be re-shot).
+          the glass is a few pixels. Still _tilt_b (the end). TANGENT (fixed after the reviews of the film's plan): the
+          plaza lamp post at (-7, 9) stood right behind the baby's head (its torches stuck out of the head's top); the
+          lead measured that moving the baby 0.25 to the lens' right does NOT clear it (the lamp at x 53 % stays inside
+          the head's box, x 35-82 %), so the hook now TAKES THE LAMP POST OUT (LAMP_OUT, _take_out: this film's village
+          has no lamp there; its two torches and their light go with it). The stills of b01 / b04 predate this. The
+          film's own tilt and plaza framings are in films/twentyminutes_common.py CAMS "tilt" / "plaza" (lens z 0.55).
     b04_long  the story's own fallback, the cut inside the line: towers 'square_long' 200 mm f/2.8 from the plaza; every
           pane between the lens and Mom's head, face and shoulders hidden (pod_panes(n=3): a grazing line crosses two
           or three); the straw hat, the face and the nose in profile at 50 / 51, the far walls' frames behind her (it
@@ -188,8 +190,7 @@ THE CAMERAS (CAMERAS; BEAT_CAMERAS[beat] = the suggested key first). Every one w
 
 LIMITS THAT REMAIN (geometry or the game; the fallbacks applied are named)
     - Beat 1: the low plaza camera sees the well's base between it and the two who flee: only their heads and
-      shoulders show over it. The lamp post at (-7, 9) stands under the tower in the middle of the frame: at beat 4's
-      end it meets the top of the baby's head (a tangent, see b04).
+      shoulders show over it. (The lamp post at (-7, 9) that stood behind the baby's head is taken out: see b04.)
     - Beat 2: "his shadow crosses its face": under this sun (north-north-east) Steve's shadow falls south-west, away
       from the baby, whichever side of the lens he passes. Not had.
     - Beat 4: the orange glow under the platform rim and the dirt zigzag cannot be seen from the square (the slot is
@@ -392,10 +393,37 @@ def twentyminutes_set(b):
                     sets.clear_view(b, c["pos"], t, 2.2)
     for name, pts in list(PATHS.items()) + list(DOOR_PATHS.items()):
         sets.clear_view(b, pts[0], pts[-1], 1.4)
+    # the plaza lamp post at (-7, 9) (village LAMPS, a vanilla plains_lamp_1) stands exactly behind the baby's head in
+    # the plaza framing of beats 1 and 4 (its torches stuck out of the head's top: a tangent both reviews of the plan
+    # and the set's own b04 still found; no place of the baby or the lens clears it while the head stays above the
+    # caption band): this film's village has no lamp there (its two torches and their light go with it)
+    _take_out(b, LAMP_OUT)
     res = dict(farm=farm, cameras={k: dict(v) for k, v in CAMERAS.items()}, anchors=dict(ANCHORS),
                paths=dict({k: list(v) for k, v in PATHS.items()}, **{k: list(v) for k, v in DOOR_PATHS.items()}))
     b.v.sets["twentyminutes"] = res
     return res
+
+
+LAMP_OUT = (-7, 9)                     # the plaza lamp post this film's village does not have (the hook takes it out)
+
+
+def _take_out(b, column, height=6):
+    """Remove everything standing on the ground in the 3 x 3 columns around `column` (a plains_lamp_1 is placed with
+    its corner at (x - 1, y - 1)): blocks from the ground's top up `height` cells. The builder drops the lights of the
+    torches that go (Village _after_edit)."""
+    x0, y0 = column
+    b.allow((x0 - 1, y0 - 1, x0 + 1, y0 + 1))
+    gone = []
+    for x in range(x0 - 1, x0 + 2):
+        for y in range(y0 - 1, y0 + 2):
+            g = b.ground(x + 0.5, y + 0.5)
+            if g is None:
+                continue
+            for z in range(int(round(g)), int(round(g)) + height):
+                if b.w.block_id(x, y, z) is not None:
+                    gone.append((x, y, z, b.w.block_id(x, y, z)))
+                    b.w.set(x, y, z, None)
+    return gone
 
 
 def build_set(scene):

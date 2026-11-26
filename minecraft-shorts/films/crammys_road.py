@@ -24,14 +24,40 @@ from films import crammys_common as CC
 
 # rd07 and rd17 film through the SHARED camera C.cam(s, "lane", ...) (films/crammys_common.py CAMS["lane"] = engine/music
 # 'lane', 16 mm f/2.8 from Kai's doorstep), with ONE focus and ONE handheld for both
-LANE_FOCUS = CC.CS.CAMERAS["b07"]["focus"]      # (1.5, 15.5, 1.2): Kai's column / the road before it
+LANE_FOCUS = (-1.5, 15.2, 1.3)          # the west side of the road where Steve runs (Kai's head soft in front)
 LANE_HANDHELD = 0.004
 B07_ARRIVE = CC.CS.B07_ARRIVE           # the set builder's: the zombie reaches the door step 54 frames into the shot
+
+
+RD17_RUN = ((-1.3, 24.0), (-1.4, 18.5), (-1.5, 15.7), (-1.6, 13.0), (-1.4, 9.0), (-1.0, 6.5))   # rd17: back down
+#                                        the WEST side of the road (in view over Kai's column from x 90 % at y 18.5
+#                                        to x 3 % at y 12); its point RD17_MID (-1.5, 15.7) is mid-frame
+RD17_MID = 2
+RD17_EARLY = 0.7                        # on "arrows" he is this far short of RD17_MID (x 60 %): his arrows stick out
+#                                        to his front right, so they show while he comes in from the right
+RD09_D0 = 2.6                           # rd09: Steve's distance along crammys_walk_out on frame 1 (in frame, walking)
+# THE CHASE (rd07; measured with tools/crammys_probe track rd07_chased 509-564:3)
+RD07_RUN = ((-1.4, 8.5), (-1.5, 12.0), (-1.75, 14.4), (-2.4, 15.45), (-3.0, 15.5, 0.0), (-4.0, 15.5, 1.0),
+            (-4.5, 15.5, 1.0), (-5.9, 15.5, 1.0))      # Steve's way home: up the WEST side of the road (lane_home's
+#                                                    x 0.3 is behind Kai's column), the step, the door, inside
+RD07_STEVE_D0 = 3.0                     # Steve's distance along RD07_RUN on frame 1 (sprinting; at the left edge)
+RD07_ZOMBIE_GAP = 0.45                  # the zombie this far behind him on frame 1 (it falls back: 2.33 vs 5.61 b/s)
+RD07_DOOR_X = -3.9                      # the door's threshold (the step's west edge is x -4.0)
+RD07_CLEAR_X = -5.35                    # past the shut door's panel (x -5.0 .. -4.81) by half his width
+RD07_OPEN_LEAD = 6                      # the door opens this many frames before he reaches it
 
 
 def _along(path, d):
     """The polyline `path` from distance d along it on."""
     return CC.CS._along(path, d)
+
+
+def _frame_x(c, a, b, x):
+    """The first frame in a..b on which character c's x is at or west of `x` (b when never)."""
+    for f in range(int(a), int(b) + 1):
+        if c.pos_at(f).x <= x:
+            return f
+    return int(b)
 
 
 def rd07_chased(st, s, C, nar):
@@ -63,6 +89,13 @@ def rd07_chased(st, s, C, nar):
       the shot's start it reaches the step on the frame the door has shut. This shot is about 56 frames: the door
       shuts and the zombie arrives in its last frames: re-time so the door is shut at least 3 frames before the cut.
       A different lane camera would need Kai's column moved (an engine/music set change: not available).
+    THE LEAD'S SCOUT (out/test/crammys_scout_rd07_chased_509_zones.png, and side by side with gd06's last frame:
+      crammys_scout_cut_gd06_rd07.png): the first night frame reads as night at once (mean luma 59 against 106, the sky
+      band rgb (63, 75, 144) against (174, 167, 177)): the starry blue sky over house_e's moonlit roof, its door torch,
+      Kai's lantern burning at the right, the back of Kai's head dark in the foreground, the gold block and note block
+      at the left. BUT NOTHING MOVES ON FRAME 509 except the handheld: Steve and the zombie are both still out of view
+      (behind the column / off the frame) and the lane camera has no move: give the shot motion on its first frame
+      (Kai's head already turning, a slow drift of the camera, Steve already in view).
     FALLBACKS (story): "Night shots on a dark lane: Steve and the zombie can sink into the background": the lamp post
       as key on the lens side and Kai's lantern in the foreground (here: Kai's lantern beside the lens); keep the
       background no brighter than the subject. An optional kicker on the back of Kai's head:
@@ -70,24 +103,38 @@ def rd07_chased(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     kai = C.actor("kai", "rd")
-    C.put(kai, f0, "lane_kai")
+    C.put(kai, f0, "kai_lane", yaw=C.yaw("lane_kai"))
     steve = C.actor("steve", "rd")
-    pts = C.v.paths["lane_home"]
-    steve.place(f0, pts[0], math.pi)
-    end = steve.walk(f0, pts, sprint=True)
-    kai.look_at(f0, steve, ease=0)
-    for f in range(f0 + 6, min(end, f1), 6):
-        kai.look_at(f, steve, ease=5)
-    C.v.door_open("house_e", end - 8)
-    C.v.door_open("house_e", end + 4, open=False)
-    # the zombie, arms out, on the same path, reaching the foot of the door step as the door has shut
     z = C.actor("zombie", "rd")
-    zp = [tuple(p) for p in C.v.paths["lane_home"] if p[2] < 0.5] + [C.P("zombie_stop")]
-    total = sum(math.dist(a[:2], b[:2]) for a, b in zip(zp, zp[1:]))
-    rest = _along(zp, max(0.0, total - CC.undead.WALK_SPEED * B07_ARRIVE / 24.0))
-    z.place(f0, rest[0], CC.yaw_to(rest[0], rest[1]))
+    path = [C.stand(p) if len(p) == 2 else p for p in RD07_RUN]
+    # Steve: already sprinting on frame 1 (at the frame's left edge), up the west side of the road where the lens
+    # sees him over Kai's column, straight through his door (opened as he comes: a player right-clicks a door from
+    # up to 4.5 blocks away) into the house
+    run = _along(path, RD07_STEVE_D0)
+    steve.place(f0, run[0], CC.yaw_to(run[0], run[1]))
+    in_end = steve.walk(f0, run, sprint=True, ramp=(False, True))
+    fd = _frame_x(steve, f0, in_end, RD07_DOOR_X)              # his feet at the door's threshold
+    fin = _frame_x(steve, f0, in_end, RD07_CLEAR_X)            # clear of the shut door's panel (x -5.0, his half width)
+    steve.attack(fd - RD07_OPEN_LEAD, "right")                 # the right-click that opens it ...
+    C.v.door_open("house_e", fd - RD07_OPEN_LEAD)              # ... open over 5 frames, before he reaches it
+    shut = fin + 1
+    steve.face(in_end, (C.P("zombie_stop")[0], 15.5, 1.6), ease=4)     # inside: he turns round (hidden by then)
+    steve.attack(shut, "right")                                # ... and the right-click that shuts it
+    C.v.door_open("house_e", shut, open=False)                 # shut 5 frames later
+    # the zombie, arms out, BEHIND him on the same way at the game's 2.33 blocks/s (he sprints at 5.61: it falls
+    # back), walking on up to the foot of his door step after the door has shut
+    zp = [p for p in path if p[2] < 0.5] + [C.P("zombie_stop")]
+    zp = [p for p in zp if p[0] > C.P("zombie_stop")[0] - 1e-6]
+    zrun = _along(zp, max(0.0, RD07_STEVE_D0 - RD07_ZOMBIE_GAP))
+    z.place(f0, zrun[0], CC.yaw_to(zrun[0], zrun[1]))
     z.aggro(f0, ease=0)
-    z.walk(f0, rest)
+    zend = z.walk(f0, zrun)
+    # Kai's head follows Steve (on frame 1 it is already turning toward him, down the road to the south) and then
+    # the zombie at the shut door
+    kai.look_at(f0, C.to_lens(kai, f0, steve.eye_point(f0 + 6), CC.CAMS["lane"]["pos"], 0.0), ease=0)
+    kai.track(f0 + 1, fin, steve, step=3, ease=5)
+    kai.look_at(fin + 3, z, ease=8)
+    C.memo["rd07_frames"] = dict(door=fd, inside=fin, shut=shut, walk_end=in_end, zombie_stop=zend)
     st.use(s, kai, steve, z)
     st.hero(s, "steve", steve)
     st.hero(s, "zombie", z)
@@ -120,9 +167,11 @@ def rd09_torch(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd")
-    pts = C.v.paths["crammys_walk_out"]
+    # already walking on frame 1 and already in the frame (x about 80 %): RD09_D0 along crammys_walk_out (from
+    # its start, (0.3, 19.6), he was at x 190 %, out of the frame for the first 15 frames: the technical review)
+    pts = _along([tuple(p) for p in C.v.paths["crammys_walk_out"]], RD09_D0)
     steve.place(f0, pts[0], CC.yaw_to(pts[0], pts[1]))
-    steve.walk(f0, pts)
+    steve.walk(f0, pts, ramp=(False, True))
     st.use(s, steve)
     st.hero(s, "steve", steve)
     C.cam(s, "set:b09", focus=steve.head, handheld=0.004)
@@ -150,18 +199,28 @@ def rd17_run_back(st, s, C, nar):
       THE ARROWS (C.arrows(steve, s)).
     NEIGHBOURS: before, md16_disc (ground level in the meadow: his feet stop at the disc); after, jb18_nobody_asked.
     MEASURED (crammys_set_b17_run_back_zones.png): Steve sprinting right to left past the doorstep with the disc,
-      mid-frame and motion-blurred. The run across the visible road is short (see rd07's KNOWN LIMIT): time it so
-      he crosses the middle on "arrows" and is out before the cut.
+      mid-frame and motion-blurred. The run across the visible road is short (see rd07's KNOWN LIMIT). The lead's
+      scout of the first stub (he started on frame 1 at the path's first point): on "arrows" (1067) he was already
+      behind Kai's column, one leg showing (out/test/crammys_pal_rd17_run_back_1067.png; palette passes: trousers min
+      channel 25). The stub now starts him up the road so that he crosses y RD17_MID_Y on "arrows" (tools.crammys_geo:
+      his eyes at x 88 % on 1060, 50 % on 1067 "arrows", 9 % on 1075, then behind the note block: on screen about 16
+      frames). The arrows stick out to his front RIGHT (toward the far side from this lens when he runs south):
+      from here they show as shafts ahead of his chest, at best.
     RISKS (story): "Kai said it sounded just like me coming home" only works if this camera is identical to rd07's:
       it is the same constant. "Arrows stuck in Steve are thin at phone size": he passes 3-5 blocks from the lens.
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd")
-    pts = C.v.paths["lane_to_square"]
-    steve.place(f0, pts[0], 0.0)
+    # timed so that he crosses the middle of the frame (RD17_RUN's point RD17_MID) on "arrows", sprinting at speed from
+    # a point up the road beyond the frame's right edge
+    pts = [C.stand(p) for p in RD17_RUN]
+    d_mid = sum(math.dist(a, b) for a, b in zip(pts[:RD17_MID + 1], pts[1:RD17_MID + 1]))
+    lead = d_mid - RD17_EARLY - CC.players.SPRINT_SPEED * (C.at(s, "arrows") - f0) / 24.0     # along the way on f0
+    run = _along(pts, max(0.0, lead))
+    steve.place(f0, run[0], CC.yaw_to(run[0], run[1]))
     C.arrows(steve, s)
     C.hold(steve, "music_disc_11", s)
-    steve.walk(f0, pts, sprint=True)
+    steve.walk(f0, run, sprint=True, ramp=(False, True))
     st.use(s, steve)
     st.hero(s, "steve", steve)
     C.cam(s, "lane", focus=LANE_FOCUS, handheld=LANE_HANDHELD)

@@ -20,15 +20,10 @@ TAGS TAKEN: steve_gd, zuri_gd, kai_gd, sunny_gd, noor_gd, alex_gd (each placed o
 pre-rolled). A twin: C.actor("steve", "gd2") ...
 NEIGHBOURS: gd06_line is followed by rd07_chased: THE HARD CUT TO NIGHT (the road sequence, from Kai's doorstep).
 """
-import math
 
 from films import crammys_common as CC
 
 GD01_CAM = CC.CS.CAMERAS["b01"]          # (the set builder's suggestions; make them this file's own constants)
-
-
-def _up(p, dz):
-    return (p[0], p[1], p[2] + dz)
 
 
 def gd01_everyone(st, s, C, nar):
@@ -56,6 +51,15 @@ def gd01_everyone(st, s, C, nar):
       y 54.5 % (face y 50-59 %); the four acts above him at y 42 % (Zuri 15, Kai 32, Noor with the horn 50, Sunny 74 %);
       their notes at 16 / 31 / 78 %. With music's own aim his chin was at 61 %, on the caption band: keep the lower aim.
       The north post carries no lantern yet (this stub: the lantern is placed in gd05).
+      THE LEAD'S SCOUT OF THIS STUB (tools.crammys_geo gd01_everyone:40, render.py --still 0.1): the PEDESTAL STANDS
+      RIGHT BEHIND STEVE'S HEAD: its gold block's top at x 54-71 %, y 47 % sits on his hair (head y 49-60 %), and the
+      totem on it (C.totem) at x 62 %, y 43 % floats in the row of the four acts' faces (all at y 42 %). A tangent to
+      solve here (Steve's spot or the camera; the pedestal and the totem are shared and stay). Steve's eyes x 62 %,
+      y 55 %, face 107-111 px; Zuri 14, Kai 31, Noor 50, Sunny 75 % (faces 37-42 px, 3-14 degrees off the lens).
+      Rendered (out/test/crammys_scout_gd01_everyone_60_zones.png): on frame 60 his head, turned "back to them" by
+      look_at alone, shows the lens only his hair and the side of his face, tipped up (the head stops at 70 degrees of
+      yaw and the four are BEHIND him): a glance over the shoulder needs the body (C.turn_to) or a smaller turn; the
+      golden totem between Noor's and Sunny's faces and the gold block on his hair are plain at phone size.
     RISKS (story): "Wool is guitar and gold is bells cannot be seen": the block under each note block is big enough in
       gd02 / gd03; here it is the joke's set-up (nothing near Steve).
     """
@@ -228,7 +232,10 @@ def gd05_trophy(st, s, C, nar):
     SHARED: THE TOTEM (C.totem), THE LAST LANTERN. Places: alex_post, last_lantern_target.
     NEIGHBOURS: before, gd04_sunny; after, gd06_line (the dolly along the line of players).
     MEASURED (crammys_set_b05_trophy*.png, music b5): the totem 50, 43 % (x 22-80 %) on the first frame; at the end the
-      whole bandstand, the placed lantern at 18 %, Alex at 27 %, the totem at 65, 50 %.
+      whole bandstand, the placed lantern at 18 %, Alex at 27 %, the totem at 65, 50 %. The lead's scout of this stub
+      (out/test/crammys_scout_gd05_trophy_340_zones.png): the totem face-on and sharp, x 44-72 %, y 44-61 % (its feet
+      touch the caption band's top), the gold block below it filling the lower third; in the middle of the move (tile
+      380) it is small: hold the first second on it.
     RISK (story): the totem is a flat item: here it is the dropped item, turning (seen face-on part of each turn):
       hold the first frames on it so it is known before Steve holds it in fn24.
     """
@@ -268,7 +275,11 @@ def gd06_line(st, s, C, nar):
       frames of the film (the lead compared them side by side with rd07's first: films/crammys.py SKIES).
     MEASURED (crammys_set_b06_line*.png, music b6): the acts held at x 28-34 %, each item 33-41 % of the frame wide;
       Zuri's held note block faces the lens (29, 39 %); the last frame ends on Steve holding out his empty hand and
-      looking down at it.
+      looking down at it. The lead's scout (crammys_scout_gd06_line_508_zones.png, the first stub with a LINEAR dolly):
+      on the last frame Steve's face x 38-68 %, y 30-50 % (geo: eyes 63, 40 %, 154 px) but soft: the dolly was still
+      at full speed (motion blur); the stub now eases out to a stop on him (ease_out) and pulls focus to him by
+      "never": re-rendered, his face sharp at x 35-66 %, y 29-51 %, his empty hand held out, his eyes down on it
+      (crammys_scout_gd06_line_508_zones.png; the side-by-side file keeps the first, soft version). Compared side by side with rd07's first frame (out/test/crammys_scout_cut_gd06_rd07.png): see SKIES.
     """
     f0, f1 = s.frame_start, s.frame_end
     cam = CC.CS.CAMERAS["b06"]
@@ -288,6 +299,8 @@ def gd06_line(st, s, C, nar):
     C.present(steve, s, hand, f0=f0 + 6, ease=8)
     steve.look_at(f0, (cam["pos"][0], sp[1], 1.6), ease=0)
     steve.look_at(C.at(s, "never") - 4, hand, ease=8)          # ... and he looks down at it
+    C.totem(s)                  # the pedestal is in frame behind the line (the technical review: x 75 %, y 27 % on
+    #                             438; it stood empty here, one shot after gd05 opened on the totem turning on it)
     st.use(s, steve, *cast)
     st.hero(s, "steve", steve)
     # the dolly at speed on frame 1 and STOPPING on Steve (ease_out): at "linear" it was still moving at full speed

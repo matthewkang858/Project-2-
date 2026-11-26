@@ -160,8 +160,13 @@ SKIES = {
     # right (figures side-lit against the northern sky) and md11 looks east into it: the moon at the edge of the
     # skeleton's oak (the story's "moon behind the branches"). Every night still of the set passes palette_check
     # (crammys_set docstring). COMPARED SIDE BY SIDE with gold at the one cut between them (gd06 -> rd07, the
-    # story's risk "the hard cut from golden hour to night could look like a mistake"): see the lead's scout stills
-    # out/test/crammys_scout_cut_gd06_rd07.png.
+    # story's risk "the hard cut from golden hour to night could look like a mistake": "the first night frame must be
+    # clearly moonlit blue"): out/test/crammys_scout_cut_gd06_rd07.png, the last gold frame (508) against the first
+    # night frame (509) at 540x960 / 16 samples: mean luma 106 -> 59, the top band of sky rgb (174, 167, 177) -> (63,
+    # 75, 144), stars, house_e's moonlit roof, Kai's lantern and the door torch the only warm lights: nobody can take
+    # the night for a mistake. Measured on the stub: palette_check passes on md13_shot@921 (Steve's trousers min
+    # channel 14 against the limit 12: the darkest face of the film so far, keep an eye on it) and rd17_run_back@1067
+    # (25). No second night entry was needed: the meadow and the stage read under the same moon.
     "night": dict(preset="night", az=0.0, el=21.0, bloom=1.3, grade="cool"),
 }
 
@@ -291,6 +296,7 @@ def build(scene, sky=None):
                   file=sys.stderr)
             C.cam(s, STAND_IN[r.sequence], handheld=0.004)
             C.lights(s, r.sky)
+        C.close_holds()            # the shot's C.hold ends, keyed after everything it did with those hands
         before = r.sequence
     if BROKEN:
         print("[crammys] !!! %d part(s) built as stand-ins: %s" % (len(BROKEN), ", ".join(BROKEN)), file=sys.stderr)

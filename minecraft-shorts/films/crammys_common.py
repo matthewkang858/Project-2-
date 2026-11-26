@@ -98,10 +98,14 @@ SHARED (decided once, used by two shots or two sequences)
   CAMS["lane"]       rd07_chased and rd17_run_back, EXACTLY (position, aim, lens, f-stop; handheld 0.004 in both):
                      "the same camera as the zombie chase" (beat 17), engine/music's 'lane' (16 mm from Kai's
                      doorstep). The road sequence's alone; ONE constant for both shots.
-  THE ARROWS         beats 13 and 14 put two arrows in Steve (md13_shot: the skeleton shoots them, ARROW_HITS below:
-                     the chest one aligned with its flight, then the right shoulder); from md15 to the end EVERY
-                     Steve in the picture carries the same two: C.arrows(steve, s) (idempotent per twin; the set's
-                     CS.arrows with ARROW_SCALE). They stay until the film ends (hostiles.hit until=None).
+  THE ARROWS         beats 13 and 14 put two arrows in Steve (md13_shot: the skeleton shoots them with C.shoot_steve,
+                     ARROW_HITS below: the chest, then the right shoulder, BOTH ALIGNED with their flight: the
+                     shafts stick out toward his FRONT RIGHT, where the skeleton stood); from md15 to the end EVERY
+                     Steve in the picture carries the same two: C.arrows(steve, s) (idempotent per twin). They stay
+                     until the film ends (hostiles.hit until=None). They read best from his right side or front
+                     right (in profile, the two fletchings as two crosses); from his left they hide behind him.
+                     The lead's scout: crammys_scout_aligned_md13_shot_921 (both clear, his face free) against
+                     crammys_scout_md13_shot_915 (the unaligned shoulder arrow lay across his face).
   THE DISC           music disc 11 (the broken one) drops where the creeper dies (md15, C.disc_drop: one item for
                      md15 and md16), is in Steve's right hand in rd17, jb18, jb19, jb20 (C.hold(steve,
                      "music_disc_11", s)) and goes into the jukebox in jb20 ON THE WORD "one" (INSERT below; the
@@ -168,7 +172,12 @@ def build_set(scene):
 PLACES = {
     # the lead's own names for spots two shots share (each is an anchor of the set)
     "steve_center": "steve_jukebox",        # the night stage: Steve at the jukebox's south-east corner (jb19-fn24)
-    "zombie_stop": CS.B07_STOP,            # rd07: the zombie stops at the foot of the narrator's door step
+    # rd07: the zombie stops at the foot of the narrator's door step (the set builder's B07_STOP (-3.45, 15.5) is
+    # inside the cobblestone stairs at (-4, 15): this is in front of them, on the dirt path)
+    "zombie_stop": (-2.85, 15.5),
+    # rd07: Kai on his doorstep in the gap between his gold / note block column (1, 15) and his lantern post (1, 17),
+    # 0.4 block west of engine/music's lane_kai: further from the raised lane camera, his head higher in its frame
+    "kai_lane": (2.05, 16.85),
 }
 NIGHT_STAGE = ("alex", "kai", "zuri", "sunny", "noor")        # at ring_<name> from jb19 (Alex from jb20's end) to fn24
 
@@ -188,7 +197,8 @@ CAMS = {
     # whole at x 90 %, his gold / note column at the left edge. KNOWN LIMIT (the set builder, measured): the frame
     # sees the road only north of y 14.4 and the column hides it south of y 15.9: a runner coming up from the square
     # shows for about half a second before the door (crammys_set_b07_chased*.png).
-    "lane": _set_cam("b07"),
+    "lane": dict(pos=(3.84, 16.5, 3.1), target=(-4.5, 15.3, 0.8), pos1=(3.84, 16.42, 3.06),
+                 target1=(-4.5, 15.25, 0.8), lens=16.0, fstop=2.8),
     # the stand-ins of a failed shot (films/crammys.py STAND_IN), one per place
     "gold_wide": _set_cam("b04"),
     "gate": _set_cam("b09"),
@@ -232,6 +242,15 @@ MOBS = ("zombie", "creeper", "skeleton")
 def yaw_to(src, dst):
     """Yaw that makes a character at src (facing -Y at yaw 0) face dst."""
     return L.yaw_to(src, dst)
+
+
+def _end_hold(p, held, end):
+    """End one engine.players held item on `end` (its model variants off from there), leaving every other hold of
+    that hand alone (Player.hold(None, frame) also ends holds that start after `frame`)."""
+    held.end = int(end)
+    for att in held.variants.values():
+        att.set(int(end), False)
+    p._refresh()
 
 
 class ShotInfo:
@@ -298,6 +317,7 @@ class Crammys:
         self._fills = {}
         self._arrowed = set()      # names of the Steve twins that carry the two arrows already
         self._totem = None
+        self._holds = []           # C.hold calls whose end is keyed when the shot function returns (close_holds)
 
     # ------------------------------------------------------------------ places and cameras
     def stand(self, p):
@@ -337,17 +357,24 @@ class Crammys:
             return _set_cam(name[4:])
         return dict(CAMS[name])
 
-    def cam(self, s, name, focus=None, handheld=0.006, seed=None, move=True, ease="ease_out", **over):
+    def cam(self, s, name, focus=None, handheld=0.006, seed=None, move=True, ease="ease_out", timing=None, **over):
         """Put a camera on shot s: lens, position / aim (with its move when it has one and move=True), focus
         (default: its target) and a gentle handheld. name = one of CAMS (a shared camera), "set:bNN", or None: the
         shot's OWN camera, a constant of its sequence file given whole as keywords (pos, target, lens[, fstop,
         pos1, target1]: C.cam(s, None, focus=steve.head, **GD01_CAM)). over = entries to replace or give. ease: of
         the move; default 'ease_out' = AT SPEED ON THE FIRST FRAME, slowing to the last (engine.shots' own default
         'smooth' starts from rest: a still for the first half second). 'linear' for a constant drift / track.
-        The handheld seed is the shot name's. Returns the spec used."""
+        timing: a function frame -> fraction of the move (0..1) that REPLACES the shot's even clock and `ease`
+        (C.timing_hold_move builds one: a creep, the move between two frames, a hold): a move that starts on a
+        word. The handheld seed is the shot name's. Returns the spec used."""
         c = dict(self.camera_spec(name), **over)
         if "pos" not in c or "target" not in c or "lens" not in c:
             raise KeyError("camera %r for %s needs pos, target and lens" % (name, s.name))
+        if timing is not None:
+            # engine.shots Shot keys the camera on every frame at ease(s._u(frame)): this shot's own clock instead
+            # (an instance attribute; the engine file is untouched)
+            s._u = lambda frame, _t=timing: min(1.0, max(0.0, float(_t(frame))))
+            ease = "linear"
         s.lens(c["lens"], c.get("fstop", 2.8))
         if move and ("pos1" in c or "target1" in c):
             s.move(c["pos"], c["target"], c.get("pos1", c["pos"]), c.get("target1", c["target"]), ease=ease)
@@ -357,6 +384,25 @@ class Crammys:
         if handheld:
             s.handheld(handheld, seed=sum(ord(ch) for ch in s.name) % 89 if seed is None else seed)
         return c
+
+    @staticmethod
+    def timing_hold_move(a, b, f0=None, creep=0.0, ease="smooth"):
+        """A camera clock for C.cam(..., timing=): from the shot's first frame f0 to frame `a` a slow linear creep
+        (`creep` of the move: 0 = held still), from `a` to `b` the rest of the move with `ease` ('smooth': from
+        rest to rest), held after `b`. fn24: hold on Steve and the totem through "I won Best", pull back from
+        rest on "Best", settle before the last 1.5 s."""
+        from engine.shots import EASES
+        fn = EASES[ease]
+        a, b = float(a), float(b)
+        start = a if f0 is None else float(f0)
+
+        def t(frame):
+            if frame <= a:
+                return creep * (frame - start) / max(1.0, a - start) if frame > start else 0.0
+            if frame >= b:
+                return 1.0
+            return creep + (1.0 - creep) * fn((frame - a) / (b - a))
+        return t
 
     # ------------------------------------------------------------------ the cast
     @staticmethod
@@ -414,18 +460,50 @@ class Crammys:
         return pos
 
     # ------------------------------------------------------------------ acting the story needs more than once
-    @staticmethod
-    def hold(p, item, s, hand="right", frame=None, until=None):
+    def hold(self, p, item, s, hand="right", frame=None, until=None):
         """An item in p's hand in shot s only: engine/music hold (block items drawn as the game draws a block in a
         hand; discs, horn, totem as flat sprites along the hand) KEYED on the shot's first frame (or `frame`), and
-        emptied on `until` (default: the frame after the shot; KEY HOLDS PER SHOT: a hold without a frame is for
-        the whole film). Jukebox.insert / LastLantern.place empty the hand themselves: pass until= their frame + 1
-        or leave the default. Returns the item object (a focus target). Call it after p.place() on the same
-        frame."""
+        emptied on `until` (default: the frame after the shot). Returns the item object (a focus target). Call it
+        after p.place() on the same frame. KEY HOLDS PER SHOT: a bare players hold without a frame is for the whole
+        film.
+
+        THE END IS KEYED WHEN YOUR SHOT FUNCTION RETURNS (films/crammys.py build() calls C.close_holds after each
+        one), not here: everything the shot does with that hand after C.hold works as the engine documents it:
+        Jukebox.insert and LastLantern.place empty the hand on their own frame (that end then stands), toot /
+        draw_bow / block switch the item's model and back, a second C.hold (or players hold) in the same hand
+        replaces it on its own frame. An end keyed at once (the first version of this helper) made the players
+        rig skip every later hand change in the shot: in jb20 disc eleven stayed in Steve's hand after the insert
+        to the cut, and Noor's toot in gd01 left her horn on from frame 86 to the film's end (the technical
+        review, measured)."""
         f = s.frame_start if frame is None else int(frame)
+        end = s.frame_end + 1 if until is None else int(until)
+        side = "l" if str(hand).lower().startswith("l") else "r"
         ob = music.hold(p, item, hand=hand, frame=f)
-        p.hold(None, hand=hand, frame=s.frame_end + 1 if until is None else int(until))
+        held = p._hands[side][-1] if getattr(p, "_hands", None) else None
+        if held is not None:
+            self._holds.append((p, hand, held, end))
         return ob
+
+    def close_holds(self):
+        """Key the end of every C.hold of the shot just built (films/crammys.py calls it after each shot function).
+        A hold that something in the shot ended EARLIER (an insert; a later hold in that hand) keeps that end; one
+        that a later hold ended after the `until` asked for is cut back to it. Returns how many it closed."""
+        n = 0
+        for p, hand, held, end in self._holds:
+            side = "l" if str(hand).lower().startswith("l") else "r"
+            if held.end is None:
+                later = [h for h in p._hands[side] if h is not held and h.end is None and h.start is not None
+                         and h.start >= end]
+                if not later:
+                    p.hold(None, hand=hand, frame=end)          # the engine's own way (it also lowers the arm)
+                else:                                           # (p.hold(None) would also end those later holds)
+                    _end_hold(p, held, end)
+                n += 1
+            elif end < held.end:
+                _end_hold(p, held, end)
+                n += 1
+        self._holds = []
+        return n
 
     @staticmethod
     def present(p, s, target, f0=None, f1=None, hand="right", ease=0):
@@ -444,6 +522,42 @@ class Crammys:
         p.face(frame, target, ease=ease)
         p.look_at(frame, target, ease=ease if head_ease is None else head_ease)
         return frame + ease
+
+    @staticmethod
+    def walk_frames(distance, frame, speed=None, ramp=(False, True)):
+        """The frame a players walk of `distance` blocks started on `frame` ends on (engine.players Player.walk's own
+        step arithmetic: the game's speed per tick, its ground friction on a ramp; default speed: the walk, 4.317
+        blocks/s; players.SPRINT_SPEED to sprint). ramp=(False, True): at speed on the first frame, sliding to a
+        halt at the end (a player already walking when the shot starts)."""
+        speed = players.WALK_SPEED if speed is None else float(speed)
+        ramp_in, ramp_out = (bool(ramp), bool(ramp)) if isinstance(ramp, (bool, int)) else ramp
+        v, g = speed / 20.0, players.GROUND_FRICTION
+        n, acc, d = 0, 0.0, (0.0 if ramp_in else v)
+        while n < 100000:
+            d = g * d + (1.0 - g) * v if ramp_in else v
+            tail = d * g / (1.0 - g) if ramp_out else 0.0
+            if acc + d + tail >= distance:
+                break
+            n += 1
+            acc += d
+        n += 1
+        while ramp_out and d > 0.004:
+            d *= g
+            n += 1
+        return int(math.ceil(frame + n * players.TICK - 1e-9))
+
+    @classmethod
+    def walk_lead(cls, frame, arrive, speed=None, ramp=(False, True)):
+        """The distance a player walking from `frame` (at speed on it: ramp=(False, True)) covers when he stops ON
+        `arrive`: where to place him on frame 1 so that he arrives on a word (md12: on "middle")."""
+        lo, hi = 0.05, 40.0
+        for _ in range(40):
+            mid = 0.5 * (lo + hi)
+            if cls.walk_frames(mid, frame, speed, ramp) <= arrive:
+                lo = mid
+            else:
+                hi = mid
+        return lo
 
     @staticmethod
     def clap(p, frame, count=6, every=4, down=2):
@@ -538,16 +652,18 @@ class Crammys:
             f += step
         return out
 
-    def song(self, s, seed=None):
+    def song(self, s, seed=None, end=None):
         """THE SONG's notes born inside shot s (after the insert), facing s's camera: Jukebox.play over the notes of
-        song_note_frames(s.frame_start, s.frame_end), in phase with the insert. A note born in the last 7 frames of
-        the shot before lives on across the cut (6 ticks), facing that shot's camera, as particles do. Returns the
-        note frames."""
-        frames = self.song_note_frames(s.frame_start, s.frame_end)
+        song_note_frames(s.frame_start, end), in phase with the insert. end (default: the shot's end less a note's
+        life, 6 ticks = 7.2 frames): no note is born that would still be in the air at the cut (a particle lives on
+        across a cut facing the old camera; the technical review found fn22's last note, born on 1393, in fn23's
+        first 6 frames). So fn22 has notes on 1345 and 1369, not 1393. Returns the note frames."""
+        last = s.frame_end + 1 - music.NOTE_LIFETIME * music.TICK if end is None else float(end)
+        frames = self.song_note_frames(s.frame_start, last)
         if not frames:
             return []
         jb = self.bd.jukebox
-        return jb.play(frames[0], s.frame_end, disc=SONG_DISC, camera=s,
+        return jb.play(frames[0], last, disc=SONG_DISC, camera=s,
                        seed=(sum(ord(ch) for ch in s.name) % 97) if seed is None else seed, first=True)
 
     # ------------------------------------------------------------------ light

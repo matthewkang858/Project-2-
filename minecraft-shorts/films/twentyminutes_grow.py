@@ -16,6 +16,13 @@ GROWING UP: towers.grow_up(baby, narrator, frame, look=C.zombie_eye): the baby r
 THE SCOUTING STILLS: out/test/twentyminutes_set_b16_mom.png, _b17_twenty.png, _b18_bounce.png, _b19_ended.png,
   _b19_ended_strip.png, _b21_count.png (+ _zones.png each).
 MOM'S HEAD IS ON THE ZOMBIE IN EVERY FRAME (C.on_zombie). The baby looks at HER (gr16), where she looks (gr17-gr19).
+  A head turns at most 70 degrees from its body and the clamp is SILENT: in gr21 the row faces the player and the
+  zombie is 117 degrees from that, so Mom's BODY is turned (C.reach_yaw) and C.on_zombie(..., until=s.frame_end)
+  warns ("!!!") if a look cannot reach (the technical and story reviews found her 47 degrees off in the old stub).
+THIS SEQUENCE OWNS (the contract, amended): CAMS "grow" (gr17 = gr19, GROW_SEED): redefine it ONCE as a constant here if
+  you must, used by both. THE OTHER TWO VILLAGERS (the cleric, the librarian) live in the pod too (THREE in ce08, the
+  row in gr21) but are not in gr16-gr19: keep their places out of these frames or put them in (back_1 / back_2 are
+  behind the lens of CAMS "grow"; 'mom' (-20.5, 19.5) is clear in its frame at x 19 / y 30 %: the probe's missing).
 LIGHT: C.lights(s, "tower") (the lantern is the warm key of gr18: "warm lantern light on both").
 TAGS TAKEN (twins): mom_gr, zombie_gr, baby_gr (gr16-gr19), narrator_gr (gr19, gr21), steve_gr, cleric_gr,
   librarian_gr (gr21). New: gr2, gr3 ...
@@ -47,14 +54,15 @@ def gr16_mom(st, s, C, nar):
     RISKS (story "MOM NEVER LOOKS AT ME"): her head on the zombie in every pod shot; if a shot forces her to face the
       lens, frame her from behind the straw hat.
     MEASURED (the set builder, still _mom at f0 + 20): Mom from behind on the zombie, the baby pressed against her on the
-      lens side looking up (47 / 58 %), the zombie soft in the window beyond.
+      lens side looking up (47 / 58 %), the zombie soft in the window beyond. The lead's probe: THE BABY'S HEAD BOX
+      REACHES y 66 % (x 34-73 / y 46-66 % all shot): its chin in the caption band; raise the framing.
     NOW (stub = the set's stage_b16): camera "set:b16", focus on the baby; Mom on bed_side on the zombie (aggro: raised
       arms); the baby 0.62 west of her, its body turned half to the lens, its head on her. Hero: the baby.
     """
     f0 = s.frame_start
     mom = C.actor("mom", "gr")
     C.put(mom, f0, "bed_side")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "gr", aggro=True, look=mom)
     baby = C.actor("baby", "gr")
     bs = C.A["bed_side"]
@@ -84,18 +92,24 @@ def gr17_twenty(st, s, C, nar):
     MUST BE SEEN, ON WHICH WORD
       frame 1           the locked framing (the handheld only), Mom in profile, the baby 0.9 from her
       "twenty minutes"  the top of the baby's head level with her folded arms: Mom is the height ruler
-    SHARED: CAMS "grow" (= gr19's EXACTLY: the same handheld seed in both), towers' mom_glass and baby_glass.
+    OWNED: CAMS "grow" (= gr19's EXACTLY: the same handheld seed in both), towers' mom_glass and baby_glass.
     NEIGHBOURS: before, gr16_mom; after, gr18_bounce.
     MEASURED (the set builder, still _twenty at f0 + 24, re-aimed at 20 mm): Mom in profile (30 / 33 %), the baby at her
-      arms (62 / 52 %), the lantern glowing at the right edge, the village's roofs small and golden below. The zombie's
-      arms are not in that frame (the story's "at the frame edge"): say so if you find them.
+      arms (62 / 52 %), the lantern glowing at the right edge, the village's roofs small and golden below. The lead's
+      probe: Mom's head box x 11-53 / y 19-39 %, the baby's 51-77 / 44-57 % all shot. THE ZOMBIE'S ARMS ARE NOT IN THIS
+      FRAME (the story's "at the frame edge"; both reviews): from this lens they are 56 degrees off the axis against
+      a half-width of 27. The lead TRIED a camera outside the back glass ((-20.6, 24.2, 11.4) -> (-20.3, 18.6, 10.9),
+      20 mm, the north wall hidden: geo put the arm tips at x 3-9 %): rendered, a white bed filled the lower half and
+      the roof's frames the upper, Mom and the baby small, the arms not legible: rejected
+      (out/test/twentyminutes_scout_gr17_twenty_1060_zones.png). DROPPED HERE unless you find a framing that has both:
+      the motion on frame 1 is the handheld drift; the zombie is in the window in gr16.
     NOW (stub = the set's stage_b17): CAMS "grow" with the seed shared with gr19, focus on Mom; Mom on mom_glass on the
       zombie; the baby on baby_glass looking where she looks (the zombie). Heroes: Mom, the baby.
     """
     f0 = s.frame_start
     mom = C.actor("mom", "gr")
     C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "gr", look=mom)
     baby = C.actor("baby", "gr")
     C.put(baby, f0, "baby_glass")
@@ -127,7 +141,8 @@ def gr18_bounce(st, s, C, nar):
     SHARED: none (the set's camera b18 = towers' bounce, 24 mm, the red bed from the east).
     NEIGHBOURS: before, gr17_twenty; after, gr19_ended (CAMS "grow" again).
     MEASURED (the set builder, still _bounce at f0 + 8): the baby mid-bounce facing the lens (71 / 43 %, motion-blurred:
-      it is in the air), Mom's hat at the left edge.
+      it is in the air), Mom's hat at the left edge. The lead's probe: THE BABY'S HEAD BOX REACHES x 86-87 % (x 47-87 /
+      y 20-53 % over the shot): into the icon column; re-aim.
     NOW (stub = the set's stage_b18, from f0): camera "set:b18", focus on the baby; fm.bounce(baby, f0, "mom", jumps=2,
       yaw cheated toward the lens); Mom on bed_side on the zombie. (The stand beside her after the bounce is not
       staged.) Hero: the baby.
@@ -140,7 +155,7 @@ def gr18_bounce(st, s, C, nar):
     C.fm.bounce(baby, f0, "mom", jumps=2, yaw=TC.yaw_to(bp, toward))
     mom = C.actor("mom", "gr")
     C.put(mom, f0, "bed_side")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "gr", look=mom)
     st.use(s, baby, mom)
     C.cam(s, "set:b18", focus=baby.head)
@@ -172,7 +187,9 @@ def gr19_ended(st, s, C, nar):
       after, the snap timed to the word "ended". If it still does not read: a small white puff (not vanilla) is the
       story's last resort: say so, do not add it.
     MEASURED (the set builder, _ended_strip: the frame before and the frame of the swap): it reads as the same villager
-      grown, head level with Mom's, same pose.
+      grown, head level with Mom's, same pose. The lead's probe (as built): baby_gr visible to 1177, hidden from 1178;
+      narrator_gr hidden to 1177, visible from 1178 ("ended"); the narrator's head box x 48-76 / y 22-39 % at the cut,
+      Mom's 11-53 / 19-39; both heads on the zombie (0 degrees).
     NOW (stub = the set's stage_b19 on the word): CAMS "grow" with GROW_SEED, focus on Mom; Mom on mom_glass on the
       zombie; the baby on baby_glass on the zombie; towers.grow_up on "ended" (look = the zombie). Heroes: Mom, the
       narrator.
@@ -180,7 +197,7 @@ def gr19_ended(st, s, C, nar):
     f0 = s.frame_start
     mom = C.actor("mom", "gr")
     C.put(mom, f0, "mom_glass")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "gr", look=mom)
     baby = C.actor("baby", "gr")
     C.put(baby, f0, "baby_glass")
@@ -222,10 +239,21 @@ def gr21_count(st, s, C, nar):
       he stands on top_step right behind it); or drop the count to a single slow sweep.
     MEASURED (the set builder, still _count at f0 + 76): the four in a row (38-75 %, y 40-44 %), the two red beds side
       by side in the middle (the second at y 58 %), the back of Steve's head at the bottom.
+      BOTH REVIEWS: Mom on row_4 faced north (yaw 180, with the row, at Steve); the zombie's eyes are 117 degrees from
+      that and the head stops at 70: SHE WAS 47 DEGREES OFF THE ZOMBIE the whole shot, showing the lens a three-quarter
+      face (she read as looking at the player). FIXED in the stub: her body is turned to yaw 118 (C.reach_yaw: a
+      55-degree head turn reaches the zombie); the probe and the story checker's tools/check_twentyminutes_story_mom21
+      now measure 0 degrees on every frame. From this camera she is then a lost profile, hat to the lens (the still
+      out/test/twentyminutes_scout_gr21_count_1300_zones.png). The probe's head boxes: Mom x 29-46, the narrator 47-54,
+      the cleric 59-69, the librarian 70-81 %, all y 37-48 %; the second bed appears on 1304 (hidden 1256-1303).
+      Steve's head (his back) is at y 72-82 % (under the caption band). STEVE'S HAND IS EMPTY when the bed appears:
+      a held bed cannot be drawn by the engine (engine/mcassets.item_object draws a flat item sprite; the game's
+      red_bed item is a composite of two block models and has no textures/item sprite): not had; his hand is at the
+      frame's bottom edge from this camera.
     NOW (stub = the set's stage_b21, on the words): camera "set:b21" (towers' high, roof hidden), focus on the narrator;
       the four on row_1..4; the librarian and the cleric look away, Mom on the zombie, the narrator up at Steve; Steve
       on top_step watches the librarian to "twice", Mom to "then", sneaks on "brought", swings 4 frames later, the bed
-      appears 2 frames after the swing. Heroes: the four.
+      appears 2 frames after the swing (1304); Mom's body turned toward the zombie (reach_yaw). Heroes: the four.
     """
     f0 = s.frame_start
     steve = C.actor("steve", "gr")
@@ -233,13 +261,19 @@ def gr21_count(st, s, C, nar):
     row = []
     for i, role in enumerate(("librarian", "cleric", "narrator", "mom")):
         c = C.actor(role, "gr")
-        C.put(c, f0, "row_%d" % (i + 1))
+        place = "row_%d" % (i + 1)
+        if role == "mom":
+            # row_4 faces north (yaw 180, at Steve); the zombie's eyes are 117 degrees from that, past the head's 70:
+            # her body is turned (reach_yaw) so that her head reaches the zombie with a 55-degree turn
+            C.put(c, f0, place, yaw=C.reach_yaw(C.P(place), C.zombie_eye, C.yaw(place), max_head=55.0))
+        else:
+            C.put(c, f0, place)
         row.append(c)
     for c in row[:2]:
         p = c.pos_at(f0)
         c.look_at(f0, (p.x - 3.0, p.y - 1.0, TC.F + 1.6), ease=0)
     row[2].look_at(f0, steve, ease=0)
-    C.on_zombie(row[3], f0)
+    C.on_zombie(row[3], f0, until=s.frame_end)
     t1, t2 = C.at(s, "twice"), C.at(s, "brought")
     steve.watch(f0, t1, row[0])
     steve.watch(t1 + 1, t2 - 1, row[3])

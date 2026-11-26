@@ -26,9 +26,13 @@ CONTINUITY CHEATS (the story's own, kept; engine/music documents them): Sunny an
 in jb19 and stands at alex_beside in jb20, then at ring_alex again from fn22.
 TAGS TAKEN: steve_jb, alex_jb, zuri_jb, kai_jb, sunny_jb, noor_jb (placed on each shot's first frame).
 """
+import math
+
 from films import crammys_common as CC
 
 CS = CC.CS
+
+JB18_STOP_AFTER = 3         # jb18: Steve stops this many frames after "Nobody" appears
 
 
 def _up(p, dz):
@@ -70,7 +74,10 @@ def jb08_eject(st, s, C, nar):
         C.put(p, f0, spot)
         p.look_at(f0, jt, ease=0)
     fe = C.at(s, "drops") - 2
-    C.bd.jukebox.play(f0 - 30, fe, disc="music_disc_cat", camera=s)
+    # the cat disc playing: a note born on f0 - 2 (563) is rising on frame 1 (it lives 7.2 frames) and the next
+    # one (587) is cancelled by the eject (fe = 581): the first stub's play(f0 - 30) put its notes on 535 and 559,
+    # so frame 1 showed only the last frame or two of a dying note (the technical review)
+    C.bd.jukebox.play(f0 - 2, fe, disc="music_disc_cat", camera=s)
     item = C.bd.jukebox.eject(fe, player=a, disc="music_disc_cat", camera=s, until=f1 + 1, name="crammys_cat_jb")
     st.cast[item.name] = item
     steve.look_at(fe + 2, item.root, ease=6)
@@ -106,7 +113,11 @@ def jb18_nobody_asked(st, s, C, nar):
     NEIGHBOURS: before, rd17_run_back (the lane); after, jb19_to_jukebox (from behind him: he walks on to the jukebox).
     MEASURED (crammys_set_b18_nobody_asked.png, music b18, 40 mm f/3.2): Sunny 23 %, Steve 47 % with both arrows plain
       in the lantern light, Noor 72 % (y 46 %). This shot is 46 frames: the walk the camera sees is the path from its
-      point 2 (music); the turn there and back must fit after he stops.
+      point 2 (music); the turn there and back must fit after he stops. The lead's scout with the ALIGNED arrows
+      (out/test/crammys_scout_aligned_jb18_nobody_asked_1135_zones.png; geo: Sunny 22 %, Steve 47 %, Noor 72 %, faces
+      81-90 px): the arrows now stick out to his front right, toward Sunny: the chest arrow's shaft shows beside
+      Sunny's raised arm, half hidden by it, the shoulder one hardly: turn Steve a little to his left, or stand Sunny
+      back, so the two fletchings stand clear.
     """
     f0, f1 = s.frame_start, s.frame_end
     jt = C.P("jukebox_top_target")
@@ -115,15 +126,24 @@ def jb18_nobody_asked(st, s, C, nar):
     su.look_at(f0, jt, ease=0)
     C.put(no, f0, "three_noor")
     no.look_at(f0, jt, ease=0)
-    pts = C.v.paths["bandstand_wing_to_three"][2:]
-    steve.place(f0, pts[0], 3.14159)
+    # already walking on frame 1 (the game's walk, at speed) on the last leg of bandstand_wing_to_three, placed so
+    # that he stops on "Nobody" + 3 (C.walk_lead): the first stub walked the path from its point 2 (3.0 blocks at
+    # 1.6 b/s = 45 frames of a 46-frame shot) and never stopped (the technical review)
+    sp = C.P("three_steve")
+    back = C.v.paths["bandstand_wing_to_three"][-2]
+    arrive = C.at(s, "Nobody") + JB18_STOP_AFTER
+    lead = C.walk_lead(f0, arrive)
+    d = math.dist(back[:2], sp[:2])
+    k = min(1.0, lead / d)
+    start = (sp[0] + (back[0] - sp[0]) * k, sp[1] + (back[1] - sp[1]) * k, sp[2])
+    steve.place(f0, start, CC.yaw_to(start, sp))
     C.arrows(steve, s)
     C.hold(steve, "music_disc_11", s)
-    end = steve.walk(f0, pts, speed=1.6)
+    end = steve.walk(f0, [start, sp], ramp=(False, True))
     steve.look_at(end, jt, ease=8)
-    sp = C.P("three_steve")
-    su.look_at(min(end + 2, f1 - 24), (sp[0], sp[1], sp[2] + 1.2), ease=6)      # to the arrows (chest height) ...
-    su.look_at(min(end + 16, f1 - 8), jt, ease=6)                              # ... and back to the jukebox
+    su.look_at(end + 4, (sp[0], sp[1], sp[2] + 1.2), ease=6)         # to the arrows (chest height) ...
+    su.look_at(end + 16, jt, ease=6)                                 # ... and back to the jukebox
+    C.memo["jb18_stop"] = end
     st.use(s, su, no, steve)
     st.hero(s, "steve", steve)
     C.cam(s, "set:b18", focus=steve.head, handheld=0.004,
@@ -153,7 +173,9 @@ def jb19_to_jukebox(st, s, C, nar):
     MEASURED (crammys_set_b19_to_jukebox.png, music b19, 28 mm f/4 from (-6.9, -3.9, 4.0)): Kai 61, Zuri 50, Sunny 38,
       Noor 29 % (y 44-48 %) face us across the jukebox; Steve's back at the bottom right (x 85-100 %) and THE ARROWS
       HARDLY READ FROM BEHIND (the story's "arrows in the foreground"): a lower or more side-on start, or the lantern
-      rim on the fletching, is this shot's open problem.
+      rim on the fletching, is this shot's open problem. The lead's geo of this stub at 1190: STEVE'S HEAD AT y 52-64 %
+      (the back of it, in the caption band) as he nears the jukebox; Alex 121 degrees off the lens as she walks aside;
+      the four faces x 28-61 %, y 44-48 %, 47-61 px, 6-14 degrees off the lens.
     """
     f0, f1 = s.frame_start, s.frame_end
     names = ("kai", "zuri", "sunny", "noor")
@@ -205,7 +227,10 @@ def jb20_eleven(st, s, C, nar):
       THE ARROWS. Places: steve_jukebox, alex_beside.
     NEIGHBOURS: before, jb19_to_jukebox; after, fn21_running (the jukebox sharp in the foreground, notes drifting up).
     MEASURED (crammys_set_b20_disc11.png, music b20, 40 mm f/2.4 from (-8.0, 2.1, 2.65)): disc 11 at x 20 %, y 44 % (a
-      third of the frame), the cat disc at 72, 45 %, Steve's face between them.
+      third of the frame), the cat disc at 72, 45 %, Steve's face between them. The lead's scout of this stub
+      (out/test/crammys_scout_jb20_eleven_1225_zones.png): disc 11 face-on at x 5-37 %, y 38-50 %, broken and black,
+      the cat disc face-on at x 58-90 %, Steve's face between (eyes x 40 %, 160 px, 3 degrees off the lens); Alex's
+      face is cut by the right edge (geo: x 74-108 %); the jukebox's slot big and soft in the lower third.
     RISK (story): "a sixteen-pixel item may not read as broken at phone size": the arm points at the lens, the disc a
       third of the frame and in focus; the fallback is item frames on the back wall (not built).
     """

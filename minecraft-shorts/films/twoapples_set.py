@@ -35,7 +35,9 @@ WHAT THIS FILE CHANGES AGAINST engine/underground.py (all of it film-local; each
                 twoapples_set_b16_aisle_A.png against _B.png, 270x480 scouting). Set through the BlockLight
                 environment's own `emit` before the bake (U.env(b).emit), so every baked face of the set, the stair
                 mouth's rim and the stairwell included, is drawn at 0.45 of the game's light; the point lights and
-                bloom carry the torches. The palette checks pass on every hall still (stone G/R 0.92-0.94).
+                bloom carry the torches. On the hall stills the faces (skin s 0.43-0.49), robes and Steve pass
+                tools/palette_check; its stone check does not see the set's baked stone (material names it does not
+                know: engine/underground's own proof counted them in a second pass, not done here).
     the skies   "dusk" and "under" exactly as the engine gives them; NO third sky: a "room" sky (dusk, ambient 0.3) was
                 tested for the bedroom and changed nothing visible (the room is lit by house_a's lights).
     cameras     b02 (three-quarter from the child's right, 38 degrees off his facing), b04 / b05 (the bedroom), b20
@@ -45,7 +47,8 @@ WHAT THIS FILE CHANGES AGAINST engine/underground.py (all of it film-local; each
     paths       ta_round_well / ta_round_well_on (beat 20); ug_round_well is NOT used (from the engine's b20 camera
                 neither child is ever in the safe area: they are behind the well or out of the frame for the whole
                 run, measured on a dry run).
-    film lights MOUTH_GLOW (beat 2), ROOM_COOL (4, 5), DOWN_FILL (7), DAD_SIDE_FILL (13), each a U.bounce for one shot.
+    film lights MOUTH_GLOW (beat 2), ROOM_COOL (4, 5), DOWN_FILL (7), DAD_SIDE_FILL (13, 19), each a U.bounce for one
+                shot; torch boosts (Stage.lights extra=): MOUTH_KEY (2), CORNER_KEY (8), the dad torch (13, 17, 24).
     the village plants are cleared on the ground line of CAMERAS["b20"] (sets.clear_view, width 1.2).
 
 THE SKIES (Blender azimuth: degrees counter-clockwise from east)
@@ -157,12 +160,14 @@ the beat says, and looked at; the numbers are where the hero lands in the frame,
                 (pos0 (7.8, -11.3, -2.6), the frame's up is south) sliding east and down to over dad's (pos (14.5,
                 -11.8, -4.3)); farmer, fletcher, cleric look up(ug_aisle_<n>, 1.4), dad looks up at the lens.
                 STILLS: start (the straw hat and the fletcher's cap over composter and fletching table), end (dad's
-                face up at us x 54 / y 50, the box's smooth stone lid behind his pocket, the lever x 35 / y 74). DOWN_FILL (120 W) lifts the pockets; it still reads
-                partly as a cutaway model (see NOT VERIFIED).
+                face up at us x 54 / y 50, the box's smooth stone lid behind his pocket, the lever x 35 / y 74).
+                DOWN_FILL (120 W) lifts the pockets (the "start" still was rendered before it was added: darker);
+                it still reads partly as a cutaway model (see NOT VERIFIED).
     b08 slot    under. U.CAMERAS["b08_slot"], 35 mm f/2.0 ON THE FLOOR against the corner's east wall, square on to the
                 slot 3.75 away, focus on its "boot" point; Steve walks U.STEVE_PAST (2.15 from the lens, frame left to
-                right); the baby zombie villager U.hands_in_slot(zv, f) + U.shade_face(v, zv). STILLS: the boots (the legs-together frame
-                nearest his crossing: his leg on the left, the slot soft behind, x 51 / y 51) and "hands" (16 frames
+                right); the baby zombie villager U.hands_in_slot(zv, f) + U.shade_face(v, zv). STILLS: the boots
+                (the legs-together frame nearest his crossing: his leg on the left, the slot soft behind, x 51 / y 51)
+                and "hands" (16 frames
                 later: the dark slot, the green head a shape, the hands a few green pixels in the bars' gaps; the
                 corner torch x 1.8 (CORNER_KEY) on them). Lights: no fill. Trousers 22 ok.
     b09 lever   under. U.CAMERAS["b09_lever"], 32 mm f/2.0, U.hold_then_move as the engine's BEATS: STILLS "hand" (his
@@ -196,7 +201,8 @@ the beat says, and looked at; the numbers are where the hero lands in the frame,
     b17 trade   under. U.CAMERAS["b17_ots"], 35 mm f/2.8, over Steve's shoulder at ug_aisle_dad: the emerald
                 (raise_arm 55) big and low (x 49 / y 80, below the caption band), dad x 50 / y 45 behind it holding out
                 the enchanted book (fx.hold_out(dad, "enchanted_book", f, f_end, enchanted=True): give it its END
-                frame, or the book stays visible in every later shot), purple Nausea swirls; the dad torch x 1.6. palette: "robe hue" fails on the few near-black robe pixels left between the book and the emerald
+                frame, or the book stays visible in every later shot), purple Nausea swirls; the dad torch x 1.6.
+                palette: "robe hue" fails on the few near-black robe pixels left between the book and the emerald
                 (rgb 24, 16, 19: hue undefined at that level); the face s 0.47.
     b18 follow  under. U.CAMERAS["b18_portrait"], 50 mm f/2.0: dad at ug_cell_dad_mid, dad.look_at(f, steve,
                 ease=0) then dad.track(f, f1, steve, step=2, ease=4) while Steve walks ug_follow_start ->
@@ -205,15 +211,16 @@ the beat says, and looked at; the numbers are where the hero lands in the frame,
     b19 behind  under. U.CAMERAS["b19_endwall"], 32 mm f/2.4, see ug_end_wall + ug_end_pier (lever NOT used): dad at
                 ug_cell_dad_mid gazing up the aisle (look (13.4, -10.3, F+1.6)) in profile (start: x 44 / y 48), the
                 slide pos0 -> pos ends on the piston wall's stone behind his back (end: SEAM x 50 / y 50, dad at the
-                right edge). DAD_SIDE_FILL 10 W in the cell. palette: "robe hue" on his shaded east side (near-black, as b17).
+                right edge). DAD_SIDE_FILL 10 W in the cell. palette: "robe hue" fails on his shaded east side
+                (near-black, as b17); the face s 0.43.
     b20 grow    dusk. NEW: pos (11.5, -0.4, 1.9), target (-0.5, 0.3, 0.5), 22 mm f/4: the square from the east,
                 over the glowing mouth (foreground, x 34-38 / y 58-64) to the well and the sunset behind it. Two
                 children on ta_round_well / ta_round_well_on (4.4 blocks/s, the second 4 frames later): west along the
                 well's north side (frame right), behind its west side (hidden: 1-block rim, 2-block core), out at its
                 south-west corner and east along its south side (frame left), the second on past the mouth toward the
                 lens. r = U.swap_hidden(k1, adult, pos, f0, f1, v.world, then=path[2:], speed=ADULT_SPEED): the swap
-                lands in the middle of the hidden run. STILLS: both children on the north side (frame 45 of the shot),
-                the grown-up out at the south-west corner and the second child running (frame 119). From the engine's
+                lands in the middle of the hidden run. STILLS: both children on the north side (1.8 s into the run),
+                the grown-up out at the south-west corner and the second child running (4.9 s). From the engine's
                 b20_well camera with ug_round_well neither child is ever in the safe area (measured).
     b21 slot    under. CAMERAS["b08"] again, focus on U.SLOT_FACE, the slow push in (pos -> pos1); no hands, black
                 inside; Steve's legs pass (the slot ends at his waist). Slot x 51 / y 51; trousers 15 ok.
@@ -259,9 +266,11 @@ LIGHT (LIGHTS[...], as the stills were rendered; Stage.lights keywords + the fil
             the dark west aisle stays black). Beat 24: U.bounce(st, s, U.SLOT_STRIP, energy=6, color=POINT_COLOR,
             kind="torch") the whole shot (his only light while the wall is shut), U.DOORWAY_GLOW 60 W (torch) from
             r["open"], the dad torch x 2.5, ug.light_doorway via open_wall(relight=(st, s)).
-  Palette (tools/palette_check, every still): all checks pass except b17 and b19 "robe hue" (near-black robe pixels, rgb about (24, 16, 19),
-            where no torch reaches: hue is undefined there). Every face check passes (skin s 0.43-0.50), every
-            stone check (G/R 0.92-0.94), Steve's trousers (min channel 15-42) and shirt everywhere.
+  Palette (tools/palette_check, every still): all checks pass except b17 and b19 "robe hue" (near-black robe
+            pixels, rgb about (24, 16, 19), where no torch reaches: hue is undefined there).
+            Every face check passes (skin s 0.43-0.50), every
+            stone check on the square and in the house (G/R 0.92-0.94; the hall's baked stone is not seen by the
+            check), Steve's trousers (min channel 15-42) and shirt everywhere.
 
 NOT VERIFIED / LEFT TO THE DIRECTORS
     - NO ANIMATION WAS RENDERED: stills only (one or two frames per beat). The push, the bed bounce, the runs, the
@@ -273,14 +282,15 @@ NOT VERIFIED / LEFT TO THE DIRECTORS
     - b08: the walking legs smear with motion blur; the still is the legs-together frame near the crossing. The two
       hands are a few green pixels in the dark slot (the corner torch x 1.8 on them); the head a dark green shape.
     - b07: the steep look down still reads partly as a cutaway model (the risk the story names). Its fallback (the
-      counter ride from a child's eye height) was NOT built: from the aisle the front row's solid pier at x 6 hides
-      the farmer's window from any low camera west of x 6.5 looking along the row (ray-cast); a ride must start
-      inside the aisle east of x 6.5. A 45-degree look along the row from above the aisle was tried and dropped:
-      the front row's top bars stand between the lens and every face.
+      counter ride from a child's eye height) was NOT built: by the layout (worked out, not rendered) the front
+      row's solid pier at x 6 hides the farmer's window from a low camera at the counter west of x 6.5 looking
+      along the row; such a ride must start east of it. A 45-degree look along the row from above the aisle was
+      tried and dropped (scouting, 270x480): the front row's top bars stand between the lens and every face.
     - b20: the children are small (about 40 px tall at 540x960) in a wide that shows the whole circuit; both are in
-      the safe area together for only about 9 frames before the well hides the first (frames 41-49 of a 5 s
-      shot, swap on 74 with U.swap_hidden), the grown-up and the second child together for about 8 frames (113-
-      120). ADULT_SPEED 2.4 is a film choice (the grown-up walks out briskly, then the director slows him).
+      the safe area together for only 9 frames before the well hides the first (1.6-2.0 s into the run; the swap
+      3.0 s in, U.swap_hidden), the grown-up and the second child together for 8 frames (4.6-4.9 s). ADULT_SPEED
+      2.4 is a film choice (the grown-up walks out briskly; the director slows him). A longer lens panning with
+      them would make them bigger; not tried.
     - HALL_EMIT 0.45 is a look choice, not the game (the game draws the hall at EMIT 1.0); not compared with the game.
       It changes every baked face of the set (the stairwell and the mouth's rim too); the square's dusk stills and
       the stairwell were re-rendered with it and pass the palette.

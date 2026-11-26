@@ -17,10 +17,10 @@ THE SKY "night": the moon due EAST, low (az 0, el 21): the cameras that look nor
 their right, out of frame: figures side-lit, standing AGAINST THE NORTHERN SKY above a clean horizon (the story's
 answer to "green on green": the low camera); md11 looks east into it: the moon at the edge of the oak's canopy.
 C.lights(s, "night") (x 1.3: the gate's lamps are 10-20 blocks behind; they light nothing here).
-SHARED: THE ARROWS: md13 shoots them with C.shoot_steve(sk, steve, f, 0 / 1) (ARROW_HITS: the chest one aligned with
-its flight, then shoulder_r; knockback 0.1); steve_md then carries them to the end, and every OTHER Steve twin from
-md15 on gets C.arrows(steve, s) (the set's CS.arrows: the chest arrow aligned with ARROW_FLIGHT, the flight from
-skeleton_line to steve_shot): KEEP md13's skeleton at skeleton_line and Steve at steve_shot facing yaw 135 when the
+SHARED: THE ARROWS: md13 shoots them with C.shoot_steve(sk, steve, f, 0 / 1) (ARROW_HITS: the chest, then shoulder_r,
+BOTH aligned with their flight; knockback 0.1); steve_md then carries them to the end, and every OTHER Steve twin from
+md15 on gets C.arrows(steve, s) (both aligned with the set's ARROW_FLIGHT: the flight from skeleton_line to
+steve_shot in his own frame): KEEP md13's skeleton at skeleton_line and Steve at steve_shot facing yaw 135 when the
 arrows land, or the later twins' arrows will not match his (say so in your result if you must move them). THE DISC:
 C.disc_drop(...) ONCE, in md15, ON the killing blow at the creeper's feet; md16 films the same item
 (C.memo["md_disc"]); it must still be dropped in md16's first frames ("the smoke thins").
@@ -31,11 +31,19 @@ still swollen, then the poof (hostiles die). Arrows are 0.045 block thin: they r
 TAGS TAKEN: steve_md (md10, md12, md13, md15, md16), creeper_md (md10, md12, md13, md15), skeleton_md (md11, md12,
 md13, md15). A twin for a pre-roll: C.actor("steve", "md2") ...
 """
+
 import math
 
 from films import crammys_common as CC
 
 CS = CC.CS
+
+MD12_LOOK = (2, 2)          # md12: the look left starts this many frames after he stops, the look right this many
+#                             after the look left has arrived (7-frame turns)
+MD12_CREEPER = 16           # md12: the creeper starts toward him this many frames after he stops
+MD15_DRAW = 24              # md15: the skeleton twin's first draw (frames before the first hit)
+MD15_KILL_AFTER = 20        # md15: the killing arrow lands this many frames after the first (on "shot" + 20)
+MD15_FUSE = 3               # md15: the creeper starts to swell on f0 + 3 (it would explode 35 frames later)
 
 
 def _cam(s, beat):
@@ -136,16 +144,26 @@ def md12_middle(st, s, C, nar):
     steve = C.actor("steve", "md")
     C.put(cr, f0, "creeper_line")
     C.put(sk, f0, "skeleton_line")
-    pts = C.v.paths["crammys_into_middle"]
-    steve.place(f0, pts[0], CC.yaw_to(pts[0], pts[1]))
+    # Steve: ALREADY WALKING on frame 1 (the game's walk, 4.32 blocks/s, at speed: ramp in off) on the line from
+    # steve_enter to the middle, placed so that he stops ON "middle" (C.walk_lead: the players walk's own arithmetic;
+    # the first stub walked 5 blocks at 2.2 b/s, 55 frames in a 47-frame shot: he never reached the middle)
+    mid, ent = C.P("middle"), C.P("steve_enter")
+    arrive = C.at(s, "middle")
+    lead = C.walk_lead(f0, arrive)
+    u = [(m - e_) for m, e_ in zip(mid, ent)]
+    n = math.hypot(u[0], u[1])
+    start = C.stand((mid[0] - u[0] / n * lead, mid[1] - u[1] / n * lead))
+    steve.place(f0, start, CC.yaw_to(start, mid))
     sk.aim(f0, steve, ease=0)
-    sk.draw(f0, release=f1 + 1, target=steve)
-    e = steve.walk(f0, pts, speed=2.2)
-    steve.look_at(e + 1, C.eyes("creeper_line", 1.3), ease=6)
-    steve.look_at(e + 12, C.eyes("skeleton_line", 1.7), ease=6)
+    sk.draw(f0, release=f1 + 1, target=steve)                  # the bow drawn through the shot (loosed in md13)
     cr.look_at(f0, steve, ease=0)
-    a = C.P("creeper_line")
-    cr.walk(max(e + 14, f1 - 16), [a, (a[0] + 0.6, a[1], a[2])], speed=CC.hostiles.CREEPER_STROLL)
+    steve.look_at(f0, (mid[0], mid[1] + 6.0, 1.5), ease=0)    # straight ahead, up the line
+    e = steve.walk(f0, [start, mid], ramp=(False, True))
+    left = steve.look_at(e + MD12_LOOK[0], C.eyes("creeper_line", 1.3), ease=7)     # left: the creeper ...
+    steve.look_at(left + MD12_LOOK[1], C.eyes("skeleton_line", 1.7), ease=7)       # ... right: the skeleton
+    a_ = C.P("creeper_line")
+    cr.walk(max(e + MD12_CREEPER, f0 + 1), [a_, (a_[0] + 0.6, a_[1], a_[2])], speed=CC.hostiles.CREEPER_STROLL)
+    C.memo["md12_stop"] = e
     st.use(s, cr, sk, steve)
     st.hero(s, "steve", steve)
     C.cam(s, "set:b12", focus=steve.head, pos1=tuple(p + d for p, d in zip(_cam(s, "b12")["pos"], (0.0, 0.35, 0.0))))
@@ -175,7 +193,8 @@ def md13_shot(st, s, C, nar):
       "shot" (b13)     the first arrow flicks in from beside the lens and sticks in his CHEST (C.shoot_steve(sk,
                        steve, f, 0): ARROW_HITS[0], aligned with its flight), red hurt flash, he rocks back half a step
                        (knockback 0.1); he does not move away
-      "again" (b14)    a second jolt and flash, the second arrow in his RIGHT SHOULDER (C.shoot_steve(..., 1))
+      "again" (b14)    a second jolt and flash, the second arrow in his RIGHT SHOULDER (C.shoot_steve(..., 1):
+                       ARROW_HITS[1], aligned too)
       after "again"    he looks down at the two arrows, then up; the creeper now right behind his shoulder
     SHARED: THE ARROWS (C.shoot_steve: ARROW_HITS, ARROW_SCALE; keep skeleton_line / steve_shot / yaw 135 when they land:
       the later twins' arrows are computed from that staging). Places: steve_shot, skeleton_line,
@@ -184,8 +203,12 @@ def md13_shot(st, s, C, nar):
       the creeper: a cut on action).
     MEASURED (crammys_set_b13_shot.png / b14_again, 45 mm f/2.8 from (8.19, 41.16, 1.05), 1.2 blocks north of the
       skeleton): Steve's face three-quarter at x 56 %, y 42 %, the chest arrow's fletching on his upper chest (aligned:
-      unaligned it sat over his mouth), the creeper soft at the right edge. In b14 THE SHOULDER ARROW'S SHAFT CROSSES
-      HIS RIGHT EYE from this lens: frame or turn him so it does not (the spot itself is shared: ARROW_HITS).
+      unaligned it sat over his mouth), the creeper soft at the right edge. In b14 the UNALIGNED shoulder arrow's shaft
+      crossed his right eye from this lens; the lead's scout of this stub confirmed it (out/test/crammys_scout_md13_
+      shot_915_zones.png: shaft and fletching across his face) and made ARROW_HITS[1] aligned too: on 921 both
+      fletchings are clear crosses on his chest and shoulder and his face is free (crammys_scout_aligned_md13_shot_921
+      _zones.png: face x 40-75 %, y 33-52 %; the creeper's head at the right edge, x 86 %: outside the safe area, soft
+      background). 915 is still inside the second red flash (12 frames).
       The set builder measured Steve's trousers at min channel 14 here (palette limit 12): a cool moon fill
       (C.fill("md_moon", ..., color=CS.MOON_KEY_COLOR)) if they go under, never a brighter lamp.
     TIMING (hostiles): sk.shoot(f, ...) draws from f and looses on `release` (default f + 24); the arrow sticks 2-3
@@ -202,15 +225,17 @@ def md13_shot(st, s, C, nar):
     C.put(sk, f0, "skeleton_line")
     sk.aim(f0, steve, ease=0)
     steve.look_at(f0, sk, ease=0)
-    hit1 = C.at(s, "shot") - 1
-    hit2 = C.at(s, "again") - 1
-    fl1 = C.shoot_steve(sk, steve, f0, 0, release=max(f0 + 4, hit1 - 2))
-    fl2 = C.shoot_steve(sk, steve, fl1.frames[0] + 1, 1, release=max(fl1.frames[0] + 17, hit2 - 2))
-    down = int(fl2) + 8
-    steve.look_at(down, (steve.pos_at(down)[0], steve.pos_at(down)[1], 0.9), ease=8)
-    steve.look_at(min(down + 18, f1 - 6), sk, ease=8)
+    # the first arrow lands on "shot" (b13), the second on the SECOND "shot" (b14: "Then it shot me again."), so the
+    # reaction fits before the cut: the red flash (12 frames), the look down at the two arrows, the look up
+    hit1, hit2 = C.at(s, "shot", 0), C.at(s, "shot", 1)
+    fl1 = C.shoot_steve(sk, steve, f0, 0, release=hit1 - 1)            # a 16-frame draw (bow at pulling_1)
+    fl2 = C.shoot_steve(sk, steve, int(hit1), 1, release=hit2 - 3)
+    flash_end = int(fl2) + 12
+    down = steve.look_at(flash_end + 1, (steve.pos_at(flash_end)[0], steve.pos_at(flash_end)[1], 0.9), ease=8)
+    up = steve.look_at(down + 2, sk, ease=8)
+    C.memo["md13_frames"] = dict(hit1=int(fl1), hit2=int(fl2), down=down, up=up)
     cr.look_at(f0, steve, ease=0)
-    cr.walk(f0 + 20, [a, b], speed=0.8)
+    cr.walk(f0 + 24, [a, b], speed=0.8)                         # behind his shoulder by about 907
     st.use(s, steve, cr, sk)
     st.hero(s, "steve", steve)
     C.cam(s, "set:b13", focus=steve.head, pos1=tuple(p + d for p, d in zip(_cam(s, "b13")["pos"], (-0.12, 0.05, 0.0))))
@@ -252,28 +277,31 @@ def md15_kill(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     cr = C.actor("creeper", "md")
-    sk = C.actor("skeleton", "md")
     steve = C.actor("steve", "md")
+    # the skeleton is a TWIN here: its draw starts before the cut (pre-roll), and skeleton_md is in md13, the shot
+    # before (its keys there would be overwritten: the technical review measured a third draw in md13)
+    sk = C.actor("skeleton", "md2")
     pts = C.v.paths["crammys_round"]
     C.put(cr, f0, "creeper_turn")
     steve.place(f0, pts[0], CC.yaw_to(pts[0], pts[1]))
     C.arrows(steve, s)                                  # (steve_md has them since md13: this does nothing for him)
-    C.put(sk, f0, "skeleton_close")
-    sk.aim(f0, cr, ease=0)
-    steve.walk(f0, pts, speed=2.6)
-    cr.face(f0 + 1, steve, ease=6)
+    first, kill = C.at(s, "shot"), C.at(s, "shot") + MD15_KILL_AFTER
+    C.put(sk, first - MD15_DRAW, "skeleton_close")
+    sk.aim(first - MD15_DRAW, cr, ease=0)
+    steve.walk(f0, pts, ramp=(False, True))             # his last step round it: at speed on frame 1 (cut on action)
+    cr.face(f0 + 1, steve, ease=6)                      # it turns after him ...
     cr.look_at(f0 + 1, steve, ease=4)
-    cr.fuse(f0)
-    first = C.at(s, "Then")
-    a = sk.shoot(first - 26, cr, release=first - 2, knockback=0.1)
-    k = sk.shoot(a.frames[0] + 1, cr, release=a.frames[0] + 20, kill=True, knockback=0.1, camera=s)
+    cr.fuse(f0 + MD15_FUSE)                             # ... and swells (it would explode 35 frames later)
+    a = sk.shoot(first - MD15_DRAW, cr, release=first - 3, knockback=0.1)
+    k = sk.shoot(int(first) - 2, cr, release=kill - 3, kill=True, knockback=0.1, camera=s)
     sk.lower(int(k) + 12)
-    steve.look_at(int(a) - 4, cr, ease=6)
+    steve.look_at(f0 + 2, cr, ease=6)
     lens16 = _cam(s, "b16")["pos"]
     feet = cr.pos_at(int(k))
     d = C.disc_drop(feet, int(k), until=C.T["md16_disc"].frame_end + 1, face=lens16)
     C.memo["md_disc"] = d
     C.memo["md_kill"] = int(k)
+    C.memo["md15_frames"] = dict(hit1=int(a), kill=int(k), fuse=f0 + MD15_FUSE)
     st.use(s, cr, sk, steve, d)
     st.hero(s, "creeper", cr)
     C.cam(s, "set:b15", focus=cr.head, pos1=tuple(p + d_ for p, d_ in zip(_cam(s, "b15")["pos"], (0.0, 0.3, 0.0))))

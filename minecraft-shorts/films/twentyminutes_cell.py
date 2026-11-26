@@ -17,6 +17,9 @@ THE PLACE (engine/towers.py LAYOUT; films/twentyminutes_set.py): the pod inside 
 THE SCOUTING STILLS: out/test/twentyminutes_set_b06_bed_a.png, _b06_bed_b.png, _b07_reach.png, _b08w_window.png,
   _b23w_window.png, _b23_afraid.png, _b24w_window.png (+ _zones.png each).
 LIGHT: C.lights(s, "tower") (the lantern and the cell's torch at 1.0; far village torches off).
+THIS SEQUENCE OWNS (the contract, amended): CAMS "window" (ce23) and "window_08" (ce08): you may redefine them ONCE as
+  constants here (keep ONE lens position for both: "This camera position returns for the last two lines"). FOUR and
+  THREE are NOT yours (gm09 / gm10 / gm24 see the same people from the platform).
 MOM'S HEAD IS ON THE ZOMBIE IN EVERY FRAME (C.on_zombie / towers.panic with the zombie's eyes: C.pod does it).
 TAGS TAKEN (twins): mom_ce, zombie_ce (every shot), cleric_ce, librarian_ce (ce08, ce23), narrator_ce (ce23). New: ce2..
 PREVIEWS through render.py: --samples 6 (PREVIEW_SAMPLES["cell"]).
@@ -45,19 +48,25 @@ def ce06_bed(st, s, C, nar):
     SHARED: none. Mom on bed_beside (the second bed's space: allowed here only, before gr21).
     NEIGHBOURS: before, sq05_wave (the foot of the tower, outside); after, ce07_reach.
     MEASURED (the set builder, stills _bed_a at f0 + 2 / _bed_b at the end): the red bed lengthwise with the white beds,
-      Mom's hat at the edge; at the end the zombie fills the window over the sill.
+      Mom's hat at the edge; at the end the zombie fills the window over the sill. The technical review (heads at the
+      first / middle / last frame): MOM IS OUT OF THE FRAME nearly the whole pan (x 68-130 % at 339, -56..15 at 375,
+      -169..-39 at 411), though the story's pan goes "past Mom standing beside it": bring her into the pan (another
+      place on its path, or the pan through her) or let the bed and the zombie carry it. The stub's hero is now the
+      zombie (in the frame from about 400: x 44-72 / y 30-43 % at 411). The pan: heading 91.7 -> 22.6 degrees,
+      ease_out (23 degrees in its first 18 frames).
     NOW (stub = the set's stage_b06): camera "set:b06" (towers' pan_bed, 24 mm, panning to the cell), focus on the red
-      bed, racked to the zombie on "zombie"; Mom on bed_beside, head on the zombie; the zombie, arms forward. Hero: Mom.
+      bed, racked to the zombie on "zombie"; Mom on bed_beside, head on the zombie; the zombie, arms forward. Hero: the
+      zombie.
     """
     f0 = s.frame_start
     mom = C.actor("mom", "ce")
     C.put(mom, f0, "bed_beside")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     z = C.zombie(s, "ce", look=mom)
     st.use(s, mom)
     C.cam(s, "set:b06", focus=C.fm.beds["mom"]["pos"])
     C.rack(s, z, C.at(s, "zombie"), frames=16)
-    st.hero(s, "mom", mom)
+    st.hero(s, "zombie", z)              # (Mom is out of this pan's frame nearly all the time: the technical review)
     C.lights(s, "tower")
 
 
@@ -80,14 +89,15 @@ def ce07_reach(st, s, C, nar):
     NEIGHBOURS: before, ce06_bed; after, ce08_scared (the window camera).
     MEASURED (the set builder, still _reach at f0 + 12): the green arms out of the window at the LEFT EDGE (a sliver:
       look at it at phone size), one empty block, Mom in profile at x 76 / y 49 %. The two-shot is at 45 mm f/2.8 from
-      9 blocks: a longer lens from further back (the story's "long lens") would make the arms bigger: try it.
+      9 blocks: a longer lens from further back (the story's "long lens") would make the arms bigger: try it. The
+      lead's probe: Mom's head box x 62-89 / y 42-53 % the whole shot: INTO THE ICON COLUMN (x > 82): re-frame.
     NOW (stub = the set's stage_b07): camera "set:b07" (45 mm), focus on Mom; Mom on 'mom', head on the zombie; the
       zombie aggro (raised arms); the north wall seen through. Heroes: Mom.
     """
     f0 = s.frame_start
     mom = C.actor("mom", "ce")
     C.put(mom, f0, "mom")
-    C.on_zombie(mom, f0)
+    C.on_zombie(mom, f0, until=s.frame_end)
     C.zombie(s, "ce", aggro=True, look=mom)
     st.use(s, mom)
     st.see_through(s, "tower_pod_north")
@@ -121,6 +131,10 @@ def ce08_scared(st, s, C, nar):
     MEASURED (the set builder, still b08w_window at f0 + 30, this aim): Mom 20 %, the cleric 46 %, the librarian 66 %,
       all y 47-48 %. (With CAMS "window", ce23's aim, tools.twentyminutes_geo ce08_scared:480 put their eyes at 32 /
       58 / 79 % and the librarian's head to x 84.5 %, into the icon column: that is why ce08 has its own aim.)
+      The lead's still out/test/twentyminutes_scout_ce08_scared_485.png (+ _zones): three faces to the lens, the arm
+      blur at the left edge; tools/twentyminutes_palette 485 passes every rule (hero Mom x 17-35 %, y 40-50 %). The
+      probe's head box (hat included): Mom x 8-37 % (on the safe edge at 479), y 39-50. Heads on the zombie: within
+      2.7 degrees all shot (tools/twentyminutes_probe looks).
     NOW (stub): CAMS "window_08", focus on the cleric; THREE trembling (C.pod(..., panic=True)); the zombie, arms
       forward. Hero: Mom.
     """
@@ -151,13 +165,19 @@ def ce23_afraid(st, s, C, nar):
       "zombie"          the narrator and Mom side by side, same height, same pose, trembling ALIKE (PANIC_SEED: the
                         same tremble frame for frame), both staring at the zombie just over the lens
       "Apparently" .. "that"   the shot HELD (nothing new: the fear goes on); the cut on "counts" goes to gm24
-    SHARED: CAMS "window" (= ce08's), FOUR (the same four places as gm24, where they are seen from the platform),
-      PANIC_SEED, the zombie's arms forward; the second bed is in this shot (the film's BED2_FROM).
+    OWNED: CAMS "window" (ce08's lens position: keep it one position). SHARED ACROSS SEQUENCES (frozen): FOUR (the same
+      four places as gm24, where they are seen from the platform), PANIC_SEED; the second bed is in this shot (the
+      film's BED2_FROM). The zombie's arms forward (aggro=False).
     NEIGHBOURS: before, gp22_step (the narrator watching Steve break the step, from outside); after, gm24_counts.
     KNOWN (the set builder): "the two red beds below them" cannot be had from beside the cell: the beds are north of
       the four; one red bed shows at the right edge of the window framing (both side by side are seen in gr21).
     MEASURED (the set builder, still b23w_window at f0 + 20): the arm blur at the left edge; Mom 26 %, the narrator
-      57 %, the librarian between them behind (41 %), the cleric on back_2 (79 %); a red bed at the right edge.
+      57 %, the librarian between them behind (41 %), the cleric on back_2 (79 %); a red bed at the right edge. With
+      b23w's aim MOM'S HEAD BOX WAS x 3-43 %, cut by the left edge (both reviews): CAMS "window" is now aimed 0.35
+      further south from the same position (the lead; tools.twentyminutes_geo ce23_afraid:1440 and the probe): Mom
+      x 10-49 / y 35-51 %, the narrator 51-74 / 34-50 %, the librarian 40-55 %, the cleric 78-92 % (cut by the right
+      edge: not a hero), the arm's blur still over the left edge (out/test/twentyminutes_scout_ce23_afraid_1440_zones.png,
+      270x480: both faces read, the hat whole). Heads on the zombie: within 3.0 degrees (probe looks).
     NOW (stub): CAMS "window", focus on the narrator; FOUR trembling (C.pod(..., panic=True): Mom and the narrator
       with PANIC_SEED); the zombie, arms forward. (The head snap is not staged yet.) Heroes: the narrator, Mom.
     """

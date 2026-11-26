@@ -26,8 +26,14 @@ from films import crammys_common as CC
 CS = CC.CS
 
 
-def _up(p, dz):
-    return (p[0], p[1], p[2] + dz)
+# fn24: the opening medium and the pull back on ONE 32 mm lens (the engine has no zoom): close enough at the start
+# for the medium (the set builder's b24 at 40 mm from 5.6 blocks), far enough at the end for all six heads inside
+# x 14-69 % (geo at 1550: Noor 14, Sunny 24, Zuri 34, Kai 42, Alex 51, Steve 69; with b24's 40 mm and aim they
+# spanned 11-80 %, Steve on the icon column)
+FN24_CAM = dict(pos=(-10.1, -0.45, 2.75), target=(-5.6, -0.3, 2.45), pos1=(-19.5, 0.3, 4.6), target1=(-5.5, 1.4, 2.3),
+                lens=32.0, fstop=2.8)
+FN24_TOTEM_AIM = (0.0, 1.5, -0.6)          # the arm's aim from the lens: north (his right: the frame's left), lower
+FN24_SETTLE = 1538                         # the pull back has settled (the last 1.5 s held after "Vocals")
 
 
 def _six(C, s, look=None):
@@ -66,7 +72,8 @@ def fn21_running(st, s, C, nar):
     SHARED: THE SONG (C.song), THE ARROWS. Places: steve_jukebox, ring_kai (his look).
     NEIGHBOURS: before, jb20_eleven (the insert, the first note); after, fn22_nobody_moved (the frontal wide).
     MEASURED (crammys_set_b21_jukebox.png, music b21, 32 mm f/2.4 push): the jukebox slot in front at x 50 %, y 53 % and
-      Steve beside it with both arrows plain; at the end of the push his head 50, 48 % (music).
+      Steve beside it with both arrows plain; at the end of the push his head 50, 48 % (music). (The set builder's
+      still had the old unaligned shoulder arrow: see THE ARROWS in films/crammys_common.py.)
     RISK (story): "the joke is a sound and the picture cannot show it; the line carries it" (fallbacks: an original
       sound of running feet and panting; or one second of rd07's chase cut in: NOT available, the cuts are fixed).
     """
@@ -102,6 +109,8 @@ def fn22_nobody_moved(st, s, C, nar):
     MEASURED (crammys_set_b22_nobody_moved.png, music b22, 24 mm f/5.6 from (-20.5, -0.3, 3.6)): the six faces at
       x 24-63 %, y 48 % (small: about 4.5 % of the frame wide each: a wide), both lantern posts at 29 % / 84 %, the
       moon at 62, 16 %. "Locked-off" here = no move; the stub keeps a handheld of 0.002 (nothing is ever dead still).
+      The lead's geo of this stub at 1370: faces 20-23 px, x 24-63 %, y 48 %; Noor 71 and Sunny 67 degrees off the
+      lens (they look at the jukebox: profiles), Steve and Kai 42.
     """
     f0, f1 = s.frame_start, s.frame_end
     six = _six(C, s)
@@ -133,7 +142,8 @@ def fn23_kai(st, s, C, nar):
     NEIGHBOURS: before, fn22_nobody_moved; after, fn24_vocals (Steve with the totem).
     MEASURED (crammys_set_b23_kai*.png, music b23, 24 mm f/3.2 from (-10.6, -3.4, 3.5)): Noor 12, Sunny 24, Zuri 36,
       Kai 48 then 53 after his step, Alex 62, Steve 76 % (y 44-47 %); the five turned 17-40 degrees from the lens
-      once they look at him; the pedestal big in the foreground.
+      once they look at him; the pedestal big in the foreground. The lead's geo of this stub at 1460: the five x
+      11-62 %, y 44-45 %, faces 41-44 px, 21-39 degrees off the lens; Steve the back of his head (123 degrees) at 77 %.
     RISK (story): "only works if the viewer remembers the chase ... and knows Kai saw it": Kai's head turns ALONE for
       half a second before the others (the story's fallback, built into the stub's timing).
     """
@@ -180,24 +190,36 @@ def fn24_vocals(st, s, C, nar):
     MEASURED (crammys_set_b24_vocals*.png, music b24, 40 mm f/2.8 pulling back to (-19.5, 0.3, 4.6)): the totem at
       x 41 %, y 47 % (17 % wide) with the empty pedestal below on the first frame; at the end of the pull back all six
       heads at x 11-80 % (Steve at 80 %, on the edge), y 47-49 %. From the front the row of note blocks hides the
-      clappers below the chest: the claps read as heads and shoulders bobbing.
+      clappers below the chest: the claps read as heads and shoulders bobbing. The lead's scout of this stub
+      (out/test/crammys_scout_fn24_vocals_1480_zones.png): THE TOTEM COVERS HALF HIS FACE (present() aims the arm
+      from the shoulder straight at the lens, so the item sits between his eyes and the camera): aim it lower or to
+      his side; the empty gold pedestal fills the bottom third; Alex at the left edge. Geo at 1555: all six heads
+      x 10-79 %, y 47-48 % (Steve 79 %, next to the icon column), faces 36-40 px.
     RISKS (story): "Crouch applause may puzzle non-players" (fallback: two players jumping; keep the totem inside the
       safe area so the win reads on its own); "held flat items turn edge-on if the arm drops or the camera moves to
       the side": check the totem at phone size along the whole pull back.
     """
     f0, f1 = s.frame_start, s.frame_end
-    cam = CS.CAMERAS["b24"]
+    cam = FN24_CAM
     six = _six(C, s, look=cam["pos"])
     steve = six["steve"]
     steve.look_at(f0, cam["pos"], ease=0)
     totem = C.hold(steve, "totem_of_undying", s)
-    C.present(steve, s, cam["pos"])
+    # the arm points at a spot beside and below the lens (FN24_TOTEM_AIM), not at the lens itself: aimed from the
+    # shoulder straight at the lens, the totem sat between his eyes and the camera and covered half his face
+    # (the lead's scout, crammys_scout_fn24_vocals_1480_zones.png)
+    C.present(steve, s, tuple(c + d for c, d in zip(cam["pos"], FN24_TOTEM_AIM)))
+    best = C.at(s, "Best")
     for i, n in enumerate(("zuri", "kai", "sunny", "noor", "alex")):
         six[n].look_at(f0, steve, ease=0)
-        C.clap(six[n], C.at(s, "Best") + 2 * i, count=max(1, (f1 - 40 - C.at(s, "Best")) // 4))
+        C.clap(six[n], best + 2 * i, count=max(1, (FN24_SETTLE - best) // 4))
     C.song(s)
     st.use(s, *six.values())
     st.hero(s, "totem", totem)
-    C.cam(s, "set:b24", focus=totem, handheld=0.004)
+    # the camera holds the medium on Steve and the totem through "I won Best" (a slow creep), pulls back from rest
+    # on "Best" ('smooth', a written exception to C.cam's ease_out for this one shot) and has settled by
+    # FN24_SETTLE: the last 1.5 s are Steve standing still among the five clapping
+    C.cam(s, None, focus=totem, handheld=0.004,
+          timing=C.timing_hold_move(best - 2, FN24_SETTLE, f0=f0, creep=0.03), **cam)
     s.focus(steve.head, at_s=s.film.seconds(C.at(s, "Vocals")))
     C.lights(s, "night")
