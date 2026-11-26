@@ -49,13 +49,13 @@ def _anchors(bas):
     rim = A["home_rim_w"]
     put("six_pit_lure", (5.4, 7.3, -2.0))                       # beat 6: the lure ingot on the pit floor (not on
     #                                                               the kept last block's cell (4, 6))
-    put("six_pearl_rest", _add(rim, (-0.4, -0.6)))              # beat 7: the pearl rests here (explicit floor point:
+    put("six_pearl_rest", _add(rim, (0.25, -0.45)))              # beat 7: the pearl rests here (explicit floor point:
     #                                                               barter(lob=True, toward=<runner>) keys it over the pit)
-    gravel = [(-0.45, 0.3), (0.2, -0.5), (-0.15, 0.55), (0.25, 0.45), (-0.7, 0.15), (0.05, -0.75), (-0.5, 0.65)]
+    gravel = [(-0.45, 0.2), (-0.35, -0.35), (0.15, -0.45), (0.2, 0.45), (-0.2, 0.5), (-0.55, -0.1), (0.3, -0.3)]
     for k, d in enumerate(gravel, 1):                           # beats 8 and 20: the pile round his boots (all on the
         put("six_gravel_%d" % k, _add(rim, d))                  #   floor west of the rim x 4.0)
-    put("six_pearl_pile", _add(rim, (-0.2, 0.85)))            # beat 8: one lonely pearl among the gravel
-    drops = {"boots": (-0.9, -0.55), "pickaxe": (-0.4, 0.75), "gravel": (-1.3, 0.3), "pearl": (0.05, -0.75)}
+    put("six_pearl_pile", _add(rim, (-0.5, 0.45)))            # beat 8: one lonely pearl among the gravel
+    drops = {"boots": (-0.7, 0.6), "pickaxe": (-0.3, 1.1), "gravel": (-1.0, 1.0), "pearl": (0.3, 0.9)}
     for k, d in drops.items():                                  # beat 10: what the runner drops, on the blackstone
         put("six_drop_%s" % k, _add(rim, d))
     # beats 21-23: the brute at the SOUTH end of the gold row, facing the gold diagonally (north-east), his ingot on
@@ -63,21 +63,23 @@ def _anchors(bas):
     # away: head pitch 21 degrees). Why there: his head can then turn to the gateway within the piglin's 75 degrees
     # (beat 23: 63), a camera on the step beyond the ingot sees the ingot with his face right above it (beat 22),
     # and the ingot-row camera holds him, his ingot and both brothers (beat 21)
-    put("six_brute_gold", (7.3, 10.0, 0.0), _yaw((1.0, 1.0)))
-    put("six_step_ingot", (8.15, 11.6, 1.0))
-    put("six_brother_1", A["home_gold_3"], _yaw((1.0, 1.0)))    # beats 2, 21-23: the two brothers admiring
-    put("six_brother_2", A["home_gold_4"], _yaw((1.0, 1.0)))
-    put("six_brute_turned", (5.55, 16.35, 0.0), _yaw("west"))    # beat 2: the brute's dark shoulder at the right edge,
+    put("six_brute_gold", (7.6, 10.0, 0.0), _yaw((1.0, 1.0)))
+    put("six_step_ingot", (8.16, 11.71, 1.0))
+    put("six_brother_1", (7.0, 13.2, 0.0), _yaw((1.0, 1.0)))   # beats 2, 21-23: the two brothers admiring (found by
+    put("six_brother_2", (6.2, 11.6, 0.0), _yaw((1.0, 1.0)))   #   search: apart in the ingot-row frame, both in
+    #                                                               profile, clear of the brute's line to the reverse cam)
+    put("six_brute_turned", (5.2, 15.4, 0.0), _yaw("west"))    # beat 2: the brute's dark shoulder at the right edge,
     #                                                               turned away from them
-    put("six_gateway_mouth", (4.5, 18.6, 1.8))                  # beat 23: what he turns his head to
+    put("six_gateway_mouth", (4.5, 18.6, 1.8))
+    put("six_landing_look", (0.15, 16.7, 5.55))                 # beat 1: just past the six_landing lens                  # beat 23: what he turns his head to
     foot = A["bridge_pillar_foot"]
     for k, d in enumerate(((0.45, -0.3), (-0.3, -0.45), (0.25, -0.75)), 1):     # beats 14, 15: ingots at his feet
         put("six_bridge_ingot_%d" % k, _add(foot, d))
     for s in ("home", "bridge", "treasure"):                    # beat 16: the same three spots in every flash cut
         f = A["%s_flash" % s]
         put("six_flash_puff_%s" % s, _add(f, (1.2, -0.2)))
-        put("six_flash_boots_%s" % s, _add(f, (0.55, -0.75)))
-        put("six_flash_extra_%s" % s, _add(f, (-0.6, -0.65)))
+        put("six_flash_boots_%s" % s, _add(f, (0.7, 0.1)))
+        put("six_flash_extra_%s" % s, _add(f, (-0.65, 0.0)))
     return out
 
 
@@ -87,31 +89,33 @@ def _anchors(bas):
 NEW_CAMERAS = {
     # beat 1: nether's 'landing' panned 9 degrees toward the brute (he was cut by the left edge) and tilted down a
     # little (the piglins at the gold sat in the caption band); a slow push in along the landing (pos1)
-    "six_landing": dict(pos=(0.45, 16.6, 5.85), target=(5.9, 14.72, 3.6), lens=22.0, fstop=2.8, beats=(1,),
-                        pos1=(0.75, 16.5, 5.8), set="home", focus="home_landing_edge",
+    "six_landing": dict(pos=(0.4, 17.4, 5.8), target=(6.0, 13.6, 3.4), lens=26.0, fstop=2.8, beats=(1,),
+                        pos1=(0.62, 17.25, 5.76), set="home", focus="home_landing_edge",
                         sees=("home_landing_edge", "home_gold_1:head", "home_gold_2:head", "home_gold_3:head")),
     # beats 2 and 21 (the ingot row frame): snout height from the north-west along the gold wall; replaces nether's
     # 'ingot_row' for this film because its frame cannot hold the brute's own ingot in beat 21
-    "six_ingot_row": dict(pos=(5.7, 17.8, 1.6), target=(7.6, 10.2, 1.4), lens=40.0, fstop=2.2, beats=(2, 21),
-                          set="home", focus="six_brother_1",
+    "six_ingot_row": dict(pos=(5.0, 17.0, 1.65), target=(7.6, 10.2, 1.45), lens=40.0, fstop=2.2, beats=(2, 21),
+                          set="home", focus="six_step_ingot",
                           sees=("six_brother_1:head", "six_brother_2:head", "six_brute_gold:head")),
     # beat 7: behind and above the runner's right shoulder at the west rim, down into the pit
     "six_over_pit": dict(pos=(2.6, 4.9, 3.3), target=(4.9, 7.0, -0.6), lens=26.0, fstop=4.0, beats=(7,),
                          set="home", pit="open", focus="home_pit_center",
                          sees=("home_pit_2:head", "home_pit_3:head", "home_pit_4:head")),
     # beat 8: low on the floor south-west of the boots at the rim, the pit beyond them on the right
-    "six_boots_rim": dict(pos=(2.1, 5.2, 1.1), target=(3.6, 6.95, 0.0), lens=45.0, fstop=2.8, beats=(8,),
+    "six_boots_rim": dict(pos=(1.75, 4.75, 1.0), target=(3.55, 6.95, 0.05), lens=40.0, fstop=2.8, beats=(8,),
                           set="home", pit="open", focus="home_rim_w", sees=("home_rim_w:shins",)),
     # beat 10: rim_side a little wider
-    "six_rim_wide": dict(pos=(3.6, 0.8, 1.45), target=(4.0, 7.6, 0.9), lens=26.0, fstop=3.2, beats=(10,),
+    "six_rim_side": dict(pos=(3.4, 0.8, 1.45), target=(3.1, 7.6, 1.0), lens=35.0, fstop=3.0, beats=(9,),
+                         set="home", pit="open", focus="home_rim_w", sees=("home_rim_w", "home_strike")),
+    "six_rim_wide": dict(pos=(3.4, 0.8, 1.45), target=(3.3, 7.6, 0.85), lens=28.0, fstop=3.2, beats=(10,),
                          set="home", pit="open", focus="home_rim_w", sees=("home_rim_w", "home_strike")),
     # beat 22: low on the step beyond the ingot, looking back along his line of sight: the ingot in the middle,
     # his face right above it; a slow push in (pos1)
-    "six_ingot_close": dict(pos=(8.83, 12.88, 1.12), target=(7.95, 11.25, 1.1), lens=40.0, fstop=2.0, beats=(22,),
-                            pos1=(8.72, 12.67, 1.12), set="home", focus="six_step_ingot",
+    "six_ingot_close": dict(pos=(8.84, 13.8, 1.12), target=(8.0, 11.2, 1.15), lens=35.0, fstop=2.0, beats=(22,),
+                            pos1=(8.8, 13.68, 1.12), set="home", focus="six_step_ingot",
                             sees=("six_brute_gold:head",)),
     # beat 23 (the story's fallback): reverse angle from just inside the gateway, floor level
-    "six_gate_reverse": dict(pos=(3.3, 17.4, 0.4), target=(6.8, 11.0, 1.2), lens=30.0, fstop=2.8, beats=(23,),
+    "six_gate_reverse": dict(pos=(8.6, 16.6, 0.4), target=(7.3, 10.6, 1.2), lens=32.0, fstop=2.8, beats=(23,),
                              set="home", focus="six_brute_gold", sees=("six_brute_gold",)),
 }
 
@@ -141,7 +145,8 @@ NE = _yaw((1.0, 1.0))
 
 BEATS = [
     dict(key="b01_landing", beat=1, cam="six_landing", sky="home", set="home",
-         cast=[("brute", "home_landing_edge", "home_landing_edge_look", {})] + G3, hero="brute"),
+         cast=[("brute", "home_landing_edge", "six_landing_look", dict(yaw=nether.yaw_to((2.65, 16.25), (0.4, 17.4))))]
+         + G3, hero="brute"),
     dict(key="b02_ingot_row", beat=2, cam="six_ingot_row", sky="home", set="home",
          cast=[("piglin_admire", "six_brother_1", None, {}), ("piglin_admire", "six_brother_2", None, {}),
                ("brute", "six_brute_turned", None, {})], hero="piglin"),
@@ -165,7 +170,7 @@ BEATS = [
          cast=[("steve", "home_rim_w", "home_pit_center", {}), ("item:ender_pearl", "six_pearl_pile", None, {})] +
               [("item:gravel", "six_gravel_%d" % k, None, {}) for k in range(1, 8)],
          lights={"home_pit": 2.0}, hero="boots"),
-    dict(key="b09_rim_side", beat=9, cam="rim_side", sky="home", set="home", pit="open",
+    dict(key="b09_rim_side", beat=9, cam="six_rim_side", sky="home", set="home", pit="open",
          cast=[("steve", "home_rim_w", "home_pit_center", {}),
                ("brute", "home_strike", "home_rim_w", dict(aggro=True))] +
               [("piglin_admire", "home_pit_%d" % k, None, dict(yaw=_yaw("west"))) for k in (2, 3, 4)],

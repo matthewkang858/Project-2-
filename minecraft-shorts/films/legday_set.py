@@ -54,7 +54,7 @@ STONE_ROW = [(5, y, 0) for y in range(-16, -8)]          # eight stone blocks on
 BENCH_BOX = (-9, 4, -3, 6)                               # the smooth-stone floor of the open-air bench (NW corner)
 BENCH = dict(torch=(-8, 5, 0), dust=[(-7, 5, 0), (-6, 5, 0)], repeater=(-5, 5, 0), block=(-4, 5, 0),
              lamp=(-4, 5, 1), piston=(-3, 5, 0), piston_facing="east")
-COLUMN = dict(piston=(-4, 9, 0), pier=(-3, 9, 0), lever=(-3, 9, 1), blocks=12)
+COLUMN = dict(piston=(-4, 9, 0), pier=(-5, 9, 0), lever=(-5, 9, 1), lever_facing="west", blocks=12)
 
 
 def _box_cells(x0, y0, x1, y1):
@@ -228,8 +228,8 @@ ANCHORS = {
     "bench_narrator": ((-7.1, 3.62), "north"),
     "arms_narrator": ((-3.98, 4.15), "south"), "arms_steve": ((-3.02, 4.15), "south"),
     # ---- beats 9-10: the column (Steve at its south foot looking down at the piston; the narrator east of the pier)
-    "column_steve": ((-3.5, 8.2), "north"), "column_narrator": ((-1.95, 9.5), "west"),
-    "column_walk_end": ((-1.5, 1.6), None),                     # beat 10: where Steve's walk to the well ends
+    "column_steve": ((-3.5, 8.2), "north"), "column_narrator": ((-5.95, 9.3), "east"),
+    "column_walk_end": ((-4.4, 2.6), None),                     # beat 10: where Steve's walk to the well ends
     # ---- the pens (pen_set adds chicken_pen_center / _gate, cow_pen_center / _gate)
     "kai_chickens": ((-19.6, 22.6), "south"), "zuri_cow": ((-11.6, 22.4), "south"),
     "cow_milk_target": ((-10.2, 23.1), None),                   # where the milked cow stands (beats 4-6)
@@ -343,5 +343,8 @@ def make_parts(v, armed_from=1):
     P["column"] = dict(piston=k.piston(COLUMN["piston"], "up", name="column_piston"),
                        blocks=[k.block("iron_block", (cx, cy, cz + i), name="column_iron_%d" % i)
                                for i in range(1, COLUMN["blocks"] + 1)],
-                       lever=k.lever(COLUMN["lever"], "floor", "east", name="column_lever"))
+                       lever=k.lever(COLUMN["lever"], "floor", COLUMN["lever_facing"], name="column_lever"))
     return P
+
+
+CAMERAS = {}

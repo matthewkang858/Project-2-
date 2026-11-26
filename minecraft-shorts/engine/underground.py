@@ -901,3 +901,395 @@ def cameras():
 
 
 CAMERAS = {}
+
+
+# =====================================================================================================================
+# small mechanics the beats need (frames are film frames; 1 tick = 1.2 frames)
+# =====================================================================================================================
+# Entity.push(Entity): d = absMax(dx, dz) between the centres; if d >= 0.01: (dx, dz) / sqrt(d) * min(1, 1 / sqrt(d))
+#   * 0.05 is pushed into the other entity and the opposite into this one (LivingEntity.pushEntities -> doPush ->
+#   push, every tick, for boxes that overlap; the server pushes the villager, the client the player)
+PUSH_STRENGTH = 0.05
+PUSH_MIN_D = 0.01
+ENTITY_WIDTH = {"player": 0.6, "villager": 0.6, "baby": 0.3}   # EntityType sizes (baby villager: scale 0.5)
+GROUND_DRAG = 0.6 * 0.91              # Block.friction 0.6 x 0.91: horizontal speed kept per tick on the ground
+AIR_DRAG = 0.91                       # ... in the air
+WALK_INPUT = 0.1 * 0.98               # movement speed 0.1 x forward input 0.98 (the player's acceleration per tick)
+GRAVITY = 0.08                        # LivingEntity.DEFAULT_BASE_GRAVITY
+VERTICAL_DRAG = 0.98
+STEP_UP = 0.6                         # Entity.maxUpStep
+JUMP_POWER = 0.42                     # LivingEntity.BASE_JUMP_POWER (Attributes.JUMP_STRENGTH): babies alike
+# BedBlock: Blocks lambda$static$44 (every coloured bed): Properties.bounceRestitution(0.75F),
+# fallDistanceReduction(0.5F). Entity.restituteMovementAfterCollisions: on landing with -vy > gravity, vy becomes
+# (f * g - vy) * lerp(f, 1, airDrag) * restitution (f = the part of the tick's move made before the hit); living
+# entities take the full 0.75 (getBlockBounciness: x 0.8 only for non-living ones). Sneaking suppresses it.
+BED_RESTITUTION = 0.75
+# JumpOnBed (the baby villager's play behaviour): MIN_JUMPS 3, MAX_JUMPS 6 (3 + nextInt(4)), COOLDOWN_BETWEEN_JUMPS
+# 5 ticks, a jump only while onBedSurface; LivingEntity.noJumpDelay 10 after every jump
+BED_JUMPS = (3, 6)
+BED_JUMP_COOLDOWN = 5
+NO_JUMP_DELAY = 10
+
+
+def _top_at(world, x, y, z_max):
+    """Height of the walking surface under the point (x, y): the top of the highest solid block whose top is at
+    most z_max (stairs by their two halves, bottom slabs, path blocks 15/16)."""
+    cx, cy = int(math.floor(x)), int(math.floor(y))
+    fx, fy = x - cx, y - cy
+    for z in range(int(math.floor(z_max)), int(math.floor(z_max)) - 24, -1):
+        st = world.get(cx, cy, z)
+        if st is None or not world.is_solid(cx, cy, z):
+            continue
+        bid, p = st
+        top = z + 1.0
+        if bid.endswith("_stairs") and p.get("half", "bottom") == "bottom":
+            face = p.get("facing", "north")
+            high = {"north": fy >= 0.5, "south": fy < 0.5, "east": fx >= 0.5, "west": fx < 0.5}[face]
+            top = z + (1.0 if high else 0.5)
+        elif bid.endswith("_slab") and p.get("type", "bottom") == "bottom":
+            top = z + 0.5
+        elif bid in ("dirt_path", "farmland"):
+            top = z + 15.0 / 16.0
+        if top <= z_max + 1e-6:
+            return top
+    return None
+
+
+def _support(world, x, y, z_now, half, along):
+    """The highest surface under an entity's square footprint (it stands on whatever is under any part of it)."""
+    best = None
+    ax, ay = along
+    px, py = -ay, ax
+    for u in (-half + 0.01, 0.0, half - 0.01):
+        for w_ in (-half + 0.01, 0.0, half - 0.01):
+            t = _top_at(world, x + ax * u + px * w_, y + ay * u + py * w_, z_now + STEP_UP)
+            if t is not None and (best is None or t > best):
+                best = t
+    return best
+
+
+def push(player, villager, frame, path, world, taps=(4, 4), steps_down=1, gap=0.9, legs=False, tail=6,
+         max_ticks=600, stop_margin=0.32):
+    """THE PLAYER WALKS INTO A VILLAGER and pushes him along `path` ((x, y[, z]) points; the villager starts at
+    path[0], the player `gap` blocks behind him) until he has dropped down `steps_down` steps (the stair's two
+    half steps count as one each), with the game's entity push (Entity.push: 0.05 * sqrt(d) per tick while the two
+    boxes overlap, d = the distance of the centres) and friction. The push is weakest when they overlap most, so a
+    player who holds the walk key walks THROUGH a villager in about a second: players push villagers along by
+    tapping it, which is what `taps` = (ticks pressed, ticks released) does (4, 4: about 1.1 blocks/s, in small
+    nudges; None = held). The player stops at the lip (he never follows him down). Both are placed on `frame`;
+    the villager slides with no walk cycle (legs=True: the game's leg wave from the distance he moves, which the
+    game does draw for a pushed mob). Returns dict(end, landed, drops, villager, player) with per-tick tracks."""
+    from . import characters as ch
+
+    f0 = int(round(frame))
+    pts = [Vector((p[0], p[1], 0.0)) for p in path]
+    seg = [(b - a).length for a, b in zip(pts, pts[1:])]
+    total = sum(seg)
+    dirv = (pts[-1] - pts[0]).normalized()
+    along = (dirv.x, dirv.y)
+
+    def at(s):
+        for i, length in enumerate(seg):
+            if s <= length or i == len(seg) - 1:
+                return pts[i].lerp(pts[i + 1], max(0.0, s / length) if length > 1e-9 else 0.0)
+            s -= length
+        return pts[-1]
+
+    def xy(s):
+        if s < 0:
+            return pts[0] + dirv * s
+        if s > total:
+            return pts[-1] + dirv * (s - total)
+        return at(s)
+
+    zv = _support(world, pts[0].x, pts[0].y, 2.0, 0.3, along) or 0.0
+    zp0 = _support(world, xy(-gap).x, xy(-gap).y, 2.0, 0.3, along) or 0.0
+    sv, vv, vz, z, sp, vp = 0.0, 0.0, 0.0, zv, -gap, 0.0
+    ground = True
+    drops, landed_tick = [], None
+    stop_s = None
+    vtrack, ptrack = [(sv, z)], [sp]
+    t = 0
+    while t < max_ticks:
+        pressed = taps is None or (t % (taps[0] + taps[1])) < taps[0]
+        if len(drops) >= steps_down or (stop_s is not None and sp >= stop_s):
+            pressed = False
+        # the player: input, move, friction (he stays on the square)
+        if pressed:
+            vp += WALK_INPUT
+        sp += vp
+        if stop_s is not None and sp > stop_s:
+            sp, vp = stop_s, 0.0
+        vp *= GROUND_DRAG
+        # the villager: move, fall, friction
+        sv += vv
+        q = xy(sv)
+        sup = _support(world, q.x, q.y, z, 0.3, along)
+        if ground and (sup is None or sup < z - 1e-6):
+            ground, vz = False, 0.0
+        if not ground:
+            z_new = z + vz
+            if sup is not None and z_new <= sup:
+                z, vz, ground = sup, 0.0, True
+                drops.append(t)
+                landed_tick = t
+            else:
+                z = z_new
+                vz = (vz - GRAVITY) * VERTICAL_DRAG
+        elif sup is not None and sup > z:
+            z = sup                                          # stepping up (not on this path)
+        vv *= GROUND_DRAG if ground else AIR_DRAG
+        # the push (after travel), while the two boxes overlap
+        dx = sv - sp
+        if abs(dx) < 0.5 * (ENTITY_WIDTH["player"] + ENTITY_WIDTH["villager"]) and z < zp0 + 1.8:
+            d = abs(dx)
+            if d >= PUSH_MIN_D:
+                r = math.sqrt(d)
+                p = (dx / r) * min(1.0, 1.0 / r) * PUSH_STRENGTH
+                vv += p
+                vp -= p
+        if stop_s is None:
+            lip = _first_drop(world, xy, zp0, along)
+            stop_s = lip - stop_margin if lip is not None else total + 10.0
+        vtrack.append((sv, z))
+        ptrack.append(sp)
+        t += 1
+        if len(drops) >= steps_down and ground and abs(vv) < 2e-3 and abs(vp) < 2e-3:
+            break
+    for _ in range(tail):
+        vtrack.append(vtrack[-1])
+        ptrack.append(ptrack[-1])
+    # keys: the villager's feet per tick (LINEAR), the player through his own gait (engine.players)
+    yaw = math.atan2(dirv.x, -dirv.y)
+    villager.place(f0, (pts[0].x, pts[0].y, zv), yaw)
+    for i in range(3):
+        keys = []
+        for k, (s, zz) in enumerate(vtrack):
+            q = xy(s)
+            keys.append((f0 + k * TICK, (q.x, q.y, zz)[i], "LINEAR"))
+        ch._segment(villager.root, "location", i, keys, "LINEAR")
+    if legs:
+        _leg_wave(villager, f0, [b[0] - a[0] for a, b in zip(vtrack, vtrack[1:])], scale=0.5)
+    start = xy(-gap)
+    player.place(f0, (start.x, start.y, zp0), yaw)
+    steps = [b - a for a, b in zip(ptrack, ptrack[1:])]
+    _drive_player(player, f0, [Vector((xy(s).x, xy(s).y, zp0)) for s in ptrack], steps)
+    end = int(math.ceil(f0 + (len(vtrack) - 1) * TICK))
+    return dict(end=end, landed=None if landed_tick is None else int(math.ceil(f0 + landed_tick * TICK)),
+                drops=[int(math.ceil(f0 + d * TICK)) for d in drops], villager=vtrack, player=ptrack,
+                speed=(vtrack[-1][0] - vtrack[0][0]) / max(1e-9, (len(vtrack) - 1) / 20.0))
+
+
+def _first_drop(world, xy, z, along):
+    """Distance along the push line where the ground first drops by half a block or more (the lip)."""
+    prev = None
+    s = 0.0
+    while s < 40.0:
+        q = xy(s)
+        top = _top_at(world, q.x, q.y, z + 0.1)
+        if prev is not None and (top is None or top < prev - 0.4):
+            return s
+        prev = top if top is not None else prev
+        s += 0.05
+    return None
+
+
+def _leg_wave(c, f0, steps, scale=0.5):
+    """The game's walk-animation legs from per-tick distances (calculateEntityAnimation, HumanoidModel /
+    VillagerModel legs cos(0.6662 p) * 1.4 * s * scale)."""
+    from . import characters as ch
+
+    p, s = 0.0, 0.0
+    kr, kl = [], []
+    for k, d in enumerate(list(steps) + [0.0] * 12):
+        s += (min(4.0 * abs(d), 1.0) - s) * 0.4
+        p += s
+        a = math.cos(0.6662 * p) * 1.4 * s * scale
+        kr.append((f0 + k * TICK, a, "LINEAR"))
+        kl.append((f0 + k * TICK, -a, "LINEAR"))
+    ch._segment(c.leg_r, "rotation_euler", 0, kr, "LINEAR")
+    ch._segment(c.leg_l, "rotation_euler", 0, kl, "LINEAR")
+
+
+def _drive_player(player, f0, positions, steps):
+    """Key a player (engine.players.Player) along per-tick positions with his own gait (legs from the distances)."""
+    path = []
+    for q in positions:
+        if not path or (q - path[-1]).length > 1e-6:
+            path.append(q.copy())
+    if len(path) < 2:
+        return
+    cum = [0.0]
+    for d in steps:
+        cum.append(cum[-1] + abs(d))
+    if hasattr(player, "_travel") and hasattr(player, "_limbs"):
+        total = sum((b - a).length for a, b in zip(path, path[1:]))
+        k = total / cum[-1] if cum[-1] > 1e-9 else 1.0
+        cum = [c * k for c in cum]
+        times = player._travel(f0, path, cum)
+        player._yaw_keys(f0, path, times, False)
+        player._limbs(f0, [abs(d) * k for d in steps])
+    else:
+        player.walk(f0, [positions[0], positions[-1]], speed=max(0.3, cum[-1] / max(1e-6, len(steps) / 20.0)))
+
+
+def bed_bounce(child, frame, spot, jumps=4, settle=True):
+    """A baby villager jumping on a bed, as JumpOnBed plays it: `jumps` (the game: 3 to 6) full jumps of
+    JUMP_POWER 0.42 (1.25 blocks up, 12 ticks), each starting the tick after the last landing (the brain asks again
+    while it stands on the bed; noJumpDelay 10 has run out), then with settle=True the bed's own bounce
+    (restitution 0.75) dying out: 0.67, 0.33, 0.12 blocks ... `spot` = (x, y, z) on the mattress (z = its top,
+    9/16 above the bed's floor: the Village bed anchors). The child is placed on `frame`; legs do not move (the game
+    draws no walk animation for a vertical move). Returns dict(end, landings, peaks, track)."""
+    from . import characters as ch
+
+    f0 = int(round(frame))
+    base = float(spot[2])
+    z, vy = base, 0.0
+    track, landings, peaks = [z], [], []
+    left = int(jumps)
+    t = 0
+    ground = True
+    top = base
+    while t < 400:
+        if ground and left > 0:
+            vy = max(JUMP_POWER, vy)
+            left -= 1
+            ground = False
+            top = base
+        z_prev = z
+        z_new = z + vy
+        if not ground and z_new <= base and vy < 0:
+            frac = (base - z_prev) / vy if vy != 0 else 0.0
+            if -vy > GRAVITY:
+                vy = (frac * GRAVITY - vy) * (1.0 + frac * (VERTICAL_DRAG - 1.0)) * BED_RESTITUTION
+                if not settle and left <= 0:
+                    vy = 0.0
+            else:
+                vy = 0.0
+            z = base
+            ground = True
+            landings.append(t)
+            peaks.append(top - base)
+            vy = (vy - GRAVITY) * VERTICAL_DRAG if vy > 0 else 0.0
+            if vy <= 0:
+                vy = 0.0
+            elif left <= 0:
+                ground = False                              # the bounce: up again with what is left
+        else:
+            z = z_new
+            top = max(top, z)
+            vy = (vy - GRAVITY) * VERTICAL_DRAG
+        track.append(z)
+        t += 1
+        if left <= 0 and ground and vy == 0.0 and t > 2:
+            break
+    yaw = child.yaw_at(f0)
+    child.place(f0, (spot[0], spot[1], base), yaw)
+    ch._segment(child.root, "location", 2, [(f0 + k * TICK, zz, "LINEAR") for k, zz in enumerate(track)],
+                "LINEAR")
+    return dict(end=int(math.ceil(f0 + (len(track) - 1) * TICK)), landings=[int(math.ceil(f0 + l * TICK)) for l in
+                landings], peaks=[round(p, 3) for p in peaks], track=track)
+
+
+def jump_loop(player, frame_start, frame_end):
+    """The player jumping on the spot again and again (space held: a new jump the tick he lands, every 12 ticks
+    = 14.4 frames; engine.players Player.jump). Returns the take-off frames."""
+    out = []
+    t = float(frame_start)
+    period = 12 * TICK
+    while t + period <= frame_end + 1e-6:
+        out.append(int(round(t)))
+        player.jump(t)
+        t += period
+    return out
+
+
+def hidden_frames(world, camera, character, frame_start, frame_end, points=(0.25, 0.55, 0.85), step=0.08):
+    """Frames on which every sample point of the character (heights as fractions of its height, on its centre
+    line) is hidden from the camera by solid blocks of the World. camera = a point or a callable frame -> point."""
+    import bpy as _bpy
+
+    out = []
+    h = getattr(character, "height", 1.0)
+    for f in range(int(frame_start), int(frame_end) + 1):
+        cam = Vector(camera(f) if callable(camera) else camera)
+        feet = character.pos_at(f)
+        hidden = True
+        for frac in points:
+            p = feet + Vector((0.0, 0.0, h * frac))
+            d = p - cam
+            n = max(1, int(d.length / step))
+            blocked = False
+            for i in range(1, n):
+                q = cam + d * (i / n)
+                c = (int(math.floor(q.x)), int(math.floor(q.y)), int(math.floor(q.z)))
+                if world.is_solid(*c) and world.is_full_cube(*c):
+                    blocked = True
+                    break
+            if not blocked:
+                hidden = False
+                break
+        if hidden:
+            out.append(f)
+    return out
+
+
+def swap_hidden(child, adult, camera, frame_start, frame_end, world, then=None, speed=None):
+    """Beat 20: the child is swapped for the grown-up villager on a frame where it is hidden from the camera
+    (by the well): the middle of the longest run of hidden frames between frame_start and frame_end. The adult is
+    not there before that frame (engine.undead vanish / appear, independent of the Stage's shows), stands where the
+    child was, facing the same way, and walks on along `then` (points) at `speed` (None: the child's own walk
+    ends there and the adult's stroll is Character.walk's default). Returns dict(frame, hidden)."""
+    from . import undead
+
+    hid = hidden_frames(world, camera, child, frame_start, frame_end)
+    if not hid:
+        raise ValueError("swap_hidden: the child is never hidden from that camera between frames %d and %d"
+                         % (frame_start, frame_end))
+    runs, cur = [], [hid[0]]
+    for f in hid[1:]:
+        if f == cur[-1] + 1:
+            cur.append(f)
+        else:
+            runs.append(cur)
+            cur = [f]
+    runs.append(cur)
+    best = max(runs, key=len)
+    f = best[len(best) // 2]
+    undead.vanish(adult, frame_start)
+    undead.vanish(child, f)
+    pos, yaw = child.pos_at(f), child.yaw_at(f)
+    adult.place(f, pos, yaw)
+    undead.appear(adult, f)
+    if then:
+        adult.walk(f, [pos] + list(then), speed=speed)
+    return dict(frame=f, hidden=(best[0], best[-1]), runs=[(r[0], r[-1]) for r in runs])
+
+
+def hands_in_slot(zv, frame, slot=SLOT, lateral=0.0):
+    """The baby zombie villager inside the box with his tiny hands resting between the iron bars of the slot: he
+    stands against the bars (his box touches the pane, as the game's collision allows), facing out, arms out (the
+    zombie's own -80 degrees, toed in, with their slow bob); the two 2-px hands land in the bars' two gaps (texels
+    4-6 and 9-11 of iron_bars.png) with the fingertips in the pane. Places him on `frame`; returns the hand tips."""
+    import bpy as _bpy
+
+    from . import undead
+
+    sx, sy, sz = slot
+    pane_x = sx + 0.5                                         # the pane of a north-south bars block: x 7..9 px
+    yaw = yaw_of("east")
+    y = sy + 0.5 + lateral
+    zv.place(frame, (sx + 0.0, y, float(sz)), yaw)
+    scene = _bpy.context.scene
+    scene.frame_set(int(frame))
+    dg = _bpy.context.evaluated_depsgraph_get()
+    tips = []
+    for arm in (zv.arm_r, zv.arm_l):
+        ev = arm.evaluated_get(dg)
+        xs = [(ev.matrix_world @ Vector(c)).x for c in ev.bound_box]
+        tips.append(max(xs))
+    reach = max(tips) - (sx + 0.0)
+    x = pane_x + 1.0 / 32.0 - reach                           # fingertips 0.5 px into the 2-px pane
+    body_back = x - undead.BABY_SIZE[0] / 2.0
+    zv.place(frame, (x, y, float(sz)), yaw)
+    return dict(x=x, reach=reach, tip_x=x + reach, body_back=body_back, pane=(pane_x - 1 / 16.0, pane_x + 1 / 16.0))
