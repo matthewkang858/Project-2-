@@ -93,6 +93,33 @@ def main():
     gf = h["grow"]
     a, b = take([gf - 1, gf])
     ok("the baby is swapped for the adult ON frame %d: the fingerprint changes there" % gf, a != b)
+    # beat 24: the golem appears through the glass behind the four on its frame; the trembles move every frame
+    b24 = h["b24"]
+    a, b = take([b24["spawn"] - 1, b24["spawn"]])
+    ok("beat 24: the golem appears behind the glass ON its frame (%d)" % b24["spawn"], a != b)
+    s24 = shots["b24"]
+    fr = list(range(s24.frame_start + 2, s24.frame_start + 10))
+    vals = take(fr)
+    ok("beat 24: the panic tremble changes every frame (%d frames)" % len(fr), len(set(vals)) == len(fr))
+    # the panic shots in the digest too (their seeds must not depend on the process: zlib.crc32, not hash())
+    take([shots["pod_in"].frame_start + 6, shots["b08"].frame_start + 6, shots["b08"].frame_start + 7])
+    # particles do not run on into the next shot (golem_death / break_top_step until=)
+
+    def lit(burst, f):
+        scene.frame_set(f)
+        return [p for p in burst.particles if not p["object"].hide_render]
+
+    order_ = sorted(film.shots, key=lambda s_: s_.frame_start)
+    for shot_name, burst in (("slide", sl["death"]["burst"]), ("stairs", m.get("burst")), ("b22", h["b22"].get("burst"))):
+        if burst is None:
+            continue
+        sh_ = shots[shot_name]
+        nxt_ = [s_ for s_ in order_ if s_.frame_start > sh_.frame_start]
+        if not nxt_:
+            continue
+        f_next = nxt_[0].frame_start
+        ok("the %s shot's particles are all gone on the next shot's first frame (%d)" % (shot_name, f_next),
+           not lit(burst, f_next) and not lit(burst, f_next + 6))
     po = shots["pod_out"]
     nxt = shots[[s.name for s in sorted(film.shots, key=lambda s: s.frame_start)
                  if s.frame_start > po.frame_start][0]]

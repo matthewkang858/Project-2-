@@ -46,23 +46,86 @@ from engine import breaking, fx, redstone
 from films import legday_common as LC
 
 # ---------------------------------------------------------------------------------------------------------------
-# this sequence's own cameras (starts: the set builder's suggestions, films/legday_set.py CAMERAS; yours to change)
+# this sequence's own cameras (C.cam(s, None, **CAM)); a move's timing per shot: _ease (KEYS)
 # ---------------------------------------------------------------------------------------------------------------
-SQ01_CAM = dict(LC._set_cam("b01"), pos1=(-0.55, -12.3, 0.34))          # + a slow push in (moving on frame 1)
-# beats 2 and 3, one take: close on Steve punching the first stone (b02), then drifting back and round to the
-# whole row with the pickaxe behind him (b03's pull-back)
-SQ02_CAM = dict(pos=(7.0, -20.4, 0.8), target=(5.79, -15.55, 0.8), pos1=(1.4, -23.0, 1.25),
-                target1=(3.9, -13.9, 0.7), lens=24.0, fstop=2.8)
-SQ07_CAM = dict(LC._set_cam("b07"), pos1=(-1.0, 7.0, 1.35))
-SQ08_CAM = dict(LC._set_cam("b08"), pos1=(-5.52, -0.45, 1.12))
-SQ09_CAM = LC._set_cam("b09")                                             # a tilt up the column (target -> target1)
+SQ01_CAM = dict(pos=(-0.42, -10.45, 0.95), target=(-0.55, -6.6, 0.6), pos1=(-0.47, -9.85, 0.93),
+                target1=(-0.55, -6.6, 0.6), lens=18.0, fstop=2.8)
+SQUATS = {"steve": (-0.55, -7.5), "zuri": (-1.72, -5.85), "ari": (0.6, -5.8)}   # a wedge: Steve forward
+NARRATOR_FAR = (4.6, 2.6)     # sq01: at the square's east edge beyond the well: the one spot of the far square the
+#                               trio does not cover from SQ01_CAM (narrator_far (-6.0, 3.2) is behind Zuri's anvil)
+SQ02_CAM = dict(pos=(6.45, -19.0, 1.25), target=(4.85, -15.45, 0.85), pos1=(3.45, -20.5, 1.8),
+                target1=(3.1, -14.2, 0.7), lens=22.0, fstop=2.8)
+SQ02_KEYS = [(73, 0.0), (128, 0.08), (152, 0.22), (184, 0.90), (205, 1.0)]
+BENCH_NARRATOR = (-7.25, 7.4)  # sq07: bench_narrator (-7.3, 6.6) moved 0.8 north, beside the head of the dust: from
+#                               the south-east he stands above and left of the lamp instead of behind it
+SQ07_CAM = dict(pos=(-2.85, 3.65, 2.25), target=(-6.6, 6.55, 0.85), pos1=(-3.05, 3.9, 2.15),
+                target1=(-6.6, 6.6, 0.85), lens=20.0, fstop=2.4)
+SQ08_CAM = dict(pos=(-5.5, -1.66, 1.12), target=(-5.5, 3.15, 1.12), pos1=(-5.5, -0.42, 1.02),
+                target1=(-5.5, 3.15, 1.02), lens=50.0, fstop=2.8)
+SQ08_KEYS = [(431, 0.0), (437, 0.25), (447, 0.80), (455, 0.93), (520, 1.0)]
+SQ09_CAM = dict(pos=(-1.3, 5.9, 0.45), target=(-3.55, 9.55, 1.15), pos1=(-1.45, 5.75, 0.4),
+                target1=(-3.6, 9.6, 11.5), lens=18.0, fstop=4.0)
+SQ09_KEYS = [(520, 0.0), (590, 0.06), (596, 0.25), (612, 0.95), (627, 1.0)]
 SQ10_CAM = dict(LC._set_cam("b10"), pos1=(-1.85, 3.5, 0.45))
-KAI_LAP = [(1.3, -5.3, -0.06), (2.9, -3.0, -0.06), (3.6, 0.4, -0.06), (2.4, 3.6, -0.06)]
+KAI_LAP = [(3.38, -1.3), (3.4, 0.5), (1.5, 3.5), (-2.5, 3.6), (-4.4, 1.5), (-4.5, -3.0), (-4.45, -6.0)]   # round the well
 MINE_BREAK = "drops"          # the first stone bursts on this word (sq02): "It DROPS nothing"
 MINE_FRAMES = breaking.break_frames("stone")   # click -> break of stone by hand: THE GAME'S 180 frames (7.5 s; the
 #                               review: the first stub compressed it to 114, and punching stone being slow is the joke
 #                               of the beat). The click is on frame -50 (a pre-roll before the film: the stone row is
 #                               in no earlier frame); on frame 73 the cracks are at stage 6 of 10
+
+
+def _curve(keys):
+    """A monotone cubic through keys [(frame, value), ...] (Fritsch-Carlson: no overshoot), held outside them:
+    returns e(frame)."""
+    xs = [float(k[0]) for k in keys]
+    ys = [float(k[1]) for k in keys]
+    n = len(xs)
+    d = [(ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]) for i in range(n - 1)]
+    m = [d[0]] + [0.0 if d[i - 1] * d[i] <= 0 else (d[i - 1] + d[i]) / 2.0 for i in range(1, n - 1)] + [d[-1]]
+    for i in range(n - 1):
+        if d[i] == 0.0:
+            m[i] = m[i + 1] = 0.0
+            continue
+        a, b = m[i] / d[i], m[i + 1] / d[i]
+        h = a * a + b * b
+        if h > 9.0:
+            t = 3.0 / math.sqrt(h)
+            m[i], m[i + 1] = t * a * d[i], t * b * d[i]
+
+    def e(f):
+        if f <= xs[0]:
+            return ys[0]
+        if f >= xs[-1]:
+            return ys[-1]
+        i = max(k for k in range(n - 1) if xs[k] <= f)
+        h = xs[i + 1] - xs[i]
+        t = (f - xs[i]) / h
+        h00, h10 = 2 * t ** 3 - 3 * t ** 2 + 1, t ** 3 - 2 * t ** 2 + t
+        h01, h11 = -2 * t ** 3 + 3 * t ** 2, t ** 3 - t ** 2
+        return h00 * ys[i] + h10 * h * m[i] + h01 * ys[i + 1] + h11 * h * m[i + 1]
+    return e
+
+
+def _ease(s, keys):
+    """A camera move of shot s timed by keys [(film frame, fraction of the move), ...] (a monotone cubic through
+    them: one shot can drift, then move, then settle) instead of one of engine.shots' four eases. The curve is
+    registered in engine.shots.EASES under the shot's own name (at run time: no engine file changes), so the move
+    is baked with it by C.cam and again by Film.finalize. Returns that name: C.cam(s, None, ease=_ease(s, KEYS))."""
+    from engine import shots as SH
+    e = _curve(keys)
+    span = float(max(1, s.frame_end + 1 - s.frame_start))
+    name = "legday_" + s.name
+    SH.EASES[name] = lambda u, e=e, f0=s.frame_start, span=span: e(f0 + u * span)
+    return name
+
+
+def _head_dir(c, frame, yaw_deg, pitch_deg=0.0, dist=3.0):
+    """A look target that turns c's head `yaw_deg` from its body (+ = to its left) and `pitch_deg` up at `frame`."""
+    eye = c.eye_point(frame)
+    yaw = c.yaw_at(frame) + math.radians(yaw_deg)
+    return (eye.x + math.sin(yaw) * dist, eye.y - math.cos(yaw) * dist,
+            eye.z + math.tan(math.radians(pitch_deg)) * dist)
 
 
 def _stone(C, i):
@@ -122,22 +185,24 @@ def sq01_squats(st, s, C, nar):
       frame 1 (at speed), the narrator still at narrator_far with the torch. Heroes: Steve, Zuri, Ari.
     """
     f0, f1 = s.frame_start, s.frame_end
+    lens_at = SQ01_CAM["pos"]
     trio = []
     for role in ("steve", "zuri", "ari"):
         p = C.actor(role, "sq")
-        C.put(p, f0, "squat_" + role)
+        C.put(p, f0, SQUATS[role], yaw=C.yaw("squat_" + role))      # facing south (the lens)
         C.carry_anvil(p)                                 # the morning: whole anvils
         trio.append(p)
+    kai = C.actor("kai", "sq")
+    lap = [C.stand(q) for q in KAI_LAP]
+    kai.place(f0, lap[0], LC.yaw_to(lap[0], lap[1]))
+    efe = C.narrator("sq")
+    C.put(efe, f0, NARRATOR_FAR, toward=SQUATS["steve"])     # the only one not moving: placed, nothing else
     for p in trio:
-        p.look_at(f0, SQ01_CAM["pos"], ease=0)
-        for f in range(f0 + 1, f1 - 6, 12):            # squats in unison (crouch spam): down 6 frames, up 6
+        p.look_at(f0, lens_at, ease=0)                   # their faces to the lens
+        for f in range(f0 + 1, f1 - 6, 12):             # squats in unison (crouch spam): down 6 frames, up 6
             p.sneak(f, True)
             p.sneak(f + 6, False)
-    kai = C.actor("kai", "sq")
-    kai.place(f0, KAI_LAP[0], LC.yaw_to(KAI_LAP[0], KAI_LAP[1]))
-    kai.sprint_jump(f0, KAI_LAP, ramp=(False, False))
-    efe = C.narrator("sq")
-    C.put(efe, f0, "narrator_far")
+    kai.sprint_jump(f0, lap, ramp=(False, False))      # already hopping at speed on frame 1
     st.use(s, *trio, kai, efe)
     C.cam(s, None, focus=trio[0].head, **SQ01_CAM)
     st.hero(s, "squatters", *trio)
@@ -206,14 +271,16 @@ def sq02_reps(st, s, C, nar):
     steve.look_at(burst + 6, spot, ease=6)
     b = C.P("mine_2")
     step = burst + 23
-    steve.walk(step, [a, b], speed=1.4)
+    arrive = steve.walk(step, [a, b], speed=2.6)       # one block north at an easy pace (14 frames)
     steve.look_at(step + 2, _stone(C, 1).center, ease=8)
-    _begin_mining(steve, _stone(C, 1), step + 17, f1)
+    steve.turn(arrive, C.yaw("mine_2"), ease=5)           # square to stone 2 again (the walk turned him north)
+    steve.look_at(arrive + 1, _stone(C, 1).center, ease=4)   # (and his head with it, BEFORE the swings: fx keys
+    _begin_mining(steve, _stone(C, 1), arrive + 6, f1)       # the head absolute from the pose at the first one)
     pick = C.item("iron_pickaxe", "sq")
     pick.place(f0, C.P("pickaxe_target"))
     pick.animate(f0, f1 + 1)
     st.use(s, steve, pick)
-    C.cam(s, None, focus=steve.head, ease="linear", **SQ02_CAM)
+    C.cam(s, None, focus=steve.head, ease=_ease(s, SQ02_KEYS), **SQ02_CAM)
     st.hero(s, "steve", steve)
     C.lights(s, "gold", near=(4.0, -14.0, 1.0), radius=10.0)
 
@@ -247,12 +314,16 @@ def sq07_bench(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.narrator("sq")
-    C.put(efe, f0, "bench_narrator")
+    C.put(efe, f0, BENCH_NARRATOR, yaw=C.yaw("bench_narrator"))      # facing east
     B = C.bench
-    efe.look_at(f0, (-5.5, 8.4, 0.2), ease=0)
-    t = B["torch"].plant(C.at(s, "I'm"), player=efe)
+    spot = (-5.5, 8.45, 0.15)                            # the torch's spot at the head of the dust
+    efe.look_at(f0, (-5.6, 7.6, 0.3), ease=0)            # on the cut he looks down along the dust ...
+    efe.look_at(f0 + 1, spot, ease=5)                    # ... and up it to the spot (moving on frame 1)
+    plant = C.at(s, "a") - 2                             # the swing; the torch stands on the next frame
+    t = B["torch"].plant(plant, player=efe)
     redstone.signal(t, B["wire"], B["repeater"], (B["lamp"], B["piston"]))
-    efe.look_at(int(t) + 6, B["lamp"].center, ease=6)
+    efe.look_at(int(t) + 2, B["lamp"].center, ease=6)    # to the lamp as it lights: its light on his face
+    efe.look_at(int(t) + 16, SQ07_CAM["pos1"], ease=8)   # then to us: "I'm a redstoner"
     st.use(s, efe)
     C.cam(s, None, focus=efe.head, **SQ07_CAM)
     st.hero(s, "narrator", efe)
@@ -313,19 +384,21 @@ def sq08_arms(st, s, C, nar):
     C.put(efe, f0, "arms_narrator")
     steve = C.actor("steve", "sq3")
     b = C.P("arms_steve")
-    a = (b[0] + 0.8, b[1] + 0.25, b[2])
+    a = (b[0] + 0.8, b[1] + 0.2, b[2])
     front = C.yaw("arms_steve")                          # south: the lens
-    steve.place(f0 - 20, a, LC.yaw_to(a, b))
-    steve.look_at(f0 - 20, (b[0] - 1.0, b[1] - 1.5, 1.5), ease=0)
-    arrive = steve.walk(f0 - 20, [a, b], speed=1.6)
+    lens_at = SQ08_CAM["pos1"]
+    steve.place(f0 - 21, a, LC.yaw_to(a, b))
+    steve.look_at(f0 - 21, (b[0] - 1.0, b[1] - 1.5, 1.5), ease=0)
+    arrive = steve.walk(f0 - 21, [a, b], speed=1.4)
     square = steve.turn(arrive, front, ease=5)           # square to the lens before "arms"
     assert square < C.at(s, "arms"), "sq08: Steve must be square to the lens before 'arms' (%d)" % square
-    efe.look_at(f0, (-5.6, 1.0, 1.2), ease=0)
-    steve.look_at(arrive, (-5.6, 1.0, 1.25), ease=5)
-    steve.look_at(C.at(s, "three") - 2, (-5.38, 2.9, 1.0), ease=8)
-    efe.look_at(C.at(s, "four") - 4, (-5.65, 2.9, 0.95), ease=8)
+    efe.look_at(f0, lens_at, ease=0)
+    steve.look_at(arrive, lens_at, ease=5)
+    steve.look_at(C.at(s, "three") - 2, (-5.66, 3.15, 0.95), ease=8)     # down at the thin arm
+    steve.look_at(C.at(s, "and") - 6, lens_at, ease=8)
+    efe.look_at(C.at(s, "four") - 4, (-5.40, 3.15, 0.95), ease=8)      # at the wide arm
     st.use(s, efe, steve)
-    C.cam(s, None, focus=(-5.52, 3.15, 1.1), **SQ08_CAM)
+    C.cam(s, None, focus=(-5.5, 3.15, 1.1), ease=_ease(s, SQ08_KEYS), **SQ08_CAM)
     st.hero(s, "narrator", efe)
     st.hero(s, "steve", steve)
     C.lights(s, "gold", near=(-3.5, 4.0, 1.0), radius=8.0)
@@ -363,13 +436,17 @@ def sq09_lifts(st, s, C, nar):
     C.put(steve, f0, "column_steve")
     efe = C.narrator("sq")
     C.put(efe, f0, "column_narrator", toward=(-3.5, 10.5, 1.3))
-    steve.look_at(f0, (-3.5, 9.5, 0.6), ease=0)
-    efe.look_at(f0, (-3.5, 10.5, 1.2), ease=0)
-    t = redstone.flip_by(efe, C.column["lever"], C.at(s, "said"), look=False)
+    piston = (-3.5, 9.5, 0.7)
+    steve.look_at(f0, piston, ease=0)
+    efe.look_at(f0, steve, ease=0)
+    steve.look_at(C.at(s, "asked") - 4, efe, ease=7)                    # he asks the narrator ...
+    steve.look_at(C.at(s, "my") - 2, piston, ease=6)                    # ... and looks at "my piston"
+    t = redstone.flip_by(efe, C.column["lever"], C.at(s, "said"))
     C.column["piston"].power(t)
-    steve.look_at(int(t) + 2, (-3.5, 9.5, 9.0), ease=14)
+    steve.look_at(int(t) + 1, (-3.5, 9.5, 9.0), ease=12)                # his head tips back with the column
+    efe.look_at(int(t) + 3, steve, ease=8)
     st.use(s, steve, efe)
-    C.cam(s, None, focus=steve.head, ease="linear", **SQ09_CAM)
+    C.cam(s, None, focus=steve.head, ease=_ease(s, SQ09_KEYS), **SQ09_CAM)
     st.hero(s, "steve", steve)
     st.hero(s, "narrator", efe)
     C.lights(s, "gold", near=(-4.0, 9.0, 1.0), radius=10.0)
@@ -400,15 +477,16 @@ def sq10_cheating(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "sq3")
-    a, e = (-4.6, 8.0, 0.0), C.P("column_walk_end")
+    a, e = C.stand((-4.6, 8.0)), C.P("column_walk_end")
     steve.place(f0, a, LC.yaw_to(a, e))
-    steve.walk(f0, [a, e], ramp=(False, True))
-    cam = SQ10_CAM["pos"]
-    steve.look_at(f0, C.to_lens(steve, f0, (cam[0] + 3.0, cam[1] - 2.0, 1.6), cam, degrees=60.0), ease=0)
     efe = C.narrator("sq")
     C.put(efe, f0, "column_narrator")
-    efe.look_at(f0, steve.eye_point(f0 + 10), ease=0)
-    efe.look_at(f0 + 4, steve.eye_point(f1), ease=f1 - f0 - 8)
+    steve.look_at(f0, _head_dir(steve, f0, 12.0, -6.0), ease=0)
+    steve.walk(f0, [a, e], ramp=(False, True))
+    away = C.at(s, "cheating") - 3                       # his head turns away in profile: nose up, to his left
+    steve.look_at(away, _head_dir(steve, away + 6, 70.0, 12.0), ease=6)
+    efe.look_at(f0, steve, ease=0)
+    efe.track(f0 + 1, f1, steve, step=3, ease=4)
     st.use(s, steve, efe)
     C.cam(s, None, focus=steve.head, **SQ10_CAM)
     st.hero(s, "steve", steve)

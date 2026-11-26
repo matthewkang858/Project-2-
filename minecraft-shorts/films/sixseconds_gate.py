@@ -12,8 +12,8 @@ and MEASURED lines, the stills and the palette checks):
         from the runner to the brute once he is past the lens; a neutral fill keeps the shirt teal
   gt17  one slow heavy step into the gateway (pre-rolled, planted by "waiting"), axe low, a slow push in
   gt18  THE GATE FRAME: the silhouette in the gateway, the flicker, the ears (the piglins placed once for gt19 too)
-  gt19  the match cut; the runner far down the corridor's east side on the cut, through the brute's spot on
-        "version", out of the frame's LEFT edge along the landing's foot before "from"; the crossbow piglin's head
+  gt19  the match cut; the runner far down the corridor's east side on the cut, through the brute's spot under
+        "older version", out of the frame's LEFT edge along the landing's foot by "before"; the crossbow piglin's head
         follows him and goes back to the gold
 MOTION: out/test/sixseconds_gate_motion.mp4 (every frame of the six shots, 270x480, 5 samples, 24 fps).
 
@@ -38,7 +38,7 @@ PREVIEW samples of this sequence: 5 (films/sixseconds_common.py PREVIEW_SAMPLES)
 from mathutils import Vector
 
 GOLD = ("gold_1", "gold_2", "gold_3")
-# gt01: this shot's own camera (the set's six_landing moved into the landing's north-west corner, 22 mm) and the
+# gt01: this shot's own camera (the set's six_landing moved into the landing's north-west corner, 20 mm) and the
 # brute's own spot near the landing's north-east corner, facing the lens; he looks just past it (LANDING_LOOK)
 LANDING_CAM = dict(pos=(0.15, 17.8, 5.8), target=(6.14, 14.17, 3.6), lens=20.0, fstop=2.8,
                    pos1=(0.456, 17.675, 5.79), target1=(6.14, 14.17, 3.6))
@@ -67,13 +67,13 @@ RUN_IN_RACK = 268             # the focus leaves the runner (gone past the left 
 RUN_IN_FILL = dict(pos=(5.8, 13.5, 2.6), watts=60.0, color=(0.95, 0.98, 1.0))
 # gt19: on the match cut the runner is a small figure far down the corridor on its EAST side (the gate camera sees
 # the whole corridor: nowhere to hide him; every figure in it lands at x 43-48 % of the frame, right of the brute's
-# former silhouette at x 33-42 %), sprint-jumping already (ramp off). He goes through the brute's spot (4.5, 19) on
-# "version" and then turns down the WEST side of the courtyard, along the landing's foot (x >= 3.25 beside it: its
-# body is solid to x 3.0), and out of the frame's LEFT edge before "from": the gold piglins are on the east side, and
-# the right edge is reached only near the lens (the stub's right exit took 49 frames from the spot, this one 38), so
-# "from before they added me" plays over the empty gateway and landing. NOT nether's home_run_past (its leg
+# former silhouette at x 33-42 %), sprint-jumping already (ramp off). He goes through the brute's spot (4.5, 19) under
+# "older version" and then turns down the WEST side of the courtyard, along the landing's foot (x >= 3.25 beside it: its
+# body is solid to x 3.0), and out of the frame's LEFT edge by 1250 (during "from"): the gold piglins are on the east
+# side, and the right edge is reached only near the lens (the stub's right exit took 49 frames from the spot, this one
+# 43), so "before they added me" plays over the empty gateway and landing. NOT nether's home_run_past (its leg
 # (4.5, 19) -> (6.4, 9) runs through piglin_gt2 at gold_2: the technical check). He ends behind the camera's plane.
-RUN_PAST = [(5.65, 27.0, 0.0), (4.5, 19.0, 0.0), (3.55, 10.2, 0.0), (2.45, 6.0, 0.0), (2.4, -1.2, 0.0)]
+RUN_PAST = [(5.65, 26.4, 0.0), (4.5, 19.0, 0.0), (3.55, 10.2, 0.0), (2.45, 6.0, 0.0), (2.4, -1.2, 0.0)]
 GLANCE = (1216, 1238)     # piglin_xbow_gt3 (gold_3) follows the runner with its head on these frames
 
 
@@ -114,8 +114,9 @@ def gt01_landing(st, s, C, nar):
       his head (ears included) x 14.4..52.6 % on frame 1 and x 10.3..53.7 % on 97, y 26-41 %; eyes x 33 %, y 32-33 %;
       face 129 -> 147 px, 13 degrees off the lens. The piglins' heads x 54-77 %, y 52.5-59 % (backs and profiles,
       83-140 degrees off), the gold wall beside his right arm and behind the piglins (x 50-80 %, y 40-55 %), the
-      golden axe at his right hand (x 15-20 %, y 52-65 %). Palette (out/test/sixseconds_pal_gt01_landing_77.png):
-      SEE THE MEASURED LINE AT THE END OF THIS DOCSTRING.
+      golden axe at his right hand (x 15-20 %, y 52-65 %). Preview frames 1-97: the push reads (1 against 97).
+      Palette 77 (out/test/sixseconds_pal_gt01_landing_77.png): brute x 19-49 %, y 27-40 %, 100 % in the safe area,
+      x 2.43 the blackstone (with KEY_LANDING), gold hue 45 s 0.80: all pass.
     FALLBACKS TAKEN (the set's): not the scripted LOW LONG lens (the landing is 3 blocks wide; a lower lens loses
       the piglins behind its edge: nether's note, ray-checked); the "lantern as key" is the film-local fill
       KEY_LANDING (the Bastion has no edit hook for a lantern block). Lava glow from below: only the look's
@@ -358,32 +359,45 @@ def gt19_older(st, s, C, nar):
     MUST BE SEEN, ON WHICH WORD
       frame 1180      THE SAME FRAME as 1179 without the brute (see gt18's MATCH CUT note)
       "older" 1198 .. "version" 1209   the runner through the gateway, through the brute's spot, without slowing
-      by "before" 1251  he is out of the frame (its RIGHT edge: the gate camera's floor is out of reach of "the
-                      bottom of the frame": it would take a run within a block of the lens); then the empty gateway
-                      and the empty landing held under "before they added me" (1251-1289, 39 frames)
+      by "before" 1251  he is out of the frame (its LEFT edge: "the bottom of the frame" would take a run within a
+                      block of the lens); then the empty gateway and the empty landing held under "before they added
+                      me" (1250-1289, 40 frames)
     SHARED: CAMS["gate"] exactly; PLACES "gold_1".."gold_3" (the gt18 instances, untouched here).
     THE WORLD'S RULES: NO BRUTE (C.actor("brute", ...) must not be in this shot); the floor whole.
     NO HIDDEN START (ray-checked; seen on the stills): the gate camera sees the whole corridor walkway (x 3..6 between
       the lava channels, up to the lava wall at y 33) through the gateway, and behind the jambs there is only lava,
       so on 1180 the runner is already a figure in the corridor. ACCEPTED by the lead (the technical check left it to
-      him): he is on the corridor's EAST side, his body at x 43-50 % on 1180, beside the brute's former silhouette
-      (x 33-42 % on 1179), not in it; he is moving at speed (mid-hop), and a teal shirt is not a brute. The start
-      trades size against the exit: from (5.7, 29.5) (the first stub's, x 45-47.5 %, smaller) he left the frame only
-      about 1258, on "they"; from RUN_PAST's (5.7, 25.5) he is out by 1250-1251, on "before". If the cut reads as
-      "the brute turned into Steve" in the preview, start him further back (a later exit) or split gt19 at about
-      1186 into two shots on CAMS["gate"] with the same seed (invisible: the drift follows the frame) and let him
-      enter the corridor in the second only (he then appears 30 blocks off: check that it is not a pop).
-    NOW (stub): the gate camera; the runner SPRINT-JUMPING from 1180 (ramp off: at speed) on RUN_PAST (5.7, 25.5) ->
-      the brute's spot (4.5, 19) -> (5.0, 12) -> (6.9, 3.5) -> (7.4, -1.0), iron pickaxe in hand; the piglins of gt18
-      (nothing re-keyed). Hero: the runner. NOT nether's home_run_past (its leg (4.5, 19) -> (6.4, 9) runs THROUGH
-      piglin_gt2 at gold_2 (6.3, 11.2) on 1235-1238 of the old timeline: the technical check; the stub's first fix
-      had it).
-    MEASURED (the lead's probe of the run; stills out/test/sixseconds_scout_gt19_older_1180_zones.png and the match
-      pair above): in the brute's spot on 1201 (0.15 from it; "older" 1198, "version" 1209); closest to a gold
-      piglin 1.1 block (gold_2, about 1226; about 1.7 from gold_1, 2.3 from gold_3); his body leaves the right edge
-      on 1249-1251 (the left edge of his box at x 84 % on 1249, out of the frame on 1252); the last leg passes 2
-      blocks from the gate camera, behind its plane. Track: $BPY -m tools.sixseconds_geo --sky wastes gt19_older:1180
-      --track runner_gt:1180-1289:3.
+      him), and judged by the gate director in the preview: every figure in the corridor lands at x 43-48 % of the
+      frame (its vanishing point is x 43.6 %), right of the brute's former silhouette (x 33-42 %), so the only choice
+      is its size: the further back, the smaller, the more it reads as somebody far away coming in, and the later he
+      leaves. With the faster left exit (below) he starts 0.9 block further back than the lead's stub and still
+      leaves sooner. On the preview the cut reads: a dark silhouette with ears gone, a small teal figure hopping far
+      down the corridor. The invisible split (two shots on CAMS["gate"]) is not open to a sequence director (no
+      st.shot); it stays the lead's option if a viewer still reads it as a transformation.
+    NOW: the gate camera exactly; the runner SPRINT-JUMPING from 1180 (ramp off: at speed) on RUN_PAST (5.65, 26.4)
+      -> the brute's spot (4.5, 19) -> (3.55, 10.2) -> (2.45, 6.0) -> (2.4, -1.2), iron pickaxe in hand from 1180: on
+      the cut a small figure far down the corridor's east side, through the brute's spot without slowing, then down
+      the courtyard's WEST side along the landing's foot and out of the frame's LEFT edge, ending behind the camera's
+      plane. The piglins of gt18 (nothing re-keyed on the cut); from 1216 the crossbow piglin's head follows him over
+      its shoulder (its face to the lens, clamped at 75 degrees: piglins look at a player near them, and this one wears
+      gold) and is back on the gold by 1247 (GLANCE). Hero: the runner.
+      WHY THE LEFT EXIT (the story check asked for the exit by about 1244, with "from before they added me" over the
+      empty frame): the right edge is reached only near the lens (the gold piglins stand on that side), so the stub's
+      right exit took 49 frames from the spot; the left one takes 43, which let the start move 0.9 block further down
+      the corridor (smaller on the cut) and still clear the frame a little sooner (1250 against 1251-1252). pt20 (the pit camera) then
+      finds him at the pit's west rim, the way he was running.
+    MEASURED (tools.sixseconds_geo --sky wastes gt19_older:1180 --track runner_gt:1180-1252:1; preview frames
+      1176-1289 looked at; stills out/test/sixseconds_gate_gt18_nocome_1179.png | sixseconds_gate_gt19_older_1180.png,
+      _1240_zones.png): on 1180 his head x 44.6-47.7 %, y 53.7-55.2 % (16 px, 25.4 blocks off), beside the brute's
+      former silhouette (x 33-42 % on 1179), not in it; in the brute's spot on 1206-1207 (between "older" 1198 and
+      "version" 1209); eyes x 26 % on 1229, x 8.7 % on 1242; his body leaves the left edge on 1246-1247 and nothing of
+      him is in the frame from 1250 (measured on the preview frames, motion blur included: his trailing leg is a
+      sliver at the left edge on 1248-1249), during "from" (1247-1250): "before they added me" plays over the empty
+      gateway and landing, 40 frames to the cut. Closest to a gold piglin: about 2.6 blocks (gold_2). The match cut (1179 against 1180, 540x960 16 samples): outside the gateway's
+      column (x 25-55 %) the frames differ by a mean of 0.18 / 255 (piglins 0.23): only the brute is gone.
+      Palette 1240 (out/test/sixseconds_pal_gt19_older_1240.png, the final run: he is leaving by the left edge, the
+      crossbow piglin's face turned to him): shirt hue 173, trousers min channel 21, runner 89 % in the safe area (he is
+      on his way out), gold hue 44 s 0.79, piglin skin hue 21 s 0.57: all pass.
     NEIGHBOURS: before, gt18_nocome (the match cut); after, pt20_likes (the pit camera: in that bastion, everyone
       likes gold).
     """

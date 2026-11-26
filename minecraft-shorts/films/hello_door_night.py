@@ -42,9 +42,11 @@ KNOCK = dict(attempt=44, every=16, half="both", along=-0.3, shudder=8, crumbs=3)
 #                                                       notes), plus a few wood crumbs per blow (story: "wood crumbs")
 DN02_LEAD = 4          # beat 2: the zombie's pre-rolled swing starts 4 frames before the shot (under way on 72)
 DN02_PHASE = 0.3       # beat 2: cracks at stage 3 on the first frame, stage 7 when Steve's blow ends the attempt
-DN02_HANDHELD = 0.02   # beat 2's sway on door_front (C.cam's default 0.008 is sub-pixel 7 blocks from the door: once
-#                        the zombie was gone, 103-113 and 124-132 changed by 0.1-0.25 grey levels a frame, a paused
-#                        picture; review of the whole-film preview). dn18 keeps the default: its zombie never stops
+DN02_HANDHELD = 0.02   # the sway on door_front, beats 2 AND 18 (C.cam's default 0.008 is sub-pixel 7 blocks from the
+#                        door: once dn02's zombie was gone, 103-113 and 124-132 changed by 0.1-0.25 grey levels a
+#                        frame, a paused picture; review of the whole-film preview. dn18 kept the default until the
+#                        last review: between its blows the zombie holds its raised arms and its six 7-8 frame pauses
+#                        changed by 0.15-0.3 a frame, the same stillness)
 DN18_LEAD = 1          # beat 18: the swing starts on 1100: blows then land on 1105, 1121, 1137 ("knocked" 1138),
 #                        1153 ("door"), 1169 ("sunrise" 1170), 1185, and go on in beat 19 (1201, 1217, 1233, 1249)
 DN18_PHASE = 0.591     # beat 18: cracks at stage 5 on 1101; reset 1119-1120 (between two blows: a reset ON a blow
@@ -184,8 +186,8 @@ def dn02_fight(st, s, C, nar):
       camera  door_front exactly, handheld DN02_HANDHELD 0.02 (since the review of the whole-film preview: C.cam's
               default 0.008 is sub-pixel 7 blocks off, and once the zombie had gone 103-113 and 124-132 changed by
               only 0.1-0.25 grey levels a frame; now 0.16-0.45 and 0.30-0.49 on the preview); focus on the door,
-              racked to Steve's head from "that" (108). dn18 keeps door_front with the default 0.008: the same
-              framing, its zombie never stops.
+              racked to Steve's head from "that" (108). dn18 has door_front with the same handheld since the last
+              review (DN02_HANDHELD: the two halves of the shared framing float alike).
       light   the lead's pass: the moon behind the house (SKIES "night", azimuth 35), the door torches at the night
               level (LIGHTS "night_door" door 1.0, was 2.0), the 40 mm door_front with the starry sky over the roof.
     MEASURED (the lead's pass, tools.hello_geo with the new door_front; preview 270x480_6spp re-rendered 72-144): the
@@ -267,16 +269,25 @@ def dn18_knock(st, s, C, nar):
               1170), 1185. Cracks: stage 5 on 1101, 9 on 1115, reset 1119-1120 (between blows), climbing again,
               9 from 1161 ("until" 1162), reset 1165-1166, stage 0 from 1167: the blow on 1169 hits a clean door
               (stage 5 at the cut). The rhythm and the cracks go on in dn19 (C.memo["dn_bang"]).
-      camera  door_front exactly as dn02 (handheld: C.cam's default 0.008; dn02 floats more, 0.02, for its still
-              stretches), focus on the door. Nobody else: the right third (the
-              cobblestone wall and the south torch, where Steve came in) stays empty. The lead's pass: the 40 mm
-              door_front with the starry sky over the roof, the moon behind the house, door torches x 1.
+      camera  door_front exactly as dn02, with dn02's handheld DN02_HANDHELD 0.02 (since the last review of the
+              whole-film preview: with C.cam's default 0.008 the zombie's six pauses between blows, 7-8 frames
+              each, holding its raised arms, changed by only 0.15-0.3 grey levels a frame, a paused picture six
+              times over, and the last frames before the cut 0.15-0.21), focus on the door. Nobody else: the right
+              third (the cobblestone wall and the south torch, where Steve came in) stays empty. The lead's pass:
+              the 40 mm door_front with the starry sky over the roof, the moon behind the house, door torches x 1.
     MEASURED (tools/hello_door_night_probe, render): the zombie's head x 19-44 %, y 17-31 % the whole shot; the
       door at x 33-60 %; nothing at x > 62 % but the wall and its torch. palette_check dn18@1150 passes (stone
       G/R 0.99, hero 100 % inside). THE LEAD'S PASS (tools.hello_geo, the new door_front): the zombie's head x
       36-55 %, y 31-41 % (eyes y 37 %) the whole shot, the starry sky in the top-left corner; palette_check
       dn18@1150: stone G/R 0.96, planks s 0.30, zombie 100 % in the safe area; mean luma about 83 (was 110), the
       same night as in17 before it. Still: out/test/hello_lead_dn18_knock_1163_zones.png.
+      WITH DN02_HANDHELD 0.02 (the last review pass; stills out/test/hello_review_fix_dn18_knock_1112[_zones].png,
+      _1190[_zones].png at 540x960 / 16): the framing as before (the zombie well inside, the right third empty);
+      hello_palette dn18@1150: stone G/R 0.97, planks s 0.29, zombie x 37-53 %, y 32-40 %, 100 % inside. Preview
+      360x640_8spp 1101-1192: the six pauses between blows (1109-1116, 1125-1132, 1141-1148, 1157-1164, 1173-1180,
+      1189-1192) now change by 0.26-0.90 grey levels a frame (were 0.15-0.42; whole frame), the last four frames
+      0.65 / 0.40 / 0.28 / 0.26 (were 0.39 / 0.21 / 0.16 / 0.15): as dn02's floating stretches (0.16-0.49). The cut
+      1192|1193 to dn19 is unchanged (23.3 grey levels).
     """
     f0, f1 = s.frame_start, s.frame_end
     z = C.actor("zombie", "dn")
@@ -287,7 +298,7 @@ def dn18_knock(st, s, C, nar):
     C.memo.setdefault("dn_log", []).append("dn18 knocks %s hits %s stages %s resets %s phase out %.3f next %.1f" % (
         r["knocks"], r["hits"], r["stages"], r["resets"], r["phase"], r["next_knock"]))
     st.use(s, z)
-    C.cam(s, "door_front", focus=C.P("door"))
+    C.cam(s, "door_front", focus=C.P("door"), handheld=DN02_HANDHELD)    # as dn02: never a paused picture
     st.hero(s, "zombie", z)
     C.lights(s, "night_door", near="door", radius=24.0)
 

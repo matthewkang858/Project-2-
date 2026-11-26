@@ -68,7 +68,7 @@ def build(emit=None):
     s4.lens(c["lens"], c["fstop"])
     s4.move(c["pos0"], c["target0"], c["pos"], c["target"])
     s4.focus(c["target"])
-    for ob in v.cutaways["ug_ceiling"]:
+    for ob in v.cutaways["ug_ceiling"] + v.cutaways["ug_caps"]:
         for f, val in ((film.frame_start, True), (s4.frame_start, False), (s4.frame_end + 1, True)):
             ob.visible_camera = val
             ob.keyframe_insert("visible_camera", frame=f)
@@ -86,7 +86,26 @@ def build(emit=None):
         ob.keyframe_insert(path, frame=frame)
     st.key = key
     out["bounce"] = U.bounce(st, s4, U.COUNTER_BOUNCE)
-    for ch_, shot in ((dad, s2), (steve, s2), (kid, s3), (jumper, s4)):
+    # beat 24 / 10-12: the wall shut again, then opened with the doorway re-lit in this shot only, the camera held
+    # then panned (hold_then_move); a villager jolted in his capped cell and swapped for the zombie villager
+    s5 = film.shot("box", 12.0, 14.5)
+    c = U.CAMERAS["b24_box"]
+    s5.lens(c["lens"], c["fstop"])
+    ug.close_wall(s5.frame_start + 2, lever=False)
+    out["box"] = ug.open_wall(s5.frame_start + 14, relight=(st, s5))
+    out["pan_from"] = out["box"]["open_end"] + 8
+    U.hold_then_move(s5, out["pan_from"], c["pos"], c["target"], c["pos1"], c["target1"],
+                     frame_end=out["pan_from"] + 16)
+    s5.focus(c["target"])
+    from engine import undead
+    cdad = characters.make_villager("st_cdad", "librarian")
+    czv = undead.make_zombie_villager("st_czv", "librarian")
+    cdad.place(s5.frame_start, v.anchors["ug_cell_dad"], v.yaws["ug_cell_dad"])
+    out["blow"] = s5.frame_start + 4
+    U.hurt_in_cell(cdad, out["blow"], attacker=v.anchors["ug_door_target"])
+    out["infect"] = s5.frame_start + 30
+    U.infect_in_cell(cdad, czv, out["infect"], attacker=v.anchors["ug_door_target"])
+    for ch_, shot in ((dad, s2), (steve, s2), (kid, s3), (jumper, s4), (cdad, s5)):
         for other in film.shots:
             ch_.show(other.frame_start, other is shot)
     film.finalize()
@@ -116,7 +135,7 @@ def frames_of(b, name):
 
 def main(argv):
     b = build()
-    frames = [f for n in ("wall", "push", "bed", "down") for f in frames_of(b, n)]
+    frames = [f for n in ("wall", "push", "bed", "down", "box") for f in frames_of(b, n)]
     if "--child" in argv:
         print("DIGEST", digest(prints(b, frames), frames), flush=True)
         return 0
@@ -156,6 +175,28 @@ def main(argv):
     fb2 = frames_of(b, "bed")[0]
     bo.hide_render = True
     ok("the bounce light is not in another shot's frames", prints(b, [fb2])[fb2] == a[fb2])
+    # beat 24: the lit doorway comes on with the wall (its hide_render keys are in the frame), the camera holds
+    fx = frames_of(b, "box")
+    ob_ = b["box"]["open"]
+    ok("box: the frame changes where the lit doorway comes on (frame %d)" % ob_, a[ob_] != a[ob_ - 1])
+    cam_parts = {}
+    fpr = stamp.Fingerprinter(b["film"].scene, b["film"])
+    for f in fx:
+        cam_parts[f] = fpr.frame(f)["parts"]["c"]
+    held = [f for f in fx[1:] if f < b["pan_from"] and cam_parts[f] != cam_parts[f - 1]]
+    panned = [f for f in fx[1:] if b["pan_from"] < f <= b["pan_from"] + 16 and cam_parts[f] != cam_parts[f - 1]]
+    ok("box: hold_then_move holds the camera until the pan and moves it after (%d held changes, %d moving)"
+       % (len(held), len(panned)), not held and len(panned) >= 14)
+    ok("box: the jolt in the cell and the swap change the frames", a[b["blow"] + 1] != a[b["blow"] - 1]
+       and a[b["infect"]] != a[b["infect"] - 1])
+    for ob in b["ug"].doorway["lit"] + b["ug"].doorway["dark"]:
+        ob.animation_data_clear()
+    for ob in b["ug"].doorway["lit"]:
+        ob.hide_render = True
+    for ob in b["ug"].doorway["dark"]:
+        ob.hide_render = False
+    late = fx[-1]
+    ok("box: the lit doorway (hide_render keys) is in the fingerprint", prints(b, [late])[late] != a[late])
     b2 = build()
     a2 = prints(b2, frames)
     ok("built again in this process: identical fingerprints", a2 == a,

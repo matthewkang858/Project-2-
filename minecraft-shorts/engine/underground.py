@@ -10,7 +10,7 @@ client jar (the class or file is named beside each constant). Blender axes: +X e
     v, ug = U.build_village(scene, seed=1)          # the village WITH the set (hook + finish); edit= adds yours
     A, C = v.anchors, U.CAMERAS                     # A["ug_cell_dad"], C["b12_cell"] = dict(pos, target, lens, fstop)
     st = Stage(scene, film, v, skies=SKIES, sky=sky)   # SKIES: "dusk" for the square / house, "under" below (see SKY)
-    ug.register(st)                                 # door + lever in st.cast: st.use(s, *ug.parts) in hall shots
+    ug.register(st)                                 # the lever in st.cast: st.use(s, ug.lever) where it is seen
 
 PUBLIC API
   build_village(scene, seed=1, bed_colors=None, edit=None, **kw) -> (Village, UndergroundSet)
@@ -18,28 +18,39 @@ PUBLIC API
   underground_set(b, name="underground", bed=BED, bed_color="red", rim=True) -> dict      IN A HOOK of your own;
       then call finish(v) after build_village. The stair mouth, stairwell, hall, cells, piston wall, zombie box,
       lights, dad's red bed (house_a_bed_2), the baked light; anchors, paths. Village.sets["underground"].
-  finish(v) -> UndergroundSet     meshes the cutaways, gives the baked faces their emission, builds the piston
-      door and the lever (engine.redstone kit) and lights them like the wall they sit in, adds the hall's fill.
+  finish(v) -> UndergroundSet     meshes the cutaways and the doorway's two copies, gives the baked faces their
+      emission, builds the piston door and the lever (engine.redstone kit), lights them like the wall they sit in,
+      adds the hall's fill.
   UndergroundSet (ug)
       ug.door        engine.redstone PistonDoor: two stone blocks at DOOR (dad's back wall), sticky pistons west of
                      them (hidden in the back wall behind the 2-wide pier). ug.door.open(f) / close(f) -> end time
                      (2 ticks = 2.4 frames), ug.door.is_open(t).
       ug.lever       engine.redstone Lever, on the north face of the end pier (LEVER), off.
-      ug.open_wall(frame, player=None, reach=True, look=True) -> dict(flip, open, open_end)
-                     the lever flipped on `frame` (by `player`: redstone.flip_by, his swing starts on frame) and the
-                     wall opening 2 ticks later (a hidden inverter: a redstone torch behind the pier, TOGGLE 2 ticks).
+      ug.open_wall(frame, player=None, reach=True, look=True, relight=None, repeater=0, sync="game")
+                     -> dict(flip, open, open_end, hand): the lever flipped on `frame` (by `player`:
+                     redstone.flip_by, his swing starts on frame; sync="hand" moves the lever on the frame his hand
+                     is nearest it, `hand`), the wall opening 2 ticks later (a hidden inverter: a redstone torch
+                     behind the pier) + 2 ticks per step of a hidden repeater (repeater=4: 12 frames after the flip).
+                     relight=(st, shot): light_doorway in that shot from r["open"] (beat 24).
       ug.close_wall(frame, lever=True) -> end frame          the lever back 2 ticks before, the wall shut on frame.
-      ug.parts = [door, lever]; ug.register(st) puts them in st.cast: then st.use(shot, *ug.parts) in EVERY shot
-                     that sees them (unregistered they are always there). A shot that sees through "ug_end_pier"
-                     uses only ug.door: the lever hangs on that pier and would float.
+      ug.light_doorway(st, shot, frame) -> frame    in ONE shot, from `frame` on: the doorway's floor and ceiling
+                     and the box's inside drawn with the light the game gives them once the wall is open (door
+                     cells 9-10, box 8-9) instead of the box's darkness, which every other frame keeps (two meshed
+                     copies, ug.doorway["dark"] / ["lit"], swapped by hide_render keys: in the stamp).
+      ug.parts = [door, lever]; ug.register(st, door=False, lever=True) puts the lever (and with door=True the door)
+                     in st.cast: a registered part is hidden in every shot that does not st.use it. st.use(s,
+                     ug.lever) (or *ug.parts) in every shot that sees the end pier's north face; leave it out of a
+                     shot that sees through "ug_end_pier" (it would float). The door is unregistered by default: it
+                     is always there and only moves when opened (registered and forgotten, it would leave a hole).
       ug.brightness_at(point) -> 0..1 the game's brightness there (its block / sky light through the lightmap).
       ug.env         the BlockLight environment (levels(cell) -> (block, sky), block_at, level_at).
-      ug.anchors / ug.cameras / ug.cutaways
+      ug.anchors / ug.cameras / ug.cutaways / ug.doorway
   Cutaways (Village.cutaways: st.see_through(shot, name) = invisible to the camera only, st.remove = gone):
-      "ug_ceiling"   everything above the hall from x -9 to 18, y -17 to -10 (z F+3 .. -2): beat 7 looks down
+      "ug_ceiling"   everything above the hall from x -9 to 20, y -17 to -10 (z F+3 .. -2): beat 7 looks down
                      into the cells; the camera sits INSIDE it (z -7 .. -1.2), never above z -1 (the square's ground).
+      "ug_caps"      the stone caps over the four job cells (F+2): beat 7 (with "ug_ceiling").
       "ug_end_wall"  the end wall beside dad's cell and behind it (x 15, y -15..-14): beats 13, 19, 24.
-      "ug_end_pier"  the end pier in front of it (x 15, y -13; the lever hangs on it): beats 13, 16.
+      "ug_end_pier"  the end pier in front of it (x 15, y -13; the lever hangs on it): beats 13, 16, 19.
       "ug_box_side"  the box's east wall above the slot (x 15, y -16, z F+1, F+2): beat 24.
       "ug_slot"      the slot's iron bars (x 15, y -16, z F): beat 24 when the bars would cross the lens.
       Faces that only a cutaway reveals are lit as if it were gone (the game's light through the open space).
@@ -48,45 +59,65 @@ PUBLIC API
       push(player, villager, frame, path, world, taps=(4, 4), steps_down=1, gap=0.9, legs=False) -> dict
           the player walks into the villager and pushes him along `path` with the game's entity push until he
           drops down `steps_down` steps; both are placed on `frame`. Returns end, drops (landing frames), speed ...
-      bed_bounce(child, frame, spot, jumps=4, settle=True) -> dict(end, landings, peaks)     JumpOnBed + the bed.
+      hurt_in_cell(villager, frame, attacker=None, max_back=CELL_MAX_BACK) -> dict(end, peak, landed)
+          a blow in his capped cell (beats 10, 11): undead.hurt's red flash and leg kick, and the knock-back as the
+          game plays it under the cap: up 0.05 for one tick (cell_track), at most 0.05 toward the job block.
+      infect_in_cell(villager, zombie_villager, frame, attacker=None) -> dict(end, peak)    undead.infect with the
+          same capped jolt on the zombie villager (beat 12).
+      cell_track(strength=0.4, max_back=0.05, room=0.05) -> [(forward, up)] per tick      the capped knock-back.
+      bed_bounce(child, frame, spot, jumps=6, mode="game", settle=True) -> dict(end, takeoffs, landings, peaks,
+          track)      JumpOnBed as the brain plays it (mode "game": `jumps` jump() calls, the ones that fall in the
+          air are spent: 3 give ONE jump and the bed's bounces, 6 give two jumps 36 frames apart; jumps=(6, 6)
+          runs the behaviour twice back to back); mode "regular" (NOT THE GAME): a jump every 14.4 frames.
       jump_loop(player, frame_start, frame_end) -> take-off frames      the player jumping on the spot, held.
       swap_hidden(child, adult, camera, frame_start, frame_end, world, then=None, speed=None) -> dict(frame, hidden)
           the child replaced by the grown-up on a frame where the well hides it from `camera` (a point or f -> point).
       hidden_frames(world, camera, character, f0, f1) -> frames on which the character is hidden by blocks.
-      hands_in_slot(zv, frame, slot=SLOT, lateral=0.0) -> dict      the baby zombie villager against the slot's
-          bars, facing out, the two tiny hands between the bars (in the bars' two gaps), fingertips in the pane.
+      hands_in_slot(zv, frame, slot=SLOT, lateral=0.0, face="away") -> dict      the baby zombie villager against the
+          slot's bars, facing out, the two tiny hands between the bars (in the bars' two gaps), fingertips in the
+          pane; face="away" turns his big head down and away (HIDE_FACE_LOOK): beat 8, the face must never read.
+      shade_face(v, zv) -> collection     keeps the baby's head and robe out of the corner torch's point light
+          (Blender light linking, static for the film; his hands still catch it). Call it once, for beat 8.
+      hold_then_move(shot, frame_move, pos0, target0, pos1, target1, frame_end=None, ease="smooth") -> shot
+          a camera that holds until frame_move, then moves (Shot.move eases over the whole shot). Call it INSTEAD
+          of s.move (it re-times the Shot's own curve; a later s.move keeps that timing).
       cheat(target, head, camera, k=0.35) -> point   a look target turned part of the way to the lens.
-      bounce(st, shot, pos, energy=35, color=..., start=None, kind="fill") -> light   a film-local light for ONE
-          shot (hidden elsewhere, so it is in no other frame's stamp): COUNTER_BOUNCE (beat 13: Steve's side that
-          faces the lens), DOORWAY_GLOW / DOORWAY_WATTS with kind="torch", start=r["open"] (beat 24: the light that
-          falls into the box when the wall opens).
+      bounce(st, shot, pos, energy=35, color=..., start=None, kind="fill", name=None) -> light   a film-local light
+          for ONE shot (hidden elsewhere, so it is in no other frame's stamp): COUNTER_BOUNCE (beat 13),
+          DOORWAY_GLOW / DOORWAY_WATTS with kind="torch", start=r["open"] (beat 24: the light that falls into the
+          box when the wall opens), SLOT_STRIP / SLOT_STRIP_WATTS kind="torch" (beat 24: the strip through the bars).
   The light (see THE GAME'S LIGHT): lightmap_rgb(block, sky, ...), face_light(block, sky) -> (D, E), flood(opaque,
       sources), env(b) -> BlockLight, relight_object(ob, env, cell=None, levels=None) (a separate object lit like a
       World face: what finish() does to the door and the lever; use it for any prop placed in the hall).
   Constants: F (hall floor -10), CELL_X, PROFESSION, JOB, DOOR, LEVER, BOX, SLOT, LIGHTS, LIGHT_GROUPS, CAMERAS,
-      WARMTH, EMIT, POINT_COLOR, FILL_SHARE, BOX_SEALED, DOOR_KEEPS_DARK, PUSH_STRENGTH, VILLAGER_PUSHES,
-      BED_RESTITUTION, COUNTER_BOUNCE, DOORWAY_GLOW, DOORWAY_WATTS, WINDOW_PIER ...
+      CELL_HEADROOM, CELL_MAX_BACK, STEVE_PAST, SLOT_FACE, SLOT_STRIP(_WATTS), APPLE_POINT, HIDE_FACE_LOOK, WARMTH,
+      EMIT, POINT_COLOR, FILL_SHARE, BOX_SEALED, DOOR_KEEPS_DARK, PUSH_STRENGTH, VILLAGER_PUSHES, BED_RESTITUTION,
+      COUNTER_BOUNCE, DOORWAY_GLOW, DOORWAY_WATTS, WINDOW_PIER, RELIT_CELLS ...
 
 THE SET (seed 1; the well's stone is x -3..2, y -3..2)
   mouth      2 wide (x 4..5) beside the well's east side, open over y 0..-3, the rim turned to grass (x 3..6,
              y -4..1; the plaza's path cells there are grass now). ug_lip (4.85, 1.42, 0) is the lip.
   stairwell  ten stone stairs facing north, x 4..5, y 0..-9 (step k: top -k, front half -k-0.5), 3 high, its
-             ceiling stepping down (the square's ground is the ceiling over steps 4..9: dirt from below); walls dirt
-             to z -4, stone to -6, deepslate below (z -7 mixed). Wall torches at y -2, -3 (just under the rim: the
-             glow from below), -6, -9; the landing y -10 (floor F = -10) with a torch (ug_foot).
-  aisle      east-west, y -12..-11 (2 wide: y -12 .. -10), x -8..17, deepslate walls and ceiling, deepslate-brick
+             ceiling stepping down (the square's ground over step 4, then the lining). Walls and ceiling lined in
+             stone from just under the grass (z -2), mixed at -7, deepslate below (from about step 6). Wall torches
+             at y -2, -3 (just under the rim: the glow from below), -6, -9; the landing y -10 (floor F = -10) with a
+             torch (ug_foot).
+  aisle      east-west, y -12..-11 (2 wide: y -12 .. -10), x -8..19, deepslate walls and ceiling, deepslate-brick
              floor; west of the stair foot (x -8..3) it has no torch and falls off into the dark. A torch over the
-             farmer / fletcher (x 9), the hanging lantern (x 10), a torch facing dad's cell (x 14); the leg x 16..17
-             runs south to the back corner (y -16), its floor torch at (17, -16) shining into the slot.
-  cells      stone, one block each, facing north into the aisle: farmer x 7 (composter), fletcher x 9 (fletching
-             table), cleric x 11 (brewing stand), [2-wide pier x 12..13], dad x 14 (lectern), end pier x 15. The
-             front row (y -13) is one long counter from x 7 to 14: stone or a job block at the floor, a window at
-             face height (F+1), iron bars above (F+2), over the pier too (WINDOW_PIER: a solid pier front hid every
-             face beyond it from an oblique camera); iron bars between the first three cells, solid stone behind the
-             pier (it hides the pistons). Villagers at ug_cell_<name> (y -13.3, against the job block; dad 0.18
-             west of centre: DAD_OFFSET; ug_cell_dad_mid is the centre, for a head turned west).
+             farmer / fletcher (x 9), the hanging lantern over the aisle's north half (10, -11), a torch facing dad's
+             cell (x 14); the back corner x 16..19, y -17..-13 (4 wide, one block past the slot) with its one torch
+             on its east wall (19, -14, F+1), 4 blocks from the slot.
+  cells      stone, one block wide and TWO high under a stone cap at F+2 (the classic trading-hall cell: the cap
+             stops the knock-back hop after 0.05; the caps over the job cells are "ug_caps"), facing north into the
+             aisle: farmer x 7 (composter), fletcher x 9 (fletching table), cleric x 11 (brewing stand), [2-wide pier
+             x 12..13], dad x 14 (lectern), end pier x 15. The front row (y -13) is one long counter from x 7 to 14:
+             stone or a job block at the floor, a window at face height (F+1), iron bars above (F+2), over the pier
+             too (WINDOW_PIER); iron bars between the first three cells (F, F+1); every bars block connected from its
+             real neighbours (IronBarsBlock.attachsTo). Villagers at ug_cell_<name> (y -13.3, against the job
+             block; dad 0.18 west of centre: DAD_OFFSET; ug_cell_dad_mid is the centre, for a head turned west).
   piston wall  dad's back wall (14, -15, F and F+1): two stone blocks on sticky pistons at x 12, heads at x 13.
-  lever      wall lever on the end pier's north face, (15, -12, F+1); Steve at ug_lever_stand.
+  lever      wall lever on the end pier's north face, (15, -12, F+1); Steve at ug_lever_stand (a block north of
+             it, facing south).
   zombie box (14, -16), 1 x 1 x 2 inside, stone, smooth stone lid at F+2, its only opening the slot of iron bars
              at floor level in its east wall (15, -16, F) facing the back corner. The open piston wall joins it to
              dad's cell: the doorway behind dad IS the box.
@@ -94,10 +125,10 @@ THE SET (seed 1; the well's stone is x -3..2, y -3..2)
   Anchors: ug_lip, ug_lip_target, ug_mouth_target, ug_push_start, ug_push_player, ug_stair_top, ug_stair_foot,
     ug_cell_<farmer|fletcher|cleric|dad> (+ _station), ug_cell_dad_mid, ug_aisle_<name> (in front of the cell),
     ug_lever_stand, ug_lever_target, ug_counter_steve (beat 13), ug_door_target, ug_box, ug_slot_hands,
-    ug_slot_target, ug_corner, ug_leg_north, ug_aisle_west_end, ug_aisle_center, ug_jump_spot (beat 16),
+    ug_slot_target, ug_corner, ug_leg_north, ug_aisle_west_end, ug_aisle_center, ug_jump_spot (beat 16, x 12.3),
     ug_follow_start / ug_follow_end (beat 18). Paths: ug_down (square -> stairs -> aisle, with the steps'
     heights), ug_aisle (stair foot -> dad's cell), ug_leg (past the end pier to the slot), ug_push (to the lip),
-    ug_round_well (beat 20). Yaws in v.yaws[anchor].
+    ug_round_well (beat 20); U.STEVE_PAST (beat 8). Yaws in v.yaws[anchor].
   Light groups (Stage.lights groups=): ug_mouth, ug_stairs, ug_foot, ug_hall, ug_dad, ug_corner (one point light
     per torch / lantern, colour POINT_COLOR); "ug_hall" also holds the hall's cool shadowless fill, in two halves
     (over the aisle, and in the leg east of dad's cell), on only with inside="ug_hall".
@@ -107,177 +138,217 @@ SKY (a multi-sky film: films/_multisky_demo.py)
              "under": dict(preset="dusk", az=187.0, el=5.0, key=0.0, ambient=0.0, bloom=1.3, grade="neutral",
                            haze=0.0)}
   "under" is the same dusk with no sun, no sky fill, no bounce lamps and no distance haze: below the ground the
-  only light is the baked block light and the torches (the haze turned the dark end of the aisle purple-grey).
-  Nothing in the set depends on the sky. Torches below: Stage.lights(s, scale=0.0, groups={g: 0.7 for g in
-  U.LIGHT_GROUPS}, inside="ug_hall") (0.7 keeps torch-lit stone near the game's brightness, MEASURED); for the
-  box and slot shots leave inside out (the fill passes through walls and would light the baby in the box).
-  The proof film (tools/underground_proof.py `_under`) does exactly this; copy it.
+  only light is the baked block light and the torches. Nothing in the set depends on the sky. Torches below:
+  Stage.lights(s, scale=0.0, groups={g: 0.7 for g in U.LIGHT_GROUPS}, inside="ug_hall") (0.7 keeps torch-lit stone
+  near the game's brightness, MEASURED); for the box and slot shots leave inside out (the fill passes through
+  walls and would light the box). The proof film (tools/underground_proof.py `_under`) does exactly this.
 
-BEATS (camera = U.CAMERAS[name]: pos, target, lens, fstop (+ pos0 / target0 for a move); every one was rendered
-through films.lookdev.Stage and the SKIES above and looked at: out/test/underground_<still>.png)
-   1 mouth      dusk. b01_mouth (still "mouth"): east of the mouth at a child's eye height (0.92), Steve in profile
-                walking down: steve = players.add_player(st, ...); path = [(5, 7, 0)] + v.paths["ug_down"][:10];
-                steve.place(f, path[0], pi); steve.walk(f, path, speed=players.WALK_SPEED) (MEASURED: his head is under
-                the grass 54 frames after (5, 7), the walk ends at the 10th point 75 frames after). Lights: st.lights(s, scale=1.3, groups={g: 1.0 for g in
-                U.LIGHT_GROUPS}, near=A["ug_mouth_target"], radius=22). Push in toward A["ug_mouth_target"].
+BEATS (camera = U.CAMERAS[name]: pos, target, lens, fstop (+ pos0 / target0 or pos1 / target1 for a move); every
+one was rendered through films.lookdev.Stage and the SKIES above and looked at: out/test/underground_<still>.png;
+the recipes are the proof film's, tools/underground_proof.py shot_<still>)
+   1 mouth      dusk, 3.5 s. b01_mouth: steve placed at (5, 6.5, 0) on the shot's first frame, steve.walk(f0,
+                [(5, 6.5, 0)] + v.paths["ug_down"][1:10], speed=players.WALK_SPEED); s.move(C["pos0"], steve.head,
+                C["pos"], C["target"]) (the aim rides on his head, eases onto the glowing hole, the camera pushes
+                in). MEASURED: his head is in the picture on frames 0..60 of the shot and in the Reels safe area on
+                0..53; he is in profile at the lip on frame 36 (still "mouth"). Lights: st.lights(s, scale=1.3,
+                groups={g: 1.0 for g in U.LIGHT_GROUPS}, near=A["ug_mouth_target"], radius=22).
    2 lip        dusk. b02_lip: the child at A["ug_lip"] (yaw v.yaws["ug_lip"]: south), look_at(U.cheat(
                 A["ug_lip_target"], A["ug_lip"], cam pos, 0.35), ease=0); the glow from below is ug_mouth.
    3 push       dusk. b03_push (side-on from the east, low; the well behind them): r = U.push(steve, dad, f,
                 v.paths["ug_push"] + [(5.0, -2.0, 0.0)], v.world); dad.look_at(f, (cam x, cam y - 0.6, 1.4),
-                ease=0) held to the end (his head turned back to the lens); the child at C["b03_push"]["kid"] facing
-                dad (look_at dad, ease=0) is the soft head in the bottom right corner. From ug_push_start dad
-                drops down the first step r["drops"][0] - f = 59 frames later (MEASURED, 1.16 blocks/s in nudges);
-                start him further up for a longer shot. Sheet: out/test/underground_push_sheet.png.
-   4 bed        dusk. b04_bed: kid placed on v.beds[U.BED]["foot"] (yaw bed yaw + pi), U.bed_bounce(kid, f, foot,
-                jumps=6); lights scale 1.2, groups={"house_a": 1.5}, near=A["house_a_center"], radius=14,
-                inside="house_a". Sheet: out/test/underground_bed_sheet.png.
+                ease=0) held to the end; the child at C["b03_push"]["kid"] facing dad (look_at dad, ease=0) is the
+                soft head in the bottom right corner. From ug_push_start dad drops down the first step 59 frames
+                after f (MEASURED, 1.16 blocks/s in nudges). Sheet: underground_push_sheet.png.
+   4 bed        dusk. b04_bed (aimed high enough for the 1.25-block jump: the head at its top stays in the safe
+                area): kid placed on v.beds[U.BED]["foot"] (yaw bed yaw + pi), U.bed_bounce(kid, f, foot, jumps=6)
+                (the game: a jump, the bed's bounces, a second jump 36 frames later; jumps=(6, 6) for more); lights
+                scale 1.2, groups={"house_a": 1.5}, near=A["house_a_center"], radius=14, inside="house_a". Sheet:
+                underground_bed_sheet.png.
    5 bed wide   dusk. b05_bed_wide: the kid standing on the foot facing the door, look_at the lens; locked off.
-   6 stairwell  dusk (the top of the flight has sky light). b06_stairwell: kid.walk(f, v.paths["ug_down"][1:],
-                speed=4.4, run=True); look_at a wall torch (U.LIGHTS[2][0]) so the nose reads; lights scale 0 with
-                every ug group at 1.0.
-   7 down       under. st.see_through(s, "ug_ceiling"); b07_down: from above the aisle 70 degrees down into the
-                pockets (the frame's up is south), s.move(pos0, target0, pos, target) from over the farmer to over
-                dad (stills "down_start", "down"): straw hat, feathered cap, bare head, each over his job block, then
-                the book hat; dad.look_at(f, C["b07_down"]["pos"], ease=0) (his head tipped back to its stop, his
-                face up at us); the box's smooth stone lid behind his cell, the lever on the end pier beside it.
-                Others look_at up(A["ug_aisle_<name>"], 1.4). Fallback (story risks): the counter ride from 0.7 high.
-   8 slot       under. b08_slot (on the floor of the leg; still "slot_boots"): Steve walks (16.6, -12.4) ->
-                (16.6, -16.4) at players.WALK_SPEED, his boots cross the lens axis 14 frames after he starts; focus
-                s.focus((16.6, -14.97, F + 0.15)); zv = undead.add_zombie_villager(st, name, "none", baby=True);
-                U.hands_in_slot(zv, f) (still "slot_hands": the hands in the bars' gaps); lights as below but
-                groups ug_corner 0.35 and NO inside (the box stays black, the hands catch a little).
-   9 lever      under. b09_lever, Steve at A["ug_lever_stand"] (yaw south): r = ug.open_wall(f, player=steve);
-                rack focus from A["ug_lever_target"] to A["ug_door_target"] after r["open"].
+   6 stairwell  dusk (the top of the flight has sky light). b06_stairwell: kid placed at v.paths["ug_down"][1],
+                kid.walk(f, path[1:], speed=4.4, run=True); kid.track(f, f_end, (4.1, -5.5, -4.4), step=2, ease=4)
+                (his head follows the west wall's torch as he passes it at y -5.6: still "stairwell"); lights
+                scale 0 with every ug group at 1.0. Tiny in the frame, as the story asks: his turned head shows
+                the side of his face, the nose is a few pixels.
+   7 down       under. st.see_through(s, "ug_ceiling") AND (s, "ug_caps"); b07_down: from above the aisle 70
+                degrees down into the pockets (the frame's up is south), s.move(pos0, target0, pos, target) from
+                over the farmer to over dad (stills "down_start", "down"); dad.look_at(f, C["b07_down"]["pos"],
+                ease=0) (his face up at us); the box's smooth stone lid behind his cell, the lever on the end pier.
+                Others look_at up(A["ug_aisle_<name>"], 1.4). Fallback (story risks): the counter ride from 0.7.
+   8 slot       under, 2.5 s. b08_slot (on the floor against the back corner's east wall, square on to the slot
+                3.75 away): steve placed at U.STEVE_PAST[0] (yaw north), steve.walk(f, U.STEVE_PAST,
+                speed=players.WALK_SPEED): he walks south to north, frame left to right, 2.15 from the lens; focus
+                s.focus(C["b08_slot"]["boot"]); zv = undead.add_zombie_villager(st, name, "none", baby=True);
+                U.hands_in_slot(zv, f) (face="away") and U.shade_face(st.v, zv): the hands catch the corner torch,
+                his head is a dark green shape, the face never reads (stills "slot_boots", "slot_hands"). Lights as
+                below, NO inside. His boots are sharpest with the legs together (the proof still picks that frame).
+   9 lever      under, 2.5 s. Steve at A["ug_lever_stand"] (yaw v.yaws: south; out of the frame but for his right
+                arm); r = ug.open_wall(f + 10, player=steve, repeater=4, sync="hand"); b09_lever:
+                U.hold_then_move(s, r["flip"] + 2, C["pos"], C["target0"], C["pos"], C["target"],
+                frame_end=r["open"] - 1) (held on the lever while his arm swings in from the left and flips it,
+                then a pan right onto the back wall past dad); s.focus(A["ug_lever_target"]); s.focus(
+                A["ug_door_target"], at_s=film.seconds(r["flip"] + 3), rack_s=0.4). The wall jerks aside 12
+                frames after the flip, when the pan has arrived; the doorway black beside his robe; dad faces
+                front. Sheet: underground_lever_sheet.png; still "lever" is the end.
   10 hit        under. b10_cell_side (low, east of the cell axis, the lectern in the bottom third): the strip of
-                black doorway shows left of his robe (stills "cell_shut" / "cell_open"). undead.hurt(dad, f,
-                attacker=A["ug_door_target"], max_back=0.05) (the lectern is right in front of him: the hop goes up,
-                not forward; the attacker is not in the shot).
-  11 portrait   under. b11_portrait (40 mm): the second blow (12 frames or more after the first), same max_back.
+                black doorway shows left of his robe (stills "cell_shut" / "cell_open"). U.hurt_in_cell(dad, f,
+                attacker=A["ug_door_target"]) (the cap stops the hop: a jolt of 0.05 for one tick, 0.05 forward
+                against the lectern; the attacker is not in the shot).
+  11 portrait   under. b11_portrait (40 mm): the second blow U.hurt_in_cell(dad, f + 14, ...) (12 frames or more
+                after the first; an earlier one is ignored, as the game ignores it). MEASURED: through the blows his
+                head stays at 45-52 % of the frame height, the jolt moves it 2.2 %. Sheet: underground_hit_sheet.png.
   12 turn       under. b12_cell (frontal, symmetric; still "cell"; dead ahead he hides the doorway):
-                undead.infect(dad, zv_dad, f, attacker=A["ug_door_target"], max_back=0.05) (zv_dad =
-                undead.add_zombie_villager(st, ..., "librarian")).
+                U.infect_in_cell(dad, zv_dad, f, attacker=A["ug_door_target"]) (zv_dad = undead.add_zombie_villager(
+                st, ..., "librarian")); zv_dad.aggro(f, ease=0) for the arms out. Head moves 1.0 % of the frame.
   13 potion     under. b13_counter (20 mm, side-on from the east): st.see_through(s, "ug_end_pier") and
-                (s, "ug_end_wall"); st.use(s, ug.door) (not the lever); Steve at A["ug_counter_steve"] (yaw there);
+                (s, "ug_end_wall"); the lever NOT used (hidden); Steve at A["ug_counter_steve"] (yaw there);
                 undead.throw_potion(steve, zv_dad, f, camera=s); steve.hold("golden_apple") before his place,
                 raise_arm. Lights: the ug_dad torch x 1.8 (extra=[((14.5, -10.6, F + 1.9), 1.8)]) and
                 U.bounce(st, s, U.COUNTER_BOUNCE): without it his trousers are crushed (palette check, MEASURED).
-  14 apple      under. b14_apple: target = steve.item_point("right", f) (50 mm, f/1.8); Steve at A["ug_aisle_dad"].
+  14 apple      under. b14_apple: Steve at A["ug_aisle_dad"], steve.hold("golden_apple"), raise_arm(f, 55):
+                C["target"] = U.APPLE_POINT is the apple then (MEASURED); if he moves aim and focus at
+                steve.item_point("right", f) (C["target_from"]). 50 mm, f/1.8.
   15 drift      under. b15_drift (pos0 -> pos): the wall open (ug.door.open), undead.cure(zv_dad, dad, f, ...,
                 shake=3) starting, focus on (14.6, -15.0, F + 1); on the last word ug.close_wall(f).
-  16 wide       under. b16_aisle (20 mm, from the aisle's east end, through st.see_through(s, "ug_end_pier");
-                st.use(s, ug.door) only): zombie dad in his window on the left shaking with yellow swirls, the
-                cleric, fletcher and farmer in theirs, Steve at A["ug_jump_spot"] (yaw v.yaws[...]) with
-                U.jump_loop(steve, f0, f1), the aisle falling off into the dark beyond the stair foot.
+  16 wide       under. b16_aisle (20 mm, from the aisle's east end, through st.see_through(s, "ug_end_pier"); the
+                lever not used): zombie dad in his window on the left shaking with yellow swirls, the cleric,
+                fletcher and farmer in theirs, Steve at A["ug_jump_spot"] (yaw v.yaws[...]) with U.jump_loop(steve,
+                f0, f1); the lantern hangs well right of him even at the top of a jump (still "aisle" is a peak).
   17 trade      under. b17_ots: Steve at A["ug_aisle_dad"] holding the emerald up (raise_arm 55), dad holds out the
                 book (engine.fx hold_out), Nausea swirls from cure(). From beat 18 on dad stands at ug_cell_dad_mid.
   18 follow     under. b18_portrait (from in front, a little above his eyes): dad at A["ug_cell_dad_mid"],
                 dad.look_at(f, steve, ease=0) then dad.track(f, f1, steve, step=2) as Steve walks
                 A["ug_follow_start"] -> A["ug_follow_end"] (under the lens): his face turns into profile, the big
-                nose toward the stair foot, and holds at the 70-degree stop. (His pocket is 0.3 behind the counter
-                with the pier on his west: a face turned west is seen from the front only; at ug_cell_dad the head
-                turned to its stop puts his nose 0.03 into the pier.)
-  19 behind     under. b19_endwall: st.see_through(s, "ug_end_wall"), dad at ug_cell_dad_mid: side-on from the
-                east, the piston wall at his back to the left; slide the camera south onto the wall. Seen from the
-                east a head turned up the aisle (west) shows its back: hold his look at most ~20 degrees west of
-                north for his profile, or use b19_alt (from the aisle north-west, his face toward the lens).
+                nose toward the stair foot, and holds at the 70-degree stop.
+  19 behind     under, 2 s. b19_endwall: st.see_through(s, "ug_end_wall") AND (s, "ug_end_pier") (the lever not
+                used); dad at ug_cell_dad_mid, dad.look_at(f, C["b19_endwall"]["look"], ease=0) (up the aisle, 20
+                degrees west of north: from this camera his profile, MEASURED 93 degrees off the lens); s.move(
+                C["pos0"], C["target0"], C["pos"], C["target"]): the slide off his face onto the piston wall behind
+                his back (still "endwall" is the start). b19_alt: from the aisle north-west, his face to the lens.
   20 grow up    dusk. b20_well (south-east: the well, the glowing mouth in front of it): two children run
                 v.paths["ug_round_well"], 0.7 block apart in time; r = U.swap_hidden(child, adult,
-                C["b20_well"]["pos"], f0, f1, v.world, then=[(3.6, 1.8, 0)], speed=1.6): MEASURED at 4.4 blocks/s the
-                child is hidden for about 80 frames behind the well's stone, the swap lands in the middle of that run.
-  21 slot       under. b08_slot again, no hands (still "slot": black inside); push in toward A["ug_slot_target"]
-                (pos -> about (16.9, -14.95, F + 0.22)); Steve's legs pass as in beat 8 (the slot ends at his waist).
+                C["b20_well"]["pos"], f0, f1, v.world, then=[(3.6, 1.8, 0)], speed=1.6): MEASURED at 4.4 blocks/s
+                the child is hidden for about 80 frames behind the well's stone, the swap lands in its middle.
+  21 slot       under. b08_slot again, no hands (still "slot": black inside); focus on U.SLOT_FACE, s.move(pos,
+                target, pos1, target1) (the slow push in); Steve's legs pass as in beat 8 (the slot ends at his
+                waist).
   22 foot       under. b22_foot: the child at A["ug_stair_foot"] (yaw south), look_at the lens; the zombie from the
                 dark west aisle (A["ug_aisle_west_end"] + 6 east), z.aggro(f); the rim light is the ug_foot torch.
   23 kill       under. b23_kill: steve.hold("iron_sword"), steve.attack(f); undead.die(z, f, camera=s,
                 attacker=steve) (the rotten flesh: engine.mobs make_dropped_item).
-  24 box        under. b24_box (stills "box", "box_open"): st.see_through(s, "ug_box_side"), (s, "ug_end_wall"),
-                (s, "ug_slot"); zv at A["ug_box"] (yaw v.yaws: north, toward the wall), zv.look_at(f,
-                U.cheat(A["ug_door_target"], up(A["ug_box"], 0.8), cam pos, 0.7), ease=0) (three-quarter to us);
-                lights groups ug_corner 2.0 (the strip of torchlight through the bars), others 0.7, NO inside.
-                r = ug.open_wall(f) (the lever flips off screen) and U.bounce(st, s, U.DOORWAY_GLOW,
-                energy=U.DOORWAY_WATTS, color=U.POINT_COLOR, start=r["open"], kind="torch"): the warm light falls
-                across his face (MEASURED: face +40 %). Then his first step: zv.walk(f2, [A["ug_box"], (14.6, -14.9, F)]) (into the doorway; dad stands at
-                ug_cell_dad, 0.4 beyond) and pan left (north) onto dad's back through the see-through end wall.
+  24 box        under, 3 s. b24_box (stills "box", "box_open", sheet underground_box_sheet.png):
+                st.see_through(s, "ug_box_side"), (s, "ug_end_wall"), (s, "ug_slot"); zv at A["ug_box"] (yaw
+                v.yaws: north), zv.look_at(f, U.cheat(A["ug_door_target"], up(A["ug_box"], 0.8), cam pos, 0.7),
+                ease=0) (three-quarter to us); dad at A["ug_cell_dad"]; U.bounce(st, s, U.SLOT_STRIP,
+                energy=U.SLOT_STRIP_WATTS, color=U.POINT_COLOR, kind="torch", name=...) (the strip of torchlight
+                through the bars, the whole shot); lights 0.7, NO inside, extra=[((14.5, -10.6, F + 1.9), 2.5)].
+                Hold a second, then r = ug.open_wall(f_open, relight=(st, s)) (the lever flips off screen; the
+                doorway's floor, ceiling and the box come up lit) and U.bounce(st, s, U.DOORWAY_GLOW,
+                energy=U.DOORWAY_WATTS, color=U.POINT_COLOR, start=r["open"], kind="torch") (the warm light on his
+                face). His step: run = r["open_end"] + 6; zv.look_at(run - 3, up(A["ug_cell_dad"], 1.5), ease=3);
+                zv.walk(run, [A["ug_box"], (14.6, -14.9, F)]); the pan RIGHT (north) with it:
+                U.hold_then_move(s, run, C["pos"], C["target"], C["pos1"], C["target1"], frame_end=run + 16) onto
+                dad's back and book hat; s.focus(zv.head) then s.focus(dad.head, at_s=film.seconds(run + 4)).
 
 THE GAME'S LIGHT, AND WHAT IS BAKED
   The game draws a block face with the light of the cell it faces (Smooth Lighting off here: one value per face).
   BLOCK light: every emitter's cell gets its level (LIGHT_EMISSION: torch / wall torch 14, lantern 15 ...), every
   neighbour one less, through anything that is not an opaque full cube (BlockLightEngine.propagateIncrease, level
-  - max(1, getLightDampening)); SKY light likewise from 15 down open columns (the stairwell's mouth). LIGHTMAP
-  (lightmap.fsh): ambient #0a0a0a + sky + mix(#FFD88C, white, 0.9 (2 l - 1)^2) * l / (4 - 3 l) * 1.4, clamped,
-  then half-way to notGamma (Brightness 50 %): level 0 = 0.094, 4 = 0.33, 7 = 0.52, 11 = 0.79, 14 = 1.0 (warm in
-  the middle levels, white near the source). Face shade CardinalLighting: up 1.0, down 0.5, north / south 0.8,
-  east / west 0.6. A face here is drawn: texel x D (grey, baked into the texture: it dims whatever scene light
-  falls on it) + texel x E (emission: the game's lightmap colour x the face shade, x EMIT). So without any scene
-  light the set looks like the game; the torches' real point lights (shadows, glow, bloom) come on top.
+  - max(1, getLightDampening): iron bars pass it with dampening 0, CrossCollisionBlock.propagatesSkylightDown);
+  SKY light likewise from 15 down open columns (the stairwell's mouth). LIGHTMAP (lightmap.fsh): ambient #0a0a0a +
+  sky + mix(#FFD88C, white, 0.9 (2 l - 1)^2) * l / (4 - 3 l) * 1.4, clamped, then half-way to notGamma (Brightness
+  50 %): level 0 = 0.094, 4 = 0.33, 7 = 0.52, 11 = 0.79, 14 = 1.0 (warm in the middle levels, white near the
+  source). Face shade CardinalLighting: up 1.0, down 0.5, north / south 0.8, east / west 0.6. A face here is
+  drawn: texel x D (grey, baked into the texture: it dims whatever scene light falls on it) + texel x E (emission:
+  the game's lightmap colour x the face shade, x EMIT). So without any scene light the set looks like the game;
+  the torches' real point lights (shadows, glow, bloom) come on top.
 
 MEASURED (on the stills of this version)
   The aisle with every point light off (still "falloff": the bake alone), tools.underground_proof measure()
   (ray-cast pixels, displayed / texel against the game's lightmap x cardinal shade; levels with hundreds of samples
-  are the reliable ones): level 10 walls 0.39 / game 0.43 (324 samples), floor 0.62 / 0.72 (258); 11 walls
-  0.62 / 0.63 (949), floor 0.72 / 0.79 (1069); 12 walls 0.70 / 0.69 (423), floor 0.69 / 0.87 (1105); 13 walls
-  0.80 / 0.76: the game's falloff within 10-20 %. The dark end (levels 0-4, few samples) renders 0.18-0.35 against
+  are the reliable ones): level 9 walls 0.34 / game 0.39 (291 samples); 10 walls 0.46 / 0.43 (315), floor 0.63 /
+  0.72 (323); 11 walls 0.62 / 0.63 (853), floor 0.65 / 0.79 (1063); 12 walls 0.70 / 0.69 (399), floor 0.73 / 0.87
+  (1040): the game's falloff within 10-20 %. The dark end (levels 0-4, few samples) renders 0.24-0.39 against
   0.05-0.32: the bounce of the lit faces (Fast GI) that the game does not have.
   The black doorway (stills "cell_shut" / "cell_open", the b10 camera, torches 0.7): the 8900 pixels that change
-  when the wall opens have mean 76 / 255 shut and 12 / 255 open; the lit wall beside them 82.
-  Beat 24: the doorway light raises the baby's face from (50, 58, 26) to (71, 82, 40).
-  Bake: dad's cell block light 11 (brightness 0.79), the box 0 (sealed), the aisle's west end 1, the mouth's rim
-  10 under open sky. Push: 1.16 block/s, the player never passes him (closest 0.38 between centres); with the key
-  HELD he walks through him (the game's push is weakest at full overlap). Bed: 1.252 high jumps every 14.4 frames,
-  then the bed's bounces 0.56, 0.24, 0.10, 0.04 block. Jump loop: take-offs every 14-15 frames, 1.252 high.
-  Hands: fingertips 0.5 px into the 2 px pane, his back 0.01 inside the box. Every proof still passes
-  tools/palette_check (stone G/R 0.93-0.97, Steve's trousers >= 12, robes, skin) and its hero's safe-area check.
+  when the wall opens have mean 76 / 255 shut and 11 / 255 open; the lit wall beside them 83.
+  Bake: dad's cell block light 11 (brightness 0.79), the box 0 (sealed; the game: about 6), the aisle's west end
+  1, the mouth's rim 10 under open sky; the lit doorway copy: door cells 9-10, box 8-9. Push: 1.16 block/s, the
+  player never passes him (closest 0.38 between centres); with the key HELD he walks through him. Bed (game):
+  3 calls = one jump of 1.252 and the bounces 0.556, 0.238, 0.104, 0.042; 6 calls = take-offs 36 frames apart.
+  Jump loop: take-offs every 14-15 frames, 1.252 high. Cell blows: a jolt of 0.050 up for one tick; dad's head
+  moves 2.2 % of the frame height in b11, 1.0-1.3 % in b10 / b12. Hands: fingertips 0.5 px into the 2 px pane.
+  Every proof still passes tools/palette_check (stone G/R, Steve's trousers >= 12, robes, skin) and its hero's
+  safe-area check.
 
 NOT THE GAME
   - WARMTH 0.4: the block-light tint is 40 % of the way from white to #FFD88C. The game's own tint makes lit
     stone G/R 0.87-0.90 at levels 6-12, under the palette rule's 0.92 (tools/palette_check): a film choice.
   - POINT_COLOR (1, 0.92, 0.80) for this set's torches (the game's light near a source), paler than the village's
     props.TORCH_COLOR, which pushed villager skin over the palette's 0.52.
-  - BOX_SEALED: the slot's bars pass no light in the bake, so the box is black inside (the game: about 6 levels
-    under the corner). DOOR_KEEPS_DARK: the doorway keeps the box's darkness when it opens (the game re-lights in a
-    tick). Both are what the story needs (a black slot, a black doorway); the torches' point lights still reach in,
-    and beat 24's DOORWAY_GLOW stands in for the game's re-lighting on the baby.
+  - BOX_SEALED: the slot's bars count as opaque in the bake, so the box is black inside. The game lets light
+    through iron bars at full strength (dampening 0, one level per step): the box would be at about level 6 from
+    the corner torch, plainly lit. DOOR_KEEPS_DARK: the doorway keeps the box's darkness when it opens (the game
+    re-lights it within a tick), except in the shot that calls light_doorway (beat 24). Both are what the story
+    needs (a black slot, a black doorway from the aisle); the torches' point lights still reach in.
+  - shade_face: the baby's head and robe get no light from the corner torch (light linking); the game draws a mob
+    at the block light of its cell, the same from every side.
   - Characters are not baked: they are lit by the point lights, the fill and what the glowing faces around them
     bounce (the game draws a mob at the block light of its position, from every side alike).
   - Smooth lighting and ambient occlusion are not reproduced (flat per face); slabs / stairs pass light.
   - The game's 50 % Brightness lifts dark levels a lot (level 4 = 0.33); "Moody" would be lightmap_rgb(gamma=0).
   - push(): the player's taps (4 ticks pressed, 4 released) are a film choice; held, the game lets him walk
     through the villager.
-  - The hall's design (a counter with a window over the 2-wide pier, the end pier with the lever) is ours: a
-    player-built hall in the classic style, not a structure of the game.
+  - bed_bounce(mode="regular") and jumps=(6, 6) (the behaviour run twice back to back) are film choices; the
+    default is the game's JumpOnBed.
+  - jump_loop keys the open-air jump (1.252); under the aisle's 3-high ceiling the game stops the head at the
+    ceiling (1.20, one tick earlier down): his head top is 0.05 inside the ceiling for about 2 frames, unseen
+    from below.
+  - The hall's design (2-high cells with caps, a counter with a window over the 2-wide pier, the end pier with
+    the lever, the hidden inverter and repeater, the 4-wide back corner) is ours: a player-built hall in the
+    classic style, not a structure of the game.
 
 GOTCHAS
   - films/lookdev.py Stage.see_through / remove key the cutaway VISIBLE again on the film's first frame every time
     they are called: a see-through shot that starts on the film's first frame loses its see-through as soon as a
     later shot sees through the same cutaway. Never open the film on such a shot (the proof film has a one-frame
     lead-in for this), or key visible_camera yourself.
-  - Dad's cell is a 1-wide, 3-deep pocket 0.3 behind the counter, between the 2-wide pier and the end pier: his
-    face is seen from the aisle within about 45 degrees of frontal (on the west through the window over the
-    pier, ug_cell_dad's DAD_OFFSET helps that), from straight above (beat 7), or through a cutaway (ug_end_wall,
-    ug_end_pier). The doorway behind him shows as a strip beside his robe from b10_cell_side / b15_drift; dead
-    ahead he hides it.
+  - Dad's cell is a 1-wide, 2-high pocket 0.3 behind the counter, between the 2-wide pier and the end pier: his
+    face is seen from the aisle within about 45 degrees of frontal (on the west through the window over the pier,
+    ug_cell_dad's DAD_OFFSET helps that), from straight above with the caps off (beat 7), or through a cutaway
+    (ug_end_wall, ug_end_pier). The doorway behind him shows as a strip beside his robe from b09, b10_cell_side,
+    b15_drift; dead ahead he hides it.
+  - Use hurt_in_cell / infect_in_cell for a villager in his cell, not undead.hurt with an attacker: that is the
+    open-air hop (0.96 up) and puts his head into the cap. During the 12 red frames Stage.hero finds his head
+    hidden (undead's flash twins): take stills before or after a blow.
   - Cutaways see-through still cast shadows: a character behind ug_end_pier is in its shadow (beat 13: the extra
-    on the ug_dad torch and U.bounce). The lever hangs on ug_end_pier: register it (ug.register(st)) and leave it
-    out of a shot that sees through the pier, or it floats.
+    on the ug_dad torch and U.bounce). The lever hangs on ug_end_pier: with ug.register(st) leave it out of a shot
+    that sees through the pier (beats 13, 16, 19) and st.use it everywhere else it is seen.
   - The fill is shadowless and passes walls: never inside="ug_hall" in a box or slot shot (it would light the box).
   - Every under-ground shot that sees the back wall must find the door shut unless it opens it: ug.door.close(f)
     after a shot that opened it (the proof film does it in _shut()).
-  - A defocused trouser leg right in front of the b08 lens veils the black slot purple: take the slot's own frames
-    (beat 21) before or after he passes.
+  - hold_then_move replaces the Shot's easing: call it once per shot instead of s.move (a later s.move keeps its
+    hold), and s.focus after it.
+  - shade_face is set on the corner torch for the whole film (not keyed): fine for this story (the box shots light
+    the baby with SLOT_STRIP / DOORWAY_GLOW); it is in the frame stamp.
   - Proof characters are new per shot (the proof film pre-rolls walks); in a film keep the rule of CONTRACT.md:
     nobody keyed before a shot starts if he is in the shot before it (push() and bed_bounce() place on `frame`).
   - render.Session imports films.<name>: tools/underground_proof.py registers itself as films._underground_proof.
 
 Self-test:  $BPY -m engine.underground              numeric checks (tools/underground_check.py, about 10 s: light
-                                                    model, flood fill, the set, camera sight lines, mechanics)
+                                                    model, flood fill, the set, the bars, camera sight lines with
+                                                    the unused cutaways solid, the cell jolt through b10-b12,
+                                                    mechanics)
             $BPY -m engine.underground NAME ...     proof stills out/test/underground_<name>.png (540x960, 16 spp,
-                                                    2 threads; 3-5 per call): mouth lip push well bed bed_wide
-                                                    stairwell down down_start cell cell_open cell_shut lever aisle
-                                                    endwall endwall_alt slot slot_hands slot_boots box box_open foot
-                                                    falloff portrait counter apple drift ots follow kill; sheets
-                                                    push_sheet bed_sheet (cell_open + cell_shut together print the
-                                                    doorway measurement; aisle and falloff print measure())
-            $BPY -m tools.check_underground_stamp   frame fingerprints (11 cases, two processes, about 90 s)
+                                                    2 threads; 3-4 per call): mouth lip push well bed bed_wide
+                                                    stairwell down down_start cell cell_open cell_shut lever hit
+                                                    aisle endwall endwall_alt slot slot_hands slot_boots box
+                                                    box_open foot falloff portrait counter apple drift ots follow
+                                                    kill; sheets push_sheet bed_sheet lever_sheet hit_sheet
+                                                    box_sheet (cell_open + cell_shut together print the doorway
+                                                    measurement; aisle and falloff print measure(); mouth and
+                                                    slot_boots print the hero's frames in the picture)
+            $BPY -m tools.check_underground_stamp   frame fingerprints (15 cases, two processes, about 2 min)
 """
 import math
 
@@ -333,8 +404,11 @@ OCCLUDING = ("dirt_path", "farmland")  # not full cubes, but useShapeForLightOcc
 WARMTH = 0.4                           # the block-light tint used: 40 % of the way from white to #FFD88C (palette)
 EMIT = 1.0                             # baked light drawn as emission x this (1 = the game's brightness exactly)
 DOOR_KEEPS_DARK = True                 # the doorway is baked as the box behind it: the open doorway stays black
+                                       # (except in a shot that calls ug.light_doorway: beat 24)
 BOX_SEALED = True                      # the slot's bars count as opaque in the bake: the box is black inside (the
-                                       # game: bars pass light, the box would be about 6 levels under the corner)
+                                       # game: iron bars pass light at full strength - CrossCollisionBlock.
+                                       # propagatesSkylightDown = !waterlogged, so getLightDampening 0 and one level
+                                       # per step - and the box would be at about level 6 from the corner torch)
 POINT_COLOR = (1.0, 0.92, 0.80)        # the set's torch / lantern point lights: the game's block light near its
                                        # source (lightmap level 13: (1, 0.92, 0.78)), paler than the village's
                                        # props.TORCH_COLOR (1, 0.88, 0.72), which pushes villager skin over 0.52
@@ -1425,7 +1499,8 @@ SLOT_STRIP_WATTS = 6.0                    # (kind "torch": a shadowed point, the
 # beat 8 / 21: Steve walks out of the back corner past the slot, north to the aisle, under the b08 camera's line
 STEVE_PAST = [(17.6, -16.65, float(F)), (17.6, -12.2, float(F))]
 HIDE_FACE_LOOK = (SLOT[0] - 0.6, SLOT[1] - 0.9, F - 0.6)   # beat 8: where the baby in the box looks (down, south)
-APPLE_POINT = (14.17, -11.67, F + 1.27)   # beat 14: the golden apple in Steve's right hand at ug_aisle_dad, raise_arm 55
+APPLE_POINT = (14.145, -11.75, F + 1.23)  # beat 14: the golden apple in Steve's right hand at ug_aisle_dad, raise_arm 55
+                                          # (MEASURED: players item_point("right", f) on that pose)
 
 
 def cheat(target, head, camera, k=0.35):
@@ -1440,26 +1515,30 @@ def cheat(target, head, camera, k=0.35):
 # name -> dict(pos, target, lens, fstop, beat, note): the framings of the proof stills (each rendered and looked at:
 # out/test/underground_<still>.png). A start, not a rule.
 CAMERAS = {
-    "b01_mouth": dict(beat=1, still="mouth", pos0=(8.6, -1.9, 0.92), target0=(5.0, 2.4, 1.0), pos=(7.7, -1.5, 0.88),
+    "b01_mouth": dict(beat=1, still="mouth", pos0=(9.0, -2.2, 0.92), target0=(5.0, 5.0, 1.6), pos=(7.9, -1.6, 0.88),
                       target=(4.9, -1.1, -0.1), lens=28.0, fstop=3.2,
-                      note="child's eye height east of the mouth: s.move(pos0, target0, pos, target) pans left with "
-                           "Steve as he crosses in profile from the north and pushes in on the glowing hole as he "
-                           "sinks into it (the well and the sunset behind); see BEATS for his frames in the picture"),
+                      aim_from="steve.head",
+                      note="child's eye height east of the mouth: s.move(pos0, steve.head, pos, target) - the aim "
+                           "rides on his head (aim_from; target0 is where it starts) as he crosses in profile from "
+                           "the north and eases onto the glowing hole while the camera pushes in (the well and the "
+                           "sunset behind); BEATS gives his frames in the picture"),
     "b02_lip": dict(beat=2, still="lip", pos=(5.75, -0.85, 0.82), target=(4.85, 1.42, 0.52), lens=50.0, fstop=2.0,
                     note="over the hole, three-quarter front on the child at the lip; repeated by b24_box"),
     "b03_push": dict(beat=3, still="push", pos=(9.0, 1.0, 1.05), target=(5.0, 0.7, 1.0), lens=28.0, fstop=3.2,
                      kid=(8.1, 1.45, 0.0), note="side-on and low from the east (the well behind them): dad turned "
                                                "back to the lens, Steve at his back; the child at `kid` (facing "
                                                "west, watching) is the soft head in the bottom right corner"),
-    "b04_bed": dict(beat=4, still="bed", pos=(16.45, -9.85, 1.85), target=(19.9, -9.5, 2.75), lens=26.0, fstop=2.6,
-                    note="beside the foot of the red bed, low; the bed fills the bottom third"),
+    "b04_bed": dict(beat=4, still="bed", pos=(16.45, -9.85, 1.85), target=(19.9, -9.5, 3.15), lens=24.0, fstop=2.6,
+                    note="beside the foot of the red bed, low; the bed fills the bottom third, room above him for "
+                         "the 1.25-block jump"),
     "b05_bed_wide": dict(beat=5, still="bed_wide", pos=(11.4, -8.7, 2.25), target=(18.6, -9.6, 2.0), lens=30.0,
                          fstop=3.2, note="by the door, locked off: he stands on the bed facing it"),
     "b06_stairwell": dict(beat=6, still="stairwell", pos=(5.0, -0.7, 1.45), target=(5.0, -6.0, -6.2), lens=26.0,
                           fstop=4.0, note="high behind at the top of the flight"),
     "b07_down": dict(beat=7, still="down", pos=(14.5, -11.8, -4.3), target=(14.45, -13.4, -8.6), lens=26.0,
                      fstop=4.0, pos0=(7.8, -11.3, -2.6), target0=(7.8, -13.5, -8.6),
-                     note="the ceiling off (st.see_through 'ug_ceiling'): from above the aisle, 70 degrees down into "
+                     note="the ceiling and the caps off (st.see_through 'ug_ceiling', 'ug_caps'): from above the "
+                          "aisle, 70 degrees down into "
                           "the pockets (the frame's up is south), sliding east and down from the farmer's pocket "
                           "(pos0) to dad's (pos): hats in the pockets, dad looks up, the box's lid behind his cell, "
                           "the lever on the end pier"),
@@ -1509,11 +1588,12 @@ CAMERAS = {
                                       "left, the cleric, fletcher and farmer in theirs, Steve jumping at "
                                       "ug_jump_spot, the aisle falling off into the dark beyond the stair foot"),
     "b19_endwall": dict(beat=19, still="endwall", pos0=(16.9, -12.55, F + 0.95), target0=(14.5, -13.2, F + 1.55),
-                        pos=(16.95, -13.35, F + 0.9), target=(14.5, -14.0, F + 1.0), lens=32.0, fstop=2.4,
+                        pos=(16.95, -13.4, F + 0.9), target=(14.5, -14.0, F + 1.0), lens=32.0, fstop=2.4,
                         look=(13.4, -10.3, F + 1.6),
-                        note="through the see-through end wall ('ug_end_wall') from the north-east, lower than his "
-                             "face: dad at ug_cell_dad_mid gazing up the aisle 20 degrees west of north (`look`) is "
-                             "in profile; slide (pos0 -> pos) off his face onto the piston wall behind his back"),
+                        note="through the see-through end wall AND end pier ('ug_end_wall', 'ug_end_pier': leave "
+                             "the lever out of the shot) from the north-east, lower than his face: dad at "
+                             "ug_cell_dad_mid gazing up the aisle 20 degrees west of north (`look`) is in profile; "
+                             "slide (pos0 -> pos) off his face onto the piston wall behind his back"),
     "b19_alt": dict(beat=19, still="endwall_alt", pos=(13.95, -10.55, -9.05), target=(14.6, -13.8, -8.6), lens=32.0,
                     fstop=2.4, note="from the aisle west of the cell, low: his face turned up the aisle toward the "
                                     "lens, the piston wall beside his back"),

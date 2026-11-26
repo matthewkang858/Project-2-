@@ -63,12 +63,15 @@ STEVE_PRE = 32                   # he starts this many frames before beat 6 (in 
 ME07_FSTOP = 2.0                 # beat 7's depth of field (beat 6's gate camera keeps its f/4): the watcher soft
 # beat 7's OWN camera (the review of the whole-film preview): from the gate camera's position, behind the dip to
 # black, a 30 mm lens (the gate's 22 mm left him 30 px tall at 540x960, 3 % of the frame: on a phone the road read as
-# empty) aimed 2.5 blocks west of him and a little lower (the child whole at the left, its chin over the caption
-# band), and a slow linear push of ME07_PUSH blocks along the aim with a pan that keeps the child where it is (the
-# locked gate camera was a still photograph after the dip: 0.07-0.21 grey levels from frame to frame)
+# empty) aimed 2.5 blocks west of him and low (the child whole at the left, its chin over the caption band), and a
+# slow linear push of ME07_PUSH blocks along the aim with a pan that keeps the child where it is (the locked gate
+# camera was a still photograph after the dip: 0.07-0.21 grey levels from frame to frame). The aim's z was 1.6 / 1.0
+# until the last review of the preview: the head-down child's chin then reached 64 % of the frame height, 2 % into
+# the caption band (0.62-0.72), and "came", "back", "sunrise" sat on its nose and chin; one block lower (about 1.6
+# degrees more tilt) its head ends at 61-62 %, above the band
 ME07_PUSH = 0.3
 _G = HC.CAMS["gate"]["pos"]
-_T0, _T1 = (-2.0, 57.6, 1.6), (-3.1, 57.6, 1.0)
+_T0, _T1 = (-2.0, 57.6, 0.6), (-3.1, 57.6, 0.0)     # (z 1.6 / 1.0 until the last review: see me07)
 _D = math.dist(_G, _T0)
 ME07_CAM = dict(pos=_G, target=_T0, pos1=tuple(g + ME07_PUSH * (t - g) / _D for g, t in zip(_G, _T0)), target1=_T1,
                 lens=30.0, fstop=ME07_FSTOP)
@@ -254,9 +257,12 @@ def me07_return(st, s, C, nar):
       the story offers is not available (the narration fixes every cut). Plain Steve skin (sets notes: his eye
       whites are two pale dots at 30 px: the white-eyed skin would be brighter).
     NOW (since the review of the whole-film preview): ME07_CAM, its own camera behind the dip: the gate camera's
-      position, 30 mm f/2.0 (ME07_FSTOP) aimed 2.5 blocks west of him and a little low, a slow LINEAR push of 0.3
-      block along the aim (ME07_PUSH) with a pan of 1.1 blocks west and 0.6 down at his distance that holds the child
-      in place, handheld 0.012 (ME07_HANDHELD, dg22's); focus on the child. With the gate camera exactly (22 mm,
+      position, 30 mm f/2.0 (ME07_FSTOP) aimed 2.5 blocks west of him and low (_T0 z 0.6; since the last review of
+      the preview one block lower than it was, z 1.6, about 1.6 degrees more tilt: the head-down child's chin sat
+      2 % inside the caption band and "came" / "back" / "sunrise" touched its nose and chin; now its whole head is
+      above the band from the first frame), a slow LINEAR push of 0.3 block along the aim (ME07_PUSH) with a pan
+      of 1.1 blocks west and 0.6 down at his distance that holds the child in place, handheld 0.012
+      (ME07_HANDHELD, dg22's); focus on the child. With the gate camera exactly (22 mm,
       locked, handheld 0.004) he was 30 px tall at 540x960, 3 % of the frame: on a phone the road read as empty on
       "He came back"; and the frame changed by 0.07-0.21 grey levels a frame for 2.6 s, a still photograph after
       the dip. The change of lens is hidden by the dip (black 421-422); the place is the same (the gate, the road,
@@ -267,15 +273,17 @@ def me07_return(st, s, C, nar):
       ("sunrise" 442) it lifts and turns up the road to him, cheated to MAX_OFF (nose in profile, both eyes); then
       it keeps peering at him, the head rising about 7 degrees and turning 4 more to the cut (456-482). Hero: the
       child.
-    MEASURED (tools.hello_geo at 426 / 456 / 484; stills out/test/hello_review_fix_me07_return_426/460/484.png and
-      _484_zones.png at 540x960 / 16 samples): him eyes x 61 -> 65 %, y 50 -> 49 %, about 42 px tall (shirt and legs
-      33-34 px, was 30 px in all), face 11-12 px, 35 blocks: at f/2.0 an even smudge (crop of 460: brightest face
-      pixel value 81, no eye whites); teal shirt, bare arms, bare head and blue legs read against the black trunks;
-      the child's eyes x 27-29 %, y 55-56 %, head x 10.5-49.5 %, y 44-64 % (head down at 426: its brow's corner
-      at 64 %; 44-61 % once lifted), face 61-66 px, 39 degrees off the lens at 426, 65 at 456, 68 at 484.
-      palette_check me07_return@460 passes everything (robe hue 9, skin s 0.43, plants 0.75 of the grass, hero
-      child x 13-41 %, y 46-60 %, 100 % inside). Preview 360x640_8spp 421-484: 0.41-0.69 grey levels a frame
-      (was 0.09-0.26).
+    MEASURED (the last review pass, the aim one block lower: tools.hello_geo at 426 / 433 / 442 / 457 / 484; stills
+      out/test/hello_review_fix_me07_return_426/433/442/460/484.png and their _zones.png at 540x960 / 16 samples):
+      him eyes x 61 -> 65 %, y 47.6 -> 46.3 % (was 50 -> 49), about 42 px tall, face 11-12 px, 35 blocks: at f/2.0
+      an even smudge; teal shirt, bare arms, bare head and blue legs read against the black trunks (crops of the
+      preview mp4 at 426 / 457 / 484); the child's eyes x 27-29 %, y 52.5-53.7 % (was 55-56), head x 10.4-50.5 %,
+      y 43.6-61.6 % head down (426-442; was 45-64 %, 2 % inside the caption band), 41.6-58.2 % once lifted, face
+      61-66 px, 39 degrees off the lens at 426, 65 at 457, 68 at 484. In the preview mp4 "came" / "back" /
+      "sunrise" / "without" now sit on its robe and legs, never on its head (its chest under them is accepted).
+      palette_check me07_return@460 passes everything (robe hue 10, skin s 0.43, plants 0.73 of the grass, hero
+      child x 13-41 %, y 43-57 %, 100 % inside). Preview 360x640_8spp 421-484: 0.42-0.68 grey levels a frame
+      (before the review's push 0.09-0.26).
     """
     f0, f1 = s.frame_start, s.frame_end
     kid = C.actor("child", "me")

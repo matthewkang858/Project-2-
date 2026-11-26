@@ -77,7 +77,10 @@ def shot_mouth(st, s, ug):
     steve.place(f0, MOUTH_START, math.pi)
     s.ug = dict(end=steve.walk(f0, [MOUTH_START] + path[1:10], speed=players.WALK_SPEED), steve=steve)
     st.use(s, steve)
-    _cam(s, "b01_mouth", focus=(5.0, 0.6, 0.9), moving=True)
+    c = U.CAMERAS["b01_mouth"]
+    s.lens(c["lens"], c["fstop"])
+    s.move(c["pos0"], steve.head, c["pos"], c["target"])   # the aim rides on his head, eases onto the hole
+    s.focus((5.0, 0.6, 0.9))
     st.hero(s, "steve", steve)
     st.lights(s, scale=1.3, groups={k: 1.0 for k in U.LIGHT_GROUPS}, near=A["ug_mouth_target"], radius=22.0)
 
@@ -173,7 +176,7 @@ def shot_stairwell(st, s, ug):
     kid.place(f0, path[1], math.pi)
     kid.walk(f0, path[1:], speed=4.4, run=True)
     torch = (U.LIGHTS[2][0][0] + 0.1, U.LIGHTS[2][0][1] + 0.5, U.LIGHTS[2][0][2] + 0.6)   # the west wall's torch
-    kid.look_at(f0, torch, ease=0)
+    kid.track(f0, s.frame_end, torch, step=2, ease=4)       # the head follows the torch as he runs past it
     s.ug = dict(kid=kid)
     st.use(s, kid)
     _cam(s, "b06_stairwell", focus=kid.head)
@@ -315,9 +318,10 @@ def shot_endwall(st, s, ug):
     cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else cam["look"],
                    dad_at="ug_cell_dad_mid")
     st.see_through(s, "ug_end_wall")
+    st.see_through(s, "ug_end_pier")
     _cam(s, "b19_endwall", focus=cells["dad"].head, moving=True)
     st.hero(s, "dad", cells["dad"])
-    _under(st, s, ug, inside=True)
+    _under(st, s, ug, inside=True, parts="door")
 
 
 def shot_endwall_alt(st, s, ug):
@@ -608,7 +612,7 @@ def build(scene, sky=None):
     for n in (WANTED or ORDER):
         tag, fn = BUILDERS[n]
         secs = {"push": 6.0, "bed": 6.0, "down": 3.0, "down_start": 3.0, "mouth": 4.0, "lever": 2.5,
-                "box_open": 3.0, "hit": 2.0, "stairwell": 2.5, "slot_boots": 2.5, "slot_hands": 2.5,
+                "box_open": 3.0, "hit": 2.0, "stairwell": 2.5, "mouth": 3.5, "slot_boots": 2.5, "slot_hands": 2.5,
                 "endwall": 2.0}.get(n, 1.0)
         s = st.shot(n, secs, sky=tag)
         SHOT["name"] = n
@@ -640,8 +644,10 @@ def still_frame(film, name):
         return min(range(shot.frame_start, shot.frame_end + 1), key=lambda f: abs(kid.pos_at(f).y + 5.6))
     if name == "aisle":
         return r["takeoffs"][1] + 7                          # the top of a jump (12 ticks: the peak at tick 5-6)
-    if name == "slot_boots":                                 # his boots cross the line to the slot
-        return _crossing(shot, r["steve"])
+    if name == "slot_boots":                                 # his boots cross the line to the slot: the frame
+        c = _crossing(shot, r["steve"])                      # nearest it with the legs together (least smear)
+        legs = r["steve"]
+        return min(range(c - 3, c + 4), key=lambda f: (abs(_leg_angle(legs, f)), abs(f - c)))
     if name == "slot_hands":
         return _crossing(shot, r["steve"]) + 16              # he has passed: the hands alone
     if name == "slot":
@@ -651,6 +657,13 @@ def still_frame(film, name):
     if name == "endwall":
         return shot.frame_start
     return shot.frame_start + int(round(STILL_AT * film.fps))
+
+
+def _leg_angle(c, f):
+    import bpy
+
+    bpy.context.scene.frame_set(f)
+    return c.leg_r.matrix_basis.to_euler().x
 
 
 def _crossing(shot, steve):

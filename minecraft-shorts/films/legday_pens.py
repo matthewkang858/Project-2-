@@ -35,27 +35,137 @@ TAGS (twins): the stubs use one tag per shot (pn04: kai_pn, zuri_pn, hen_pn4h0..
 LIGHT: C.lights(s, "gold", near=<point>, radius=8..10).
 PREVIEW samples for render.py previews: 6 (legday_common.PREVIEW_SAMPLES).
 """
-from engine import animals
+from mathutils import Vector
+
+from engine import animals, shots
 from films import legday_common as LC
 
 # ---------------------------------------------------------------------------------------------------------------
 # this sequence's own cameras (starts: the set builder's suggestions; yours to change)
 # ---------------------------------------------------------------------------------------------------------------
-PN04_CAM = LC._set_cam("b04")             # a linear track west -> east along the south fences (3.6 s in the set's
-#                                           proof; this shot is 3.92 s: the track is slower)
-PN05_CAM = dict(LC._set_cam("b05"), pos1=(-10.25, 17.85, 1.43))
-PN06_CAM = dict(LC._set_cam("b06"), pos1=(-9.5, 18.35, 1.2))
-PN17_CAM = dict(LC._set_cam("b17"), pos1=(-4.45, 21.85, 1.1))
-HENS = ((-21.2, 23.6), (-20.6, 21.5), (-18.6, 23.4), (-19.0, 24.6))
-COWS_04 = ((-10.2, 23.1, -10.0, 19.0), (-8.6, 24.4, -9.5, 20.0))     # (x, y, facing toward x, y)
+# beat 5: the two-shot from the south, 40 mm (the set's b05 at 50 mm had her at x 26 % and the cow's head at 82-90 %),
+# a block above the pen's top rail, a slow push (at speed on 299)
+PN05_CAM = dict(pos=(-10.6, 17.7, 1.75), pos1=(-10.62, 17.98, 1.73), target=(-10.85, 22.45, 1.1), lens=40.0,
+                fstop=2.4)
+# beat 6: behind the narrator's right shoulder from further back than the set's b06 (there his head was off the
+# frame's left edge, x -67..14 %): his head and shoulder at the left, Zuri in the middle, the cow at the right
+PN06_CAM = dict(pos=(-10.0, 17.3, 1.45), pos1=(-10.05, 17.5, 1.45), target=(-11.15, 22.3, 1.35), lens=30.0,
+                fstop=2.4)
+EFE_06 = (-11.05, 19.25)                  # the narrator at the cow pen's gate (narrator_fence is 0.5 east: from any
+EFE_06_FACE = (-10.6, 22.4)               # lens behind his right shoulder Zuri stood right behind his head there)
+# beat 17: from the road side through the east fence, low (1.1: the cows' backs cover the four to the chin), a slow
+# push; the post with its arrows in the foreground, the row of four heads beyond, between two cows' heads
+PN17_CAM = dict(pos=(-4.1, 22.7, 1.1), pos1=(-4.3, 22.7, 1.1), target=(-10.4, 22.48, 1.4), lens=26.0, fstop=2.8)
+# THE COWS: a cow's head is as high as a face, and three cows end to end facing one way put a head every 1.65 blocks:
+# there is room for two players between two heads, never four (hide_1..4 put Zuri behind cow 2's head). So the two
+# in front of the four stand RUMP TO RUMP along the fence (cow B facing south, cow C north): 3.1 blocks of backs with
+# no head, a head at each end (B's looks at the lens). Cow A stands north of C, facing north, its rump at the frame's
+# right edge. (x, y, facing toward x, y)
+COWS_17 = ((-8.7, 25.1, -8.7, 27.0), (-8.7, 22.0, -8.7, 20.0), (-8.7, 23.3, -8.7, 25.0))      # A, B, C
+HIDERS_17 = (("steve", -10.05, 21.85), ("kai", -10.75, 22.45), ("zuri", -10.05, 23.05), ("ari", -10.75, 23.65))
+ARROW_1 = (-6.55, 22.4, 0.93)             # the arrows' points on the east fence post's road face (the x -7, y 22
+ARROW_2 = (-6.55, 22.6, 0.86)             # post: arrow_post_target), high on it: the arrows above the caption band
 ARROW_DIR = (-0.55, -0.78, -0.30)         # the way the arrows flew: from up the road to the NORTH-EAST (where the
 ARROW_DIR_2 = (-0.62, -0.72, -0.31)       # patrol is) into the east fence post: the shafts stand 60-70 degrees off
 #                                           the lens axis and read as arrows (the first stub's flew from due east,
 #                                           straight at the lens: two white X shapes, the fletching end-on)
+COW_MILK = (-10.3, 23.25)                 # the milked cow (pn04-pn06): cow_milk_target (-10.0, 23.3) moved 0.3 west,
+COW_MILK_FACE = (-11.0, 20.5)             # its head beside her right shoulder, facing south-south-west
 DRINK = 38                                # frames of one drink: the game's 32 ticks (players.drink's default)
 DRINK_ENDS = 303                          # the milk loop ON THE GAME'S CLOCK across pn04 -> pn05 -> pn06: the drink
 #                                           begun in pn04 (265) empties the bucket on 303; tap on "fill" 323, drink
 #                                           325-363, tap 368, drink from 370
+
+# beat 4: Kai at the EAST side of the chicken pen; Zuri and her cow on their pn05 places (zuri_cow, cow_milk_target)
+KAI_04 = (-18.35, 22.7)
+KAI_04_FACE = (-16.9, 21.0)               # toward the track's start: the cooked chicken face-on at his mouth (in
+#                                           profile it is edge-on, a brown stick: scouted, legday_pens_pn04_farms_214)
+ZURI_FACE = (-9.6, 21.7)                  # Zuri at zuri_cow faces east-south-east in pn04-pn06: the sun, the cow's head
+#                                           in front of her (the tap), and her RIGHT side (the bucket hand) to the lenses
+#                                           in the south: a held bucket's sprite faces sideways, so it reads from her
+#                                           side (frontal, the lowered empty bucket was an edge-on sliver: _pn05_312)
+# the four hens round Kai: (x, y, body facing toward x, y): beside and behind him, their faces or profiles to the
+# lens as they look up at him (a hen between him and the lens shows it its back)
+HENS_04 = ((-19.45, 22.45, -18.35, 22.7), (-19.35, 23.6, -18.35, 22.7), (-17.4, 23.85, -18.35, 22.7),
+           (-17.25, 22.85, -18.35, 22.7))
+COW_B = (-8.6, 24.6, -11.0, 24.2)         # the second cow (pn04), at the back of the pen facing west
+# THE TRACK: from a block above eye height (2.5) over the south fences, west -> east, the camera and its aim on keyed
+# paths (_keyed_cam): slow on Kai and his hens through "chicken farm"; between "farm" and "cow" a truck of 3 blocks
+# with a pan of about 50 degrees to the cow pen; slow on Zuri and her cow from "cow farm" to the end. WHY HIGH: from
+# eye height or lower the top rail hides the hens and the anvil wall (x -4, y 27-60, 18 high) fills every view of the
+# cow pen from the south-west (legday_pens_pn04_farms_250 / _281: grey stone over 60-85 % of the frame); from 2.5
+# looking down on them the hens stand on the grass, the pen's grass is behind the faces and the wall is a strip at
+# the top right (legday_pensvar_pn04_farms_214_v0 / _281_v0). WHY KEYED: a linear track was still between the pens on
+# "cow" (the lead's note); with the camera on one ease the pan alone was 67 degrees in 28 frames.
+PN04_PATH = (
+    (205, (-17.1, 18.25, 2.5)),
+    (230, (-16.5, 18.25, 2.5)),
+    (252, (-13.6, 18.35, 2.5)),
+    (299, (-12.6, 18.4, 2.5)),
+)
+PN04_AIM = (
+    (205, (-18.4, 22.7, 0.9)),
+    (230, (-18.1, 22.7, 0.9)),
+    (252, (-11.25, 22.7, 0.95)),
+    (299, (-11.0, 22.8, 0.95)),
+)
+PN04_LENS = (32.0, 2.6)
+
+
+def _pchip(xs, ys, x):
+    """Monotone cubic (Fritsch-Carlson) through (xs, ys) at x: no overshoot between keys, and the end slopes are
+    the end segments' own (a path keyed this way is at speed on its first frame)."""
+    n = len(xs)
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    h = [xs[i + 1] - xs[i] for i in range(n - 1)]
+    d = [(ys[i + 1] - ys[i]) / h[i] for i in range(n - 1)]
+    m = [d[0]] + [0.0] * (n - 2) + [d[-1]]
+    for i in range(1, n - 1):
+        if d[i - 1] * d[i] > 0:
+            w1, w2 = 2 * h[i] + h[i - 1], h[i] + 2 * h[i - 1]
+            m[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i])
+    i = max(j for j in range(n - 1) if xs[j] <= x)
+    t = (x - xs[i]) / h[i]
+    t2, t3 = t * t, t * t * t
+    return ((2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1]
+            + (t3 - t2) * h[i] * m[i + 1])
+
+
+def _keyed_empty(s, what, keys):
+    """An empty "pn_<what>_<shot>" keyed on every frame of shot s (and one past its end) along keys = [(frame,
+    point)], each coordinate a monotone cubic through them. Never rendered."""
+    import bpy
+    ob = bpy.data.objects.new("pn_%s_%s" % (what, s.name), None)
+    s.film.collection.objects.link(ob)
+    fr = [k[0] for k in keys]
+    for f in range(s.frame_start, s.frame_end + 2):
+        ob.location = [_pchip(fr, [k[1][i] for k in keys], f) for i in range(3)]
+        ob.keyframe_insert("location", frame=f)
+    shots._linearize(ob)
+    ob.hide_render = True
+    return ob
+
+
+def _keyed_cam(C, s, path, aim, lens, focus=None, handheld=0.006):
+    """A camera whose position AND aim follow keyed paths [(frame, point)] (monotone cubics: _keyed_empty), for a
+    move that no single ease gives (pn04: slow on the hens, the truck and pan between the pens, slow on the cows).
+    engine.shots bakes a camera's own location again in Film.finalize (pos -> pos1 with one ease), so the camera is
+    C.cam'd at the local origin (its own keys = the handheld drift only, seeded by the shot name as always) and
+    parented to a keyed rig; the aim is an object target, which engine.shots follows. Returns the spec C.cam used."""
+    rig = _keyed_empty(s, "rig", path)
+    spec = C.cam(s, None, focus=focus, handheld=handheld, pos=(0.0, 0.0, 0.0), target=_keyed_empty(s, "aim", aim),
+                 lens=lens[0], fstop=lens[1])
+    s.camera.parent = rig
+    return spec
+
+
+def _path_at(keys, f):
+    """A keyed path's point at frame f (as _keyed_empty keys it; no handheld)."""
+    fr = [k[0] for k in keys]
+    return tuple(_pchip(fr, [k[1][i] for k in keys], f) for i in range(3))
 
 
 def pn04_farms(st, s, C, nar):
@@ -88,27 +198,48 @@ def pn04_farms(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     kai = C.actor("kai", "pn")
-    C.put(kai, f0, "kai_chickens", toward=(-18.2, 21.5))
-    kai.hold("cooked_chicken")
-    kai.eat(f0 + 4, C.at(s, "and") - 2)
+    C.put(kai, f0, KAI_04, toward=KAI_04_FACE)
     zuri = C.actor("zuri", "pn")
-    C.put(zuri, f0, "zuri_cow", toward=(-9.9, 21.3))
-    zuri.hold("milk_bucket")
-    zuri.drink(DRINK_ENDS - DRINK)                # 265: the game's 38 frames, ending in pn05 (on its clock)
+    C.put(zuri, f0, "zuri_cow", toward=ZURI_FACE)
     hens = []
-    for i, (x, y) in enumerate(HENS):
+    for i, (x, y, tx, ty) in enumerate(HENS_04):
         h = C.hen("pn4h%d" % i)
-        h.place(f0, (x, y, 0.0), LC.yaw_to((x, y), (-19.6, 22.6)))
-        h.look_at(f0, kai.eye_point(f0), ease=0)
+        h.place(f0, (x, y, 0.0), LC.yaw_to((x, y), (tx, ty)))
         hens.append(h)
-    cows = []
-    for i, (x, y, tx, ty) in enumerate(COWS_04):
-        c = C.cow("pn4c%d" % i)
-        c.place(f0, (x, y, 0.0), LC.yaw_to((x, y), (tx, ty)))
-        c.idle(f0, f1, seed=i)
-        cows.append(c)
-    st.use(s, kai, zuri, *hens, *cows)
-    C.cam(s, None, focus=kai.head, ease="linear", **PN04_CAM)
+    cow = C.cow("pn4c0")
+    cow.place(f0, C.stand(COW_MILK), LC.yaw_to(COW_MILK, COW_MILK_FACE))
+    cow_b = C.cow("pn4c1")
+    cow_b.place(f0, (COW_B[0], COW_B[1], 0.0), LC.yaw_to(COW_B[:2], COW_B[2:]))
+    lift = C.at(s, "chicken") - 4                 # 209: the cooked chicken at his mouth on "chicken" 213
+    down = C.at(s, "farm") + 8                    # 231: lowered (he stops eating: the game lets go), his face again
+    # Kai: looking down at his hens on the cut, then the chicken up to his mouth through "chicken farm", then back
+    # down to the hens as the camera pans away
+    kai.hold("cooked_chicken")
+    kai.look_at(f0, (KAI_04[0] - 0.4, KAI_04[1] - 0.9, 0.5), ease=0)
+    kai.look_at(lift - 2, C.to_lens(kai, lift, (KAI_04_FACE[0], KAI_04_FACE[1], 1.7), _path_at(PN04_PATH, lift),
+                                     degrees=30), ease=6)
+    kai.eat(lift, down)
+    kai.look_at(down + 4, (KAI_04[0] - 0.9, KAI_04[1] + 0.6, 0.6), ease=8)
+    # the hens peck-look at the ground, then their heads come up to him as the chicken goes up (one after another)
+    for i, h in enumerate(hens):
+        x, y = HENS_04[i][:2]
+        h.look_at(f0, ((x + KAI_04[0]) / 2.0, (y + KAI_04[1]) / 2.0, 0.0), ease=0)
+        h.look_at(lift - 1 + 2 * i, kai, ease=5)
+        h.track(lift + 5 + 2 * i, f1, kai, step=4, ease=4)
+    # Zuri with her milk bucket beside the cow, the drink on "protein shakes" on the game's clock (265-303)
+    drink = DRINK_ENDS - DRINK                    # 265
+    zuri.hold("milk_bucket")
+    zuri.look_at(f0, cow, ease=0)                 # (out of the frame until the pan)
+    turn = C.at(s, "and") - 10                    # 232: her head off the cow and round toward the lens before the pan
+    zuri.look_at(turn, C.to_lens(zuri, turn, (ZURI_FACE[0], ZURI_FACE[1], 1.55),
+                                 _path_at(PN04_PATH, C.at(s, "cow")), degrees=35), ease=8)
+    zuri.drink(drink)                             # at her mouth from 269 ("protein"), lowered on 303 (in pn05)
+    cow.look_at(f0, zuri, ease=0)
+    cow.idle(f0, f1, seed=2)
+    cow_b.idle(f0, f1, seed=5)
+    st.use(s, kai, zuri, *hens, cow, cow_b)
+    _keyed_cam(C, s, PN04_PATH, PN04_AIM, PN04_LENS, focus=kai.head)
+    s.focus(zuri.head, at_s=s.film.seconds(C.at(s, "and") - 8), rack_s=0.5)     # the pull to Zuri with the pan
     st.hero(s, "kai", kai)
     st.hero(s, "zuri", zuri)
     C.lights(s, "gold", near=(-15.0, 22.0, 1.0), radius=10.0)
@@ -148,19 +279,24 @@ def pn05_milk(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     zuri = C.actor("zuri", "pn2")
-    C.put(zuri, f0, "zuri_cow", toward=(-9.7, 20.6))
+    C.put(zuri, f0, "zuri_cow", toward=ZURI_FACE)
     cow = C.cow("pn5")
-    cp = C.P("cow_milk_target")
-    cow.place(f0, cp, LC.yaw_to(cp, (-11.0, 20.5)))
-    zuri.look_at(f0, cow.eye_point(f0), ease=0)
+    cow.place(f0, C.stand(COW_MILK), LC.yaw_to(COW_MILK, COW_MILK_FACE))
+    cam = PN05_CAM["pos"]
+    fill = C.at(s, "fill")                        # 323
+    ahead = C.to_lens(zuri, f0, (ZURI_FACE[0], ZURI_FACE[1], 1.55), cam, degrees=35)
+    zuri.look_at(f0, ahead, ease=0)
     empty = DRINK_ENDS                            # 303: pn04's drink ends (the game's clock): the bucket is empty
     animals.hand_item(zuri, "milk_bucket", f0, empty)
-    zuri.drink(f0 - 6, empty - 4)                 # (pre-rolled: the bucket already AT her face on 299)
-    fill = C.at(s, "fill")
-    animals.milk(zuri, fill, empty, f1 + 1)
+    zuri.drink(f0 - 6, empty - 4)                 # (pre-rolled: the bucket already AT her face on 299, as on 298)
+    zuri.look_at(empty + 4, cow, ease=8)          # she looks at the cow with the empty bucket ("doesn't" 309) ...
+    animals.milk(zuri, fill, empty, f1 + 1)       # ... one swing at it on "fill": a milk bucket again
+    zuri.look_at(fill + 1, ahead, ease=6)         # (the head BEFORE the drink: the drink pose follows the head's keys)
     zuri.drink(fill + 2)                          # 325-363: straight back up, at her face on "up" 334
-    cow.look_at(f0, zuri.eye_point(f0), ease=0)
-    cow.look_at(C.at(s, "you"), PN05_CAM["pos"], ease=8)
+    # the cow: on Zuri, a glance away while she lowers the bucket, then its head round to the lens after the tap
+    cow.look_at(f0, zuri, ease=0)
+    cow.idle(f0, fill - 4, seed=7)
+    cow.look_at(fill + 1, cam, ease=8)            # looking into the lens from 332, before "up" 334
     st.use(s, zuri, cow)
     C.cam(s, None, focus=zuri.head, **PN05_CAM)
     st.hero(s, "zuri", zuri)
@@ -195,27 +331,33 @@ def pn06_told(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     efe = C.narrator("pn")
-    a = C.put(efe, f0, "narrator_fence")
+    a = C.put(efe, f0, EFE_06, toward=EFE_06_FACE)
     zuri = C.actor("zuri", "pn3")
-    C.put(zuri, f0, "zuri_cow", toward=(-9.7, 20.6))
+    C.put(zuri, f0, "zuri_cow", toward=ZURI_FACE)
     cow = C.cow("pn6")
-    cp = C.P("cow_milk_target")
-    cow.place(f0, cp, LC.yaw_to(cp, (-11.0, 20.5)))
-    cow.look_at(f0, PN06_CAM["pos"], ease=0)
-    zuri.look_at(f0, cow.eye_point(f0), ease=0)
+    cow.place(f0, C.stand(COW_MILK), LC.yaw_to(COW_MILK, COW_MILK_FACE))
+    cam = PN06_CAM["pos"]
+    cow.look_at(f0, cam, ease=0)                  # it keeps looking at the lens (as at the end of pn05)
+    ahead = C.to_lens(zuri, f0, (ZURI_FACE[0], ZURI_FACE[1], 1.55), cam, degrees=35)
+    zuri.look_at(f0, ahead, ease=0)
     ends = C.T["pn05_milk"].at("fill") + 2 + DRINK            # 363: pn05's drink ends (the game's clock)
     animals.hand_item(zuri, "milk_bucket", f0, ends)
     zuri.drink(f0 - 6, ends - 4)                              # (pre-rolled: at her face on 349, as on 348)
+    zuri.look_at(ends - 2, cow, ease=6)
     animals.milk(zuri, ends + 5, ends, f1 + 1)                # 368: the tap
-    zuri.drink(ends + 7)
-    efe.look_at(f0, zuri.eye_point(f0), ease=0)
-    turn = C.at(s, "them")
-    efe.look_at(turn, (-14.0, 14.0, 1.5), ease=6)
-    away = (a[0] - 2.4, a[1] - 0.9, a[2])
-    efe.walk(turn + 4, [a, away], speed=2.4)
+    zuri.look_at(ends + 6, ahead, ease=6)                     # (the head first: the drink pose follows it)
+    zuri.drink(ends + 7)                                      # 370: and up again
+    # the narrator: watching her over the fence, then on "them" his head round to the village (south-east, over his
+    # right shoulder: his face to the lens) and he walks off toward it, out past the lens on the left
+    efe.look_at(f0, zuri, ease=0)
+    turn = C.at(s, "them")                                    # 371
+    efe.look_at(turn - 2, (a[0] + 2.5, a[1] - 3.0, 1.5), ease=6)
+    away = [a, (a[0] + 0.1, a[1] - 0.9, a[2]), (a[0] + 0.25, a[1] - 3.4, a[2])]
+    efe.walk(turn + 4, away, speed=3.2)
     st.use(s, efe, zuri, cow)
     C.cam(s, None, focus=zuri.head, **PN06_CAM)
     st.hero(s, "zuri", zuri)
+    st.hero(s, "narrator", efe)
     C.lights(s, "gold", near=(-11.0, 21.0, 1.0), radius=8.0)
 
 
@@ -260,26 +402,38 @@ def pn17_cows(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     cam = PN17_CAM["pos"]
+    hid = C.at(s, "hid")                                                # 1061: the second arrow thuds in
+    cows_word = C.at(s, "cows")                                         # 1078
     four = []
-    for i, role in enumerate(("steve", "kai", "zuri", "ari")):
+    for i, (role, x, y) in enumerate(HIDERS_17):
         p = C.actor(role, "pn17")
-        C.put(p, f0, "hide_%d" % (i + 1))
-        y = C.A["hide_%d" % (i + 1)][1]
-        p.look_at(f0, (0.5, y + 3.0, 1.5), ease=0)
+        C.put(p, f0, (x, y), yaw=C.yaw("hide_1"))                      # facing east (the road)
         four.append(p)
     cows = []
-    for i in range(3):
-        cp = C.P("hide_cow_%d_target" % (i + 1))
+    for i, (x, y, tx, ty) in enumerate(COWS_17):
         c = C.cow("pn17c%d" % i)
-        c.place(f0, cp, LC.yaw_to(cp, (cp[0], cp[1] + 1.0)))           # facing north, along the fence
+        c.place(f0, (x, y, 0.0), LC.yaw_to((x, y), (tx, ty)))
         cows.append(c)
-    cows[0].look_at(f0, cam, ease=0)
-    for i, c in enumerate(cows[1:]):
-        c.idle(f0, f1, seed=i + 3)
-    post = C.P("arrow_post_target")
-    C.stuck_arrow(s, (post[0], post[1] - 0.05, 0.92), ARROW_DIR)
-    C.stuck_arrow(s, (post[0], post[1] + 0.1, 0.72), ARROW_DIR_2, frame=C.at(s, "hid"))
+    # the four: heads turned up the road to the north-east, where the volleys come from, each re-aiming now and then
+    # (alive); on "hid" all four duck behind the cows (the sneak, a frame apart), and on "cows" they peek up again
+    for i, p in enumerate(four):
+        y = HIDERS_17[i][2]
+        p.look_at(f0, (0.5, y + 4.0, 1.6), ease=0)
+        p.look_at(f0 + 14 + 9 * i, (0.5, y + 6.5, 1.9), ease=8)
+        p.look_at(f0 + 40 + 7 * i, (0.0, y + 3.0, 1.4), ease=10)
+        p.sneak(hid + 1 + (i % 2) + i // 2)
+        p.look_at(hid + 3, (0.0, y + 1.5, 0.9), ease=4)               # heads down
+        up = cows_word - 1 + 2 * i
+        p.sneak(up, False)
+        p.look_at(up, (0.5, y + 4.5, 1.7), ease=5)                    # peeking up the road again
+    # cow B (the nearest, the south end) looks into the lens, unbothered; C and A idle
+    cows[1].look_at(f0, cam, ease=0)
+    cows[2].idle(f0, f1, seed=3)
+    cows[0].idle(f0, f1, seed=4)
+    C.stuck_arrow(s, ARROW_1, ARROW_DIR)
+    C.stuck_arrow(s, ARROW_2, ARROW_DIR_2, frame=hid)
     st.use(s, *four, *cows)
-    C.cam(s, None, focus=four[0].head, **PN17_CAM)
+    C.cam(s, None, focus=ARROW_1, **PN17_CAM)
+    s.focus(four[1].head, at_s=s.film.seconds(C.at(s, "so") - 7), rack_s=0.5)    # the arrow, then the heads
     st.hero(s, "hiding", *four)
-    C.lights(s, "gold", near=(-10.0, 22.0, 1.0), radius=10.0)
+    C.lights(s, "gold", near=(-9.5, 22.5, 1.0), radius=10.0)

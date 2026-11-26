@@ -102,7 +102,11 @@ def the_set():
                     break
     ok("no village path crosses the stair's opening", not crossing, "%s" % sorted(set(crossing)))
     for name in U.CAMERAS:
-        ok("camera %s has pos, target, lens" % name, all(k in U.CAMERAS[name] for k in ("pos", "target", "lens")))
+        c = U.CAMERAS[name]
+        pts = [c[k] for k in ("pos", "target", "pos0", "target0", "pos1", "target1") if k in c]
+        ok("camera %s has pos, target, lens; every pos / target is a point" % name,
+           all(k in c for k in ("pos", "target", "lens")) and all(
+               isinstance(p, tuple) and len(p) == 3 and all(isinstance(x, (int, float)) for x in p) for p in pts))
     # sight lines: nothing in the World (cutaway cells are not in it) between a camera and the faces it is for
     A = v.anchors
     face = {n: (A["ug_cell_%s" % n][0], A["ug_cell_%s" % n][1] + 0.27, U.F + 1.65) for n in U.CELL_X}
@@ -110,10 +114,11 @@ def the_set():
     cases = [("b16_aisle", n) for n in U.CELL_X] + [("b12_cell", "dad"), ("b11_portrait", "dad"),
                                                     ("b10_cell_side", "dad"), ("b18_portrait", "dad_mid"),
                                                     ("b17_ots", "dad"), ("b07_down", "dad")]
+    seen = {"b16_aisle": ("ug_end_pier",), "b07_down": ("ug_ceiling", "ug_caps")}
     for cam, who in cases:
-        blk = sight(w, U.CAMERAS[cam]["pos"], face[who])
+        blk = sight(w, U.CAMERAS[cam]["pos"], face[who], also=cut_cells(ug, *seen.get(cam, ())))
         ok("sight %s -> %s's face is clear" % (cam, who), blk is None, "blocked at %s" % (blk,))
-    blk = sight(w, U.CAMERAS["b07_down"]["pos0"], face["farmer"])
+    blk = sight(w, U.CAMERAS["b07_down"]["pos0"], face["farmer"], also=cut_cells(ug, "ug_ceiling", "ug_caps"))
     ok("sight b07_down (start) -> the farmer's face is clear", blk is None, "blocked at %s" % (blk,))
     # beat 9: from the b09 camera the lever's handle, dad's head and the back wall's north face beside his robe
     c9 = U.CAMERAS["b09_lever"]["pos"]
@@ -121,7 +126,7 @@ def the_set():
                     ("dad's head", face["dad"]), ("the door's north face beside his robe",
                                                   (U.DOOR[0][0] + 0.85, U.DOOR[0][1] + 1.02, U.F + 0.9)),
                     ("the top of the doorway", (U.DOOR[0][0] + 0.5, U.DOOR[0][1] + 1.02, U.F + 1.9))):
-        blk = sight(w, c9, p)
+        blk = sight(w, c9, p, also=cut_cells(ug))
         ok("sight b09_lever -> %s is clear" % what, blk is None, "blocked at %s" % (blk,))
     # beat 19: dad's profile from b19's start (his look 20 degrees west of north, the camera's bearing)
     c19 = U.CAMERAS["b19_endwall"]
@@ -131,6 +136,11 @@ def the_set():
     ang = abs((math.degrees(look - cam) + 180.0) % 360.0 - 180.0)
     ok("b19: dad's look %.0f degrees west of north, %.0f degrees off the lens (profile: 70-110)"
        % (-math.degrees(look), ang), 70.0 <= ang <= 110.0 and -math.degrees(look) <= 21.0)
+    for key, p in (("pos0", face["dad_mid"]), ("pos", (U.DOOR[0][0] + 0.5, U.DOOR[0][1] + 1.02, U.F + 1.0))):
+        blk = sight(w, c19[key], p, also=cut_cells(ug, "ug_end_wall", "ug_end_pier"))
+        ok("sight b19_endwall %s -> %s is clear (ug_end_wall, ug_end_pier see-through)" % (key, "dad's face" if key == "pos0"
+                                                                              else "the piston wall"),
+           blk is None, "blocked at %s" % (blk,))
     # the bars connected as the game connects them (IronBarsBlock.attachsTo): the window above is air
     bars = {c: w.get(*c) for c in ((8, U.CELL_Y, U.F), (8, U.CELL_Y, U.F + 1), (14, U.FRONT_Y, U.F + 2), U.SLOT)}
     want = {(8, U.CELL_Y, U.F): ("true", "true"), (8, U.CELL_Y, U.F + 1): ("false", "true"),
@@ -151,16 +161,27 @@ def the_set():
     return v, ug
 
 
-def sight(world, a, b, step=0.02):
-    """The first opaque full cube on the segment a -> b (None: clear)."""
+def sight(world, a, b, step=0.02, also=()):
+    """The first opaque full cube on the segment a -> b (None: clear). The cutaways are not in the World: pass the
+    cells of every cutaway the shot does NOT see through as `also` (cut_cells)."""
     a, b = np.array(a, dtype=float), np.array(b, dtype=float)
     n = max(2, int(np.linalg.norm(b - a) / step))
+    also = set(also)
     for i in range(1, n):
         q = a + (b - a) * (i / n)
         c = tuple(int(math.floor(x)) for x in q)
-        if world.is_solid(*c) and world.is_full_cube(*c):
+        if c in also or (world.is_solid(*c) and world.is_full_cube(*c)):
             return c
     return None
+
+
+def cut_cells(ug, *see_through):
+    """The solid cells of every cutaway except the named ones (those a shot sees through)."""
+    out = set()
+    for name, got in ug.res["cut"].items():
+        if name not in see_through:
+            out.update(c for c in got if c != tuple(__import__("engine.underground", fromlist=["SLOT"]).SLOT))
+    return out
 
 
 def mechanics(v, ug):

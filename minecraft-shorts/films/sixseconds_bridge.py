@@ -42,19 +42,160 @@ THE WORLD'S RULES that bite here: the runner wears the golden boots; the brute k
 TAGS TAKEN by the stubs: runner_br (br11, br12, br13, br15), brute_br (br12-br15), gold_ingot_br14_k, _br15_k.
 PREVIEW samples of this sequence: 9.
 """
+import math
+
 from mathutils import Vector
+
+from engine import piglins
 
 # br11: the runner sprints in from behind the lens (at speed, unseen: the lens is at y 2.9) on RUN_FROM, so that the
 # bridge is EMPTY for a beat out of black, his legs enter from the frame's left on "bastion" and the boots stop on the
 # mark before "same boots" (the story check: the first stub stopped them only on 726-728, after the words)
 BR11_RUN_FROM = (400.5, 0.0, 0.0)
 BR11_RUN_START = 683
-# br11's focus: far on the empty bridge (the pillars, the lantern over bridge_brute) out of black, racked to the boot
-# mark as the legs come in (the shared camera's focus is free; its f/2 at 3.8 blocks left the empty bridge a blur)
+# br11's focus: out of black it opens on the empty boot mark (where the boots will stop) and pulls out to the far
+# bridge (the pillars, the lantern over bridge_brute) in BR11_OPEN frames: the new world comes into focus, and the
+# picture moves from its first frame (the shared camera's handheld, 0.004, is a pixel); then held far, and racked
+# back to the boots as the legs come in (the shared camera's focus is free)
+BR11_NEAR = (400.5, 6.5, 0.2)
 BR11_FAR = (400.5, 15.0, 1.6)
-# br15: bridge_top aimed 1.5 block lower (the story check: from the set's aim his feet were at y 60 % and every ingot
-# that his body did not hide lay in the caption band)
-BR15_CAM = dict(pos=(402.3, 21.4, 5.4), target=(400.2, 17.4, -1.2), lens=30.0, fstop=3.0)
+BR11_OPEN = 14
+BR11_RACK = 10
+
+# br12: over the runner's shoulder (engine/nether.py bridge_shoulder) with a slow push down the bridge
+BR12_CAM = dict(pos=(401.15, 8.7, 1.95), target=(400.5, 16.5, 1.35), lens=50.0, fstop=2.6,
+                pos1=(401.1, 9.1, 1.93), handheld=0.006)
+BR12_LANTERN = 1.0             # the brute's lantern (group bridge_lantern) in br12
+
+# THE PILLAR (br13-br15): the runner crouches on the netherrack pillar's top block (x 400..401, y 19..20, top z 3)
+# at its SOUTH-EAST corner, over the brute: sneaking holds a player on an edge, his box still on the block (centre
+# 0.25 / 0.2 in from the east / south faces). From the middle of the top (pillar_top) a dropped ingot lands on the
+# pillar itself (the game's drop is look x 0.3 + 0.1 up: looking down, it falls at his feet), and his body hid the
+# brute from br15's camera.
+EDGE = (401.1, 19.95, 3.0)
+CROUCH_EYE = 1.27              # a crouching player's eye height (the game's crouching pose: 1.27)
+# the gold he throws: three ingots, ONE entity each from the throw to the end of br15, resting on the shared spots
+# six_bridge_ingot_1..3. The throws are the game's drop (Player.drop: look x 0.3 + 0.1 up, no jitter), the look
+# solved so that each comes to rest on its spot: #1 on "threw" (br13), #2 on "me" (br13: in the air over the cut,
+# falling past his snout on br14's first frame), #3 out of frame in br14, landing on "zero"
+INGOT_SPOTS = ("six_bridge_ingot_1", "six_bridge_ingot_2", "six_bridge_ingot_3")
+INGOT_LOBS = (False, False, True)
+# br13: side-on from the east over the void (engine/nether.py bridge_pillar, re-aimed): the whole tableau inside
+# y 14-60 %
+BR13_CAM = dict(pos=(410.2, 18.7, 2.2), target=(400.5, 18.9, 1.0), lens=28.0, fstop=4.0, pos1=(410.1, 18.95, 2.2),
+                handheld=0.008)
+# br14: the brute in profile from the east (engine/nether.py bridge_profile, re-aimed)
+BR14_CAM = dict(pos=(406.3, 18.05, 1.35), target=(400.5, 18.2, 0.25), lens=35.0, fstop=2.4, pos1=(406.3, 18.35, 1.35),
+                handheld=0.006)
+# br15: high behind the runner on the pillar (engine/nether.py bridge_top, re-placed)
+BR15_CAM = dict(pos=(401.85, 20.7, 7.35), target=(401.0, 18.65, 0.1), lens=26.0, fstop=3.0, pos1=(401.8, 20.5, 7.0),
+                handheld=0.006)
+# br15: the crouch spam (Player.sneak on / off: the game snaps the pose), frames between toggles, repeated
+SPAM = (3, 4, 3, 3, 4)
+# br15: the head snaps on "he can't": degrees left (+) / right (-) of his line to the brute, each held a few frames
+SNAPS = ((42, 5), (-40, 5), (35, 4), (-44, 5), (0, 6))
+
+
+def _runner_eyes():
+    """The crouched runner's eyes on the pillar's edge: what the brute stares at in br13-br15."""
+    return Vector((EDGE[0], EDGE[1], EDGE[2] + CROUCH_EYE))
+
+
+def _drop_toward(C, origin, target, lob=False):
+    """The game's drop of an item by a player (Player.drop / LivingEntity.createItemStackToDrop: look x 0.3, plus
+    0.1 up; the jitter left out) from `origin` (his eyes - 0.3), with the look pitch solved by bisection so that the
+    item entity (piglins.item_track: gravity 0.04, drag 0.98, the deck's blocks) comes to REST at `target`: looking
+    down at it, or (lob=True) looking up, so that it arcs over whatever stands between. Returns (velocity per tick,
+    track [(tick, (x, y, z))], pitch in radians)."""
+    o, t = Vector(origin), Vector(target)
+    flat = Vector((t.x - o.x, t.y - o.y))
+    dist = flat.length
+    u = flat / dist
+
+    def toss(pitch):
+        v = (u.x * piglins.PLAYER_DROP_SPEED * math.cos(pitch), u.y * piglins.PLAYER_DROP_SPEED * math.cos(pitch),
+             piglins.PLAYER_DROP_SPEED * math.sin(pitch) + piglins.PLAYER_DROP_UP)
+        track = piglins.item_track(o, v, world=C.bas)
+        end = Vector(track[-1][1])
+        return Vector((end.x - o.x, end.y - o.y)).dot(u), v, track
+
+    # looking down, a steeper look falls shorter; looking up past the longest throw, a steeper look falls shorter too
+    lo, hi = (0.8, 1.5) if lob else (-1.55, 0.6)
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        got, v, track = toss(mid)
+        if (got < dist) != lob:
+            lo = mid
+        else:
+            hi = mid
+    return v, track, mid
+
+
+def _landing(track):
+    """The first tick on which a thrown item touches the floor it comes to rest on."""
+    rest_z = track[-1][1][2]
+    for tick, p in track:
+        if p[2] <= rest_z + 1e-3:
+            return tick
+    return track[-1][0]
+
+
+def _ingots(C):
+    """THE GOLD HE THROWS (br13, br14, br15): three item entities, keyed once (the first pillar shot to ask), each
+    lying on its shared spot six_bridge_ingot_k from its landing to the end of br15 (st.use per shot). Returns
+    [dict(item, throw, land, still, spot, track)] in throw order; C.memo["br_ingots"]."""
+    got = C.memo.get("br_ingots")
+    if got is not None:
+        return got
+    last = C.T["br15_wait"].frame_end
+    origin = Vector((EDGE[0], EDGE[1], EDGE[2] + CROUCH_EYE - piglins.THROW_BELOW_EYE))
+    out = []
+    for k, (spot, lob) in enumerate(zip(INGOT_SPOTS, INGOT_LOBS), 1):
+        v, track, pitch = _drop_toward(C, origin, C.P(spot), lob=lob)
+        land = _landing(track) * piglins.TICK
+        if k == 1:
+            throw = C.T["br13_pillar"].at("threw") - 2       # the swing's top on "threw", the ingot away
+        elif k == 2:
+            throw = C.T["br13_pillar"].at("me") + 2          # in the air over the cut into br14
+        else:
+            throw = int(round(C.T["br14_zero"].at("seconds") - land))   # out of frame; lands on "seconds"
+        it = C.item("gold_ingot", "br_ingot%d" % k)
+        still = piglins.launch(it, throw, origin, v, world=C.bas)
+        it.animate(throw, last + 1)
+        out.append(dict(item=it, throw=throw, land=throw + land, still=still, spot=spot, track=track, pitch=pitch))
+    C.memo["br_ingots"] = out
+    return out
+
+
+def _crouch_spam(runner, f0, f1):
+    """The game's crouch spam: the sneak key tapped, the pose snapping down and up every SPAM frames, from f0 (down)
+    to 3 frames before the cut (left down)."""
+    on, f, i = True, f0, 0
+    while f < f1 - 3:
+        runner.sneak(f, on)
+        f += SPAM[i % len(SPAM)]
+        on = not on
+        i += 1
+    if on and f <= f1:                                # the last toggle stood him up: down again for the end
+        runner.sneak(f, True)
+
+
+def _head_snaps(runner, brute, f0, f1):
+    """Impatience: the head snapping left and right of his line to the brute (SNAPS: degrees, frames held) from f0,
+    each turn in 2 frames (a mouse flick), back on the brute by f1."""
+    f = f0
+    for deg, hold in SNAPS:
+        if f + 2 + hold > f1 - 2:                     # no time left for another look away: back on the brute
+            deg = 0
+        eye = runner.eye_point(f)
+        d = Vector(brute.pos_at(f)) - eye
+        a = math.atan2(d.y, d.x) + math.radians(deg)
+        flat = math.hypot(d.x, d.y)
+        tgt = eye + Vector((math.cos(a) * flat, math.sin(a) * flat, d.z))
+        runner.look_at(f, tgt if deg else brute, ease=2)
+        f += 2 + hold
+        if not deg:
+            break
 
 
 def br11_boots(st, s, C, nar):
@@ -91,16 +232,18 @@ def br11_boots(st, s, C, nar):
       brute); in pt05 he faces it (he came from the gateway): each is right for its neighbours.
     NEIGHBOURS: before, pt10_smoke (black from "ended"); after, br12_blocks.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     runner = C.actor("runner", "br")
     mark = C.P("bridge_boot_mark")
     a = BR11_RUN_FROM
     C.put(runner, f0, a, toward=mark)
     runner.hold("iron_pickaxe", frame=f0)
-    runner.walk(BR11_RUN_START, [a, mark], sprint=True, ramp=(False, True))
+    stop = runner.walk(BR11_RUN_START, [a, mark], sprint=True, ramp=(False, True))
+    runner.idle(stop + 1, f1 + 1)                     # the boots held: the game's weight shift and arm bob
     st.use(s, runner)
-    C.cam(s, "bridge_boot", focus=Vector(BR11_FAR))
-    C.rack(s, Vector(mark) + Vector((0.0, 0.0, 0.2)), C.at(s, "bastion") + 2, 10)
+    C.cam(s, "bridge_boot", focus=Vector(BR11_NEAR))
+    C.rack(s, Vector(BR11_FAR), f0, BR11_OPEN)        # out of black: the new world comes into focus
+    C.rack(s, Vector(mark) + Vector((0.0, 0.0, 0.2)), C.at(s, "bastion") + 2, BR11_RACK)
     st.hero(s, "boots", *C.boots_of(runner))
     C.lights(s, "bridge")
 
@@ -134,18 +277,20 @@ def br12_blocks(st, s, C, nar):
       the frames named in those stills are the old timeline's, 7 frames earlier.)
     NEIGHBOURS: before, br11_boots; after, br13_pillar.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     runner = C.actor("runner", "br")
     brute = C.actor("brute", "br")
     C.put(brute, f0, "bridge_brute")
-    C.stand(s, runner, "bridge_player", look="bridge_player_look")
+    C.put(runner, f0, "bridge_player")
     runner.hold("iron_pickaxe", frame=f0)
+    runner.look_at(f0, Vector(C.P("bridge_player_look")), ease=0)
+    runner.idle(f0, f1 + 1)                           # soft at the near edge: the weight shift, glances
     brute.look_at(f0, Vector(C.P("bridge_brute_look")), ease=0)
-    brute.flop_ears(f0, s.frame_end + 1)
-    st.use(s, brute)
-    C.cam(s, "set:bridge_shoulder", focus=brute.head)
+    brute.flop_ears(f0, f1 + 1)                       # perfectly still: the ears only
+    st.use(s, runner, brute)
+    C.cam(s, None, focus=brute.head, **BR12_CAM)
     st.hero(s, "brute", brute)
-    C.lights(s, "bridge")
+    C.lights(s, "bridge", groups={"bridge_lantern": BR12_LANTERN})
 
 
 def br13_pillar(st, s, C, nar):
@@ -180,16 +325,24 @@ def br13_pillar(st, s, C, nar):
       separates from the void by brightness only: check it at 360x640.
     NEIGHBOURS: before, br12_blocks; after, br14_zero.
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     C.pillar(s)
     runner = C.actor("runner", "br")
-    C.put(runner, f0, "pillar_top")
+    brute = C.actor("brute", "br")
+    C.put(runner, f0, EDGE, toward="pillar_brute")
+    C.put(brute, f0, "pillar_brute")
     runner.hold("gold_ingot", frame=f0)
     runner.sneak(f0)
-    st.use(s, runner)
-    brute = C.actor("brute", "br")
-    C.stand(s, brute, "pillar_brute", look="bridge_pillar_top_target", idle=False)
-    C.cam(s, "set:bridge_pillar", focus=brute.head)
+    runner.look_at(f0, brute, ease=0)                 # down at the brute (a player's head stops at 35 here)
+    brute.look_at(f0, _runner_eyes(), ease=0)         # up at him: the game's 40 degrees
+    brute.flop_ears(f0, f1 + 1)
+    ingots = _ingots(C)
+    for g in ingots:
+        if f0 <= g["throw"] <= f1:
+            runner.attack(g["throw"])                 # the drop's arm swing
+        st.use(s, g["item"])
+    st.use(s, runner, brute)
+    C.cam(s, None, focus=brute.head, **BR13_CAM)
     st.hero(s, "brute", brute)
     C.lights(s, "bridge")
 
@@ -219,12 +372,13 @@ def br14_zero(st, s, C, nar):
       the brute on pillar_foot): 2.69 x the blackstone; the pillar at the right edge.
     NEIGHBOURS: before, br13_pillar; after, br15_wait.
     """
+    f0, f1 = s.frame_start, s.frame_end
     brute = C.actor("brute", "br")
     C.pillar(s)
-    C.stand(s, brute, "pillar_brute", look="bridge_pillar_top_target", idle=False)
-    for k in (1, 2):
-        C.rest(s, "gold_ingot", "br14_%d" % k, "six_bridge_ingot_%d" % k)
-    C.cam(s, "set:bridge_profile", focus=brute.head)
+    C.stand(s, brute, "pillar_brute", look=_runner_eyes(), idle=False)
+    for g in _ingots(C):
+        st.use(s, g["item"])
+    C.cam(s, None, focus=brute.head, **BR14_CAM)
     st.hero(s, "brute", brute)
     C.lights(s, "bridge")
 
@@ -265,17 +419,21 @@ def br15_wait(st, s, C, nar):
       face in half from bridge_top (his eyes behind bridge_pillar_2, 3.7 blocks from the lens).
     NEIGHBOURS: before, br14_zero; after, fl16_bridge (the flash cut in this world: the brute, a puff, the boots).
     """
-    f0 = s.frame_start
+    f0, f1 = s.frame_start, s.frame_end
     C.pillar(s)
     runner = C.actor("runner", "br")
-    C.put(runner, f0, "pillar_top")
-    runner.hold("gold_ingot", frame=f0)
-    runner.sneak(f0)
-    st.use(s, runner)
     brute = C.actor("brute", "br")
-    C.stand(s, brute, "pillar_brute", look=(400.5, 19.6, 4.6), idle=False)
-    for k in (1, 2, 3):
-        C.rest(s, "gold_ingot", "br15_%d" % k, "six_bridge_ingot_%d" % k)
+    C.put(runner, f0, EDGE, toward="pillar_brute")
+    C.put(brute, f0, "pillar_brute")
+    runner.hold("gold_ingot", frame=f0)
+    runner.look_at(f0, brute, ease=0)
+    _crouch_spam(runner, f0, f1)
+    _head_snaps(runner, brute, C.at(s, "he"), f1 - 4)
+    brute.look_at(f0, _runner_eyes(), ease=0)         # perfectly still: the ears only
+    brute.flop_ears(f0, f1 + 1)
+    for g in _ingots(C):
+        st.use(s, g["item"])
+    st.use(s, runner, brute)
     C.cam(s, None, focus=brute.head, **BR15_CAM)
     st.hero(s, "brute", brute)
     C.lights(s, "bridge")
