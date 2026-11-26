@@ -680,7 +680,7 @@ CHAIN = {"axis": "y", "waterlogged": "false"}
 UP = {"axis": "y"}
 FLAME_GLOW_GROUPS = ("block_lantern", "block_fire")
 LANTERN_WATTS = 200.0            # a bastion lantern's point light (engine.props' lantern; Stage.lights scales it per shot)
-PIT_FILL_WATTS = 12.0            # the pit's own shadowless fill (Bastion.pit_fill), on only in pit_open shots: the
+PIT_FILL_WATTS = 16.0            # the pit's own shadowless fill (Bastion.pit_fill), on only in pit_open shots: the
 #                                  game's ambient reaches a pit's floor unoccluded (MEASURED in the module docstring)
 
 
@@ -913,12 +913,12 @@ class Bastion:
             blk._rekey()
 
     # ---- the corridor's lava glow (beat 18: "nothing moves but the flicker of the lava glow")
-    def lava_flicker(self, f0, f1, amount=0.25, seed=0):
+    def lava_flicker(self, f0, f1, amount=0.4, seed=0):
         """The home corridor's lava light unrest on frames f0..f1: the channel lights AND the lava wall's area light
         (home_lava_wall_light) together, the same factor on the same frame (engine.fixtures' slow three-sine
-        unrest, CONSTANT per frame, keyed on the lights' data so the frame fingerprints follow). amount 0.25 = +-25
-        %. The lava's own surfaces glow as before (their texture animates): what flickers is the light they throw
-        on the jambs, the corridor walls and floor and a figure in the gateway. MEASURED: see the module docstring."""
+        unrest, CONSTANT per frame, keyed on the lights' data so the frame fingerprints follow). The lava's own surfaces glow as before (their texture animates): what flickers is the light they throw
+        on the jambs, the corridor walls and floor and a figure in the gateway. amount 0.4 = +-40 %: the least that
+        moves the gate frame's gateway by 5 / 255 (MEASURED: tools/check_nether_glow.py)."""
         ch = self.lava.get("home_channels")
         wall = self.lava.get("home_lava_wall_light")
         if ch is None or wall is None:
@@ -1672,7 +1672,8 @@ def _cam(s, bas, name, lens=None, fstop=None, focus=None, pos=None, target=None)
 
 
 def _proof_build(scene):
-    """The proof stills as a small film on films.lookdev.Stage (each shot one still; see PROOFS)."""
+    """The proof stills as a small film on films.lookdev.Stage (each shot one still; see PROOFS): the camera
+    suggestions staged by _stage_cam with their casts, plus the beat-18 gate frame and the treasure flash's drops."""
     from engine import piglins, players, shots
 
     scene.render.resolution_x, scene.render.resolution_y = 540, 960
@@ -1682,114 +1683,54 @@ def _proof_build(scene):
     film = shots.Film(scene, fps=24)
     st = Stage(scene, film, bas, sky)
     A, Y = bas.anchors, bas.yaws
-    brute = piglins.add_piglin(st, "brute", "brute")
-    pigs = [piglins.add_piglin(st, "pig_%d" % k, weapon=("crossbow" if k == 3 else "default")) for k in (1, 2, 3, 4)]
-    runner = players.add_player(st, "runner", "steve")
+    pool = {"brute": [piglins.add_piglin(st, "brute", "brute")],
+            "piglin": [piglins.add_piglin(st, "pig_%d" % k, weapon=("crossbow" if k == 3 else "default"))
+                       for k in (1, 2, 3, 4)],
+            "steve": [players.add_player(st, "runner", "steve")],
+            "ingot": [piglins.add_item(st, "gold_ingot", name="step_ingot"),
+                      piglins.add_item(st, "gold_ingot", name="pit_ingot")]}
+    runner = pool["steve"][0]
     players.equip(runner, boots="golden")
     runner.hold("iron_pickaxe")
-    ingot = piglins.add_item(st, "gold_ingot", name="step_ingot")
+    brute, pigs = pool["brute"][0], pool["piglin"]
     boots = piglins.add_item(st, "golden_boots", name="drop_boots")
-    pit_ingot = piglins.add_item(st, "gold_ingot", name="pit_ingot")
-    home = bas.lights_for("home")
-    for blk in bas.pillar:                                  # the netherrack pillar exists from beat 13 on
+    for blk in bas.pillar:                                  # the Stage route as well: hidden outside its shots
         st.cast[blk.name] = blk
-
-    def at_gold(s, who, ks):
-        for p, k in zip(who, ks):
-            p.place(s.frame_start, A["home_gold_%d" % k], Y["home_gold_%d" % k])
-            p.look_at(s.frame_start, A["home_gold_target"], ease=0)
-            p.flop_ears(s.frame_start, s.frame_end + 1)
-
-    # 1. landing (beat 1): the brute at frame left on the landing, three piglins far below at the gold wall
-    s = st.shot("landing", 1.0)
-    brute.place(s.frame_start, A["home_landing_edge"], Y["home_landing_edge"])
-    brute.look_at(s.frame_start, Vector(bas.cameras["landing"]["pos"]) + Vector((0.6, 0.0, -0.2)), ease=0)
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    at_gold(s, pigs[:3], (1, 2, 3))
-    _cam(s, bas, "landing", fstop=3.2, focus=brute.head)
-    st.use(s, brute, *pigs[:3])
-    st.hero(s, "brute", brute)
-    st.lights(s, 1.0, **home)
-    # 2. ingot row (beats 2 / 21): two piglins admiring, the brute beside them over the ingot on the step
-    s = st.shot("ingot_row", 1.0)
-    for p, k in zip(pigs[1:3], (2, 3)):
-        p.place(s.frame_start, A["home_gold_%d" % k], Y["home_gold_%d" % k])
-        p.admire(s.frame_start, "gold_ingot")
-    brute.place(s.frame_start, A["home_gold_4"], Y["home_gold_4"])
-    ingot.place(s.frame_start, A["home_step_4_item"])
-    ingot.animate(s.frame_start, s.frame_end + 1)
-    brute.look_at(s.frame_start, Vector(A["home_step_4_item"]) + Vector((0, 0, 0.15)), ease=0)
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    _cam(s, bas, "ingot_row", focus=pigs[2].item_point(s.frame_start + 12, "off"))
-    st.use(s, brute, pigs[1], pigs[2], ingot)
-    st.hero(s, "piglin", pigs[1])
-    st.hero(s, "piglin 2", pigs[2])
-    st.lights(s, 1.0, **home)
-    # 3. gate frame (beat 3): the brute on the landing in profile, the piglins at the gold
-    s = st.shot("gate", 1.0)
-    brute.place(s.frame_start, A["home_landing"], Y["home_landing"])
-    brute.look_at(s.frame_start, Vector(A["home_gateway"]) + Vector((0, 0, 1.6)), ease=0)
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    at_gold(s, pigs[:3], (1, 2, 3))
-    _cam(s, bas, "gate", focus=A["home_center"])
-    st.use(s, brute, *pigs[:3])
-    st.hero(s, "brute", brute)
-    st.lights(s, 1.0, **home)
-    # 4. gate frame (beat 18): the landing empty, the brute small in the gateway, back to us
-    s = st.shot("gate_18", 1.0)
-    brute.place(s.frame_start, A["home_gateway"], Y["home_gateway"])
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    at_gold(s, pigs[:3], (1, 2, 3))
-    _cam(s, bas, "gate", focus=A["home_center"])
-    st.use(s, brute, *pigs[:3])
-    st.lights(s, 1.0, **home)
-    # 5. pit (beat 6): the pit dug but its last block, piglins in it, the runner at the west rim
-    s = st.shot("pit", 1.0)
-    bas.pit_open(s, keep=[bas.pit_last.cell])
-    for p, k in zip(pigs[1:4], (2, 3, 4)):
-        p.place(s.frame_start, A["home_pit_%d" % k], yaw_to(A["home_pit_%d" % k], A["home_rim_w"]))
-        p.look_at(s.frame_start, Vector(A["home_rim_w"]) + Vector((0, 0, 1.6)), ease=0)
-        p.flop_ears(s.frame_start, s.frame_end + 1)
-    runner.place(s.frame_start, A["home_rim_w"], Y["home_rim_w"])
-    runner.look_at(s.frame_start, bas.pit_last.center, ease=0)
-    pit_ingot.place(s.frame_start, Vector(A["home_pit_1"]) + Vector((0.1, 0.1, 0.0)))
-    pit_ingot.animate(s.frame_start, s.frame_end + 1)
-    _cam(s, bas, "pit", focus=A["home_pit_center"])
-    st.use(s, runner, *pigs[1:4], pit_ingot)
-    st.hero(s, "piglin", pigs[2])
-    st.lights(s, 1.0, groups={"home_pit": 2.5}, **home)
-    # 6. bridge (beat 12): over the runner's shoulder, the brute blocking the bridge under his lantern
-    s = st.shot("bridge", 1.0)
-    runner.place(s.frame_start, A["bridge_player"], Y["bridge_player"])
-    runner.look_at(s.frame_start, Vector(A["bridge_brute"]) + Vector((0, 0, 1.7)), ease=0)
-    brute.place(s.frame_start, A["bridge_brute"], Y["bridge_brute"])
-    brute.look_at(s.frame_start, runner.head, ease=0)
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    _cam(s, bas, "bridge_shoulder", focus=brute.head)
-    st.use(s, runner, brute)
-    st.hero(s, "brute", brute)
-    st.lights(s, 1.0, **bas.lights_for("bridge"))
-    # 7. the bridge wide: pillars, the brute, the lava glow far below
-    s = st.shot("bridge_wide", 1.0)
-    brute.place(s.frame_start, A["bridge_brute"], Y["bridge_brute"])
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    _cam(s, bas, "bridge_wide", focus=brute.head)
-    st.use(s, brute, *bas.pillar)                           # with the netherrack pillar (beats 13-15)
-    st.lights(s, 1.0, **bas.lights_for("bridge"))
-    # 8. treasure corner (beat 16): the brute locked in frame, a puff beside him, golden boots at his feet
-    s = st.shot("treasure", 1.0)
-    brute.place(s.frame_start, A["treasure_flash"], Y["treasure_flash"])
-    brute.flop_ears(s.frame_start, s.frame_end + 1)
-    spot = Vector(A["treasure_flash"]) + Vector((1.2, -0.2, 0.0))
-    piglins.poof(spot, s.frame_start - 8, camera=s, size=(0.6, 1.8), seed=3)
-    boots.place(s.frame_start, Vector(A["treasure_flash"]) + Vector((0.55, -0.75, 0.0)))
-    boots.animate(s.frame_start, s.frame_end + 1)
-    _cam(s, bas, "treasure_flash", focus=brute.head)
-    st.use(s, brute, boots)
-    st.hero(s, "brute", brute)
-    st.lights(s, 1.6, **bas.lights_for("treasure"))
+    for still, cam in PROOF_CAMS:
+        s = st.shot(still, 1.0)
+        if still == "gate_18":                              # beat 18: the landing empty, the brute in the gateway
+            brute.place(s.frame_start, A["home_gateway"], Y["home_gateway"])
+            brute.flop_ears(s.frame_start, s.frame_end + 1)
+            for p, k in zip(pigs, (1, 2, 3)):
+                p.place(s.frame_start, A["home_gold_%d" % k], Y["home_gold_%d" % k])
+                p.look_at(s.frame_start, A["home_gold_target"], ease=0)
+                p.flop_ears(s.frame_start, s.frame_end + 1)
+            _cam(s, bas, "gate", focus=A["home_center"])
+            st.use(s, brute, *pigs[:3])
+            st.lights(s, 1.0, **bas.lights_for("home"))
+            bas.lava_flicker(s.frame_start, s.frame_end)    # "nothing moves but the flicker of the lava glow"
+            continue
+        vis = _stage_cam(st, s, bas, cam, pool)
+        hero = (None if still == "ingot_row" else next((v for v in vis if v is brute), None)) or \
+            next(v for v in vis if v in pigs)
+        st.hero(s, "brute" if hero is brute else "piglin", hero)
+        if still == "bridge_wide":
+            bas.pillar_in(s)                                # with the netherrack pillar (beats 13-15)
+            st.use(s, *bas.pillar)
+        if still == "treasure":                             # beat 16: a puff beside him, golden boots at his feet
+            spot = Vector(A["treasure_flash"]) + Vector((1.2, -0.2, 0.0))
+            piglins.poof(spot, s.frame_start - 8, camera=s, size=(0.6, 1.8), seed=3)
+            boots.place(s.frame_start, Vector(A["treasure_flash"]) + Vector((0.55, -0.75, 0.0)))
+            boots.animate(s.frame_start, s.frame_end + 1)
+            st.use(s, boots)
     st.finish()
     return {"film": film, "captions": [], "stage": st, "bastion": bas}
+
+
+# still name -> the camera suggestion it is staged with (PROOF_CAMS order = the proof film's shot order)
+PROOF_CAMS = (("landing", "landing"), ("ingot_row", "ingot_row"), ("gate", "gate"), ("gate_18", "gate"),
+              ("pit", "pit"), ("bridge", "bridge_shoulder"), ("bridge_wide", "bridge_wide"),
+              ("treasure", "treasure_flash"))
 
 
 # still name -> (shot, seconds into the shot)
@@ -1996,7 +1937,8 @@ def check_still(scene, image_path, heroes=(), report=True):
                                                                                 GOLD_HUE[1], ss, GOLD_MIN_SAT))
     if stone.sum() >= pc.MIN_PIXELS:
         colours["blackstone"] = tuple(int(v) for v in np.median(pix[stone], axis=0))
-    if brute.sum() >= pc.MIN_PIXELS and stone.sum() >= pc.MIN_PIXELS:
+    brute_hero = any("brute" in str(label) for label, _obs in (heroes or ()))
+    if brute_hero and brute.sum() >= pc.MIN_PIXELS and stone.sum() >= pc.MIN_PIXELS:
         lb, ls = float(np.median(_lum(pix[brute]))), float(np.median(_lum(pix[stone])))
         colours["brute"] = tuple(int(v) for v in np.median(pix[brute], axis=0))
         add("brute separates from blackstone", lb >= BRUTE_SEPARATION * max(ls, 1.0) and lb >= 25.0,
