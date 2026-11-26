@@ -40,17 +40,20 @@ PUBLIC API
     zombie_in_cell(zombie, frame, aggro=False, look=None, ease=0)    the zombie ON frame in its cell: pressed against
         the sill, facing the pod, arms out over the sill with engine.undead's endless slow sway; aggro=True: the
         raised arms (the game snaps: ease 0)
-    golem_spawn(golem, frame, pos=None, yaw=None, look=None, look_after=6, look_ease=6) -> frame
+    golem_spawn(golem, frame, pos=None, yaw=None, look=None, look_after=6, look_ease=6, empty_from=None) -> frame
         the golem APPEARS on the platform ON frame, standing, no effect (the game spawns it in one tick); not
         rendered before (engine.undead.vanish/appear, independent of the Stage's shots); default spot = anchor
-        golem_spawn facing south-west; look = its head turns to a point / Character `look_after` frames later
+        golem_spawn facing north-west (the game gives a spawned golem a random facing); look = its head turns to a
+        point / Character `look_after` frames later; empty_from = the Shot (or frame) of a jump cut: a golem still
+        standing from an earlier spawn is gone from there (required when one is: else ValueError)
     golem_step(golem, frame, toward=None, distance=0.45) -> end frame      one heavy step toward the pod (east)
     golem_slide(golem, frame, start=None) -> dict(frame, edge, frame_end, gone, track, drop)
         fixtures.slide west to the rim (0.014/tick push, x 0.8 drag: 1.4 blocks/s), over it and 4 blocks down
         into the slot; gone (not rendered) from the frame its head is under the rim
     golem_death(golem, slide, camera=None, delay=0, seed=0, flicker=True, glow=None) -> dict(frame, burst)
-        the white death puff (engine.animals.poof, 20 particles in a 1.4 x 2.7 box) rising out of the slot on
-        slide['gone'] + delay (delay 288 = the game's 12 s in lava) and the lava light smothered and flaring
+        the white death puff (engine.animals.poof, 20 particles in a 1.4 x 2.7 box, self-light 0.5) rising out of
+        the slot on slide['gone'] + delay (delay 288 = the game's 12 s in lava) and the lava light smothered and
+        flaring
     deliver(items, frame, every=6, seed=0, land=True, spread=0.15) -> [plan]
         engine.mobs dropped items ('iron_ingot', 'poppy') fall out of the chute's mouth onto the hopper at the foot
         and vanish into it one per 8 ticks (fixtures Hopper.stream). plans[i]['frame'] = the frame item i is gone
@@ -62,8 +65,9 @@ PUBLIC API
     climb(c, frame, first=0, last=None, pause=3, approach=True) -> frame
         a villager / baby hops up dirt steps first..last (0 = the bottom one), each hop the game's jump, its head
         stopped by the floor overhang over the lower flight
-    bounce(c, frame, bed="mom", jumps=1, place=True) -> frame    a baby jumping on a pod bed (JumpOnBed), the
-        glass roof stopping its head 0.46 over the mattress (beds: 'mom', 'white_1', 'white_2', 'bed2')
+    bounce(c, frame, bed="mom", jumps=2, place=True, yaw=None) -> frame    a baby jumping on a pod bed (JumpOnBed),
+        the glass roof stopping its head 0.46 over the mattress, no rebound under it: jumps=2 = "bounces twice"
+        in 1.05 s (beds: 'mom', 'white_1', 'white_2', 'bed2'); yaw = its facing (cheat it to the lens)
     see_through(st, shot, camera=None, n=1, cells=None, points=None) -> [panes]
         hide pod glass blocks from the camera only, for one shot: the first pane on the line from camera['pos'] to
         each of `points` (Characters or points), or the `n` first toward camera['target'], or the cells named.
@@ -76,7 +80,8 @@ PUBLIC API
       of facing the threat, one every 9-17 frames) with the HEAD KEPT ON `threat` (Character.shiver would tuck it).
       The same seed gives the same tremble frame for frame (beat 23: the narrator's matched to Mom's).
   hop(c, frame, to, face=True, ceiling=None) -> landing frame      the game's jump up (or down) a block to `to`
-  bounce(c, frame, bed, jumps=1, place=True, ceiling=None) -> frame        the bed bounce (Farm.bounce in the pod)
+  bounce(c, frame, bed, jumps=1, place=True, ceiling=None, yaw=None) -> frame   the bed bounce (Farm.bounce in the
+      pod); under open sky one jump bounces three times (1.85 s)
   push(player, villager, frame, points, gap0=1.5, mode="tap", release=0.45, rest_ticks=3) -> dict(end, surges, track)
       the player walks into her back and pushes her along `points` with the game's entity push: "tap" = shoves
       (she surges 0.7-1.1 blocks at a time, 0.9 blocks/s over all), "sneak" = a slow continuous shuffle (0.75
@@ -181,8 +186,8 @@ BEATS (stories/ironfarm.json; the anchors, cameras and calls that stage each lin
                               the arms reach only 0.35 into the pod and are behind any lens there (a lens inside the
                               cell sees the zombie's back); cut to C["two_shot"] / C["pod_in"] for the arms.
      9 "an iron golem comes"  C["platform"]; fm.golem_spawn(g, f, yaw=..., look=A["pod_target"]).
-    10 "every time"           the same framing, jump cut: fm.golem_spawn(g, f2) (same spot and pose), then
-                              fm.golem_step(g, f2 + 12).
+    10 "every time"           the same framing, jump cut to shot s2: fm.golem_spawn(g, f2, empty_from=s2) (same
+                              spot and pose; the platform is empty from s2's first frame), fm.golem_step(g, f2 + 12).
     11 "the water pushes it"  C["slide"]; r = fm.golem_slide(g, f); fm.golem_death(g, r, camera=s) (puff + flicker).
     12 "takes the iron"       C["hopper"]; items = [mobs.make_dropped_item(...)]; fm.deliver(items, f);
                               poppies = fm.strew(...); steve on chest_front with steve.hold("iron_ingot"), then
@@ -196,8 +201,9 @@ BEATS (stories/ironfarm.json; the anchors, cameras and calls that stage each lin
     16 "Mom never looks at me"   two-shot at the red bed: Mom on bed_side looking at fm.zombie_eye for the WHOLE
                               shot; the baby against her on the lens side, look_at Mom cheated to the lens.
     17 "twenty minutes"       C["grow"] (locked); Mom on mom_glass, baby on baby_glass (0.9 west of her).
-    18 "I spent mine with her"   C["bounce"]; fm.bounce(baby, f, "mom") (three bounces in 1.85 s), then the baby
-                              placed beside Mom.
+    18 "I spent mine with her"   C["bounce"]; fm.bounce(baby, f, "mom", jumps=2, yaw=...) (two jumps under the
+                              roof, 1.05 s: each stopped by the glass 0.46 over the mattress), then the baby
+                              placed beside Mom with look_at(fm.zombie_eye).
     19 "when it ended"        C["grow"] again; towers.grow_up(baby, narrator, frame_of("ended"),
                               look=fm.zombie_eye) (narrator = st.actor("narrator", "none")); hold a second.
     20 "now I don't fit"      a low side view of the back wall from the west inside (about (-21.4, 22.4, 10.9)
@@ -210,6 +216,7 @@ BEATS (stories/ironfarm.json; the anchors, cameras and calls that stage each lin
                               step by step (towers.hop(steve, f, fm.set["stairs"][k]) for k = 7, 6, ...: a hop down
                               per step works for the player too); C["stairs"] is the outside view.
     23 "afraid of the zombie" C["cell_side"]; panic(narrator, ..., seed=k) and panic(mom, ..., seed=k): matched.
+                              (The arms at the foreground edge: not from here, see beat 8.)
     24 "apparently that counts"   the same shot: fm.golem_spawn(g, f, pos=(-26.8, 22.1, 10), look=A["pod_target"])
                               behind the villagers (north of them in the frame, its head above theirs), golem_step,
                               golem_slide; rack focus to it (s.focus(g.head, at_s=...)); cut before it drops.
@@ -271,6 +278,8 @@ GOTCHAS
       head, the tremble). golem_spawn / golem_slide / grow_up use engine.undead.vanish / appear: never key
       hide_render on these characters.
     - ONE golem for every spawn (st.cast["golem"]); a golem in two consecutive shots needs no show() of its own.
+      A spawn while the golem of an earlier spawn still stands (no golem_slide in between: beats 9 -> 10) needs
+      empty_from=<the new shot>, else the old golem would stand there until the new spawn (golem_spawn refuses).
     - see_through keys visible_camera at the shot's first frame and the next shot's: make the calls in shot order
       (a later call's key on the same frame wins).
     - break_top_step needs camera= (the particles face it). Register fm.top_step with the Stage only if it must be
@@ -284,16 +293,19 @@ MEASURED (proof stills out/test/towers_*.png, 540x960, 16 samples, 2 threads, mo
 look-dev sun az 62 / el 27; dusk = look-dev dusk az 187 / el 5; strips are 270x480 frames side by side)
     - tools.palette_check on every golden still: all pass (lit stone G/R 0.94-0.98, robe hue 9-19, villager skin
       saturation 0.39-0.48, Steve's shirt hue 177, plants 0.86-1.17 of the ground). Dusk: square_dusk and
-      cell_side_dusk pass (stone 0.92-0.93, on the limit); pod_out_dusk FAILS skin saturation (0.56 > 0.52) and
-      pod_in_dusk FAILS stone (G/R 0.91 < 0.92): the 5-degree dusk sun shines flat into the glass pod ten blocks up
-      and paints faces and floor orange (a look matter: the story is all golden hour).
+      cell_side_dusk pass (stone 0.92-0.93, on the limit); pod_out_dusk FAILS skin saturation (0.57 > 0.52) and
+      stone (G/R 0.90), pod_in_dusk FAILS stone (G/R 0.91 < 0.92): the 5-degree dusk sun shines flat into the glass
+      pod ten blocks up and paints faces and floor orange (a look matter: the story is all golden hour).
     - The golem: appears on its frame, turns its head, steps, slides west (1.4 blocks/s) and drops 4 blocks; from
-      the slot's open south end the lava shows as an orange band under the rim, the puff rises out of the slot.
+      the slot's open south end the lava shows as an orange band under the rim, the puff rises out of the slot
+      (near white with GOLEM_PUFF_GLOW 0.5; with engine.animals' default 0.15 it read mid-grey against the sun).
+      The slide shot opens on an empty platform (empty_from=s) and the golem pops in ON its frame.
       In daylight the lava's light hardly shows on the slot's stone: the glow reads from the lava texture.
     - The hopper: an ingot falls out of the dark chute, lands in the bowl with the poppy and they go 8 ticks apart;
       five poppies lie spinning on the grass in front of the niche.
     - The top step: ten crack stages over the game's 17 frames, then the 64 dirt particles (stairs strip).
-    - The pod: glass reads as the game's connected glass; the zombie's head and arms over the sill, lit by the
+    - The pod: glass reads as the game's glass blocks (every block its own frame and streaks, no faces between two
+      glass blocks: fixtures.glass_box); the zombie's head and arms over the sill, lit by the
       lantern and the sky (the foot-level torch adds a warm under-light); the second red bed pops in; the four in a
       row from above with the roof hidden; the gap exactly a baby's height; the swap baby -> adult in one frame.
     - The narrator: the unemployed adult (the plain brown robe of type/plains, no profession layer) next to the
@@ -301,7 +313,7 @@ look-dev sun az 62 / el 27; dusk = look-dev dusk az 187 / el 5; strips are 270x4
     - Render times under load: 11-40 s per 540x960 still, 13-70 s per strip.
 
 SELF-TEST
-    $BPY -m engine.towers                       32 numeric checks (builds the village with the tower, renders nothing,
+    $BPY -m engine.towers                       33 numeric checks (builds the village with the tower, renders nothing,
                                                 about 10 s); exit code 1 if one fails
     $BPY -m engine.towers stills NAME ...       proof stills out/test/towers_<name>.png (tools/towers_proof.py, 20-40 s
                                                 each, at most 4-5 per call): square square_wide foot push pod_out pod_in
@@ -339,6 +351,7 @@ NO_GOLEM_ON_SUFFIX = ("_stained_glass", "_stained_glass_pane", "_leaves")   # bl
 ZOMBIE_SCARE = 8.0                   # VillagerHostilesSensor: ZOMBIE 8.0 blocks (and line of sight: glass blocks it)
 GOLEM_LOOT = (("iron_ingot", 3, 5), ("poppy", 0, 2))      # loot_table/entities/iron_golem.json: two pools, uniform
 GOLEM_SIZE = (1.4, 2.7)              # EntityType.IRON_GOLEM
+GOLEM_PUFF_GLOW = 0.5                # this module's choice: the death puff's self-light (particles are lit by level only)
 GOLEM_HEALTH = 100.0                 # IronGolem.createAttributes MAX_HEALTH
 LAVA_DAMAGE = 4.0                    # Entity.lavaHurt: hurtServer(lava, 4.0)
 HURT_COOLDOWN_TICKS = 10             # LivingEntity: a hit only lands 10 ticks after the last (invulnerableTime 20)
@@ -797,20 +810,43 @@ class Farm:
         return frame
 
     # ---- the golem
-    def golem_spawn(self, golem, frame, pos=None, yaw=None, look=None, look_after=6, look_ease=6):
+    def golem_spawn(self, golem, frame, pos=None, yaw=None, look=None, look_after=6, look_ease=6, empty_from=None):
         """The golem APPEARS on the platform ON `frame`, in one frame, standing (the game's spawn: no effect at
-        all): placed at `pos` (default the golem_spawn anchor) facing `yaw` (default: north-east, across the
-        platform), not rendered before `frame` (since its last slide). look = a point / Character its head turns to
-        `look_after` frames later. Use ONE engine.mobs IronGolem for every spawn. Returns `frame`."""
+        all): placed at `pos` (default the golem_spawn anchor) facing `yaw` (default -135 degrees: north-west, along
+        the platform; EntityType.create gives a spawned mob a random facing), not rendered before `frame` (since its
+        last slide). look = a point / Character its head turns to
+        `look_after` frames later. Use ONE engine.mobs IronGolem for every spawn. Returns `frame`.
+        empty_from = a Shot or a frame: the golem of an EARLIER spawn that has not slid away is gone from there
+        (the jump cut of beat 10: pass the new shot, the platform is empty until `frame`). Without it such a call
+        raises ValueError (one model: the earlier golem would stand there until `frame`)."""
         from . import undead
 
         pos = self.A["golem_spawn"] if pos is None else pos
         yaw = math.radians(-135.0) if yaw is None else yaw
-        if not self._golem_events or self._golem_events[0][0] > frame:
+        frame = int(frame)
+        before = [e for e in self._golem_events if e[0] < frame]
+        if not before:
             undead.vanish(golem, None)                                      # nothing before the first spawn
+        elif before[-1][1] == "spawn" or empty_from is not None:
+            last = max(e[0] for e in before)
+            e0 = getattr(empty_from, "frame_start", empty_from)
+            if e0 is None:
+                if before[-1][1] == "spawn":
+                    raise ValueError("golem_spawn(%d): the golem spawned on frame %d has not slid away; pass "
+                                     "empty_from=<the shot> (or a frame) where the platform is empty again"
+                                     % (frame, before[-1][0]))
+            else:
+                e0 = int(e0)
+                if not last < e0 <= frame:
+                    raise ValueError("golem_spawn(%d): empty_from %d must lie after the golem's last event (%d) and "
+                                     "not after the spawn" % (frame, e0, last))
+                if e0 < frame:
+                    undead.vanish(golem, e0)
+                    self._golem_events.append((e0, "gone"))
         golem.place(frame, pos, yaw)
         undead.appear(golem, frame)
         self._golem_events.append((frame, "spawn"))
+        self._golem_events.sort(key=lambda e: e[0])
         if look is not None:
             golem.look_at(frame + look_after, look, ease=look_ease)
         return frame
@@ -843,6 +879,7 @@ class Farm:
         gone = r["gone"] if r["gone"] is not None else r["frame_end"]
         undead.vanish(golem, gone)
         self._golem_events.append((gone, "gone"))
+        self._golem_events.sort(key=lambda e: e[0])
         r.update(drop=drop, vanish=gone)
         return r
 
@@ -851,12 +888,16 @@ class Farm:
         (engine.animals.poof, 20 particles in the golem's 1.4 x 2.7 box) where its head goes under the rim, ON
         slide['gone'] + delay, rising out of the slot. delay=0 is the film's (the puff as it drops); the game's golem
         burns 240 ticks (12 s: 100 health, 4 per lava hit, one hit per 10 ticks) before it dies: delay=288.
-        flicker: the lava light is smothered on gone and flares (fixtures Fluid.flicker). Returns dict(frame, burst)."""
+        flicker: the lava light is smothered on gone and flares (fixtures Fluid.flicker). glow = the puff's self-light
+        (default GOLEM_PUFF_GLOW 0.5: the game lights a particle by the light level only, so in daylight a poof is
+        near white even against the sun; engine.animals' 0.15 left it mid-grey in the backlit slide shot).
+        Returns dict(frame, burst)."""
         from . import animals
 
         f = int(slide["gone"] or slide["frame_end"]) + int(delay)
         x, y = slide["track"][-1][1][0], slide["track"][-1][1][1]
         feet = (x, y, float(self.L["rim"]) - GOLEM_SIZE[1] + 0.6)
+        glow = GOLEM_PUFF_GLOW if glow is None else float(glow)
         burst = animals.poof(feet, f, camera=camera, seed=seed, village=None, size=GOLEM_SIZE, glow=glow)
         if flicker:
             self.lava.flicker(slide["edge"] or slide["frame"], f + 40, at=slide["gone"] or f)
@@ -912,11 +953,12 @@ class Farm:
         return breaking.mine(player, self.top_step, frame, tool="hand", duration=duration, camera=camera,
                              drop=drop, seed=seed)
 
-    def bounce(self, c, frame, bed="mom", jumps=1, place=True):
+    def bounce(self, c, frame, bed="mom", jumps=2, place=True, yaw=None):
         """A baby jumping on one of the pod's beds ('mom', 'white_1', 'white_2' or 'bed2'), its head stopped by the
-        glass roof 2 blocks over the floor (as the game stops it): see bounce(). Returns the frame it stands still."""
+        glass roof 2 blocks over the floor (as the game stops it; no rebound under it, so jumps=2 is "bounces
+        twice", 1.05 s): see bounce(). yaw = its facing (cheat it to the lens). Returns the frame it stands still."""
         b = self.bed2 if bed == "bed2" else self.beds[bed]
-        return bounce(c, frame, b, jumps=jumps, place=place, ceiling=self.L["F"] + 2.0)
+        return bounce(c, frame, b, jumps=jumps, place=place, ceiling=self.L["F"] + 2.0, yaw=yaw)
 
     def ceiling_over(self, x, y, z):
         """The z of the first solid block over the point (x, y, z) (None: open sky within 6 blocks)."""
@@ -1071,14 +1113,16 @@ def hop(c, frame, to, face=True, ceiling=None):
     return int(math.ceil(f1 - 1e-6))
 
 
-def bounce(c, frame, bed, jumps=1, place=True, ceiling=None):
+def bounce(c, frame, bed, jumps=1, place=True, ceiling=None, yaw=None):
     """A baby villager jumping on a bed (JumpOnBed: babies do this by themselves): it stands on the mattress
-    (place=True puts it on the bed's middle ON `frame`, facing the pillow's left), jumps 0.42 up, and each landing
-    on the bed throws it back up at 0.75 of the speed (bounceRestitution 0.75) until the bounce dies; 5 ticks
-    later the next of `jumps` jumps (the game: 3 to 6; ONE jump already shows three bounces, 1.85 s).
-    bed = a Village.beds entry, a fixtures Bed or a point on
+    (place=True puts it on the bed's middle ON `frame`, facing `yaw`, default the pillow's left), jumps 0.42 up,
+    and each landing on the bed throws it back up at 0.75 of the speed (bounceRestitution 0.75) until the bounce
+    dies; 5 ticks later the next of `jumps` jumps (the game: 3 to 6). Under open sky ONE jump shows three
+    bounces (1.85 s); under the pod's roof (2 high) each jump is stopped 0.46 over the mattress and does not
+    rebound: jumps=2 is "bounces twice" (1.05 s). bed = a Village.beds entry, a fixtures Bed or a point on
     the mattress. ceiling = the z of the block over it (the pod's glass roof: Farm.bounce passes it). Returns
     the frame it stands still again."""
+    face = yaw
     if isinstance(bed, dict):
         pos, yaw = bed["pos"], bed.get("yaw", 0.0)
     elif hasattr(bed, "pos"):
@@ -1087,7 +1131,7 @@ def bounce(c, frame, bed, jumps=1, place=True, ceiling=None):
         pos, yaw = bed, c.yaw_at(frame)
     f0 = int(frame)
     if place:
-        c.place(f0, pos, yaw + math.pi / 2.0)
+        c.place(f0, pos, yaw + math.pi / 2.0 if face is None else face)
     z0 = c.pos_at(f0).z
     top = None if ceiling is None else float(ceiling) - z0 - getattr(c, "height", 1.95)
     hs = bounce_track(jumps, ceiling=top)
@@ -1442,6 +1486,17 @@ def _check():
     fm.golem_spawn(g_, f2)
     ok("the same golem appears again for the next spawn (one model for every golem)",
        not shown(g_, f2 - 1) and shown(g_, f2))
+    f3, cut = f2 + 60, f2 + 50                     # beat 10: a jump cut on frame `cut`, the new golem on f3
+    try:
+        fm.golem_spawn(g_, f3)
+        refused = False
+    except ValueError:
+        refused = True
+    fm.golem_spawn(g_, f3, empty_from=cut)
+    ok("a jump cut: the golem still standing from the last spawn is gone from empty_from, the new one appears "
+       "ON its frame (and a spawn over a standing golem without empty_from is refused)",
+       refused and shown(g_, cut - 1) and not shown(g_, cut) and not shown(g_, f3 - 1) and shown(g_, f3),
+       "cut %d, spawn %d" % (cut, f3))
     z = undead.make_zombie("t_zombie")
     fm.zombie_in_cell(z, 1, aggro=True)
     zp = z.pos_at(5)

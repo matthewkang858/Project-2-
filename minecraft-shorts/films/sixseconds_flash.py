@@ -25,6 +25,11 @@ THE WORLD'S RULES that bite here: fl16_home's floor is WHOLE (no pit); the runne
   BEFORE the shot: the puffs already in the air on its first frame) and his drops; NO netherrack pillar in
   fl16_bridge (the lead tried it: from this camera its top block sits right on the brute's head; C.pillar refuses
   it); the brute's axe low or coming to rest.
+THE LOCK, MEASURED by the lead on the stub (tools.sixseconds_geo fl16_bridge:1002 --sky soul, fl16_treasure:1024,
+  fl16_home:1050; stills out/test/sixseconds_scout_fl16_bridge_1006.png, _fl16_treasure_1020.png, _fl16_home_1040.png):
+  his head x 32.9-67.2 / 31.7-68.2 / 31.9-67.9 %, y 19.4-30.6 % in all three, face 120 px, straight at the lens: the
+  same spot of the frame to a pixel. The puff stands at the right edge (x 70-100 %): keep it inside x 82 % where it
+  must read. No pillar on his head (it is absent outside br13-br15).
 RISK (story): "three cuts must read as many worlds": the bridge world is teal (sky "soul"), the treasure corner is
   gold and enclosed, home is red with the gateway's glow. Fallback: "four cuts of twenty frames each".
 TAGS TAKEN by the stubs: brute_fl (all three), golden_boots_fl1..3, gravel_fl1, ender_pearl_fl2, iron_pickaxe_fl3.
@@ -61,6 +66,8 @@ def fl16_bridge(st, s, C, nar):
     MEASURED (out/test/sixseconds_set_b16a_bridge_flash.png under nether_wastes; under this film's sky the lead's
     out/test/sixseconds_scout_flash_bridge.png): brute x 38-62 %, y 20-30 %, 1.65 x the blackstone (rule 1.5: near
     the limit); the drops above the caption band.
+    UNDER THIS FILM'S SKY (the lead: tools.sixseconds_palette --sky soul 1006): brute x 1.57 the blackstone (rule
+      1.5: near the limit), hero x 40-62 %, y 20-30 %, 100 % inside: passes; re-measure after any change of light.
     NEIGHBOURS: before, br15_wait (the same world: the runner on the pillar); after, fl16_treasure (snap to black).
     """
     _flash(st, s, C, 1)

@@ -18,6 +18,9 @@ contract, the set, the places, the shared cameras, the cast and the helpers: fil
     $BPY -m tools.sixseconds_shots render --shots pt09_axe --frame 580 --zones    # stills of single shots (one
                                                          #   build per sky; 540x960, 16 samples by default)
     $BPY -m tools.sixseconds_shots tiles --sky wastes; ... --sky soul; ... sheet   # one tile per shot
+    $BPY -m tools.sixseconds_geo --sky wastes rw22_six:1420 [--pts ...] [--boots runner_pt] [--track NAME:A-B]
+                                                         # heads, faces, angles, what hides them (no render)
+    $BPY -m tools.sixseconds_palette --sky wastes 1420   # engine.nether.check_still on a 540x960 16-sample frame
     $BPY -m render sixseconds --still 12.0 --zones       # one frame through render.py
     $BPY -m render sixseconds --frames pt09_axe --res 270x480 --samples 7 --threads 2    # one shot as a preview
                                                          #   (each sequence its own sample count: _common)
@@ -42,9 +45,11 @@ THE EDIT (the story's devices, designed into the plan below)
     (0.54 s), with the caption "ended" held on the black (RESETS). br11 comes up out of black, cut 2 frames before
     "New". The flash cuts of beat 16 are snaps too (SNAPS: 2 black frames at the start of fl16_treasure and
     fl16_home): each world that ends goes to black.
-  * THE FLASH CUTS: fl16_bridge starts 8 frames BEFORE "I" (in the silence after "can't": the first world is seen
-    before it is named), fl16_treasure on "full", fl16_home on "worlds": 22 / 19 / 33 frames (0.92 / 0.79 / 1.38
-    s), the last one longer because it is home and it settles into "I started waiting at the gate".
+  * THE FLASH CUTS: fl16_bridge starts 10 frames BEFORE "I" (8 before the sentence's own cut, in the silence after
+    "can't": the first world is seen before it is named), fl16_treasure on "full", fl16_home on "worlds": 22 / 19 /
+    33 frames (0.92 / 0.79 / 1.38 s; the snaps leave 17 and 31 frames of picture), the last one longer because it
+    is home and it settles into "I started waiting at the gate". These three are the only shots under 1.2 s: the
+    story's device ("three flash cuts of about a second each"). No shot is longer than 5 s (the longest, gt19, 4.58 s).
   * THE SIX-SECOND STARE: rw21 (58 frames) + rw22 (86) = 144 frames exactly; "Six seconds." is spoken in the first
     second of rw22, then 2.5 s of silence; the cut into rw23 lands 2 frames before "Nothing".
   * THE END: "Nothing." is held 2.0 s, then a PLAIN cut to black for the last 8 frames (END_BLACK; no caption on
@@ -53,6 +58,18 @@ THE EDIT (the story's devices, designed into the plan below)
     pixel match cut: only the brute is gone; the story's fourth use, beat 23, is replaced by the story's own
     fallback, the reverse angle: the gate frame cannot give a face turning to the gateway behind him); the boot
     framing pt05 / br11 (BOOT_FRAME); the ingot row rw02 / rw21; the pit camera pt06 / pt20.
+
+THE LEAD'S PASS AFTER THE MACHINE RESTART (Nov 26; the earlier lead was cut off mid-job, its work checked here):
+  kept: the narration (--check: current; --phonemes: nothing to respell), the plan, the two skies, the five sequences
+  and their stubs, the common module, tools/sixseconds_shots.py and _timeline.py (both strict builds clean, the
+  caption check passes, the encoder's black checked against Stage.dip's own ramps). Added: tools/sixseconds_geo.py
+  and tools/sixseconds_palette.py (named in the docstrings but missing). Fixed in the stubs on renders: gt19's runner
+  started inside the brute's silhouette on the match cut (now RUN_PAST_START on the corridor's east side); br15's
+  brute had his face cut in half by the pillar (now BR15_BRUTE, 0.5 east). Measured and written into the stubs for
+  their directors: gt01's push takes the brute's ear out of the frame; pt05's piglins hidden behind the runner's
+  arms; pt09 / pt10's pit piglins in the caption band; br13's runner under the top icons; rw22's ingot on the top
+  edge of the caption band. Verified on renders: the boot framing (pt05 = br11), the match cut (gt18 -> gt19), the
+  flash lock (fl16 x 3). The scouting stills: out/test/sixseconds_scout_*.png (each named in its shot's docstring).
 
 THE SKIES (two; each costs one more build, about 2 s, per render command that has work in it)
   "wastes"  nether_wastes: the dark red haze of the home bastion, of "the older version of the world" (gt19, pt20:
@@ -65,7 +82,15 @@ THE SKIES (two; each costs one more build, about 2 s, per render command that ha
             cut fl16_bridge (teal) -> fl16_treasure (enclosed gold) -> fl16_home (red) shows three worlds, which is
             the story's risk for beat 16. Lighting of the subjects is unchanged (the fog starts at 10 blocks; the
             lanterns and the lava glow are the same). Compared side by side with nether_wastes on four bridge beats:
-            out/test/sixseconds_scout_sky_*_soul_sand_valley.png against sixseconds_set_<beat>.png.
+            out/test/sixseconds_scout_sky_*_soul_sand_valley.png against sixseconds_set_<beat>.png (the lead after
+            the restart looked at the four pairs side by side: the same lanterns, the same lava, the void teal
+            instead of red; the runner's teal shirt against the teal void in br13 reads by brightness only).
+            A third biome for the treasure corner was tried (warped_forest: out/test/
+            sixseconds_scout_sky_b16b_treasure_flash_warped_forest.png against sixseconds_set_b16b_treasure_flash.png):
+            the same picture, nothing of the fog reaches that enclosed frame, so no third sky.
+            Its cost, measured (tools.sixseconds_palette --sky soul): the teal fill lifts the blackstone, so the
+            brute's separation drops: br12 x 1.52 (1.74 under nether_wastes), fl16_bridge x 1.57, br15 x 2.82: all
+            pass the 1.5 rule, br12 at the limit (its docstring says what to do).
 """
 import importlib
 import os

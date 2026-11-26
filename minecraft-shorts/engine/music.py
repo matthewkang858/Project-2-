@@ -330,14 +330,14 @@ class Jukebox:
     def play(self, frame_start, frame_end, disc="music_disc_11", camera=None, seed=0, glow=None, first=True):
         """The notes of a playing jukebox from `frame_start` (the tick the song starts) to `frame_end`: one note
         particle every 20 ticks (24 frames) at (0.5, 1.2, 0.5) above the block, its colour value 0..3 of 24 drawn at
-        random (green to yellow-green: JukeboxSongPlayer.spawnMusicParticles); the first ON frame_start when
-        `first` (ticksSinceSongStarted 0). A song stops by itself after its length (SONG_SECONDS; 11: 71 s).
-        Returns the frames the notes appear on."""
+        random (green, lime, yellow or orange: JukeboxSongPlayer.spawnMusicParticles); the first ON frame_start
+        when `first` (ticksSinceSongStarted 0). A song stops by itself one second after its length (JukeboxSong
+        .hasFinished; SONG_SECONDS: 11 = 71 s). Returns the frames the notes appear on."""
         a = float(frame_start)
         length = SONG_SECONDS.get(disc)
         b = float(frame_end)
-        if length is not None:
-            b = min(b, a + length * FPS)
+        if length is not None:                          # JukeboxSong.hasFinished: ticks >= ceil(20 s) + 20
+            b = min(b, a + (math.ceil(length * 20.0) + 20 - 1) * TICK)
         rng = np.random.default_rng([int(seed) & 0x7FFFFFFF, int(a * 10), 61])
         frames = []
         f = a if first else a + JUKEBOX_EVERY_TICKS * TICK
@@ -366,6 +366,13 @@ class Jukebox:
         end = frame + 240 if until is None else until
         return self.play(frame + TICK, end, disc=disc, camera=camera, seed=seed, glow=glow)
 
+    def _cancel(self, frame):
+        """No note spawns ON or after `frame`; the notes already in the air rise and fade as the game's do."""
+        f = int(math.ceil(frame - 1e-6))
+        for b in self.bursts:
+            _cancel_after(b, f)
+        self.spans = [(a, min(e, frame - TICK), d) for a, e, d in self.spans]
+
     def eject(self, frame, player=None, disc="music_disc_cat", seed=0, land="top", hand="right", until=None,
               camera=None, name=None):
         """A player right-clicks the playing jukebox ON `frame` (JukeboxBlock.useWithoutItem -> popOutTheItem): the
@@ -380,9 +387,7 @@ class Jukebox:
 
         if player is not None:
             player.attack(frame, hand)
-        for b in self.bursts:
-            b.stop(int(math.ceil(frame + TICK)))
-        self.spans = [(a, min(b, frame), d) for a, b, d in self.spans]
+        self._cancel(frame + TICK)
         w = getattr(self.world, "world", self.world)
         if w is None:
             raise ValueError("Jukebox.eject needs the jukebox's world (music.band(v) gives it one)")
@@ -411,9 +416,25 @@ class Jukebox:
 
     def stop(self, frame):
         """The song stops ON `frame` (no more notes; the ones in the air live on)."""
-        for b in self.bursts:
-            b.stop(int(math.ceil(frame)))
-        self.spans = [(a, min(b, frame), d) for a, b, d in self.spans]
+        self._cancel(frame)
+
+
+def _cancel_after(burst, frame):
+    """Hide, in an engine.fx Burst, every particle that would appear ON or after `frame` (the ones already shown are
+    left to live out their 6 ticks). Returns how many were cancelled."""
+    from . import fx
+
+    n = 0
+    for p in burst.particles:
+        if p["first"] >= frame and p["last"] > p["first"]:
+            for path in ("hide_render", "hide_viewport"):
+                fx._write(p["object"], path, 0, [p["first"] - 1], [1.0], "CONSTANT")
+            p["object"].hide_render = p["object"].hide_viewport = True
+            p["last"] = p["first"]
+            n += 1
+    seen = [p["last"] - 1 for p in burst.particles if p["last"] > p["first"]]
+    burst.frame_end = max(seen) if seen else burst.frame
+    return n
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -438,8 +459,16 @@ JUKEBOX_CELL = (-6, 0, 1)                   # centre stage, one row behind the f
 PEDESTAL = (-9, 0)                          # oak fence (z 0) + gold block (z 1) on the ground before the stage
 POSTS = {"south": (-8, -3), "north": (-8, 3)}       # 2 oak fences + a lantern; the north one is placed on camera
 WALL_LANTERNS = ((-4, -3), (-4, 3))         # lanterns standing on the back wall's top (z 4)
-LANE = dict(column=(1, 17), lantern=(1, 15), kai=(2.65, 16.5))  # Kai's doorstep in front of house_f (door at (4, 16))
+LANE = dict(column=(1, 15), lantern=(1, 17), kai=(2.75, 16.75))  # Kai's doorstep in front of house_f (door at (4, 16))
 LIGHT_GROUPS = ("bandstand", "lane")        # Stage.lights groups of the set's lanterns (the placed one: Band.lights)
+# the skies the proof stills are made under (a film's SKIES may copy them): the stage faces WEST, so the golden sun
+# stands in the south-west (az 240: 120 degrees off the lens of a camera looking east at the stage; nothing tall
+# stands that way, the farm is low); the night is the moon of tools/check_hostiles_crammys (az 176, from the west:
+# the stage front is moonlit, the lanterns are the warm keys)
+SKIES = {
+    "gold": dict(preset="golden", az=240.0, el=27.0, bloom=1.0, grade="warm"),
+    "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool"),
+}
 
 # village anchors that the bandstand covers: moved to the nearest free ground (name -> new 2D spot)
 MOVED_ANCHORS = {"square_w": (-9.6, 1.7), "square_4": (-6.4, -4.6), "square_6": (-5.6, 6.6)}
@@ -575,10 +604,12 @@ def _stage_anchors(b, name):
     F = 1.0                                                     # the stage floor
     A = {}
 
-    def put(key, p, look=None, yaw=None):
+    def put(key, p, look=None, yaw=None, ground=False):
         if yaw is None and look is not None:
             yaw = yaw_to(p, look)
-        full = b.anchor("%s_%s" % (name, key), p if len(p) == 3 else (p[0], p[1], F), yaw, replace=True)
+        if len(p) == 2 and not ground:
+            p = (p[0], p[1], F)                                 # on the stage floor (2D on the ground: walk height)
+        full = b.anchor("%s_%s" % (name, key), p, yaw, replace=True)
         A[key] = full
         return full
 
@@ -613,31 +644,39 @@ def _stage_anchors(b, name):
     for i, p in enumerate(((-6.95, -0.6), (-6.2, -1.4), (-5.2, -1.85)), 1):
         put("flank_s%d" % i, p, look=(jx + 0.5, jy + 0.5))
     # on the ground in front of the stage (the corridor before it and the street)
-    put("steve_foot", (-9.6, -1.6), look=(jx + 0.5, jy + 0.5, 2.0))
-    put("steve_front", (-10.6, 0.6), yaw=yaw_of("west"))
+    put("steve_foot", (-9.75, -1.15), look=(jx + 0.5, jy + 0.5, 2.0), ground=True)
+    put("steve_front", (-11.2, -0.3), look=(-16.5, -1.6), ground=True)
+    put("steve_kai", (-9.95, -0.7), look=(-7.5, 1.5), ground=True)     # beat 3: his shoulder in the foreground
     for i, y in enumerate((2.3, 1.05, -0.2, -1.45, -2.7), 1):  # beat 6: the line beside the stage, facing west
-        put("line_%d" % i, (-10.2, y), yaw=yaw_of("west"))
+        put("line_%d" % i, (-10.2, y), yaw=yaw_of("west"), ground=True)
     put("alex_post", (-7.0, 3.25), look=(-7.5, 3.5, 3.0))       # beat 5: Alex places the last lantern
+    put("alex_beside", (-6.45, 1.75), yaw=yaw_of("south"))      # beat 20: beside steve_jukebox, her disc held out
+    # beat 18: the three-shot on the jukebox's south side, all facing it (Steve stops between Sunny and Noor)
+    put("three_sunny", (-6.65, -1.0), look=(jx + 0.5, jy + 0.5))
+    put("three_steve", (-5.9, -1.3), look=(jx + 0.5, jy + 0.5))
+    put("three_noor", (-5.0, -1.1), look=(jx + 0.5, jy + 0.5))
     return A
 
 
 def lane_set(b, name="lane"):
-    """In the hook: Kai's doorstep dressing in front of house_f (his gold block with a note block on it, a lantern on
-    the ground: light group 'lane'), facing the narrator's front door (house_e, across the exit road). Registers
+    """In the hook: Kai's doorstep dressing in front of house_f (his gold block with a note block on it south of the
+    doorstep, a lantern on an oak fence post north of it: light group 'lane'), facing the narrator's front door (house_e, across the exit road). Registers
     the anchors lane_* and the paths lane_home (from the square side up the road and in at house_e's door) and
     lane_to_square (down the road from the north to the square); re-routes square_to_house_f past the lantern."""
     _new_name(b, name)
     w, v = b.w, b.v
     (cx, cy), (lx, ly) = LANE["column"], LANE["lantern"]
-    b.allow((cx, ly, cx, cy))
+    b.allow((min(cx, lx), min(cy, ly), max(cx, lx), max(cy, ly)))
     w.set(cx, cy, -1, "dirt")                                   # the path under a full block turns to dirt
     w.set(cx, cy, 0, "gold_block")
     w.set(cx, cy, 1, "note_block", {"instrument": instrument("gold_block"), "note": "12", "powered": "false"})
-    b.torch((lx, ly, 0), "lantern", group="lane")
+    w.set(lx, ly, -1, "dirt")                                   # (a fence keeps no dirt path under it either)
+    w.set(lx, ly, 0, "oak_fence")                               # the lantern on a fence post: beside Kai's head
+    b.torch((lx, ly, 1), "lantern", group="lane")
     door_f = v.anchors.get("house_f_door_out")
     if "square_to_house_f" in v.paths and door_f is not None:
         entry = _entry_after(v.paths["square_to_house_f"], door_f)
-        b.path("square_to_house_f", [(1.5, -7.0), (6.8, -3.0), (7.0, 5.0), (1.6, 9.5), (0.6, 10.5), (0.6, 16.2)]
+        b.path("square_to_house_f", [(1.5, -7.0), (6.8, -3.0), (7.0, 5.0), (1.6, 9.5), (0.4, 10.5), (0.4, 16.4)]
                + entry, replace=True)
     A = {}
     A["kai"] = b.anchor(name + "_kai", LANE["kai"], yaw_of("west"), replace=True)
@@ -649,7 +688,7 @@ def lane_set(b, name="lane"):
     to_square = b.path(name + "_to_square", [(0.4, 22.5), (0.4, 12.0), (0.2, 8.0), (-2.0, 6.0)], replace=True)
     v.anchors[name + "_note_target"] = (cx + 0.5, cy + 0.5, 1.5)
     v.anchors[name + "_door_target"] = tuple(v.anchors["house_e_door"])
-    res = dict(name=name, column=(cx, cy), lantern=(lx, ly, 0), anchors=A, home=home, to_square=to_square,
+    res = dict(name=name, column=(cx, cy), lantern=(lx, ly, 1), anchors=A, home=home, to_square=to_square,
                narrator_door="house_e", kai_door="house_f")
     b.v.sets[name] = res
     return res
@@ -666,7 +705,8 @@ def crammys_set(b):
 class LastLantern:
     """The lantern on the north front post, placed on camera (beat 5). A block of its own (engine.breaking
     Breakable) and its own point light, both there from the start unless place(frame) is called. Stage.lights does
-    not touch its light: Band.lights does (or level())."""
+    not touch its light: Band.lights does (or level()). show(frame, visible) as every Stage cast member (block and
+    light are rendered only while shown AND placed)."""
 
     def __init__(self, cell, world, collection):
         from . import breaking, props
@@ -682,21 +722,29 @@ class LastLantern:
         self.base_energy = float(self.light["base_energy"])
         self.placed = None
         self._levels = {}                 # frame -> scale (CONSTANT)
+        self._shown = {}                  # frame -> bool (Stage.finish)
         self._rekey()
 
     def objects(self):
         """The block's objects and the light."""
-        return list(self.block.objects()) + [self.light]
+        return list(self.block.objects) + [self.light]
 
     def there_at(self, frame):
         """True when the lantern block stands on its post at `frame`."""
         return self.placed is None or frame >= self.placed
 
+    def show(self, frame, visible=True):
+        """Per-shot visibility (Stage.finish calls it when the lantern is in st.cast)."""
+        self._shown[int(round(frame))] = bool(visible)
+        self.block.show(frame, visible)
+        self._rekey()
+
     def place(self, frame, player=None, hand="right"):
         """The lantern appears ON `frame` (placing a block: the game shows it at once, no animation, no particles)
-        and its light comes on; player = who places it (the arm swing on the same frame)."""
+        and its light comes on; player = who places it (the arm swing on the same frame: BlockItem.place is the
+        use-item swing). Returns the frame."""
         self.placed = int(round(frame))
-        self.block._there0 = False
+        self.block._there0 = False                          # (what breaking.place_block(frame=...) does)
         self.block._there = {self.placed: True}
         self.block._rekey()
         if player is not None:
@@ -716,10 +764,17 @@ class LastLantern:
                 best, out = f, s
         return out
 
+    def _shown_at(self, frame):
+        best, out = None, True
+        for f, s in self._shown.items():
+            if f <= frame and (best is None or f > best):
+                best, out = f, s
+        return out
+
     def _rekey(self):
         from . import fx
 
-        frames = sorted(set(self._levels) | ({self.placed} if self.placed is not None else set()))
+        frames = sorted(set(self._levels) | set(self._shown) | ({self.placed} if self.placed is not None else set()))
         ob = self.light
         if not frames:
             ob.data.energy = self.base_energy
@@ -727,7 +782,7 @@ class LastLantern:
             return
         first = frames[0] - 1
         keys_f = [first] + frames
-        on = [self.there_at(f) and self._scale_at(f) > 0.0 for f in keys_f]
+        on = [self.there_at(f) and self._shown_at(f) and self._scale_at(f) > 0.0 for f in keys_f]
         en = [self.base_energy * max(self._scale_at(f), 0.0) for f in keys_f]
         fx._write(ob, "hide_render", 0, keys_f, [0.0 if o else 1.0 for o in on], "CONSTANT")
         fx._write(ob, "hide_viewport", 0, keys_f, [0.0 if o else 1.0 for o in on], "CONSTANT")
@@ -900,49 +955,89 @@ def cameras(A=None):
     jt = (-5.5, 0.5, 2.0)
     cams = {
         # 1: low, long lens, slow push in; Steve (steve_front) sharp, the stage soft behind him
-        "b1": dict(pos=(-16.8, -1.9, 1.05), target=(-10.4, 0.55, 1.75), pos1=(-15.6, -1.45, 1.1),
-                   target1=(-10.4, 0.55, 1.75), lens=60.0, fstop=2.0, focus=(-10.6, 0.6, 1.6), beat=1),
+        "b1": dict(pos=(-16.2, -0.2, 1.0), target=(-6.6, 0.8, 2.3), pos1=(-15.4, -0.12, 1.05),
+                   target1=(-6.6, 0.8, 2.3), lens=40.0, fstop=2.0, focus=(-11.2, -0.3, 1.6), beat=1),
+
+
+
         # 2: close on Zuri's note block on its white wool, then tilt up to her face
-        "b2": dict(pos=(-10.15, 3.75, 0.95), target=(-7.5, 2.5, 1.25), target1=(-6.75, 2.85, 2.45),
-                   lens=50.0, fstop=2.2, focus=(-7.5, 2.5, 1.0), beat=2),
+        "b2": dict(pos=(-10.9, 3.4, 1.05), target=(-7.5, 2.5, 1.15), target1=(-6.6, 2.85, 2.55),
+                   lens=40.0, fstop=2.2, focus=(-7.5, 2.5, 1.0), beat=2),
+
         # 3: the mirror: past Steve's soft shoulder (steve_foot) to Kai's note block on gold, pull to his face
-        "b3": dict(pos=(-10.45, -1.05, 1.8), target=(-7.5, 1.55, 1.45), lens=50.0, fstop=2.2,
-                   focus=(-7.5, 1.5, 1.0), beat=3),
+        "b3": dict(pos=(-10.3, -2.3, 1.35), target=(-7.5, 1.5, 1.4), lens=45.0, fstop=2.2,
+                   focus=(-7.5, 1.5, 1.2), beat=3),
+
+
+
         # 4: static wide of the stage (Sunny at the far end, Steve below it)
-        "b4": dict(pos=(-18.0, 0.4, 2.05), target=(-6.4, 0.5, 1.95), lens=32.0, fstop=5.6, focus=(-7.0, 0.5, 2.0),
+        "b4": dict(pos=(-16.5, 0.2, 1.6), target=(-6.6, 0.6, 2.0), lens=30.0, fstop=5.6, focus=(-7.0, 0.5, 2.0),
                    beat=4),
+
+
         # 5: close on the totem above the pedestal, rising and pulling back to the whole bandstand
-        "b5": dict(pos=(-10.75, 0.35, 2.35), target=(-8.5, 0.5, 2.3), pos1=(-18.5, 0.4, 3.9),
-                   target1=(-6.4, 0.5, 2.1), lens=35.0, fstop=2.8, focus=(-8.5, 0.5, 2.3), beat=5),
+        "b5": dict(pos=(-11.2, 0.5, 2.75), target=(-8.5, 0.5, 2.45), pos1=(-18.5, 0.6, 3.9),
+                   target1=(-6.4, 0.8, 2.1), lens=55.0, fstop=2.8, focus=(-8.5, 0.5, 2.35), beat=5),
+
+
         # 6: travelling along the line beside the stage (line_1 .. line_5 = Steve) at hand height
-        "b6": dict(pos=(-12.3, 3.0, 1.35), target=(-10.2, 2.2, 1.45), pos1=(-12.3, -2.05, 1.35),
-                   target1=(-10.2, -2.75, 1.4), lens=35.0, fstop=2.8, focus=(-10.2, 2.3, 1.4), beat=6),
+        "b6": dict(pos=(-13.0, 3.3, 1.5), target=(-10.2, 2.3, 1.3), pos1=(-13.0, -1.7, 1.5),
+                   target1=(-10.2, -2.7, 1.3), lens=35.0, fstop=2.8, focus=(-10.2, 2.3, 1.3), beat=6),
+
         # 8: over Steve's shoulder (steve_foot) at the jukebox: the ejected disc turning above it
-        "b8": dict(pos=(-10.55, -2.55, 1.95), target=jt[:2] + (2.45,), lens=45.0, fstop=2.4,
-                   focus=(-5.5, 0.5, 2.3), beat=8),
-        # 18: front of the stage at head height, a medium three-shot (Sunny, Steve, Noor)
-        "b18": dict(pos=(-12.6, -0.75, 2.55), target=(-6.6, -0.75, 2.45), lens=45.0, fstop=3.2,
-                    focus=(-6.6, -0.75, 2.5), beat=18),
+        "b8": dict(pos=(-10.38, -1.82, 1.95), target=(-5.5, 0.5, 2.4), lens=45.0, fstop=2.4,
+                   focus=(-5.5, 0.5, 2.4), beat=8),
+
+
+        # 18: from the front of the stage at head height (its north-west corner), a medium three-shot: Sunny,
+        # Steve, Noor (three_*) facing the jukebox
+        "b18": dict(pos=(-7.4, 1.3, 2.6), target=(-5.9, -1.25, 2.35), lens=32.0, fstop=3.2,
+                    focus=(-5.9, -1.3, 2.5), beat=18),
+
         # 19: from the wing, behind and above Steve walking to the jukebox; the half circle beyond it facing us
-        "b19": dict(pos=(-6.45, 7.6, 3.55), target=(-6.4, -1.0, 1.95), lens=30.0, fstop=4.0,
-                    focus=(-6.4, -1.0, 2.0), beat=19),
+        "b19": dict(pos=(-6.2, 6.4, 3.2), target=(-5.8, -1.0, 2.0), lens=32.0, fstop=4.0,
+                    focus=(-5.8, -1.0, 2.0), beat=19),
+
         # 20: close from across the jukebox: Steve's disc face-on to the lens (steve_jukebox, present())
         "b20": dict(pos=(-5.45, -1.75, 2.45), target=(-5.5, 1.2, 2.4), lens=40.0, fstop=2.4,
                     focus=(-5.5, 0.85, 2.45), beat=20),
         # 21: the jukebox sharp in the foreground, notes rising; push past it to Steve beside it
-        "b21": dict(pos=(-7.75, -1.95, 2.15), target=jt, pos1=(-7.2, -1.05, 2.3), target1=(-5.5, 1.7, 2.55),
-                    lens=32.0, fstop=2.4, focus=jt, beat=21),
+        "b21": dict(pos=(-7.0, -1.9, 2.25), target=(-5.5, 0.5, 2.1), pos1=(-6.7, -1.2, 2.4),
+                    target1=(-5.5, 1.7, 2.6), lens=32.0, fstop=2.4, focus=(-5.5, 0.5, 2.1), beat=21),
+
         # 22: the one locked-off frontal wide of the whole stage
-        "b22": dict(pos=(-19.0, 0.5, 2.3), target=(-6.4, 0.5, 2.0), lens=28.0, fstop=5.6, focus=(-6.5, 0.5, 2.2),
+        "b22": dict(pos=(-15.5, 0.6, 3.0), target=(-6.5, 0.6, 2.3), lens=30.0, fstop=5.6, focus=(-6.5, 0.5, 2.2),
                     beat=22),
+
         # 23: from beside the jukebox (south), along the row of faces on the north flank
-        "b23": dict(pos=(-4.95, -2.3, 2.6), target=(-6.6, 2.4, 2.5), lens=32.0, fstop=3.2,
-                    focus=(-6.25, 2.35, 2.6), beat=23),
+        "b23": dict(pos=(-4.7, -0.2, 2.65), target=(-6.6, 2.3, 2.45), lens=30.0, fstop=3.2,
+                    focus=(-6.2, 2.4, 2.6), beat=23),
+
         # 24: medium on Steve centre stage, facing the lens, the totem held out; pull back to the clapping five
         "b24": dict(pos=(-11.2, 0.5, 2.2), target=(-7.25, 0.5, 2.3), pos1=(-15.8, 0.5, 2.45),
                     target1=(-6.6, 0.5, 2.15), lens=45.0, fstop=2.8, focus=(-7.25, 0.5, 2.5), beat=24),
         # 7 and 17: from Kai's doorstep (lane_kai), past his head, across the lane to the narrator's door
-        "lane": dict(pos=(3.85, 16.42, 1.75), target=(-4.5, 15.15, 1.3), lens=22.0, fstop=2.8,
-                     focus=(0.2, 15.5, 1.2), beat=7),
+        "lane": dict(pos=(3.84, 16.3, 1.75), target=(-4.5, 16.0, 1.2), lens=20.0, fstop=2.8,
+                     focus=(1.5, 15.5, 1.2), beat=7),
+
+
+        # proofs: each hero note block close (with its base block), the held block items, the horn, the jukebox,
+        # the dropped discs, the applause
+        "note_zuri": dict(pos=(-10.0, 3.6, 1.2), target=(-7.5, 2.5, 1.35), lens=55.0, fstop=2.8,
+                          focus=(-7.5, 2.5, 1.2), beat=2),
+        "note_kai": dict(pos=(-10.1, 0.2, 1.2), target=(-7.5, 1.5, 1.35), lens=55.0, fstop=2.8,
+                         focus=(-7.5, 1.5, 1.2), beat=3),
+        "note_sunny": dict(pos=(-10.1, -3.2, 1.2), target=(-7.5, -1.5, 1.35), lens=55.0, fstop=2.8,
+                           focus=(-7.5, -1.5, 1.2), beat=4),
+        "held": dict(pos=(-13.4, -0.6, 2.0), target=(-10.2, 0.4, 1.55), lens=32.0, fstop=4.0,
+                     focus=(-10.2, 1.0, 1.4), beat=6),
+        "horn": dict(pos=(-8.9, 1.2, 2.55), target=(-5.45, 2.45, 2.6), lens=55.0, fstop=2.8,
+                     focus=(-5.45, 2.45, 2.6), beat=1),
+        "jukebox": dict(pos=(-8.6, -1.7, 2.6), target=(-5.5, 0.5, 2.25), lens=45.0, fstop=4.0,
+                        focus=(-5.5, 0.5, 2.2), beat=8),
+        "discs_drop": dict(pos=(-9.2, -1.6, 1.75), target=(-6.0, 0.5, 1.6), lens=50.0, fstop=4.0,
+                           focus=(-6.2, 0.5, 1.5), beat=16),
+        "clap": dict(pos=(-11.0, 1.0, 2.6), target=(-6.2, 2.2, 2.0), lens=35.0, fstop=4.0,
+                     focus=(-6.2, 2.2, 2.0), beat=24),
     }
     return cams

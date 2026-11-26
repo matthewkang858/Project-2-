@@ -86,8 +86,18 @@ def pt05_boots(st, s, C, nar):
       C.fill("pt_boots", ...) (measure gold hue 38-58 with nether.check_still).
     NOW (stub): the boot camera; the runner sprinting in from (4.5, 13) (pre-rolled 12 frames) and stopping on
       boot_mark facing south; the three piglins at the gold looking at the boot mark. Hero: the boots.
-    MEASURED (out/test/sixseconds_set_b05_boot.png; the lead's projection): boots x 28-69 %, y 40-57 %; piglin heads
-      at 19-25 % (the legs hide one); gold reads as gold.
+    MEASURED (out/test/sixseconds_set_b05_boot.png): boots x 28-69 %, y 40-57 %; piglin heads at 19-25 % (the legs
+      hide one); gold reads as gold.
+      THE LEAD'S SCOUTING of the stub (tools.sixseconds_geo pt05_boots:330 --boots runner_pt; the still
+      out/test/sixseconds_scout_boots_pt05_boots_318.png beside _br11_boots_728.png; tools.sixseconds_palette 318):
+      he enters from the frame's LEFT edge (feet x -13 % on 282, 27 % on 294) and stops on boot_mark by 300; boots
+      x 27.7-70.2 %, y 43.0-58.8 % (br11: 27.7-69.5 %, 42.5-58.5 %: THE BOOT FRAMING holds); gold hue 44, s 0.80;
+      piglin skin s 0.59 (limit 0.62); Steve's shirt hue 173. MEASURED PROBLEM: on 330 all three piglins' faces are
+      behind his arms (geo: piglin_pt1 blocked by his left arm, pt2 and pt3 by his right; heads x 16-42 % and 67-94 %,
+      y 16-32 %): stage them where they show beside his legs and below his hands (or the skid a little off the
+      lens's line), or they cannot "turn from the gold, tip their heads down at the boots" in a way anyone sees.
+      He faces the lens when he stops (28 degrees off; br11's runner has his back to it: each is right for its
+      neighbours; at boot height it is the same picture).
     NEIGHBOURS: before, gt04_runin (he sprints at the lens through the gateway); after, pt06_dig (the pit camera).
     """
     f0 = s.frame_start
@@ -284,6 +294,11 @@ def pt10_smoke(st, s, C, nar):
       puff, the drops lying on six_drop_boots / _pickaxe / _gravel / _pearl, the three admiring. Hero: the brute.
     MEASURED (out/test/sixseconds_set_b10_rim_wide.png): brute x 23-40 %, y 36-45 %, 2.79 x the blackstone; the puff
       at rim_w; the pit piglins low at the right.
+      THE LEAD'S GEO / STILL of the stub (pt10_smoke:626, out/test/sixseconds_scout_pt10_smoke_626_zones.png): the
+      three pit piglins' heads at x 67-112 %, y 59-71 %: IN THE CAPTION BAND and partly outside the right edge, so
+      "in the pit the piglins are still looking at their ingots" is not seen; the drops at y 52-60 %. Tilt the
+      camera down / pan right a little (it is this shot's own camera) or accept them as soft shapes under the word.
+      (pt09 at 575-578: the same: pit piglin heads y 62-81 %.)
     NEIGHBOURS: before, pt09_axe; after (out of black), br11_boots on the bridge of another world.
     """
     f0 = s.frame_start

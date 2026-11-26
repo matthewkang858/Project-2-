@@ -55,6 +55,16 @@ def main():
     sl = h["slide"]
     a, b = take([sl["spawn"] - 1, sl["spawn"]])
     ok("the golem appears ON its spawn frame (%d): the fingerprint changes there" % sl["spawn"], a != b)
+    golem = built["stage"].cast["golem"]
+
+    def golem_shown(f):
+        scene.frame_set(f)
+        return not all(ob.hide_render for ob in golem.objects() if ob.type == "MESH")
+
+    sh = shots["slide"]
+    ok("the slide shot opens on an EMPTY platform: the golem of the platform shot (no slide) is not rendered from "
+       "the shot's first frame (%d) to the spawn, and is rendered ON the spawn (%d)" % (sh.frame_start, sl["spawn"]),
+       not any(golem_shown(f) for f in range(sh.frame_start, sl["spawn"])) and golem_shown(sl["spawn"]))
     gone = sl["gone"]
     a, b, c = take([gone - 2, gone - 1, gone])
     ok("the golem slides (frames %d, %d differ) and is gone ON frame %d" % (gone - 2, gone - 1, gone), a != b != c)

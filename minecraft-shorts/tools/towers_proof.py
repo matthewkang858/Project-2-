@@ -120,14 +120,14 @@ def shot_pod_out(st, s, fm, h):
         c.lie_down(f0, bed["pos"], bed["yaw"])
         cast.append(c)
     mom = st.actor("mom", "farmer")
-    mom.place(f0, fm.A["bed_side"], fm.yaw["bed_side"])
+    mom.place(f0, fm.A["mom"], fm.yaw["mom"])          # on 'mom' (not bed_side): the zombie clear of her from here
     mom.look_at(f0, fm.zombie_eye, ease=0)
     z = st.cast.get("zombie") or undead.add_zombie(st, "zombie")
     fm.zombie_in_cell(z, f0, look=mom)
     st.use(s, mom, z, *cast)
     cam = fm.cameras["pod_out"]
     _cam(s, cam, focus=mom.head)
-    mp = fm.A["bed_side"]
+    mp = fm.A["mom"]
     pts = [mom, (mp[0], mp[1], mp[2] + 0.5), fm.zombie_eye]
     for key in ("white_1", "white_2", "mom"):
         bd = fm.beds[key]
@@ -180,7 +180,7 @@ def shot_platform(st, s, fm, h):
     g = st.cast.get("golem")
     if g is None:
         g = st.cast["golem"] = mobs.make_iron_golem("golem")
-    fm.golem_spawn(g, f0 + 4, yaw=math.radians(-150.0), look=fm.A["pod_target"], look_after=4)
+    fm.golem_spawn(g, f0 + 4, yaw=math.radians(-150.0), look=fm.A["pod_target"], look_after=4, empty_from=s)
     cast = []
     for i, (n, prof) in enumerate((("mom", "farmer"), ("cleric", "cleric"), ("librarian", "librarian"))):
         c = st.actor(n, prof)
@@ -239,7 +239,7 @@ def shot_slide(st, s, fm, h):
     g = st.cast.get("golem")
     if g is None:
         g = st.cast["golem"] = mobs.make_iron_golem("golem")
-    fm.golem_spawn(g, f0 + 6, look=fm.A["pod_target"], look_after=8)
+    fm.golem_spawn(g, f0 + 6, look=fm.A["pod_target"], look_after=8, empty_from=s)
     e = fm.golem_step(g, f0 + 30)
     r = fm.golem_slide(g, e + 2)
     d = fm.golem_death(g, r, camera=s)
@@ -336,12 +336,16 @@ def shot_gap(st, s, fm, h):
 
 
 def shot_bounce(st, s, fm, h):
-    """Beat 17: the baby bounces twice on Mom's red bed."""
-    from engine import towers
+    """Beat 18: the baby bounces twice on Mom's red bed (two jumps, the glass roof stopping each), its face cheated
+    to the lens."""
+    from engine.village import yaw_to
 
     f0 = s.frame_start
     baby = st.actor("baby", "none", child=True)
-    e = fm.bounce(baby, f0 + 2, "mom", jumps=1)
+    cam = fm.cameras["bounce"]
+    bp, mp = fm.beds["mom"]["pos"], fm.A["bed_side"]
+    toward = (0.65 * cam["pos"][0] + 0.35 * mp[0], 0.65 * cam["pos"][1] + 0.35 * mp[1])
+    e = fm.bounce(baby, f0 + 2, "mom", jumps=2, yaw=yaw_to(bp, toward))
     h["bounce"] = (f0 + 2, e)
     mom = st.actor("mom", "farmer")
     mom.place(f0, fm.A["bed_side"], fm.yaw["bed_side"])
@@ -435,7 +439,7 @@ def _strip_offsets(name, s, h):
         return [f - 1 - f0, f - f0]
     if name == "bounce":
         a, e = h["bounce"]
-        return [a - f0 + k for k in (0, 3, 6, 10, 14)] + [min(e, s.frame_end) - f0]
+        return sorted(set([a - f0 + k for k in (0, 2, 4, 7, 15)] + [min(e + 2, s.frame_end) - f0]))
     if name == "push":
         r = h["push"]
         e = r["end"]

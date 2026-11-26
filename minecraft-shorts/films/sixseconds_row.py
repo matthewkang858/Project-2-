@@ -106,6 +106,10 @@ def rw21_stare(st, s, C, nar):
     NOW (stub): exactly that; the ingot is C.memo["rw_ingot"] (one entity turning from here to the end). Hero: the
       brute.
     MEASURED (out/test/sixseconds_set_b21_ingot_row.png): brute x 40-59 %, y 42-50 %, 2.93 x the blackstone.
+      THE LEAD'S GEO / STILL (rw21_stare:1392, out/test/sixseconds_scout_rw21_stare_1392_zones.png): brute eyes x 51 %,
+      y 45 % (head x 38-61 %, 80 px, 38 degrees off the lens, pitched 24 down: he reads as looking down); brother 1
+      big at the left (head x 4-41 %, its left edge outside x 8 %), brother 2 x 61-88 %; the step ingot spot behind
+      brother 1's arm (as the set builder found).
     NEIGHBOURS: before, pt20_likes (the older world's pit: everyone likes gold); after, rw22_six.
     """
     _brothers(st, s, C)
@@ -138,6 +142,15 @@ def rw22_six(st, s, C, nar):
       the brute (the ingot is the sharp thing: also name it, st.hero(s, "ingot", *ingot objects)).
     MEASURED (out/test/sixseconds_set_b22_ingot_close.png): ingot y 44-58 %, his face (eyes, snout, tusks) above
       it at x 35-66 %, y 28-45 %, 3.16 x the blackstone, the gold lantern on his snout; the brothers out of frame.
+      THE LEAD'S SCOUTING of the stub (out/test/sixseconds_scout_rw22_six_1420.png, _1490.png, 540x960, 16 samples):
+      the ingot is SHARP (its pixel edges crisp at 2x) and his face soft behind it, as the story asks; a dropped item
+      turns about the vertical, so on some frames it is three-quarter or edge-on (1420: a narrow gold sliver at x
+      44-55 %): that is the game's look, but put a broad face of it on "Six" (1411) and on the shot's last second if
+      you can (the spin's phase: engine.mobs DroppedItem.place(frame, pos, age=) / animate(f0, f1, phase=); the
+      stub's one ingot is placed in _ingot() on rw21's first frame and turns without a break to the end). Its lower edge sits at y 60-62 % (geo:
+      the step point (8.16, 11.71, 1.1) at y 61-62 %), right on the top of the caption band where "Six" and
+      "seconds" are drawn: aim the camera a little lower (target z -0.05..-0.1) so the ingot sits at y 42-57 %.
+      His face 148-152 px, straight at the lens (0 degrees), head pitched 24 degrees down at the step.
     NEIGHBOURS: before, rw21_stare; after, rw23_nothing.
     """
     ingot = _ingot(st, s, C)
@@ -174,6 +187,11 @@ def rw23_nothing(st, s, C, nar):
     NOW (stub): exactly that, the head turn on "Nothing" over 18 frames. Hero: the brute.
     MEASURED (out/test/sixseconds_set_b23_gate_reverse.png): his head at the end of the turn x 40-53 %, y 43-48 %,
       2.69 x the blackstone; brother 2 heads-down beside him, brother 1 soft at the left edge.
+      THE LEAD'S GEO / STILL of the stub (rw23_nothing:1500 / :1530, out/test/sixseconds_scout_rw23_nothing_1530.png):
+      on 1500 his head 44 degrees off the lens, pitched 22 down (still on the ingot); by 1530 the turn is done: 9
+      degrees off the lens, level, eyes x 46 %, y 45 %, face 69 px (8.7 blocks off: small; a longer lens or a closer
+      camera on the same line would make the face read bigger at phone size; check it at 360x640). Brother 1 soft at
+      the left edge (head x -3..23 %), brother 2 at x 51-73 %, heads-down. The floor under the caption is empty.
     NEIGHBOURS: before, rw22_six; after: the end (the Reel loops to gt01).
     """
     _brothers(st, s, C)

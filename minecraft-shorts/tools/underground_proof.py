@@ -41,7 +41,11 @@ def _cam(s, name, focus=None, **over):
     return c
 
 
-def _under(st, s, ug, scale=0.7, groups=None, near=None, radius=None, extra=(), inside=False):
+def _under(st, s, ug, scale=0.7, groups=None, near=None, radius=None, extra=(), inside=False, parts=True):
+    if parts == "door":
+        st.use(s, ug.door)                      # the lever hangs on ug_end_pier: out of a shot that sees through it
+    elif parts:
+        st.use(s, *ug.parts)                    # the door and the lever (registered: hidden where not used)
     g = {k: scale for k in U.LIGHT_GROUPS}
     g.update(groups or {})
     st.lights(s, scale=0.0, groups=g, near=near, radius=radius, extra=extra, inside="ug_hall" if inside else ())
@@ -177,14 +181,17 @@ def _shut(ug, f):
         ug.door.close(f)
 
 
-def _cells(st, s, look=None, dad_profession="librarian"):
+def _cells(st, s, look=None, dad_profession="librarian", skip=(), dad_at="ug_cell_dad"):
     A = st.v.anchors
     f0 = s.frame_start
     _shut(st.ug, f0 - 6)
     out = {}
     for n in U.CELL_X:
+        if n in skip:
+            continue
         c = _actor(st, "cell_" + n, U.PROFESSION[n], level=2)
-        c.place(f0, A["ug_cell_%s" % n], st.v.yaws["ug_cell_%s" % n])
+        spot = dad_at if n == "dad" else "ug_cell_%s" % n
+        c.place(f0, A[spot], st.v.yaws[spot])
         if look is not None:
             c.look_at(f0, look(n), ease=0)
         out[n] = c
@@ -192,17 +199,21 @@ def _cells(st, s, look=None, dad_profession="librarian"):
     return out
 
 
-def shot_down(st, s, ug):
-    """Beat 7: the ceiling off, looking steeply down along the row of cells; dad looks up at us."""
-    cam = U.CAMERAS["b07_down"]
-    cells = _cells(st, s, look=lambda n: cam["pos"] if n == "dad" else up(st.v.anchors["ug_aisle_%s" % n], 1.4))
-    st.see_through(s, "ug_ceiling")
+def shot_down(st, s, ug, start=False):
+    """Beat 7: the ceiling off, looking steeply down into the row of cells from above the aisle, sliding east from
+    the farmer's pocket to dad's; dad looks up at us (start=True: the still is the first frame, over the farmer)."""
     c = U.CAMERAS["b07_down"]
+    cells = _cells(st, s, look=lambda n: c["pos"] if n == "dad" else up(st.v.anchors["ug_aisle_%s" % n], 1.4))
+    st.see_through(s, "ug_ceiling")
     s.lens(c["lens"], c["fstop"])
     s.move(c["pos0"], c["target0"], c["pos"], c["target"])
-    s.focus(cells["dad"].head)
-    st.hero(s, "dad", cells["dad"])
+    s.focus(cells["farmer" if start else "dad"].head)
+    st.hero(s, "farmer" if start else "dad", cells["farmer" if start else "dad"])
     _under(st, s, ug, inside=True)
+
+
+def shot_down_start(st, s, ug):
+    shot_down(st, s, ug, start=True)
 
 
 def shot_cell(st, s, ug, opened=False):
@@ -264,20 +275,27 @@ def shot_aisle(st, s, ug):
     falling off into the dark beyond the stair foot."""
     A = st.v.anchors
     f0 = s.frame_start
-    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5))
+    _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5), skip=("dad",))
+    zv = _zv_dad(st, s)
+    zv.look_at(f0, up(A["ug_aisle_dad"], 1.5), ease=0)
+    undead.shake(zv, f0, s.frame_end, 3.0)
+    undead.effect_swirls(zv, f0 - 30, s.frame_end, effect="strength", camera=s)
     steve = _player(st, "steve")
-    steve.place(f0, A["ug_jump_spot"], math.pi / 2.0)
-    U.jump_loop(steve, f0, s.frame_end)
-    st.use(s, steve)
+    steve.place(f0, A["ug_jump_spot"], st.v.yaws["ug_jump_spot"])
+    U.jump_loop(steve, f0 - 6, s.frame_end)
+    st.use(s, steve, zv)
+    st.see_through(s, "ug_end_pier")
     _cam(s, "b16_aisle", focus=steve.head)
     st.hero(s, "steve", steve)
-    _under(st, s, ug, inside=True)
+    st.hero(s, "zombie dad", zv)
+    _under(st, s, ug, inside=True, parts="door")
 
 
 def shot_endwall(st, s, ug):
     """Beat 19: dad's cell from the side through the see-through end wall, the piston wall behind him."""
     A = st.v.anchors
-    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else (5.0, -11.5, U.F + 1.6))
+    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else (5.0, -11.5, U.F + 1.6),
+                   dad_at="ug_cell_dad_mid")
     st.see_through(s, "ug_end_wall")
     _cam(s, "b19_endwall", focus=cells["dad"].head)
     st.hero(s, "dad", cells["dad"])
@@ -294,9 +312,11 @@ def shot_endwall_alt(st, s, ug):
     _under(st, s, ug, inside=True)
 
 
-def shot_slot(st, s, ug, hands=False):
-    """Beats 8 / 21: the back corner from the floor, the slot of iron bars in the box (black inside; with hands:
-    the baby zombie villager's hands between the bars)."""
+def shot_slot(st, s, ug, hands=False, boots=False):
+    """Beats 8 / 21: the back corner from the floor, the slot of iron bars in the box. "slot" (beat 21): black
+    inside, the still taken before Steve walks into the view (a defocused trouser leg in front of the lens veils
+    the slot purple); "slot_hands": the baby zombie villager's hands between the bars, focus on the slot;
+    "slot_boots" (beat 8 as staged): Steve's boots pass in focus, the slot and the hands soft behind them."""
     A = st.v.anchors
     f0 = s.frame_start
     steve = _player(st, "steve")
@@ -308,13 +328,23 @@ def shot_slot(st, s, ug, hands=False):
         zv = undead.add_zombie_villager(st, "kid_zv_" + SHOT["name"], "none", baby=True)
         U.hands_in_slot(zv, f0)
         st.use(s, zv)
-    _cam(s, "b08_slot")
-    st.hero(s, "slot", *st.v.cutaways["ug_slot"])
-    _under(st, s, ug)
+    if boots:
+        foot = (16.6, -14.97, U.F + 0.15)                    # where his boots cross the lens axis at f0 + 12
+        _cam(s, "b08_slot", focus=foot)
+        st.hero(s, "slot", *st.v.cutaways["ug_slot"])
+    else:
+        _cam(s, "b08_slot")
+        st.hero(s, "slot", *st.v.cutaways["ug_slot"])
+    # beat 8: the corner torch low (the inside stays black, the hands catch a little of it)
+    _under(st, s, ug, groups={"ug_corner": 0.35} if (hands or boots) else None)
 
 
 def shot_slot_hands(st, s, ug):
     shot_slot(st, s, ug, hands=True)
+
+
+def shot_slot_boots(st, s, ug):
+    shot_slot(st, s, ug, hands=True, boots=True)
 
 
 def shot_box(st, s, ug):
@@ -391,14 +421,17 @@ def shot_counter(st, s, ug):
     _shut(ug, f0 - 6)
     zv = _zv_dad(st, s)
     steve = _player(st, "steve")
-    spot = (15.2, -11.25, U.F)
+    spot = st.v.anchors["ug_counter_steve"]
     steve.place(f0, spot, yaw_to(spot, st.v.anchors["ug_cell_dad"]))
     undead.throw_potion(steve, zv, f0 + 6, camera=s)
     st.use(s, zv, steve)
     st.see_through(s, "ug_end_pier")
+    st.see_through(s, "ug_end_wall")
     _cam(s, "b13_counter", focus=zv.head)
     st.hero(s, "zombie dad", zv)
-    _under(st, s, ug, inside=True, extra=[((14.5, -10.6, U.F + 1.9), 1.8)])
+    st.hero(s, "steve", steve)
+    _under(st, s, ug, inside=True, extra=[((14.5, -10.6, U.F + 1.9), 1.8)], parts="door")
+    U.bounce(st, s, U.COUNTER_BOUNCE)          # Steve's side toward the lens is away from every torch
 
 
 def shot_apple(st, s, ug):
@@ -426,8 +459,7 @@ def shot_drift(st, s, ug):
     c = U.CAMERAS["b15_drift"]
     s.lens(c["lens"], c["fstop"])
     s.move(c["pos0"], c["target"], c["pos"], c["target"])
-    s.focus((14.6, -15.0, U.F + 1.0))
-    st.hero(s, "zombie dad", zv)
+    s.focus((14.6, -15.0, U.F + 1.0))      # the subject is the black doorway (empty space): no hero to check
     _under(st, s, ug, inside=True)
 
 
@@ -446,11 +478,23 @@ def shot_ots(st, s, ug):
 
 
 def shot_follow(st, s, ug):
-    """Beat 18: portrait of dad, his head turned up the aisle to its stop."""
+    """Beat 18: portrait of dad from far up the aisle (long lens, through the counter's windows): his head follows
+    Steve, who walks away from him up the aisle (toward the lens, soft) with the book, to its 70-degree stop."""
     A = st.v.anchors
-    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5) if n != "dad" else (5.0, -11.5, U.F + 1.6))
-    _cam(s, "b18_portrait", focus=cells["dad"].head)
-    st.hero(s, "dad", cells["dad"])
+    f0 = s.frame_start
+    cells = _cells(st, s, look=lambda n: up(A["ug_aisle_%s" % n], 1.5), skip=("dad",))
+    dad = _actor(st, "cell_dad", "librarian", level=2)
+    dad.place(f0 - 30, A["ug_cell_dad_mid"], st.v.yaws["ug_cell_dad_mid"])
+    steve = _player(st, "steve")
+    steve.hold("enchanted_book")
+    a, b = A["ug_follow_start"], A["ug_follow_end"]
+    steve.place(f0 - 30, a, yaw_to(a, b))
+    steve.walk(f0 - 30, [a, b], speed=players.WALK_SPEED)
+    dad.look_at(f0 - 30, steve, ease=0)
+    dad.track(f0 - 30, s.frame_end, steve, step=2, ease=4)
+    st.use(s, dad, steve)
+    _cam(s, "b18_portrait", focus=dad.head)
+    st.hero(s, "dad", dad)
     _under(st, s, ug, inside=True)
 
 
@@ -478,9 +522,10 @@ def shot_kill(st, s, ug):
 BUILDERS = {
     "mouth": ("dusk", shot_mouth), "lip": ("dusk", shot_lip), "push": ("dusk", shot_push), "well": ("dusk", shot_well),
     "bed": ("dusk", shot_bed), "bed_wide": ("dusk", shot_bed_wide), "stairwell": ("dusk", shot_stairwell),
-    "down": ("under", shot_down), "cell": ("under", shot_cell), "cell_open": ("under", shot_cell_open), "cell_shut": ("under", shot_cell_shut),
+    "down": ("under", shot_down), "down_start": ("under", shot_down_start), "cell": ("under", shot_cell), "cell_open": ("under", shot_cell_open), "cell_shut": ("under", shot_cell_shut),
     "lever": ("under", shot_lever), "aisle": ("under", shot_aisle), "endwall": ("under", shot_endwall), "endwall_alt": ("under", shot_endwall_alt),
-    "slot": ("under", shot_slot), "slot_hands": ("under", shot_slot_hands), "box": ("under", shot_box),
+    "slot": ("under", shot_slot), "slot_hands": ("under", shot_slot_hands),
+    "slot_boots": ("under", shot_slot_boots), "box": ("under", shot_box),
     "foot": ("under", shot_foot), "falloff": ("under", shot_falloff), "portrait": ("under", shot_portrait),
     "counter": ("under", shot_counter), "apple": ("under", shot_apple), "drift": ("under", shot_drift),
     "ots": ("under", shot_ots), "follow": ("under", shot_follow), "kill": ("under", shot_kill),
@@ -497,9 +542,13 @@ def build(scene, sky=None):
     film = shots.Film(scene, fps=24)
     st = Stage(scene, film, v, skies=SKIES, sky=sky)
     st.ug = ug
+    ug.register(st)
+    # a lead-in frame: Stage.see_through / remove key the cutaway visible again on the film's FIRST frame each time
+    # they are called, which undoes the see-through of a shot that starts on that frame (films/lookdev.py)
+    st.shot("_lead", 1.0 / 24.0, sky=next(iter(SKIES)))
     for n in (WANTED or ORDER):
         tag, fn = BUILDERS[n]
-        secs = {"push": 6.0, "bed": 6.0, "down": 3.0}.get(n, 1.0)
+        secs = {"push": 6.0, "bed": 6.0, "down": 3.0, "down_start": 3.0}.get(n, 1.0)
         s = st.shot(n, secs, sky=tag)
         SHOT["name"] = n
         fn(st, s, ug)
@@ -515,8 +564,12 @@ def still_frame(film, name):
         return shot.frame_start + 10
     if name == "down":
         return shot.frame_end
+    if name == "down_start":
+        return shot.frame_start
     if name == "mouth":
         return shot.frame_start + 20
+    if name in ("slot", "slot_hands"):
+        return shot.frame_start                              # Steve not yet in the view
     return shot.frame_start + int(round(STILL_AT * film.fps))
 
 

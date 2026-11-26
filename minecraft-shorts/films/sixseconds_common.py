@@ -12,6 +12,7 @@
     $BPY -m tools.sixseconds_timeline [--check]   the shot plan: frames, words, skies (no scene is built); captions
     $BPY -m tools.sixseconds_shots render ...     stills of single shots (its docstring): THE scouting tool
     $BPY -m tools.sixseconds_geo --sky S SHOT:F   where every head lands in the frame, face size, facing, what hides it
+                                                  (--pts points, --boots the golden boots' box, --track a figure)
     $BPY -m tools.sixseconds_palette --sky S F    nether.check_still on one frame at final quality (gold, brute vs
                                                   blackstone, piglin skin, Steve's clothes, heroes in the safe area)
     $BPY -m render sixseconds --still S [--zones] one frame through render.py (each sky is one build)
@@ -91,7 +92,8 @@ films/sixseconds.py docstring for the stills)
   CAMS["ingot_row"]   THE INGOT ROW FRAME: rw02 and rw21 exactly                                    row
   CAMS["pit"]         THE PIT CAMERA: pt06 and pt20 exactly                                         pit
   CAMS["boot"], CAMS["bridge_boot"]   THE BOOT FRAMING: pt05 (home) and br11 (bridge) are one framing on two sets:
-                      the boots land where BOOT_FRAME says in both (measured; see there)        pit, bridge
+                      the boots land where BOOT_FRAME says in both (measured on renders of the stub film; see
+                      there): the same box to 1 % of the frame                                   pit, bridge
   CAMS["flash_bridge"], ["flash_treasure"], ["flash_home"]: one offset from the brute in all three (fl16_*)
   PLACES["gold_1".."gold_3"]  the three piglins at the gold in the gate frame and the corridor: gt03, gt17, gt18,
                       gt19 (and pt05's piglins at the gold turn from there); IDENTICAL on both sides of gt18 -> gt19
@@ -217,12 +219,14 @@ CAMS = {
     # the lens (the gate frame cannot give "a clean profile against the glow": the gateway lies behind him)
     "reverse": dict(pos=(3.5, 17.5, 0.45), target=(7.2, 10.4, 1.3), lens=36.0, fstop=2.8),
 }
-# THE BOOT FRAMING: the box of the golden boots (feet +-0.28 x +-0.16 x 0..0.42) in % of the frame, projected
-# (nether.project) and seen on the lead's scouting stills (out/test/sixseconds_scout_boots_pt05.png, _br11.png):
-# both cameras are 50 mm f/2, 3.8 blocks from the boots, 0.25-0.28 above the floor; pt05 (28-69, 40-57) and br11
-# (28-69, 40-56) put them in the same place at the same size. Keep the runner's skid ON boot_mark /
-# bridge_boot_mark (the set builder's br11 suggestion, 45 mm aimed at x 400.65, had them at x 17-56 %).
-BOOT_FRAME = dict(x=(28.0, 69.0), y=(40.0, 57.0))
+# THE BOOT FRAMING: the box of the golden boots in % of the frame, measured on the stub film by the lead after the
+# restart (tools.sixseconds_geo --boots; stills out/test/sixseconds_scout_boots_pt05_boots_318.png and
+# out/test/sixseconds_scout_boots_br11_boots_728.png, side by side: the same picture on two sets): both cameras are
+# 50 mm f/2, 3.8-4.0 blocks from the boots, 0.25-0.28 above the floor; pt05 x 27.7-70.2, y 43.0-58.8 and br11
+# x 27.7-69.5, y 42.5-58.5. Keep the runner's skid ON boot_mark / bridge_boot_mark, entering from the frame's LEFT
+# edge in both (the stubs do), and the boots inside this box (the set builder's br11 suggestion, 45 mm aimed at
+# x 400.65, had them at x 17-56 %: CAMS["bridge_boot"] is that camera turned to match).
+BOOT_FRAME = dict(x=(27.0, 71.0), y=(42.0, 59.0))
 
 # lantern levels (C.lights(s, key)): Stage.lights(scale, groups, **bas.lights_for(set)); every one looked at on
 # stills (films/sixseconds_set.py BEATS). Do not raise a lantern without nether.check_still on the frame.

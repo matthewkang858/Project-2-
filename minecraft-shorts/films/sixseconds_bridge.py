@@ -20,8 +20,8 @@ THE NETHERRACK PILLAR (C.bas.pillar: three Breakables at (400, 19, 0..2)) stands
 br14, br15; br11, br12 and the flash sequence's fl16_bridge have none.
 SHARED (films/sixseconds_common.py): CAMS["bridge_boot"] for br11 with BOOT_FRAME: THE BOOT FRAMING of pt05 (home)
   repeated on this set: 50 mm f/2, 3.8 blocks from the boots, the boots in the same place at the same size (x
-  28-69 %, y 40-57 %). Keep the skid ON bridge_boot_mark; the lead turned the set's suggestion (45 mm aimed at x
-  400.65, boots at x 17-56 %) to match. PLACES "bridge_boot_mark", "bridge_player", "bridge_brute", "pillar_foot",
+  27.7-70.2 %, y 43-59 %: measured on both sets, BOOT_FRAME). Keep the skid ON bridge_boot_mark; the lead turned
+  the set's suggestion (45 mm aimed at x 400.65, boots at x 17-56 %) to match. PLACES "bridge_boot_mark", "bridge_player", "bridge_brute", "pillar_foot",
   "pillar_top".
 THE WORLD'S RULES that bite here: the runner wears the golden boots; the brute keeps the golden axe, never raised
   here (he waits); the pillar only where C.pillar allows; the ingots he ignores are dropped items (C.item) lying or
@@ -30,6 +30,9 @@ TAGS TAKEN by the stubs: runner_br (br11, br12, br13, br15), brute_br (br12-br15
 PREVIEW samples of this sequence: 9.
 """
 from mathutils import Vector
+
+# br15: the brute 0.5 east of pillar_foot, so that the pillar's top block does not cut his face (see br15's docstring)
+BR15_BRUTE = (401.0, 18.25, 0.0)
 
 
 def br11_boots(st, s, C, nar):
@@ -55,8 +58,13 @@ def br11_boots(st, s, C, nar):
       orange lava glow" is shown by br13 and br15.
     NOW (stub): the bridge boot camera; the runner enters at f0 + 14 from (400.5, -3) and sprints to the boot mark
       (arrives about 723). Hero: the boots.
-    MEASURED (projection, the lead's scouting still out/test/sixseconds_scout_boots_br11.png): boots x 28-69 %, y
-      40-56 %.
+    MEASURED (the lead, after the restart: tools.sixseconds_geo br11_boots:728 --boots runner_br and the still
+      out/test/sixseconds_scout_boots_br11_boots_728.png beside out/test/sixseconds_scout_boots_pt05_boots_318.png):
+      the stub's runner waits at (400.5, -3) behind the lens to 682, comes in from the frame's LEFT edge about 716
+      (he passes 1.15 west of the lens) and stops on the mark by 728: boots x 27.7-69.5 %, y 42.5-58.5 %, exactly
+      pt05's (27.7-70.2 %, 43.0-58.8 %): THE BOOT FRAMING holds. His back is to the lens here (he runs north, toward
+      br12's brute); in pt05 he faces the lens (he came from the gateway): each is right for its neighbours, and at
+      boot height it is the same picture. The empty bridge 668-715 (the teal void, the deck, the pillars, the lantern).
     NEIGHBOURS: before, pt10_smoke (black from "ended"); after, br12_blocks.
     """
     f0 = s.frame_start
@@ -92,6 +100,11 @@ def br12_blocks(st, s, C, nar):
     MEASURED (out/test/sixseconds_set_b12_bridge_shoulder.png under nether_wastes; out/test/
       sixseconds_scout_sky_b12_bridge_shoulder_soul_sand_valley.png under this film's sky): brute x 40-59 %, y
       39-47 %, 1.74 x the blackstone; the teal void behind him.
+      UNDER THIS FILM'S SKY "soul" (the lead: tools.sixseconds_palette --sky soul 780, still
+      out/test/sixseconds_pal_br12_blocks_780.png; out/test/sixseconds_scout_br12_blocks_815_zones.png): brute x
+      1.52 the blackstone (46 vs 30: AT the 1.5 limit; 1.74 under nether_wastes), gold hue 46, shirt hue 171. Give
+      him more of his lantern (C.lights(s, "bridge", groups={"bridge_lantern": k}) with k up to about 1.5, measured)
+      or a film-local key C.fill("br_key", ...) before anything else; re-measure.
     NEIGHBOURS: before, br11_boots; after, br13_pillar.
     """
     f0 = s.frame_start
@@ -132,6 +145,10 @@ def br13_pillar(st, s, C, nar):
       out/test/sixseconds_scout_sky_b13_bridge_pillar_soul_sand_valley.png): brute x 30-42 %, y 39-46 %, 2.84 x;
       runner on the top at 13-29 % of the height; the lava at the bottom edge. Under the teal fog his teal shirt
       separates from the void by brightness only: check it at 360x640.
+      THE LEAD'S GEO (br13_pillar:859, the stub): the runner's head y 12.4-18.7 %: its top is UNDER the Reels top
+      icons (y < 13-14 %); the story wants the whole tableau inside y 14-60 %: aim the camera a little higher or
+      pull back. The brute in profile (86 degrees off the lens), head pitched to the game's 40-degree stop, eyes
+      x 39 %, y 41 %; the ingot spots at his feet y 56-58 %.
     NEIGHBOURS: before, br12_blocks; after, br14_zero.
     """
     f0 = s.frame_start
@@ -199,8 +216,17 @@ def br15_wait(st, s, C, nar):
     NOW (stub): engine/nether.py's bridge_top (30 mm f/3, high behind the runner on the pillar), C.pillar(s), the
       runner crouched on pillar_top, the brute at pillar_foot looking up at him, three ingots lying at his feet.
       Hero: the brute.
+    PALETTE (the lead, stub with BR15_BRUTE, sky soul, frame 968): brute x 2.82 the blackstone, shirt hue 174,
+      pants min channel 17: all pass (out/test/sixseconds_pal_br15_wait_968.png).
     MEASURED (out/test/sixseconds_set_b15_bridge_top.png): brute x 41-51 %, y 40-50 %, 2.48 x; the runner's back
       the big shape at the right; the lava visible below.
+      MEASURED PROBLEM (the lead's geo, br15_wait:968): with the brute ON pillar_foot (400.5, 18.25) the pillar's top
+      block cuts his face in half from this camera (his eyes behind bridge_pillar_2, 3.7 blocks from the lens; the
+      set's still b15 shows only the left half of his face beside the pillar's edge). The pillar stands right north
+      of him and the camera looks over it: a clear line needs his eyes 0.65 further south (y <= 17.6: eyes x 45 %,
+      y 39 %) or 0.5 further east (x >= 401.0: eyes x 41 %, y 48 %), or the camera above z 6.9. THE STUB puts him on
+      BR15_BRUTE (401.0, 18.25) in this shot only (0.5 block from br13 / br14's spot: invisible across the cut to
+      a high angle); keep him there or move all three pillar shots together.
     NEIGHBOURS: before, br14_zero; after, fl16_bridge (the flash cut in this world: the brute, a puff, the boots).
     """
     f0 = s.frame_start
@@ -210,7 +236,7 @@ def br15_wait(st, s, C, nar):
     runner.sneak(f0)
     st.use(s, runner)
     brute = C.actor("brute", "br")
-    C.stand(s, brute, "pillar_foot", look=(400.5, 19.6, 4.6), idle=False)
+    C.stand(s, brute, BR15_BRUTE, yaw=C.yaw("pillar_foot"), look=(400.5, 19.6, 4.6), idle=False)
     for k in (1, 2, 3):
         C.rest(s, "gold_ingot", "br15_%d" % k, "six_bridge_ingot_%d" % k)
     C.cam(s, "set:bridge_top", focus=brute.head)

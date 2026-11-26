@@ -306,6 +306,10 @@ JOB = {"farmer": ("composter", {"level": "0"}), "fletcher": ("fletching_table", 
        "dad": ("lectern", {"facing": "north", "has_book": "false", "powered": "false"})}
 PROFESSION = {"farmer": "farmer", "fletcher": "fletcher", "cleric": "cleric", "dad": "librarian"}
 END_X = 15                             # the end wall of the cell row (its front pier holds the lever)
+WINDOW_PIER = (12, 13)                 # the 2-wide pier between the cleric and dad: solid behind (it hides the
+                                       # pistons), but its front row is counter like the rest (stone, a window at
+                                       # face height, bars): a solid front here hid every face beyond it from an
+                                       # oblique camera in the aisle (beat 16)
 BOX = (14, BOX_Y)                      # the zombie box: one cell behind dad's, 2 high, smooth stone lid
 SLOT = (15, BOX_Y, F)                  # its only opening: iron bars at floor level in its east wall
 DOOR = [(14, BACK_Y, F), (14, BACK_Y, F + 1)]       # dad's back wall: two stone blocks on sticky pistons ...
@@ -737,10 +741,10 @@ def layout():
             put(x, FRONT_Y, F, bid, dict(p))
             air(x, FRONT_Y, F + 1)
             put(x, FRONT_Y, F + 2, "iron_bars", dict(BARS_EW))
-        elif x in (8, 10):
-            put(x, FRONT_Y, F, "stone")
-            air(x, FRONT_Y, F + 1)
-            put(x, FRONT_Y, F + 2, "iron_bars", dict(BARS_EW))
+        elif x in (8, 10) + WINDOW_PIER:
+            put(x, FRONT_Y, F, "stone")                      # the counter runs on: a window at face height over
+            air(x, FRONT_Y, F + 1)                           # every pier from the farmer to dad, so the four faces
+            put(x, FRONT_Y, F + 2, "iron_bars", dict(BARS_EW))   # are seen from either end of the aisle
         else:
             for z in range(F, F + 3):
                 put(x, FRONT_Y, z, "stone")
@@ -919,8 +923,12 @@ def _register(b, name):
         anchor("ug_cell_%s" % n, (x + 0.5 + off, FRONT_Y - 0.30, float(F)), yaw_of("north"))
         anchor("ug_cell_%s_station" % n, (x + 0.5, FRONT_Y + 0.5, F + 0.5))
         anchor("ug_aisle_%s" % n, (x + 0.5, AISLE_Y[0] + 0.85, float(F)), yaw_of("south"))   # in front of the cell
+    # dad in the middle of his cell: for the beats where he turns his head west (17-19); at ug_cell_dad (DAD_OFFSET,
+    # for the strip of black doorway beside his robe) a head turned to its stop puts his nose into the pier
+    anchor("ug_cell_dad_mid", (CELL_X["dad"] + 0.5, FRONT_Y - 0.30, float(F)), yaw_of("north"))
     anchor("ug_lever_target", (LEVER[0] + 0.5, LEVER[1] + 0.3, LEVER[2] + 0.45))
     anchor("ug_lever_stand", (LEVER[0] + 0.25, LEVER[1] + 1.25, float(F)), yaw_of("south"))
+    anchor("ug_counter_steve", (15.0, AISLE_Y[0] + 0.3, float(F)), yaw_to((15.0, -11.7), (14.32, -13.3)))  # beat 13
     anchor("ug_door_target", (DOOR[0][0] + 0.5, DOOR[0][1] + 0.5, F + 1.0))
     anchor("ug_box", (BOX[0] + 0.5, BOX[1] + 0.5, float(F)), yaw_of("north"))    # inside the box, facing the door
     anchor("ug_slot_target", (SLOT[0] + 0.5, SLOT[1] + 0.5, F + 0.5))
@@ -929,7 +937,11 @@ def _register(b, name):
     anchor("ug_leg_north", (LEG_X[0] + 0.55, AISLE_Y[0] + 0.6, float(F)), yaw_of("south"))
     anchor("ug_aisle_west_end", (AISLE_X[0] + 0.6, AISLE_Y[0] + 1.0, float(F)), yaw_of("east"))
     anchor("ug_aisle_center", (10.5, AISLE_Y[0] + 1.0, float(F)))
-    anchor("ug_jump_spot", (8.5, AISLE_Y[0] + 1.0, float(F)), yaw_of("north"))    # Steve's jump loop (beat 16)
+    # beat 18: Steve walks away from dad up the aisle (under the b18 camera's line to dad: no occlusion)
+    anchor("ug_follow_start", (14.5, AISLE_Y[0] + 0.6, float(F)), yaw_of("west"))
+    anchor("ug_follow_end", (7.2, AISLE_Y[0] + 0.6, float(F)), yaw_of("west"))
+    anchor("ug_jump_spot", (11.3, AISLE_Y[0] + 0.65, float(F)), yaw_to((0, 0), (1, 1)))   # Steve's jump
+    #                                         loop (beat 16): mid-aisle in front of the cleric, facing north-east
     # paths (with their own heights: stairs)
     down = [(mx, 4.0, gz(mx, 4.0)), (mx, 1.0, gz(mx, 1.0))]
     for k in range(STEPS):
@@ -1191,6 +1203,25 @@ def cameras():
     return {k: dict(v) for k, v in CAMERAS.items()}
 
 
+def bounce(st, shot, pos, energy=35.0, color=(1.0, 0.95, 0.88), name=None):
+    """A film-local SHADOWLESS fill for one shot only (hidden in every other frame: hidden objects are not in a
+    frame's stamp), for a face or a pair of trousers on the dark side of the torches (as films/nitwit.py
+    SMITH_BOUNCE). Beat 13: bounce(st, s, U.COUNTER_BOUNCE) lifts Steve's side that faces the lens. Returns it."""
+    from . import props
+
+    ob = props.make_light("fill", st.v.collection)
+    ob.name = name or "ug_bounce_%s" % shot.name
+    ob.location = tuple(pos)
+    ob.data.color = tuple(color)
+    ob.data.energy = float(energy)
+    for f, hidden in ((st.film.frame_start, True), (shot.frame_start, False), (shot.frame_end + 1, True)):
+        st.key(ob, "hide_render", f, hidden)
+    return ob
+
+
+COUNTER_BOUNCE = (16.9, -11.5, F + 1.3)   # beat 13: east of Steve at the counter, between him and the b13 camera
+
+
 def cheat(target, head, camera, k=0.35):
     """A look target turned part of the way toward the lens (a child in profile that looks at something beyond
     itself shows a blank cheek: films/poppy_day.py _to_lens): k = 0 the target itself, 1 the camera."""
@@ -1208,18 +1239,22 @@ CAMERAS = {
                            "sunset behind"),
     "b02_lip": dict(beat=2, still="lip", pos=(5.75, -0.85, 0.82), target=(4.85, 1.42, 0.52), lens=50.0, fstop=2.0,
                     note="over the hole, three-quarter front on the child at the lip; repeated by b24_box"),
-    "b03_push": dict(beat=3, still="push", pos=(8.9, 1.5, 0.45), target=(5.0, 1.0, 0.95), lens=28.0, fstop=3.2,
-                     kid=(7.9, 1.05, 0.0), note="side-on and low, the child's head soft in the corner"),
+    "b03_push": dict(beat=3, still="push", pos=(9.0, 1.0, 1.05), target=(5.0, 0.7, 1.0), lens=28.0, fstop=3.2,
+                     kid=(8.1, 1.45, 0.0), note="side-on and low from the east (the well behind them): dad turned "
+                                               "back to the lens, Steve at his back; the child at `kid` (facing "
+                                               "west, watching) is the soft head in the bottom right corner"),
     "b04_bed": dict(beat=4, still="bed", pos=(16.45, -9.85, 1.85), target=(19.9, -9.5, 2.75), lens=26.0, fstop=2.6,
                     note="beside the foot of the red bed, low; the bed fills the bottom third"),
     "b05_bed_wide": dict(beat=5, still="bed_wide", pos=(11.4, -8.7, 2.25), target=(18.6, -9.6, 2.0), lens=30.0,
                          fstop=3.2, note="by the door, locked off: he stands on the bed facing it"),
     "b06_stairwell": dict(beat=6, still="stairwell", pos=(5.0, -0.7, 1.45), target=(5.0, -6.0, -6.2), lens=26.0,
                           fstop=4.0, note="high behind at the top of the flight"),
-    "b07_down": dict(beat=7, still="down", pos=(13.35, -13.9, -2.3), target=(14.6, -14.1, -9.6), lens=26.0,
-                     fstop=4.0, pos0=(6.35, -13.9, -2.3), target0=(7.6, -14.1, -9.6),
-                     note="the ceiling off (st.see_through 'ug_ceiling'), steeply down along the row; slide east "
-                          "to dad"),
+    "b07_down": dict(beat=7, still="down", pos=(14.5, -11.8, -4.3), target=(14.45, -13.4, -8.6), lens=26.0,
+                     fstop=4.0, pos0=(7.8, -11.3, -2.6), target0=(7.8, -13.5, -8.6),
+                     note="the ceiling off (st.see_through 'ug_ceiling'): from above the aisle, 70 degrees down into "
+                          "the pockets (the frame's up is south), sliding east and down from the farmer's pocket "
+                          "(pos0) to dad's (pos): hats in the pockets, dad looks up, the box's lid behind his cell, "
+                          "the lever on the end pier"),
     "b08_slot": dict(beat=8, still="slot", pos=(17.75, -14.55, -9.78), target=(15.5, -15.5, -9.72),
                      lens=35.0, fstop=2.0, note="the back corner on the floor; Steve's boots pass, the slot soft"),
     "b09_lever": dict(beat=9, still="lever", pos=(16.35, -10.45, -8.3), target=(14.9, -13.0, -8.75), lens=40.0,
@@ -1228,7 +1263,7 @@ CAMERAS = {
                           lens=28.0, fstop=2.8, note="low and a little to one side: the black doorway beside his robe"),
     "b11_portrait": dict(beat=11, still="portrait", pos=(15.05, -11.25, -8.3), target=(14.32, -13.25, -8.55),
                          lens=40.0, fstop=2.0, note="tight three-quarter portrait from the aisle, east of his axis"),
-    "b13_counter": dict(beat=13, still="counter", pos=(17.35, -12.4, -8.45), target=(14.7, -12.35, -8.55), lens=24.0,
+    "b13_counter": dict(beat=13, still="counter", pos=(17.9, -12.3, -8.45), target=(14.0, -12.5, -8.7), lens=20.0,
                         fstop=2.8, note="side-on along the counter from the east, through the see-through end pier "
                                         "('ug_end_pier'; register the lever with the Stage and leave it out of the shot):"
                                         " Steve right, zombie dad left behind the lectern"),
@@ -1239,16 +1274,22 @@ CAMERAS = {
                       fstop=2.4, pos0=(14.75, -10.5, -8.3), note="drift past his shoulder toward the black doorway"),
     "b17_ots": dict(beat=17, still="ots", pos=(14.0, -10.35, -8.05), target=(14.32, -13.3, -8.55), lens=35.0,
                     fstop=2.8, note="over Steve's shoulder at the counter: the emerald up, the book coming"),
-    "b18_portrait": dict(beat=18, still="follow", pos=(14.6, -10.6, -8.4), target=(14.32, -13.3, -8.5), lens=50.0,
-                         fstop=2.0, note="portrait of dad from the aisle: his head follows Steve up the aisle (west) to its 70-degree "
-                              "stop: the big nose in profile"),
+    "b18_portrait": dict(beat=18, still="follow", pos=(14.1, -10.4, -7.7), target=(14.32, -13.3, -8.45), lens=50.0,
+                         fstop=2.0, note="portrait of dad from in front, a little above his eyes: as his head "
+                                         "follows Steve (walking away west along ug_follow_start -> ug_follow_end, "
+                                         "under the lens) to its 70-degree stop, his face turns into profile, the "
+                                         "big nose pointing up the aisle. (His cell is a 1-wide pocket 0.3 behind "
+                                         "the counter with the pier on his west: a face turned west is seen from "
+                                         "the front only)"),
     "b23_kill": dict(beat=23, still="kill", pos=(8.3, -11.75, -9.0), target=(4.6, -10.9, -9.0), lens=24.0, fstop=2.8,
                      note="the stair foot wider: one swing, the zombie tips over by the steps"),
     "b12_cell": dict(beat=12, still="cell", pos=(14.5, -10.25, -8.75), target=(14.5, -14.0, -9.0), lens=26.0,
                      fstop=3.2, note="frontal, symmetrical, the whole cell; also beats 10-11 a little to one side"),
-    "b16_aisle": dict(beat=16, still="aisle", pos=(17.4, -11.15, -8.5), target=(2.0, -11.6, -9.0), lens=26.0,
-                      fstop=4.0, note="wide down the aisle from the back corner: the cells on the left, the aisle "
-                                      "falling off into the dark beyond the stair foot"),
+    "b16_aisle": dict(beat=16, still="aisle", pos=(17.5, -10.5, -8.4), target=(9.19, -13.94, -9.1), lens=20.0,
+                      fstop=4.0, note="wide down the aisle from its east end, through the see-through end pier "
+                                      "('ug_end_pier'; the lever out of the shot): zombie dad in his window on the "
+                                      "left, the cleric, fletcher and farmer in theirs, Steve jumping at "
+                                      "ug_jump_spot, the aisle falling off into the dark beyond the stair foot"),
     "b19_endwall": dict(beat=19, still="endwall", pos=(17.35, -14.25, -9.05), target=(14.5, -13.75, -8.55), lens=32.0,
                         fstop=2.4, note="through the see-through end wall ('ug_end_wall'), lower than his face: his "
                                         "profile (he gazes west, up the aisle), the piston wall's seam to the left"),

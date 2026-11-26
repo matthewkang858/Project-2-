@@ -62,7 +62,31 @@ def build(emit=None):
     s3.focus(c["target"])
     kid = characters.make_villager("st_kid", "farmer", child=True)
     out["bed"] = U.bed_bounce(kid, s3.frame_start, v.beds[U.BED]["foot"], jumps=3)
-    for ch_, shot in ((dad, s2), (steve, s2), (kid, s3)):
+    # beat 7 / 16: a see-through cutaway (keyed as Stage.see_through does), Steve's jump loop, a shot-local bounce
+    s4 = film.shot("down", 10.5, 12.0)
+    c = U.CAMERAS["b07_down"]
+    s4.lens(c["lens"], c["fstop"])
+    s4.move(c["pos0"], c["target0"], c["pos"], c["target"])
+    s4.focus(c["target"])
+    for ob in v.cutaways["ug_ceiling"]:
+        for f, val in ((film.frame_start, True), (s4.frame_start, False), (s4.frame_end + 1, True)):
+            ob.visible_camera = val
+            ob.keyframe_insert("visible_camera", frame=f)
+    jumper = players.make_player("st_jumper")
+    jumper.place(s4.frame_start, v.anchors["ug_jump_spot"], 0.0)
+    out["jumps"] = U.jump_loop(jumper, s4.frame_start, s4.frame_end)
+
+    class _St:                                       # what U.bounce needs of a Stage
+        pass
+    st = _St()
+    st.v, st.film = v, film
+
+    def key(ob, path, frame, value):
+        setattr(ob, path, value)
+        ob.keyframe_insert(path, frame=frame)
+    st.key = key
+    out["bounce"] = U.bounce(st, s4, U.COUNTER_BOUNCE)
+    for ch_, shot in ((dad, s2), (steve, s2), (kid, s3), (jumper, s4)):
         for other in film.shots:
             ch_.show(other.frame_start, other is shot)
     film.finalize()
@@ -92,7 +116,7 @@ def frames_of(b, name):
 
 def main(argv):
     b = build()
-    frames = [f for n in ("wall", "push", "bed") for f in frames_of(b, n)]
+    frames = [f for n in ("wall", "push", "bed", "down") for f in frames_of(b, n)]
     if "--child" in argv:
         print("DIGEST", digest(prints(b, frames), frames), flush=True)
         return 0
@@ -112,6 +136,26 @@ def main(argv):
     fb = frames_of(b, "bed")
     still = [f for f in fb[1:] if f > b["bed"]["end"] + 1 and a[f] != a[f - 1]]
     ok("bed: no change once the bounce has died out", not still, "%s" % still)
+    fd = frames_of(b, "down")
+    jumping = [f for f in fd[1:] if a[f] != a[f - 1]]
+    ok("down: the frames change while the camera slides and Steve jumps (%d of %d)" % (len(jumping), len(fd) - 1),
+       len(jumping) >= len(fd) - 2)
+    # the see-through ceiling and the bounce light are in the fingerprint: take them away and the frame differs
+    f = fd[len(fd) // 2]
+    scene = b["film"].scene
+    for ob in b["v"].cutaways["ug_ceiling"]:
+        ob.animation_data_clear()
+        ob.visible_camera = True
+    seen = prints(b, [f])[f]
+    ok("down: the see-through ceiling (visible_camera keys) is in the fingerprint", seen != a[f])
+    bo = b["bounce"]
+    bo.animation_data_clear()
+    bo.hide_render = True
+    gone = prints(b, [f])[f]
+    ok("down: the shot-local bounce light (hide_render keys) is in the fingerprint", gone != seen)
+    fb2 = frames_of(b, "bed")[0]
+    bo.hide_render = True
+    ok("the bounce light is not in another shot's frames", prints(b, [fb2])[fb2] == a[fb2])
     b2 = build()
     a2 = prints(b2, frames)
     ok("built again in this process: identical fingerprints", a2 == a,
