@@ -145,6 +145,17 @@ def main(argv):
                   "feet (%.2f, %.2f, %.2f)  blocked %s%s" % (
                       n, x, y, top, bot, face, off, d.length, *tuple(c.root.matrix_world.translation),
                       first_hit(scene, dg, cp, eye, own=_own(c)) or "clear", extra))
+        for label, obs in st.heroes.get(sname, ()):          # st.hero's boxes: their projected corners
+            xs, ys = [], []
+            for ob in obs:
+                if getattr(ob, "type", None) != "MESH" or ob.hide_render:
+                    continue
+                for corner in ob.bound_box:
+                    x, y, _ = proj(cam, ob.matrix_world @ Vector(corner))
+                    xs.append(x)
+                    ys.append(y)
+            if xs:
+                print("  hero %-20s x %5.1f..%5.1f  y %5.1f..%5.1f" % (label, min(xs), max(xs), min(ys), max(ys)))
         pts = wall_points(C, f)
         for spec in (args.pts or "").split(";"):
             if spec.strip():

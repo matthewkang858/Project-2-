@@ -3,9 +3,19 @@
 cl22_dusk, cl23_legday. One function per shot; the contract is in films/legday_common.py (tags "cl...", C.actor,
 C.cam, C.lights, st.use / st.hero).
 
-STATUS: STUBS written by the lead (the SHARED cameras, the climbers placed and climbing, the anvils in their hands)
-so the film builds and renders end to end. Every docstring carries the beat, its words with their frames, what must
-be seen on which word, the neighbours, the risks and the measured notes. The acting is yours.
+STATUS: SHOT by the climb director (after the lead's stubs). The four shots are two set-ups, each made once and
+repeated at dusk frame for frame:
+  cl11 / cl22  CLIMB_CAM, a crane riding up with the four from the road south-east of them (24 mm, rising from 3 to
+               10 blocks and backing off east while it pans to the shelf), the four staggered 1.6 steps apart in a
+               diagonal across the frame (CLIMBERS), each looking up the stair (LOOK_AHEAD), an anvil in every right
+               hand; by "wall" / "dark" the shelf with its planks and anvils has come in at the upper right.
+  cl12 / cl23  LEGS_CAM, low on their right side 28 degrees behind square, tracking up the stair at 92 % of their
+               pace (25 mm f/2.4): Kai's legs big in their stride at the left, Steve's legs a step above and ahead,
+               the anvils in their right hands on the camera's side, the treads sliding down past them.
+Every shot of the sequence moves on frame 1 (the walks are at speed from the first frame, the cameras linear) and
+has no handheld (the repeats; see below). tools/legday_climb_check.py (this sequence's own: the repeats with every
+climber and the camera, legs, feet on the treads, nobody in a block or topping out) passes; tools/legday_climb_probe.py
+measures the heroes per frame without rendering; tools/legday_climb_still.py renders staging / camera variants.
 
 WHY ONE SEQUENCE FOR BOTH SKIES: cl22 / cl23 must be recognised as cl11 / cl12 again ("Keep lens, height and step
 count identical and change only the light": the story's risk). One director makes both, from ONE camera each
@@ -13,8 +23,8 @@ count identical and change only the light": the story's risk). One director make
 stays ONE constant used by both of its shots) and ONE staging function each (_climb, _legs below): the dusk shots
 call the same function with the same constants. Change a constant and both change together.
 MEASURED ON THE STUB (tools.legday_palette, the heroes): cl11 704 the climbers x 27-47 %, y 23-29 % (inside; small
-and bunched, 1.3 steps apart); cl12 755 the legs x 1-55 %, y 12-98 % (Kai, the nearer, fills the lower frame: TO
-FIX, by the staging or LEGS_CAM).
+and bunched, 1.3 steps apart); cl12 755 the legs x 1-55 %, y 12-98 % (Kai, the nearer, fills the lower frame).
+BOTH FIXED: see each shot's NOW and MEASURED.
 
 THE PLACE (films/legday_set.py, "THE ANVIL WALL"): the wall's road face (x = -1) looks EAST into the morning sun; the
 stair: 18 stone-brick stairs on the road face at its south end, ascending north, step k at (-1, 27 + k, k), the top
@@ -47,7 +57,8 @@ THE REPEATS (after review): each walk is planned over a FIXED length (CLIMB_FRAM
 THE ANVILS IN HAND: whole in the morning (C.carry_anvil(p)), CHIPPED at dusk (C.carry_anvil(p, dusk=True)): the
   dusk anvils are the same ones that fell (legday_common THE CHIPPED ANVILS); the shelf's dusk set is chipped too.
 TAGS (twins): steve / kai / zuri / ari _cl (cl11), _cl2 (cl12), _cl3 (cl22), _cl4 (cl23): each holds an anvil
-  (C.carry_anvil), placed on its shot's first frame (no pre-roll).
+  (C.carry_anvil), placed where its walk starts: on its shot's first frame or a few frames before it (the
+  stride lead of CLIMBERS / LEGGERS: a pre-roll, allowed, since no twin of this sequence is in any other shot).
 LIGHT: C.lights(s, "gold" | "dusk", near=(-1.0, 40.0, 8.0), radius=26.0) (the stair's lanterns and the face's).
 PREVIEW samples for render.py previews: 7 (legday_common.PREVIEW_SAMPLES).
 """
@@ -63,12 +74,12 @@ from films import legday_set as LS
 # tools.legday_state checks that cl22 = cl11 and cl23 = cl12, cameras included, frame for frame).
 # CLIMB_CAM (cl11 = cl22): a CRANE that rides up with the four from the road, south-east of them, low at first (3
 #   blocks up, the stair's foot and the road edge in the frame's bottom corner), rising to 10 and backing off east
-#   to 11 as it pans from the climbers to the shelf (planned over CLIMB_FRAMES: by "wall" the shelf with its planks
-#   and anvils has come in at the right, against the sky). 24 mm. Looking north-west (the sun 135 degrees off the
-#   axis: the face lit, the climbers' shadows to their left on it, the risers in shade). The four keep their
+#   to 12.5 as it pans from the climbers to the shelf (planned over CLIMB_FRAMES: by "wall" the shelf with its planks
+#   and anvils has come in at the right, against the sky; Steve, the last, stays inside the safe area). 24 mm.
+#   Looking north-west (the sun 135 degrees off the axis: the face lit, the risers in shade). The four keep their
 #   stagger across the frame (a diagonal from lower left to upper right) the whole shot: the lead's b11 looked
 #   along the stair and stacked them (1.3 steps apart, 23-29 % high).
-CLIMB_CAM = dict(pos=(6.5, 26.5, 3.0), target=(-0.5, 32.5, 6.5), pos1=(11.0, 33.0, 10.0), target1=(0.0, 45.0, 14.5),
+CLIMB_CAM = dict(pos=(6.5, 26.5, 2.8), target=(-0.5, 32.5, 6.2), pos1=(12.5, 31.5, 10.0), target1=(0.0, 46.0, 15.0),
                  lens=24.0, fstop=4.0)
 CLIMB_FOCUS = "kai"           # the focus rides on this climber's head (the second of the four: the group's middle)
 # LEGS_CAM (cl12 = cl23): low on their right side, 28 degrees behind square (looking west-north-west, 5 degrees
@@ -82,7 +93,7 @@ LEGS_CAM = dict(pos=(3.55, 30.10, 5.75), target=(-0.5, 32.25, 5.35), pos1=(3.55,
                 target1=(-0.5, 37.42, 10.52), lens=25.0, fstop=2.4)
 LEGS_CAM_FRAMES = 45
 LOOK_AHEAD = (6.0, 2.5)       # every climber looks up the stair: at a point 6 blocks ahead, 2.5 above his eyes
-#                               (about 23 degrees up), keyed once on the shot's first frame (no ease)
+#                               (about 23 degrees up), keyed once where his walk starts (no ease) and held
 # NO HANDHELD IN THE REPEATS: engine.shots draws the handheld drift from FILM time (frame / fps), so the same seed
 # gives another drift 700 frames later (measured: 5.6 mm and 8.7 mm apart). The moves carry the life (linear: at
 # speed on frame 1), planned per frame so a 70- and a 73-frame shot share their first 70 frames.
@@ -90,15 +101,22 @@ CLIMB_SEED = 31               # (kept for a director who adds a drift of his own
 LEGS_SEED = 47
 CLIMB_PACE = 3.0              # blocks / s HORIZONTAL up the stair: one step every 8 frames (the story: never under
 #                               7); walked along the slope-1 ramp at CLIMB_PACE * sqrt(2) (legs about +-68 degrees)
-CLIMBERS = (("steve", 3.0), ("kai", 4.6), ("zuri", 6.2), ("ari", 7.8))   # (role, step: y = 27 + step) on the
-#                                                       shot's first frame, 1.6 apart (2.3 blocks along the stair: four
-#                                                       figures, never a clump): Ari reaches step 17.3 (of 17.7) on
-#                                                       CLIMB_FRAMES, nobody tops out inside cl22's 73 frames
+CLIMBERS = (("steve", 3.0, 0), ("kai", 4.6, 9), ("zuri", 6.2, 3), ("ari", 7.8, 6))   # (role, step: y = 27 + step
+#                                                       on the shot's first frame, stride lead in frames): 1.6 steps
+#                                                       apart (2.3 blocks along the stair: four figures, never a
+#                                                       clump); Ari reaches step 17.3 (of 17.7) on CLIMB_FRAMES,
+#                                                       nobody tops out inside cl22's 73 frames. THE STRIDE LEAD: every
+#                                                       walk started on the shot's first frame starts at the same
+#                                                       point of the leg cycle (engine.players: legs at full swing),
+#                                                       so the four climbed IN LOCKSTEP, a drill team; each walk now
+#                                                       starts `lead` frames before the shot (a pre-roll: these twins
+#                                                       are in no shot before), 0 / 9 / 3 / 6 of the 13.3-frame cycle
 CLIMB_FRAMES = 76             # the length every climb walk is planned for (>= cl22's 73): cl11 = cl22's first 70
-LEGGERS = (("steve", 5.6), ("kai", 4.4))       # cl12 / cl23: the camera tracks up the stair beside them (LEGS_CAM,
-#                                                0.4 block/s slower): Steve 2.0 steps ahead of the lens, his legs in
-#                                                the frame's middle all along; Kai 1.2 behind him, entering the frame
-#                                                beside the lens by "leg" (+16)
+LEGGERS = (("steve", 5.6, 4), ("kai", 4.4, 11))     # cl12 / cl23: Steve, Kai 1.2 steps behind him. The stride
+#                                                leads put BOTH at full swing on "leg" (+16) and "day" (+22) (the
+#                                                cycle is 13.3 frames: full swing at lead + t = 0, 6.7, 13.3, 20,
+#                                                26.7: with no lead both words fell on closed legs, 16.7 and 23.3),
+#                                                Kai half a cycle off Steve (his other leg forward: not in step)
 LEGS_FRAMES = 48              # the length of the legs walk (>= 45)
 
 
@@ -126,26 +144,30 @@ def _on_treads(p, f0, f1):
 
 
 def _climbers(C, s, tag, cast, frames, dusk):
-    """Players of `cast` [(role, step)] placed on the stair at their steps on s's first frame, an anvil in hand
+    """Players of `cast` [(role, step, lead)] on the stair at their steps on s's first frame, an anvil in hand
     (chipped at dusk: C.carry_anvil), climbing at CLIMB_PACE (horizontal) over a walk planned for `frames` frames
-    (a constant: the gold shot and its dusk repeat get the same walk), at speed on both ends, their feet on the
-    treads (_on_treads) for the shot's frames. Returns them."""
+    after the first (a constant: the gold shot and its dusk repeat get the same walk), at speed on both ends, looking
+    up the stair (LOOK_AHEAD), their feet on the treads (_on_treads). Each walk starts `lead` frames BEFORE the shot,
+    that much lower on the stair (a pre-roll: these twins are in no other shot), so that each is at his own point of
+    the leg cycle on the first frame (see CLIMBERS). Returns them."""
     f0, f1 = s.frame_start, s.frame_end
     top = LS.STAIR_Y0 + LS.STEPS - 0.3
     out = []
-    for role, step in cast:
+    for role, step, lead in cast:
         p = C.actor(role, tag)
-        y0 = LS.STAIR_Y0 + step
+        y0 = LS.STAIR_Y0 + step                                 # where he is on the shot's first frame
+        ys = y0 - CLIMB_PACE * lead / 24.0                      # where his walk starts, `lead` frames before it
         y1 = y0 + CLIMB_PACE * frames / 24.0
         if y1 > top:
             raise ValueError("%s_%s would top out (step %.1f): lower his start" % (role, tag, y1 - LS.STAIR_Y0))
-        a, b = (-0.5, y0, _ramp_z(y0)), (-0.5, y1, _ramp_z(y1))
-        p.place(f0, a, LC.yaw_to(a, b))
+        a, b = (-0.5, ys, _ramp_z(ys)), (-0.5, y1, _ramp_z(y1))
+        fs = f0 - int(lead)
+        p.place(fs, a, LC.yaw_to(a, b))
         C.carry_anvil(p, dusk=dusk)
-        eye = LS.stair_z(y0) + p.eye_height
-        p.look_at(f0, (-0.5, y0 + LOOK_AHEAD[0], eye + LOOK_AHEAD[1]), ease=0)    # up the stair, held
-        p.walk(f0, [a, b], speed=CLIMB_PACE * 2 ** 0.5, ramp=(False, False))
-        _on_treads(p, f0, f1)
+        eye = LS.stair_z(ys) + p.eye_height
+        p.look_at(fs, (-0.5, ys + LOOK_AHEAD[0], eye + LOOK_AHEAD[1]), ease=0)    # up the stair, held
+        p.walk(fs, [a, b], speed=CLIMB_PACE * 2 ** 0.5, ramp=(False, False))
+        _on_treads(p, fs, f1)
         out.append(p)
     return out
 
@@ -166,7 +188,7 @@ def _climb(st, s, C, tag, sky):
     """cl11 and cl22: CLIMB_CAM, the four climbers, the lights of the sky."""
     cl = _climbers(C, s, tag, CLIMBERS, CLIMB_FRAMES, dusk=(sky == "dusk"))
     st.use(s, *cl)
-    focus = [p for p, (role, _step) in zip(cl, CLIMBERS) if role == CLIMB_FOCUS][0]
+    focus = [p for p, (role, _step, _lead) in zip(cl, CLIMBERS) if role == CLIMB_FOCUS][0]
     _repeat_cam(C, s, CLIMB_CAM, CLIMB_FRAMES, focus=focus.head)
     st.hero(s, "climbers", *cl)
     C.lights(s, sky, near=(-1.0, 40.0, 8.0), radius=26.0)
@@ -218,8 +240,13 @@ def cl11_climb(st, s, C, nar):
       In the first stub Steve (step 3.75, walking at a quarter pace) was cut by the left edge on 704. If you need
       another camera for this shot, it changes cl22 too: say so in your result (a shared camera).
     THE PACE (the review): a step every 8 frames (CLIMB_PACE 3.0), not 29: see the module docstring.
-    NOW (stub): CLIMB_CAM (b11 + a slow linear creep), the four from steps 4.0 / 5.3 / 6.6 / 7.9 climbing a step every 8 frames
-      (anvils whole: the morning). Hero: the climbers.
+    NOW: CLIMB_CAM, a crane from the road south-east of the stair (24 mm f/4, from (6.5, 26.5, 2.8) rising and
+      backing off to (12.5, 31.5, 10) at a constant rate, its aim panning from the climbers to the shelf's south
+      end; focus riding on Kai's head). Steve, Kai, Zuri, Ari from steps 3.0 / 4.6 / 6.2 / 7.8 (1.6 apart: a
+      diagonal across the frame from lower left to upper right), a step every 8 frames from frame 1, each looking up
+      the stair (LOOK_AHEAD), a whole anvil in every right hand (the morning). The shelf comes in at the upper right
+      from "up" (717): eight anvils on their planks against the sky by "wall" (723). Hero: the climbers.
+      MEASURED_CL11
     """
     _climb(st, s, C, "cl", "gold")
 
@@ -247,9 +274,14 @@ def cl12_legday(st, s, C, nar):
     MEASURED (the set builder, out/test/legday_set_b12_legs[_zones].png): beside the stair's open east edge at knee
       height, 24 mm: Steve's legs and anvil climbing past the lens; Kai below, out of frame at that instant (he must
       come in: start him nearer).
-    NOW (stub): LEGS_CAM tracking up the stair with them (linear), focus on Steve's leg, Steve from step 5.6
-      (2 ahead of the lens), Kai from 4.4 (entering beside the lens by "leg"), a step every 8 frames. Hero: the
-      legs.
+    NOW: LEGS_CAM, low on their right side 28 degrees behind square (25 mm f/2.4 from (3.55, 30.1, 5.75), 4.6
+      blocks off, 5 degrees down), TRACKING up the stair at 92 % of their pace so they gain half a block on it;
+      focus on Steve's right leg. Steve from step 5.6, Kai 1.2 steps behind him (4.4), a step every 8 frames from
+      frame 1, legs swinging 66 degrees, each looking up the stair, a whole anvil in each right hand on the camera's
+      side. Kai's legs big in their stride at the left, Steve's legs a step above and ahead, the lit treads and
+      shaded tread fronts sliding down past them; on "leg" (755) .. "day" (761) both pairs mid-stride. Hero: the
+      legs (both pairs).
+      MEASURED_CL12
     """
     _legs(st, s, C, "cl2", "gold")
 
@@ -284,7 +316,12 @@ def cl22_dusk(st, s, C, nar):
       edge, the lever at the wall top's north end): the story's "on top the narrator waits by the lever" is carried by
       tp24 (the lever at dusk); the shared camera stays. (He could stand at the wall top's front edge to be seen, but
       that is not "by the lever".)
-    NOW (stub): _climb exactly as cl11 under the dusk lights (1.4), the anvils in hand chipped. Hero: the climbers.
+    NOW: _climb exactly as cl11 (CLIMB_CAM, CLIMBERS, LOOK_AHEAD; the first 70 frames are cl11's, the camera
+      included: tools/legday_climb_check) under the dusk lights (1.4): the face lanterns over the stair glowing, the
+      indigo sky with stars and pink clouds at the upper right, the anvils in hand CHIPPED; the shelf with eight
+      chipped dusk anvils comes in at the upper right from "back" .. "up" (1410-1417) and holds through "dark" (1429).
+      Hero: the climbers.
+      MEASURED_CL22
     """
     _climb(st, s, C, "cl3", "dusk")
 
@@ -305,6 +342,8 @@ def cl23_legday(st, s, C, nar):
     NEIGHBOURS: before, cl22_dusk; after, tp24_reloading (the wall top at last light: the film's last shot).
     MEASURED (the set builder, out/test/legday_set_b23_legs[_zones].png): the same set-up in lantern light; palette
       passes.
-    NOW (stub): _legs exactly as cl12 under the dusk lights, the anvils chipped. Hero: the legs.
+    NOW: _legs exactly as cl12 (LEGS_CAM, LEGGERS; all 45 frames are cl12's, the camera included:
+      tools/legday_climb_check) under the dusk lights (1.4), the anvils in hand CHIPPED. Hero: the legs.
+      MEASURED_CL23
     """
     _legs(st, s, C, "cl4", "dusk")

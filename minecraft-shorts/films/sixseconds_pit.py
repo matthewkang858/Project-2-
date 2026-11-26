@@ -140,7 +140,8 @@ PUFF10 = (2.4, 4.85, 0.0)
 BRUTE10 = (3.5, 5.95, 0.0)
 CAM10 = dict(pos=(6.8, -1.5, 3.0), target=(3.7, 6.6, -0.4), lens=26.0, fstop=3.2,
              pos1=(6.62, -1.15, 2.95), target1=(3.7, 6.6, -0.4))
-DROPS10 = (("golden_boots", (4.6, 5.6, 0.0)), ("iron_pickaxe", (3.1, 4.3, 0.0)))    # the boots clear of him and the puff
+DROPS10 = (("golden_boots", (4.6, 5.6, 0.0)),        # his drops: the boots clear of him and of the puff,
+           ("iron_pickaxe", (3.1, 4.3, 0.0)))        # the pickaxe under the puff
 AXE_DOWN = 600             # "turned" 601: the axe comes down to rest (the target is gone)
 
 # ---- pt20: the older world. Four piglins on the pit floor, an ingot stack lying in the pit; each admire runs out in
@@ -220,7 +221,8 @@ def pt05_boots(st, s, C, nar):
       + _zones; palette out/test/sixseconds_pal_pt05_boots_318.png): boots x 27.7-70.1 %, y 43.1-58.9 % (BOOT_FRAME x
       27-71, y 42-59: the same box as br11); the piglins' heads behind his arms (as the lead measured: the reason for
       rw05). Preview 282-321 looked at frame by frame: the boots enter from the left on 282-288, stop on 300, still
-      301-321. PALETTE: see the result line at the end of this docstring.
+      301-321. Palette (318): every check passes: gold hue 44, s 0.81; piglin skin s 0.57; Steve's shirt hue 173;
+      the boots 100 % in the safe area.
     NEIGHBOURS: before, gt04_runin (he sprints at the lens through the gateway); after, rw05_family.
     """
     f0 = s.frame_start
@@ -260,7 +262,9 @@ def pt06_dig(st, s, C, nar):
       x 21.6 %, y 41.7 %; the falling piglins cross x 47-80 %, y 25-64 %; in the pit at 427 their heads x 29-65 %,
       y 42-61 % (piglin_pt1's head bottom 60.8 %); closest approach between two piglins 0.91 block (in the air), to
       the runner 1.47. The lure at x 52 %, y 54 % until it is taken. The bottom of the frame (y > 62 %) is the empty
-      floor before the pit: the shared camera.
+      floor before the pit: the shared camera. Palette (427): passes (the runner x 15-34 %, y 36-45 %, gold hue 44,
+      shirt hue 174). Still out/test/sixseconds_pit_pt06_dig_410.png (+ _zones): one in the pit with the lure, one
+      falling, one running in.
     NEIGHBOURS: before, rw05_family (the brothers at the gold); after, pt07_pearl (above his shoulder into the pit).
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -322,7 +326,9 @@ def pt07_pearl(st, s, C, nar):
       x 30-81 %, y 34-58 % (pt2 42 / 42, xbow_pt3 61 / 38, pt1 72 / 49 eyes), faces 83-90 px, 15-49 degrees off the
       lens; the runner's head at the left edge (x -5..28 %: the over-the-shoulder); the pearl rises from piglin_pt2's
       hands and rests at x 40 %, y 48 % (pt08's own frame has it at x 62-81 %: the lead's x 83 % is gone). The
-      admired ingots are small from this height: the pose (bowed head, raised left arm) carries the stare.
+      admired ingots are small from this height: the pose (bowed head, raised left arm) carries the stare; the gold
+      in his own hand is the big gold of the frame. Palette (476): passes (hero piglin x 38-51 %, y 36-48 %, skin
+      s 0.60). Still of record: out/test/sixseconds_pit_pt07_pearl_478.png (+ _zones): the pearl in the air.
     NEIGHBOURS: before, pt06_dig; after, pt08_gravel (a time skip: the pile has come back meanwhile).
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -394,7 +400,8 @@ def pt08_gravel(st, s, C, nar):
       first try).
     MEASURED (geo pt08_gravel:540 --boots; stills out/test/sixseconds_pit_pt08_gravel_513.png, _545; probe): boots
       x 45-66 %, y 41-55 %; the pile x 8-44 %, y 43-57 %; the pearl x 62-81 %, y 46-55 %; his head above the top
-      (y -5..18 %: under the top icons). Preview 511-559 looked at.
+      (y -5..18 %: under the top icons). Preview 511-559 looked at: the lobs cross in front of his shins (518, 527).
+      Palette (540): passes (hero boots x 47-65 %, y 42-53 %, 100 % in the safe area; shirt hue 173).
     NEIGHBOURS: before, pt07_pearl; after, pt09_axe (the brute charges from the gateway).
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -443,11 +450,12 @@ def pt09_axe(st, s, C, nar):
       on 596, so the cut on 597 is in the air. The runner at rim_w (iron pickaxe), idle, head on the pit, until the
       blow. The three in the pit admiring (PIT_AT), the pile and the pearl at his feet (from pt08). Hero: the brute.
     MEASURED (geo pt09_axe:580 / :594; probe pt09_axe:560-596 --near; preview 560-596 looked at frame by frame;
-      palette out/test/sixseconds_pal_pt09_axe_580.png): the brute's head x 57-72 %, y 28-33 % (face 52-58 px,
-      25-34 degrees off the lens: three-quarter), x 2.51 the blackstone; the runner's eyes x 45 % -> 26 % on 594 (in
+      still out/test/sixseconds_pit_pt09_axe_591.png (+ _zones); palette out/test/sixseconds_pal_pt09_axe_582.png):
+      the brute's head x 57-72 %, y 28-33 % (face 52-58 px, 25-34 degrees off the lens: three-quarter), x 2.16 the
+      blackstone; the runner's eyes x 45 % -> 26 % on 594 (in
       the air, red); the pit piglins' heads x 56-86 %, y 49-62 % (the lead's y 59-81 % / off the right edge is gone;
       piglin_xbow_pt3's head reaches x 86 %: a background figure); brute and runner 1.39 apart at the blow, never
-      closer. Piglin skin s 0.61 (limit 0.62).
+      closer. Piglin skin s 0.62 (AT the limit 0.62, as the lead measured here: the pit lantern x 2 is in).
     NEIGHBOURS: before, pt08_gravel; after, pt10_smoke (the same angle, pulled back).
     """
     f0, f1 = s.frame_start, s.frame_end
@@ -503,8 +511,9 @@ def pt10_smoke(st, s, C, nar):
       at his right; the gravel pile and the pearl still at the rim (one entity each since pt08 / pt07); the three in
       the pit over their ingots. Hero: the brute.
     MEASURED (geo pt10_smoke:620; probe pt10_smoke:597-654; preview 597-667 looked at; palette
-      out/test/sixseconds_pal_pt10_smoke_620.png): the brute's head x 33-49 %, y 31-38 % (face 55 px), x 2.57 the
-      blackstone; the pit piglins' heads x 58-82 %, y 45-54 % (above the caption band: the lead's y 59-71 % is gone);
+      out/test/sixseconds_pal_pt10_smoke_620.png; still out/test/sixseconds_pit_pt10_smoke_614.png + _zones): the
+      brute's head x 33-49 %, y 31-38 % (face 55 px), x 2.52 the blackstone; the pit piglins' heads x 58-82 %,
+      y 45-54 % (above the caption band: the lead's y 59-71 % is gone);
       the boots x 54-62 %, y 47-52 %; the pickaxe x 20-30 %, y 50-54 %; the puff left of the brute (x 3-31 %).
     NEIGHBOURS: before, pt09_axe; after (out of black), br11_boots on the bridge of another world.
     """
@@ -546,10 +555,11 @@ def pt20_likes(st, s, C, nar):
       again. The results come to rest about 1302, 1316, 1326, 1340 ("everyone" 1319 .. "gold" 1334). The runner at
       rim_w with gold in his hand, idle (Player.idle). No brute; the north side, where he charged in pt09, is empty.
       Hero: piglin_pt1.
-    MEASURED (geo pt20_likes:1336; probe pt20_likes:1284-1357; still out/test/sixseconds_pit_pt20_likes_1336.png;
-      preview 1290-1357): the four heads x 24-75 %, y 38-61 % (piglin_pt4's, the nearest, y 52-61 %), three of the
-      four ingots catch the light in the pit; the runner's eyes x 21.6 %, y 41.7 %; the results rest at y 54-60 %
-      (x 14-37 %), just above the caption band. The shared camera leaves the bottom third empty floor.
+    MEASURED (geo pt20_likes:1336; probe pt20_likes:1284-1357; stills out/test/sixseconds_pit_pt20_likes_1330.png
+      (+ _zones) and _1336; preview 1290-1357): the four heads x 24-75 %, y 38-61 % (piglin_pt4's, the nearest,
+      y 51-61 %), three of the four ingots catch the light in the pit; the runner's eyes x 21.6 %, y 41.7 %; the
+      results rest at y 54-60 % (x 14-37 %), just above the caption band. The shared camera leaves the bottom third
+      empty floor. Palette (1336): passes (hero piglin x 59-74 %, y 46-53 %; gold hue 44; skin s 0.57).
     NEIGHBOURS: before, gt19_older (the match cut: the runner sprinted through the brute's spot); after, rw21_stare.
     """
     f0, f1 = s.frame_start, s.frame_end

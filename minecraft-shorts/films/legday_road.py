@@ -51,20 +51,37 @@ from engine import fixtures, illagers
 from films import legday_common as LC
 
 # ---------------------------------------------------------------------------------------------------------------
-# this sequence's own cameras (starts: the set builder's suggestions; yours to change)
+# this sequence's own cameras (C.cam(s, None, **CAM)); every one measured with tools.legday_geo and on stills
 # ---------------------------------------------------------------------------------------------------------------
-RD15_CAM = dict(LC._set_cam("b15"), pos1=(4.95, 44.3, 3.9))
-RD16_CAM = dict(LC._set_cam("b16"), pos1=(3.0, 42.4, 0.45))
+# beat 15: on the meadow's east verge, 13 blocks short of the captain and 22 degrees off the file's line, 40 mm:
+# the five read as five (the 85 mm from 28 blocks stacked them into one shape), a slow creep back and a pan with them
+RD15_CAM = dict(pos=(5.8, 59.4, 3.0), target=(0.6, 75.2, 3.55), pos1=(6.0, 58.6, 2.95), target1=(0.5, 73.6, 3.4),
+                lens=40.0, fstop=2.8)
+# beat 16: low on the east half of the road ahead of the runners (the wall and its stair on the right), 28 mm,
+# tracking back as they come (at speed on the first frame, slowing)
+RD16_CAM = dict(pos=(2.2, 43.3, 0.28), target=(1.2, 33.5, 1.0), pos1=(2.4, 45.2, 0.3), target1=(1.3, 35.0, 1.05),
+                lens=28.0, fstop=2.8)
 RD19_CAM = LC._set_cam("b19")                    # LOCKED (the story): only the tiniest handheld
 RD20_CAM = dict(pos=(3.7, 45.3, 0.6), target=(1.45, 49.65, 0.3), pos1=(2.75, 47.65, 0.42), target1=(1.45, 49.65, 0.3),
                 lens=35.0, fstop=2.8)            # a push in to the banner and the bottle (the set's b20, re-aimed on the
 #                                                  lead's drop spots: PLACES banner_spot / bottle_spot)
-RD21_CAM = dict(LC._set_cam("b21"), pos1=(4.1, 45.75, 0.3))
+# beat 21: low, 3.5 blocks south-south-east of steve_among_anvils, 22 mm, looking up the face: Steve big at the
+# lower left, the narrator at narrator_edge above him against the sky; a slow push in
+RD21_CAM = dict(pos=(2.93, 43.73, 0.3), target=(-0.49, 53.13, 4.67), pos1=(2.78, 44.05, 0.32),
+                target1=(-0.45, 53.13, 4.6), lens=22.0, fstop=4.0)
 # the release word ("back" 1169) and the captain's landing y (49.6) are the LEAD'S: legday_common RELEASE /
 # CAPTAIN_LAND_Y (the patrol clock of rd15, tp18 and rd19 hangs on them): C.release_frame(), C.land_frame()
-RUNNERS = (("steve", (1.0, 29.2), (1.0, 39.2)), ("kai", (2.3, 27.7), (2.3, 37.7)),
-           ("zuri", (0.35, 26.7), (0.35, 36.7)))          # (role, from, to): staggered 1.3 sideways, 1.5-2.5 back
-ARROWS_16 = ((0.35, 41.0), (1.15, 41.4), (2.0, 40.8))     # three arrows into the road in front of the runners
+
+# beat 16: the three runners, sprinting at speed from the first frame (ramp in False) and letting go of the sprint
+# key on RELEASE16 (the game's ground friction then stops them dead in about 3 ticks: 0.34 block of slide). Their
+# stops are staggered 1.1 sideways and 1.1 / 2.1 back (the CONTRACT: 0.7 block at least, or two runners read as
+# one two-headed shape). (role, x, y where they stand still, frame the sprint key is let go, from "them")
+RUNNERS = (("steve", 1.6, 39.0, -1), ("kai", 2.7, 37.9, 1), ("zuri", 0.55, 36.9, 2))
+SPRINT_TICK = 5.612 / 20.0                        # engine.players SPRINT_SPEED in blocks per game tick
+SLIDE = SPRINT_TICK * 0.546 / (1.0 - 0.546)       # the slide to a halt after the key is let go (GROUND_FRICTION)
+# three arrows from the patrol up the road (north) into the road 1.15 in front of each runner's stop, on "them"
+# (-2, 0, +1): (dx, dy from the runner's stop, frame offset from "them")
+ARROWS_16 = ((-0.1, 1.15, -2), (0.1, 1.1, 0), (-0.05, 1.15, 1))
 ARROW_DOWN = (0.05, -0.55, -0.83)                         # from the patrol to the north, down into the road
 
 
@@ -99,11 +116,17 @@ def rd15_pillagers(st, s, C, nar):
     NOW (stub): RD15_CAM (+ a creep), C.march_patrol("rd15") (the clock). Hero: the captain.
     """
     f0, f1 = s.frame_start, s.frame_end
-    pat = C.march_patrol("rd15")
+    pat = C.march_patrol("rd15")                  # THE PATROL CLOCK: marching since 757 (positions untouched here)
+    cap = pat[0]
+    cam = RD15_CAM["pos"]
+    # the captain's eyes find the lens on "pillagers" (a patrol mob's random look-around), and stay on it
+    cap.look_at(C.at(s, "pillagers") - 5, cam, ease=8)
+    cap.track(C.at(s, "pillagers") + 3, f1, cam, step=4, ease=2)
     st.use(s, *pat)
-    C.cam(s, None, focus=pat[0].head, **RD15_CAM)
-    st.hero(s, "captain", pat[0])
-    C.lights(s, "gold", near=(0.5, 60.0, 1.0), radius=12.0)
+    C.cam(s, None, focus=cap.head, **RD15_CAM)
+    st.hero(s, "captain", cap)
+    st.hero(s, "the file", *pat[1:])
+    C.lights(s, "gold", near=(0.5, 66.0, 2.0), radius=14.0)
 
 
 def rd16_punch(st, s, C, nar):
@@ -132,20 +155,39 @@ def rd16_punch(st, s, C, nar):
       Steve.
     """
     f0, f1 = s.frame_start, s.frame_end
-    runners = []
-    for role, a, b in RUNNERS:
+    them = C.at(s, "them")
+    look_n = (0.6, 66.0, 2.6)                     # up the road: the patrol (behind the lens)
+    runners, stops = [], []
+    for role, x, y, off in RUNNERS:
         p = C.actor(role, "rd")
-        pa, pb = C.stand(a), C.stand(b)
-        p.place(f0, pa, LC.yaw_to(pa, pb))
-        p.walk(f0, [pa, pb], sprint=True, ramp=(False, True))
+        release = them + off
+        run = SPRINT_TICK * (release - f0) / 1.2 + SLIDE      # sprinting from f0, the key let go on `release`
+        a, b = C.stand((x, y - run)), C.stand((x, y))          # (south of the strip: the World has no anvils here)
+        p.place(f0, a, LC.yaw_to(a, b))
+        p.look_at(f0, (x, y + 8.0, 1.4), ease=0)               # eyes up the road
+        p.walk(f0, [a, b], sprint=True, ramp=(False, True))
         runners.append(p)
-    runners[0].raise_arm(f0, angle=70.0, ease=4)
-    hit = C.at(s, "them")
-    for i, (x, y) in enumerate(ARROWS_16):
-        C.stuck_arrow(s, (x, y, 0.0), ARROW_DOWN, frame=hit - 2 + 2 * i, scale=1.25)
+        stops.append((b, release))
+    steve, kai, zuri = runners
+    # Steve punches the air as he runs (a player's attack swing; the game has no raised-fist pose): one swing
+    # every 8-9 frames, the last ON "punch"; Kai swings once with him on "punch"
+    punch = C.at(s, "punch")
+    for f in (punch - 26, punch - 17, punch - 8, punch):
+        steve.attack(f)
+    kai.attack(punch + 1)
+    # three arrows thud into the road just in front of them on "them" (they quiver 7 ticks): each runner lets go of
+    # the sprint a frame after his arrow lands and stops dead within 3 ticks, head down to the arrow, then up the
+    # road at the patrol (behind the lens)
+    for p, (b, release), (dx, dy, df) in zip(runners, stops, ARROWS_16):
+        hit = them + df
+        point = (b[0] + dx, b[1] + dy, 0.0)
+        C.stuck_arrow(s, point, ARROW_DOWN, frame=hit, scale=1.25)
+        p.look_at(hit + 1, (point[0], point[1], 0.2), ease=3)
+        p.look_at(release + 6, look_n, ease=6)
     st.use(s, *runners)
-    C.cam(s, None, focus=runners[0].head, **RD16_CAM)
-    st.hero(s, "steve", runners[0])
+    C.cam(s, None, focus=steve.head, **RD16_CAM)
+    st.hero(s, "steve", steve)
+    st.hero(s, "kai and zuri", kai, zuri)
     C.lights(s, "gold", near=(0.5, 36.0, 1.0), radius=12.0)
 
 
@@ -205,6 +247,11 @@ def rd19_drop(st, s, C, nar):
     pat = C.march_patrol("rd19")
     start = C.patrol_clock()["start"]
     cam = RD19_CAM["pos"]
+    # "the captain tips its head up" (the story): on the planks' snap his eyes go up to the anvil over him (the
+    # pillager's head stops at 40 degrees up) and stay there until it lands
+    cap = pat[0]
+    above = cap.pos_at(f_back + 3)
+    cap.look_at(f_back + 1, (above.x, above.y - 1.0, 18.0), ease=5)
     res = illagers.crush_patrol(pat, drops, camera=s, stage=st, knockback=False, village=C.v,
                                 spots=[C.P("bottle_spot"), C.P("banner_spot")], face=cam)
     C.memo["rd_drops"] = list(res.get(pat[0].name, {}).get("items", []))
@@ -308,20 +355,37 @@ def rd21_still(st, s, C, nar):
     """
     f0, f1 = s.frame_start, s.frame_end
     steve = C.actor("steve", "rd2")
-    b = C.P("steve_among_anvils")
-    a = (b[0] + 0.6, b[1] - 2.2, b[2])
-    steve.place(f0, a, LC.yaw_to(a, b))
-    stop = steve.walk(f0, [a, b], speed=2.0, ramp=(False, True))
     efe = C.narrator("rd")
-    C.put(efe, f0, "narrator_edge")
+    b = C.P("steve_among_anvils")                 # (1.45, 46.9): 2.35 short of the banner; z 0 (the World has the
+    b = (b[0], b[1], 0.0)                         # landed anvils on the strip, not here: x 1.45 is the road beside it)
+    still, cheat = C.at(s, "still"), C.at(s, "cheating")
+    # he walks out from the south (from the lens's left, at walking speed on the first frame: a twin not in rd20)
+    # and lets go of the key so that he stands on "still"
+    run = 0.21585 * (still - f0) / 1.2 + 0.2596   # walk 4.317 blocks/s, the slide after the key (engine.players)
+    a = (b[0] - 0.15, b[1] - run, 0.0)
+    steve.place(f0, a, LC.yaw_to(a, b))
+    C.put(efe, f0, "narrator_edge", toward=b)
     efe.look_at(f0, steve.eye_point(f0), ease=0)
-    steve.look_at(f0, (b[0] - 1.0, b[1] + 3.0, 1.0), ease=0)
-    steve.look_at(max(stop - 4, C.at(s, "still")), efe.eye_point(f0), ease=8)
-    steve.look_at(C.at(s, "cheating"), (b[0] - 0.5, b[1] + 1.5, 0.4), ease=8)
-    steve.look_at(C.at(s, "cheating") + 12, (-0.5, 40.0, 4.0), ease=10)
+    steve.look_at(f0, (b[0] - 0.2, b[1] + 6.0, 1.3), ease=0)          # where he walks: the anvils ahead
+    steve.walk(f0, [a, b], ramp=(False, True))
+    # on "still" he looks up at the narrator (the head stops at 35 degrees up: the wall top) and holds it
+    steve.look_at(still - 2, efe.eye_point(still), ease=8)
+    # on "cheating" he turns away: the head down to the anvil beside him, then the body round to the stairs (his
+    # face comes round to the lens: the same turn away as sq10's "He said that's cheating")
+    anvil = (0.5, b[1] + 0.3, 0.6)
+    steve.look_at(cheat - 3, anvil, ease=6)
+    stair = (-0.5, 37.5, 9.0)                    # the stair he carries them back up (step 10 at y 37, z 10)
+    steve.face(cheat + 4, stair, ease=10)
+    steve.look_at(cheat + 4, stair, ease=10)
+    efe.track(f0 + 1, f1, steve, step=4, ease=4)
     items = _drops(st, s, C, "rd21")
     st.use(s, steve, efe)
     C.cam(s, None, focus=steve.head, **RD21_CAM)
+    # the eye goes where Steve looks: the focus racks to the narrator while Steve looks up at him, and back to Steve
+    # before he turns away (engine.shots focus(..., at_s): a 0.5 s pull)
+    s.focus(efe.head, at_s=s.film.seconds(still + 2), rack_s=0.5)
+    s.focus(steve.head, at_s=s.film.seconds(cheat - 9), rack_s=0.4)
     st.hero(s, "steve", steve)
-    C.lights(s, "gold", near=(0.0, 47.0, 6.0), radius=16.0)
+    st.hero(s, "efe", efe)
+    C.lights(s, "gold", near=(0.0, 50.0, 8.0), radius=16.0)
     del items

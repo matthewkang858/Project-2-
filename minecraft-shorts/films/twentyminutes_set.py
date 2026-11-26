@@ -1,4 +1,234 @@
-"""THE SETS OF "TWENTY MINUTES" (stories/ironfarm.json): a film-local set module (docstring written last: see below).
+"""THE SETS OF "TWENTY MINUTES" (stories/ironfarm.json): a film-local set module, built INTO the seed-1 village through
+village.build_village(edit=...) exactly as engine/sets.py builds hello_set. Nothing in engine/ is changed: the whole
+iron farm is engine/towers.py's (built for this film); this file wraps it, adds what the beats need beyond it (beat
+1's flight into house_c, the window cameras of beats 8 / 23 / 24, a platform camera with the sun for beats 9 / 10 /
+24p, the reverse of beat 22, film-only anchors), and proves one camera per beat with a still.
+
+    from films import twentyminutes_set as TS
+    v = TS.build_set(scene)              # = village.build_village(scene, seed=1, edit=TS.twentyminutes_set)
+    P = TS.make_parts(v)                 # P.farm (towers.Farm: every call of the farm at work), P.pod, P.bed2, P.hopper,
+                                         #   P.chest, P.water, P.lava, P.top_step, P.door (house_c's)
+    D = TS.data(v)                       # anchors, paths, parts, cutaways, lights, cameras (the beat's camera first)
+    TS.SKIES                             # the one sky every still was made under (copy into films/twentyminutes.py)
+    TS.CAMERAS["b08w"]                   # dict(pos, target, lens, fstop[, pos1, target1, ease], what, sky, from_)
+    TS.BEAT_CAMERAS[8]                   # ["b08w", "b08"]: the suggested camera of beat 8 first, then alternatives
+
+    $BPY -m films.twentyminutes_set                      # THE SELF-TEST (numbers, about 60 s under load): builds the set,
+                                                         #   stages every beat, checks anchors / cameras / heroes
+    $BPY -m films.twentyminutes_set b09: b11:strip       # stills out/test/twentyminutes_set_<beat>_<what>.png (+ _zones);
+                                                         #   'bNN:' = its main frame, 'bNN:tag' = a tagged frame, 'bNN'
+                                                         #   = every frame it names; ONE build (10-15 s) per command,
+                                                         #   then 80-140 s per 540x960 / 16-sample still on this machine
+                                                         #   under load (one or two per command under `timeout 290`)
+    $BPY -m films.twentyminutes_set b09 --dry            # no render: where every hero lands in the frame, what hides it
+    $BPY -m films.twentyminutes_set b09: --palette       # + tools/palette_check on the still (slow: 60+ s more)
+
+THE SKY (one for the whole film, as the story asks: "golden hour, sun about 27 degrees up ... a Minecraft day is twenty
+minutes, so the sun is truly back in the same place when the narrator grows up")
+    gold  dict(preset="golden", az=62.0, el=27.0, bloom=1.0, grade="warm")   (Blender azimuth: degrees counter-clockwise
+          from east: the sun stands in the north-north-east). Every still of this file and every proof of engine/towers.py
+          was made under it. Why this sun: the pod's villagers face EAST (the zombie's cell) and are lit by it through the
+          glass in every pod shot; the plaza camera looks north-west at the tower with the sun about 85 degrees off its axis
+          (side light); the back of the tower (the dirt zigzag, beat 13) faces it; and from the platform camera of beats 9 /
+          10 / 24p the sun stands at the upper left behind the golem's head: "huge against the gold sky". From inside the
+          pod looking south (beats 17 / 19) it is behind the lens: the village below is lit, the faces front-lit (flat:
+          accepted, the frame is about the two heights). Not tested: any other sky (the story has one).
+
+WHERE EVERY BEAT IS FILMED (Blender blocks: +X east, +Y north, +Z up; ground z 0; the pod's floor top z 10)
+    THE SQUARE (beats 1-4): the plaza east of the well (the well x -3..2, y -3..2); the camera low on the path east of it
+      at (9.3, -0.6), looking north-west over the well at the tower above the roofs (house_c left, house_e right).
+    THE FOOT OF THE TOWER (5 at its front, 12 at the collection niche on its north-west, 13 at the back staircase).
+    THE POD (6-8, 14-24): inside x -23..-19, y 18..22, z 10..11 (2 high), glass ring x -24..-18, y 17..23, glass roof z 12;
+      the zombie cell (-18, 19) in the east wall (the sill (-19, 19, 10) on the pod's floor, open window above it); the
+      gap (-19, 23, 10) under the cobblestone plug (-19, 23, 11) in the back (north) wall; beds along the north row (white
+      (-23, 21..22), white (-22, 21..22), Mom's red (-21, 21..22), the second red bed (-20, 21..22) from beat 21).
+    THE PLATFORM (9-11, 24p): west of the pod, x -28..-25, y 17..23 at z 9 with the water sheet on it; the kill slot x
+      -30..-29 (lava 1.1 under the rim); glass rims on y 16 / 24.
+    THE STAIRCASE (13, 14, 21, 22): ten dirt blocks up the back from (-17, 23, 0) to the top step (-19, 24, 9).
+
+THE HOOK (twentyminutes_set(b)): towers.iron_farm(b) with its defaults (at (-23, 18), floor 10, glass rims, the water
+    sheet), the film's anchors 'tm_*' and paths 'tm_*' (ANCHORS, PATHS, DOOR_PATHS below), and the plants cleared off the
+    ground lines of the film's low cameras and paths. Village.sets['twentyminutes'] = dict(farm (towers' dict),
+    cameras, anchors, paths). The village with the tower is 77,337 faces.
+
+THE PARTS (make_parts(v); towers' own objects: register what a shot shows with the Stage, st.cast[p.name] = p; st.use)
+    P.farm      towers.Farm: zombie_in_cell, golem_spawn / golem_step / golem_slide / golem_death, deliver, strew,
+                break_top_step, climb, bounce, see_through (its docstring is the manual; tools/towers_proof.py and the
+                stage_bNN functions below are worked examples)
+    P.pod       fixtures GlassBox; cutaways tower_pod_north / _east / _south / _west / _roof / _all (Stage.see_through);
+                single panes: P.farm.see_through(st, s, camera, points=[...]) or pod_panes() below (several per line)
+    P.bed2      the second red bed (fixtures Bed, foot (-20, 22), pillow (-20, 21), facing south as Steve places it):
+                REGISTER IT (st.cast[P.bed2.name] = P.bed2) and st.use it in beat 21 and every shot after (built
+                unregistered it is in EVERY shot from frame 1: fixtures.bed without frame= is there from the start);
+                P.bed2.place_at(f) in beat 21 makes it appear on f
+    P.top_step  the breakable top dirt step (-19, 24, 9) (engine.breaking): do NOT register it with the Stage unless
+                you st.use it in every shot that shows it (beats 13, 14, 15, 20, 21, 22): registered, it is hidden in
+                every other shot and the baby of beat 14 floats (that is tools/towers_proof.py's b14 still); unregistered
+                it is there until break_top_step removes it (beat 22) and gone after, which is the film's order
+    P.hopper, P.chest, P.water, P.lava   fixtures; lava: P.lava.level(f, scale), the flicker comes with golem_death
+    P.door      house_c's door (beat 1): v.door_open("house_c", f) / v.door_open("house_c", f, open=False)
+    LIGHTS      Stage.lights(s, scale=1.0, groups=POD_LIGHTS) in every shot (POD_LIGHTS: the pod's lantern
+                'tower_pod' and the cell's wall torch 'tower_cell' at 1.0); the plaza's torches at their own level.
+
+ANCHORS (Village.anchors; towers' as 'tower_<short>' = P.farm.A[short] with P.farm.yaw[short]; the film's as 'tm_<name>')
+    towers' (see engine/towers.py ANCHORS for all): mom (-20.5, 19.5), mom_glass (-20.5, 18.45), baby_glass (-21.4,
+    18.45), bed_side (-20.5, 20.45), bed_beside (-19.5, 21.4: before bed2 only), back_1 (-22.55, 19.4), back_2 (-22.55,
+    20.4), back_3 (-21.6, 18.4), row_1..4 (-22.5 .. -19.5, 20.4), gap_in (-18.5, 22.66), gap_adult (-18.5, 22.3), gap_side
+    (-19.0, 22.66), gap_down / gap_target, watch_22 (-20.3, 20.5), zombie (-17.7, 19.5) + P.farm.zombie_eye (z 11.74),
+    top_step (-18.5, 24.5, 10), top_step_baby (-18.28, 24.42, 10), one_down (-19.5, 24.5, 9), golem_spawn (-26.5,
+    19.5, 10), golem_24 (-25.5, 19.5, 10), square_baby (6.38, 1.16), push_baby (8.9, 6.0), foot_front (-20.5, 16.45),
+    stairs_foot (-15.4, 24.3), poppies (-29.55, 25.4), chest_steve (-27.75, 25.35), pod_target, hopper_target,
+    stairs_target, slot_target. Paths tower_steve_square, tower_steve_past, tower_push_square.
+    the film's (ANCHORS / PATHS / DOOR_PATHS below): tm_baby_square (= square_baby), tm_armorer_from (-5.8, 7.9),
+    tm_shepherd_from (-4.9, 8.8), tm_house_c_door_target (-10.0, 6.5, 2.0); tm_narrator_23 (-20.55, 19.7), tm_mom_23
+    (-20.55, 18.7), tm_librarian_23 (-21.8, 18.75) (beat 23 from the window); tm_watch_22_out (-20.6, 20.45) (beat 22
+    from outside). Paths tm_steve_square (= tower_steve_square), tm_steve_past (= tower_steve_past), tm_flee_armorer /
+    tm_flee_shepherd (from their spots into house_c through its door: the last nodes are the village's own
+    square_to_house_c: the oak-stairs step (-10, 6), the door cell (-11, 6), (-11.9, 6.5, 1.0) inside).
+
+THE CAMERAS (CAMERAS; BEAT_CAMERAS[beat] = the suggested key first). Every one was rendered with its beat staged by
+    stage_<key> below (the film's cast on the anchors, acting as the story says, in film order in one build) at 540x960,
+    16 samples, motion blur, under SKIES["gold"], with the Reels zones drawn: out/test/twentyminutes_set_<key>_<what>
+    [_<tag>].png and _zones.png, and LOOKED AT. "x / y" = where a head lands (% of the frame, from the top-left) on the
+    still's frame (where(): Blender's projection of the eye point).
+    b01   plaza (9.3, -0.6, 0.75) -> (-21.85, 18.65, 1.0), 40 mm f/2.8 (towers 'square' raised 0.2 and panned 3.6 degrees
+          left so house_c's door is in): the baby lower middle in profile from behind (x 48 / y 56), Steve coming at the
+          lens on the right (73 / 41), the armorer and the shepherd running into house_c (13 / 45, 23 / 46: their heads
+          and shoulders over the well's base), the door (10 / 44) shuts behind the second (tag 'door', frame 55), the
+          tower above the roofs (the pod's front y 17 %). Stills _afraid, _afraid_door.
+    b02   towers 'baby_face' (4.69, 2.57, 0.72) -> the baby, 50 mm f/2: its face front three-quarter, the upper half
+          (50 / 44), the plaza soft. Steve's legs cross the lens on tm_steve_past from frame f0 + 6 (they are in the
+          frame only for about 4 frames at 50 mm: time the walk to the word). Still _imnot.
+    b03   towers 'push_square' (3.3, 9.6, 0.65) 18 mm, panning LINEAR from (6.2, 6.0, 0.95) to (3.0, 6.0, 0.95) over 3.5 s
+          (towers' target1 (0.6, 6.0) outran the push, 0.9 blocks/s); Steve shoving Mom (44 / 43: hat brim and nose to
+          the lens); the baby runs in from the left edge. Still _push.
+    b04   the tilt: towers 'square_start' (-> (3.0, 2.5, 0.7)) to b01's framing exactly ((-21.85, 18.65, 1.0) from z
+          0.75), 40 mm: the well's east side and the baby, then the tower above the roofs over the baby's head; Mom at
+          the glass is a few pixels. Still _tilt_b (the end). TANGENT LEFT: the plaza lamp post at (-7, 9) stands
+          right behind the baby's head when it looks up at the pod (its post meets the head's top); in b01, with the
+          head tilted ahead, it stands clear above. Moving the baby 0.25 to the lens' right (tm_baby_square) would clear
+          it in both: not done (b01 / b02 would have to be re-shot).
+    b04_long  the story's own fallback, the cut inside the line: towers 'square_long' 200 mm f/2.8 from the plaza; every
+          pane between the lens and Mom's head, face and shoulders hidden (pod_panes(n=3): a grazing line crosses two
+          or three); the straw hat, the face and the nose in profile at 50 / 51, the far walls' frames behind her (it
+          reads as glass), her face clear of pane lines. Still _hat.
+    b05   towers 'foot', 35 mm: the baby at the tower's front, front three-quarter, the folded arms in the middle (y 52),
+          head far up, the stone base behind. Still _arms.
+    b06   towers 'pan_bed' 24 mm: _bed_a the red bed lengthwise from its foot, the white beds beside it, Mom's hat at
+          the right edge; _bed_b the zombie filling the window over the sill, arms out, under the slab.
+    b07   towers 'two_shot' 45 mm (tower_pod_north hidden from the camera): the green arms out of the window at the left,
+          the sill, one empty block, Mom in profile at the right (76 / 49), her red bed in the foreground. Still _reach.
+    b08w  SUGGESTED (the story's 'arm at the frame edge', which towers called impossible from beside the cell): the lens
+          in the pod's east column just north of the window, (-18.05, 20.15, 11.38) -> (-22.6, 19.3, 11.3), 18 mm f/2.8,
+          0.13 from the zombie's right arm (arms forward, NOT aggro: raised they leave the frame): that arm is a dark
+          green blur down the left edge (pixels (46, 68, 37)); Mom (back_3) 20 %, the cleric (back_1) 46 %, the
+          librarian (back_2) 66 %, all at y 47-48 %, faces toward the lens, trembling; the lantern, the sill blurred
+          along the bottom, a red bed at the right edge. Still _window. (b08 = towers 'cell_side': the three at 30 / 57 /
+          78 %, no arm.)
+    b09   NEW: over the slot's south end at the platform's level, (-29.3, 17.3, 10.35) -> (-24.3, 20.55, 11.45), 16 mm
+          f/4: the golem big in the middle (43 / 35) with the low sun and its gold halo at the upper left behind it
+          ("huge against the gold sky"), its head turned to the pod; the three small behind the west glass (61-86 %, y
+          50 %), the water sheet at foot level, the lava's orange at the bottom-left corner. Still _golem.
+    b10   b09's framing exactly (the jump cut): _again_empty = the platform empty on f0 + 4 (the glass pod with the
+          three in it, the sun, the sheet); _again = the new golem (spawned f0 + 5) after its heavy step toward the pod
+          (48 / 37): it has turned its back to us to step east (the story's "one step toward the pod").
+    b11   towers 'slide' 20 mm (from the slot's open south end): the golem, facing the pod (yaw +90), slides west and
+          drops into the slot (gone 9 frames after the rim), the white puff rises, the sun in the frame; the lava is
+          seen as the game draws it (a surface in the slot), the water as a pale sheet behind the glass rim. Stills
+          _slide (at the edge) and _slide_strip (spawned / at the edge / dropping / the puff).
+    b12   towers 'hopper_wide' re-aimed 0.35 lower (target z 0.15): the hopper in the middle with an ingot on it
+          (51 / 31), the chest below, Steve with his ingot at the left (18 / 39), the baby among the poppies at the right
+          with its face above the caption band (65 / 56). Still _iron.
+    b13   towers 'back' at 20 mm aimed 2.2 lower ((-17.4, 22.5, 3.0)): the dirt zigzag up the back, the stray dirt, the
+          pod on top; the baby tiny at the foot ABOVE the caption band (39 / 59; at 24 mm it was at 70 %). Still _stairs.
+    b14   towers 'top_step_side' 26 mm: the baby on the top step beside the opening, its head just under the plug
+          (58 / 49), the beds through the glass, Mom's hat a shape at the left edge (the plug hides the rest of her from
+          here). The top step is there under it (unregistered: see THE PARTS). Still _gap.
+    b15   towers 'gap' 22 mm (inside at floor level): the cleric against the plug at the left (24 / 24), the baby
+          running in under the plug (51 / 50), daylight through the gap. Still _fit.
+    b16   towers 'red_bed' 35 mm from outside the west glass (panes hidden): Mom from behind on the zombie, the baby
+          pressed against her on the lens side looking up (47 / 58), the zombie's head and arms soft in the window
+          beyond. Still _mom.
+    b17   towers 'grow' position (-21.0, 21.3, 11.35), re-aimed at (-21.05, 18.45, 10.75), 20 mm, locked: Mom in
+          profile at the front glass (30 / 33), the baby at her folded arms (62 / 52), the lantern glowing at the right
+          edge, the village's roofs small and golden below through the front glass. Still _twenty. (towers' 24 mm aim
+          left the baby's head 59 % inside the safe area: x 60-88 %, y 50-65 %.)
+    b18   towers 'bounce' 24 mm: the baby on Mom's red bed facing the lens mid-bounce (71 / 43, motion-blurred: it is in
+          the air), her hat at the left edge. Still _bounce.
+    b19   b17's framing exactly: _ended_strip = frame f - 1 (the baby at Mom's arms) and f (the grown narrator in the
+          plain brown robe, same spot, same facing, his head level with hers; Mom does not move): it reads as the same
+          villager grown; _ended = six frames after the swap (540x960).
+    b20   towers 'gap_side' 30 mm from outside the east glass (panes hidden): the narrator at the plug (28 / 34), his
+          head tilted down to the gap, nose in profile, daylight through the gap at his knees. Still _nofit.
+    b21   towers 'high' aimed 0.5 lower (target z 10.3), 22 mm, the roof hidden: Mom, the narrator, the cleric, the
+          librarian in a row (38 / 51 / 63 / 75 %, y 40-44 %), the two red beds side by side in the middle (the second
+          at y 58 %), the back of Steve's head at the bottom. Still _count (frame f0 + 76, after the bed appeared).
+    b22o  SUGGESTED (NEW, the reverse from outside; the story's three-quarter face cannot share a frame with Steve from
+          inside): (-17.6, 28.0, 10.3) -> (-19.71, 23.47, 10.21), 35 mm f/2.8; Steve big on one_down swinging at the
+          top step (61 / 41), the narrator on tm_watch_22_out facing him through the back glass (40 / 33), his face
+          frontal and clean: every pane in front of it hidden (pod_panes, two per line over 12 points round his face;
+          with one hidden a pane frame crossed his brows). Still _step_out. (b22 = towers 'back_glass': the narrator
+          a lost-profile blur at the left edge (9 %), Steve small through the back glass (63 / 52).)
+    b23w  SUGGESTED: b08w's camera position, aimed 0.35 more south: the zombie's arm the dark green blur at the left
+          edge; Mom (26 %) and the narrator (57 %) side by side, same height, trembling alike, both staring at the
+          lens' side; the librarian between them behind (41 %), the cleric on back_2 (79 %); a red bed at the right edge.
+          Still _window. (b23 = towers 'cell_side' with towers' spots: the narrator at 13 %, no arm, the beds behind
+          the lens.)
+    b24p  SUGGESTED for the word "counts" (the story's own fallback: "cut on that word to the low-angle platform
+          framing of line 9 with the grown narrator now among the shapes behind the glass"): b09's camera, the golem
+          big against the sun (43 / 35), the four small behind the west glass (narrator on back_2 61 %, Mom on back_1
+          72 %, the cleric on 'mom' 77 %, the librarian on bed_side 69 %, y 50-52 %). Still _platform.
+    b24w  b23w's shot held: the golem spawned on golem_spawn lands at x 66 % / y 43 %, which is the right edge of the
+          narrator's head: on the still it is NOT visible (hidden behind him). Its head cannot be above theirs from
+          this low lens (it would need the lens above z 11.6). Use b24w only up to "counts", then cut to b24p; or move
+          the spawn: a golem whose head shows in the gap between the narrator and the cleric needs x ~70 %, i.e. y
+          19.84 at x -26.5 (not a cell centre: the game spawns at one). Still _window.
+    b24   towers 'cell_side' (the golem on golem_24 between the cleric and the librarian, 67 / 44, its head a little
+          above theirs, small behind the glass as the story's risk expects); continues b23. Still _counts.
+
+LIMITS THAT REMAIN (geometry or the game; the fallbacks applied are named)
+    - Beat 1: the low plaza camera sees the well's base between it and the two who flee: only their heads and
+      shoulders show over it. The lamp post at (-7, 9) stands under the tower in the middle of the frame: at beat 4's
+      end it meets the top of the baby's head (a tangent, see b04).
+    - Beat 2: "his shadow crosses its face": under this sun (north-north-east) Steve's shadow falls south-west, away
+      from the baby, whichever side of the lens he passes. Not had.
+    - Beat 4: the orange glow under the platform rim and the dirt zigzag cannot be seen from the square (the slot is
+      behind the pod's west side, the stairs on its back; the slot's lava sits 0.1 under its end walls' tops): the
+      story's fallback (cut inside the line to the long lens: b04_long) is applied for Mom; the glow and the zigzag
+      are seen in beats 9-11 and 13 instead.
+    - Beats 8 / 23: the zombie's arm reads as a blur only (it is 0.1-0.4 from the lens); with aggro arms (raised) it
+      leaves the frame: keep the zombie's arms forward (zombie_in_cell(aggro=False)) in the window shots.
+    - Beat 22: a three-quarter face and Steve through the back glass in one frame: impossible inside; b22o is the
+      reverse (his face frontal through the glass behind Steve).
+    - Beat 23: "the two red beds below them": the beds are north of the four, never below them from a camera beside
+      the cell (one red bed shows at the right edge of b23w).
+    - Beat 24: the golem's head above theirs needs a lens above z 11.6 (the cell_side height, where the arm is lost);
+      from the window it is hidden behind the narrator (b24w); applied: the story's own fallback, the cut on "counts"
+      to the platform framing (b24p). b24 (cell_side) keeps the "same shot, held" if beat 23 is b23.
+    - Beat 11: the lava is seen as a surface in the slot (the game's still lava texture, full-bright), not "a glow
+      only": it reads as Minecraft and the drop into it reads.
+
+GOTCHAS FOUND ON THE STILLS
+    - towers.push keys the WHOLE route at 0.9 blocks/s: keys past the shot's end override the next shot's place() (the
+      full tower_push_square, 7 blocks / 7.6 s, put Mom back on the plaza behind the baby in beat 4). Push only as far
+      as the shot lasts (stage_b03: 0.85 blocks per second of shot).
+    - P.bed2 and P.top_step: see THE PARTS (register bed2, do not register the top step).
+    - The window cameras (b08w / b23w / b24w) stand 0.13 from the zombie's right arm: keep its arms forward
+      (aggro=False), raised arms leave the frame; the arm blur is dark green (46, 68, 37) on b08w's left edge.
+    - The golem of beat 11 must face the pod (yaw +90 degrees) as it slides: facing the slot it reads as walking in.
+
+PALETTE (tools/palette_check against the stills as rendered, scratch script; not part of the self-test)
+    b01, b12, b17, b23w pass every rule they have pixels for (stone G/R 0.94-0.99, robes hue 12-15, villager skin
+    s 0.44-0.47, Steve's shirt hue 176-179, his trousers not clipped, plants 0.85 of the grass). b09 FAILS "stone not
+    magenta" at G/R 0.90: the platform's stone lip in the low sun beside its gold halo, rgb(203, 183, 155): warm, B under
+    G, not magenta (the rule tests G/R only: fixtures' notes; legday_set's dusk still has the same). b17's baby head
+    was 59 % inside the safe area: the grow camera was re-aimed (20 mm, target z 10.75) and re-rendered.
+
+NOT VERIFIED / LEFT TO THE DIRECTORS: no motion was rendered except b11's and b19's strips (the walks, the push, the
+    climb, the bounce, the slide timing are towers' numbers); tools/palette_check was not run on these stills (towers'
+    own golden stills pass it); nothing was rendered at final settings through render.py; the timing of every action
+    against the words is the directors' (the stage functions use fixed offsets); Steve's and the villagers' looks are
+    single choices made for the stills.
 """
 import math
 import os
@@ -37,9 +267,10 @@ ANCHORS = {
     "armorer_from": ((-5.8, 7.9), 160.0),                   # beat 1: the two adults who hurry into house_c
     "shepherd_from": ((-4.9, 8.8), 160.0),
     "house_c_door_target": ((-10.0, 6.5, 2.0), None),       # the door that shuts behind the second (house_c, east face)
-    # ---- beat 23 from the window (b23w): the narrator and Mom side by side across the lens, 1.0 apart (folded arms
-    #      are 1.0 wide), both facing the zombie's eyes; the cleric on back_2, the librarian on back_1 behind them
-    "narrator_23": ((X + 2.45, Y + 1.7, float(F)), None),           # (-20.55, 19.7)
+    # ---- beats 23 / 24 from the window (b23w, b24w): the narrator and Mom side by side across the lens, 1.0 apart
+    #      (folded arms are 1.0 wide), both facing the zombie's eyes; the librarian between and behind them, the
+    #      cleric on towers' back_2
+    "narrator_23": ((X + 2.45, Y + 1.7, float(F)), None),           # (-20.55, 19.7); they face the zombie's eyes
     "mom_23": ((X + 2.45, Y + 0.7, float(F)), None),
     "librarian_23": ((X + 1.2, Y + 0.75, float(F)), None),
     # ---- beat 22 from outside (b22o): the narrator 0.3 west of towers' watch_22, so that from the north-east the
@@ -93,7 +324,8 @@ CAMERAS = {
     "b01": _tc("square", pos=(PLAZA[0], PLAZA[1], 0.75), target=(-21.85, 18.65, 1.0), what="afraid"),
     "b02": _tc("baby_face", what="imnot"),
     "b03": _tc("push_square", target1=(3.0, 6.0, 0.95), what="push", ease="linear"),
-    "b04": _tc("square_start", pos1=PLAZA, target1=(-21.85, 18.65, 2.45), what="tilt"),
+    "b04": _tc("square_start", pos=(PLAZA[0], PLAZA[1], 0.75), pos1=(PLAZA[0], PLAZA[1], 0.75),
+               target1=(-21.85, 18.65, 1.0), what="tilt"),             # ends on b01's framing exactly
     "b04_long": _tc("square_long", what="hat"),
     "b05": _tc("foot", what="arms"),
     "b06": _tc("pan_bed", what="bed"),
@@ -111,9 +343,9 @@ CAMERAS = {
     "b14": _tc("top_step_side", what="gap"),
     "b15": _tc("gap", what="fit"),
     "b16": _tc("red_bed", what="mom"),
-    "b17": _tc("grow", what="twenty"),
+    "b17": _tc("grow", target=(X + 1.95, Y + 0.45, F + 0.75), lens=20.0, what="twenty"),
     "b18": _tc("bounce", what="bounce"),
-    "b19": _tc("grow", what="ended"),
+    "b19": _tc("grow", target=(X + 1.95, Y + 0.45, F + 0.75), lens=20.0, what="ended"),
     "b20": _tc("gap_side", what="nofit"),
     "b21": _tc("high", target=(X + 2.5, Y + 2.2, F + 0.3), what="count"),
     "b22": _tc("back_glass", what="step"),
@@ -123,6 +355,8 @@ CAMERAS = {
     "b23w": dict(pos=(X + 4.95, Y + 2.15, F + 1.38), target=(X + 0.4, Y + 0.95, F + 1.3), lens=18.0, fstop=2.8,
                  what="window", from_=None),
     "b24": _tc("cell_side", what="counts"),
+    "b24w": dict(pos=(X + 4.95, Y + 2.15, F + 1.38), target=(X + 0.4, Y + 0.95, F + 1.3), lens=18.0, fstop=2.8,
+                 what="window", from_=None),
     "b24p": dict(pos=(X - 6.3, Y - 0.7, F + 0.35), target=(X - 1.3, Y + 2.55, F + 1.45), lens=16.0, fstop=4.0,
                  what="platform", from_=None),
 }
@@ -130,7 +364,7 @@ for _k, _c in CAMERAS.items():
     _c.setdefault("sky", "gold")
 BEATS = ["b01", "b02", "b03", "b04", "b04_long", "b05", "b06", "b07", "b08", "b08w", "b09", "b10", "b11", "b12",
          "b13", "b14", "b15", "b16", "b17", "b18", "b19", "b20", "b21", "b22", "b22o", "b23", "b23w", "b24",
-         "b24p"]
+         "b24w", "b24p"]
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -169,6 +403,35 @@ def build_set(scene):
     return village.build_village(scene, seed=1, edit=twentyminutes_set)
 
 
+# the suggested camera of every beat first, then the alternatives that were rendered (see the docstring, STILLS)
+BEAT_CAMERAS = {1: ["b01"], 2: ["b02"], 3: ["b03"], 4: ["b04", "b04_long"], 5: ["b05"], 6: ["b06"], 7: ["b07"],
+                8: ["b08w", "b08"], 9: ["b09"], 10: ["b10"], 11: ["b11"], 12: ["b12"], 13: ["b13"], 14: ["b14"],
+                15: ["b15"], 16: ["b16"], 17: ["b17"], 18: ["b18"], 19: ["b19"], 20: ["b20"], 21: ["b21"],
+                22: ["b22o", "b22"], 23: ["b23w", "b23"], 24: ["b24p", "b24", "b24w"]}
+# beats 8 / 23 / 24 are one camera position in the story ("This camera position returns for the last two lines"):
+# b08w -> b23w -> b24w (held: the golem appears partly behind the narrator) cut on "counts" to b24p (the story's own
+# fallback), or b08 -> b23 -> b24 (towers' cell_side: the golem between two heads, small; no zombie arm)
+
+
+def data(v):
+    """Everything a film's common module needs after build_set, as data:
+      anchors   {name: ((x, y, z), yaw or None)}: towers' ('tower_<short>') and the film's ('tm_<name>')
+      paths     {name: [(x, y, z), ...]}: towers' and the film's
+      parts     make_parts(v) (the farm and its fixtures, house_c's door)
+      cutaways  the pod's camera cutaways (Stage.see_through / remove): tower_pod_north / _east / _south / _west /
+                _roof / _all
+      lights    dict(pod=POD_LIGHTS): the groups for Stage.lights in every shot
+      cameras   {beat number: [camera dict, ...]} in BEAT_CAMERAS order (each dict carries its key as 'key')
+      skies     SKIES"""
+    names = [k for k in v.anchors if k.startswith(FARM + "_") or k.startswith("tm_")]
+    anchors = {k: (tuple(v.anchors[k]), v.yaws.get(k)) for k in sorted(names)}
+    paths = {k: [tuple(p) for p in pts] for k, pts in v.paths.items() if k.startswith((FARM + "_", "tm_"))}
+    cams = {b_: [dict(CAMERAS[k], key=k) for k in keys] for b_, keys in BEAT_CAMERAS.items()}
+    cut = sorted(k for k in v.cutaways if k.startswith(FARM + "_pod_"))
+    return dict(anchors=anchors, paths=paths, parts=make_parts(v), cutaways=cut, lights=dict(pod=dict(POD_LIGHTS)),
+                cameras=cams, skies=dict(SKIES))
+
+
 class Parts(dict):
     """The film's parts (a dict with attribute access): see make_parts()."""
 
@@ -201,7 +464,7 @@ def make_parts(v):
 TEST_DIR = os.path.join(ROOT, "out", "test")
 SECONDS = dict(b01=3.0, b02=2.0, b03=3.5, b04=3.0, b04_long=1.5, b05=2.5, b06=3.0, b07=2.0, b08=2.0, b08w=2.0,
                b09=2.5, b10=2.0, b11=4.0, b12=3.0, b13=2.5, b14=2.5, b15=2.5, b16=2.5, b17=2.5, b18=2.5, b19=3.0,
-               b20=2.5, b21=4.0, b22=3.5, b22o=3.5, b23=2.5, b23w=2.5, b24=4.0, b24p=3.0)
+               b20=2.5, b21=4.0, b22=3.5, b22o=3.5, b23=2.5, b23w=2.5, b24=4.0, b24w=4.0, b24p=3.0)
 
 
 class Scout:
@@ -381,7 +644,11 @@ def stage_b03(sc, s):
     from engine import towers as T
     f0, v = s.frame_start, sc.v
     steve, mom = sc.player(), sc.actor("mom", "farmer")
-    route = v.paths["%s_push_square" % FARM]
+    # ONLY AS FAR AS THE SHOT LASTS: towers.push keys the whole route (0.9 blocks/s), and keys past the shot's end
+    # override the next shot's place() (the full tower_push_square, 7 blocks / 7.6 s, put Mom back on the plaza
+    # behind the baby in beat 4); 3.5 s of shoving is 3.0 blocks
+    r0 = v.paths["%s_push_square" % FARM][0]
+    route = [r0, (r0[0] - 0.85 * SECONDS["b03"], r0[1], r0[2])]
     T.push(steve, mom, f0 + 2, route)
     for f in range(f0 + 2, s.frame_end + 1, 12):
         p = mom.pos_at(f)
@@ -579,7 +846,7 @@ def stage_b10(sc, s):
     sc.cam(s, "b10", focus=g.head)
     sc.lights(s)
     sc.memo["b10_step"] = e
-    return [(f0 + 4, "empty"), (f0 + 30, "")], {"golem": _head(g, f0 + 30)}
+    return [(f0 + 30, ""), (f0 + 4, "empty")], {"golem": _head(g, f0 + 30)}
 
 
 def stage_b11(sc, s):
@@ -648,7 +915,7 @@ def stage_b13(sc, s):
     sc.lights(s)
     sc.memo["b13_climb"] = e
     return [(f0 + 6, ""), (min(e + 2, s.frame_end), "up")], {"baby": _head(baby, f0 + 6),
-                                                             "pod": sc.A["pod_target"]}
+                                                             "pod": (X + 2.5, Y + 5.0, F + 1.5)}
 
 
 def stage_b14(sc, s):
@@ -889,8 +1156,11 @@ def stage_b22o(sc, s):
     back glass, watching, eyes level (the panes between the lens and his face hidden)."""
     nar, steve, m = _watch22(sc, s, "b22o", spot="tm_watch_22_out")
     c = sc.cam(s, "b22o", focus=nar.head)
-    sc.fm.see_through(sc.st, s, c, points=[nar, (nar.eye_point(s.frame_start)[0], nar.eye_point(s.frame_start)[1],
-                                                 F + 1.2)])
+    from engine import fixtures
+    e = nar.eye_point(s.frame_start)
+    pts = [(e[0] + dx, e[1], e[2] + dz) for dx in (-0.3, 0.0, 0.3) for dz in (-0.45, -0.2, 0.0, 0.25)]
+    fixtures.see_through(sc.st, s, pod_panes(sc, c["pos"], pts, n=2))    # every pane in front of his face (a pane
+    #                                                                        frame crossed his brows with one hidden)
     sc.st.hero(s, "narrator", nar)
     sc.st.hero(s, "steve", steve)
     sc.lights(s)
@@ -918,11 +1188,8 @@ def stage_b23(sc, s, key="b23"):
                        "librarian": _head(cast[1], f)}
 
 
-def stage_b23w(sc, s):
-    """Beat 23 from beside the window (b08w's camera): the zombie's arm a dark green blur at the left edge; the
-    narrator (tm_narrator_23) and Mom (tm_mom_23) side by side in front, 1.0 apart, trembling alike (the same
-    panic seed), both staring at the zombie's eyes (just over the lens); the cleric on back_2, the librarian on
-    back_1 behind them."""
+def _four_window(sc, s):
+    """The four of beats 23 / 24 seen from the window camera, trembling (Mom's and the narrator's alike)."""
     from engine import towers as T
     f0 = s.frame_start
     cast = []
@@ -935,6 +1202,16 @@ def stage_b23w(sc, s):
     for c in cast:
         T.panic(c, f0, s.frame_end, sc.fm.zombie_eye, seed=7 if c.name in ("mom", "narrator") else len(c.name))
     z = sc.zombie(f0, aggro=False, look=cast[2])
+    return cast, z
+
+
+def stage_b23w(sc, s):
+    """Beat 23 from beside the window (b08w's camera position): the zombie's arm a dark green blur at the left edge;
+    the narrator (tm_narrator_23) and Mom (tm_mom_23) side by side in front, 1.0 apart, trembling alike (the same
+    panic seed), both staring at the zombie's eyes (just over the lens); the librarian (tm_librarian_23) between
+    and behind them, the cleric on back_2."""
+    f0 = s.frame_start
+    cast, z = _four_window(sc, s)
     sc.st.use(s, z, sc.P.bed2, *cast)
     sc.st.hero(s, "narrator", cast[3])
     sc.st.hero(s, "mom", cast[2])
@@ -961,6 +1238,28 @@ def stage_b24(sc, s):
     sc.st.hero(s, "narrator", cast[3])
     sc.st.hero(s, "golem", g)
     sc.cam(s, "b24", focus=cast[2].head)
+    s.focus(g.head, at_s=(fs + 30 - f0) / 24.0, rack_s=0.6)
+    sc.lights(s)
+    f = fs + 40
+    return [(f, ""), (fs - 1, "before")], {"golem": _head(g, f), "narrator": _head(cast[3], f),
+                                            "mom": _head(cast[2], f)}
+
+
+def stage_b24w(sc, s):
+    """Beat 24 as b23w's shot held: behind the four, through the west glass, the golem appears on golem_spawn in the
+    gap between the narrator and the cleric, turns its head to the pod, steps, begins to slide; the focus racks to
+    it."""
+    f0 = s.frame_start
+    cast, z = _four_window(sc, s)
+    g = sc.golem()
+    fs = f0 + 18
+    sc.fm.golem_spawn(g, fs, yaw=math.radians(90.0), look=sc.A["pod_target"], look_after=6, empty_from=s)
+    e = sc.fm.golem_step(g, fs + 26)
+    sc.fm.golem_slide(g, e + 4)
+    sc.st.use(s, z, g, sc.P.bed2, *cast)
+    sc.st.hero(s, "narrator", cast[3])
+    sc.st.hero(s, "golem", g)
+    sc.cam(s, "b24w", focus=cast[3].head)
     s.focus(g.head, at_s=(fs + 30 - f0) / 24.0, rack_s=0.6)
     sc.lights(s)
     f = fs + 40
@@ -1164,8 +1463,10 @@ def check(verbose=True):
         x, y, z = v.anchors[name]
         h = 0.975 if (short in BABY_SPOTS or name in BABY_SPOTS) else (2.7 if short in GOLEM_SPOTS else 1.95)
         under = _solid_at(w, x, y, z - 0.05)
+        # bed_beside stands in the second bed's cells: valid only BEFORE P.bed2.place_at (beat 6), so bed2 is ignored
+        free_ok = ("water",) + (("red_bed",) if short == "bed_beside" else ())
         body = [zz for zz in (z + 0.3, z + 0.5 * h, z + h - 0.1) if _solid_at(w, x, y, zz)
-                and w.block_id(int(math.floor(x)), int(math.floor(y)), int(math.floor(zz))) not in ("water",)]
+                and w.block_id(int(math.floor(x)), int(math.floor(y)), int(math.floor(zz))) not in free_ok]
         if not under or body:
             bad.append("anchor %s at %s: %s" % (name, tuple(round(c, 2) for c in (x, y, z)),
                                                "nothing solid under it" if not under else "inside a block"))
@@ -1206,7 +1507,16 @@ def check(verbose=True):
     return bad
 
 
-KNOWN = set()          # (beat, hero label) pairs outside the safe area on purpose (filled from the renders)
+# (beat, hero label) pairs measured outside the safe area or behind a block ON PURPOSE (seen on the stills): printed
+# as notes by check(), not failures
+KNOWN = {("b03", "baby"),            # the baby runs in from the left edge (18 mm: 1.2 blocks behind Steve is 30 %)
+         ("b06", "mom"), ("b06", "zombie"),     # the pan's two ends: Mom is passed in the middle of the pan
+         ("b09", "mom"),             # a background shape behind the glass at the right edge (x 86 %)
+         ("b11", "slot"),            # the slot is the bottom of the frame (the golem drops into it)
+         ("b14", "mom"),             # behind the plug from here; only her hat shows at the left edge (story: a shape)
+         ("b18", "mom"),             # not in this framing (the bed and the baby are)
+         ("b22", "top step"),        # below the floor line from inside: Steve's swings show, the step does not
+         ("b22o", "top step")}       # low in the frame (y 62-70 %): the crack reads on its top face
 
 
 if __name__ == "__main__":

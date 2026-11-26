@@ -1,4 +1,177 @@
-"""THE SETS OF "THE CRAMMYS" (stories/crammys.json): a film-local set module (docstring written last; see below).
+"""THE SETS OF "THE CRAMMYS" (stories/crammys.json): a film-local set module, built INTO the seed-1 village through
+village.build_village(edit=...) exactly as engine/sets.py builds hello_set. Nothing in engine/ is changed.
+
+    from films import crammys_set as CS
+    v = CS.build_set(scene)                 # = village.build_village(scene, seed=1, edit=CS.crammys_set)
+    P = CS.make_parts(v)                    # band, notes, jukebox, last_lantern, totem, door 'house_e', oak (AFTER the build)
+    A = CS.anchors(v)                       # every named place: key -> (point, yaw) (bandstand, lane, meadow)
+    CS.SKIES                                # the two skies the stills were made under (copy into films/crammys.py)
+    CS.CAMERAS["b11"]                       # a suggested camera per beat: dict(pos, target, lens, fstop[, pos1, target1,
+                                            #   focus], sky, what); still out/test/crammys_set_<beat>_<what>.png (+ _zones)
+    CS.arrows(steve, f)                     # the two arrows of beats 13 / 14, already in him (stills of later beats)
+    CS.moon_key(st, shot, at, watts)        # a film-local shadowless cool light that only `shot` sees (not needed so far)
+
+    $BPY -m films.crammys_set               # the self-test (numbers, ~10 s): standing anchors on solid ground with the
+                                            #   body free, path nodes free, every camera (pos, pos1) outside every
+                                            #   block and above the ground, the oak, the beat-12 line vs the fuse range
+    $BPY -m films.crammys_set b11 b12 ...   # the proof stills of these beats (one fresh build each, 540x960, 16
+                                            #   samples, 2 threads, zones, tools/palette_check; 80-140 s each on the
+                                            #   shared machine: two per call under `timeout 290`)
+    $BPY -m films.crammys_set b07 --frames 34 --res 270x480 --samples 8     # other frames / quick framing tests
+    CRAMMYS_CAMS='{"b11": {"lens": 35}}' CRAMMYS_SKIES='{"night": {"az": 176}}' ...    # scouting overrides
+    $BPY -m films.crammys_set view NAME x,y,z tx,ty,tz LENS [FSTOP SKY WxH SAMPLES]   # a plain view, no cast
+
+THE SKIES (Blender azimuth: degrees counter-clockwise from east)
+    gold   dict(preset="golden", az=240, el=27, bloom=1.0, grade="warm")   beats 1-6: engine/music.py's own golden
+           sky (sun in the south-west, in front of the west-facing stage, 120 degrees off the stage cameras).
+    night  dict(preset="night", az=0, el=21, bloom=1.3, grade="cool")      beats 7-24, ONE moon for the whole night.
+           THE MOON IS DUE EAST, low: on the game's own east-west arc, opposite the sun that has just set (the
+           music module's proofs had it in the west, az 176: a moon about to set, and with it beat 11's "moon
+           behind the branches" needs the skeleton's oak west of the line, on the creeper's side). What it does:
+             - the bandstand faces west: the moon stands BEHIND it, over the well, and the stage front is in the
+               well's moonshadow. The lanterns are the key on every face (palette_check passes on every night stage
+               still: lit stone G/R 0.96-0.97, Steve's trousers min channel 14-51), the sky behind the stage is the
+               bright side of the night gradient and in the frontal wide (b22) the MOON STANDS OVER THE BANDSTAND
+               (x 62 %, y 16 %); in b24's first frame it is at the top edge.
+             - the lane (beats 7, 17): the camera looks west, the moon is behind it: house_e's front is moonlit.
+             - the meadow: cameras look north (beats 9, 10, 12, 15): the moon at their right, out of frame; figures
+               side-lit, standing against the northern sky. Beat 11 looks EAST: the moon peeks from under the edge of
+               the skeleton's oak (the story's "moon behind the branches"), see b11.
+           Compared with the music module's own night proofs under the west moon (out/test/music_cams_night.png):
+           the stage is darker around the faces and warmer; the same faces read. Haze: the preset's (0.45): the
+           meadow's far rises fade into a mauve band, the figures at 8-13 blocks stay crisp. No second night entry
+           is needed.
+    Torches: Band.lights(st, s, scale=1.0) at gold, scale=NIGHT_TORCHES (1.3) at night (the music proofs' levels;
+    the meadow shots too: the exit gate's lamps light beat 9, the others are 15+ blocks away). Never above 1.6 near
+    the well's cobblestone (music GOTCHAS).
+
+WHERE EVERY BEAT IS FILMED (Blender blocks: +X east, +Y north, +Z up; ground z 0; stage floor z 1; path 1/16 lower)
+    THE BANDSTAND (engine/music.py: west side of the square, facing west down the west street), beats 1-6 gold,
+    8 and 18-24 night: the red wool platform x -8..-5, y -3..5; back wall x -4; the front row of note blocks at
+    x -8 (Sunny's on a PUMPKIN at y -2, Kai's on GOLD at y 1, Zuri's on WHITE WOOL at y 2, dressing at -1, 4, 5);
+    the jukebox (-7, 0, 1) behind the gap at y 0; lantern posts (-8, -3) and (-8, 3) (the north lantern is placed
+    on camera in beat 5: P.last_lantern); wall lanterns (-4, +-3, 4); the trophy pedestal (oak fence + gold block)
+    at (-9, -1), its top (-8.5, -0.5, 2.0). Unchanged from engine/music.py.
+    THE LANE (engine/music.py lane_set), beats 7 and 17, night: Kai's gold block + note block column at (1, 15)
+    and his lantern post at (1, 17) in front of house_f's door (4.5, 16.5); the narrator's door = house_e's
+    (-4.5, 15.5), facing east across the exit road (x -1..1); paths lane_home (up the road from the square, in at
+    house_e's door) and lane_to_square (down the road from the north to the square).
+    THE EXIT GATE, beat 9, night: the gate's two plains_lamp_1 posts at (-3, 24) and (3, 24) (the last torches;
+    light group 'lamp'); the road runs north from there into the meadow.
+    THE NIGHT MEADOW (this module, night_meadow), beats 10-16: flat grass (z 0) north of the gate to y 50 (then a
+    1-block rise every ~11 blocks), a low hill east of x 16. Built into the World:
+      - plants off x -4..15, y 30..47 (the line, the walk, the low cameras' ground) and on every low camera's view
+        (sets.clear_view, 2 blocks wide);
+      - THE SKELETON'S OAK: a vanilla small oak, 6 logs, trunk at (13, 44) (sets.plant_oak: canopy z 3..7, leaves
+        from z 3, a skeleton's head at 1.99 fits under them), east of the line: the skeleton found under it in beat
+        11 stands on the right of the line in beat 12, as the oak is (seen at the right edge of b12 / b15);
+      - two of the village's lone oaks taken out: (6, 74) stood right behind Steve's head in the middle of the
+        beat-12 line, (-7, 63) behind the creeper; the north horizon is clean (the village keeps (-13, 47),
+        (15, 55), (24, 69)).
+      THE LINE (beat 12) runs east-west at y 40: creeper (1.8, 40), Steve in the middle (5.0, 40), skeleton
+      (8.2, 40): 3.2 blocks either side (the creeper's fuse range is 3), 3.2 blocks of flight for the arrows.
+
+ANCHORS (v.anchors["crammys_<key>"], v.yaws[...]; CS.anchors(v) gives them without the prefix, with the music
+module's bandstand ones (bd.A: zuri, kai, sunny, noor, alex_post, alex_eject, zuri_watch, kai_watch, steve_wing,
+three_*, steve_jukebox, alex, alex_beside, ring_*, kai_step, steve_front, steve_kai, steve_foot, steve_watch,
+line_1..5 and the *_target look points) and the lane's (lane_kai, lane_from_south, lane_from_north). Facing in
+brackets.)
+    walk_start (0.3, 19.6) [north]                 beat 9: Steve starts here, behind the lens's right shoulder
+    steve_found (5.0, 36.0) [the creeper]          beat 10
+    creeper_found (5.0, 41.0) [Steve]              beat 10: it faces him; cr.step(f0 + 30, steve) = its one step
+    skeleton_oak (12.45, 44.24) [the b11 lens]     beat 11: against the oak's trunk (west face x 13), under the leaves
+    steve_enter (5.2, 35.0) -> middle (5.0, 40.0)  beat 12: path crammys_into_middle (back to the lens, 2.2 b/s)
+    creeper_line (1.8, 40.0) [east]  skeleton_line (8.2, 40.0) [west]     beats 12-14 (the skeleton shoots from here)
+    steve_shot (5.0, 40.0) [yaw 135: north-east, the skeleton 45 degrees to his front right]   beats 13-14
+    creeper_behind_from (2.6, 40.4) -> creeper_behind_to (3.9, 40.3)     beats 13-14: it closes in behind him
+    beat 15: creeper_turn (4.4, 40.2) [toward steve_round_to]; Steve on path crammys_round (4.6, 39.0) ->
+             (3.6, 39.1) -> steve_round_to (2.6, 39.9) (passing in front of it: the cut on action); skeleton_close
+             (6.9, 40.0) [the creeper] (it came 1.3 blocks closer than in beat 12: the three fit a 24 mm frame)
+    beat 16: disc_rest (3.79, 40.5) (where music.creeper_disc(creeper_turn, f, seed=5, world=v) lands: re-aim on
+             item.rest_pos when the creeper dies elsewhere); steve_disc_from (6.32, 40.01) -> steve_disc (4.30,
+             41.30) [the lens]: he walks in from the right and stops just behind the disc
+    PATHS: crammys_walk_out (0.3, 19.6) -> (0.5, 24.5) -> (0.6, 30) -> (2.6, 33.4) -> (5.0, 35.6) (beat 9 and the
+           way to beat 10), crammys_into_middle, crammys_round (sets.ground_path: on the ground); music's
+           bandstand_steve_cross, bandstand_wing_to_three, lane_home, lane_to_square.
+    THE ARROWS: CS.arrows(steve, f) / ARROW_FLIGHT: the chest arrow of beat 13 is shot with align=True (its shaft
+           back along the flight); the unaligned "chest" spot points 24 degrees up and from a lens beside the line of
+           fire put the fletching over his mouth. The second (beat 14) is hostiles' "shoulder_r" (mostly up: from
+           b13's lens its shaft crosses his right eye; a director may prefer align=True there too).
+
+THE PARTS (make_parts(v)): band (music.Band: lights, kicker, tap, totem), notes, jukebox (play / insert / eject),
+    last_lantern (beat 5; keep it OUT of st.cast), totem (Band.totem, per shot), door "house_e" (the narrator's:
+    v.door_open("house_e", f[, open=False])), kai_door "house_f", oak (the oak's record). No levers, pistons or
+    cutaways: no interior is filmed.
+
+THE SUGGESTED CAMERAS (CAMERAS[beat]: pos, target[, pos1, target1, focus], lens, fstop, sky, what). Every one rendered
+at 540x960 / 16 samples, 2 threads, motion blur, under its sky, with --zones (out/test/crammys_set_<beat>_<what>
+[_f<N>].png and _zones.png) and tools/palette_check (every check passes on every still; b02's first frame fails only
+"hero in the safe area": Zuri's head is cut by the top before the tilt reaches her), with stand-ins staged as the beat
+says: beats 1-8 and 17-24 by tools/music_proof's own staging of engine/music.py BEATS (filmed through THIS table),
+plus the zombie of beat 7, the two arrows from beat 13 on, and no lantern on the north post before beat 5; beats
+9-16 by the engine/hostiles recipe on this set (stage_b09 .. stage_b16). Positions are x %, y % of the frame.
+    b01 gold   music b1 (35 mm f/2, push in 0.6) AIMED 0.25 LOWER (z 1.65): with music's aim Steve's chin sat at 61 %,
+               on the caption band. Steve 61, 54.5 (face y 50-59 %); Zuri 15, Kai 32, Noor 50 (horn), Sunny 74, all
+               at y 42; their three notes at 16 / 31 / 78 %
+    b02 gold   music b2 (40 mm, tilt and rise): first frame the note block on white wool big (its note at 52, 19), Zuri's
+               head cut by the top; last frame her face x 37-65 %, y 40-54 %. The north post's two fences stand in
+               front of her shoulder at x 10-30 % (no lantern on them yet)
+    b03 gold   music b3: Kai's face 54, 30 (screen left), the gold block's sunlit face 38, 59, Steve's shoulder soft at
+               the right edge. No sun rim on the gold (impossible on this set: music's report)
+    b04 gold   music b4 (28 mm static wide): Zuri 14, Kai 31, Sunny 72 (y 45), his note 77, 48; Steve below the stage
+               looking down at the ground at x ~75 %, beside the pedestal
+    b05 gold   music b5: the totem 50, 43 (x 22-80 %) on the first frame; at the end the whole bandstand, the placed
+               north lantern at 18 %, Alex 27 %, the totem 65, 50
+    b06 gold   music b6 (dolly): Zuri's held note block 29, 39 and her face 49, 40 on the first frame; on the last Steve
+               at the end of the line holding out his empty hand, looking down at it
+    b07 night  music "lane" (16 mm from Kai's doorstep): Kai's back of head 74, 52, his lantern at 90 %; Steve at his
+               door 42, 49 with the zombie, arms out, about two blocks behind him at 41 % (f34); the door shut and the
+               zombie at its step 44, 48 (f54). KNOWN LIMIT: the frame sees the road only north of y 14.4 and Kai's
+               gold / note column hides it south of y 15.9: Steve appears 1.5 blocks before his door, so "sprints
+               across the lane" lasts about half a second, and the zombie (stage_b07: it reaches the step on the frame
+               the door has shut, B07_ARRIVE) is two blocks behind him there, not four (four behind, it would still be
+               hidden behind the column when he goes in)
+    b08 night  music b8: the disc above the jukebox 44, 37; the jukebox top 52, 49; Alex 56, 37; Steve's head soft below
+    b09 night  20 mm f/4 from (-1.5, 18.8, 0.55): the gate's west lamp post big at the left (x 8-17 %), Steve walking
+               away up the road past it (x 80 % on f18 -> 56 % on f44, small against the clean horizon), the warm
+               pool of the lamps on the road, the skeleton's oak at the right
+    b10 night  40 mm f/4 low over Steve's left shoulder: the creeper's head against the night sky (58, 41)
+    b11 night  40 mm f/2.8 from (2.5, 41.8, 0.35) looking east: the skeleton pale against the dark trunk (26, 53), the
+               canopy over it, the MOON half behind the canopy's south edge (74, 26)
+    b12 night  24 mm f/5.6 from (5.0, 27.0, 0.45): creeper 21, Steve 50, skeleton 79 (bow drawn) at y 46-48, all three
+               against the sky above a clean horizon (a wide: figures 12 % of the frame high)
+    b13 / b14  45 mm f/2.8 from (8.19, 41.16, 1.05), 1.2 blocks north of the skeleton (the arrow comes from beside the
+               lens): Steve's face three-quarter 56-61, 42-43, the chest arrow's fletching on his upper chest, the
+               creeper soft at the right edge; in b14 the shoulder arrow's shaft crosses his right eye
+    b15 night  24 mm f/4 from (4.75, 31.0, 0.45): Steve 30, creeper 42 (swelling), skeleton 78 (a wide)
+    b16 night  40 mm f/2.8 from (2.39, 38.3, 0.3), 2.6 blocks from the disc: a black disc against the haze (50, 42),
+               Steve's legs and his arrows walking in at the right
+    b17 night  music "lane": Steve sprinting right to left past the doorstep with the disc (motion-blurred, mid-frame)
+    b18 night  music b18: Sunny 23, Steve 47 (both arrows in the lantern light), Noor 72, all at y 46
+    b19 night  music b19: Kai 61, Zuri 50, Sunny 38, Noor 29 (y 44-48); Steve's back at the bottom right (x 85-100 %)
+    b20 night  music b20: disc 11 at 20, 44 (a third of the frame), cat at 72, 45, Steve's face between
+    b21 night  music b21: the jukebox top 50, 53 (its slot), Steve beside it with both arrows plain
+    b22 night  music b22 (24 mm frontal wide): six faces x 24-63 %, y 48 %; THE MOON over the stage at 62, 16
+    b23 night  music b23: Noor 12, Sunny 24, Zuri 36, Kai 48 -> 53 (his step), Alex 62, Steve 76 (y 44-47)
+    b24 night  music b24: the totem 41, 47 and the empty pedestal below on the first frame; at the end of the pull
+               back all six heads x 11-80 % (Steve 80 %, at the edge), y 47-49 %
+
+NOT VERIFIED / KNOWN LIMITS
+    - Stills only (one or two frames a beat): walks, the creeper's step and fuse, the arrows' flights, the poof, the
+      disc's drop, the jukebox notes are the engine modules' numbers here, not watched in motion. Nothing went
+      through render.py at final settings (this is no film yet); the stills use the same Village, Stage and look.
+    - The east moon is new: the music module's night proofs were made under az 176. Every night still here passes
+      palette_check, but the stage faces are now lantern-keyed (the well's moonshadow): Steve's trousers measured
+      min channel 14 in b13 / b14 / b16 (limit 12). moon_key() is offered for a face that goes under; not rendered.
+    - Beat 16's disc lands where music.creeper_disc puts it (seed 5 from creeper_turn: disc_rest); a creeper killed
+      elsewhere drops it elsewhere: aim b16 at item.rest_pos (stage_b16 does).
+    - Beat 15: Steve ends 1.8 blocks from the creeper; two arrows at knockback=0.1 push it 0.6 toward him (hostiles'
+      numbers; not measured on this staging). Keep knockback=0.1 or max_back.
+    - The wides (b04, b12, b15, b22, b23, b24's end) have small faces; that is the stage's and the line's width in a
+      9:16 frame. b11's skeleton is 22 % of the frame high (the moon at the canopy's edge needs that width).
+    - b07: see the camera table (the lane camera sees the road only by the door).
+    - The golden sun (az 240) is music's: off the game's east-west arc, kept because every gold camera was placed
+      for it.
 """
 import json
 import math
@@ -148,7 +321,10 @@ def _mc(name, **over):
 
 
 CAMERAS = {
-    "b01": _mc("b1", sky="gold", what="everyone", proof="b1"),
+    # b01: music's b1 tilted down 0.25 at the stage (aim z 1.9 -> 1.65): with music's aim Steve's chin was at 61 % of
+    # the frame on the first frames (the caption band starts at 62 %), before the push in makes him bigger
+    "b01": _mc("b1", target=(-6.8, 0.35, 1.65), target1=(-6.8, 0.35, 1.65), sky="gold", what="everyone",
+               proof="b1"),
     "b02": _mc("b2", sky="gold", what="zuri", proof="b2"),
     "b03": _mc("b3", sky="gold", what="kai", proof="b3"),
     "b04": _mc("b4", sky="gold", what="sunny", proof="b4"),
@@ -331,6 +507,9 @@ def _music_stage(sc, s, beat):
     """A bandstand / lane beat staged by tools/music_proof (its own shot function), on this film's set."""
     from tools import music_proof as MP
     name = CAMERAS[beat]["proof"]
+    cam = {k: v for k, v in CAMERAS[beat].items() if k not in ("sky", "what", "proof")}
+    cam.update(_cam_over(beat))
+    sc.bd.cameras[name] = cam                          # the staging films THIS film's camera for the beat
     MP._EMPTY.clear()
     MP.BUILDERS[name](sc.st, s, sc.bd, sc.h)
     offs = dict((n, o) for n, _sk, _sec, o in MP.SHOTS)[name]
@@ -353,59 +532,73 @@ def _proof_seconds(beat):
 def stage_music(sc, s, beat):
     """Beats 1-6, 8, 18-24 and the lane: tools/music_proof's staging (+ the arrows from beat 13 on)."""
     frames, heroes = _music_stage(sc, s, beat)
+    if int(beat[1:]) < 5:
+        # beats 1-4 come before Alex places the last lantern (beat 5): in the film the north post has no lantern
+        # yet (LastLantern stands there from the start unless place() is called)
+        sc.bd.last_lantern.place(s.frame_end + 1)
     steve = sc.st.cast.get("steve")
     if steve is not None and int(beat[1:]) >= 13:
         _arrows(steve, s.frame_start)
     return frames, heroes
 
 
-B07_STILL = 38                   # the still frame of beat 7 (offset): Steve in his doorway, the zombie in the frame
-B07_GAP = 2.0                    # the zombie's distance behind Steve on that frame in the still (the story's four
-#                                  blocks: then it is still behind Kai's gold / note block column, see CAMERAS)
+B07_ARRIVE = 54                  # the zombie reaches the narrator's door step (B07_STOP) on this frame of the shot:
+#                                  the door has just shut (music_proof's lane: open at the walk's end - 8, shut at its
+#                                  end + 4, here frames 40 and 52). It walks 2.33 blocks/s, so it is about 2.9 blocks
+#                                  behind Steve as he turns in at his door. Kai's gold / note block column hides the road
+#                                  south of y 15.9 from this camera: a zombie four blocks behind is not yet in the frame
+#                                  when Steve goes in (see CAMERAS["b07"])
+B07_STOP = (-3.45, 15.5, 0.0)    # where the zombie stops: at the foot of the door step, facing the shut door
+B07_STILLS = (34, 54)            # Steve turning in at his door / the door shut in the zombie's face
+
+
+def _along(path, d):
+    """The polyline `path` from distance d along it on: [point at d, the following nodes]."""
+    from mathutils import Vector
+    pts = [Vector(p) for p in path]
+    acc = 0.0
+    for i, (a, b_) in enumerate(zip(pts, pts[1:])):
+        seg = (b_ - a).length
+        if acc + seg >= d:
+            q = a + (b_ - a) * ((d - acc) / seg) if seg > 0 else a
+            return [tuple(q)] + [tuple(p) for p in pts[i + 1:]]
+        acc += seg
+    return [tuple(pts[-2]), tuple(pts[-1])]
+
+
+def _length_to(path, point):
+    """Distance along `path` to its node nearest `point` (2D)."""
+    import math as _m
+    acc, best = 0.0, (1e9, 0.0)
+    for a, b_ in zip(path, path[1:]):
+        if _m.dist(a[:2], point[:2]) < best[0]:
+            best = (_m.dist(a[:2], point[:2]), acc)
+        acc += _m.dist(a, b_)
+    if _m.dist(path[-1][:2], point[:2]) < best[0]:
+        best = (0.0, acc)
+    return best[1]
 
 
 def stage_b07(sc, s, beat="b07"):
-    """Beat 7: music_proof's lane (Steve sprinting home past Kai) + the zombie four blocks behind, arms out."""
+    """Beat 7: music_proof's lane (Steve sprinting home past Kai, Kai's head following him, the door shut after him)
+    + the zombie with its arms out on the same path, reaching the door as it shuts (B07_ARRIVE)."""
     from engine import undead
     frames, heroes = _music_stage(sc, s, beat)
     steve = sc.st.cast["steve"]
     f0 = s.frame_start
-    pts = sc.v.paths["lane_home"]
+    # the zombie's way: Steve's path to the foot of the narrator's door step (cobblestone stairs at (-4, 15, 0))
+    pts = [tuple(p) for p in sc.v.paths["lane_home"] if p[2] < 0.5] + [B07_STOP]
     z = undead.add_zombie(sc.st, "zombie")
-    # the zombie walks the same path from 4 blocks behind where Steve is on the still frame, so it is 4 behind then
-    fr = s.frame_start + B07_STILL
-    import mathutils
-    sp = steve.pos_at(fr)
-    path = [mathutils.Vector(p) for p in pts]
-    # distance of Steve along the path on the still frame
-    best, acc, dist_s = 1e9, 0.0, 0.0
-    for a, b_ in zip(path, path[1:]):
-        seg = (b_ - a).length
-        for k in range(21):
-            q = a + (b_ - a) * (k / 20.0)
-            d = (q.xy - sp.xy).length
-            if d < best:
-                best, dist_s = d, acc + seg * k / 20.0
-        acc += seg
-    dz = max(0.0, dist_s - B07_GAP - undead.WALK_SPEED * (fr - f0) / 24.0)
-    start, acc = path[0], 0.0
-    rest = []
-    for a, b_ in zip(path, path[1:]):
-        seg = (b_ - a).length
-        if acc + seg >= dz and not rest:
-            start = a + (b_ - a) * ((dz - acc) / seg)
-            rest = [start, b_]
-        elif rest:
-            rest.append(b_)
-        acc += seg
-    rest = rest or [path[0], path[1]]
-    z.place(f0, tuple(rest[0]), village.yaw_to(rest[0], rest[1]))
+    total = sum(math.dist(a[:2], b_[:2]) for a, b_ in zip(pts, pts[1:]))
+    d0 = total - undead.WALK_SPEED * B07_ARRIVE / 24.0
+    rest = _along(pts, max(0.0, d0))
+    z.place(f0, rest[0], village.yaw_to(rest[0], rest[1]))
     z.aggro(f0, ease=0)
-    z.walk(f0, [tuple(p) for p in rest])
+    z.walk(f0, rest)
     sc.st.use(s, z)
     heroes["zombie"] = z
     heroes["steve"] = steve
-    return [fr], heroes
+    return [f0 + o for o in B07_STILLS], heroes
 
 
 # ---- the night meadow (beats 9-16): the engine.hostiles recipe on this set ----------------------------------------
@@ -496,7 +689,6 @@ def stage_b12(sc, s, beat="b12"):
 
 def _stage_shot(sc, s, beat, second):
     from engine import hostiles
-    from mathutils import Vector
     f0 = s.frame_start
     steve = _steve(sc, s, "steve_shot")
     cr = hostiles.add_creeper(sc.st, "creeper")
@@ -612,8 +804,6 @@ def still(beat, sky=None, res=(540, 960), samples=16, name=None, dry=False, pale
     s = sc.st.shot(beat, secs, sky=sky)
     sc.shot = s
     fr, heroes = STAGES[beat](sc, s, beat)
-    if beat in STAGES and STAGES[beat] is stage_music or "proof" in spec:
-        pass
     sc.st.finish()
     if frames is None and beat in STILL_FRAMES:
         frames = [s.frame_end - s.frame_start if o == "end" else o for o in STILL_FRAMES[beat]]
