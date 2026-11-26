@@ -51,21 +51,54 @@ TAGS TAKEN by the stubs: brute_fl (all three), golden_boots_fl1..3, gravel_fl1, 
 PREVIEW samples of this sequence: 10.
 """
 
+import math
+
+from mathutils import Vector
+
 WORLDS = {"fl16_bridge": ("bridge", "gravel", "flash_bridge", "bridge"),
           "fl16_treasure": ("treasure", "ender_pearl", "flash_treasure", "treasure"),
           "fl16_home": ("home", "iron_pickaxe", "flash_home", "home")}
 
+# THE RUNNER'S PUFF of each world: (seed, frames before the cut it started). The anchor six_flash_puff_<world> is
+# SHARED (x about 84 % of the frame: half of any burst there lies past x 82 %); the seed and the start are this
+# file's. Chosen with tools/sixseconds_flash_probe.py (every seed 0-119 at 8 and 12 frames, scored on the picture
+# frames of the cut: puff seen inside the safe area minus what a phone hides, three times what crosses the brute's
+# face / armband or the drops, one and a half times what covers the treasure's gold pile); see the module docstring.
+PUFF = {"fl16_bridge": (204, 12), "fl16_treasure": (132, 10), "fl16_home": (332, 10)}
+
+# THE LOOK, the same in every world: on the cut's first picture frame his head is turned GLANCE degrees to his left
+# (frame right: toward the puff, where the runner just was) and down; from the first picture frame + TURN_AT it
+# comes round to the lens over TURN frames and holds there to the cut. (The bridge: on the lens on 1008, the frame
+# before "I".) The lock is the head's place in the frame, which a turn of the head on its neck does not move.
+GLANCE = (24.0, -16.0)
+TURN_AT, TURN = 2, 7
+
+
+def _head_point(c, frame, yaw_deg, pitch_deg, dist=3.0):
+    """A look target that turns c's head `yaw_deg` from its body (+ = to its left) and `pitch_deg` up (+ = up)."""
+    eye = c.eye_point(frame)
+    yaw = c.yaw_at(frame) + math.radians(yaw_deg)
+    return Vector((eye.x + math.sin(yaw) * dist, eye.y - math.cos(yaw) * dist,
+                   eye.z + math.tan(math.radians(pitch_deg)) * dist))
+
 
 def _flash(st, s, C, n):
-    """One flash cut: the brute locked on his place facing the lens, a puff beside him already in the air, the golden
-    boots and the world's extra drop spinning at his feet."""
+    """One flash cut: the brute locked on his place facing the lens, his head coming round from the puff to the lens,
+    the puff beside him already in the air, the golden boots and the world's extra drop spinning at his feet."""
     world, extra, cam, light = WORLDS[s.name]
-    brute = C.actor("brute", "fl")
-    C.stand(s, brute, "flash_%s" % world, idle=False)
-    C.puff(s, "six_flash_puff_%s" % world, s.frame_start - 8, seed=16 + n)
-    first = C.black(s)[1] + 1 if C.black(s) else s.frame_start       # the first frame with a picture
+    f0, f1 = s.frame_start, s.frame_end
+    first = C.black(s)[1] + 1 if C.black(s) else f0                 # the first frame with a picture
     lens = C.camera_spec(cam)["pos"]
-    # the boots show the lens their broad side on the cut's first picture frames (edge-on they are a gold sliver)
+    brute = C.actor("brute", "fl")
+    C.put(brute, f0, "flash_%s" % world)                             # the place's own yaw: facing the lens
+    brute.look_at(f0, _head_point(brute, f0, *GLANCE), ease=0)
+    brute.look_at(first + TURN_AT, Vector(lens), ease=TURN)
+    brute.flop_ears(f0, f1 + 1)
+    st.use(s, brute)
+    seed, before = PUFF[s.name]
+    C.puff(s, "six_flash_puff_%s" % world, f0 - before, seed=seed)
+    # the boots and the extra drop show the lens their broad side on the cut's first picture frames (edge-on they
+    # are a gold sliver)
     C.rest(s, "golden_boots", "fl%d" % n, "six_flash_boots_%s" % world, face=lens, face_at=first + 3)
     C.rest(s, extra, "fl%d" % n, "six_flash_extra_%s" % world, face=lens, face_at=first + 3)
     C.cam(s, cam, focus=brute.head, handheld=0.003)

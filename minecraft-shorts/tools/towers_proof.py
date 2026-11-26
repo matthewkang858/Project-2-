@@ -306,7 +306,7 @@ def shot_b12(st, s, fm, h):
 
 def shot_b14(st, s, fm, h):
     """Beat 14: C['top_step_side']; the baby on step 8 hops up the last step onto top_step_baby beside the
-    opening; Mom on bed_side through the glass."""
+    opening; Mom on 'mom' through the glass (the pane in front of her hidden)."""
     from engine import towers
 
     f0 = s.frame_start
@@ -316,7 +316,7 @@ def shot_b14(st, s, fm, h):
     e = towers.hop(baby, f0 + 8, fm.A["top_step_baby"])
     baby.turn(e + 2, fm.yaw["top_step_baby"], ease=6)
     mom = st.actor("mom", "farmer")
-    mom.place(f0, fm.A["bed_side"], fm.yaw["bed_side"])
+    mom.place(f0, fm.A["mom"], fm.yaw["mom"])
     mom.look_at(f0, fm.zombie_eye, ease=0)
     z = _zombie(st, fm, f0, look=mom)
     st.use(s, baby, mom, z)

@@ -12,6 +12,8 @@ USE IN A FILM (two skies: SKIES below; build everything in every build, as films
     zuri = players.add_player(st, "zuri", "zuri"); zuri.place(f0, bd.A["zuri"], bd.yaw["zuri"])
     bd.notes["zuri"].song(zuri, f0 + 4, count=4, every=8, camera=s)       # 4 taps, each one semitone up
     bd.lights(st, s, scale=1.0)            # golden hour; night: scale=1.3 (the proofs' level; palette check passes)
+  tools/music_proof.py is the worked example: every beat below is staged there exactly as BEATS says (shot_b1 ...
+  shot_b24), and tools/check_music_zones.py checks each staging's faces against the Reels safe area.
 
 PUBLIC API
   crammys_set(b)                         the village hook: bandstand(b) + lane_set(b); returns both dicts
@@ -32,7 +34,7 @@ PUBLIC API
       of it: light group 'lane'), across the exit road from the narrator's door (house_e, x -4.5, y 15.5). Paths
       lane_home (up the road from the square side and in at house_e's door: beat 7) and lane_to_square (down the road
       from the north toward the square: beat 17).
-  band(v) -> Band                        after the build:
+  band(v) -> Band                        after the build (a second call for the same village returns the same Band):
       .A / .yaw        anchors (keys below; bandstand ones without the 'bandstand_' prefix, lane ones as lane_*)
       .cameras         cameras() for this set
       .notes           {'zuri', 'kai', 'sunny', 'row_1', 'row_2', 'row_3', 'lane'} -> NoteBlock
@@ -44,6 +46,9 @@ PUBLIC API
       .lights(st, shot, scale=1.0, stage=None, lane=None, at=None, **Stage.lights kw)   Stage.lights + the set's
                        lanterns: 'bandstand' x stage, 'lane' x lane (default scale), and the placed lantern
       .tap(who, player, frame, **kw)            = notes[who].tap(...)
+      .kicker(st, shot, at, watts=60, color=warm)   a film-local warm point light at `at` that only `shot` sees
+                       (keyed hidden elsewhere: no other frame's stamp changes): beat 8's fill on Steve's turned
+                       face (steve_turn_kicker_target, 30 W), optional for Kai's head in beat 7 and beat 3's rim
   NoteBlock  .cell .base .instrument .note0 .point (where its note spawns) .center .top
       played(frame, note=None, camera=None, seed=0, glow=None)  what the game shows when the block is played ON
                        `frame`: ONE note particle, its colour from the note (note_colour). The block itself does not
@@ -72,7 +77,9 @@ PUBLIC API
                        somebody takes it (the game: not before 10 ticks).
       stop(frame), playing_at(frame)
   LastLantern (band.last_lantern)  place(frame, player=None) the lantern block and its light appear ON frame with
-      the placing swing; level(frame, scale); show(frame, visible) (a Stage cast member); objects().
+      the placing swing; level(frame, scale) (Band.lights sets it per shot); objects(); show(frame, visible).
+      Do NOT put it in st.cast unless you st.use it in EVERY shot that sees the north post: Stage.finish would hide
+      it from its post in all the others. Left out of st.cast it stands on the post from the place() frame on.
   creeper_disc(feet, frame, disc="music_disc_11", seed=0, world=v, until=None, name=None, face=None) -> DroppedItem
       beat 16: the disc a creeper drops when a skeleton's arrow kills it (loot_table/entities/creeper.json: one of
       the 12 discs of #creeper_drop_music_discs), spawned ON the killing-blow frame at its feet with the item toss,
@@ -89,11 +96,14 @@ PUBLIC API
       0.55). players.hold accepts all of them (nothing had to be built here). KEY IT PER SHOT: hold(..., frame=f0)
       (a hold without frame is for the whole film: the last call wins in every shot), hold(None, frame=f0) to empty.
   present(player, f0, f1, target, hand="right", ease=6)   the arm held straight out at `target` (the lens) so a
-      flat item shows the lens its face (beats 6, 20, 24); a film gesture (third-person players raise an arm only
-      for bows, shields, the horn, the spyglass). Aimed from the shoulder at f0 (0.7 degrees off in the self-test).
+      flat item shows the lens its face (beats 6, 19, 20, 24); a film gesture (third-person players raise an arm
+      only for bows, shields, the horn, the spyglass). Aimed from the shoulder at f0 (0.7 degrees off in the
+      self-test). ease = frames the arm takes to rise: pass ease=0 when the shot OPENS on the raised arm (a cut),
+      or the raise smears through the first frames under motion blur.
   clap(player, frame, count=6, every=4, down=2)   the players' applause: fast crouches (players sneak snaps)
   hero_item(item_id, collection=None)    a flat item on its own (engine.mcassets.item_object), for close-ups
-  cameras() -> {name: dict(pos, target, lens, fstop, focus, beat[, pos1, target1])}   (Shot.move / lens / focus)
+  cameras() -> {name: dict(pos, target, lens, fstop, focus, beat[, pos1, target1, place_at])}  (= CAMERAS; Shot.move
+      (pos, target, pos1, target1) / Shot.lens(lens, fstop) / Shot.focus(focus)); bd.cameras is the same table
   SKIES                                  the proofs' skies: gold = golden, sun az 240 el 27 (south-west: in front of
       the west-facing stage, 120 degrees off a camera looking east at it; the farm that way is low); night = the moon
       of tools/check_hostiles_crammys (az 176, el 21: from the west, the stage front is moonlit)
@@ -101,68 +111,140 @@ PUBLIC API
   JUKEBOX_NOTES 4, EJECT_UP 1.01, EJECT_SPREAD 0.7, ITEM_TOSS, SONG_SECONDS, CREEPER_DISCS, INSTRUMENT_OF; the set:
   STAGE, HEROES, DRESSING_NOTES, HERO_NOTES (zuri 6, kai 10, sunny 0), JUKEBOX_CELL, PEDESTAL, POSTS, LANE.
 
-ANCHORS (seed 1; stage floor z 1.0, ground -0.06 / 0.0)
-  performers at their note blocks, facing them: zuri (-6.6, 2.85), kai (-6.6, 1.65), sunny (-6.6, -1.3); noor
-  (-5.45, 2.45, facing west), alex (-5.5, 1.45); alex_post (-7.0, 3.25: beat 5, facing the north post's top);
-  alex_eject (-5.6, 0.5: behind the jukebox, facing west); steve_center (-5.6, 1.25: beat 24, centre stage behind
-  the jukebox, 0.75 north of its notes, which would rise in front of a face there); steve_jukebox (-6.5, 1.6: at
-  the jukebox's north side, facing it); alex_beside (-5.6, 1.65, facing south); steve_wing (-6.4, 5.4: the wing,
-  stage height); half_1..4 (beat 19: south of the jukebox, facing the wing); flank_n1..3 / flank_s1..3 (beats
-  22-24: north / south of the jukebox, facing it: three-quarter faces from the front); three_sunny / three_steve /
-  three_noor (beat 18: a row across the south half, facing the jukebox). On the ground: steve_front (-11.2, -0.3:
-  beat 1), steve_kai (-9.65, 0.05: beat 3), steve_foot (-9.75, -1.15: beat 4), steve_watch (-9.6, -2.3: beat 8),
-  line_1..5 (x -10.2, y 2.3 .. -2.7, facing west: beat 6, line_5 = Steve). Targets: note_<who>_target,
-  base_<who>_target, jukebox_target, jukebox_top_target, pedestal_target, center_target, wing_target. Lane:
-  lane_kai (2.75, 16.75, facing west), lane_from_south (0.4, 9.8), lane_from_north (0.4, 22.5), lane_note_target,
-  lane_door_target (house_e's door); doors: v.doors['house_e'] (the narrator's, v.door_open('house_e', f)).
+ANCHORS (seed 1; stage floor z 1.0, ground -0.06 / 0.0; bd.A[key], bd.yaw[key]; ANCHORS_2D lists them all)
+  On the stage: zuri (-6.6, 2.85), kai (-6.6, 1.65), sunny (-6.6, -1.3) at their note blocks, facing them; noor
+  (-5.55, 0.5: beat 1, behind the jukebox, facing west); alex_post (-6.65, 2.75: beat 5, facing the north post's
+  top); alex_eject (-5.6, 0.5: beat 8, behind the jukebox) with zuri_watch (-5.75, 1.6) and kai_watch (-5.7, -0.6)
+  either side of her; steve_wing (-6.4, 5.4: the north wing); three_sunny (-5.45, -1.15), three_steve (-5.95,
+  -1.95), three_noor (-5.35, -2.7) (beat 18); alex (-5.2, 0.55: beat 19's start, behind the jukebox);
+  steve_jukebox (-5.6, -0.3: the jukebox's south-east corner, facing it: beats 19-24, Steve inserts from here);
+  alex_beside (-6.2, -0.9: beat 20); the RING (beats 19, 22-24), a staggered arc north of the jukebox, all facing it:
+  ring_alex (-4.6, 1.4), ring_kai (-5.15, 2.15), ring_zuri (-5.5, 2.9), ring_sunny (-6.05, 3.6), ring_noor
+  (-6.5, 4.4) (with steve_jukebox: 0.7-0.75 apart in y, so from the front no face is behind another; none stands
+  in the jukebox's note column y 0..1); kai_step (-5.15, 1.7: beat 23, the end of Kai's one step).
+  On the ground before the stage: steve_front (-13.8, -0.75: beat 1, three-quarter to the b1 lens), steve_kai
+  (-10.7, -1.2: beat 3), steve_foot (-9.75, -1.15: beat 4), steve_watch (-8.75, 0.45: beat 8, before the front
+  row's gap), line_1..5 (x -10.2, y 2.3 .. -2.7, facing west: beat 6, line_5 = Steve).
+  Paths on the stage (bd.v.paths, z 1.0): bandstand_steve_cross (beat 2, x -5.4, y 0.6 -> 5.2, behind Zuri),
+  bandstand_wing_to_three (beat 18: steve_wing along the back wall to three_steve, between Sunny and Noor; clear of
+  the jukebox). Lane: lane_kai (2.35, 16.85, facing west), lane_from_south (0.4, 9.8), lane_from_north (0.4, 22.5);
+  paths lane_home, lane_to_square; doors v.doors['house_e'] (the narrator's: v.door_open('house_e', f)).
+  Look targets: note_<who>_target, base_<who>_target, jukebox_target, jukebox_top_target, pedestal_target,
+  last_lantern_target (the north post's lantern), steve_away_target (beat 8), lane_note_target,
+  steve_turn_kicker_target (beat 8), lane_lantern_target, lane_door_target, lane_kicker_target.
 
-BEATS (camera = bd.cameras[name]; every camera checked on a still, out/test/music_cams_gold.png and
-music_cams_night.png; key holds and notes per shot; night torches scale 1.3)
-   1  'b1'  40 mm f/2, low (z 1.0), push in (pos -> pos1). Steve at steve_front (on the right third, sharp); zuri,
-           kai, sunny tap (bd.tap(who, p, f)), noor: hold(noor, 'goat_horn', frame=f0); noor.toot(f0, f1) (no note:
-           a horn makes none). Sunny's head is at the frame edge; Steve can turn his head 70 degrees, not back.
-   2  'b2'  40 mm, close on Zuri's note block on white wool, tilt target -> target1 (her face). notes['zuri'].song(
-           zuri, f, count=4, every=8, camera=s): red-magenta, red, ... (one semitone and one colour per tap).
-   3  'b3'  45 mm: past Steve's shoulder (steve_kai, soft, right) to Kai's note block on gold; rack focus to
-           kai's face (focus=(-7.5, 1.5, 1.2) then kai.head). The sun (south-west) is behind the camera: no rim on
-           the gold.
-   4  'b4'  30 mm static wide; sunny taps ONE note (bd.tap('sunny', ...)); zuri and kai look_at him; Steve at
-           steve_foot looking at the ground.
-   5  'b5'  35 mm close on the totem (bd.totem(f0, f1, face=cam['pos'])) rising and pulling back to pos1 (the
-           whole stage); alex at alex_post: hold(alex, 'lantern', frame=f0);
-           bd.last_lantern.place(f, player=alex); alex.hold(None, frame=f + 1).
-   6  'b6'  35 mm, dolly pos -> pos1 along the line (line_1..4: zuri note_block, noor goat_horn, alex
-           music_disc_cat, sunny pumpkin; line_5 = Steve, empty hands): hold(p, item, frame=f0); present(p, f0, f1,
-           the point the dolly passes in front of p (x -13.0, y_p + 1.0, z 1.5)); rack the focus along the line
-           (Shot.focus(..., at_s=...)): the proof holds it on the first act.
-   7  'lane' 20 mm from Kai's doorstep: kai at lane_kai (back of his head soft, right), his gold block and note block
-           (left), the lantern above his head (right edge), the narrator's door across the lane; Steve
-           walk(f, v.paths['lane_home'], sprint=True) (left to right, then in at house_e's door: v.door_open('house_e',
-           ...)); the zombie (engine.undead) 4 blocks behind on the same path; kai.look_at(f, steve) to follow.
-   8  'b8'  40 mm over Steve's shoulder (steve_watch, head soft lower left): jukebox.play(f0 - 30, f, disc=
-           'music_disc_cat'); alex at alex_eject: item = bd.jukebox.eject(f, player=alex, camera=s); st.cast[item.name]
-           = item; steve.look_at(f + 2, item.root) then away; rack focus to his profile.
+BEATS (camera = bd.cameras[name]; Shot.lens(c['lens'], c['fstop']); Shot.move(c['pos'], c['target'],
+c.get('pos1'), c.get('target1')); Shot.focus(c['focus']). Every staging below is tools/music_proof.py shot_b<N>;
+tools/check_music_zones.py puts every listed face inside x 8-82 %, y 14-60 % of the frame, seen by at least 4 of 5
+rays (no neighbour, post or block in front) and, where a face must read, turned at most 75 degrees from the lens;
+the stills are out/test/music_cams_gold.png, music_ends_gold.png, music_cams_night.png, music_ends_night.png and the
+take sheets music_b5x.png, music_b8x.png, music_b24x.png. Notes: camera=s. Holds: hold(p, item, frame=f0).
+Golden hour: bd.lights(st, s, scale=1.0); night: scale=1.3.)
+   1  'b1'  35 mm f/2 at Steve's head height (z 1.85), push in 0.6 block. Steve at steve_front (sharp, 61-63 % x,
+           57 % y: focus steve.head), the four acts in a row ABOVE his head at 44 % y: zuri (15 %), kai (32 %), noor at
+           'noor' behind the jukebox (50 %, just above Steve's hair: hold(noor, 'goat_horn', frame=f0);
+           noor.toot(f0 + 4, f1): no note), sunny (74 %); their three notes at 16 / 31 / 78 %. Taps spread over
+           the shot (bd.tap('zuri', z, f0 + 6, camera=s), kai f0 + 16, sunny f0 + 26 ...). Steve's head back to
+           them: steve.look_at(f, kai's eyes), then to the lens.
+   2  'b2'  40 mm, close on Zuri's note block on white wool (both big; the wool's face fills the lower third),
+           tilt AND rise (pos z 1.05 -> 1.9) to her face (50 %, 48 %, looking screen right); her riff:
+           notes['zuri'].song(zuri, f0 + 2, count=6, every=9, camera=s) (red-magenta, red ... one semitone and one
+           colour per tap). Steve crosses behind her on the stage: place(f0, paths['bandstand_steve_cross'][0], 0);
+           walk(f0 + 8, that path, speed=1.6); look_at(f0 + 8, zuri); soft; rack the focus to zuri.head at f0 + 28.
+   3  'b3'  35 mm f/2.2 from the south-west, z 1.4: Kai's face at 54 %, 30-32 % (looking screen left), his note
+           block on gold in the middle (the gold block's lit front face at 38 %, 59 %), Steve at steve_kai: only
+           his left arm and shoulder, soft, in the right fifth (82 %). focus = the gold face, then
+           s.focus(kai.head, at_s=f0 + 24 frames) and hold. notes['kai'].song(kai, f0 + 4, count=4, every=12).
+           The 'sun rim': the gold block's back, top and sides are covered (the note block on it, the platform
+           around it), so only its front face can catch the sun; SKIES gold (az 240) lights that face at a
+           60-degree angle: the brightest gold in the frame. A real rim needs a light behind the block, which the
+           set cannot have; for a warm edge on Kai and the note block use bd.kicker(st, s, (-5.9, 2.6, 3.4),
+           watts=60) (behind him, the sun's colour) - optional, not in the proofs.
+   4  'b4'  28 mm f/5.6 static wide: Sunny alone at the south end (72 %) taps ONE note (bd.tap('sunny', su, f0 + 6));
+           zuri (14 %) and kai (31 %) look_at Sunny's eyes on f0 + 12 (ease 6) and back on f0 + 44; Steve at
+           steve_foot (77 %, 53 %) looking at the ground before him.
+   5  'b5'  35 mm f/2.8: close on the totem (bd.totem(f0, f1 + 1, face=c['pos']); st.cast[t.name] = t; st.use(s, t)),
+           rising and pulling back to the whole bandstand (pos1 x -22, z 4.6; both posts inside 16-90 % at the
+           end). Alex at alex_post (hold(alex, 'lantern', frame=f0)); the north post enters the frame late in the
+           move, so place the lantern at fp = f0 + c['place_at'] * (f1 - f0) (0.9) or later:
+           bd.last_lantern.place(fp, player=alex); alex.hold(None, frame=fp + 1). At fp the lantern is at 16 %,
+           Alex at 27 %; at the end 18 % / 28 %.
+   6  'b6'  35 mm f/2.8 dolly along the line (pos -> pos1, y 3.3 -> -1.7): line_1..4 = zuri note_block, noor
+           goat_horn, alex music_disc_cat, sunny pumpkin (hold(p, item, frame=f0); present(p, f0, f1,
+           (-13.0, y_p + 1.0, 1.5), ease=0)); line_5 = Steve, hands empty: present(steve, f0 + 6, f1, hand,
+           ease=8) and look_at(f0 + 8, hand) with hand = line_5 + (-0.75, 0.25, 1.05) (his empty hand held out
+           low; the head alone pitches at most 35 degrees, so lowering the eyes without the hand does not read). The dolly passes each act at 48-52 % x, its item at 28-34 % x and 33-41 % of
+           the frame wide (frames: tools/music_proof.shot_b6); rack the focus to each act's item as it passes
+           (8 frames before).
+   7  'lane' 16 mm f/2.8 from Kai's doorstep (the camera stands just outside house_f's door): Kai at lane_kai, the
+           back of his head soft at 74 %, 52 %; his lantern just beside it at 90 % (top 30 %, foot 42 %, whole);
+           his gold block and note block at the left edge (13 %); the narrator's door (house_e) in the middle.
+           Steve: place(f0, paths['lane_home'][0]); walk(f0, paths['lane_home'], sprint=True) left to right and in
+           at the door: v.door_open('house_e', end - 8), v.door_open('house_e', end + 4, open=False); the zombie
+           (engine.undead) 4 blocks behind on the same path; kai.look_at(f, steve) every 6 frames to follow him
+           (his profile turns into the lantern light). bd.lights(st, s, scale=1.3): at 16 mm from his doorstep
+           the lantern beside him lights his blond hair from the side (music_lane.png, music_doorstep.png); if a
+           film wants more on the back of his head, bd.kicker(st, s, bd.A['lane_kicker_target'], watts=40) (his own
+           doorway behind him; optional, not in the proofs).
+   8  'b8'  32 mm f/2.4, high (z 3.0) over Steve at steve_watch, aimed at the jukebox top so its slot and the
+           disc read; tilt down (target -> target1) to Steve as he turns away. zuri at zuri_watch, kai at kai_watch,
+           alex at alex_eject (all look_at jukebox_top_target); bd.jukebox.play(f0 - 30, fe, disc='music_disc_cat',
+           camera=s); item = bd.jukebox.eject(fe, player=alex, camera=s, until=f1 + 1); st.cast[item.name] = item;
+           st.use(s, item); steve.look_at(fe + 2, item.root, ease=6); then he turns away toward the dark farm:
+           steve.face(fe + 34, bd.A['steve_away_target'], ease=20) and look_at(fe + 34, the same, ease=16) (the
+           head alone stops at 70 degrees and shows the lens the side of his hair); focus item.sprite, then
+           s.focus(steve.head, at_s=fe + 38 frames). Lights: bd.lights(st, s, scale=1.3) and
+           bd.kicker(st, s, bd.A['steve_turn_kicker_target'], watts=30) (a low warm fill from the camera side:
+           turned away from the lanterns his face and trousers are otherwise crushed, palette check 11 < 12 without
+           it, 22 with it). At fe + 10 the disc is at 44 %, 36 % (13 % of the frame wide),
+           the jukebox top at 52 %, 49 %, Steve's soft head low (36 %, 74 %); at the end, after the tilt, his face
+           three-quarter (49 degrees from the lens) at 50 %, 55 %, the disc lying on the jukebox at 57 %, 21 %.
   16  music.creeper_disc(cr_feet, kill_frame, world=v, face=lens, until=f1): ON the killing blow (hostiles shoot
            kill=True returns its frame); aim at item.rest_pos (out/test/music_meadow_disc.png, 'meadow_disc' 40 mm
            from z 0.65: a black shape on the moonlit ground). No experience orbs (a skeleton's kill gives none).
-  17  'lane' the same camera; Steve walk(f, v.paths['lane_to_square'], sprint=True) right to left with
+  17  'lane' the same camera, no Kai; Steve walk(f, paths['lane_to_square'], sprint=True) right to left with
            hold(steve, 'music_disc_11', frame=f0) (edge-on while running, as the story allows).
-  18  'b18' 35 mm from the stage's front-south at head height: three_sunny, three_steve, three_noor (Steve can walk on
-           from steve_wing behind the jukebox first); sunny.look_at(f, steve chest) and back to jukebox_top_target.
-  19  'b19' 32 mm from the wing, behind and above Steve walking steve_wing -> steve_jukebox (speed 1.6, disc held);
-           zuri, kai, sunny, noor at half_1..4 facing the wing (look_at Steve); alex at alex, steps aside.
-  20  'b20' 40 mm from across the jukebox (south of it): steve at steve_jukebox, alex at alex_beside, both
-           present(p, f0, f1, cam['pos']) with music_disc_11 / music_disc_cat: both discs face-on; then the arm comes
-           down (present ends) and bd.jukebox.insert(f, player=steve, disc='music_disc_11', camera=s): first note.
-  21  'b21' 32 mm, the jukebox sharp in front (its notes rising), push pos -> pos1 to Steve at steve_jukebox.
-  22  'b22' 30 mm locked-off frontal wide: flank_n1..3 and flank_s1..3 (Steve one of them), all facing the jukebox
-           (their faces three-quarter to the lens), jukebox.play running; nobody moves.
-  23  'b23' 30 mm from beside the jukebox (over the front gap) along the north row's faces (flank_n1..3 face the
-           lens); the south row is behind the camera: put the five turners in the north row for this shot or accept
-           profiles. kai steps (walk speed <= 1.0, at least 7 frames), heads turn in sequence (look_at f, f+6, ...).
-  24  'b24' 45 mm medium on Steve at steve_center facing the lens, hold(steve, 'totem_of_undying', frame=f0),
-           present(steve, f0, f1, cam['pos']); the pedestal (empty: totem(..., picked=f) earlier, or no totem() in
-           this shot) at the bottom right; pull back to pos1; the five at the flanks clap(p, f + 2 * i, count=6).
+  18  'b18' 40 mm f/3.2 from the front-south at head height: sunny at three_sunny (23 %), noor at three_noor
+           (72 %), both look_at jukebox_top_target; Steve with the disc walks on: place(f0, paths[
+           'bandstand_wing_to_three'][2]) and walk(f0, that path from point 2, speed=1.6) (the part the camera sees;
+           start at point 0, the wing, if the shot is long enough: 9.5 blocks), ends at three_steve (51 %) and
+           looks at the jukebox; sunny.look_at(end + 4, Steve's chest) and back at end + 20. Noor does not turn.
+           (The story then has Sunny and Noor in the half circle beyond the jukebox in beat 19: cut on Steve's walk.)
+  19  'b19' 28 mm f/4 from behind and above Steve (south-west, z 4.0): kai, zuri, sunny, noor at ring_<name>
+           facing him (61 / 50 / 38 / 29 %, 44-48 % y, all seen); Steve from three_steve: hold(steve,
+           'music_disc_11', frame=f0); present(steve, f0, f1, jukebox_top_target + 0.9 up, ease=0) (the disc
+           raised); walk(f0 + 4, [three_steve, steve_jukebox], speed=1.3); the four look_at Steve every 8 frames;
+           alex at 'alex' steps aside: walk(f0 + 10, [alex, ring_alex], speed=1.2).
+  20  'b20' 40 mm f/2.4 from across the jukebox (north-west of it, z 2.65): steve at steve_jukebox, alex at
+           alex_beside; hold(steve, 'music_disc_11', frame=f0), hold(alex, 'music_disc_cat', frame=f0);
+           present(steve, f0, fi - 8, c['pos'], ease=0), present(alex, f0, f1, c['pos'], ease=0): disc 11 at 20 %,
+           34 % of the frame wide (the story's third), cat at 73 % (32 %), Steve's face soft between them (40 %);
+           focus = his disc. Then bd.jukebox.insert(fi, player=steve, disc='music_disc_11', camera=s, until=...)
+           (fi = f0 + 44 in the proof): his arm comes down, the disc leaves the hand, the first note rises.
+  21  'b21' 32 mm f/2.4: the jukebox sharp in front (its slot from above), its notes rising (bd.jukebox.play(f0 -
+           10, f1 + 1, camera=s)); push pos -> pos1 and re-aim to Steve at steve_jukebox (50 %, 48 % at the end),
+           who looks from the jukebox to the others (look_at(f0 + 26, ring_kai eyes, ease=20)).
+  22  'b22' 24 mm f/5.6 locked-off frontal wide of the whole stage (both lantern posts at 29 % / 84 %; the camera
+           stands south of the village lamp post at (-17.3 / -15.7, 2.5), which would otherwise fill the left
+           edge): steve at steve_jukebox, the five at ring_<name>, everybody look_at jukebox_top_target,
+           jukebox.play running; nobody moves. The six faces at 24-63 % x, 48 % y, all seen (about 4.5 % of the
+           frame wide each: a wide).
+  23  'b23' 24 mm f/3.2 from the south-west past the pedestal and the jukebox, along the ring: the same spots as 22;
+           kai walk(f0 + 6, [ring_kai, kai_step], speed=0.8) (one slow step, 14 frames) and look_at(f0 + 8, steve,
+           ease=10); then zuri, sunny, noor, alex look_at(f0 + 26 + 7 i, steve, ease=7) in that order; steve
+           look_at the jukebox, then (f0 + 52) at them. Faces: noor 12 %, sunny 24 %, zuri 36 %, kai 48-53 %,
+           alex 62 %, Steve 76 % (his face while he looks at the jukebox, the back of his head after); all seen,
+           the five turned 17-40 degrees from the lens once they look at him.
+  24  'b24' 40 mm f/2.8: medium on Steve at steve_jukebox facing the lens (place(f0, ..., bd.yaw[...]) then
+           look_at(f0, c['pos'])), hold(steve, 'totem_of_undying', frame=f0), present(steve, f0, f1, c['pos'],
+           ease=0): the totem at 41 %, 47 % (17 % wide), the EMPTY gold pedestal straight below him (57 %, 75 %)
+           - the totem was never placed in this shot (bd.totem is per shot; if one was registered with
+           st.cast it is hidden here unless st.use'd; an unregistered DroppedItem stays forever: always register).
+           The five at ring_<name> look_at Steve and clap(p, f0 + 30 + 2 i, count=...); pull back and up to pos1
+           (z 4.6): at the end all six heads at 11-80 % x, 47-48 % y (alex 56, kai 46, zuri 35, sunny 24, noor 11,
+           Steve 80), the pedestal at 85 %. From the front the row of note blocks hides them below the chest: the
+           claps read as heads and shoulders bobbing (music_b24x.png); the higher end camera shows them from the
+           waist. Jukebox notes keep rising (bd.jukebox.play).
 
 WHAT THE GAME DOES (transcribed from the 26.3 client jar; no game file is copied)
   NoteBlock         triggerEvent: addParticle(NOTE, x + 0.5, y + 1.2, z + 0.5, note / 24, 0, 0) and the sound at pitch
@@ -190,6 +272,8 @@ WHAT THE GAME DOES (transcribed from the 26.3 client jar; no game file is copied
 
 WHERE IT DIFFERS FROM THE GAME (on purpose or not modelled)
   - present() is a film gesture: no third-person pose raises an arm to show an item.
+  - Band.kicker() is a film light (the game lights by block light levels): use it only where the story asks for a
+    light the set cannot give.
   - The note colour of the jukebox is drawn from a seeded generator, the game's from the level random.
   - eject(land="top") chooses the seed of a toss that stays on the jukebox; the game's toss can roll off the side.
   - A dropped item rests where item_track lands it (full cubes and dirt paths); slabs and stairs are not floors.
@@ -201,22 +285,37 @@ WHERE IT DIFFERS FROM THE GAME (on purpose or not modelled)
 GOTCHAS
   - KEY HOLDS PER SHOT (hold(p, item, frame=f0)), in film order: Player.hold without a frame is for the whole film.
   - Notes need camera= (the Shot) to face the lens; a cut that jumps in time: engine.fx.stop_particles(first frame).
-  - The jukebox's notes rise in front of anybody standing right behind it on its axis (x -5.6, y 0.5) seen from the
-    front: steve_center stands 0.75 north of it.
-  - Performers at their note blocks are seen from the chest up from the front (the front row is 1 block high on
-    the 1-block platform); full figures: the wing (b19) or the frontal wide from higher up.
-  - The pedestal's totem covers the face of whoever stands right behind it from a camera at the totem's height.
-  - LastLantern is not in v.lantern_lights: Band.lights (not Stage.lights alone) sets its level per shot.
-  - A dropped disc / totem must be registered with the Stage (st.cast[item.name] = item) to be hidden in other shots.
+  - The jukebox's notes rise in its column (x -6.5, y 0.5, z 2.2-2.75): seen from the front they cross any face
+    behind it at y 0..1; no anchor stands there at night (noor, alex_eject and alex stand there only while it is
+    silent or for its eject).
+  - THE JUKEBOX READS ONLY FROM ABOVE: its side texture is the note block's (jukebox_side vs note_block in the
+    26.x textures), so from the front it is one more note block; its top (the slot) shows from cameras 0.8 block
+    or more above it within 4 blocks: b8 (start), b20, b21 and the proof camera 'jukebox' (z 3.7, the
+    establishing view of the slot, usable as a cutaway before beat 8).
+  - From the front the row of note blocks (z 1-2) hides performers below the chest; the higher b24 end and the
+    'clap' camera show more. Full figures: b19 from above, b2 / b3 from the side.
+  - The pedestal's gold block stands before the stage (x -9, y -1): cameras south-west of the stage see it big in
+    the foreground (b8, b23, b24's start: there it is the empty pedestal the beat asks for).
+  - The village lamp post at (-17.3 / -15.7, 2.5) stands in the corridor before the stage: a camera behind x -15
+    at y 1-3 looks through it (b22 and b24's end sit at y 0.3-0.6 for that reason).
+  - LastLantern is not in v.lantern_lights: Band.lights (not Stage.lights alone) sets its level per shot; keep it
+    out of st.cast (see LastLantern).
+  - A dropped disc / totem must be registered with the Stage (st.cast[item.name] = item; st.use(shot, item)): an
+    unregistered engine.mobs DroppedItem is shown in every frame after it is placed.
   - Night torches at 1.3: the palette check passes (stone G/R 0.98-0.99 at night, 0.93-0.94 at golden hour on the
     proofs). Do not boost the bandstand's lanterns beyond 1.6 near the cobblestone of the well behind the wall.
+  - The story puts Sunny and Noor beside Steve in beat 18 and in the half circle beyond the jukebox in beat 19, and
+    has Steve walk to the jukebox in 19 from where he stopped in 18: the anchors follow each picture (three_* for
+    18, ring_* for 19-24); cut on his walk.
 
-Self-test:  $BPY -m engine.music                       numbers, the set in the village, the calls' keys (33 checks, 10 s)
+Self-test:  $BPY -m engine.music                       numbers, the set in the village, the calls' keys (10 s)
             $BPY -m engine.music stills NAME ...        proof stills out/test/music_<NAME>.png through the real look
-                                                       (tools/music_proof.py: wide_gold wide_night notes jukebox discs
-                                                       totem held horn doorstep clap meadow_disc cams_gold cams_night;
-                                                       10-30 s each, 3-4 per call); MUSIC_RES=270x480 for framing tests
-            $BPY -m tools.check_music_stamp            the frame fingerprints follow every change (12 cases, 40 s; the
+                                                       (tools/music_proof.py: names in its docstring; b1 ... b24,
+                                                       cams_gold, cams_night, ends_gold, ends_night, b5x, b8x, b24x
+                                                       ...; 10-60 s each); MUSIC_RES=270x480 for framing tests
+            $BPY -m tools.check_music_zones [gold|night] [shot ...]   every beat's faces and props against the
+                                                       Reels safe area, with occlusion rays (no rendering, 30 s)
+            $BPY -m tools.check_music_stamp            the frame fingerprints follow every change (40 s; the
                                                        same digest in two processes)
             $BPY -m tools.music_scout [x0 y0 x1 y1]   a top-down map of the square and the lane (no rendering)
 """
@@ -685,7 +784,7 @@ PEDESTAL = (-9, -1)                         # oak fence (z 0) + gold block (z 1)
                                             # block south of the centre line (it would hide the jukebox from the front)
 POSTS = {"south": (-8, -3), "north": (-8, 3)}       # 2 oak fences + a lantern; the north one is placed on camera
 WALL_LANTERNS = ((-4, -3), (-4, 3))         # lanterns standing on the back wall's top (z 4)
-LANE = dict(column=(1, 15), lantern=(1, 17), kai=(2.75, 16.75))  # Kai's doorstep in front of house_f (door at (4, 16))
+LANE = dict(column=(1, 15), lantern=(1, 17), kai=(2.35, 16.85))  # Kai's doorstep in front of house_f (door at (4, 16))
 LIGHT_GROUPS = ("bandstand", "lane")        # Stage.lights groups of the set's lanterns (the placed one: Band.lights)
 # the skies the proof stills are made under (a film's SKIES may copy them): the stage faces WEST, so the golden sun
 # stands in the south-west (az 240: 120 degrees off the lens of a camera looking east at the stage; nothing tall
@@ -694,6 +793,61 @@ LIGHT_GROUPS = ("bandstand", "lane")        # Stage.lights groups of the set's l
 SKIES = {
     "gold": dict(preset="golden", az=240.0, el=27.0, bloom=1.0, grade="warm"),
     "night": dict(preset="night", az=176.0, el=21.0, bloom=1.3, grade="cool"),
+}
+
+# The standing spots of the bandstand (Village.anchors 'bandstand_<key>'; stage floor z 1.0 unless in GROUND_ANCHORS,
+# which stand on the ground in front of the stage). Each one was placed with tools/check_music_zones.py (the face
+# inside the Reels safe area of its beat's camera, seen by at least 4 of 5 rays, turned at most 75 degrees from the
+# lens) and checked on a render (tools/music_proof.py). ANCHOR_LOOK: key -> (look point or "jukebox", yaw name).
+ANCHORS_2D = {
+    # beats 1-4 (golden hour): the three at their note blocks, 0.4 behind its back face and 0.35 to its side
+    "zuri": (-6.6, 2.85), "kai": (-6.6, 1.65), "sunny": (-6.6, -1.3),
+    "noor": (-5.55, 0.5),               # beat 1: behind the jukebox (silent at golden hour), between Kai and Sunny
+    "alex_post": (-6.65, 2.75),         # beat 5: places the last lantern on the north post (her face clear of it)
+    # beat 8 (night): Alex behind the jukebox facing the audience, Zuri and Kai either side of her watching it
+    "alex_eject": (-5.6, 0.5), "zuri_watch": (-5.75, 1.6), "kai_watch": (-5.7, -0.6),
+    # beats 18-24 (night)
+    "steve_wing": (-6.4, 5.4),          # the north wing (beat 18's walk on: path bandstand_wing_to_three)
+    "three_sunny": (-5.45, -1.15), "three_steve": (-5.95, -1.95), "three_noor": (-5.35, -2.7),   # beat 18
+    "steve_jukebox": (-5.6, -0.3),      # beats 19-24: the jukebox's south-east corner, facing it (he inserts the
+                                        # disc from here; 0.75 south of its notes seen from the front)
+    "alex": (-5.2, 0.55),               # beat 19's start: behind the jukebox; she steps aside to ring_alex
+    "alex_beside": (-6.2, -0.9),        # beat 20: beside Steve (screen right of him from the b20 camera)
+    # beats 19, 22-24: the ring, a staggered shallow arc north of the jukebox, facing it: 0.7-0.75 apart in y (the
+    # frontal wide), spread across the beat-23 camera; beat 19's half circle is ring_kai .. ring_noor
+    "ring_alex": (-4.6, 1.4), "ring_kai": (-5.15, 2.15), "ring_zuri": (-5.5, 2.9), "ring_sunny": (-6.05, 3.6),
+    "ring_noor": (-6.5, 4.4),
+    "kai_step": (-5.15, 1.7),           # beat 23: where Kai's one slow step from ring_kai toward Steve ends
+    # on the ground in front of the stage
+    "steve_front": (-13.8, -0.75),      # beat 1
+    "steve_kai": (-10.7, -1.2),         # beat 3: his left shoulder soft in the right fifth of the frame
+    "steve_foot": (-9.75, -1.15),       # beat 4: below the stage, looking at the ground
+    "steve_watch": (-8.75, 0.45),       # beat 8: at the foot of the stage, before the gap (the jukebox above him)
+    "line_1": (-10.2, 2.3), "line_2": (-10.2, 1.05), "line_3": (-10.2, -0.2), "line_4": (-10.2, -1.45),
+    "line_5": (-10.2, -2.7),            # beat 6: the line before the stage, facing west (line_5 = Steve)
+}
+GROUND_ANCHORS = ("steve_front", "steve_kai", "steve_foot", "steve_watch", "line_1", "line_2", "line_3", "line_4",
+                  "line_5")
+ANCHOR_LOOK = {
+    "zuri": ((-7.5, 2.5), None), "kai": ((-7.5, 1.5), None), "sunny": ((-7.5, -1.5), None),
+    "noor": (None, "west"), "alex_post": ((-7.5, 3.5, 3.0), None), "alex_eject": ("jukebox", None),
+    "zuri_watch": ("jukebox", None), "kai_watch": ("jukebox", None),
+    "steve_wing": ((-6.4, 0.0), None), "three_sunny": ("jukebox", None), "three_steve": ("jukebox", None),
+    "three_noor": ("jukebox", None), "alex": ("jukebox", None), "steve_jukebox": ("jukebox", None),
+    "alex_beside": ("jukebox", None), "ring_alex": ("jukebox", None), "ring_kai": ("jukebox", None),
+    "ring_zuri": ("jukebox", None), "ring_sunny": ("jukebox", None), "ring_noor": ("jukebox", None),
+    "kai_step": ("jukebox", None),
+    "steve_front": ((-17.0, -2.4), None), "steve_kai": ((-7.5, 1.5), None), "steve_foot": ((-6.5, 0.5, 2.0), None),
+    "steve_watch": ((-6.5, 0.5, 2.0), None),
+    "line_1": (None, "west"), "line_2": (None, "west"), "line_3": (None, "west"), "line_4": (None, "west"),
+    "line_5": (None, "west"),
+}
+
+# walks on the stage (Village.paths 'bandstand_<key>', z 1.0)
+STAGE_PATHS = {
+    "steve_cross": [(-5.4, 0.6), (-5.4, 2.6), (-5.4, 5.2)],            # beat 2: behind Zuri, south to north
+    "wing_to_three": [(-6.4, 5.4), (-4.55, 4.2), (-4.55, -0.2), (-4.7, -1.95), (-5.95, -1.95)],  # beat 18: along the
+                                                                        # back wall, then between Sunny and Noor
 }
 
 # village anchors that the bandstand covers: moved to the nearest free ground (name -> new 2D spot)
@@ -778,6 +932,8 @@ def bandstand(b, name="bandstand"):
     b.reserved.add((px, py))
     moved = _reroute_square(b)
     A = _stage_anchors(b, name)
+    for key, pts in STAGE_PATHS.items():                        # walks on the stage floor (z 1.0)
+        b.v.paths["%s_%s" % (name, key)] = [(float(x), float(y), 1.0) for x, y in pts]
     res = dict(name=name, cells=cells, notes=notes, jukebox=JUKEBOX_CELL, pedestal=(px, py, 1),
                pedestal_top=(px + 0.5, py + 0.5, 2.0), posts=dict(POSTS), last_lantern=(POSTS["north"] + (3,)),
                wall_lanterns=[(x, y, S["wall_top"] + 1) for x, y in WALL_LANTERNS], moved=moved, anchors=A,
@@ -853,38 +1009,15 @@ def _stage_anchors(b, name):
     target("pedestal", (PEDESTAL[0] + 0.5, PEDESTAL[1] + 0.5, 2.25))
     target("center", (-6.0, 0.5, 2.4))
     target("wing", (-6.5, 4.6, 2.0))
-    # performers at their note blocks: 0.4 behind the block's back face and 0.35 to its side, facing it
-    put("zuri", (-6.6, 2.85), look=(-7.5, 2.5))
-    put("kai", (-6.6, 1.65), look=(-7.5, 1.5))
-    put("sunny", (-6.6, -1.3), look=(-7.5, -1.5))
-    put("noor", (-5.45, 2.45), yaw=yaw_of("west"))
-    put("alex", (-5.5, 1.45), look=jc)                          # beside the jukebox, north-east of it
-    put("alex_eject", (-5.6, 0.5), look=jc)                     # beat 8: behind the jukebox, facing the audience
-    put("steve_center", (-5.6, 1.25), yaw=yaw_of("west"))       # beat 24: centre stage behind the jukebox, 0.75
-                                                                # north of its notes (they rise in front of a face)
-    put("steve_jukebox", (-6.5, 1.6), look=jc)                  # beats 19-21: at the jukebox, its north side
-    put("alex_beside", (-5.6, 1.65), yaw=yaw_of("south"))       # beat 20: beside him, her disc held out
-    put("steve_wing", (-6.4, 5.4), look=(-6.4, 0.0))
-    # beat 19: the half circle beyond the jukebox (south of it), facing the wing, staggered
-    for i, p in enumerate(((-6.65, -0.7), (-6.0, -1.65), (-5.1, -1.9), (-4.6, -0.8)), 1):
-        put("half_%d" % i, p, look=(-6.4, 5.0))
-    # beats 22-24: two groups flanking the jukebox, all facing it: from the front their faces are three-quarter
-    for i, p in enumerate(((-6.45, 2.2), (-5.55, 2.65), (-4.7, 2.95)), 1):     # (clear of b24's medium on Steve)
-        put("flank_n%d" % i, p, look=jc)
-    for i, p in enumerate(((-6.45, -0.75), (-5.6, -1.25), (-4.75, -1.6)), 1):
-        put("flank_s%d" % i, p, look=jc)
-    # beat 18: the three-shot, a row across the stage's south half facing the jukebox (Steve between them)
-    put("three_sunny", (-5.6, -0.65), look=jc)
-    put("three_steve", (-5.3, -1.55), look=jc)
-    put("three_noor", (-5.0, -2.45), look=jc)
-    # on the ground in front of the stage (the corridor before it and the street)
-    put("steve_foot", (-9.75, -1.15), look=(jx + 0.5, jy + 0.5, 2.0), ground=True)   # beat 4: below the stage
-    put("steve_watch", (-9.6, -2.3), look=(jx + 0.5, jy + 0.5, 2.0), ground=True)    # beat 8: at its foot
-    put("steve_front", (-11.2, -0.3), look=(-16.5, -1.6), ground=True)              # beat 1
-    put("steve_kai", (-9.65, 0.05), look=(-7.5, 1.5), ground=True)     # beat 3: his shoulder in the foreground
-    for i, y in enumerate((2.3, 1.05, -0.2, -1.45, -2.7), 1):  # beat 6: the line before the stage, facing west
-        put("line_%d" % i, (-10.2, y), yaw=yaw_of("west"), ground=True)
-    put("alex_post", (-7.0, 3.25), look=(-7.5, 3.5, 3.0))       # beat 5: Alex places the last lantern
+    target("last_lantern", (POSTS["north"][0] + 0.5, POSTS["north"][1] + 0.5, 3.3))     # the placed lantern
+    target("steve_away", (-12.0, -7.5, 1.4))                    # beat 8: where Steve turns to (the dark farm)
+    target("steve_turn_kicker", (-10.0, -1.0, 1.3))             # beat 8: a low warm fill on his turned face and
+                                                                # legs from the camera side (Band.kicker, 30 W)
+    for key, (x, y) in ANCHORS_2D.items():
+        look, yaw = ANCHOR_LOOK.get(key, (None, None))
+        if look == "jukebox":
+            look = jc
+        put(key, (x, y), look=look, yaw=yaw_of(yaw) if yaw else None, ground=key in GROUND_ANCHORS)
     return A
 
 
@@ -918,6 +1051,8 @@ def lane_set(b, name="lane"):
     home = b.path(name + "_home", [(0.4, 9.8), (0.3, 13.6)] + entry_e, replace=True)
     to_square = b.path(name + "_to_square", [(0.4, 22.5), (0.4, 12.0), (0.2, 8.0), (-2.0, 6.0)], replace=True)
     v.anchors[name + "_note_target"] = (cx + 0.5, cy + 0.5, 1.5)
+    v.anchors[name + "_lantern_target"] = (lx + 0.5, ly + 0.5, 2.3)
+    v.anchors[name + "_kicker_target"] = (3.75, 17.1, 2.45)        # in Kai's open doorway, above and behind him
     v.anchors[name + "_door_target"] = tuple(v.anchors["house_e_door"])
     res = dict(name=name, column=(cx, cy), lantern=(lx, ly, 2), anchors=A, home=home, to_square=to_square,
                narrator_door="house_e", kai_door="house_f")
@@ -1089,6 +1224,25 @@ class Band:
         st.lights(shot, scale=scale, groups=groups, at=at, **kw)
         self.last_lantern.level(shot.frame_start if at is None else at, groups["bandstand"])
 
+    def kicker(self, st, shot, at, watts=60.0, color=(1.0, 0.86, 0.66), name=None):
+        """A film-local warm light at `at` that only `shot` sees (keyed visible on its frames, hidden elsewhere, so
+        no other frame's stamp changes): the stand-in for a low sun's rim or a practical just out of frame where
+        the story asks for one the set cannot give (beat 3's 'sun rim', the back of Kai's head in beat 7 at
+        night). A lantern-type point light (smoothed falloff, soft shadows) of `watts`; returns the light."""
+        from . import props
+
+        ob = props.make_light("lantern", self.collection)
+        ob.name = name or "music_kicker_%s" % shot.name
+        ob.location = tuple(float(c) for c in at)
+        ob.data.color = tuple(float(c) for c in color)
+        ob.data.energy = float(watts)
+        ob["group"] = "music_kicker"
+        f0, f1 = shot.frame_start, shot.frame_end
+        for f, hidden in ((min(1, f0) - 1, True), (f0, False), (f1 + 1, True)):
+            st.key(ob, "hide_render", f, hidden)
+            st.key(ob, "hide_viewport", f, hidden)
+        return ob
+
     def tap(self, who, player, frame, **kw):
         """notes[who].tap(player, frame, **kw): the player plays his note block (see NoteBlock.tap)."""
         return self.notes[who].tap(player, frame, **kw)
@@ -1096,8 +1250,16 @@ class Band:
 
 def band(v, name="bandstand", lane="lane", collection=None):
     """The handles of the set after village.build_village(..., edit=music.crammys_set): Band (anchors A / yaw,
-    cameras, notes, jukebox, last_lantern, totem(), lights())."""
-    return Band(v, name, lane, collection)
+    cameras, notes, jukebox, last_lantern, totem(), lights(), kicker()). Calling it again for the same village
+    returns the same Band (one placed lantern, one light: a film split into several modules may call it in each)."""
+    if name not in v.sets:
+        raise KeyError("music.band: the village has no %r set: build it with edit=music.crammys_set" % name)
+    cached = v.sets[name].get("_band")
+    if cached is not None:
+        return cached
+    bd = Band(v, name, lane, collection)
+    v.sets[name]["_band"] = bd
+    return bd
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1181,132 +1343,101 @@ def hero_item(item_id, collection=None):
 # suggested cameras (checked with the proof stills of tools/music_proof.py)
 # ----------------------------------------------------------------------------------------------------
 def cameras(A=None):
-    """name -> dict(pos, target, lens, fstop, focus, beat[, pos1, target1]) for the beats on this module's sets
-    (golden hour and night alike; Shot.move(pos, target, pos1, target1), Shot.lens(lens, fstop), Shot.focus)."""
-    jt = (-6.5, 0.5, 2.0)
-    cams = {
-        # 1: low, long lens, slow push in; Steve (steve_front) sharp, the stage soft behind him
-        "b1": dict(pos=(-16.2, -0.2, 1.0), target=(-6.6, 0.8, 2.3), pos1=(-15.4, -0.12, 1.05),
-                   target1=(-6.6, 0.8, 2.3), lens=40.0, fstop=2.0, focus=(-11.2, -0.3, 1.6), beat=1),
+    """name -> dict(pos, target, lens, fstop, focus, beat[, pos1, target1, place_at]) for the beats on this module's
+    sets (Shot.move(pos, target, pos1, target1), Shot.lens(lens, fstop), Shot.focus(focus)). Every one was placed with
+    tools/check_music_zones.py and checked on a render (tools/music_proof.py, out/test/music_cams_*.png)."""
+    return {k: dict(v) for k, v in CAMERAS.items()}
+
+
+CAMERAS = {
+    # 1: low, long lens, slow push in; Steve (steve_front) sharp in the foreground, the four acts above his head
+    "b1": dict(pos=(-18.6, -1.0, 1.85), target=(-6.8, 0.35, 1.9), pos1=(-18.0, -0.9, 1.85), target1=(-6.8, 0.35, 1.9),
+               lens=35.0, fstop=2.0, focus=(-13.8, -0.75, 1.6), beat=1),
+    # 2: close on Zuri's note block on its white wool, then tilt up to her face (she looks screen right)
+    "b2": dict(pos=(-10.9, 3.4, 1.05), target=(-7.5, 2.5, 1.15), pos1=(-10.9, 3.4, 1.9), target1=(-6.6, 2.85, 2.55),
+               lens=40.0, fstop=2.2, focus=(-7.5, 2.5, 1.0), beat=2),
+    # 3: the mirror: past Steve's soft shoulder (steve_kai) to Kai's note block on gold; focus up to his face
+    "b3": dict(pos=(-12.6, -1.3, 1.4), target=(-7.3, 1.45, 1.25), lens=35.0, fstop=2.2,
+               focus=(-8.0, 1.5, 0.75), beat=3),
+    # 4: static wide of the stage (Sunny at the far end, Steve below it)
+    "b4": dict(pos=(-16.5, -0.1, 1.6), target=(-6.6, 0.25, 2.0), lens=28.0, fstop=5.6, focus=(-7.0, 0.5, 2.0),
+               beat=4),
+    # 5: close on the totem above the pedestal, rising and pulling back to the whole bandstand; place_at = the
+    # fraction of the shot from which the north post (the last lantern) is inside the frame
+    "b5": dict(pos=(-9.75, -0.5, 2.6), target=(-8.5, -0.5, 2.38), pos1=(-22.0, 0.2, 4.6),
+               target1=(-6.5, 0.8, 2.2), lens=35.0, fstop=2.8, focus=(-8.5, -0.5, 2.35), beat=5, place_at=0.9),
+    # 6: travelling along the line beside the stage (line_1 .. line_5 = Steve) at hand height
+    "b6": dict(pos=(-13.0, 3.3, 1.5), target=(-10.2, 2.3, 1.3), pos1=(-13.0, -1.7, 1.5),
+               target1=(-10.2, -2.7, 1.3), lens=35.0, fstop=2.8, focus=(-10.2, 2.3, 1.3), beat=6),
+    # 7 and 17: from Kai's doorstep (lane_kai), past his head, across the lane to the narrator's door
+    "lane": dict(pos=(3.84, 16.5, 1.7), target=(-4.5, 15.95, 1.3), lens=16.0, fstop=2.8,
+                 focus=(1.5, 15.5, 1.2), beat=7),
+
+
+    # 8: high over Steve's shoulder (steve_watch) at the jukebox's top: the disc pops out; the camera tilts down
+    # to his profile as he turns away (target -> target1)
+    "b8": dict(pos=(-11.5, -0.3, 3.0), target=(-6.5, 0.5, 2.1), target1=(-8.75, 0.45, 1.75), lens=32.0, fstop=2.4,
+               focus=(-6.5, 0.5, 2.4), beat=8),
+
+    # 18: from the front of the stage at head height, a medium three-shot: Sunny, Steve, Noor (three_*)
+    "b18": dict(pos=(-11.6, -1.3, 2.9), target=(-5.8, -1.95, 2.45), lens=40.0, fstop=3.2,
+                focus=(-5.95, -1.95, 2.6), beat=18),
+
+
+    # 19: from the wing, behind and above Steve walking to the jukebox; the half circle beyond it facing us
+    "b19": dict(pos=(-6.9, -3.9, 4.0), target=(-5.6, 2.4, 2.4), lens=28.0, fstop=4.0,
+                focus=(-5.5, 2.5, 2.6), beat=19),
+
+
+    # 20: close from across the jukebox: both discs face-on to the lens (steve_jukebox, alex_beside, present())
+    "b20": dict(pos=(-8.0, 2.1, 2.65), target=(-5.7, -0.45, 2.45), lens=40.0, fstop=2.4,
+                focus=(-6.2, 0.25, 2.4), beat=20),
 
 
 
-        # 2: close on Zuri's note block on its white wool, then tilt up to her face
-        "b2": dict(pos=(-10.9, 3.4, 1.05), target=(-7.5, 2.5, 1.15), target1=(-6.6, 2.85, 2.55),
-                   lens=40.0, fstop=2.2, focus=(-7.5, 2.5, 1.0), beat=2),
+    # 21: the jukebox sharp in the foreground, notes rising; push past it to Steve beside it
+    "b21": dict(pos=(-8.7, 1.3, 2.9), target=(-6.5, 0.5, 2.1), pos1=(-8.0, 0.9, 2.85),
+                target1=(-5.6, -0.3, 2.55), lens=32.0, fstop=2.4, focus=(-6.5, 0.5, 2.1), beat=21),
 
-        # 3: the mirror: past Steve's soft shoulder (steve_foot) to Kai's note block on gold, pull to his face
-        "b3": dict(pos=(-10.7, -0.1, 1.45), target=(-7.5, 1.5, 1.4), lens=45.0, fstop=2.2,
-                   focus=(-7.5, 1.5, 1.2), beat=3),
-
-
+    # 22: the one locked-off frontal wide of the whole stage
+    "b22": dict(pos=(-20.5, -0.3, 3.6), target=(-6.0, 1.3, 2.3), lens=24.0, fstop=5.6, focus=(-5.5, 2.0, 2.4),
+                beat=22),
 
 
-        # 4: static wide of the stage (Sunny at the far end, Steve below it)
-        "b4": dict(pos=(-16.5, 0.2, 1.6), target=(-6.6, 0.6, 2.0), lens=30.0, fstop=5.6, focus=(-7.0, 0.5, 2.0),
-                   beat=4),
+    # 23: from beside the jukebox (north-west of it, over the front row) along the half circle's faces
+    "b23": dict(pos=(-10.6, -3.4, 3.5), target=(-6.0, 1.1, 2.25), lens=24.0, fstop=3.2,
+                focus=(-5.15, 1.9, 2.6), beat=23),
 
 
-        # 5: close on the totem above the pedestal, rising and pulling back to the whole bandstand
-        "b5": dict(pos=(-9.75, -0.5, 2.6), target=(-8.5, -0.5, 2.38), pos1=(-18.5, 0.3, 3.9),
-                   target1=(-6.4, 0.6, 2.1), lens=35.0, fstop=2.8, focus=(-8.5, -0.5, 2.35), beat=5),
+    # 24: medium on Steve (steve_jukebox) facing the lens, the totem held out; pull back and up to the clapping five
+    "b24": dict(pos=(-11.2, -0.5, 2.8), target=(-5.6, -0.3, 2.45), pos1=(-19.5, 0.3, 4.6),
+                target1=(-5.5, 1.8, 2.3), lens=40.0, fstop=2.8, focus=(-6.2, -0.35, 2.4), beat=24),
 
 
+    # proofs: each hero note block close (with its base block), the held block items, the horn, the jukebox
+    # (the establishing camera that shows its slot: from above its top), the dropped discs, the applause
+    "note_zuri": dict(pos=(-12.6, 3.3, 1.55), target=(-7.5, 2.5, 1.55), lens=50.0, fstop=4.0,
+                      focus=(-7.5, 2.5, 1.5), beat=2),
+    "note_kai": dict(pos=(-12.6, 1.2, 1.55), target=(-7.5, 1.5, 1.55), lens=50.0, fstop=4.0,
+                     focus=(-7.5, 1.5, 1.5), beat=3),
+    "note_sunny": dict(pos=(-12.3, -3.4, 1.55), target=(-7.5, -1.5, 1.55), lens=50.0, fstop=4.0,
+                       focus=(-7.5, -1.5, 1.5), beat=4),
+    "held": dict(pos=(-13.9, 1.3, 1.55), target=(-10.2, 1.1, 1.2), lens=28.0, fstop=4.0,
+                 focus=(-10.2, 1.05, 1.2), beat=6),
+    "horn": dict(pos=(-9.3, -0.4, 2.65), target=(-5.55, 0.5, 2.62), lens=55.0, fstop=2.8,
+                 focus=(-5.55, 0.5, 2.62), beat=1),
+    "jukebox": dict(pos=(-8.9, -1.7, 3.7), target=(-6.5, 0.5, 2.3), lens=40.0, fstop=4.0,
+                    focus=(-6.5, 0.5, 2.2), beat=8),
+    "discs_drop": dict(pos=(-10.9, 0.5, 2.75), target=(-7.6, -0.3, 2.2), lens=40.0, fstop=4.0,
+                       focus=(-7.6, -0.3, 2.2), beat=16),
+    "discs_hero": dict(pos=(-9.75, 0.52, 2.42), target=(-7.75, 0.52, 2.35), lens=40.0, fstop=4.0,
+                       focus=(-7.75, 0.52, 2.35), beat=20),
+    "meadow_disc": dict(pos=(-0.9, 34.0, 0.65), target=(0.7, 36.4, 0.1), lens=40.0, fstop=2.8,
+                        focus=(0.7, 36.4, 0.2), beat=16),
+    "clap": dict(pos=(-10.6, 2.6, 2.9), target=(-5.4, 2.6, 2.2), lens=35.0, fstop=4.0,
+                 focus=(-5.4, 2.6, 2.2), beat=24),
 
-
-        # 6: travelling along the line beside the stage (line_1 .. line_5 = Steve) at hand height
-        "b6": dict(pos=(-13.0, 3.3, 1.5), target=(-10.2, 2.3, 1.3), pos1=(-13.0, -1.7, 1.5),
-                   target1=(-10.2, -2.7, 1.3), lens=35.0, fstop=2.8, focus=(-10.2, 2.3, 1.3), beat=6),
-
-        # 8: over Steve's shoulder (steve_foot) at the jukebox: the ejected disc turning above it
-        "b8": dict(pos=(-10.42, -3.78, 1.95), target=(-6.5, 0.5, 2.4), lens=40.0, fstop=2.4,
-                   focus=(-6.5, 0.5, 2.4), beat=8),
-
-
-
-
-        # 18: from the front of the stage at head height (its north-west corner), a medium three-shot: Sunny,
-        # Steve, Noor (three_*) facing the jukebox
-        "b18": dict(pos=(-10.2, -1.9, 2.75), target=(-5.3, -1.55, 2.45), lens=35.0, fstop=3.2,
-                    focus=(-5.3, -1.55, 2.5), beat=18),
-
-
-
-        # 19: from the wing, behind and above Steve walking to the jukebox; the half circle beyond it facing us
-        "b19": dict(pos=(-6.2, 6.4, 3.2), target=(-5.9, -0.9, 2.0), lens=32.0, fstop=4.0,
-                    focus=(-5.9, -0.9, 2.0), beat=19),
-
-
-        # 20: close from across the jukebox: Steve's disc face-on to the lens (steve_jukebox, present())
-        "b20": dict(pos=(-6.45, -2.6, 2.45), target=(-6.45, 1.0, 2.4), lens=40.0, fstop=2.4,
-                    focus=(-6.45, 0.95, 2.45), beat=20),
-
-
-        # 21: the jukebox sharp in the foreground, notes rising; push past it to Steve beside it
-        "b21": dict(pos=(-6.8, -1.9, 2.25), target=(-6.5, 0.5, 2.05), pos1=(-6.75, -1.2, 2.4),
-                    target1=(-6.5, 1.6, 2.6), lens=32.0, fstop=2.4, focus=(-6.5, 0.5, 2.05), beat=21),
-
-
-
-        # 22: the one locked-off frontal wide of the whole stage
-        "b22": dict(pos=(-15.5, 0.6, 3.0), target=(-6.0, 0.6, 2.3), lens=30.0, fstop=5.6, focus=(-6.2, 0.5, 2.2),
-                    beat=22),
-
-
-        # 23: from beside the jukebox (south), along the row of faces on the north flank
-        "b23": dict(pos=(-7.7, -0.4, 2.6), target=(-5.2, 2.7, 2.5), lens=30.0, fstop=3.2,
-                    focus=(-6.45, 2.2, 2.6), beat=23),
-
-
-
-        # 24: medium on Steve centre stage, facing the lens, the totem held out; pull back to the clapping five
-        "b24": dict(pos=(-9.8, 1.15, 2.55), target=(-5.6, 1.25, 2.45), pos1=(-14.5, 0.9, 2.9),
-                    target1=(-5.8, 0.7, 2.2), lens=45.0, fstop=2.8, focus=(-5.6, 1.25, 2.5), beat=24),
-
-
-        # 7 and 17: from Kai's doorstep (lane_kai), past his head, across the lane to the narrator's door
-        "lane": dict(pos=(3.84, 16.3, 1.75), target=(-4.5, 16.0, 1.2), lens=20.0, fstop=2.8,
-                     focus=(1.5, 15.5, 1.2), beat=7),
-
-
-        # proofs: each hero note block close (with its base block), the held block items, the horn, the jukebox,
-        # the dropped discs, the applause
-        "note_zuri": dict(pos=(-12.6, 3.3, 1.55), target=(-7.5, 2.5, 1.55), lens=50.0, fstop=4.0,
-                          focus=(-7.5, 2.5, 1.5), beat=2),
-
-        "note_kai": dict(pos=(-12.6, 1.2, 1.55), target=(-7.5, 1.5, 1.55), lens=50.0, fstop=4.0,
-                         focus=(-7.5, 1.5, 1.5), beat=3),
-
-        "note_sunny": dict(pos=(-12.3, -3.4, 1.55), target=(-7.5, -1.5, 1.55), lens=50.0, fstop=4.0,
-                           focus=(-7.5, -1.5, 1.5), beat=4),
-
-        "held": dict(pos=(-13.9, 1.3, 1.55), target=(-10.2, 1.1, 1.2), lens=28.0, fstop=4.0,
-                     focus=(-10.2, 1.05, 1.2), beat=6),
-
-
-        "horn": dict(pos=(-8.9, 1.2, 2.55), target=(-5.45, 2.45, 2.6), lens=55.0, fstop=2.8,
-                     focus=(-5.45, 2.45, 2.6), beat=1),
-        "jukebox": dict(pos=(-9.0, -1.6, 2.7), target=(-6.5, 0.5, 2.3), lens=45.0, fstop=4.0,
-                        focus=(-6.5, 0.5, 2.2), beat=8),
-
-        "discs_drop": dict(pos=(-10.9, 0.5, 2.75), target=(-7.6, -0.3, 2.2), lens=40.0, fstop=4.0,
-                           focus=(-7.6, -0.3, 2.2), beat=16),
-
-
-
-
-        "discs_hero": dict(pos=(-9.75, 0.52, 2.42), target=(-7.75, 0.52, 2.35), lens=40.0, fstop=4.0,
-                           focus=(-7.75, 0.52, 2.35), beat=20),
-
-
-        "meadow_disc": dict(pos=(-0.9, 34.0, 0.65), target=(0.7, 36.4, 0.1), lens=40.0, fstop=2.8,
-                            focus=(0.7, 36.4, 0.2), beat=16),
-
-        "clap": dict(pos=(-10.5, 1.2, 2.6), target=(-5.6, 2.2, 2.0), lens=35.0, fstop=4.0,
-                     focus=(-5.6, 2.2, 2.0), beat=24),
-
-    }
-    return cams
+}
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1314,6 +1445,7 @@ def cameras(A=None):
 # ----------------------------------------------------------------------------------------------------
 def _check():
     """The numbers against the classes, the set in the village, the calls' keys. Returns the list of failures."""
+    import itertools
     import sys
 
     from . import blocks, fx, players, quick, village
@@ -1379,9 +1511,7 @@ def _check():
        w.block_id(cx, cy, 0) == "gold_block" and w.block_id(cx, cy, 1) == "note_block"
        and w.block_id(lx, ly, 2) == "lantern" and w.block_id(lx, ly, 1) == "oak_fence"
        and math.dist(bd.A["lane_kai"][:2], v.anchors["house_f_door_out"][:2]) < 1.6)
-    stage_spots = ["zuri", "kai", "sunny", "noor", "alex", "steve_center", "steve_jukebox", "alex_beside",
-                   "steve_wing", "three_sunny", "three_steve", "three_noor"] + ["flank_n%d" % i for i in (1, 2, 3)] + \
-                  ["flank_s%d" % i for i in (1, 2, 3)] + ["half_%d" % i for i in (1, 2, 3, 4)]
+    stage_spots = [k for k in ANCHORS_2D if k not in GROUND_ANCHORS]
     ok("performers stand on the stage floor (z 1.0), the others on the ground",
        all(abs(bd.A[k][2] - 1.0) < 1e-9 for k in stage_spots)
        and all(abs(bd.A[k][2] - v.ground(bd.A[k][0], bd.A[k][1])) < 0.07 for k in
@@ -1396,13 +1526,31 @@ def _check():
                         return False
         return True
 
-    blocked = [k for k in stage_spots + ["steve_foot", "steve_front", "steve_kai", "steve_watch"]
-               + ["line_%d" % i for i in range(1, 6)] if not clear_of_blocks(bd.A[k])]
+    blocked = [k for k in ANCHORS_2D if not clear_of_blocks(bd.A[k])]
     ok("every standing spot leaves a 0.6-wide, 1.8-tall body clear of blocks", not blocked, "%s" % blocked)
-    for i, j in (("flank_n1", "flank_n2"), ("flank_n2", "flank_n3"), ("flank_s1", "flank_s2"),
-                 ("flank_s2", "flank_s3"), ("three_sunny", "three_steve"), ("three_steve", "three_noor")):
-        if math.dist(bd.A[i][:2], bd.A[j][:2]) < 0.7:
-            ok("%s and %s at least 0.7 apart" % (i, j), False)
+    ring = ["steve_jukebox"] + ["ring_" + n for n in ("alex", "kai", "zuri", "sunny", "noor")]
+    close = [(i, j) for i, j in itertools.combinations(ring, 2) if math.dist(bd.A[i][:2], bd.A[j][:2]) < 0.75]
+    ys = sorted(bd.A[k][1] for k in ring)
+    ok("beats 22-24: the six (steve_jukebox + ring_*) stand 0.75 apart and 0.7 apart in y (no face behind a "
+       "neighbour from the front), none in the jukebox's note column (y 0..1)", not close
+       and min(b - a for a, b in zip(ys, ys[1:])) >= 0.7 - 1e-9 and not any(0.0 < y < 1.0 for y in ys),
+       "%s y %s" % (close, ys))
+    three = ["three_sunny", "three_steve", "three_noor"]
+    ok("beat 18: the three stand 0.75 apart", all(math.dist(bd.A[i][:2], bd.A[j][:2]) >= 0.75
+                                                    for i, j in itertools.combinations(three, 2)))
+    for key, pts in STAGE_PATHS.items():
+        bad_pts = []
+        for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+            n = max(1, int(math.dist((ax, ay), (bx, by)) / 0.1))
+            for k in range(n + 1):
+                q = (ax + (bx - ax) * k / n, ay + (by - ay) * k / n, 1.0)
+                if not clear_of_blocks(q):
+                    bad_pts.append(tuple(round(c, 2) for c in q[:2]))
+        ok("stage path %s keeps a 0.6-wide body clear of blocks (the jukebox, the wall)" % key, not bad_pts,
+           "%s" % bad_pts[:3])
+    b2 = band(v)
+    ok("band(v) twice gives the same Band (one placed lantern, one light)", b2 is bd
+       and len([o for o in bpy.data.objects if o.name.startswith("light_music_last_lantern")]) == 1)
     inside = [k for k, c in bd.cameras.items() if w.is_solid(*(int(math.floor(a)) for a in c["pos"]))]
     ok("no suggested camera sits inside a block", not inside, "%s" % inside)
 
@@ -1489,6 +1637,18 @@ def _check():
     d2 = (Vector(target) - sh).normalized()
     ang = math.degrees(d1.angle(d2))
     ok("present(): the arm points at the target (within 6 degrees)", ang < 6.0, "%.1f deg" % ang)
+    class _Key:                                                 # the one Stage method kicker() uses
+        def key(self, idb, path, frame, value):
+            setattr(idb, path, value)
+            idb.keyframe_insert(path, frame=frame)
+
+    kick = bd.kicker(_Key(), s, bd.A["lane_kicker_target"], watts=40.0, name="music_kicker_test")
+    vis = []
+    for f in (s.frame_start - 1, s.frame_start, s.frame_end, s.frame_end + 1):
+        scene.frame_set(f)
+        vis.append(not kick.hide_render)
+    ok("kicker(): a film-local light seen only on its shot's frames (hidden before and after it)",
+       vis == [False, True, True, False] and abs(kick.data.energy - 40.0) < 1e-6, "%s" % vis)
     scene.frame_set(1)
     print("[music] %s (%d checks failed)" % ("OK" if not bad else "FAILED", len(bad)))
     return bad

@@ -211,8 +211,8 @@ through films.lookdev.Stage at the look-dev golden hour (sun az 62 / el 27): out
     hopper        (-28.75, 26.0, 3.1) macro on the niche, 30 mm f/2.8: the hopper top, the items falling in
     hopper_wide   (-29.9, 29.0, 3.2), 24 mm f/2.8: Steve at x 18 %, the hopper x 51 / y 35 %, the baby x 69 / y 58 %
     back          the back, locked tall, 24 mm (the baby tiny at its foot at y 70 %: the story's picture)
-    top_step_side (-15.6, 26.4, 10.7) outside north-east of the top step, 30 mm: the baby on top_step_baby in front
-                  of the opening, its head just under the plug; Mom (bed_side) through the glass
+    top_step_side (-15.6, 26.4, 10.7) outside north-east of the top step, 26 mm f/2.8: the baby on top_step_baby
+                  (x 58 %) in front of the opening, its head just under the plug; Mom on 'mom' through the glass
     gap           inside on the floor, the gap in the middle, 22 mm (beat 15)
     red_bed       (-24.7, 20.9, 10.9) outside the west glass (hide the panes: see_through(points=[mom, baby])),
                   35 mm f/2.8: Mom from behind on the zombie, the baby against her, its face at y 53 %
@@ -276,9 +276,9 @@ BEATS (stories/ironfarm.json; what stages each line; tools/towers_proof.py shot_
     13 "his dirt staircase"   C["back"]; baby on stairs_foot; fm.climb(baby, f, 0, 1) (the first two steps).
     14 "a gap, one block high"   C["top_step_side"]; the baby placed on fm.set["stairs"][8] hops up the last one:
                               towers.hop(baby, f, A["top_step_baby"]), then baby.turn(f2, fm.yaw["top_step_baby"]):
-                              it stands in front of the opening, its head just under the plug; Mom on bed_side
+                              it stands in front of the opening, its head just under the plug; Mom on 'mom'
                               looking at the zombie through the glass (fm.see_through(st, s, C["top_step_side"],
-                              points=[mom]) clears the pane in front of her hat).
+                              points=[mom]) clears the pane in front of her hat; from bed_side the plug hides her).
     15 "grownups don't fit"   C["gap"]; the cleric walks to gap_side (into the plug); the baby runs in under it:
                               baby.walk(f, [A["top_step"], A["gap_in"], A["bed_side"]], run=True).
     16 "Mom never looks at me"   C["red_bed"] + fm.see_through(st, s, C["red_bed"], points=[mom, baby]); Mom on
@@ -297,9 +297,10 @@ BEATS (stories/ironfarm.json; what stages each line; tools/towers_proof.py shot_
                               A["gap_down"], ease=8): his head tilts down to the gap, nose in profile.
     21 "counted us twice"     C["high"], st.see_through(s, "tower_pod_roof"); librarian, cleric, narrator, Mom on
                               row_1..4; Steve on top_step, steve.watch(...) along the row and back; to place the bed
-                              he sneaks (steve.sneak(f)): the ray from a sneaking eye (1.27) reaches the floor under
-                              the plug through the gap, as the game allows; steve.attack(f); fm.bed2.place_at(f + 2)
-                              (the pillow to the south, as he places it).
+                              he sneaks (steve.sneak(f)): from a sneaking eye (1.27) the ray to the second bed's
+                              cell passes under the plug through the gap with about 0.02 to spare (geometry; the
+                              game's ray clip was not simulated); steve.attack(f); fm.bed2.place_at(f + 2) (the
+                              pillow to the south, as he places it). Through glass he could not place it.
     22 "not afraid of the player"   C["back_glass"]; the narrator on watch_22, still, eyes level:
                               look_at(one_down + 1.62 up); fm.top_step.restore(s.frame_start) if an earlier shot
                               broke it; Steve on one_down: fm.break_top_step(steve, f, camera=s, until=s.frame_end
@@ -408,7 +409,7 @@ MEASURED (out/test/towers_*.png, 540x960, 16 samples, 2 threads, motion blur on,
     - Heads in the frame (x %, y %) with the real rigs (tools/towers_proof.py --where): b01 baby 30/52, Steve 66/37;
       b02 baby 60/40; b03 Mom 48/43, Steve 40/43, baby 18/53; b04 baby 35/51, Mom 41/21 (36 blocks); b04_long Mom
       50/50; b05 baby 55/43; b06 Mom 34/29 mid-pan, zombie 57/37 at its end; b08 cleric 57/49, librarian 76/49, Mom
-      28/49; b09 golem 31/29, villagers 48-80/55; b12 baby 69/58, Steve 18/42; b14 baby 59/47; b16 baby 54/56, Mom
+      28/49; b09 golem 31/29, villagers 48-80/55; b12 baby 69/58, Steve 18/42; b14 baby 58/45, Mom 16/39; b16 baby 54/56, Mom
       42/34, zombie 57/39; b20 narrator 32/33; b22 narrator 9/44, Steve 65/52; b24 golem 67/45, cleric 56/49,
       librarian 76/49, Mom 42/50, narrator 13/50.
     - The golem: appears on its frame, turns its head, steps, slides west (1.4 blocks/s) and drops 4 blocks; the
@@ -1599,9 +1600,10 @@ def cameras(L):
         "slide_low": cam((X - 6.9, Y - 3.9, F - 0.72), (X - 5.0, Y + 2.5, F + 1.0), 20, 4.0,
                          "11 (alternative): a little below the platform: the lava only a band in the slot; the rim's "
                          "stone lip hides the sheet (with rims=None its open edge shows: not the game)"),
-        "top_step_side": cam((X + 7.4, Y + 8.4, F + 0.7), (X + 4.4, Y + 5.9, F + 0.6), 30, 2.8,
+        "top_step_side": cam((X + 7.4, Y + 8.4, F + 0.7), (X + 4.9, Y + 6.3, F + 0.6), 26, 2.8,
                              "14: outside, north-east of the top step: the baby on top_step_baby beside the "
-                             "opening, the plug over it; through the glass the beds and Mom's hat (bed_side)"),
+                             "opening, the plug over it; through the glass the beds and Mom's hat (on 'mom': from "
+                             "bed_side the plug hides her head)"),
         "gap": cam((X + 4.85, Y + 2.25, F + 0.42), (X + 4.5, Y + 5.0, F + 0.62), 22, 4.0,
                    "15: inside at floor level, the gap in the middle"),
         "red_bed": cam((X - 1.7, Y + 2.9, F + 0.9), (X + 2.8, Y + 2.2, F + 0.95), 35, 2.8,
@@ -1687,7 +1689,8 @@ def beat_frames(fm):
         dict(beat=12, camera="hopper", heroes={"hopper": A["hopper_target"]}),
         dict(beat=12, camera="hopper_wide", heroes={"baby": h("poppies", "baby"), "steve": h("chest_steve", "steve"),
                                                     "hopper": A["hopper_target"]}),
-        dict(beat=14, camera="top_step_side", heroes={"baby": h("top_step_baby", "baby"), "gap": A["gap_target"]}),
+        dict(beat=14, camera="top_step_side", heroes={"baby": h("top_step_baby", "baby"), "gap": A["gap_target"],
+                                                      "mom": h("mom", "adult")}),
         dict(beat=15, camera="gap", heroes={"gap": A["gap_target"]}),
         dict(beat=16, camera="red_bed", heroes={"mom": h("bed_side", "adult"),
                                                 "baby": h("bed_side", "baby", -0.62, -0.05)}),

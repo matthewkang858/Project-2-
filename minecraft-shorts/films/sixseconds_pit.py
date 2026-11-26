@@ -47,25 +47,96 @@ TAGS TAKEN by the stubs: runner_pt (pt05-pt09, pt20), piglin_pt1 / piglin_pt2 / 
   iron_pickaxe_pt10.
 PREVIEW samples of this sequence: 7.
 """
+import math
+
 from mathutils import Vector
 
-from engine import breaking, piglins
+from engine import breaking, mobs, piglins
+from films import sixseconds_common as SC
 
 PIGS = (("piglin", "pt1"), ("piglin", "pt2"), ("piglin_xbow", "pt3"))
-# pt07: the frame the pearl is lobbed out of the pit (it lands spinning beside his boots by "pearls")
-PEARL_LOB = 466
-# pt08: four gravel entities already lying round his boots on 511; three more lobbed out of the pit, one per pit
-# piglin (the game: one barter = one item entity of 8-16 gravel, thrown once after a 6-second admire), the first
-# already in the air on the shot's first frame: (launch frame, from, stack size)
-GRAVEL_LYING = (1, 2, 5, 6)
-GRAVEL_LOBBED = (3, 4, 7)
-GRAVEL_LOBS = ((497, "home_pit_2", 11), (507, "home_pit_3", 13), (517, "home_pit_4", 8))
-# pt09: the brute strides in from the frame's left (pre-rolled), swings on "my" / "axe": the blow lands on PT09_HIT and
-# the small knock-back keeps the runner in the air over the rim to the cut (the full 0.4 throws him 2 blocks over
-# the open pit)
-BRUTE_IN = (0.95, 5.6, 0.0)
-PT09_STRIDE_PRE = 6
-PT09_SWING, PT09_HIT, PT09_KNOCK = 590, 590, 0.25        # the game deals the damage on the swing's first tick
+
+# ---- the trap piglins on the pit floor (pt07-pt10), and the way each faces. The ADMIRED INGOT is held 0.59 in front
+#      of the snout, 0.74 under the rim: a piglin that faces the west wall holds it against that wall, where the rim
+#      hides it from every camera on the runner's side. So they stand in three corners facing into the open
+#      south-west quarter (where the ingots then are, mid-pit, seen from above), their faces toward the runner's
+#      side: piglin_pt2 in the north-west corner facing south (it is next to the rim where he stands: its barter
+#      comes out), piglin_xbow_pt3 north-east facing south-west, piglin_pt1 south-east facing west.
+#      (position, a point it faces); boxes 0.6 wide, 0.3 clear of the pit's walls (x 4..6, y 6..8)
+PIT_AT = (((5.4, 6.5, -2.0), (4.0, 6.5, -2.0)),        # piglin_pt1: south-east, facing west
+          ((4.6, 7.5, -2.0), (4.6, 6.0, -2.0)),        # piglin_pt2: north-west, facing south
+          ((5.4, 7.5, -2.0), (4.4, 6.5, -2.0)))        # piglin_xbow_pt3: north-east, facing south-west
+THROWER = 1                # pt07: piglin_pt2 throws the pearl (north-west: next to the rim)
+
+# ---- pt06: the three run for the lure ingot (the game: a piglin goes for gold it sees within 9 blocks at its
+#      chase speed, 5.4 blocks/s: GoToWantedItem 1.0) from their places at the gold, over the rim and down. (points,
+#      frame it steps off the rim, drift in the air: None = the game's from a chase, 1.10 block). A and B step off
+#      the EAST rim running west and land in the west half; C steps off the north rim (a shorter drift so that it
+#      lands in the east half, clear of A and B)
+RUNS6 = (
+    ([(7.3, 9.6, 0.0), (6.9, 6.5, 0.0), (5.7, 6.5, 0.0)], 398, None),
+    ([(6.3, 13.4, 0.0), (6.6, 7.5, 0.0), (5.7, 7.5, 0.0)], 408, None),
+    ([(7.0, 15.5, 0.0), (5.45, 9.2, 0.0), (5.45, 7.7, 0.0)], 418, 0.7),
+)
+LURE_TAKE = 2              # pt06: the first to land takes the lure this many frames after its landing
+
+# ---- pt07: above his right shoulder, looking down into the pit from the south rim side (the set's six_over_pit, from
+#      the south-west, put his reaching right hand and the ingot in it right over the piglin next to the rim: from
+#      here his hand and that piglin's face are apart), a slow push
+CAM7 = dict(pos=(3.6, 4.4, 3.8), target=(4.85, 7.3, -1.2), lens=26.0, fstop=4.0,
+            pos1=(3.66, 4.52, 3.74), target1=(4.85, 7.3, -1.2))
+TOSS7 = 442                # "threw" 441: he drops one ingot into the pit (the game's Q: one item, the arm swings)
+TOSS7_AIM = (4.75, 6.75, -1.6)         # into the open south-west quarter, within the thrower's reach
+PEARL_THROW = 472          # "they" 468 / "threw back" 471-484: piglin A's admire ends, the pearl is lobbed
+PEARL_COUNT = 3            # a pearl barter gives 2-4 (one item entity, drawn as two sprites)
+
+# ---- pt08: low on the floor SOUTH of the boots, looking north along the west rim: the pit's edge at the right, the
+#      pile on the boots' west side (left), the pearl alone at their right, between them and the pit's edge. The
+#      set's six_boots_rim (south-west) saw the lobs pass BEHIND his legs and put the pearl at x 83 %; from here the
+#      lobs come out of the pit at the right and cross in front of his shins to the left
+CAM8 = dict(pos=(3.0, 3.6, 0.8), target=(3.5, 7.0, 0.05), lens=32.0, fstop=2.8,
+            pos1=(3.02, 3.72, 0.79), target1=(3.5, 7.0, 0.05))
+PILE = ((2.95, 7.35), (2.75, 7.15), (3.2, 7.55), (3.45, 7.8), (3.1, 6.55), (3.0, 6.95), (2.8, 6.7))
+PILE_COUNT = (12, 9, 14, 10, 11, 13, 8)                # one barter = one entity of 8-16 gravel
+PILE_LYING = (0, 1, 2, 3)                              # already there on 511 (the barters of the time skipped)
+PILE_LOBS = ((4, 0, 518), (5, 2, 526), (6, 1, 540))    # (pile spot, from pit piglin, frame it lies still): one each
+
+# ---- pt09 / pt10: THE STRIKE FROM THE NORTH RIM (the knock-back along the rim, onto the floor, never over the pit).
+#      The brute charges from the gateway he guards (the game: a brute attacks every player within 12 blocks, at its
+#      chase speed, axe held high) and strikes from STRIKE_N, 1.39 north-north-east of rim_w: the full knock-back
+#      (0.4, the game's) throws the runner 2 blocks south-south-west along the west rim (his box stays west of x 4)
+STRIKE_N = (4.05, 8.32, 0.0)
+BRUTE_RUN = ((4.5, 18.4, 0.0), (4.35, 12.0, 0.0))     # the gateway, then down the courtyard to STRIKE_N
+HIT9 = 587                                             # inside "axe" (580-593): in the air 587-599, the cut on 597
+KNOCK9 = 0.4
+CAM9 = dict(pos=(6.6, -1.0, 2.5), target=(3.8, 7.2, 0.0), lens=32.0, fstop=2.8,
+            pos1=(6.48, -0.75, 2.47), target1=(3.8, 7.2, 0.0))
+# pt10: the same angle pulled back and a little higher; the second blow (unseen) found him where the first one threw
+#      him: the brute 1.0 north-east of the puff, facing it, the axe coming down to rest; his drops round the puff
+PUFF10 = (2.4, 4.85, 0.0)
+BRUTE10 = (3.5, 5.95, 0.0)
+CAM10 = dict(pos=(6.8, -1.5, 3.0), target=(3.7, 6.6, -0.4), lens=26.0, fstop=3.2,
+             pos1=(6.62, -1.15, 2.95), target1=(3.7, 6.6, -0.4))
+DROPS10 = (("golden_boots", (4.6, 5.6, 0.0)), ("iron_pickaxe", (3.1, 4.3, 0.0)))    # the boots clear of him and the puff
+AXE_DOWN = 600             # "turned" 601: the axe comes down to rest (the target is gone)
+
+# ---- pt20: the older world. Four piglins on the pit floor, an ingot stack lying in the pit; each admire runs out in
+#      turn, the result is lobbed to the runner's boots and the piglin takes one more ingot off the stack
+# The four stand in the pit's corners like a pinwheel, each facing along a wall, so that every admired ingot is held
+# out in the open middle of the pit (seen from the high pit camera) and the stack lies in the centre between them.
+# (position, a point it faces) for piglin_pt1 (south-east, facing north), piglin_pt2 (north-west, facing south),
+# piglin_xbow_pt3 (north-east, facing west), piglin_pt4 (south-west, facing east)
+PIT20_AT = (((5.68, 6.32, -2.0), (5.68, 7.5, -2.0)),
+            ((4.32, 7.68, -2.0), (4.32, 6.5, -2.0)),
+            ((5.68, 7.68, -2.0), (4.5, 7.68, -2.0)),
+            ((4.32, 6.32, -2.0), (5.5, 6.32, -2.0)))
+STACK20 = (5.0, 7.0, -2.0)
+# (piglin, frame its admire ends and it throws, result, count, where the result comes to rest: round his boots on the
+# lens's side, inside the safe area of the pit camera)
+THROWS20 = ((1, 1283, "gravel", 11, (3.0, 7.12, 0.0)),        # already in the air on 1290
+            (3, 1300, "ender_pearl", 3, (3.85, 6.55, 0.0)),
+            (0, 1310, "gravel", 14, (3.2, 6.62, 0.0)),
+            (2, 1322, "gravel", 9, (3.55, 6.4, 0.0)))
 
 
 def _pigs(C):
@@ -73,57 +144,43 @@ def _pigs(C):
     return [C.actor(role, tag) for role, tag in PIGS]
 
 
-def _in_pit(st, s, C, pigs, places=(2, 3, 4), yaw=None):
-    """Piglins standing on the pit floor (home_pit_k), facing west (toward the rim where the runner is), admiring
-    their ingots through the whole shot."""
-    west = C.Y.get("home_rim_e", -1.571) if yaw is None else yaw
-    for p, k in zip(pigs, places):
-        C.put(p, s.frame_start, "home_pit_%d" % k, yaw=west)
-        C.admire(s, p)
+def _yaw_to(src, dst):
+    """Yaw that faces src to dst (a character faces -Y at yaw 0)."""
+    return SC.yaw_to(src, dst)
+
+
+def _in_pit(st, s, C, pigs, admire=True):
+    """The trap piglins on their places on the pit floor (PIT_AT), facing into the open quarter, in the admire pose
+    for the whole shot (ingot in the LEFT hand at the snout) unless admire=False."""
+    for p, (at, faces) in zip(pigs, PIT_AT):
+        p.place(s.frame_start, at, _yaw_to(at, faces))
+        if admire:
+            C.admire(s, p)
     st.use(s, *pigs)
 
 
+def _run_start(points, step_off, speed=piglins.CHASE_SPEED, ramp_in=4.0):
+    """The frame a piglin's walk(run=True, ramp=(ramp_in, 0)) along `points` must start so that it ends (and steps
+    off the rim) on `step_off`: Piglin.walk's own count of frames (its route with the corners rounded)."""
+    route = mobs._Route([Vector(p) for p in points], piglins.CORNER_RADIUS, 0.0)
+    n = max(2, int(round(route.total / (speed / SC.FPS) + ramp_in / 2.0)))
+    return step_off - n
+
+
+def _lob(C, item, src_feet, dst, land):
+    """Launch `item` from the hands of a piglin standing on src_feet (0.3 under its eyes, as the game throws) so that
+    it comes to rest on `dst` on about frame `land` (piglins.lob_velocity: the arc that clears the rim). Returns
+    (launch frame, frame it lies still)."""
+    start = Vector(src_feet) + Vector((0.0, 0.0, piglins.PIGLIN_EYE - piglins.THROW_BELOW_EYE))
+    v = piglins.lob_velocity(start, dst, world=C.bas)
+    ticks = piglins.item_track(start, v, world=C.bas)[-1][0]
+    f = int(round(land - ticks * piglins.TICK))
+    still = piglins.launch(item, f, start, v, world=C.bas)
+    return f, still
+
+
 def pt05_boots(st, s, C, nar):
-    """BEAT 5 (1 of 2)  "He wore golden boots,"   frames 282-321 (40 f, 1.67 s), sky wastes.
-    Words: He 284, wore 287, golden 295, boots 307 (ends 318); the cut into rw05_family is 2 frames before "so" (324).
-
-    STORY: The boot shot (returns on the bridge): camera on the blackstone floor, long lens, looking across the
-    courtyard at the gold wall. The legs sprint in from the gateway side and skid to a stop with the golden boots
-    bright in the middle of the frame, above the caption band. Behind them three piglins turn from the gold, tip their
-    heads down at the boots, hold, then turn back to the gold. Rack focus from the boots to the piglins and back so
-    the look at the boots is sharp.
-    Cast: the player (legs and boots), three piglins. Effects: golden boots keyed by a warm-white lantern, piglins
-    holding golden swords and a crossbow, skid stop, rack focus, floor-level boot shot camera preset re-used in
-    sentence eleven.
-    THE LEAD'S DECISION (the technical check, confirmed with geo): from this lens (z 0.25, 3.8 blocks from a runner
-      facing it) his torso and arms cover x 17-83 % at the height the piglins' heads have (y 16-32 %), wherever they
-      stand in the courtyard (on 318 all three are behind his arms: piglin_pt1 behind his left, pt2 and pt3 behind his
-      right); they would have to stand 14+ blocks off, beyond the gold wall, to show under his hands. So the piglins'
-      look at the boots is the NEXT shot (rw05_family, the row sequence: the three at the gold turn and tip their
-      heads down at the boots, from the boots' height) and this shot is the boots alone: the sprint, the skid, the
-      boots held still under "golden boots" and after.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 282       the legs already sprinting (runner_pt is pre-rolled: he is not in gt04, runner_gt is)
-      "golden boots" 295-318   the skid: boots stopped by about 300, bright, mid-frame (BOOT_FRAME), above the
-                      caption band, and held still to the cut (22 frames: br11 holds them about 25)
-      the whole shot  the piglins at the gold soft beyond, their backs to him (they have not looked yet)
-    SHARED: CAMS["boot"] exactly (its focus is free), BOOT_FRAME (br11 repeats it); PLACES "boot_mark", "gold_1".."3".
-    RISKS (story): golden boots in orange lava light turn the colour of everything else: "light the boots with a
-      warm-white lantern, keep the blackstone behind them at half brightness, hold the first boot shot half a second
-      longer" (the pause after this line was opened to 0.6 s for it). A film-local warm-white fill on the boots is
-      C.fill("pt_boots", ...) (measure gold hue 38-58 with nether.check_still).
-    NOW (stub): the boot camera; the runner sprinting in from (4.5, 13) (pre-rolled 12 frames, iron pickaxe) and
-      stopping on boot_mark facing south; the three piglins at the gold looking at the gold. Hero: the boots.
-    MEASURED (the lead; tools.sixseconds_geo pt05_boots:318 --boots runner_pt; the stills
-      out/test/sixseconds_scout_boots_pt05_boots_318.png beside _br11_boots_728.png of the first stub;
-      tools.sixseconds_palette 318): he enters from the frame's LEFT edge (feet x -13 % on 282, 27 % on 294) and stops
-      on boot_mark by 300; boots x 27.7-70.1 %, y 43.1-58.9 % (br11 on 725: 27.7-69.8 %, 42.7-58.6 %: THE BOOT
-      FRAMING holds); gold hue 44, s 0.80; piglin skin s 0.59 (limit 0.62); Steve's shirt hue 173. He faces the lens
-      when he stops (28 degrees off; br11's runner has his back to it: at boot height it is the same picture).
-    NEIGHBOURS: before, gt04_runin (he sprints at the lens through the gateway); after, rw05_family (the brothers
-      turn to the boots: the row sequence's camera on the floor by the boot mark).
-    """
+    """BEAT 5 (1 of 2)."""
     f0 = s.frame_start
     runner = C.actor("runner", "pt")
     mark = C.P("boot_mark")
@@ -133,7 +190,7 @@ def pt05_boots(st, s, C, nar):
     runner.hold("iron_pickaxe", frame=fs)
     runner.walk(fs, [a, (4.3, 10.0, 0.0), mark], sprint=True, ramp=(False, True))
     st.use(s, runner)
-    for k, p in enumerate(_pigs(C), 1):        # at the gold, backs to him (rw05 turns them): soft, mostly hidden
+    for k, p in enumerate(_pigs(C), 1):        # at the gold, backs to him (rw05 turns them): soft
         C.stand(s, p, "gold_%d" % k, look="gold_target", seed=k)
     C.cam(s, "boot", focus=Vector(mark) + Vector((0.0, 0.0, 0.2)))
     st.hero(s, "boots", *C.boots_of(runner))
@@ -141,310 +198,214 @@ def pt05_boots(st, s, C, nar):
 
 
 def pt06_dig(st, s, C, nar):
-    """BEAT 6  "He dug a hole, and they fell in."   frames 379-435 (57 f, 2.38 s), sky wastes.
-    Words: He 381, dug 384, a 390, hole 391, and 403, they 406, fell 409, in 416 (ends 422).
-
-    STORY: High three-quarter angle on the courtyard: the player breaks the last block of a pit two blocks deep and
-    two wide, with cracks and crumbs. The pit is in plain blackstone, never gilded blackstone or gold. A gold ingot is
-    already spinning at the bottom. Three piglins walk to it, step off the rim one after another, 0.7 block and a
-    beat apart, and drop in.
-    Cast: the player, three piglins. Effects: iron pickaxe swing, block breaking with cracks and blackstone crumbs,
-    gold ingot (dropped, spinning) as the lure, piglins stepping off the rim and dropping, staggered, pit camera
-    preset re-used in sentence twenty.
-
-    MUST BE SEEN, ON WHICH WORD
-      "dug" 384 .. "hole" 391   the last block cracks and breaks (crumbs), the lure ingot spinning on the pit floor
-      "they fell in" 406-422   the three piglins step off the rim a beat apart and drop; the third lands by 426,
-                      at least 3 frames before the cut (436)
-    SHARED: CAMS["pit"] exactly (pt20 repeats it); PLACES "rim_w", "pit_lure" (NOT home_pit_1: inside the kept
-      block).
-    NOW (stub): C.pit(s, keep_last=True); the runner at rim_w (iron pickaxe) breaking C.bas.pit_last from f0 + 2
-      (breaking.mine with drop=None: 7 ticks; cracks on 381-388, gone on 389); the lure on pit_lure; C.bas.pit_drop
-      (the three, f0): they land on f0 + 23 / 35 / 47 = 402 / 414 / 426. Hero: the runner.
-    THE TECHNICAL CHECK (confirmed by the lead's probe): with breaking.mine's default drop='auto' the broken block
-      left a blackstone ITEM (drop_blackstone) in the pit, unregistered, unhidden on every frame to the film's end
-      (in pt20's "older world" pit too). The stub passes drop=None, and build() now stops (strict) or prints "!!!" for
-      any dropped item that is not in the Stage's cast (sixseconds_common.unregistered_items).
-    MEASURED (out/test/sixseconds_set_b06_pit.png): runner x 15-34 %, y 36-46 %; the piglins at the approach
-      points; the lure on the pit floor.
-    NEIGHBOURS: before, rw05_family (the brothers at the gold, turned back to it); after, pt07_pearl (over his
-      shoulder into the pit).
-    """
-    f0 = s.frame_start
+    """BEAT 6."""
+    f0, f1 = s.frame_start, s.frame_end
     C.pit(s, keep_last=True)
     runner = C.actor("runner", "pt")
     C.put(runner, f0, "rim_w")
-    runner.look_at(f0, Vector(C.bas.pit_last.center), ease=0)
+    last = Vector(C.bas.pit_last.center)
+    runner.look_at(f0, last, ease=0)
     runner.hold("iron_pickaxe", frame=f0)
-    breaking.mine(runner, C.bas.pit_last, f0 + 2, camera=s, drop=None)     # drop=None: see ENGINE SIDE DOORS
+    dug = breaking.mine(runner, C.bas.pit_last, f0 + 2, camera=s, drop=None,     # drop=None: ENGINE SIDE DOORS
+                        glow=0.25)                     # the crumbs read in the pit's dark (breaking: glow at night)
     st.use(s, runner)
-    C.rest(s, "gold_ingot", "pt1", "pit_lure")
+    lure = C.rest(s, "gold_ingot", "pt1", "pit_lure")
     pigs = _pigs(C)
-    C.bas.pit_drop(pigs, f0)
+    lands = []
+    for p, (pts, off, drift) in zip(pigs, RUNS6):
+        start = _run_start(pts, off)
+        p.place(start, pts[0], _yaw_to(pts[0], pts[1]))         # pre-rolled: not in rw05, the shot before
+        end = p.walk(start, pts, run=True, ramp=(4, 0))
+        land = p.fall(end, -2.0, forward=drift)
+        p.flop_ears(land, f1 + 1)
+        lands.append(land)
     st.use(s, *pigs)
-    C.cam(s, "pit")
+    # the first one down takes the lure and admires it; the other two land beside it and look at its gold
+    piglins.barter(pigs[0], lure, lands[0] + LURE_TAKE, result_item=None, world=C.bas)
+    for p, land in zip(pigs[1:], lands[1:]):
+        p.look_at(land + 4, pigs[0].item_point(lands[0] + LURE_TAKE + 2, "off"), ease=6)
+    # his head: down on the block he breaks, then up at the first piglin coming, down with them into the pit
+    runner.watch(dug["frame"] + 2, lands[0] + 4, pigs[0], ease=6)
+    runner.watch(lands[0] + 5, f1, pigs[2], ease=8)
+    C.cam(s, "pit", focus=last)
+    C.rack(s, Vector(C.P("home_pit_center")) + Vector((0.0, 0.0, 1.2)), dug["frame"] + 2, frames=12)
     st.hero(s, "runner", runner)
     C.lights(s, "pit")
+    C.memo["pt_lands6"] = lands
 
 
 def pt07_pearl(st, s, C, nar):
-    """BEAT 7  "He threw gold, and they threw back ender pearls."   frames 436-510 (75 f, 3.12 s), sky wastes.
-    Words: He 438, threw 441, gold 447, and 465, they 468, threw 471, back 477, ender 484, pearls 489 (ends 505).
-
-    STORY: From behind and above the player's shoulder at the rim, third person, looking down into the pit: all three
-    piglins already stand frozen, each with an ingot held up in front of his snout. The player tosses one more ingot
-    down. A piglin who has been staring since the last shot lowers his hand, and an ender pearl pops up out of the pit
-    and lands spinning beside the golden boots. The pearl is never the answer to the ingot thrown in this shot.
-    Cast: the player (shoulder, arm, boots), three piglins in the pit. Effects: gold ingot tossed down (item arc),
-    three ingots in the admire pose, ender pearl popping up and landing as a spinning item, golden boots.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 436       the three already frozen with their ingots (admire from the first frame)
-      "threw gold" 441-459   his toss (Player.throw / swing; the ingot's arc: piglins.throw_item into the pit)
-      "threw back" 471-484   one piglin's pose ends (stop_admiring or its admire running out) and the pearl is lobbed
-      "pearls" 489    the pearl lands spinning beside his boots: on PLACES "pearl_rest" (an explicit floor point)
-    NOW (stub): the set's six_over_pit (26 mm f/4 behind and above his right shoulder, down into the open pit), the
-      pit dug, the runner at rim_w with a gold ingot in his hand, the three admiring on home_pit_2..4 facing west;
-      THE PEARL is ONE item entity for pt07 AND pt08 (C.memo["pt_pearl"]: the technical check found two entities on
-      one spot, their spin jumping on the cut), lobbed from piglin_pt2's hands (home_pit_3, 1.25 up) on PEARL_LOB 466
-      with piglins.launch + lob_velocity to pearl_rest. Hero: a piglin.
-    MEASURED (the lead's probe): the pearl rises out of the pit from 466 and lies still on pearl_rest (3.84, 6.54) from
-      487, 2 frames before "pearls"; in this frame at x 37.5 %, y 59 % (just above the caption band); from pt08's
-      camera it lies at x 83 %, y 53.5 % (at the safe area's right edge). The director moves the lob to "threw back"
-      (471-484: launch about 468-471 lands about 489-494) and stages the barter that throws it.
-      Earlier (out/test/sixseconds_set_b07_over_pit.png): piglins x 58-80 %, y 40-53 %; his shoulder and head at the
-      left edge.
-    NEIGHBOURS: before, pt06_dig; after, pt08_gravel (the boots at the rim).
-    """
-    f0 = s.frame_start
+    """BEAT 7."""
+    f0, f1 = s.frame_start, s.frame_end
+    C.time_jump(f0)
     C.pit(s)
     runner = C.actor("runner", "pt")
     C.put(runner, f0, "rim_w")
-    runner.look_at(f0, Vector(C.P("home_pit_center")), ease=0)
+    pigs = _pigs(C)
+    for p, (at, faces) in zip(pigs, PIT_AT):
+        p.place(f0, at, _yaw_to(at, faces))
+    a = pigs[THROWER]
+    a_at = Vector(PIT_AT[THROWER][0])
+    runner.look_at(f0, a_at + Vector((0.0, 0.0, 1.3)), ease=0)
     runner.hold("gold_ingot", frame=f0)
     st.use(s, runner)
-    pigs = _pigs(C)
-    _in_pit(st, s, C, pigs)
-    # THE PEARL: ONE item entity from its lob here through pt08 (the technical check: two entities on one spot jump
-    # their spin on the cut). The stub lobs it from piglin_pt2's hands in the pit to pearl_rest (piglins.launch with
-    # lob_velocity: the lead's cheat for barter(lob=True)); the director stages the barter that throws it.
-    pearl = C.memo["pt_pearl"] = C.item("ender_pearl", "pt7")
-    start = Vector(C.P("home_pit_3")) + Vector((0.0, 0.0, 1.25))
-    lob = PEARL_LOB
-    landed = piglins.launch(pearl, lob, start, piglins.lob_velocity(start, C.P("pearl_rest"), world=C.bas),
-                            world=C.bas)
-    C.memo["pt_pearl_landed"] = landed
-    pearl.animate(lob, C.T["pt08_gravel"].frame_end + 1)
+    # "He threw gold": one more ingot dropped into the pit (it cannot be taken for 40 ticks)
+    runner.look_at(TOSS7 - 5, Vector(TOSS7_AIM), ease=4)
+    runner.attack(TOSS7)
+    ingot = C.item("gold_ingot", "pt7")
+    landed = piglins.throw_item(ingot, TOSS7, runner, Vector(TOSS7_AIM), world=C.bas)
+    ingot.animate(TOSS7, f1 + 1)
+    st.use(s, ingot)
+    # "they threw back ender pearls": the piglin next to the rim has been staring since before the cut; its admire
+    # runs out, the off hand swings and the pearl is lobbed out of the pit to land beside his boots. ONE item
+    # entity, lying there through pt08, pt09 and pt10 (C.memo["pt_pearl"])
+    pearl = C.memo["pt_pearl"] = C.item("ender_pearl", "pt7", count=PEARL_COUNT)
+    beats = piglins.barter(a, None, f0, pearl, toward=Vector(C.P("pearl_rest")),
+                           admire_ticks=(PEARL_THROW - f0) / piglins.TICK, world=C.bas, lob=True,
+                           face=CAM7["pos"], animate=C.T["pt10_smoke"].frame_end + 1 - PEARL_THROW, seed=0)
+    C.memo["pt_pearl_landed"] = beats["landed"]
     st.use(s, pearl)
-    C.cam(s, "set:six_over_pit", focus=pigs[1].head)
-    st.hero(s, "piglin", pigs[1])
+    # ... and once the new ingot may be taken, it takes that one and stares again (the trap goes on)
+    take = max(landed + 2, TOSS7 + 48)
+    if take <= f1 - 6 and piglins.in_reach(a, ingot, take):
+        piglins.barter(a, ingot, take, result_item=None, world=C.bas)
+    for p in pigs:
+        if p is not a:
+            C.admire(s, p)
+    st.use(s, *pigs)
+    # his head follows the pearl out of the pit and down to his boots
+    runner.look_at(PEARL_THROW - 6, a_at + Vector((0.0, 0.0, 1.0)), ease=6)
+    runner.track(PEARL_THROW + 2, beats["landed"] + 3, pearl.spinner, step=3, ease=4)
+    C.cam(s, None, focus=a.head, **CAM7)
+    C.rack(s, Vector(C.P("pearl_rest")) + Vector((0.0, 0.0, 0.2)), PEARL_THROW + 12, frames=10)
+    st.hero(s, "piglin", a)
     C.lights(s, "pit")
 
 
 def pt08_gravel(st, s, C, nar):
-    """BEAT 8  "Mostly gravel."   frames 511-559 (49 f, 2.04 s), sky wastes. Words: Mostly 513, gravel 526 (ends 540:
-    19 frames of hold).
-
-    STORY: Close on the golden boots at the rim of the pit: gravel pops out of the hole piece after piece and piles up
-    around his feet, bobbing and spinning, with one lonely ender pearl among it. Boots and pile sit between 14 and 60
-    percent of the frame height. Hold a full beat after the words.
-    Cast: the player (boots only). Effects: six to eight gravel items popping up (block items, small cubes), one ender
-    pearl item, lantern light on the pile, hold after the line.
-    MINECRAFT TRUTH (the story check): one barter throws its loot ONCE, after a 119-tick admire (the film's own six
-      seconds), and gravel comes as ONE item entity of 8-16 (drawn as 2-3 cubes); three pit piglins give at most three
-      throws in this shot. So the pile is mostly ALREADY THERE on the first frame (the barters that came back across
-      the time skipped at the cut) and at most one more lands per pit piglin.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 511       four gravel stacks already round his boots, a fifth already in the air
-      "Mostly" 513 .. "gravel" 526   the 2nd and 3rd lobs land (one per pit piglin), the pile grows
-      to 559          the pile bobbing and turning; nothing else moves (the boots still, pt07's pearl among it)
-    NOW (stub): the set's six_boots_rim (40 mm f/2.8 low on the floor south-west of the boots), the pit dug, the
-      runner at rim_w (iron pickaxe back in his hand: a hold lasts), gravel stacks of 12 / 9 / 14 / 10 lying on
-      six_gravel_1 / 2 / 5 / 6 (C.rest(..., count=)), three more lobbed out of the pit (GRAVEL_LOBS: from home_pit_2 /
-      3 / 4 on 497 / 507 / 517, stacks of 11 / 13 / 8) to six_gravel_3 / 4 / 7, pt07's pearl. Hero: the boots.
-    MEASURED (the lead's probe): the three lobs come to rest on 518, 524 and 540 (the last on the end of "gravel"),
-      then nothing moves to the cut (19 frames); the pearl lies at x 83 %, y 53.5 % in this frame (at the safe area's
-      right edge). Earlier (out/test/sixseconds_set_b08_boots_rim.png): boots x 31-70 %, y 38-54 %; gravel reads as
-      grey cubes on blackstone (the story's gilded-rim fallback was NOT needed).
-    NEIGHBOURS: before, pt07_pearl; after, pt09_axe (the brute strides in behind him).
-    """
-    f0 = s.frame_start
+    """BEAT 8."""
+    f0, f1 = s.frame_start, s.frame_end
+    C.time_jump(f0)
     C.pit(s)
     runner = C.actor("runner", "pt")
     C.put(runner, f0, "rim_w")
-    runner.look_at(f0, Vector(C.P("home_pit_center")), ease=0)
+    runner.look_at(f0, Vector(PIT_AT[THROWER][0]) + Vector((0.0, 0.0, 1.0)), ease=0)
     runner.hold("iron_pickaxe", frame=f0)
     st.use(s, runner)
-    # the pile: the barters that came back across the time skipped at the cut already lie there (one entity of 8-16
-    # gravel each, as the game throws it), and one more per pit piglin pops out of the hole on the words
-    for k, n in zip(GRAVEL_LYING, (12, 9, 14, 10)):
-        C.rest(s, "gravel", "pt8_%d" % k, "six_gravel_%d" % k, count=n)
-    for k, (fl, src, n) in zip(GRAVEL_LOBBED, GRAVEL_LOBS):
-        g = C.item("gravel", "pt8_%d" % k, count=n)
-        start = Vector(C.P(src)) + Vector((0.0, 0.0, 1.25))
-        piglins.launch(g, fl, start, piglins.lob_velocity(start, C.P("six_gravel_%d" % k), world=C.bas),
-                       world=C.bas)
-        g.animate(fl, s.frame_end + 1)
-        st.use(s, g)
+    last = C.T["pt10_smoke"].frame_end + 1
+    pile = []
+    for k in PILE_LYING:
+        g = C.item("gravel", "pt8_%d" % (k + 1), count=PILE_COUNT[k])
+        g.place(f0, (PILE[k][0], PILE[k][1], 0.0), age=200.0 + 37.0 * k)
+        g.animate(f0, last)
+        pile.append(g)
+    lobs = []
+    for k, src, land in PILE_LOBS:
+        g = C.item("gravel", "pt8_%d" % (k + 1), count=PILE_COUNT[k])
+        fl, still = _lob(C, g, PIT_AT[src][0], (PILE[k][0], PILE[k][1], 0.0), land)
+        g.animate(fl, last)
+        pile.append(g)
+        lobs.append((fl, still))
+    C.memo["pt_pile"] = pile
+    C.memo["pt_lobs8"] = lobs
+    st.use(s, *pile)
     st.use(s, C.memo["pt_pearl"])               # pt07's pearl, still turning where it landed
-    C.cam(s, "set:six_boots_rim", focus=Vector(C.P("rim_w")) + Vector((0.0, 0.0, 0.15)))
+    C.cam(s, None, focus=Vector(C.P("rim_w")) + Vector((0.0, 0.0, 0.15)), **CAM8)
     st.hero(s, "boots", *C.boots_of(runner))
     C.lights(s, "pit")
 
 
 def pt09_axe(st, s, C, nar):
-    """BEAT 9  "I hit him with my axe."   frames 560-596 (37 f, 1.54 s), sky wastes. Words: I 562, hit 565, him 568,
-    with 571, my 575, axe 580 (ends 593).
-
-    STORY: Side-on medium at the rim: the brute strides into frame behind the player and swings the golden axe once.
-    The player flashes red and is knocked back off his feet. Cut on the knock-back. The only full swing in the film.
-    Cast: piglin brute, the player. Effects: golden axe swing, red hurt flash, knock-back, gravel pile at the rim.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 560       the brute already striding in from the left (brute_pt is pre-rolled: he is in no shot before)
-      "I hit him with my" 562-579   he closes in; the axe goes up (aggro)
-      "axe" 580-593   ONE swing and the blow (the game deals the damage on the swing's first tick: runner.hurt on
-                      the attack's frame): the red flash and the knock-back, and the CUT WHILE HE IS IN THE AIR
-      the whole shot  the gravel pile at his feet; the pit piglins still admiring
-    THE TIMING (the story check: a blow on "hit" 565 lands him on the floor about 577, 20 frames before the cut; the
-      lead measured Player.hurt): a knock-back of 0.25 keeps him in the air 8 frames and flies him 0.9 block; 0.4
-      (the default) 12 frames and 2 blocks; Player.hurt has no max_back. The stub: attack + hurt on PT09_HIT 590
-      (on "axe"), knockback 0.25: in the air 591-598, the cut on 597 catches him at 0.24 above the floor.
-      KNOWN CONFLICT, the director's call: home_strike is due WEST of him, so any knock-back throws him EAST, over the
-      open pit: x 3.60 -> 4.33 by 596 (the pit's edge is x 4.0: from 594 he is over the pit, in the air); pt10's puff
-      stands at rim_w. Options measured on paper: (a) as the stub, cut in the air over the pit's edge (the second,
-      unseen blow happens off screen); (b) the brute strikes from the NORTH rim (about (4.0, 8.3), on the floor beyond
-      the pit's corner): the knock-back goes south-south-west, onto the floor (he lands at about (3.3, 6.1) with
-      0.25), the brute is BEHIND him in depth from this camera (a new film anchor in films/sixseconds_set.py: ask the
-      lead; pt10 and pt20's "empty side" follow it).
-    NOW (stub): the set's six_rim_side (35 mm f/3 from the south), the pit dug, the runner at rim_w facing the pit
-      (iron pickaxe), the brute walking in from BRUTE_IN (0.95, 5.6) on 554 to strike (2.35, 7.0) by about 580, ONE
-      attack on 590 with the blow on 590, the three admiring in the pit, three gravel. Hero: the brute.
-    MEASURED (the lead's probe and geo; still out/test/sixseconds_scout_pt09_axe_595_zones.png): the brute enters
-      the frame's left edge about 568 (body x -3..33 % on 568), at strike by 580 (head x 19-40 %, y 34-43 %, 95 px);
-      the runner's eyes x 63 % on 590 -> 84 % on 596 (at the safe area's edge, red, in the air); the pit piglins'
-      heads x 72-132 %, y 63-81 %: IN THE CAPTION BAND and off the right edge (tilt the camera down / pan right a
-      little: it is this shot's own camera). Earlier (out/test/sixseconds_set_b09_rim_side.png): brute 2.62 x the
-      blackstone; pit piglin skin saturation 0.62 (AT the limit).
-    NEIGHBOURS: before, pt08_gravel; after, pt10_smoke (the same angle, a little wider).
-    """
-    f0 = s.frame_start
+    """BEAT 9."""
+    f0, f1 = s.frame_start, s.frame_end
     C.pit(s)
     runner = C.actor("runner", "pt")
     C.put(runner, f0, "rim_w")
-    runner.look_at(f0, Vector(C.P("home_pit_center")), ease=0)
+    runner.look_at(f0, Vector(PIT_AT[THROWER][0]) + Vector((0.0, 0.0, 1.0)), ease=0)
     runner.hold("iron_pickaxe", frame=f0)
+    runner.idle(f0, HIT9, seed=9)
     st.use(s, runner)
+    # the brute: pre-rolled (he is in no shot before), already charging from the gateway on 560, axe high
     brute = C.actor("brute", "pt")
-    # pre-rolled (he is in no shot before): already striding in from the left on 560, at strike by about 580
-    w0 = f0 - PT09_STRIDE_PRE
-    C.put(brute, w0, BRUTE_IN, toward="strike")
+    path = [BRUTE_RUN[0], BRUTE_RUN[1], STRIKE_N]
+    route = mobs._Route([Vector(p) for p in path], piglins.CORNER_RADIUS, 0.0)
+    ramp_in, ramp_out = 4.0, 4.0
+    n = max(2, int(round(route.total / (piglins.CHASE_SPEED / SC.FPS) + (ramp_in + ramp_out) / 2.0)))
+    w0 = HIT9 - n
+    brute.place(w0, path[0], _yaw_to(path[0], path[1]))
+    brute.aggro(w0)
     brute.look_at(w0, runner, ease=0)
-    brute.walk(w0, [BRUTE_IN, C.P("strike")], speed=1.94, ramp=(0, 4))
-    brute.flop_ears(w0, s.frame_end + 1)
-    brute.attack(PT09_SWING)                                  # ONE swing; the blow lands on PT09_HIT ("axe")
-    runner.hurt(PT09_HIT, from_point=Vector(C.P("strike")), knockback=PT09_KNOCK)
+    brute.walk(w0, path, run=True, ramp=(ramp_in, ramp_out))
+    brute.track(w0 + 1, HIT9, runner, step=3, ease=3)
+    brute.attack(HIT9)                                        # ONE swing; the game deals the blow on its first tick
+    runner.hurt(HIT9, from_point=Vector(STRIKE_N), knockback=KNOCK9)
+    brute.track(HIT9 + 1, f1, runner, step=2, ease=3)
+    brute.flop_ears(HIT9, f1 + 1)
     st.use(s, brute)
     _in_pit(st, s, C, _pigs(C))
-    for k in (1, 3, 5):
-        C.rest(s, "gravel", "pt9_%d" % k, "six_gravel_%d" % k)
-    C.cam(s, "set:six_rim_side", focus=brute.head)
+    st.use(s, *C.memo["pt_pile"])
+    st.use(s, C.memo["pt_pearl"])
+    C.cam(s, None, focus=brute.head, **CAM9)
     st.hero(s, "brute", brute)
     C.lights(s, "pit")
 
 
 def pt10_smoke(st, s, C, nar):
-    """BEAT 10  "He turned into smoke, and the whole world ended."   frames 597-667 (71 f, 2.96 s), sky wastes.
-    Words: He 599, turned 601, into 609, smoke 614, and 632, the 635, whole 637, world 645, ended 655 (ends 665).
-    THE RESET: from 655 to 667 the encoder shows BLACK with the caption "ended" held on it (films/sixseconds.py
-    RESETS): nothing after 654 is seen. The voice then rests 0.5 s (the story check: with 0.2 s "ended. New world"
-    ran together; the storyteller's beat after the end of a world), and br11's empty bridge comes up out of black on
-    668, in the silence, 9 frames before "New" (677).
-
-    STORY: Same angle, a little wider. The brute's axe is just coming down to rest from a second blow we did not see.
-    A white puff where the player was. Gravel, the iron pickaxe, the golden boots and one ender pearl scatter and spin
-    on the blackstone. In the pit the piglins are still looking at their ingots. On the word ended the picture snaps
-    to black and the caption word stays on the black for half a second.
-    Cast: piglin brute, three piglins in the pit, the player (vanishing). Effects: axe lowering (tail of a second
-    blow), white smoke puff, dropped items: gravel, iron pickaxe, golden boots, ender pearl, snap to black (the
-    picture for a reset), caption held on black.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 597       the axe coming down to rest (the tail of the second blow: aggro on, then lowered) and the puff
-                      already rising where he was (C.puff(s, "rim_w", f0 - 6): puffs in the air on the first frame)
-      "smoke" 614     the drops scattering (mobs DroppedItem.drop with a small velocity, from rim_w) and spinning
-      to 654          the piglins still heads-down over their ingots
-    RISK (story): "players know a brute needs two hits ... if it reads as a one-hit kill in the preview: put a
-      second red flash on the first two frames of sentence ten before the puff".
-    NOW (stub): the set's six_rim_wide (28 mm f/3.2, the same place as pt09), the pit dug, the brute at strike, the
-      puff, the drops lying on six_drop_boots / _pickaxe / _gravel / _pearl, the three admiring. Hero: the brute.
-    MEASURED (out/test/sixseconds_set_b10_rim_wide.png): brute x 23-40 %, y 36-45 %, 2.79 x the blackstone; the puff
-      at rim_w; the pit piglins low at the right.
-      THE LEAD'S GEO / STILL of the stub (pt10_smoke:626, out/test/sixseconds_scout_pt10_smoke_626_zones.png): the
-      three pit piglins' heads at x 67-112 %, y 59-71 %: IN THE CAPTION BAND and partly outside the right edge, so
-      "in the pit the piglins are still looking at their ingots" is not seen; the drops at y 52-60 %. Tilt the
-      camera down / pan right a little (it is this shot's own camera) or accept them as soft shapes under the word.
-      (pt09 at 575-578: the same: pit piglin heads y 62-81 %.)
-    THE PUFF'S PLACE: pt09's knock-back throws him EAST toward the pit's edge (see pt09's KNOWN CONFLICT); the stub's
-      puff stands at rim_w, where he stood. If pt09 keeps the cut in the air over the edge, put the puff where the
-      second blow found him (on the rim, about (3.85, 7.0)): never inside the pit, which holds the piglins.
-    NEIGHBOURS: before, pt09_axe; after (out of black), br11_boots on the bridge of another world.
-    """
-    f0 = s.frame_start
+    """BEAT 10."""
+    f0, f1 = s.frame_start, s.frame_end
+    C.time_jump(f0)
     C.pit(s)
     brute = C.actor("brute", "pt")
-    C.stand(s, brute, "strike", look="rim_w", idle=False)
-    C.puff(s, "rim_w", f0 - 6, seed=10)
-    for item, where in (("golden_boots", "six_drop_boots"), ("iron_pickaxe", "six_drop_pickaxe"),
-                        ("gravel", "six_drop_gravel"), ("ender_pearl", "six_drop_pearl")):
-        C.rest(s, item, "pt10", where)
+    brute.place(f0, BRUTE10, _yaw_to(BRUTE10, PUFF10))
+    brute.aggro(f0)                                           # the axe still up from the blow ...
+    brute.look_at(f0, Vector(PUFF10) + Vector((0.0, 0.0, 0.6)), ease=0)
+    brute.aggro(AXE_DOWN, on=False, ease=3)                   # ... coming down to rest: nobody to hit any more
+    for item, where in DROPS10:
+        C.rest(s, item, "pt10", where, face=CAM10["pos"], face_at=C.at(s, "smoke"))
+    brute.look_at(C.at(s, "smoke") - 2, Vector(PUFF10) + Vector((0.3, -0.2, 0.1)), ease=12)  # down to where he was
+    brute.flop_ears(f0, f1 + 1)
+    st.use(s, brute)
+    C.puff(s, PUFF10, f0 - 6, seed=10)
     _in_pit(st, s, C, _pigs(C))
-    C.cam(s, "set:six_rim_wide", focus=brute.head)
+    st.use(s, *C.memo["pt_pile"])
+    st.use(s, C.memo["pt_pearl"])
+    C.cam(s, None, focus=brute.head, ease="linear", **CAM10)
     st.hero(s, "brute", brute)
     C.lights(s, "pit")
 
 
 def pt20_likes(st, s, C, nar):
-    """BEAT 20  "In that bastion, everyone likes gold."   frames 1290-1357 (68 f, 2.83 s), sky wastes.
-    Words: In 1292, that 1294, bastion 1299, everyone 1319, likes 1328, gold 1334 (ends 1346).
-
-    STORY: High shot over the pit, the camera of sentence six: four piglins each hold an ingot up and stare at it. The
-    player stands on the rim, unhurried, ender pearls and gravel popping up around his golden boots. The side of the
-    frame where the brute walked in for sentence nine stays empty.
-    Location: the older version of the world (the home set, no brute). Cast: the player, four piglins in the pit.
-    Effects: four gold ingots in the admire pose, ender pearls and gravel popping out of the pit, golden boots,
-    deliberately empty space behind the player.
-
-    MUST BE SEEN, ON WHICH WORD
-      frame 1290      four piglins frozen over their ingots; a pearl or gravel already in the air
-      "everyone likes gold" 1319-1346   pearls and gravel landing round his boots on explicit floor points (see
-                      ENGINE NOTES; one throw per piglin, as in pt08); he stands at ease (an idle, a glance down)
-      the whole shot  the brute's side of the frame (west of the rim, toward home_strike) EMPTY
-    SHARED: CAMS["pit"] exactly (= pt06); PLACES "rim_w".
-    THE WORLD'S RULES: NO BRUTE (NO_BRUTE_SHOTS); the pit dug (C.pit).
-    NOW (stub): the pit camera, the pit dug, four piglins admiring on home_pit_1..4, the runner at rim_w with a gold
-      ingot in his hand (he is trading: set on the first frame), three gravel and a pearl lying at his feet. Hero: a
-      piglin.
-    MEASURED (out/test/sixseconds_set_b20_pit.png): four piglins admiring in the pit, the runner at the rim.
-    NEIGHBOURS: before, gt19_older (the match cut: the runner sprinted through the brute's spot); after, rw21_stare.
-    """
-    f0 = s.frame_start
+    """BEAT 20."""
+    f0, f1 = s.frame_start, s.frame_end
     C.pit(s)
     runner = C.actor("runner", "pt")
     C.put(runner, f0, "rim_w")
-    runner.look_at(f0, Vector(C.P("home_pit_center")), ease=0)
+    runner.look_at(f0, Vector(STACK20) + Vector((0.0, 0.0, 1.0)), ease=0)
     runner.hold("gold_ingot", frame=f0)          # he is trading: gold in his hand (set here: a hold lasts)
+    runner.idle(f0, f1 + 1, seed=20)
     st.use(s, runner)
     pigs = _pigs(C) + [C.actor("piglin", "pt4")]
-    south = C.Y.get("home_rim_n", 0.0)
-    for p, k in zip(pigs, (2, 4, 1, 3)):
-        C.put(p, f0, "home_pit_%d" % k, yaw=C.Y.get("home_rim_e", -1.571) if k in (2, 4) else south)
-        C.admire(s, p)
+    stack = C.rest(s, "gold_ingot", "pt20_stack", STACK20, count=64)
+    for k, (p, (at, faces)) in enumerate(zip(pigs, PIT20_AT)):
+        t = next(t for j, t, _r, _n, _w in THROWS20 if j == k)
+        start = min(f0, t - 12)                  # the one already throwing on 1290 is pre-rolled (not in gt19)
+        p.place(start, at, _yaw_to(at, faces))
+    for j, t, res, n, where in sorted(THROWS20, key=lambda r: r[1]):
+        p = pigs[j]
+        start = min(f0, t - 12)
+        item = C.item(res, "pt20_%d" % (j + 1), count=n)
+        beats = piglins.barter(p, None, start, item, toward=Vector(where), admire_ticks=(t - start) / piglins.TICK,
+                               world=C.bas, lob=True, face=SC.CAMS["pit"]["pos"], animate=f1 + 1 - t, seed=j)
+        st.use(s, item)
+        # ... and takes one more ingot off the stack lying in the pit: the next six seconds start
+        again = beats["throw"] + 8
+        if again <= f1 - 4:
+            one = C.item("gold_ingot", "pt20_take_%d" % (j + 1))
+            one.place(again - 1, STACK20)
+            st.use(s, one)
+            piglins.barter(p, one, again, result_item=None, world=C.bas)
     st.use(s, *pigs)
-    for k in (1, 3, 5):
-        C.rest(s, "gravel", "pt20_%d" % k, "six_gravel_%d" % k)
-    C.rest(s, "ender_pearl", "pt20", "pearl_rest")
-    C.cam(s, "pit")
+    st.use(s, stack)
+    C.cam(s, "pit", focus=Vector(C.P("home_pit_center")) + Vector((0.0, 0.0, 1.4)))
     st.hero(s, "piglin", pigs[0])
     C.lights(s, "pit")

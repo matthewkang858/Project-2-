@@ -5,8 +5,9 @@
         comes to rest against its shared spot six_bridge_ingot_k, and whether its flight clears the netherrack pillar
         (the pillar is not in the bastion's World, so piglins.item_track does not see it) and the brute's head
     $BPY -m tools.sixseconds_bridge_probe fly br14_zero:898-925[:STEP] [--cam "x,y,z>tx,ty,tz>lens"]
-        each ingot's position in the frame (x / y in % of a 540x960 frame, y from the top) frame by frame, with the
-        brute's eyes and the runner's eyes, for the shot's camera or a candidate one
+        each ingot's position in the frame (x / y in % of a 540x960 frame, y from the top) and the degrees between its
+        broad side and the lens (0 = broad side, 90 = edge-on) frame by frame, with the brute's eyes and the runner's
+        eyes, for the shot's camera or a candidate one
 Prefix with `nice -n 12 timeout 290`. One build of the sky "soul".
 """
 import math
@@ -110,7 +111,14 @@ def main(argv):
             p = it.spinner.matrix_world.translation
             vis = not it.copies[0].hide_render
             co = world_to_camera_view(scene, cam, p)
-            row.append("%s %5.1f %5.1f%s" % (it.name[-1], co.x * 100, (1 - co.y) * 100, "" if vis else " (hidden)"))
+            n = it.spinner.matrix_world.to_3x3() @ Vector((0.0, 1.0, 0.0))      # the sprite's face normal
+            to = cam.matrix_world.translation - p
+            n2, t2 = Vector((n.x, n.y)), Vector((to.x, to.y))
+            ang = 0.0
+            if n2.length > 1e-6:
+                ang = math.degrees(math.acos(min(1.0, abs(n2.normalized().dot(t2.normalized())))))
+            row.append("%s %5.1f %5.1f %2.0f%s" % (it.name[-1], co.x * 100, (1 - co.y) * 100, ang,
+                                                 "" if vis else " (hidden)"))
         for who in (brute, runner):
             if who is None:
                 continue

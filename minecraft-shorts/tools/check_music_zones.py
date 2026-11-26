@@ -10,7 +10,8 @@ For every declared frame it prints each face / prop as (x %, y %) of the frame, 
 block counts as hidden), and for faces the angle between the look and the lens (0 = straight at the lens, 90 =
 profile). A face is OK when its centre is inside the Reels safe area (x 8-82 %, y 14-60 %, CONTRACT.md "Composition
 rule"), at least 4 of 5 rays reach it, and it turns no more than 75 degrees from the lens; a prop when its centre is
-in the safe area and its ray reaches it; 'frame' things need only be inside the frame (x 5-95 %, y 0-100 %) and seen.
+in the safe area and its ray reaches it; 'head' = a face without the angle test (a profile is wanted); 'wide' =
+inside x 10-90 %, y 5-95 % and seen; 'frame' things need only be inside the frame (x 5-95 %, y 0-100 %) and seen.
 Exit code 1 when anything fails.
 """
 import math
@@ -21,6 +22,8 @@ from mathutils import Vector
 
 SAFE = (8.0, 82.0, 14.0, 60.0)
 INFRAME = (5.0, 95.0, 0.0, 100.0)
+WIDE = (10.0, 90.0, 5.0, 95.0)
+TRANSIENT = ("music_note_", "fx_")                        # particles: they pass in front for a few frames            # 'wide': inside the frame's width less the phone crop and a margin
 
 
 def _root(ob):
@@ -56,7 +59,9 @@ def _ray(scene, dg, origin, point, owner_roots, slack=0.12):
         return True, ""
     if _root(ob) in owner_roots or ob in owner_roots:
         return True, ob.name
-    return False, ob.name
+    if ob.name.startswith(TRANSIENT):                    # a note particle passing in front: seen a moment later
+        return True, ob.name + "(passing)"
+    return False, "%s@(%.1f,%.1f,%.1f)" % (ob.name, loc.x, loc.y, loc.z)
 
 
 def _inside(x, y, z, box):
@@ -92,13 +97,15 @@ def check(scene, film, zones, only=None):
                     for q in pts:
                         s, nm = _ray(scene, dg, cpos, q, owners)
                         seen.append(s)
-                        if not s and not first:
+                        if (not s or "(passing)" in nm) and not first:
                             first = nm
                     x, y, z = _project(scene, cam, eye)
                     ang = math.degrees(lv.angle((cpos - eye).normalized())) if lv.length > 0 else 0.0
                     nseen = sum(seen)
                     if kind == "face":
                         ok = _inside(x, y, z, SAFE) and nseen >= 4 and ang <= 75.0
+                    elif kind == "head":
+                        ok = _inside(x, y, z, SAFE) and nseen >= 4
                     elif kind == "frame":
                         ok = _inside(x, y, z, INFRAME) and nseen >= 3
                     else:
@@ -118,10 +125,15 @@ def check(scene, film, zones, only=None):
                         p = Vector(thing(frame) if callable(thing) else thing)
                         hidden = False
                     x, y, z = _project(scene, cam, p)
+                    size = ""
+                    if ob is not None and ob.type == "MESH":
+                        ev = ob.evaluated_get(dg)
+                        xs = [_project(scene, cam, ev.matrix_world @ v.co)[0] for v in ev.data.vertices]
+                        size = " w%.0f%%" % (max(xs) - min(xs))
                     s, nm = _ray(scene, dg, cpos, p, owners, slack=0.3)
-                    box = SAFE if kind == "prop" else INFRAME
+                    box = SAFE if kind == "prop" else (WIDE if kind == "wide" else INFRAME)
                     ok = (kind == "info") or (_inside(x, y, z, box) and s and not hidden)
-                    txt = "%s(%.0f,%.0f)%s%s" % (label, x, y, "" if s else " <" + nm, " HIDDEN" if hidden else "")
+                    txt = "%s(%.0f,%.0f)%s%s%s" % (label, x, y, size, "" if s else " <" + nm, " HIDDEN" if hidden else "")
                 row.append(("" if ok else "!!") + txt)
                 if not ok:
                     bad.append((shot, frame, label))

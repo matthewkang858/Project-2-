@@ -71,7 +71,7 @@ def _sky(sky, names, digest):
         ok("the note rises (frames %d, %d differ) and is gone from frame %d" % (end - 2, end - 1, end),
            a != b and b != c)
         s = shots["b5"]
-        lp = s.frame_start + 30
+        lp = h["b5_place"]
         a, b = take([lp - 1, lp])
         ok("the last lantern (block and light) appears ON frame %d, where Alex places it" % lp, a != b)
         ll = st.cast.get("music_last_lantern")
